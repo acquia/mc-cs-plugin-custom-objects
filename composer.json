@@ -1,0 +1,15 @@
+{
+    "name": "mautic/custom-objects-bundle",
+    "description": "This plugin adds custom objects feature.",
+    "type": "mautic-plugin",
+    "version": "1.0-dev",
+    "keywords": ["custom","mautic","plugin"],
+    "require": {
+      "php": "^7.1 || ^7.2",
+      "ext-mbstring": "*"
+    },
+    "minimum-stability": "dev",
+    "require-dev": {
+        "symplify/easy-coding-standard": "^4.6@dev"
+    }
+  }
