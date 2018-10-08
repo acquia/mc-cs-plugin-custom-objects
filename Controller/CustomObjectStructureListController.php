@@ -60,9 +60,9 @@ class CustomObjectStructureListController extends Controller
     public function listAction(int $page)
     {
         $request = $this->requestStack->getCurrentRequest();
-        $search  = $request->get('search', $this->session->get('custom.objects.filter', ''));
+        $search  = $request->get('search', $this->session->get('custom.object.structures.filter', ''));
 
-        $this->session->set('custom.objects.filter', $search);
+        $this->session->set('custom.object.structures.filter', $search);
 
         // @todo check permissions
 
@@ -71,7 +71,7 @@ class CustomObjectStructureListController extends Controller
         ];
 
         //set limits
-        $limit = $this->session->get('custom.objects.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
+        $limit = $this->session->get('custom.object.structures.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
@@ -79,8 +79,8 @@ class CustomObjectStructureListController extends Controller
 
         $filter = ['string' => $search];
 
-        $orderBy    = $this->session->get('custom.objects.orderby', 'c.title');
-        $orderByDir = $this->session->get('custom.objects.orderbydir', 'DESC');
+        $orderBy    = $this->session->get('custom.object.structures.orderby', 'c.title');
+        $orderByDir = $this->session->get('custom.object.structures.orderbydir', 'DESC');
 
         $entities = $this->customObjectStructureListModel->getEntities(
             [
@@ -101,7 +101,7 @@ class CustomObjectStructureListController extends Controller
                 $lastPage = (ceil($count / $limit)) ?: 1;
             }
             $viewParams['page'] = $lastPage;
-            $this->session->set('custom.objects.page', $lastPage);
+            $this->session->set('custom.object.structures.page', $lastPage);
             $returnUrl = $this->generateUrl('mautic_category_index', $viewParams);
 
             return $this->postActionRedirect(
@@ -117,7 +117,7 @@ class CustomObjectStructureListController extends Controller
             );
         }
 
-        $this->session->set('custom.objects.page', $page);
+        $this->session->set('custom.object.structures.page', $page);
 
         $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
         $template = 'CustomObjectsBundle:CustomObjectStructure:list.html.php';

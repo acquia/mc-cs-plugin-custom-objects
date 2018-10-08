@@ -157,7 +157,7 @@ class CustomObjectStructureActionController extends Controller
     private function redirectToList(Request $request)
     {
         $params = [
-            'page' => $this->session->get('custom.objects.page', 1),
+            'page' => $this->session->get('custom.object.structures.page', 1),
             'tmpl' => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
         ];
 

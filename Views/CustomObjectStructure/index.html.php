@@ -13,7 +13,7 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 
 $view['slots']->set('mauticContent', 'customObjectStructure');
 
-$view['slots']->set('headerTitle', $view['translator']->trans('custom.objects.title'));
+$view['slots']->set('headerTitle', $view['translator']->trans('custom.object.structure.title'));
 
 $view['slots']->set(
     'actions',
@@ -24,7 +24,7 @@ $view['slots']->set(
                 'new' => true//$view['security']->isGranted('plugin:mauticSocial:monitoring:create'),
             ],
             'routeBase' => 'custom_objects',
-            'langVar'   => 'custom.objects',
+            'langVar'   => 'custom.object.structures',
         ]
     )
 );

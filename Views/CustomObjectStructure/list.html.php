@@ -118,6 +118,6 @@ if ($tmpl == 'index') {
         ); ?>
     </div>
 <?php else: ?>
-    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php', ['tip' => 'custom.objects.noresults.tip']); ?>
+    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php', ['tip' => 'custom.object.structures.noresults.tip']); ?>
 <?php endif; ?>
 
