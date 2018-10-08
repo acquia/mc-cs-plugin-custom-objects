@@ -16,16 +16,16 @@ namespace MauticPlugin\CustomObjectsBundle\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectActionModel;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObjectStructure;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectStructureType;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectStructureActionModel;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Response;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Symfony\Component\Form\FormFactory;
-use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class CustomObjectActionController extends Controller
+class CustomObjectStructureActionController extends Controller
 {
     public function __construct(
         RequestStack $requestStack,
@@ -33,7 +33,7 @@ class CustomObjectActionController extends Controller
         Session $session,
         FormFactory $formFactory,
         TranslatorInterface $translator,
-        CustomObjectActionModel $customObjectActionModel
+        CustomObjectStructureActionModel $customObjectStructureActionModel
     )
     {
         $this->request = $requestStack->getCurrentRequest();
@@ -41,7 +41,7 @@ class CustomObjectActionController extends Controller
         $this->session = $session;
         $this->formFactory = $formFactory;
         $this->translator = $translator;
-        $this->customObjectActionModel = $customObjectActionModel;
+        $this->customObjectStructureActionModel = $customObjectStructureActionModel;
     }
 
     public function executeAction(string $objectAction, int $objectId)
@@ -59,9 +59,9 @@ class CustomObjectActionController extends Controller
      */
     private function newAction()
     {
-        $entity = new CustomObject();
+        $entity = new CustomObjectStructure();
         $action = $this->router->generate('mautic_custom_objects_action', ['objectAction' => 'new']);
-        $form   = $this->formFactory->create(CustomObjectType::class, $entity, ['action' => $action]);
+        $form   = $this->formFactory->create(CustomObjectStructureType::class, $entity, ['action' => $action]);
 
         if ($this->request->getMethod() == 'POST') {
             $cancelled = $this->request->request->get($form->getName().'[buttons][cancel]', false, true) !== false;
@@ -104,7 +104,7 @@ class CustomObjectActionController extends Controller
             }
         }
 
-        $template = 'CustomObjectsBundle:CustomObjects:form.html.php';
+        $template = 'CustomObjectsBundle:CustomObjectStructure:form.html.php';
         $parameters = [
             'entity' => $entity,
             'form'   => $form->createView(),
@@ -120,10 +120,10 @@ class CustomObjectActionController extends Controller
             'tmpl' => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
         ];
 
-        return $this->forward('custom_objects.list_controller:listAction', $params);
+        return $this->forward('custom_object_structures.list_controller:listAction', $params);
     }
 
-    private function redirectToDetail(CustomObject $entity)
+    private function redirectToDetail(CustomObjectStructure $entity)
     {
         $params = [
             'objectAction' => 'view',
@@ -131,6 +131,6 @@ class CustomObjectActionController extends Controller
             'tmpl'         => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
         ];
 
-        return $this->render('CustomObjectsBundle:CustomObjects:view.html.php', $params, new Response(''));
+        return $this->render('CustomObjectsBundle:CustomObjectStructure:view.html.php', $params, new Response(''));
     }
 }

@@ -10,15 +10,15 @@
  */
 $view->extend('MauticCoreBundle:Default:content.html.php');
 
-$view['slots']->set('mauticContent', 'customObject');
+$view['slots']->set('mauticContent', 'customObjectStructure');
 
 if ($entity->getId()) {
     $header = $view['translator']->trans(
-        'custom.object.edit',
+        'custom.object.structure.edit',
         ['%name%' => $view['translator']->trans($entity->getName())]
     );
 } else {
-    $header = $view['translator']->trans('custom.object.new');
+    $header = $view['translator']->trans('custom.object.structure.new');
 }
 
 $view['slots']->set('headerTitle', $header);
@@ -34,6 +34,7 @@ $view['slots']->set('headerTitle', $header);
             <div class="row">
                 <div class="col-md-4">
                     <?php echo $view['form']->row($form['name']); ?>
+                    <?php echo $view['form']->row($form['alias']); ?>
                     <?php echo $view['form']->row($form['description']); ?>
                 </div>
             </div>

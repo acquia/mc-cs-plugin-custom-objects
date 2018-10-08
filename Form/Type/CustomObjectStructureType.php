@@ -16,8 +16,10 @@ namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 
-class CustomObjectType extends AbstractType
+class CustomObjectStructureType extends AbstractType
 {
     /**
      * @param FormBuilderInterface $builder
@@ -27,35 +29,39 @@ class CustomObjectType extends AbstractType
     {
         $builder->add(
             'name',
-            'text',
+            TextType::class,
             [
-                'label'      => 'mautic.social.monitoring.twitter.tweet.name',
+                'label'      => 'custom.object.structure.name.label',
                 'required'   => true,
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'tooltip' => 'mautic.social.monitoring.twitter.tweet.name.tooltip',
-                    'class'   => 'form-control',
+                    'class' => 'form-control',
                 ],
-                'constraints' => [
-                    new NotBlank(
-                        [
-                            'message' => 'mautic.core.name.required',
-                        ]
-                    ),
+            ]
+        );
+
+        $builder->add(
+            'alias',
+            TextType::class,
+            [
+                'label'      => 'custom.object.structure.alias.label',
+                'required'   => true,
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class' => 'form-control',
                 ],
             ]
         );
 
         $builder->add(
             'description',
-            'textarea',
+            TextareaType::class,
             [
-                'label'      => 'mautic.social.monitoring.twitter.tweet.description',
+                'label'      => 'custom.object.structure.description.label',
                 'required'   => false,
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'tooltip' => 'mautic.social.monitoring.twitter.tweet.description.tooltip',
-                    'class'   => 'form-control',
+                    'class' => 'form-control',
                 ],
             ]
         );

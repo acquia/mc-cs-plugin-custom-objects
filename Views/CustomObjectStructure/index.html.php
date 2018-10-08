@@ -11,7 +11,7 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 
-$view['slots']->set('mauticContent', 'customObjects');
+$view['slots']->set('mauticContent', 'customObjectStructure');
 
 $view['slots']->set('headerTitle', $view['translator']->trans('custom.objects.title'));
 

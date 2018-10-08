@@ -17,23 +17,28 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectListModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectStructureListModel;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 
-class CustomObjectListController extends Controller
+class CustomObjectStructureListController extends Controller
 {
+    private $request;
+    private $session;
+    private $coreParametersHelper;
+    private $customObjectStructureListModel;
+
     public function __construct(
-        RequestStack $requestStack,
+        RequestStack $requestStack,// Can be 'request' Request?
         Session $session,
         CoreParametersHelper $coreParametersHelper,
-        CustomObjectListModel $customObjectListModel
+        CustomObjectStructureListModel $customObjectStructureListModel
     )
     {
         $this->request = $requestStack->getCurrentRequest();
         $this->session = $session;
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->customObjectListModel = $customObjectListModel;
+        $this->customObjectStructureListModel = $customObjectStructureListModel;
     }
 
     public function listAction(int $page)
@@ -60,7 +65,7 @@ class CustomObjectListController extends Controller
         $orderBy    = $this->session->get('custom.objects.orderby', 'c.title');
         $orderByDir = $this->session->get('custom.objects.orderbydir', 'DESC');
 
-        $entities = $this->customObjectListModel->getEntities(
+        $entities = $this->customObjectStructureListModel->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -98,7 +103,7 @@ class CustomObjectListController extends Controller
         $this->session->set('custom.objects.page', $page);
 
         $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
-        $template = 'CustomObjectsBundle:CustomObjects:list.html.php';
+        $template = 'CustomObjectsBundle:CustomObjectStructure:list.html.php';
         $parameters = [
             // 'permissionBase' => $permissionBase,
             'searchValue'    => $search,

@@ -13,14 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
-class CustomObjectListModel
+class CustomObjectStructureActionModel
 {
     public function __construct()
     {
-    }
-
-    public function getEntities($filter)
-    {
-
     }
 }

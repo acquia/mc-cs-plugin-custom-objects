@@ -20,36 +20,36 @@ return [
     'routes' => [
         'main' => [
             'custom_objects_list' => [
-                'path'       => '/custom/objects/{page}',
-                'controller' => 'custom_objects.list_controller:listAction',
+                'path'       => '/custom/object/structures/{page}',
+                'controller' => 'custom_object_structures.list_controller:listAction',
             ],
             'mautic_custom_objects_action' => [
-                'path'       => '/custom/objects/{objectAction}/{objectId}',
-                'controller' => 'custom_objects.action_controller:executeAction',
+                'path'       => '/custom/object/structures/{objectAction}/{objectId}',
+                'controller' => 'custom_object_structures.action_controller:executeAction',
             ],
         ],
     ],
 
     'menu' => [
         'admin' => [
-            'custom.objects.title' => [
-                'route'     => 'custom_objects_index',
-                'access'    => 'custom_objects:objects:view',
+            'custom.object.structures.title' => [
+                'route'     => 'custom_object_structures_index',
+                'access'    => 'custom_object_structures:objects:view',
                 'iconClass' => 'fa-list-alt',
-                'id'        => 'custom_objects_index',
+                'id'        => 'custom_object_structures_index',
             ],
         ],
     ],
 
     'services' => [
         'controllers' => [
-            'custom_objects.list_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectListController::class,
+            'custom_object_structures.list_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectStructureListController::class,
                 'arguments' => [
                     'request_stack',
                     'session',
                     'mautic.helper.core_parameters',
-                    'custom_objects.model.list',
+                    'custom_object_structures.model.list',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -57,15 +57,15 @@ return [
                     ]
                 ]
             ],
-            'custom_objects.action_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectActionController::class,
+            'custom_object_structures.action_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectStructureActionController::class,
                 'arguments' => [
                     'request_stack',
                     'router',
                     'session',
                     'form.factory',
                     'translator',
-                    'custom_objects.model.action',
+                    'custom_object_structures.model.action',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -75,13 +75,13 @@ return [
             ],
         ],
         'models' => [
-            'custom_objects.model.list' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomObjectListModel::class,
+            'custom_object_structures.model.list' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomObjectStructureListModel::class,
                 'arguments' => [
                 ],
             ],
-            'custom_objects.model.action' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomObjectActionModel::class,
+            'custom_object_structures.model.action' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomObjectStructureActionModel::class,
                 'arguments' => [
                 ],
             ],
