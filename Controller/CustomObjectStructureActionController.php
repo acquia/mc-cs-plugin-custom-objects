@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObjectStructure;
@@ -24,9 +23,40 @@ use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 class CustomObjectStructureActionController extends Controller
 {
+    /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
+    /**
+     * @var Router
+     */
+    private $router;
+
+    /**
+     * @var Session
+     */
+    private $session;
+
+    /**
+     * @var FormFactory
+     */
+    private $formFactory;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var CustomObjectStructureActionModel
+     */
+    private $customObjectStructureActionModel;
+
     public function __construct(
         RequestStack $requestStack,
         Router $router,
@@ -36,7 +66,7 @@ class CustomObjectStructureActionController extends Controller
         CustomObjectStructureActionModel $customObjectStructureActionModel
     )
     {
-        $this->request = $requestStack->getCurrentRequest();
+        $this->requestStack = $requestStack;
         $this->router = $router;
         $this->session = $session;
         $this->formFactory = $formFactory;
@@ -44,6 +74,16 @@ class CustomObjectStructureActionController extends Controller
         $this->customObjectStructureActionModel = $customObjectStructureActionModel;
     }
 
+    /**
+     * Calls correct action method in this controller.
+     *
+     * @param string $objectAction
+     * @param integer $objectId
+     * 
+     * @return ???
+     * 
+     * @throws \UnexpectedValueException
+     */
     public function executeAction(string $objectAction, int $objectId)
     {
         $methodName = $objectAction.'Action';
@@ -59,18 +99,19 @@ class CustomObjectStructureActionController extends Controller
      */
     private function newAction()
     {
-        $entity = new CustomObjectStructure();
-        $action = $this->router->generate('mautic_custom_objects_action', ['objectAction' => 'new']);
-        $form   = $this->formFactory->create(CustomObjectStructureType::class, $entity, ['action' => $action]);
+        $request = $this->requestStack->getCurrentRequest();
+        $entity  = new CustomObjectStructure();
+        $action  = $this->router->generate('mautic_custom_objects_action', ['objectAction' => 'new']);
+        $form    = $this->formFactory->create(CustomObjectStructureType::class, $entity, ['action' => $action]);
 
-        if ($this->request->getMethod() == 'POST') {
-            $cancelled = $this->request->request->get($form->getName().'[buttons][cancel]', false, true) !== false;
+        if ($request->getMethod() == 'POST') {
+            $cancelled = $request->request->get($form->getName().'[buttons][cancel]', false, true) !== false;
 
             if ($cancelled) {
-                return $this->redirectToList();
+                return $this->redirectToList($request);
             }
 
-            $form->handleRequest($this->request);
+            $form->handleRequest($request);
             
             $valid       = $form->isValid();
             $saveClicked = $form->get('buttons')->get('save')->isClicked();
@@ -97,7 +138,7 @@ class CustomObjectStructureActionController extends Controller
                 );
 
                 if (!$saveClicked) {
-                    return $this->redirectToDetail($entity);
+                    return $this->redirectToDetail($request, $entity);
                 } else {
                     return $this->editAction($entity->getId(), true);
                 }
@@ -113,22 +154,22 @@ class CustomObjectStructureActionController extends Controller
         return $this->render($template, $parameters, new Response(''));
     }
 
-    private function redirectToList()
+    private function redirectToList(Request $request)
     {
         $params = [
             'page' => $this->session->get('custom.objects.page', 1),
-            'tmpl' => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
+            'tmpl' => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
         ];
 
         return $this->forward('custom_object_structures.list_controller:listAction', $params);
     }
 
-    private function redirectToDetail(CustomObjectStructure $entity)
+    private function redirectToDetail(Request $request, CustomObjectStructure $entity)
     {
         $params = [
             'objectAction' => 'view',
             'objectId'     => $entity->getId(),
-            'tmpl'         => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
+            'tmpl'         => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
         ];
 
         return $this->render('CustomObjectsBundle:CustomObjectStructure:view.html.php', $params, new Response(''));

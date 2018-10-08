@@ -20,22 +20,38 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectStructureListModel;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
+use Predis\Protocol\Text\RequestSerializer;
 
 class CustomObjectStructureListController extends Controller
 {
-    private $request;
+    /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
+    /**
+     * @var Session
+     */
     private $session;
+
+    /**
+     * @var CoreParametersHelper
+     */
     private $coreParametersHelper;
+
+    /**
+     * @var CustomObjectStructureListModel
+     */
     private $customObjectStructureListModel;
 
     public function __construct(
-        RequestStack $requestStack,// Can be 'request' Request?
+        RequestStack $requestStack,
         Session $session,
         CoreParametersHelper $coreParametersHelper,
         CustomObjectStructureListModel $customObjectStructureListModel
     )
     {
-        $this->request = $requestStack->getCurrentRequest();
+        $this->requestStack = $requestStack;
         $this->session = $session;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->customObjectStructureListModel = $customObjectStructureListModel;
@@ -43,7 +59,8 @@ class CustomObjectStructureListController extends Controller
 
     public function listAction(int $page)
     {
-        $search = $this->request->get('search', $this->session->get('custom.objects.filter', ''));
+        $request = $this->requestStack->getCurrentRequest();
+        $search  = $request->get('search', $this->session->get('custom.objects.filter', ''));
 
         $this->session->set('custom.objects.filter', $search);
 
@@ -102,7 +119,7 @@ class CustomObjectStructureListController extends Controller
 
         $this->session->set('custom.objects.page', $page);
 
-        $tmpl = $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index';
+        $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
         $template = 'CustomObjectsBundle:CustomObjectStructure:list.html.php';
         $parameters = [
             // 'permissionBase' => $permissionBase,
