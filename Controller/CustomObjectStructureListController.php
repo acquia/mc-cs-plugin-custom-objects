@@ -18,11 +18,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectStructureListModel;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Response;
 use Predis\Protocol\Text\RequestSerializer;
+use Mautic\CoreBundle\Controller\CommonController;
 
-class CustomObjectStructureListController extends Controller
+class CustomObjectStructureListController extends CommonController
 {
     /**
      * @var RequestStack
@@ -35,15 +34,16 @@ class CustomObjectStructureListController extends Controller
     private $session;
 
     /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    /**
      * @var CustomObjectStructureListModel
      */
     private $customObjectStructureListModel;
 
+    /**
+     * @param RequestStack $requestStack
+     * @param Session $session
+     * @param CoreParametersHelper $coreParametersHelper
+     * @param CustomObjectStructureListModel $customObjectStructureListModel
+     */
     public function __construct(
         RequestStack $requestStack,
         Session $session,
@@ -51,12 +51,16 @@ class CustomObjectStructureListController extends Controller
         CustomObjectStructureListModel $customObjectStructureListModel
     )
     {
-        $this->requestStack = $requestStack;
-        $this->session = $session;
-        $this->coreParametersHelper = $coreParametersHelper;
+        $this->requestStack                   = $requestStack;
+        $this->session                        = $session;
+        $this->coreParametersHelper           = $coreParametersHelper;
         $this->customObjectStructureListModel = $customObjectStructureListModel;
     }
 
+    /**
+     * @param integer $page
+     * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse
+     */
     public function listAction(int $page)
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -93,6 +97,8 @@ class CustomObjectStructureListController extends Controller
         );
 
         $count = count($entities);
+        $route = $this->generateUrl('mautic_custom_object_structures_list', $viewParams);
+
         if ($count && $count < ($start + 1)) {
             //the number of entities are now less then the current page so redirect to the last page
             if ($count === 1) {
@@ -102,11 +108,11 @@ class CustomObjectStructureListController extends Controller
             }
             $viewParams['page'] = $lastPage;
             $this->session->set('custom.object.structures.page', $lastPage);
-            $returnUrl = $this->generateUrl('mautic_category_index', $viewParams);
+            $route = $this->generateUrl('mautic_custom_object_structures_list', $viewParams);
 
             return $this->postActionRedirect(
                 [
-                    'returnUrl'       => $returnUrl,
+                    'returnUrl'       => $route,
                     'viewParameters'  => ['page' => $lastPage],
                     'contentTemplate' => 'MauticCategoryBundle:Category:index',
                     'passthroughVars' => [
@@ -119,39 +125,20 @@ class CustomObjectStructureListController extends Controller
 
         $this->session->set('custom.object.structures.page', $page);
 
-        $tmpl = $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index';
-        $template = 'CustomObjectsBundle:CustomObjectStructure:list.html.php';
-        $parameters = [
-            // 'permissionBase' => $permissionBase,
-            'searchValue'    => $search,
-            'items'          => $entities,
-            'page'           => $page,
-            'limit'          => $limit,
-            // 'permissions'    => $permissions,
-            'tmpl'           => $tmpl,
-        ];
-
-        return $this->render($template, $parameters, new Response(''));
-
         return $this->delegateView(
             [
-                'returnUrl'      => $this->generateUrl('mautic_category_index', $viewParams),
+                'returnUrl'      => $route,
                 'viewParameters' => [
-                    'bundle'         => $bundle,
-                    'permissionBase' => $permissionBase,
                     'searchValue'    => $search,
                     'items'          => $entities,
                     'page'           => $page,
                     'limit'          => $limit,
-                    'permissions'    => $permissions,
-                    'tmpl'           => $tmpl,
-                    'categoryTypes'  => $categoryTypes,
+                    'tmpl'           => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                 ],
-                'contentTemplate' => 'MauticCategoryBundle:Category:list.html.php',
+                'contentTemplate' => 'CustomObjectsBundle:CustomObjectStructureList:list.html.php',
                 'passthroughVars' => [
-                    'activeLink'    => '#mautic_'.$bundle.'category_index',
-                    'mauticContent' => 'category',
-                    'route'         => $this->generateUrl('mautic_category_index', $viewParams),
+                    'mauticContent' => 'customObjectStructure',
+                    'route'         => $route,
                 ],
             ]
         );

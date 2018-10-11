@@ -68,7 +68,10 @@ class CustomObjectStructureType extends AbstractType
 
         $builder->add(
             'buttons',
-            'form_buttons'
+            'form_buttons',
+            [
+                'cancel_onclick' => "mQuery('form[name=custom_object_structure]').attr('action', mQuery('form[name=custom_object_structure]').attr('action').replace('/new', '/cancel'));",
+            ]
         );
 
         $builder->setAction($options['action']);

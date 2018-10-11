@@ -23,7 +23,8 @@ $view['slots']->set(
             'templateButtons' => [
                 'new' => true//$view['security']->isGranted('plugin:mauticSocial:monitoring:create'),
             ],
-            'routeBase' => 'custom_objects',
+            'routeBase' => 'custom_object_structures',
+            'actionRoute' => 'mautic_custom_object_structures_new',
             'langVar'   => 'custom.object.structures',
         ]
     )

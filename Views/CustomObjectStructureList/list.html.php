@@ -10,7 +10,7 @@
  */
 
 if ($tmpl == 'index') {
-    $view->extend('CustomObjectsBundle:CustomObjectStructure:index.html.php');
+    $view->extend('CustomObjectsBundle:CustomObjectStructureList:index.html.php');
 }
 ?>
 <?php if (count($items)): ?>
@@ -65,8 +65,8 @@ if ($tmpl == 'index') {
                             [
                                 'item'            => $item,
                                 'templateButtons' => [
-                                    'edit'   => $view['security']->isGranted('plugin:mauticSocial:monitoring:edit'),
-                                    'delete' => $view['security']->isGranted('plugin:mauticSocial:monitoring:delete'),
+                                    'edit'   => true,//$view['security']->isGranted('plugin:mauticSocial:monitoring:edit'),
+                                    'delete' => true,$view['security']->isGranted('plugin:mauticSocial:monitoring:delete'),
                                 ],
                                 'routeBase'  => 'social',
                                 'langVar'    => 'mautic.social.monitoring',

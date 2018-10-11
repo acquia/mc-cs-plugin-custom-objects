@@ -19,24 +19,30 @@ return [
 
     'routes' => [
         'main' => [
-            'custom_objects_list' => [
+            'mautic_custom_object_structures_list' => [
                 'path'       => '/custom/object/structures/{page}',
                 'controller' => 'custom_object_structures.list_controller:listAction',
             ],
-            'mautic_custom_objects_action' => [
-                'path'       => '/custom/object/structures/{objectAction}/{objectId}',
-                'controller' => 'custom_object_structures.action_controller:executeAction',
+            'mautic_custom_object_structures_new' => [
+                'path'       => '/custom/object/structures/new',
+                'controller' => 'custom_object_structures.new_controller:renderForm',
+                'method'     => 'GET',
+            ],
+            'mautic_custom_object_structures_cancel' => [
+                'path'       => '/custom/object/structures/cancel',
+                'controller' => 'custom_object_structures.cancel_controller:redirectToList',
+                'method'     => 'POST',
             ],
         ],
     ],
 
     'menu' => [
         'admin' => [
-            'custom.object.structures.title' => [
-                'route'     => 'custom_object_structures_index',
+            'custom.object.structure.title' => [
+                'route'     => 'mautic_custom_object_structures_list',
                 'access'    => 'custom_object_structures:objects:view',
                 'iconClass' => 'fa-list-alt',
-                'id'        => 'custom_object_structures_index',
+                'id'        => 'mautic_custom_object_structures_list',
             ],
         ],
     ],
@@ -57,14 +63,26 @@ return [
                     ]
                 ]
             ],
-            'custom_object_structures.action_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectStructureActionController::class,
+            'custom_object_structures.new_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectStructureNewController::class,
                 'arguments' => [
                     'request_stack',
                     'router',
                     'session',
                     'form.factory',
                     'translator',
+                    'custom_object_structures.model.action',
+                ],
+                'methodCalls' => [
+                    'setContainer' => [
+                        '@service_container'
+                    ]
+                ]
+            ],
+            'custom_object_structures.cancel_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectStructureCancelController::class,
+                'arguments' => [
+                    'session',
                     'custom_object_structures.model.action',
                 ],
                 'methodCalls' => [
