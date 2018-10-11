@@ -18,6 +18,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObjectStructure;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class CustomObjectStructureType extends AbstractType
 {
@@ -70,10 +72,28 @@ class CustomObjectStructureType extends AbstractType
             'buttons',
             'form_buttons',
             [
-                'cancel_onclick' => "mQuery('form[name=custom_object_structure]').attr('action', mQuery('form[name=custom_object_structure]').attr('action').replace('/new', '/cancel'));",
+                'cancel_onclick' => "mQuery('form[name=custom_object_structure]').attr('action', mQuery('form[name=custom_object_structure]').attr('action').replace('/save', '/cancel'));",
             ]
         );
 
         $builder->setAction($options['action']);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(
+            [
+                'data_class'        => CustomObjectStructure::class,
+                'validation_groups' => [
+                    CustomObjectStructure::class,
+                    'determineValidationGroups',
+                ],
+                // 'ignore_formexit' => false,
+                // 'in_profile'      => false,
+            ]
+        );
     }
 }

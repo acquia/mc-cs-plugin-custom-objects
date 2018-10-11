@@ -33,6 +33,11 @@ return [
                 'controller' => 'custom_object_structures.cancel_controller:redirectToList',
                 'method'     => 'POST',
             ],
+            'mautic_custom_object_structures_save' => [
+                'path'       => '/custom/object/structures/save',
+                'controller' => 'custom_object_structures.save_controller:save',
+                'method'     => 'POST',
+            ],
         ],
     ],
 
@@ -65,6 +70,18 @@ return [
             ],
             'custom_object_structures.new_controller' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectStructureNewController::class,
+                'arguments' => [
+                    'router',
+                    'form.factory',
+                ],
+                'methodCalls' => [
+                    'setContainer' => [
+                        '@service_container'
+                    ]
+                ]
+            ],
+            'custom_object_structures.save_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectStructureSaveController::class,
                 'arguments' => [
                     'request_stack',
                     'router',
@@ -101,6 +118,7 @@ return [
             'custom_object_structures.model.action' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomObjectStructureActionModel::class,
                 'arguments' => [
+                    'doctrine.orm.entity_manager',
                 ],
             ],
         ],

@@ -13,9 +13,34 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObjectStructure;
+use Doctrine\ORM\EntityManager;
+
 class CustomObjectStructureActionModel
 {
-    public function __construct()
+    /**
+     * @var EntityManager
+     */
+    private $entityManager;
+
+    /**
+     * @param EntityManager $entityManager
+     */
+    public function __construct(EntityManager $entityManager)
     {
+        $this->entityManager = $entityManager;
+    }
+
+    /**
+     * @param CustomObjectStructure $entity
+     * 
+     * @return CustomObjectStructure
+     */
+    public function saveEntity(CustomObjectStructure $entity): CustomObjectStructure
+    {
+        $this->entityManager->persist($entity);
+        $this->entityManager->flush();
+
+        return $entity;
     }
 }

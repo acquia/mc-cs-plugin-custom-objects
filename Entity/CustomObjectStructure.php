@@ -82,21 +82,11 @@ class CustomObjectStructure extends FormEntity
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata)
     {
-        $metadata->addPropertyConstraint('name', new Assert\Length(
-            [
-                'max' => 255,
-            ]
-        ));
-        
-        $metadata->addPropertyConstraint('alias', new Assert\Length(
-            [
-                'max' => 255,
-            ]
-        ));
-            
+        $metadata->addPropertyConstraint('name', new Assert\Length(['max' => 255]));
         $metadata->addPropertyConstraint('name', new Assert\Required());
+        $metadata->addPropertyConstraint('alias', new Assert\Length(['max' => 255]));
         $metadata->addPropertyConstraint('alias', new Assert\Required());
-
+        $metadata->addPropertyConstraint('description', new Assert\Length(['max' => 65535]));
     }
 
     /**
@@ -108,6 +98,15 @@ class CustomObjectStructure extends FormEntity
     }
 
     /**
+     * @param string $name
+     */
+    public function setName(string $name): void
+    {
+        $this->isChanged('name', $name);
+        $this->name = $name;
+    }
+
+    /**
      * @return string|null
      */
     public function getName(): ?string
@@ -116,11 +115,29 @@ class CustomObjectStructure extends FormEntity
     }
 
     /**
+     * @param string $alias
+     */
+    public function setAlias(string $alias): void
+    {
+        $this->isChanged('alias', $alias);
+        $this->alias = $alias;
+    }
+
+    /**
      * @return string|null
      */
     public function getAlias(): ?string
     {
         return $this->alias;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription(string $description): void
+    {
+        $this->isChanged('description', $description);
+        $this->description = $description;
     }
 
     /**

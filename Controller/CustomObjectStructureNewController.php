@@ -13,15 +13,11 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller;
 
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObjectStructure;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectStructureType;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectStructureActionModel;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -29,19 +25,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class CustomObjectStructureNewController extends CommonController
 {
     /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
      * @var Router
      */
     private $router;
-
-    /**
-     * @var Session
-     */
-    private $session;
 
     /**
      * @var FormFactory
@@ -49,25 +35,16 @@ class CustomObjectStructureNewController extends CommonController
     private $formFactory;
 
     /**
-     * @var CustomObjectStructureActionModel
+     * @param Router $router
+     * @param FormFactory $formFactory
      */
-    private $customObjectStructureActionModel;
-
     public function __construct(
-        RequestStack $requestStack,
         Router $router,
-        Session $session,
-        FormFactory $formFactory,
-        TranslatorInterface $translator,
-        CustomObjectStructureActionModel $customObjectStructureActionModel
+        FormFactory $formFactory
     )
     {
-        $this->requestStack                     = $requestStack;
-        $this->router                           = $router;
-        $this->session                          = $session;
-        $this->formFactory                      = $formFactory;
-        $this->translator                       = $translator;
-        $this->customObjectStructureActionModel = $customObjectStructureActionModel;
+        $this->router      = $router;
+        $this->formFactory = $formFactory;
     }
 
     /**
@@ -77,9 +54,8 @@ class CustomObjectStructureNewController extends CommonController
      */
     public function renderForm()
     {
-        $request = $this->requestStack->getCurrentRequest();
         $entity  = new CustomObjectStructure();
-        $action  = $this->router->generate('mautic_custom_object_structures_new');
+        $action  = $this->router->generate('mautic_custom_object_structures_save');
         $form    = $this->formFactory->create(CustomObjectStructureType::class, $entity, ['action' => $action]);
 
         return $this->delegateView(
@@ -88,7 +64,6 @@ class CustomObjectStructureNewController extends CommonController
                 'viewParameters' => [
                     'entity' => $entity,
                     'form'   => $form->createView(),
-                    // 'tmpl'   => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomObjectStructureAction:form.html.php',
                 'passthroughVars' => [
