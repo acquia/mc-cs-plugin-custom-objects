@@ -17,13 +17,14 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObjectStructure;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectStructureType;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectStructureActionModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectStructureModel;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Controller\CommonController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class CustomObjectStructureSaveController extends CommonController
 {
@@ -48,9 +49,9 @@ class CustomObjectStructureSaveController extends CommonController
     private $formFactory;
 
     /**
-     * @var CustomObjectStructureActionModel
+     * @var CustomObjectStructureModel
      */
-    private $customObjectStructureActionModel;
+    private $customObjectStructureModel;
 
     public function __construct(
         RequestStack $requestStack,
@@ -58,7 +59,7 @@ class CustomObjectStructureSaveController extends CommonController
         Session $session,
         FormFactory $formFactory,
         TranslatorInterface $translator,
-        CustomObjectStructureActionModel $customObjectStructureActionModel
+        CustomObjectStructureModel $customObjectStructureModel
     )
     {
         $this->requestStack                     = $requestStack;
@@ -66,18 +67,18 @@ class CustomObjectStructureSaveController extends CommonController
         $this->session                          = $session;
         $this->formFactory                      = $formFactory;
         $this->translator                       = $translator;
-        $this->customObjectStructureActionModel = $customObjectStructureActionModel;
+        $this->customObjectStructureModel = $customObjectStructureModel;
     }
 
     /**
      * @todo implement permissions
      * 
-     * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse
+     * @return Response|JsonResponse
      */
     public function save()
     {
-        $request = $this->requestStack->getCurrentRequest();
         $entity  = new CustomObjectStructure();
+        $request = $this->requestStack->getCurrentRequest();
         $action  = $this->router->generate('mautic_custom_object_structures_save');
         $form    = $this->formFactory->create(CustomObjectStructureType::class, $entity, ['action' => $action]);
 
@@ -87,7 +88,7 @@ class CustomObjectStructureSaveController extends CommonController
         // $errors = $validator->validate($entity);
         
         if ($form->isValid()) {
-            $this->customObjectStructureActionModel->saveEntity($entity);
+            $this->customObjectStructureModel->save($entity);
 
             // $this->session->getFlashBag()->add(
             //     'notice',

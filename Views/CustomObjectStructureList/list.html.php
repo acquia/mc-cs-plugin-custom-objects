@@ -23,9 +23,9 @@ if ($tmpl == 'index') {
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
                         'checkall'        => 'true',
-                        'target'          => '#monitoringTable',
-                        'langVar'         => 'mautic.social.monitoring',
-                        'routeBase'       => 'social',
+                        'target'          => '#custom-objects-table',
+                        'langVar'         => 'custom.object.structures',
+                        'routeBase'       => 'custom_object_structures',
                         'templateButtons' => [
                             // 'delete' => $view['security']->isGranted('plugin:mauticSocial:monitoring:delete'),
                         ],
@@ -35,10 +35,10 @@ if ($tmpl == 'index') {
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'sessionVar' => 'social.monitoring',
-                        'orderBy'    => 'e.title',
-                        'text'       => 'mautic.core.title',
-                        'class'      => 'col-monitoring-title',
+                        'sessionVar' => 'custom.object.structures',
+                        'orderBy'    => 'e.name',
+                        'text'       => 'mautic.core.name',
+                        'class'      => 'col-custom_object_structure-name',
                         'default'    => true,
                     ]
                 );
@@ -46,7 +46,7 @@ if ($tmpl == 'index') {
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'sessionVar' => 'social.monitoring',
+                        'sessionVar' => 'custom.object.structures',
                         'orderBy'    => 'e.id',
                         'text'       => 'mautic.core.id',
                         'class'      => 'visible-md visible-lg col-asset-id',
@@ -65,12 +65,12 @@ if ($tmpl == 'index') {
                             [
                                 'item'            => $item,
                                 'templateButtons' => [
-                                    'edit'   => true,//$view['security']->isGranted('plugin:mauticSocial:monitoring:edit'),
-                                    'delete' => true,$view['security']->isGranted('plugin:mauticSocial:monitoring:delete'),
+                                    // 'edit'   => true,//$view['security']->isGranted('plugin:mauticSocial:monitoring:edit'),
+                            //         'delete' => true,//$view['security']->isGranted('plugin:mauticSocial:monitoring:delete'),
                                 ],
-                                'routeBase'  => 'social',
-                                'langVar'    => 'mautic.social.monitoring',
-                                'nameGetter' => 'getTitle',
+                                'routeBase'  => 'custom_object_structures',
+                                'langVar'    => 'custom.object.structures',
+                                'nameGetter' => 'getName',
                             ]
                         );
                         ?>
@@ -89,7 +89,7 @@ if ($tmpl == 'index') {
                                 ['objectAction' => 'view', 'objectId' => $item->getId()]
                             ); ?>"
                                data-toggle="ajax">
-                                <?php echo $item->getTitle(); ?>
+                                <?php echo $item->getName(); ?>
                             </a>
                         </div>
                         <?php if ($description = $item->getDescription()): ?>

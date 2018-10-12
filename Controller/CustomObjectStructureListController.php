@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectStructureListModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectStructureModel;
 use Predis\Protocol\Text\RequestSerializer;
 use Mautic\CoreBundle\Controller\CommonController;
 
@@ -34,27 +34,27 @@ class CustomObjectStructureListController extends CommonController
     private $session;
 
     /**
-     * @var CustomObjectStructureListModel
+     * @var CustomObjectStructureModel
      */
-    private $customObjectStructureListModel;
+    private $customObjectStructureModel;
 
     /**
      * @param RequestStack $requestStack
      * @param Session $session
      * @param CoreParametersHelper $coreParametersHelper
-     * @param CustomObjectStructureListModel $customObjectStructureListModel
+     * @param CustomObjectStructureModel $customObjectStructureModel
      */
     public function __construct(
         RequestStack $requestStack,
         Session $session,
         CoreParametersHelper $coreParametersHelper,
-        CustomObjectStructureListModel $customObjectStructureListModel
+        CustomObjectStructureModel $customObjectStructureModel
     )
     {
-        $this->requestStack                   = $requestStack;
-        $this->session                        = $session;
-        $this->coreParametersHelper           = $coreParametersHelper;
-        $this->customObjectStructureListModel = $customObjectStructureListModel;
+        $this->requestStack               = $requestStack;
+        $this->session                    = $session;
+        $this->coreParametersHelper       = $coreParametersHelper;
+        $this->customObjectStructureModel = $customObjectStructureModel;
     }
 
     /**
@@ -83,10 +83,10 @@ class CustomObjectStructureListController extends CommonController
 
         $filter = ['string' => $search];
 
-        $orderBy    = $this->session->get('custom.object.structures.orderby', 'c.title');
+        $orderBy    = $this->session->get('custom.object.structures.orderby', 'e.id');
         $orderByDir = $this->session->get('custom.object.structures.orderbydir', 'DESC');
 
-        $entities = $this->customObjectStructureListModel->getEntities(
+        $entities = $this->customObjectStructureModel->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,

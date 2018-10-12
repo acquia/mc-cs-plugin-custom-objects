@@ -86,13 +86,7 @@ class CustomObjectStructureType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class'        => CustomObjectStructure::class,
-                'validation_groups' => [
-                    CustomObjectStructure::class,
-                    'determineValidationGroups',
-                ],
-                // 'ignore_formexit' => false,
-                // 'in_profile'      => false,
+                'data_class' => CustomObjectStructure::class,
             ]
         );
     }

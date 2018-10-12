@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Session\Session;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectStructureActionModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectStructureModel;
 use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -27,17 +27,17 @@ class CustomObjectStructureCancelController extends CommonController
     private $session;
 
     /**
-     * @var CustomObjectStructureActionModel
+     * @var CustomObjectStructureModel
      */
-    private $customObjectStructureActionModel;
+    private $customObjectStructureModel;
 
     public function __construct(
         Session $session,
-        CustomObjectStructureActionModel $customObjectStructureActionModel
+        CustomObjectStructureModel $customObjectStructureModel
     )
     {
         $this->session                          = $session;
-        $this->customObjectStructureActionModel = $customObjectStructureActionModel;
+        $this->customObjectStructureModel = $customObjectStructureModel;
     }
 
     /**
@@ -56,7 +56,7 @@ class CustomObjectStructureCancelController extends CommonController
             [
                 'returnUrl'       => $this->generateUrl('mautic_custom_object_structures_list', $viewParameters),
                 'viewParameters'  => $viewParameters,
-                'contentTemplate' => 'custom_object_structures.list_controller:listAction',
+                'contentTemplate' => 'custom_object.structures.list_controller:listAction',
                 'passthroughVars' => [
                     'mauticContent' => 'customObjectStructure',
                 ],
