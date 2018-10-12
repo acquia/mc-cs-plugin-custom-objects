@@ -21,6 +21,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use DateTimeInterface;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\FormEntity;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectStructureRepository;
 
 class CustomObjectStructure extends FormEntity
 {
@@ -66,8 +67,8 @@ class CustomObjectStructure extends FormEntity
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('custom_objects')
-            ->setCustomRepositoryClass(CustomObjectRepository::class)
+        $builder->setTable('custom_object_structures')
+            ->setCustomRepositoryClass(CustomObjectStructureRepository::class)
             ->addIndex(['alias'], 'alias');
 
         $builder->addId();
@@ -80,12 +81,11 @@ class CustomObjectStructure extends FormEntity
     /**
      * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
+        $metadata->addPropertyConstraint('name', new Assert\NotBlank());
         $metadata->addPropertyConstraint('name', new Assert\Length(['max' => 255]));
-        $metadata->addPropertyConstraint('name', new Assert\Required());
         $metadata->addPropertyConstraint('alias', new Assert\Length(['max' => 255]));
-        $metadata->addPropertyConstraint('alias', new Assert\Required());
         $metadata->addPropertyConstraint('description', new Assert\Length(['max' => 65535]));
     }
 
