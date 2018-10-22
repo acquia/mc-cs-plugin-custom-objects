@@ -60,6 +60,12 @@ class CustomObjectStructure extends FormEntity
      **/
     private $category;
 
+    public function __clone()
+    {
+        $this->id    = null;
+        $this->alias = null;
+    }
+
     /**
      * @param ORM\ClassMetadata $metadata
      */

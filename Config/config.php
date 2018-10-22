@@ -39,6 +39,11 @@ return [
                 'controller' => 'CustomObjectsBundle:CustomObjectStructureEdit:renderForm',
                 'method'     => 'GET',
             ],
+            'mautic_custom_object_structures_clone' => [
+                'path'       => '/custom/object/structures/clone/{objectId}',
+                'controller' => 'CustomObjectsBundle:CustomObjectStructureClone:clone',
+                'method'     => 'GET',
+            ],
             'mautic_custom_object_structures_cancel' => [
                 'path'       => '/custom/object/structures/cancel',
                 'controller' => 'CustomObjectsBundle:CustomObjectStructureCancel:cancel',
@@ -107,6 +112,19 @@ return [
             ],
             'custom_object.structures.edit_controller' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectStructureEditController::class,
+                'arguments' => [
+                    'router',
+                    'form.factory',
+                    'custom_object.structures.model',
+                ],
+                'methodCalls' => [
+                    'setContainer' => [
+                        '@service_container'
+                    ],
+                ],
+            ],
+            'custom_object.structures.clone_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectStructureCloneController::class,
                 'arguments' => [
                     'router',
                     'form.factory',

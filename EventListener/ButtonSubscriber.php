@@ -86,7 +86,7 @@ class ButtonSubscriber extends CommonSubscriber
     {
         return [
             'attr' => [
-                'href' => $this->router->generate('mautic_custom_object_structures_edit', ['objectId' => $entity->getId()]),
+                'href' => $this->router->generate('mautic_custom_object_structures_clone', ['objectId' => $entity->getId()]),
             ],
             'btnText'   => $this->translator->trans('mautic.core.form.clone'),
             'iconClass' => 'fa fa-copy',
