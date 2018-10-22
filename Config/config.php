@@ -21,21 +21,27 @@ return [
         'main' => [
             'mautic_custom_object_structures_list' => [
                 'path'       => '/custom/object/structures/{page}',
-                'controller' => 'custom_object.structures.list_controller:listAction',
+                'controller' => 'CustomObjectsBundle:CustomObjectStructureList:list',
+                'method'     => 'GET',
             ],
             'mautic_custom_object_structures_new' => [
                 'path'       => '/custom/object/structures/new',
-                'controller' => 'custom_object.structures.new_controller:renderForm',
+                'controller' => 'CustomObjectsBundle:CustomObjectStructureNew:renderForm',
+                'method'     => 'GET',
+            ],
+            'mautic_custom_object_structures_edit' => [
+                'path'       => '/custom/object/structures/edit/{objectId}',
+                'controller' => 'CustomObjectsBundle:CustomObjectStructureEdit:renderForm',
                 'method'     => 'GET',
             ],
             'mautic_custom_object_structures_cancel' => [
                 'path'       => '/custom/object/structures/cancel',
-                'controller' => 'custom_object.structures.cancel_controller:redirectToList',
-                'method'     => 'POST',
+                'controller' => 'CustomObjectsBundle:CustomObjectStructureCancel:cancel',
+                'method'     => 'GET',
             ],
             'mautic_custom_object_structures_save' => [
                 'path'       => '/custom/object/structures/save',
-                'controller' => 'custom_object.structures.save_controller:save',
+                'controller' => 'CustomObjectsBundle:CustomObjectStructureSave:save',
                 'method'     => 'POST',
             ],
         ],
@@ -73,6 +79,19 @@ return [
                 'arguments' => [
                     'router',
                     'form.factory',
+                ],
+                'methodCalls' => [
+                    'setContainer' => [
+                        '@service_container'
+                    ],
+                ],
+            ],
+            'custom_object.structures.edit_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectStructureEditController::class,
+                'arguments' => [
+                    'router',
+                    'form.factory',
+                    'custom_object.structures.model',
                 ],
                 'methodCalls' => [
                     'setContainer' => [

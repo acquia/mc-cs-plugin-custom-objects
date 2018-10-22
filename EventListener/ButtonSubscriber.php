@@ -15,6 +15,7 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObjectStructure;
 
 class ButtonSubscriber extends CommonSubscriber
 {
@@ -30,43 +31,22 @@ class ButtonSubscriber extends CommonSubscriber
      */
     public function injectViewButtons(CustomButtonEvent $event)
     {
-        if ($event->getRoute() === 'mautic_custom_object_structures_list') {
-            // $event->addButton(
-            //     [
-            //         'attr' => [
-            //             'class'       => 'btn btn-default btn-sm btn-nospin',
-            //             'data-header' => $this->translator->trans('mautic.plugin.clearbit.button.caption'),
-            //         ],
-            //         'btnText'   => $this->translator->trans('mautic.plugin.clearbit.button.caption'),
-            //         'iconClass' => 'fa fa-search',
-            //     ],
-            //     ButtonHelper::LOCATION_BULK_ACTIONS
-            // );
+        $entity = $event->getItem();
+        // if ('mautic_custom_object_structures_list' === $event->getRoute() && 'list_action' === $event->getLocation()) {
+        if ($entity && $entity instanceof CustomObjectStructure) {
+            $editButton = [
+                'attr' => [
+                    'href' => $this->router->generate('mautic_custom_object_structures_edit', ['objectId' => $event->getItem()->getId()]),
+                ],
+                'btnText'   => $this->translator->trans('mautic.core.form.edit'),
+                'iconClass' => 'fa fa-pencil-square-o',
+            ];
 
-            if ($event->getItem()) {
-                $editButton = [
-                    'attr' => [
-                        'href' => $this->router->generate(
-                            'mautic_custom_object_structures_new'// replace with edit,
-                            // ['objectId' => $event->getItem()->getId(), 'objectAction' => 'lookupPerson']
-                        ),
-                    ],
-                    'btnText'   => $this->translator->trans('mautic.core.form.edit'),
-                    'iconClass' => 'fa fa-pencil-square-o',
-                ];
-
-                $event
-                    // ->addButton(
-                    //     $editButton,
-                    //     ButtonHelper::LOCATION_PAGE_ACTIONS,
-                    //     ['mautic_contact_action', ['objectAction' => 'view']]
-                    // )
-                    ->addButton(
-                        $editButton,
-                        ButtonHelper::LOCATION_LIST_ACTIONS,
-                        'mautic_custom_object_structures_list'// replace with edit
-                    );
-            }
+            $event->addButton(
+                $editButton,
+                ButtonHelper::LOCATION_LIST_ACTIONS,
+                'mautic_custom_object_structures_list'
+            );
         }
     }
 }

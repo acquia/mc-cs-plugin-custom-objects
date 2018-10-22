@@ -72,7 +72,7 @@ class CustomObjectStructureType extends AbstractType
             'buttons',
             'form_buttons',
             [
-                'cancel_onclick' => "mQuery('form[name=custom_object_structure]').attr('action', mQuery('form[name=custom_object_structure]').attr('action').replace('/save', '/cancel'));",
+                'cancel_onclick' => "mQuery('form[name=custom_object_structure]').attr('method', 'get').attr('action', mQuery('form[name=custom_object_structure]').attr('action').replace('/save', '/cancel'));",
             ]
         );
 

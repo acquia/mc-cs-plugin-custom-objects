@@ -63,16 +63,14 @@ class CustomObjectStructureListController extends CommonController
      */
     public function listAction(int $page)
     {
-        $request = $this->requestStack->getCurrentRequest();
-        $search  = $request->get('search', $this->session->get('custom.object.structures.filter', ''));
+        $request    = $this->requestStack->getCurrentRequest();
+        $search     = $request->get('search', $this->session->get('custom.object.structures.filter', ''));
+        $viewParams = ['page' => $page];
 
         $this->session->set('custom.object.structures.filter', $search);
 
         // @todo check permissions
 
-        $viewParams = [
-            'page' => $page,
-        ];
 
         //set limits
         $limit = $this->session->get('custom.object.structures.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
@@ -81,8 +79,7 @@ class CustomObjectStructureListController extends CommonController
             $start = 0;
         }
 
-        $filter = ['string' => $search];
-
+        $filter     = ['string' => $search];
         $orderBy    = $this->session->get('custom.object.structures.orderby', 'e.id');
         $orderByDir = $this->session->get('custom.object.structures.orderbydir', 'DESC');
 
@@ -99,29 +96,29 @@ class CustomObjectStructureListController extends CommonController
         $count = count($entities);
         $route = $this->generateUrl('mautic_custom_object_structures_list', $viewParams);
 
-        if ($count && $count < ($start + 1)) {
-            //the number of entities are now less then the current page so redirect to the last page
-            if ($count === 1) {
-                $lastPage = 1;
-            } else {
-                $lastPage = (ceil($count / $limit)) ?: 1;
-            }
-            $viewParams['page'] = $lastPage;
-            $this->session->set('custom.object.structures.page', $lastPage);
-            $route = $this->generateUrl('mautic_custom_object_structures_list', $viewParams);
+        // if ($count && $count < ($start + 1)) {
+        //     //the number of entities are now less then the current page so redirect to the last page
+        //     if ($count === 1) {
+        //         $lastPage = 1;
+        //     } else {
+        //         $lastPage = (ceil($count / $limit)) ?: 1;
+        //     }
+        //     $viewParams['page'] = $lastPage;
+        //     $this->session->set('custom.object.structures.page', $lastPage);
+        //     $route = $this->generateUrl('mautic_custom_object_structures_list', $viewParams);
 
-            return $this->postActionRedirect(
-                [
-                    'returnUrl'       => $route,
-                    'viewParameters'  => ['page' => $lastPage],
-                    'contentTemplate' => 'MauticCategoryBundle:Category:index',
-                    'passthroughVars' => [
-                        'activeLink'    => '#mautic_'.$bundle.'category_index',
-                        'mauticContent' => 'category',
-                    ],
-                ]
-            );
-        }
+        //     return $this->postActionRedirect(
+        //         [
+        //             'returnUrl'       => $route,
+        //             'viewParameters'  => ['page' => $lastPage],
+        //             'contentTemplate' => 'CustomObjectsBundle:CustomObjectStructureList:list.html.php',
+        //             'passthroughVars' => [
+        //                 'mauticContent' => 'customObjectStructure',
+        //                 'route'         => $route,
+        //             ],
+        //         ]
+        //     );
+        // }
 
         $this->session->set('custom.object.structures.page', $page);
 

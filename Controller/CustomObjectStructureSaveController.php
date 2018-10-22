@@ -75,7 +75,7 @@ class CustomObjectStructureSaveController extends CommonController
      * 
      * @return Response|JsonResponse
      */
-    public function save()
+    public function saveAction()
     {
         $entity  = new CustomObjectStructure();
         $request = $this->requestStack->getCurrentRequest();

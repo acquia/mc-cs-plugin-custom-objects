@@ -21,8 +21,9 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectStructureModel;
 
-class CustomObjectStructureNewController extends CommonController
+class CustomObjectStructureEditController extends CommonController
 {
     /**
      * @var Router
@@ -35,26 +36,36 @@ class CustomObjectStructureNewController extends CommonController
     private $formFactory;
 
     /**
+     * @var CustomObjectStructureModel
+     */
+    private $customObjectStructureModel;
+
+    /**
      * @param Router $router
      * @param FormFactory $formFactory
+     * @param CustomObjectStructureModel $customObjectStructureModel
      */
     public function __construct(
         Router $router,
-        FormFactory $formFactory
+        FormFactory $formFactory,
+        CustomObjectStructureModel $customObjectStructureModel
     )
     {
         $this->router      = $router;
         $this->formFactory = $formFactory;
+        $this->customObjectStructureModel = $customObjectStructureModel;
     }
 
     /**
      * @todo implement permissions
      * 
+     * @param int $objectId
+     * 
      * @return Response|JsonResponse
      */
-    public function renderFormAction()
+    public function renderFormAction(int $objectId)
     {
-        $entity  = new CustomObjectStructure();
+        $entity  = $this->customObjectStructureModel->getEntity($objectId);
         $action  = $this->router->generate('mautic_custom_object_structures_save');
         $form    = $this->formFactory->create(CustomObjectStructureType::class, $entity, ['action' => $action]);
 
@@ -68,7 +79,7 @@ class CustomObjectStructureNewController extends CommonController
                 'contentTemplate' => 'CustomObjectsBundle:CustomObjectStructureAction:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customObjectStructure',
-                    'route'         => $this->router->generate('mautic_custom_object_structures_new'),
+                    'route'         => $this->router->generate('mautic_custom_object_structures_edit', ['objectId' => $objectId]),
                 ],
             ]
         );

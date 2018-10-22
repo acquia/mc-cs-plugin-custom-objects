@@ -31,12 +31,16 @@ class CustomObjectStructureCancelController extends CommonController
      */
     private $customObjectStructureModel;
 
+    /**
+     * @param Session $session
+     * @param CustomObjectStructureModel $customObjectStructureModel
+     */
     public function __construct(
         Session $session,
         CustomObjectStructureModel $customObjectStructureModel
     )
     {
-        $this->session                          = $session;
+        $this->session                    = $session;
         $this->customObjectStructureModel = $customObjectStructureModel;
     }
 
@@ -46,7 +50,7 @@ class CustomObjectStructureCancelController extends CommonController
      * 
      * @return Response|JsonResponse
      */
-    public function redirectToList()
+    public function cancelAction()
     {
         $viewParameters = [
             'page' => $this->session->get('custom.object.structures.page', 1),
@@ -56,7 +60,7 @@ class CustomObjectStructureCancelController extends CommonController
             [
                 'returnUrl'       => $this->generateUrl('mautic_custom_object_structures_list', $viewParameters),
                 'viewParameters'  => $viewParameters,
-                'contentTemplate' => 'custom_object.structures.list_controller:listAction',
+                'contentTemplate' => 'CustomObjectsBundle:CustomObjectStructureList:list',
                 'passthroughVars' => [
                     'mauticContent' => 'customObjectStructure',
                 ],
