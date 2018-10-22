@@ -24,6 +24,11 @@ return [
                 'controller' => 'CustomObjectsBundle:CustomObjectStructureList:list',
                 'method'     => 'GET',
             ],
+            'mautic_custom_object_structures_view' => [
+                'path'       => '/custom/object/structures/view/{objectId}',
+                'controller' => 'CustomObjectsBundle:CustomObjectStructureView:view',
+                'method'     => 'GET',
+            ],
             'mautic_custom_object_structures_new' => [
                 'path'       => '/custom/object/structures/new',
                 'controller' => 'CustomObjectsBundle:CustomObjectStructureNew:renderForm',
@@ -62,6 +67,20 @@ return [
         'controllers' => [
             'custom_object.structures.list_controller' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectStructureListController::class,
+                'arguments' => [
+                    'request_stack',
+                    'session',
+                    'mautic.helper.core_parameters',
+                    'custom_object.structures.model',
+                ],
+                'methodCalls' => [
+                    'setContainer' => [
+                        '@service_container'
+                    ],
+                ],
+            ],
+            'custom_object.structures.view_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectStructureViewController::class,
                 'arguments' => [
                     'request_stack',
                     'session',

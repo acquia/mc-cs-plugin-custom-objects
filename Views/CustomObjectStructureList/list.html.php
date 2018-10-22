@@ -84,10 +84,7 @@ if ($tmpl == 'index') {
                                     'model' => 'social.monitoring',
                                 ]
                             ); ?>
-                            <a href="<?php echo $view['router']->path(
-                                'mautic_social_action',
-                                ['objectAction' => 'view', 'objectId' => $item->getId()]
-                            ); ?>"
+                            <a href="<?php echo $view['router']->path('mautic_custom_object_structures_view', ['objectId' => $item->getId()]); ?>"
                                data-toggle="ajax">
                                 <?php echo $item->getName(); ?>
                             </a>
