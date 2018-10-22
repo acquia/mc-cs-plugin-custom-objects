@@ -12,13 +12,7 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'mauticWebhook');
 $view['slots']->set('headerTitle', $item->getName());
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', [
-    'item'            => $item,
-    'templateButtons' => [
-        'edit'   => true,//$view['security']->hasEntityAccess($permissions['webhook:webhooks:editown'], $permissions['webhook:webhooks:editother'], $item->getCreatedBy()),
-        'clone'  => true,//$permissions['webhook:webhooks:create'],
-        'delete' => true,//$view['security']->hasEntityAccess($permissions['webhook:webhooks:deleteown'], $permissions['webhook:webhooks:deleteown'], $item->getCreatedBy()),
-    ],
-    'routeBase' => 'webhook',
+    'item' => $item,
 ]));
 ?>
 

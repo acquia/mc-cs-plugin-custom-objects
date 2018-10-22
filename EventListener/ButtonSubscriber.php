@@ -31,22 +31,86 @@ class ButtonSubscriber extends CommonSubscriber
      */
     public function injectViewButtons(CustomButtonEvent $event)
     {
-        $entity = $event->getItem();
-        // if ('mautic_custom_object_structures_list' === $event->getRoute() && 'list_action' === $event->getLocation()) {
-        if ($entity && $entity instanceof CustomObjectStructure) {
-            $editButton = [
-                'attr' => [
-                    'href' => $this->router->generate('mautic_custom_object_structures_edit', ['objectId' => $event->getItem()->getId()]),
-                ],
-                'btnText'   => $this->translator->trans('mautic.core.form.edit'),
-                'iconClass' => 'fa fa-pencil-square-o',
-            ];
-
-            $event->addButton(
-                $editButton,
-                ButtonHelper::LOCATION_LIST_ACTIONS,
-                'mautic_custom_object_structures_list'
-            );
+        switch ($event->getRoute()) {
+            case 'mautic_custom_object_structures_list':
+                $this->addEntityButtons($event, ButtonHelper::LOCATION_LIST_ACTIONS);
+                break;
+            
+            case 'mautic_custom_object_structures_view':
+                $this->addEntityButtons($event, ButtonHelper::LOCATION_PAGE_ACTIONS);
+                break;
         }
     }
+
+    /**
+     * @param CustomButtonEvent $event
+     * @param string            $location
+     */
+    private function addEntityButtons(CustomButtonEvent $event, $location): void
+    {
+        $entity = $event->getItem();
+        if ($entity && $entity instanceof CustomObjectStructure) {
+            $event->addButton($this->defineDeleteButton($entity), $location, $event->getRoute());
+            $event->addButton($this->defineCloneButton($entity), $location, $event->getRoute());
+            $event->addButton($this->defineEditButton($entity), $location, $event->getRoute());
+        }
+    }
+
+    /**
+     * @todo add permissions
+     * 
+     * @param CustomObjectStructure $entity
+     * 
+     * @return array
+     */
+    private function defineEditButton(CustomObjectStructure $entity): array
+    {
+        return [
+            'attr' => [
+                'href' => $this->router->generate('mautic_custom_object_structures_edit', ['objectId' => $entity->getId()]),
+            ],
+            'btnText'   => $this->translator->trans('mautic.core.form.edit'),
+            'iconClass' => 'fa fa-pencil-square-o',
+            'priority'  => 500,
+        ];
+    }
+
+    /**
+     * @todo add permissions
+     * 
+     * @param CustomObjectStructure $entity
+     * 
+     * @return array
+     */
+    private function defineCloneButton(CustomObjectStructure $entity): array
+    {
+        return [
+            'attr' => [
+                'href' => $this->router->generate('mautic_custom_object_structures_edit', ['objectId' => $entity->getId()]),
+            ],
+            'btnText'   => $this->translator->trans('mautic.core.form.clone'),
+            'iconClass' => 'fa fa-copy',
+            'priority'  => 300,
+        ];
+    }
+
+    /**
+     * @todo add permissions
+     * 
+     * @param CustomObjectStructure $entity
+     * 
+     * @return array
+     */
+    private function defineDeleteButton(CustomObjectStructure $entity): array
+    {
+        return [
+            'attr' => [
+                'href' => $this->router->generate('mautic_custom_object_structures_edit', ['objectId' => $entity->getId()]),
+            ],
+            'btnText'   => $this->translator->trans('mautic.core.form.delete'),
+            'iconClass' => 'fa fa-fw fa-trash-o text-danger',
+            'priority'  => 0,
+        ];
+    }
+
 }
