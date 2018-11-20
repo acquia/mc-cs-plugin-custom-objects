@@ -113,18 +113,17 @@ class CustomObjectStructureSaveController extends CommonController
                         '%name%' => $entity->getName(),
                         '%url%'  => $this->router->generate(
                             'mautic_custom_object_structures_edit',
-                            [
-                                'objectId' => $entity->getId(),
-                            ]
+                            ['objectId' => $entity->getId()]
                         ),
                     ], 
                     'flashes'
                 )
             );
+
             if ($form->get('buttons')->get('save')->isClicked()) {
-                return $this->redirectToDetail($entity);
+                return $this->redirectToDetail($request, $entity);
             } else {
-                return $this->redirectToEdit($entity);
+                return $this->redirectToEdit($request, $entity);
             }
         }
 
