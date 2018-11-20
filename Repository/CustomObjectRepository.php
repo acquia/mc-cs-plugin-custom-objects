@@ -16,7 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Repository;
 use Doctrine\DBAL\Types\Type;
 use Mautic\CoreBundle\Entity\CommonRepository;
 
-class CustomObjectStructureRepository extends CommonRepository
+class CustomObjectRepository extends CommonRepository
 {
     /**
      * @param string   $alias

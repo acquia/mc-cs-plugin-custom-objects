@@ -11,15 +11,15 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 
-$view['slots']->set('mauticContent', 'customObjectStructure');
+$view['slots']->set('mauticContent', 'customObject');
 
 if ($entity->getId()) {
     $header = $view['translator']->trans(
-        'custom.object.structure.edit',
+        'custom.object.edit',
         ['%name%' => $view['translator']->trans($entity->getName())]
     );
 } else {
-    $header = $view['translator']->trans('custom.object.structure.new');
+    $header = $view['translator']->trans('custom.object.new');
 }
 
 $view['slots']->set('headerTitle', $header);

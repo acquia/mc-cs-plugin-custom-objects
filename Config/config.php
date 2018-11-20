@@ -19,42 +19,42 @@ return [
 
     'routes' => [
         'main' => [
-            'mautic_custom_object_structures_list' => [
-                'path'       => '/custom/object/structures/{page}',
-                'controller' => 'CustomObjectsBundle:CustomObjectStructureList:list',
+            'mautic_custom_object_list' => [
+                'path'       => '/custom/object/{page}',
+                'controller' => 'CustomObjectsBundle:CustomObjectList:list',
                 'method'     => 'GET',
             ],
-            'mautic_custom_object_structures_view' => [
-                'path'       => '/custom/object/structures/view/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomObjectStructureView:view',
+            'mautic_custom_object_view' => [
+                'path'       => '/custom/object/view/{objectId}',
+                'controller' => 'CustomObjectsBundle:CustomObjectView:view',
                 'method'     => 'GET',
             ],
-            'mautic_custom_object_structures_new' => [
-                'path'       => '/custom/object/structures/new',
-                'controller' => 'CustomObjectsBundle:CustomObjectStructureNew:renderForm',
+            'mautic_custom_object_new' => [
+                'path'       => '/custom/object/new',
+                'controller' => 'CustomObjectsBundle:CustomObjectNew:renderForm',
                 'method'     => 'GET',
             ],
-            'mautic_custom_object_structures_edit' => [
-                'path'       => '/custom/object/structures/edit/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomObjectStructureEdit:renderForm',
+            'mautic_custom_object_edit' => [
+                'path'       => '/custom/object/edit/{objectId}',
+                'controller' => 'CustomObjectsBundle:CustomObjectEdit:renderForm',
                 'method'     => 'GET',
             ],
-            'mautic_custom_object_structures_clone' => [
-                'path'       => '/custom/object/structures/clone/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomObjectStructureClone:clone',
+            'mautic_custom_object_clone' => [
+                'path'       => '/custom/object/clone/{objectId}',
+                'controller' => 'CustomObjectsBundle:CustomObjectClone:clone',
                 'method'     => 'GET',
             ],
-            'mautic_custom_object_structures_cancel' => [
-                'path'       => '/custom/object/structures/cancel/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomObjectStructureCancel:cancel',
+            'mautic_custom_object_cancel' => [
+                'path'       => '/custom/object/cancel/{objectId}',
+                'controller' => 'CustomObjectsBundle:CustomObjectCancel:cancel',
                 'method'     => 'GET',
                 'defaults'   => [
                     'objectId' => null,
                 ],
             ],
-            'mautic_custom_object_structures_save' => [
-                'path'       => '/custom/object/structures/save/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomObjectStructureSave:save',
+            'mautic_custom_object_save' => [
+                'path'       => '/custom/object/save/{objectId}',
+                'controller' => 'CustomObjectsBundle:CustomObjectSave:save',
                 'method'     => 'POST',
                 'defaults'   => [
                     'objectId' => null,
@@ -65,24 +65,24 @@ return [
 
     'menu' => [
         'admin' => [
-            'custom.object.structure.title' => [
-                'route'     => 'mautic_custom_object_structures_list',
-                'access'    => 'custom_object_structures:objects:view',
+            'custom.object.title' => [
+                'route'     => 'mautic_custom_object_list',
+                // 'access'    => 'custom_object:objects:view',
                 'iconClass' => 'fa-list-alt',
-                'id'        => 'mautic_custom_object_structures_list',
+                'id'        => 'mautic_custom_object_list',
             ],
         ],
     ],
 
     'services' => [
         'controllers' => [
-            'custom_object.structures.list_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectStructureListController::class,
+            'custom_object.list_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectListController::class,
                 'arguments' => [
                     'request_stack',
                     'session',
                     'mautic.helper.core_parameters',
-                    'custom_object.structures.model',
+                    'custom_object.model',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -90,13 +90,13 @@ return [
                     ],
                 ],
             ],
-            'custom_object.structures.view_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectStructureViewController::class,
+            'custom_object.view_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectViewController::class,
                 'arguments' => [
                     'request_stack',
                     'session',
                     'mautic.helper.core_parameters',
-                    'custom_object.structures.model',
+                    'custom_object.model',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -104,8 +104,8 @@ return [
                     ],
                 ],
             ],
-            'custom_object.structures.new_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectStructureNewController::class,
+            'custom_object.new_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectNewController::class,
                 'arguments' => [
                     'router',
                     'form.factory',
@@ -116,12 +116,12 @@ return [
                     ],
                 ],
             ],
-            'custom_object.structures.edit_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectStructureEditController::class,
+            'custom_object.edit_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectEditController::class,
                 'arguments' => [
                     'router',
                     'form.factory',
-                    'custom_object.structures.model',
+                    'custom_object.model',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -129,12 +129,12 @@ return [
                     ],
                 ],
             ],
-            'custom_object.structures.clone_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectStructureCloneController::class,
+            'custom_object.clone_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectCloneController::class,
                 'arguments' => [
                     'router',
                     'form.factory',
-                    'custom_object.structures.model',
+                    'custom_object.model',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -142,15 +142,15 @@ return [
                     ],
                 ],
             ],
-            'custom_object.structures.save_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectStructureSaveController::class,
+            'custom_object.save_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectSaveController::class,
                 'arguments' => [
                     'request_stack',
                     'router',
                     'session',
                     'form.factory',
                     'translator',
-                    'custom_object.structures.model',
+                    'custom_object.model',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -158,11 +158,11 @@ return [
                     ],
                 ],
             ],
-            'custom_object.structures.cancel_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectStructureCancelController::class,
+            'custom_object.cancel_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectCancelController::class,
                 'arguments' => [
                     'session',
-                    'custom_object.structures.model',
+                    'custom_object.model',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -172,25 +172,25 @@ return [
             ],
         ],
         'models' => [
-            'custom_object.structures.model' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomObjectStructureModel::class,
+            'custom_object.model' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
-                    'custom_object.structures.repository',
+                    'custom_object.repository',
                 ],
             ],
         ],
         'repositories' => [
-            'custom_object.structures.repository' => [
+            'custom_object.repository' => [
                 'class'     => Doctrine\ORM\EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
-                    \MauticPlugin\CustomObjectsBundle\Entity\CustomObjectStructure::class,
+                    \MauticPlugin\CustomObjectsBundle\Entity\CustomObject::class,
                 ],
             ],
         ],
         'events' => [
-            'custom_object.structures.button.subscriber' => [
+            'custom_object.button.subscriber' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\ButtonSubscriber::class,
             ],
         ],

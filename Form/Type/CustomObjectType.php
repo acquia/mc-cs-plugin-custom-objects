@@ -18,10 +18,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObjectStructure;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class CustomObjectStructureType extends AbstractType
+class CustomObjectType extends AbstractType
 {
     /**
      * @param FormBuilderInterface $builder
@@ -33,7 +33,7 @@ class CustomObjectStructureType extends AbstractType
             'name',
             TextType::class,
             [
-                'label'      => 'custom.object.structure.name.label',
+                'label'      => 'custom.object.name.label',
                 'required'   => true,
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
@@ -46,7 +46,7 @@ class CustomObjectStructureType extends AbstractType
             'alias',
             TextType::class,
             [
-                'label'      => 'custom.object.structure.alias.label',
+                'label'      => 'custom.object.alias.label',
                 'required'   => true,
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
@@ -59,7 +59,7 @@ class CustomObjectStructureType extends AbstractType
             'description',
             TextareaType::class,
             [
-                'label'      => 'custom.object.structure.description.label',
+                'label'      => 'custom.object.description.label',
                 'required'   => false,
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
@@ -72,7 +72,7 @@ class CustomObjectStructureType extends AbstractType
             'buttons',
             'form_buttons',
             [
-                'cancel_onclick' => "mQuery('form[name=custom_object_structure]').attr('method', 'get').attr('action', mQuery('form[name=custom_object_structure]').attr('action').replace('/save', '/cancel'));",
+                'cancel_onclick' => "mQuery('form[name=custom_object]').attr('method', 'get').attr('action', mQuery('form[name=custom_object]').attr('action').replace('/save', '/cancel'));",
             ]
         );
 
@@ -86,7 +86,7 @@ class CustomObjectStructureType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => CustomObjectStructure::class,
+                'data_class' => CustomObject::class,
             ]
         );
     }

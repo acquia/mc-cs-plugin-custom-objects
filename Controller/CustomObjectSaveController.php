@@ -15,9 +15,9 @@ namespace MauticPlugin\CustomObjectsBundle\Controller;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObjectStructure;
-use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectStructureType;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectStructureModel;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
@@ -27,7 +27,7 @@ use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
-class CustomObjectStructureSaveController extends CommonController
+class CustomObjectSaveController extends CommonController
 {
     /**
      * @var RequestStack
@@ -50,9 +50,9 @@ class CustomObjectStructureSaveController extends CommonController
     private $formFactory;
 
     /**
-     * @var CustomObjectStructureModel
+     * @var CustomObjectModel
      */
-    private $customObjectStructureModel;
+    private $customObjectModel;
 
     /**
      * @param RequestStack $requestStack
@@ -60,7 +60,7 @@ class CustomObjectStructureSaveController extends CommonController
      * @param Session $session
      * @param FormFactory $formFactory
      * @param TranslatorInterface $translator
-     * @param CustomObjectStructureModel $customObjectStructureModel
+     * @param CustomObjectModel $customObjectModel
      */
     public function __construct(
         RequestStack $requestStack,
@@ -68,7 +68,7 @@ class CustomObjectStructureSaveController extends CommonController
         Session $session,
         FormFactory $formFactory,
         TranslatorInterface $translator,
-        CustomObjectStructureModel $customObjectStructureModel
+        CustomObjectModel $customObjectModel
     )
     {
         $this->requestStack               = $requestStack;
@@ -76,7 +76,7 @@ class CustomObjectStructureSaveController extends CommonController
         $this->session                    = $session;
         $this->formFactory                = $formFactory;
         $this->translator                 = $translator;
-        $this->customObjectStructureModel = $customObjectStructureModel;
+        $this->customObjectModel = $customObjectModel;
     }
 
     /**
@@ -89,21 +89,21 @@ class CustomObjectStructureSaveController extends CommonController
     public function saveAction(?int $objectId = null)
     {
         try {
-            $entity = $objectId ? $this->customObjectStructureModel->getEntity($objectId): new CustomObjectStructure();
+            $entity = $objectId ? $this->customObjectModel->getEntity($objectId): new CustomObject();
         } catch (NotFoundException $e) {
             $this->notFound($e->getMessage());
         }
 
         $request = $this->requestStack->getCurrentRequest();
-        $action  = $this->router->generate('mautic_custom_object_structures_save', ['objectId' => $objectId]);
-        $form    = $this->formFactory->create(CustomObjectStructureType::class, $entity, ['action' => $action]);
+        $action  = $this->router->generate('mautic_custom_object_save', ['objectId' => $objectId]);
+        $form    = $this->formFactory->create(CustomObjectType::class, $entity, ['action' => $action]);
         $form->handleRequest($request);
 
         // $validator = $this->get('validator');
         // $errors = $validator->validate($entity);
         
         if ($form->isValid()) {
-            $this->customObjectStructureModel->save($entity);
+            $this->customObjectModel->save($entity);
 
             $this->session->getFlashBag()->add(
                 'notice',
@@ -112,7 +112,7 @@ class CustomObjectStructureSaveController extends CommonController
                     [
                         '%name%' => $entity->getName(),
                         '%url%'  => $this->router->generate(
-                            'mautic_custom_object_structures_edit',
+                            'mautic_custom_object_edit',
                             ['objectId' => $entity->getId()]
                         ),
                     ], 
@@ -129,16 +129,16 @@ class CustomObjectStructureSaveController extends CommonController
 
         return $this->delegateView(
             [
-                'returnUrl'      => $this->router->generate('mautic_custom_object_structures_new'),
+                'returnUrl'      => $this->router->generate('mautic_custom_object_new'),
                 'viewParameters' => [
                     'entity' => $entity,
                     'form'   => $form->createView(),
                     'tmpl'   => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObjectStructureAction:form.html.php',
+                'contentTemplate' => 'CustomObjectsBundle:CustomObjectAction:form.html.php',
                 'passthroughVars' => [
-                    'mauticContent' => 'customObjectStructure',
-                    'route'         => $this->router->generate('mautic_custom_object_structures_new'),
+                    'mauticContent' => 'customObject',
+                    'route'         => $this->router->generate('mautic_custom_object_new'),
                 ],
             ]
         );
@@ -146,29 +146,29 @@ class CustomObjectStructureSaveController extends CommonController
 
     /**
      * @param Request               $request
-     * @param CustomObjectStructure $entity
+     * @param CustomObject $entity
      * 
      * @return Response
      */
-    private function redirectToEdit(Request $request, CustomObjectStructure $entity): Response
+    private function redirectToEdit(Request $request, CustomObject $entity): Response
     {
         $request->setMethod('GET');
         $params = ['objectId' => $entity->getId()];
 
-        return $this->forward('custom_object.structures.edit_controller:renderFormAction', $params);
+        return $this->forward('custom_object.edit_controller:renderFormAction', $params);
     }
 
     /**
      * @param Request               $request
-     * @param CustomObjectStructure $entity
+     * @param CustomObject $entity
      * 
      * @return Response
      */
-    private function redirectToDetail(Request $request, CustomObjectStructure $entity): Response
+    private function redirectToDetail(Request $request, CustomObject $entity): Response
     {
         $request->setMethod('GET');
         $params = ['objectId' => $entity->getId()];
 
-        return $this->forward('CustomObjectsBundle:CustomObjectStructureView:view', $params);
+        return $this->forward('CustomObjectsBundle:CustomObjectView:view', $params);
     }
 }

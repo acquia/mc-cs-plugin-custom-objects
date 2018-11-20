@@ -17,11 +17,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectStructureModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Predis\Protocol\Text\RequestSerializer;
 use Mautic\CoreBundle\Controller\CommonController;
 
-class CustomObjectStructureViewController extends CommonController
+class CustomObjectViewController extends CommonController
 {
     /**
      * @var RequestStack
@@ -34,27 +34,27 @@ class CustomObjectStructureViewController extends CommonController
     private $session;
 
     /**
-     * @var CustomObjectStructureModel
+     * @var CustomObjectModel
      */
-    private $customObjectStructureModel;
+    private $customObjectModel;
 
     /**
      * @param RequestStack $requestStack
      * @param Session $session
      * @param CoreParametersHelper $coreParametersHelper
-     * @param CustomObjectStructureModel $customObjectStructureModel
+     * @param CustomObjectModel $customObjectModel
      */
     public function __construct(
         RequestStack $requestStack,
         Session $session,
         CoreParametersHelper $coreParametersHelper,
-        CustomObjectStructureModel $customObjectStructureModel
+        CustomObjectModel $customObjectModel
     )
     {
         $this->requestStack               = $requestStack;
         $this->session                    = $session;
         $this->coreParametersHelper       = $coreParametersHelper;
-        $this->customObjectStructureModel = $customObjectStructureModel;
+        $this->customObjectModel = $customObjectModel;
     }
 
     /**
@@ -66,8 +66,8 @@ class CustomObjectStructureViewController extends CommonController
      */
     public function viewAction(int $objectId)
     {
-        $entity = $this->customObjectStructureModel->getEntity($objectId);
-        $route  = $this->generateUrl('mautic_custom_object_structures_view', ['objectId' => $objectId]);
+        $entity = $this->customObjectModel->getEntity($objectId);
+        $route  = $this->generateUrl('mautic_custom_object_view', ['objectId' => $objectId]);
 
         return $this->delegateView(
             [
@@ -75,9 +75,9 @@ class CustomObjectStructureViewController extends CommonController
                 'viewParameters' => [
                     'item' => $entity,
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObjectStructureList:detail.html.php',
+                'contentTemplate' => 'CustomObjectsBundle:CustomObjectList:detail.html.php',
                 'passthroughVars' => [
-                    'mauticContent' => 'customObjectStructure',
+                    'mauticContent' => 'customObject',
                     'route'         => $route,
                 ],
             ]

@@ -10,7 +10,7 @@
  */
 
 if ($tmpl == 'index') {
-    $view->extend('CustomObjectsBundle:CustomObjectStructureList:index.html.php');
+    $view->extend('CustomObjectsBundle:CustomObjectList:index.html.php');
 }
 ?>
 <?php if (count($items)): ?>
@@ -24,8 +24,8 @@ if ($tmpl == 'index') {
                     [
                         'checkall'        => 'true',
                         'target'          => '#custom-objects-table',
-                        'langVar'         => 'custom.object.structures',
-                        'routeBase'       => 'custom_object_structures',
+                        'langVar'         => 'custom.object',
+                        'routeBase'       => 'custom_object',
                         'templateButtons' => [
                             // 'delete' => $view['security']->isGranted('plugin:mauticSocial:monitoring:delete'),
                         ],
@@ -35,10 +35,10 @@ if ($tmpl == 'index') {
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'sessionVar' => 'custom.object.structures',
+                        'sessionVar' => 'custom.object',
                         'orderBy'    => 'e.name',
                         'text'       => 'mautic.core.name',
-                        'class'      => 'col-custom_object_structure-name',
+                        'class'      => 'col-custom_object_-name',
                         'default'    => true,
                     ]
                 );
@@ -46,7 +46,7 @@ if ($tmpl == 'index') {
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'sessionVar' => 'custom.object.structures',
+                        'sessionVar' => 'custom.object',
                         'orderBy'    => 'e.id',
                         'text'       => 'mautic.core.id',
                         'class'      => 'visible-md visible-lg col-asset-id',
@@ -68,8 +68,8 @@ if ($tmpl == 'index') {
                                     // 'edit'   => true,//$view['security']->isGranted('plugin:mauticSocial:monitoring:edit'),
                             //         'delete' => true,//$view['security']->isGranted('plugin:mauticSocial:monitoring:delete'),
                                 ],
-                                'routeBase'  => 'custom_object_structures',
-                                'langVar'    => 'custom.object.structures',
+                                'routeBase'  => 'custom_object',
+                                'langVar'    => 'custom.object',
                                 'nameGetter' => 'getName',
                             ]
                         );
@@ -84,7 +84,7 @@ if ($tmpl == 'index') {
                                     'model' => 'social.monitoring',
                                 ]
                             ); ?>
-                            <a href="<?php echo $view['router']->path('mautic_custom_object_structures_view', ['objectId' => $item->getId()]); ?>"
+                            <a href="<?php echo $view['router']->path('mautic_custom_object_view', ['objectId' => $item->getId()]); ?>"
                                data-toggle="ajax">
                                 <?php echo $item->getName(); ?>
                             </a>
@@ -116,6 +116,6 @@ if ($tmpl == 'index') {
         ); ?>
     </div>
 <?php else: ?>
-    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php', ['tip' => 'custom.object.structures.noresults.tip']); ?>
+    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php', ['tip' => 'custom.object.noresults.tip']); ?>
 <?php endif; ?>
 

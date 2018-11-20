@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObjectStructure;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Model\FormModel;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectStructureRepository;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
-class CustomObjectStructureModel extends FormModel
+class CustomObjectModel extends FormModel
 {
     /**
      * @var EntityManager
@@ -28,29 +28,29 @@ class CustomObjectStructureModel extends FormModel
     private $entityManager;
 
     /**
-     * @var CustomObjectStructureRepository
+     * @var CustomObjectRepository
      */
-    private $customObjectStructureRepository;
+    private $customObjectRepository;
 
     /**
      * @param EntityManager $entityManager
-     * @param CustomObjectStructureRepository $customObjectStructureRepository
+     * @param CustomObjectRepository $customObjectRepository
      */
     public function __construct(
         EntityManager $entityManager,
-        CustomObjectStructureRepository $customObjectStructureRepository
+        CustomObjectRepository $customObjectRepository
     )
     {
         $this->entityManager                   = $entityManager;
-        $this->customObjectStructureRepository = $customObjectStructureRepository;
+        $this->customObjectRepository = $customObjectRepository;
     }
 
     /**
-     * @param CustomObjectStructure $entity
+     * @param CustomObject $entity
      * 
-     * @return CustomObjectStructure
+     * @return CustomObject
      */
-    public function save(CustomObjectStructure $entity): CustomObjectStructure
+    public function save(CustomObject $entity): CustomObject
     {
         $entity = $this->sanitizeAlias($entity);
         $entity = $this->ensureUniqueAlias($entity);
@@ -63,16 +63,16 @@ class CustomObjectStructureModel extends FormModel
     /**
      * @param integer $id
      * 
-     * @return CustomObjectStructure
+     * @return CustomObject
      * 
      * @throws NotFoundException
      */
-    public function fetchEntity(int $id): CustomObjectStructure
+    public function fetchEntity(int $id): CustomObject
     {
         $entity = parent::getEntity($id);
 
         if (null === $entity) {
-            throw new NotFoundException("Custom Object Structure with ID = {$id} was not found");
+            throw new NotFoundException("Custom Object  with ID = {$id} was not found");
         }
 
         return $entity;
@@ -83,15 +83,15 @@ class CustomObjectStructureModel extends FormModel
      */
     public function getRepository(): CommonRepository
     {
-        return $this->customObjectStructureRepository;
+        return $this->customObjectRepository;
     }
 
     /**
-     * @param CustomObjectStructure $entity
+     * @param CustomObject $entity
      * 
-     * @return CustomObjectStructure
+     * @return CustomObject
      */
-    private function sanitizeAlias(CustomObjectStructure $entity): CustomObjectStructure
+    private function sanitizeAlias(CustomObject $entity): CustomObject
     {
         $dirtyAlias = $entity->getAlias();
 
@@ -109,14 +109,14 @@ class CustomObjectStructureModel extends FormModel
     /**
      * Make sure alias is not already taken.
      *
-     * @param CustomObjectStructure $entity
+     * @param CustomObject $entity
      * 
-     * @return CustomObjectStructure
+     * @return CustomObject
      */
-    private function ensureUniqueAlias(CustomObjectStructure $entity): CustomObjectStructure
+    private function ensureUniqueAlias(CustomObject $entity): CustomObject
     {
         $testAlias = $entity->getAlias();
-        $isUnique  = $this->customObjectStructureRepository->isAliasUnique($testAlias, $entity->getId());
+        $isUnique  = $this->customObjectRepository->isAliasUnique($testAlias, $entity->getId());
         $counter   = 1;
 
         while ($isUnique) {

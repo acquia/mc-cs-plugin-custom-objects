@@ -11,9 +11,9 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 
-$view['slots']->set('mauticContent', 'customObjectStructure');
+$view['slots']->set('mauticContent', 'customObject');
 
-$view['slots']->set('headerTitle', $view['translator']->trans('custom.object.structure.title'));
+$view['slots']->set('headerTitle', $view['translator']->trans('custom.object.title'));
 
 $view['slots']->set(
     'actions',
@@ -23,9 +23,9 @@ $view['slots']->set(
             'templateButtons' => [
                 'new' => true//$view['security']->isGranted('plugin:mauticSocial:monitoring:create'),
             ],
-            'routeBase' => 'custom_object_structures',
-            'actionRoute' => 'mautic_custom_object_structures_new',
-            'langVar'   => 'custom.object.structures',
+            'routeBase' => 'custom_object',
+            'actionRoute' => 'mautic_custom_object_new',
+            'langVar'   => 'custom.object',
         ]
     )
 );

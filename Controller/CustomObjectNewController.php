@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller;
 
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObjectStructure;
-use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectStructureType;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class CustomObjectStructureNewController extends CommonController
+class CustomObjectNewController extends CommonController
 {
     /**
      * @var Router
@@ -54,21 +54,21 @@ class CustomObjectStructureNewController extends CommonController
      */
     public function renderFormAction()
     {
-        $entity  = new CustomObjectStructure();
-        $action  = $this->router->generate('mautic_custom_object_structures_save');
-        $form    = $this->formFactory->create(CustomObjectStructureType::class, $entity, ['action' => $action]);
+        $entity  = new CustomObject();
+        $action  = $this->router->generate('mautic_custom_object_save');
+        $form    = $this->formFactory->create(CustomObjectType::class, $entity, ['action' => $action]);
 
         return $this->delegateView(
             [
-                'returnUrl'      => $this->router->generate('mautic_custom_object_structures_list'),
+                'returnUrl'      => $this->router->generate('mautic_custom_object_list'),
                 'viewParameters' => [
                     'entity' => $entity,
                     'form'   => $form->createView(),
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObjectStructureAction:form.html.php',
+                'contentTemplate' => 'CustomObjectsBundle:CustomObjectAction:form.html.php',
                 'passthroughVars' => [
-                    'mauticContent' => 'customObjectStructure',
-                    'route'         => $this->router->generate('mautic_custom_object_structures_new'),
+                    'mauticContent' => 'customObject',
+                    'route'         => $this->router->generate('mautic_custom_object_new'),
                 ],
             ]
         );

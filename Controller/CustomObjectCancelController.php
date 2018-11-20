@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Controller;
 
 use Symfony\Component\HttpFoundation\Session\Session;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectStructureModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class CustomObjectStructureCancelController extends CommonController
+class CustomObjectCancelController extends CommonController
 {
     /**
      * @var Session
@@ -27,21 +27,21 @@ class CustomObjectStructureCancelController extends CommonController
     private $session;
 
     /**
-     * @var CustomObjectStructureModel
+     * @var CustomObjectModel
      */
-    private $customObjectStructureModel;
+    private $customObjectModel;
 
     /**
      * @param Session $session
-     * @param CustomObjectStructureModel $customObjectStructureModel
+     * @param CustomObjectModel $customObjectModel
      */
     public function __construct(
         Session $session,
-        CustomObjectStructureModel $customObjectStructureModel
+        CustomObjectModel $customObjectModel
     )
     {
-        $this->session                    = $session;
-        $this->customObjectStructureModel = $customObjectStructureModel;
+        $this->session           = $session;
+        $this->customObjectModel = $customObjectModel;
     }
 
     /**
@@ -55,16 +55,16 @@ class CustomObjectStructureCancelController extends CommonController
     public function cancelAction(?int $objectId)
     {
         $viewParameters = [
-            'page' => $this->session->get('custom.object.structures.page', 1),
+            'page' => $this->session->get('custom.object.page', 1),
         ];
 
         return $this->postActionRedirect(
             [
-                'returnUrl'       => $this->generateUrl('mautic_custom_object_structures_list', $viewParameters),
+                'returnUrl'       => $this->generateUrl('mautic_custom_object_list', $viewParameters),
                 'viewParameters'  => $viewParameters,
-                'contentTemplate' => 'CustomObjectsBundle:CustomObjectStructureList:list',
+                'contentTemplate' => 'CustomObjectsBundle:CustomObjectList:list',
                 'passthroughVars' => [
-                    'mauticContent' => 'customObjectStructure',
+                    'mauticContent' => 'customObject',
                 ],
             ]
         );

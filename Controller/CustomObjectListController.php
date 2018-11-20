@@ -17,11 +17,11 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectStructureModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Predis\Protocol\Text\RequestSerializer;
 use Mautic\CoreBundle\Controller\CommonController;
 
-class CustomObjectStructureListController extends CommonController
+class CustomObjectListController extends CommonController
 {
     /**
      * @var RequestStack
@@ -34,27 +34,27 @@ class CustomObjectStructureListController extends CommonController
     private $session;
 
     /**
-     * @var CustomObjectStructureModel
+     * @var CustomObjectModel
      */
-    private $customObjectStructureModel;
+    private $customObjectModel;
 
     /**
      * @param RequestStack $requestStack
      * @param Session $session
      * @param CoreParametersHelper $coreParametersHelper
-     * @param CustomObjectStructureModel $customObjectStructureModel
+     * @param CustomObjectModel $customObjectModel
      */
     public function __construct(
         RequestStack $requestStack,
         Session $session,
         CoreParametersHelper $coreParametersHelper,
-        CustomObjectStructureModel $customObjectStructureModel
+        CustomObjectModel $customObjectModel
     )
     {
         $this->requestStack               = $requestStack;
         $this->session                    = $session;
         $this->coreParametersHelper       = $coreParametersHelper;
-        $this->customObjectStructureModel = $customObjectStructureModel;
+        $this->customObjectModel = $customObjectModel;
     }
 
     /**
@@ -64,26 +64,26 @@ class CustomObjectStructureListController extends CommonController
     public function listAction(int $page)
     {
         $request    = $this->requestStack->getCurrentRequest();
-        $search     = $request->get('search', $this->session->get('custom.object.structures.filter', ''));
+        $search     = $request->get('search', $this->session->get('custom.object.filter', ''));
         $viewParams = ['page' => $page];
 
-        $this->session->set('custom.object.structures.filter', $search);
+        $this->session->set('custom.object.filter', $search);
 
         // @todo check permissions
 
 
         //set limits
-        $limit = $this->session->get('custom.object.structures.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
+        $limit = $this->session->get('custom.object.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
         $start = ($page === 1) ? 0 : (($page - 1) * $limit);
         if ($start < 0) {
             $start = 0;
         }
 
         $filter     = ['string' => $search];
-        $orderBy    = $this->session->get('custom.object.structures.orderby', 'e.id');
-        $orderByDir = $this->session->get('custom.object.structures.orderbydir', 'DESC');
+        $orderBy    = $this->session->get('custom.object.orderby', 'e.id');
+        $orderByDir = $this->session->get('custom.object.orderbydir', 'DESC');
 
-        $entities = $this->customObjectStructureModel->getEntities(
+        $entities = $this->customObjectModel->getEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -94,7 +94,7 @@ class CustomObjectStructureListController extends CommonController
         );
 
         $count = count($entities);
-        $route = $this->generateUrl('mautic_custom_object_structures_list', $viewParams);
+        $route = $this->generateUrl('mautic_custom_object_list', $viewParams);
 
         // if ($count && $count < ($start + 1)) {
         //     //the number of entities are now less then the current page so redirect to the last page
@@ -104,23 +104,23 @@ class CustomObjectStructureListController extends CommonController
         //         $lastPage = (ceil($count / $limit)) ?: 1;
         //     }
         //     $viewParams['page'] = $lastPage;
-        //     $this->session->set('custom.object.structures.page', $lastPage);
-        //     $route = $this->generateUrl('mautic_custom_object_structures_list', $viewParams);
+        //     $this->session->set('custom.object.page', $lastPage);
+        //     $route = $this->generateUrl('mautic_custom_object_list', $viewParams);
 
         //     return $this->postActionRedirect(
         //         [
         //             'returnUrl'       => $route,
         //             'viewParameters'  => ['page' => $lastPage],
-        //             'contentTemplate' => 'CustomObjectsBundle:CustomObjectStructureList:list.html.php',
+        //             'contentTemplate' => 'CustomObjectsBundle:CustomObjectList:list.html.php',
         //             'passthroughVars' => [
-        //                 'mauticContent' => 'customObjectStructure',
+        //                 'mauticContent' => 'customObject',
         //                 'route'         => $route,
         //             ],
         //         ]
         //     );
         // }
 
-        $this->session->set('custom.object.structures.page', $page);
+        $this->session->set('custom.object.page', $page);
 
         return $this->delegateView(
             [
@@ -132,9 +132,9 @@ class CustomObjectStructureListController extends CommonController
                     'limit'          => $limit,
                     'tmpl'           => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObjectStructureList:list.html.php',
+                'contentTemplate' => 'CustomObjectsBundle:CustomObjectList:list.html.php',
                 'passthroughVars' => [
-                    'mauticContent' => 'customObjectStructure',
+                    'mauticContent' => 'customObject',
                     'route'         => $route,
                 ],
             ]

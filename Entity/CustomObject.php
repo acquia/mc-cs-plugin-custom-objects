@@ -21,9 +21,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 use DateTimeInterface;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\FormEntity;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectStructureRepository;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 
-class CustomObjectStructure extends FormEntity
+class CustomObject extends FormEntity
 {
     /**
      * @var int|null
@@ -73,8 +73,8 @@ class CustomObjectStructure extends FormEntity
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('custom_object_structures')
-            ->setCustomRepositoryClass(CustomObjectStructureRepository::class)
+        $builder->setTable('custom_object')
+            ->setCustomRepositoryClass(CustomObjectRepository::class)
             ->addIndex(['alias'], 'alias');
 
         $builder->addId();

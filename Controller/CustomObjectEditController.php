@@ -13,17 +13,17 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller;
 
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObjectStructure;
-use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectStructureType;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectStructureModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 
-class CustomObjectStructureCloneController extends CommonController
+class CustomObjectEditController extends CommonController
 {
     /**
      * @var Router
@@ -36,24 +36,24 @@ class CustomObjectStructureCloneController extends CommonController
     private $formFactory;
 
     /**
-     * @var CustomObjectStructureModel
+     * @var CustomObjectModel
      */
-    private $customObjectStructureModel;
+    private $customObjectModel;
 
     /**
      * @param Router $router
      * @param FormFactory $formFactory
-     * @param CustomObjectStructureModel $customObjectStructureModel
+     * @param CustomObjectModel $customObjectModel
      */
     public function __construct(
         Router $router,
         FormFactory $formFactory,
-        CustomObjectStructureModel $customObjectStructureModel
+        CustomObjectModel $customObjectModel
     )
     {
         $this->router      = $router;
         $this->formFactory = $formFactory;
-        $this->customObjectStructureModel = $customObjectStructureModel;
+        $this->customObjectModel = $customObjectModel;
     }
 
     /**
@@ -63,23 +63,23 @@ class CustomObjectStructureCloneController extends CommonController
      * 
      * @return Response|JsonResponse
      */
-    public function cloneAction(int $objectId)
+    public function renderFormAction(int $objectId)
     {
-        $entity  = clone $this->customObjectStructureModel->getEntity($objectId);
-        $action  = $this->router->generate('mautic_custom_object_structures_save');
-        $form    = $this->formFactory->create(CustomObjectStructureType::class, $entity, ['action' => $action]);
+        $entity  = $this->customObjectModel->fetchEntity($objectId);
+        $action  = $this->router->generate('mautic_custom_object_save', ['objectId' => $objectId]);
+        $form    = $this->formFactory->create(CustomObjectType::class, $entity, ['action' => $action]);
 
         return $this->delegateView(
             [
-                'returnUrl'      => $this->router->generate('mautic_custom_object_structures_list'),
+                'returnUrl'      => $this->router->generate('mautic_custom_object_list'),
                 'viewParameters' => [
                     'entity' => $entity,
                     'form'   => $form->createView(),
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObjectStructureAction:form.html.php',
+                'contentTemplate' => 'CustomObjectsBundle:CustomObjectAction:form.html.php',
                 'passthroughVars' => [
-                    'mauticContent' => 'customObjectStructure',
-                    'route'         => $this->router->generate('mautic_custom_object_structures_clone', ['objectId' => $objectId]),
+                    'mauticContent' => 'customObject',
+                    'route'         => $this->router->generate('mautic_custom_object_edit', ['objectId' => $objectId]),
                 ],
             ]
         );
