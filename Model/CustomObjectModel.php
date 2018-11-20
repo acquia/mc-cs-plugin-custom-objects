@@ -19,6 +19,10 @@ use Mautic\CoreBundle\Model\FormModel;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
 
 class CustomObjectModel extends FormModel
 {
@@ -33,16 +37,27 @@ class CustomObjectModel extends FormModel
     private $customObjectRepository;
 
     /**
+     * @var CorePermissions
+     */
+    private $corePermissions;
+
+    /**
      * @param EntityManager $entityManager
      * @param CustomObjectRepository $customObjectRepository
+     * @param CorePermissions $corePermissions
+     * @param UserHelper $userHelper
      */
     public function __construct(
         EntityManager $entityManager,
-        CustomObjectRepository $customObjectRepository
+        CustomObjectRepository $customObjectRepository,
+        CorePermissions $corePermissions,
+        UserHelper $userHelper
     )
     {
         $this->entityManager          = $entityManager;
         $this->customObjectRepository = $customObjectRepository;
+        $this->corePermissions        = $corePermissions;
+        $this->userHelper             = $userHelper;
     }
 
     /**
@@ -52,8 +67,21 @@ class CustomObjectModel extends FormModel
      */
     public function save(CustomObject $entity): CustomObject
     {
+        $user   = $this->userHelper->getUser();
         $entity = $this->sanitizeAlias($entity);
         $entity = $this->ensureUniqueAlias($entity);
+        $now    = new DateTimeHelper();
+
+        if ($entity->isNew()) {
+            $entity->setCreatedBy($user->getId());
+            $entity->setCreatedByUser($user->getName());
+            $entity->setDateAdded($now->getUtcDateTime());
+        }
+
+        $entity->setModifiedBy($user->getId());
+        $entity->setModifiedByUser($user->getName());
+        $entity->setDateModified($now->getUtcDateTime());
+
         $this->entityManager->persist($entity);
         $this->entityManager->flush();
 
@@ -72,10 +100,23 @@ class CustomObjectModel extends FormModel
         $entity = parent::getEntity($id);
 
         if (null === $entity) {
-            throw new NotFoundException("Custom Object  with ID = {$id} was not found");
+            throw new NotFoundException("Custom Object with ID = {$id} was not found");
         }
 
         return $entity;
+    }
+
+    /**
+     * @param array $args
+     * 
+     * @return Paginator
+     */
+    public function fetchEntities(array $args = []): Paginator
+    {
+        $args     = $this->addCreatorLimit($args);
+        $entities = parent::getEntities($args);
+
+        return $entities;
     }
 
     /**
@@ -130,5 +171,37 @@ class CustomObjectModel extends FormModel
         }
 
         return $entity;
+    }
+
+    /**
+     * Adds condition for creator if the user doesn't have permissions to view other.
+     *
+     * @param array $args
+     * 
+     * @return array
+     */
+    private function addCreatorLimit(array $args): array
+    {
+        if (!$this->corePermissions->isGranted('custom_objects:custom_objects:viewother')) {
+            if (!isset($args['filter'])) {
+                $args['filter'] = [];
+            }
+
+            if (!isset($args['filter']['force'])) {
+                $args['filter']['force'] = [];
+            }
+
+            $limitOwnerFilter = [
+                [
+                    'column' => 'e.createdBy',
+                    'expr'   => 'eq',
+                    'value'  => $this->userHelper->getUser()->getId(),
+                ],
+            ];
+
+            $args['filter']['force'] = $args['filter']['force'] + $limitOwnerFilter;
+        }
+
+        return $args;
     }
 }

@@ -72,7 +72,7 @@ return [
         'admin' => [
             'custom.object.title' => [
                 'route'     => 'mautic_custom_object_list',
-                // 'access'    => 'custom_object:objects:view',
+                'access'    => 'custom_objects:custom_objects:view',
                 'iconClass' => 'fa-list-alt',
                 'id'        => 'mautic_custom_object_list',
             ],
@@ -88,6 +88,7 @@ return [
                     'session',
                     'mautic.helper.core_parameters',
                     'custom_object.model',
+                    'mautic.security',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -195,6 +196,8 @@ return [
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'custom_object.repository',
+                    'mautic.security',
+                    'mautic.helper.user',
                 ],
             ],
         ],

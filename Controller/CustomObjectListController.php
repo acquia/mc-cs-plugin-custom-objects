@@ -20,6 +20,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Predis\Protocol\Text\RequestSerializer;
 use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 
 class CustomObjectListController extends CommonController
 {
@@ -39,22 +40,30 @@ class CustomObjectListController extends CommonController
     private $customObjectModel;
 
     /**
+     * @var CorePermissions
+     */
+    private $corePermissions;
+
+    /**
      * @param RequestStack $requestStack
      * @param Session $session
      * @param CoreParametersHelper $coreParametersHelper
      * @param CustomObjectModel $customObjectModel
+     * @param CorePermissions $corePermissions
      */
     public function __construct(
         RequestStack $requestStack,
         Session $session,
         CoreParametersHelper $coreParametersHelper,
-        CustomObjectModel $customObjectModel
+        CustomObjectModel $customObjectModel,
+        CorePermissions $corePermissions
     )
     {
         $this->requestStack         = $requestStack;
         $this->session              = $session;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->customObjectModel    = $customObjectModel;
+        $this->corePermissions      = $corePermissions;
     }
 
     /**
@@ -63,14 +72,15 @@ class CustomObjectListController extends CommonController
      */
     public function listAction(int $page)
     {
+        if (!$this->corePermissions->isGranted('custom_objects:custom_objects:view')) {
+            return $this->accessDenied();
+        }
+
         $request    = $this->requestStack->getCurrentRequest();
         $search     = $request->get('search', $this->session->get('custom.object.filter', ''));
         $viewParams = ['page' => $page];
 
         $this->session->set('custom.object.filter', $search);
-
-        // @todo check permissions
-
 
         //set limits
         $limit = $this->session->get('custom.object.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
@@ -83,7 +93,7 @@ class CustomObjectListController extends CommonController
         $orderBy    = $this->session->get('custom.object.orderby', 'e.id');
         $orderByDir = $this->session->get('custom.object.orderbydir', 'DESC');
 
-        $entities = $this->customObjectModel->getEntities(
+        $entities = $this->customObjectModel->fetchEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
