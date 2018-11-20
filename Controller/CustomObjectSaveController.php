@@ -71,11 +71,11 @@ class CustomObjectSaveController extends CommonController
         CustomObjectModel $customObjectModel
     )
     {
-        $this->requestStack               = $requestStack;
-        $this->router                     = $router;
-        $this->session                    = $session;
-        $this->formFactory                = $formFactory;
-        $this->translator                 = $translator;
+        $this->requestStack      = $requestStack;
+        $this->router            = $router;
+        $this->session           = $session;
+        $this->formFactory       = $formFactory;
+        $this->translator        = $translator;
         $this->customObjectModel = $customObjectModel;
     }
 

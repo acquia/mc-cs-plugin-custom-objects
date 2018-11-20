@@ -51,10 +51,10 @@ class CustomObjectListController extends CommonController
         CustomObjectModel $customObjectModel
     )
     {
-        $this->requestStack               = $requestStack;
-        $this->session                    = $session;
-        $this->coreParametersHelper       = $coreParametersHelper;
-        $this->customObjectModel = $customObjectModel;
+        $this->requestStack         = $requestStack;
+        $this->session              = $session;
+        $this->coreParametersHelper = $coreParametersHelper;
+        $this->customObjectModel    = $customObjectModel;
     }
 
     /**

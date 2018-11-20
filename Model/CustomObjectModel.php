@@ -41,7 +41,7 @@ class CustomObjectModel extends FormModel
         CustomObjectRepository $customObjectRepository
     )
     {
-        $this->entityManager                   = $entityManager;
+        $this->entityManager          = $entityManager;
         $this->customObjectRepository = $customObjectRepository;
     }
 

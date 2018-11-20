@@ -51,8 +51,8 @@ class CustomObjectEditController extends CommonController
         CustomObjectModel $customObjectModel
     )
     {
-        $this->router      = $router;
-        $this->formFactory = $formFactory;
+        $this->router            = $router;
+        $this->formFactory       = $formFactory;
         $this->customObjectModel = $customObjectModel;
     }
 
