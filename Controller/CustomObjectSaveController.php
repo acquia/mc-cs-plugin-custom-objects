@@ -91,7 +91,7 @@ class CustomObjectSaveController extends CommonController
         try {
             $entity = $objectId ? $this->customObjectModel->getEntity($objectId): new CustomObject();
         } catch (NotFoundException $e) {
-            $this->notFound($e->getMessage());
+            return $this->notFound($e->getMessage());
         }
 
         $request = $this->requestStack->getCurrentRequest();

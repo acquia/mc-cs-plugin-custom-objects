@@ -26,7 +26,7 @@ class NotFoundException extends Exception
      */
     public function __construct(
         string $message = 'Not found',
-        int $code = 0,
+        int $code = 404,
         ?Throwable $throwable = null
     ) {
         parent::__construct($message, $code, $throwable);

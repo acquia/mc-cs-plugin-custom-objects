@@ -20,6 +20,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Predis\Protocol\Text\RequestSerializer;
 use Mautic\CoreBundle\Controller\CommonController;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
 class CustomObjectViewController extends CommonController
 {
@@ -66,8 +67,13 @@ class CustomObjectViewController extends CommonController
      */
     public function viewAction(int $objectId)
     {
-        $entity = $this->customObjectModel->getEntity($objectId);
-        $route  = $this->generateUrl('mautic_custom_object_view', ['objectId' => $objectId]);
+        try {
+            $entity = $this->customObjectModel->fetchEntity($objectId);
+        } catch (NotFoundException $e) {
+            return $this->notFound($e->getMessage());
+        }
+
+        $route = $this->generateUrl('mautic_custom_object_view', ['objectId' => $objectId]);
 
         return $this->delegateView(
             [
