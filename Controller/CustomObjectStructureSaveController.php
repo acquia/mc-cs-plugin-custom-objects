@@ -25,6 +25,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
 class CustomObjectStructureSaveController extends CommonController
 {
@@ -53,6 +54,14 @@ class CustomObjectStructureSaveController extends CommonController
      */
     private $customObjectStructureModel;
 
+    /**
+     * @param RequestStack $requestStack
+     * @param Router $router
+     * @param Session $session
+     * @param FormFactory $formFactory
+     * @param TranslatorInterface $translator
+     * @param CustomObjectStructureModel $customObjectStructureModel
+     */
     public function __construct(
         RequestStack $requestStack,
         Router $router,
@@ -62,26 +71,32 @@ class CustomObjectStructureSaveController extends CommonController
         CustomObjectStructureModel $customObjectStructureModel
     )
     {
-        $this->requestStack                     = $requestStack;
-        $this->router                           = $router;
-        $this->session                          = $session;
-        $this->formFactory                      = $formFactory;
-        $this->translator                       = $translator;
+        $this->requestStack               = $requestStack;
+        $this->router                     = $router;
+        $this->session                    = $session;
+        $this->formFactory                = $formFactory;
+        $this->translator                 = $translator;
         $this->customObjectStructureModel = $customObjectStructureModel;
     }
 
     /**
      * @todo implement permissions
      * 
+     * @param int|null $objectId
+     * 
      * @return Response|JsonResponse
      */
-    public function saveAction()
+    public function saveAction(?int $objectId = null)
     {
-        $entity  = new CustomObjectStructure();
-        $request = $this->requestStack->getCurrentRequest();
-        $action  = $this->router->generate('mautic_custom_object_structures_save');
-        $form    = $this->formFactory->create(CustomObjectStructureType::class, $entity, ['action' => $action]);
+        try {
+            $entity = $objectId ? $this->customObjectStructureModel->getEntity($objectId): new CustomObjectStructure();
+        } catch (NotFoundException $e) {
+            $this->notFound($e->getMessage());
+        }
 
+        $request = $this->requestStack->getCurrentRequest();
+        $action  = $this->router->generate('mautic_custom_object_structures_save', ['objectId' => $objectId]);
+        $form    = $this->formFactory->create(CustomObjectStructureType::class, $entity, ['action' => $action]);
         $form->handleRequest($request);
 
         // $validator = $this->get('validator');
@@ -90,28 +105,27 @@ class CustomObjectStructureSaveController extends CommonController
         if ($form->isValid()) {
             $this->customObjectStructureModel->save($entity);
 
-            // $this->session->getFlashBag()->add(
-            //     'notice',
-            //     $this->translator->trans(
-            //         'mautic.core.notice.created',
-            //         [
-            //             '%name%' => $entity->getName(),
-            //             '%url%'  => $this->router->generate(
-            //                 'custom_objects_edit',
-            //                 [
-            //                     'objectId' => $entity->getId(),
-            //                 ]
-            //             ),
-            //         ], 
-            //         'flashes'
-            //     )
-            // );
-
-            // if (!$form->get('buttons')->get('save')->isClicked()) {
-            //     return $this->redirectToDetail($request, $entity);
-            // } else {
-            //     return $this->editAction($entity->getId(), true);
-            // }
+            $this->session->getFlashBag()->add(
+                'notice',
+                $this->translator->trans(
+                    $objectId ? 'mautic.core.notice.updated' : 'mautic.core.notice.created',
+                    [
+                        '%name%' => $entity->getName(),
+                        '%url%'  => $this->router->generate(
+                            'mautic_custom_object_structures_edit',
+                            [
+                                'objectId' => $entity->getId(),
+                            ]
+                        ),
+                    ], 
+                    'flashes'
+                )
+            );
+            if ($form->get('buttons')->get('save')->isClicked()) {
+                return $this->redirectToDetail($entity);
+            } else {
+                return $this->redirectToEdit($entity);
+            }
         }
 
         return $this->delegateView(
@@ -131,34 +145,31 @@ class CustomObjectStructureSaveController extends CommonController
         );
     }
 
-    // private function redirectToList(Request $request)
-    // {
-    //     $viewParameters = [
-    //         'page' => $this->session->get('custom.object.structures.page', 1),
-    //         // 'tmpl' => $request->isXmlHttpRequest() ? $request->get('tmpl', 'list') : 'list',
-    //     ];
-    //     return $this->postActionRedirect(
-    //         [
-    //             'returnUrl'       => $this->generateUrl('mautic_custom_object_structures_list', $viewParameters),
-    //             'viewParameters'  => $viewParameters,
-    //             'contentTemplate' => 'CustomObjectsBundle:CustomObjectStructureList:list.html.php',
-    //             'passthroughVars' => [
-    //                 'mauticContent' => 'customObjectStructure',
-    //             ],
-    //         ]
-    //     );
+    /**
+     * @param Request               $request
+     * @param CustomObjectStructure $entity
+     * 
+     * @return Response
+     */
+    private function redirectToEdit(Request $request, CustomObjectStructure $entity): Response
+    {
+        $request->setMethod('GET');
+        $params = ['objectId' => $entity->getId()];
 
-    //     return $this->forward('custom_object_structures.list_controller:listAction', $params);
-    // }
+        return $this->forward('custom_object.structures.edit_controller:renderFormAction', $params);
+    }
 
-    // private function redirectToDetail(Request $request, CustomObjectStructure $entity)
-    // {
-    //     $params = [
-    //         'objectAction' => 'view',
-    //         'objectId'     => $entity->getId(),
-    //         'tmpl'         => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
-    //     ];
+    /**
+     * @param Request               $request
+     * @param CustomObjectStructure $entity
+     * 
+     * @return Response
+     */
+    private function redirectToDetail(Request $request, CustomObjectStructure $entity): Response
+    {
+        $request->setMethod('GET');
+        $params = ['objectId' => $entity->getId()];
 
-    //     return $this->render('CustomObjectsBundle:CustomObjectStructureDetail:view.html.php', $params, new Response(''));
-    // }
+        return $this->forward('CustomObjectsBundle:CustomObjectStructureView:view', $params);
+    }
 }

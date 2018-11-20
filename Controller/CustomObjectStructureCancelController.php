@@ -48,9 +48,11 @@ class CustomObjectStructureCancelController extends CommonController
      * @todo implement permissions
      * @todo unlock entity?
      * 
+     * @param int|null $objectId
+     * 
      * @return Response|JsonResponse
      */
-    public function cancelAction()
+    public function cancelAction(?int $objectId)
     {
         $viewParameters = [
             'page' => $this->session->get('custom.object.structures.page', 1),

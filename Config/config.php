@@ -45,14 +45,20 @@ return [
                 'method'     => 'GET',
             ],
             'mautic_custom_object_structures_cancel' => [
-                'path'       => '/custom/object/structures/cancel',
+                'path'       => '/custom/object/structures/cancel/{objectId}',
                 'controller' => 'CustomObjectsBundle:CustomObjectStructureCancel:cancel',
                 'method'     => 'GET',
+                'defaults'   => [
+                    'objectId' => null,
+                ],
             ],
             'mautic_custom_object_structures_save' => [
-                'path'       => '/custom/object/structures/save',
+                'path'       => '/custom/object/structures/save/{objectId}',
                 'controller' => 'CustomObjectsBundle:CustomObjectStructureSave:save',
                 'method'     => 'POST',
+                'defaults'   => [
+                    'objectId' => null,
+                ],
             ],
         ],
     ],

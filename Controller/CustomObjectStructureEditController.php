@@ -65,8 +65,8 @@ class CustomObjectStructureEditController extends CommonController
      */
     public function renderFormAction(int $objectId)
     {
-        $entity  = $this->customObjectStructureModel->getEntity($objectId);
-        $action  = $this->router->generate('mautic_custom_object_structures_save');
+        $entity  = $this->customObjectStructureModel->fetchEntity($objectId);
+        $action  = $this->router->generate('mautic_custom_object_structures_save', ['objectId' => $objectId]);
         $form    = $this->formFactory->create(CustomObjectStructureType::class, $entity, ['action' => $action]);
 
         return $this->delegateView(

@@ -18,6 +18,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Model\FormModel;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectStructureRepository;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
 class CustomObjectStructureModel extends FormModel
 {
@@ -55,6 +56,24 @@ class CustomObjectStructureModel extends FormModel
         $entity = $this->ensureUniqueAlias($entity);
         $this->entityManager->persist($entity);
         $this->entityManager->flush();
+
+        return $entity;
+    }
+
+    /**
+     * @param integer $id
+     * 
+     * @return CustomObjectStructure
+     * 
+     * @throws NotFoundException
+     */
+    public function fetchEntity(int $id): CustomObjectStructure
+    {
+        $entity = parent::getEntity($id);
+
+        if (null === $entity) {
+            throw new NotFoundException("Custom Object Structure with ID = {$id} was not found");
+        }
 
         return $entity;
     }
@@ -101,7 +120,7 @@ class CustomObjectStructureModel extends FormModel
         $counter   = 1;
 
         while ($isUnique) {
-            $testAlias = $alias.$counter;
+            $testAlias = $testAlias.$counter;
             $isUnique  = $repo->isAliasUnique($testAlias, $entity->getId());
             ++$counter;
         }
