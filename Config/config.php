@@ -60,6 +60,11 @@ return [
                     'objectId' => null,
                 ],
             ],
+            'mautic_custom_object_delete' => [
+                'path'       => '/custom/object/delete/{objectId}',
+                'controller' => 'CustomObjectsBundle:CustomObjectDelete:delete',
+                'method'     => 'GET',
+            ],
         ],
     ],
 
@@ -151,6 +156,19 @@ return [
                     'form.factory',
                     'translator',
                     'custom_object.model',
+                ],
+                'methodCalls' => [
+                    'setContainer' => [
+                        '@service_container'
+                    ],
+                ],
+            ],
+            'custom_object.delete_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectDeleteController::class,
+                'arguments' => [
+                    'custom_object.model',
+                    'session',
+                    'translator',
                 ],
                 'methodCalls' => [
                     'setContainer' => [

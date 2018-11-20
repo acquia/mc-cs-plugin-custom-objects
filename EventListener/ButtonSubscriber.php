@@ -123,7 +123,7 @@ class ButtonSubscriber extends CommonSubscriber
     {
         return [
             'attr' => [
-                'href' => $this->router->generate('mautic_custom_object_edit', ['objectId' => $entity->getId()]),
+                'href' => $this->router->generate('mautic_custom_object_delete', ['objectId' => $entity->getId()]),
             ],
             'btnText'   => $this->translator->trans('mautic.core.form.delete'),
             'iconClass' => 'fa fa-fw fa-trash-o text-danger',
