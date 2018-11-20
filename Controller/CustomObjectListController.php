@@ -111,7 +111,7 @@ class CustomObjectListController extends CommonController
         //         [
         //             'returnUrl'       => $route,
         //             'viewParameters'  => ['page' => $lastPage],
-        //             'contentTemplate' => 'CustomObjectsBundle:CustomObjectList:list.html.php',
+        //             'contentTemplate' => 'CustomObjectsBundle:CustomObject:list.html.php',
         //             'passthroughVars' => [
         //                 'mauticContent' => 'customObject',
         //                 'route'         => $route,
@@ -132,7 +132,7 @@ class CustomObjectListController extends CommonController
                     'limit'          => $limit,
                     'tmpl'           => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObjectList:list.html.php',
+                'contentTemplate' => 'CustomObjectsBundle:CustomObject:list.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
                     'route'         => $route,

@@ -135,7 +135,7 @@ class CustomObjectSaveController extends CommonController
                     'form'   => $form->createView(),
                     'tmpl'   => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObjectAction:form.html.php',
+                'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
                     'route'         => $this->router->generate('mautic_custom_object_new'),

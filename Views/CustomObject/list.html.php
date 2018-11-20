@@ -10,7 +10,7 @@
  */
 
 if ($tmpl == 'index') {
-    $view->extend('CustomObjectsBundle:CustomObjectList:index.html.php');
+    $view->extend('CustomObjectsBundle:CustomObject:index.html.php');
 }
 ?>
 <?php if (count($items)): ?>

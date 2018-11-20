@@ -65,7 +65,7 @@ class CustomObjectNewController extends CommonController
                     'entity' => $entity,
                     'form'   => $form->createView(),
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObjectAction:form.html.php',
+                'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
                     'route'         => $this->router->generate('mautic_custom_object_new'),

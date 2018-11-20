@@ -75,7 +75,7 @@ class CustomObjectViewController extends CommonController
                 'viewParameters' => [
                     'item' => $entity,
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObjectList:detail.html.php',
+                'contentTemplate' => 'CustomObjectsBundle:CustomObject:detail.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
                     'route'         => $route,
