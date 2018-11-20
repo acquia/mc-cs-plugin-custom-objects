@@ -104,9 +104,9 @@ class CustomObjectStructure extends FormEntity
     }
 
     /**
-     * @param string $name
+     * @param string|null $name
      */
-    public function setName(string $name): void
+    public function setName(?string $name): void
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -121,9 +121,9 @@ class CustomObjectStructure extends FormEntity
     }
 
     /**
-     * @param string $alias
+     * @param string|null $alias
      */
-    public function setAlias(string $alias): void
+    public function setAlias(?string $alias): void
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -138,9 +138,9 @@ class CustomObjectStructure extends FormEntity
     }
 
     /**
-     * @param string $description
+     * @param string|null $description
      */
-    public function setDescription(string $description): void
+    public function setDescription(?string $description): void
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -163,9 +163,9 @@ class CustomObjectStructure extends FormEntity
     }
 
     /**
-     * @param Category $category
+     * @param Category|null $category
      */
-    public function setCategory(Category $category): void
+    public function setCategory(?Category $category): void
     {
         $this->category = $category;
     }
@@ -179,9 +179,9 @@ class CustomObjectStructure extends FormEntity
     }
 
     /**
-     * @param string $language
+     * @param string|null $language
      */
-    public function setLanguage($language): void
+    public function setLanguage(?string $language): void
     {
         $this->isChanged('language', $language);
         $this->language = $language;
