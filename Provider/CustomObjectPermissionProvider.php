@@ -19,7 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 
 class CustomObjectPermissionProvider
 {
-    private const BASE = 'custom_objects:custom_objects:';
+    public const BASE = 'custom_objects:custom_objects:';
 
     /**
      * @var CorePermissions
@@ -35,76 +35,86 @@ class CustomObjectPermissionProvider
     }
 
     /**
-     * @thorws ForbiddenException
+     * @param string $permission
+     * 
+     * @throws ForbiddenException
      */
-    public function canCreate()
+    public function isGranted(string $permission): void
     {
-        if (!$this->corePermissions->isGranted(self::BASE.'create')) {
-            throw new ForbiddenException('create');
+        if (!$this->corePermissions->isGranted(CustomObjectPermissionProvider::BASE.$permission)) {
+            throw new ForbiddenException($permission);
         }
+    }
+
+    /**
+     * @param string $permission
+     * 
+     * @throws ForbiddenException
+     */
+    public function hasEntityAccess(string $permission, UniqueEntityInterface $entity): void
+    {
+        if (!$this->corePermissions->hasEntityAccess(self::BASE.$permission.'own', self::BASE.$permission.'other', $entity->getCreatedBy())) {
+            throw new ForbiddenException($permission);
+        }
+    }
+
+    /**
+     * @throws ForbiddenException
+     */
+    public function canCreate(): void
+    {
+        $this->isGranted('create');
     }
 
     /**
      * @param UniqueEntityInterface $entity
      * 
-     * @thorws ForbiddenException
+     * @throws ForbiddenException
      */
-    public function canView(UniqueEntityInterface $entity)
+    public function canView(UniqueEntityInterface $entity): void
     {
-        if (!$this->corePermissions->hasEntityAccess(self::BASE.'viewown', self::BASE.'viewother', $entity->getCreatedBy())) {
-            throw new ForbiddenException('view', $entity);
-        }
+        $this->hasEntityAccess('view', $entity);
     }
 
     /**
-     * @thorws ForbiddenException
+     * @throws ForbiddenException
      */
-    public function canViewAtAll()
+    public function canViewAtAll(): void
     {
-        if (!$this->corePermissions->isGranted(self::BASE.'view')) {
-            throw new ForbiddenException('view', $entity);
-        }
+        $this->isGranted('view');
     }
 
     /**
      * @param UniqueEntityInterface $entity
      * 
-     * @thorws ForbiddenException
+     * @throws ForbiddenException
      */
-    public function canEdit(UniqueEntityInterface $entity)
+    public function canEdit(UniqueEntityInterface $entity): void
     {
-        if (!$this->corePermissions->hasEntityAccess(self::BASE.'editown', self::BASE.'editother', $entity->getCreatedBy())) {
-            throw new ForbiddenException('edit', $entity);
-        }
+        $this->hasEntityAccess('edit', $entity);
     }
 
     /**
      * @param UniqueEntityInterface $entity
      * 
-     * @thorws ForbiddenException
+     * @throws ForbiddenException
      */
-    public function canClone(UniqueEntityInterface $entity)
+    public function canClone(UniqueEntityInterface $entity): void
     {
         // Check the create permission as new entity will be created.
-        if (!$this->corePermissions->isGranted(self::BASE.'create')) {
-            throw new ForbiddenException('create');
-        }
+        $this->isGranted('create');
 
         // But check also if the user can view others as clone will show values of the original entity.
-        if (!$this->corePermissions->hasEntityAccess(self::BASE.'viewown', self::BASE.'viewother', $entity->getCreatedBy())) {
-            throw new ForbiddenException('view', $entity);
-        }
+        $this->hasEntityAccess('view', $entity);
     }
 
     /**
      * @param UniqueEntityInterface $entity
      * 
-     * @thorws ForbiddenException
+     * @throws ForbiddenException
      */
-    public function canDelete(UniqueEntityInterface $entity)
+    public function canDelete(UniqueEntityInterface $entity): void
     {
-        if (!$this->corePermissions->hasEntityAccess(self::BASE.'deleteown', 'custom_objects:custom_objects:deleteother', $entity->getCreatedBy())) {
-            throw new ForbiddenException('delete', $entity);
-        }
+        $this->hasEntityAccess('delete', $entity);
     }
 }
