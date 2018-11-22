@@ -86,6 +86,8 @@ class CustomObjectCloneController extends CommonController
             $this->accessDenied(false, $e->getMessage());
         }
 
+        $entity->setName($entity->getName().' '.$this->translator->trans('mautic.core.form.clone'));
+
         $action = $this->router->generate('mautic_custom_object_save');
         $form   = $this->formFactory->create(CustomObjectType::class, $entity, ['action' => $action]);
 
