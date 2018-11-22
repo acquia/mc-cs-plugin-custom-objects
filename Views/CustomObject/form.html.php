@@ -43,7 +43,7 @@ $view['slots']->set('headerTitle', $header);
     </div>
     <div class="col-md-3 bg-white height-auto">
         <div class="pr-lg pl-lg pt-md pb-md">
-            <?php //echo $view['form']->row($form['category']); ?>
+            <?php echo $view['form']->row($form['category']); ?>
         </div>
     </div>
 </div>

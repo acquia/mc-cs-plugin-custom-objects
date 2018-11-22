@@ -69,6 +69,14 @@ class CustomObjectType extends AbstractType
         );
 
         $builder->add(
+            'category',
+            'category',
+            [
+                'bundle' => 'custom_object',
+            ]
+        );
+
+        $builder->add(
             'buttons',
             'form_buttons',
             [
