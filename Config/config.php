@@ -103,6 +103,7 @@ return [
                     'session',
                     'mautic.helper.core_parameters',
                     'custom_object.model',
+                    'custom_object.permission.provider',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -115,6 +116,7 @@ return [
                 'arguments' => [
                     'router',
                     'form.factory',
+                    'custom_object.permission.provider',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -128,6 +130,7 @@ return [
                     'router',
                     'form.factory',
                     'custom_object.model',
+                    'custom_object.permission.provider',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -141,6 +144,7 @@ return [
                     'router',
                     'form.factory',
                     'custom_object.model',
+                    'custom_object.permission.provider',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -157,6 +161,8 @@ return [
                     'form.factory',
                     'translator',
                     'custom_object.model',
+                    'custom_object.permission.provider',
+
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -170,6 +176,7 @@ return [
                     'custom_object.model',
                     'session',
                     'translator',
+                    'custom_object.permission.provider',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -213,6 +220,17 @@ return [
         'events' => [
             'custom_object.button.subscriber' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\ButtonSubscriber::class,
+                'arguments' => [
+                    'custom_object.permission.provider',
+                ],
+            ],
+        ],
+        'other' => [
+            'custom_object.permission.provider' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider::class,
+                'arguments' => [
+                    'mautic.security',
+                ],
             ],
         ],
     ],

@@ -21,6 +21,8 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 
 class CustomObjectNewController extends CommonController
 {
@@ -35,25 +37,37 @@ class CustomObjectNewController extends CommonController
     private $formFactory;
 
     /**
+     * @var CustomObjectPermissionProvider
+     */
+    private $permissionProvider;
+
+    /**
      * @param Router $router
      * @param FormFactory $formFactory
+     * @param CustomObjectPermissionProvider $permissionProvider
      */
     public function __construct(
         Router $router,
-        FormFactory $formFactory
+        FormFactory $formFactory,
+        CustomObjectPermissionProvider $permissionProvider
     )
     {
-        $this->router      = $router;
-        $this->formFactory = $formFactory;
+        $this->router             = $router;
+        $this->formFactory        = $formFactory;
+        $this->permissionProvider = $permissionProvider;
     }
 
     /**
-     * @todo implement permissions
-     * 
      * @return Response|JsonResponse
      */
     public function renderFormAction()
     {
+        try {
+            $this->permissionProvider->canCreate();
+        } catch (ForbiddenException $e) {
+            return $this->accessDenied($e->getMessage());
+        }
+        
         $entity  = new CustomObject();
         $action  = $this->router->generate('mautic_custom_object_save');
         $form    = $this->formFactory->create(CustomObjectType::class, $entity, ['action' => $action]);

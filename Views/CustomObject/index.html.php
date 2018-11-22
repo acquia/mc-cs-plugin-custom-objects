@@ -12,23 +12,8 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 
 $view['slots']->set('mauticContent', 'customObject');
-
 $view['slots']->set('headerTitle', $view['translator']->trans('custom.object.title'));
-
-$view['slots']->set(
-    'actions',
-    $view->render(
-        'MauticCoreBundle:Helper:page_actions.html.php',
-        [
-            'templateButtons' => [
-                'new' => true//$view['security']->isGranted('plugin:mauticSocial:monitoring:create'),
-            ],
-            'routeBase' => 'custom_object',
-            'actionRoute' => 'mautic_custom_object_new',
-            'langVar'   => 'custom.object',
-        ]
-    )
-);
+$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php'));
 ?>
 
 <div class="panel panel-default bdr-t-wdh-0 mb-0">

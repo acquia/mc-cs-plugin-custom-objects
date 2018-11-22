@@ -22,6 +22,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
 class CustomObjectCloneController extends CommonController
 {
@@ -41,33 +44,50 @@ class CustomObjectCloneController extends CommonController
     private $customObjectModel;
 
     /**
+     * @var CustomObjectPermissionProvider
+     */
+    private $permissionProvider;
+
+    /**
      * @param Router $router
      * @param FormFactory $formFactory
      * @param CustomObjectModel $customObjectModel
+     * @param CustomObjectPermissionProvider $permissionProvider
      */
     public function __construct(
         Router $router,
         FormFactory $formFactory,
-        CustomObjectModel $customObjectModel
+        CustomObjectModel $customObjectModel,
+        CustomObjectPermissionProvider $permissionProvider
     )
     {
-        $this->router            = $router;
-        $this->formFactory       = $formFactory;
-        $this->customObjectModel = $customObjectModel;
+        $this->router             = $router;
+        $this->formFactory        = $formFactory;
+        $this->customObjectModel  = $customObjectModel;
+        $this->permissionProvider = $permissionProvider;
     }
 
     /**
-     * @todo implement permissions
-     * 
      * @param int $objectId
      * 
      * @return Response|JsonResponse
      */
     public function cloneAction(int $objectId)
     {
-        $entity  = clone $this->customObjectModel->getEntity($objectId);
-        $action  = $this->router->generate('mautic_custom_object_save');
-        $form    = $this->formFactory->create(CustomObjectType::class, $entity, ['action' => $action]);
+        try {
+            $entity = clone $this->customObjectModel->fetchEntity($objectId);
+        } catch (NotFoundException $e) {
+            return $this->notFound($e->getMessage());
+        }
+
+        try {
+            $this->permissionProvider->canClone($entity);
+        } catch (ForbiddenException $e) {
+            return $this->accessDenied($e->getMessage());
+        }
+
+        $action = $this->router->generate('mautic_custom_object_save');
+        $form   = $this->formFactory->create(CustomObjectType::class, $entity, ['action' => $action]);
 
         return $this->delegateView(
             [

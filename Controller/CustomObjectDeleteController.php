@@ -20,6 +20,8 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 
 class CustomObjectDeleteController extends CommonController
 {
@@ -34,24 +36,30 @@ class CustomObjectDeleteController extends CommonController
     private $session;
 
     /**
+     * @var CustomObjectPermissionProvider
+     */
+    private $permissionProvider;
+
+    /**
      * @param CustomObjectModel $customObjectModel
      * @param Session $session
      * @param TranslatorInterface $translator
+     * @param CustomObjectPermissionProvider $permissionProvider
      */
     public function __construct(
         CustomObjectModel $customObjectModel,
         Session $session,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        CustomObjectPermissionProvider $permissionProvider
     )
     {
         $this->customObjectModel = $customObjectModel;
         $this->session           = $session;
         $this->translator        = $translator;
+        $this->permissionProvider = $permissionProvider;
     }
 
     /**
-     * @todo implement permissions
-     * 
      * @param int $objectId
      * 
      * @return Response|JsonResponse
@@ -60,10 +68,17 @@ class CustomObjectDeleteController extends CommonController
     {
         try {
             $entity = $this->customObjectModel->fetchEntity($objectId);
-            $this->customObjectModel->deleteEntity($entity);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         }
+
+        try {
+            $this->permissionProvider->canDelete($entity);
+        } catch (ForbiddenException $e) {
+            return $this->accessDenied($e->getMessage());
+        }
+
+        $this->customObjectModel->deleteEntity($entity);
 
         $this->session->getFlashBag()->add(
             'notice',
@@ -71,7 +86,7 @@ class CustomObjectDeleteController extends CommonController
                 'mautic.core.notice.deleted',
                 [
                     '%name%' => $entity->getName(),
-                    '%id%'   => $objectId,
+                    '%id%'   => $entity->getId(),
                 ], 
                 'flashes'
             )

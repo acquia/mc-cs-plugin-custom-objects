@@ -26,6 +26,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 
 class CustomObjectSaveController extends CommonController
 {
@@ -55,12 +57,18 @@ class CustomObjectSaveController extends CommonController
     private $customObjectModel;
 
     /**
+     * @var CustomObjectPermissionProvider
+     */
+    private $permissionProvider;
+
+    /**
      * @param RequestStack $requestStack
      * @param Router $router
      * @param Session $session
      * @param FormFactory $formFactory
      * @param TranslatorInterface $translator
      * @param CustomObjectModel $customObjectModel
+     * @param CustomObjectPermissionProvider $permissionProvider
      */
     public function __construct(
         RequestStack $requestStack,
@@ -68,20 +76,20 @@ class CustomObjectSaveController extends CommonController
         Session $session,
         FormFactory $formFactory,
         TranslatorInterface $translator,
-        CustomObjectModel $customObjectModel
+        CustomObjectModel $customObjectModel,
+        CustomObjectPermissionProvider $permissionProvider
     )
     {
-        $this->requestStack      = $requestStack;
-        $this->router            = $router;
-        $this->session           = $session;
-        $this->formFactory       = $formFactory;
-        $this->translator        = $translator;
-        $this->customObjectModel = $customObjectModel;
+        $this->requestStack       = $requestStack;
+        $this->router             = $router;
+        $this->session            = $session;
+        $this->formFactory        = $formFactory;
+        $this->translator         = $translator;
+        $this->customObjectModel  = $customObjectModel;
+        $this->permissionProvider = $permissionProvider;
     }
 
     /**
-     * @todo implement permissions
-     * 
      * @param int|null $objectId
      * 
      * @return Response|JsonResponse
@@ -92,6 +100,16 @@ class CustomObjectSaveController extends CommonController
             $entity = $objectId ? $this->customObjectModel->getEntity($objectId): new CustomObject();
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
+        }
+
+        try {
+            if ($entity->isNew()) {
+                $this->permissionProvider->canCreate();
+            } else {
+                $this->permissionProvider->canEdit($entity);
+            }
+        } catch (ForbiddenException $e) {
+            return $this->accessDenied($e->getMessage());
         }
 
         $request = $this->requestStack->getCurrentRequest();

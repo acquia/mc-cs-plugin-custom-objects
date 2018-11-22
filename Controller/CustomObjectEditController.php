@@ -22,6 +22,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 
 class CustomObjectEditController extends CommonController
 {
@@ -41,6 +44,12 @@ class CustomObjectEditController extends CommonController
     private $customObjectModel;
 
     /**
+     * @var CustomObjectPermissionProvider
+     */
+    private $permissionProvider;
+
+
+    /**
      * @param Router $router
      * @param FormFactory $formFactory
      * @param CustomObjectModel $customObjectModel
@@ -48,12 +57,14 @@ class CustomObjectEditController extends CommonController
     public function __construct(
         Router $router,
         FormFactory $formFactory,
-        CustomObjectModel $customObjectModel
+        CustomObjectModel $customObjectModel,
+        CustomObjectPermissionProvider $permissionProvider
     )
     {
         $this->router            = $router;
         $this->formFactory       = $formFactory;
         $this->customObjectModel = $customObjectModel;
+        $this->permissionProvider = $permissionProvider;
     }
 
     /**
@@ -65,7 +76,18 @@ class CustomObjectEditController extends CommonController
      */
     public function renderFormAction(int $objectId)
     {
-        $entity  = $this->customObjectModel->fetchEntity($objectId);
+        try {
+            $entity = $this->customObjectModel->fetchEntity($objectId);
+        } catch (NotFoundException $e) {
+            return $this->notFound($e->getMessage());
+        }
+
+        try {
+            $this->permissionProvider->canEdit($entity);
+        } catch (ForbiddenException $e) {
+            return $this->accessDenied($e->getMessage());
+        }
+
         $action  = $this->router->generate('mautic_custom_object_save', ['objectId' => $objectId]);
         $form    = $this->formFactory->create(CustomObjectType::class, $entity, ['action' => $action]);
 

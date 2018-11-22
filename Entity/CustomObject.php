@@ -22,8 +22,9 @@ use DateTimeInterface;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\FormEntity;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
+use MauticPlugin\CustomObjectsBundle\Entity\UniqueEntityInterface;
 
-class CustomObject extends FormEntity
+class CustomObject extends FormEntity implements UniqueEntityInterface
 {
     /**
      * @var int|null
