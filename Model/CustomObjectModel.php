@@ -19,10 +19,11 @@ use Mautic\CoreBundle\Model\FormModel;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 
 class CustomObjectModel extends FormModel
 {
@@ -37,26 +38,26 @@ class CustomObjectModel extends FormModel
     private $customObjectRepository;
 
     /**
-     * @var CorePermissions
+     * @var CustomObjectPermissionProvider
      */
-    private $corePermissions;
+    private $permissionProvider;
 
     /**
      * @param EntityManager $entityManager
      * @param CustomObjectRepository $customObjectRepository
-     * @param CorePermissions $corePermissions
+     * @param CustomObjectPermissionProvider $permissionProvider
      * @param UserHelper $userHelper
      */
     public function __construct(
         EntityManager $entityManager,
         CustomObjectRepository $customObjectRepository,
-        CorePermissions $corePermissions,
+        CustomObjectPermissionProvider $permissionProvider,
         UserHelper $userHelper
     )
     {
         $this->entityManager          = $entityManager;
         $this->customObjectRepository = $customObjectRepository;
-        $this->corePermissions        = $corePermissions;
+        $this->permissionProvider     = $permissionProvider;
         $this->userHelper             = $userHelper;
     }
 
@@ -182,7 +183,9 @@ class CustomObjectModel extends FormModel
      */
     private function addCreatorLimit(array $args): array
     {
-        if (!$this->corePermissions->isGranted('custom_objects:custom_objects:viewother')) {
+        try {
+            $this->permissionProvider->isGranted('viewother');
+        } catch (ForbiddenException $e) {
             if (!isset($args['filter'])) {
                 $args['filter'] = [];
             }

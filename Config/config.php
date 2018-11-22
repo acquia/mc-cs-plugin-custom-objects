@@ -203,7 +203,7 @@ return [
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'custom_object.repository',
-                    'mautic.security',
+                    'custom_object.permission.provider',
                     'mautic.helper.user',
                 ],
             ],
