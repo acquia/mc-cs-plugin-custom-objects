@@ -36,7 +36,6 @@ if ($tmpl == 'index') {
                         'orderBy'    => 'e.name',
                         'text'       => 'mautic.core.name',
                         'class'      => 'col-custom_object_-name',
-                        'default'    => true,
                     ]
                 );
 
@@ -47,6 +46,7 @@ if ($tmpl == 'index') {
                         'orderBy'    => 'e.id',
                         'text'       => 'mautic.core.id',
                         'class'      => 'visible-md visible-lg col-asset-id',
+                        'default'    => true,
                     ]
                 );
                 ?>

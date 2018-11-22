@@ -22,6 +22,7 @@ use Predis\Protocol\Text\RequestSerializer;
 use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use Mautic\CoreBundle\Helper\InputHelper;
 
 class CustomObjectListController extends CommonController
 {
@@ -81,16 +82,26 @@ class CustomObjectListController extends CommonController
         }
 
         $request      = $this->requestStack->getCurrentRequest();
-        $search       = $request->get('search', $this->session->get('custom.object.filter', ''));
+        $search       = InputHelper::clean($request->get('search', $this->session->get('mautic.custom.object.filter', '')));
         $defaultlimit = (int) $this->coreParametersHelper->getParameter('default_pagelimit');
-        $sessionLimit = (int) $this->session->get('custom.object.limit', $defaultlimit);
+        $sessionLimit = (int) $this->session->get('mautic.custom.object.limit', $defaultlimit);
         $limit        = (int) $request->get('limit', $sessionLimit);
         $viewParams   = ['page' => $page];
         $start        = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $start        = $start < 0 ? 0 : $start;
         $filter       = ['string' => $search];
-        $orderBy      = $this->session->get('custom.object.orderby', 'e.id');
-        $orderByDir   = $this->session->get('custom.object.orderbydir', 'DESC');
+        $orderBy      = $this->session->get('mautic.custom.object.orderby', 'e.id');
+        $orderByDir   = $this->session->get('mautic.custom.object.orderbydir', 'DESC');
         $route        = $this->generateUrl('mautic_custom_object_list', $viewParams);
+
+        if ($request->query->has('orderby')) {
+            $orderBy    = InputHelper::clean($request->query->get('orderby'), true);
+            $orderByDir = $this->session->get("mautic.custom.object.orderbydir", 'ASC');
+            $orderByDir = ($orderByDir == 'ASC') ? 'DESC' : 'ASC';
+            $this->session->set("mautic.custom.object.orderby", $orderBy);
+            $this->session->set("mautic.custom.object.orderbydir", $orderByDir);
+        }
+        
         $entities     = $this->customObjectModel->fetchEntities(
             [
                 'start'      => $start,
@@ -101,9 +112,9 @@ class CustomObjectListController extends CommonController
             ]
         );
     
-        $this->session->set('custom.object.page', $page);
-        $this->session->set('custom.object.limit', $limit);
-        $this->session->set('custom.object.filter', $search);
+        $this->session->set('mautic.custom.object.page', $page);
+        $this->session->set('mautic.custom.object.limit', $limit);
+        $this->session->set('mautic.custom.object.filter', $search);
 
         return $this->delegateView(
             [
