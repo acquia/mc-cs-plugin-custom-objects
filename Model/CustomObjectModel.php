@@ -121,11 +121,23 @@ class CustomObjectModel extends FormModel
     }
 
     /**
+     * Used only by Mautic's generic methods. Use DI instead.
+     * 
      * @return CommonRepository
      */
     public function getRepository(): CommonRepository
     {
         return $this->customObjectRepository;
+    }
+
+    /**
+     * Used only by Mautic's generic methods. Use CustomFieldPermissionProvider instead.
+     * 
+     * @return string
+     */
+    public function getPermissionBase(): string
+    {
+        return 'custom_objects:custom_objects';
     }
 
     /**

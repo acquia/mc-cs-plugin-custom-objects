@@ -26,9 +26,6 @@ if ($tmpl == 'index') {
                         'target'          => '#custom-objects-table',
                         'langVar'         => 'custom.object',
                         'routeBase'       => 'custom_object',
-                        'templateButtons' => [
-                            // 'delete' => $view['security']->isGranted('plugin:mauticSocial:monitoring:delete'),
-                        ],
                     ]
                 );
 
@@ -60,19 +57,7 @@ if ($tmpl == 'index') {
                 <tr>
                     <td>
                         <?php
-                        echo $view->render(
-                            'MauticCoreBundle:Helper:list_actions.html.php',
-                            [
-                                'item'            => $item,
-                                'templateButtons' => [
-                                    // 'edit'   => true,//$view['security']->isGranted('plugin:mauticSocial:monitoring:edit'),
-                            //         'delete' => true,//$view['security']->isGranted('plugin:mauticSocial:monitoring:delete'),
-                                ],
-                                'routeBase'  => 'custom_object',
-                                'langVar'    => 'custom.object',
-                                'nameGetter' => 'getName',
-                            ]
-                        );
+                        echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', ['item' => $item,]);
                         ?>
                     </td>
                     <td>
@@ -81,11 +66,10 @@ if ($tmpl == 'index') {
                                 'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                                 [
                                     'item'  => $item,
-                                    'model' => 'social.monitoring',
+                                    'model' => 'custom.object',
                                 ]
                             ); ?>
-                            <a href="<?php echo $view['router']->path('mautic_custom_object_view', ['objectId' => $item->getId()]); ?>"
-                               data-toggle="ajax">
+                            <a href="<?php echo $view['router']->path('mautic_custom_object_view', ['objectId' => $item->getId()]); ?>" data-toggle="ajax">
                                 <?php echo $item->getName(); ?>
                             </a>
                         </div>
@@ -95,7 +79,7 @@ if ($tmpl == 'index') {
                             </div>
                         <?php endif; ?>
                     </td>
-                    <td class="visible-md visible-lg"><?php echo $item->getId(); ?></td>
+                    <td><?php echo $item->getId(); ?></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>

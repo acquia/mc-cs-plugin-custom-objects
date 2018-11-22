@@ -87,7 +87,7 @@ return [
                     'request_stack',
                     'session',
                     'mautic.helper.core_parameters',
-                    'custom_object.model',
+                    'mautic.custom.model.object',
                     'custom_object.permission.provider',
                 ],
                 'methodCalls' => [
@@ -102,7 +102,7 @@ return [
                     'request_stack',
                     'session',
                     'mautic.helper.core_parameters',
-                    'custom_object.model',
+                    'mautic.custom.model.object',
                     'custom_object.permission.provider',
                 ],
                 'methodCalls' => [
@@ -129,7 +129,7 @@ return [
                 'arguments' => [
                     'router',
                     'form.factory',
-                    'custom_object.model',
+                    'mautic.custom.model.object',
                     'custom_object.permission.provider',
                 ],
                 'methodCalls' => [
@@ -143,7 +143,7 @@ return [
                 'arguments' => [
                     'router',
                     'form.factory',
-                    'custom_object.model',
+                    'mautic.custom.model.object',
                     'custom_object.permission.provider',
                 ],
                 'methodCalls' => [
@@ -160,7 +160,7 @@ return [
                     'session',
                     'form.factory',
                     'translator',
-                    'custom_object.model',
+                    'mautic.custom.model.object',
                     'custom_object.permission.provider',
 
                 ],
@@ -173,7 +173,7 @@ return [
             'custom_object.delete_controller' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectDeleteController::class,
                 'arguments' => [
-                    'custom_object.model',
+                    'mautic.custom.model.object',
                     'session',
                     'translator',
                     'custom_object.permission.provider',
@@ -188,7 +188,7 @@ return [
                 'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectCancelController::class,
                 'arguments' => [
                     'session',
-                    'custom_object.model',
+                    'mautic.custom.model.object',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -198,7 +198,7 @@ return [
             ],
         ],
         'models' => [
-            'custom_object.model' => [
+            'mautic.custom.model.object' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
