@@ -80,24 +80,18 @@ class CustomObjectListController extends CommonController
             $this->accessDenied(false, $e->getMessage());
         }
 
-        $request    = $this->requestStack->getCurrentRequest();
-        $search     = $request->get('search', $this->session->get('custom.object.filter', ''));
-        $viewParams = ['page' => $page];
-
-        $this->session->set('custom.object.filter', $search);
-
-        //set limits
-        $limit = $this->session->get('custom.object.limit', $this->coreParametersHelper->getParameter('default_pagelimit'));
-        $start = ($page === 1) ? 0 : (($page - 1) * $limit);
-        if ($start < 0) {
-            $start = 0;
-        }
-
-        $filter     = ['string' => $search];
-        $orderBy    = $this->session->get('custom.object.orderby', 'e.id');
-        $orderByDir = $this->session->get('custom.object.orderbydir', 'DESC');
-
-        $entities = $this->customObjectModel->fetchEntities(
+        $request      = $this->requestStack->getCurrentRequest();
+        $search       = $request->get('search', $this->session->get('custom.object.filter', ''));
+        $defaultlimit = (int) $this->coreParametersHelper->getParameter('default_pagelimit');
+        $sessionLimit = (int) $this->session->get('custom.object.limit', $defaultlimit);
+        $limit        = (int) $request->get('limit', $sessionLimit);
+        $viewParams   = ['page' => $page];
+        $start        = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $filter       = ['string' => $search];
+        $orderBy      = $this->session->get('custom.object.orderby', 'e.id');
+        $orderByDir   = $this->session->get('custom.object.orderbydir', 'DESC');
+        $route        = $this->generateUrl('mautic_custom_object_list', $viewParams);
+        $entities     = $this->customObjectModel->fetchEntities(
             [
                 'start'      => $start,
                 'limit'      => $limit,
@@ -106,35 +100,10 @@ class CustomObjectListController extends CommonController
                 'orderByDir' => $orderByDir,
             ]
         );
-
-        $count = count($entities);
-        $route = $this->generateUrl('mautic_custom_object_list', $viewParams);
-
-        // if ($count && $count < ($start + 1)) {
-        //     //the number of entities are now less then the current page so redirect to the last page
-        //     if ($count === 1) {
-        //         $lastPage = 1;
-        //     } else {
-        //         $lastPage = (ceil($count / $limit)) ?: 1;
-        //     }
-        //     $viewParams['page'] = $lastPage;
-        //     $this->session->set('custom.object.page', $lastPage);
-        //     $route = $this->generateUrl('mautic_custom_object_list', $viewParams);
-
-        //     return $this->postActionRedirect(
-        //         [
-        //             'returnUrl'       => $route,
-        //             'viewParameters'  => ['page' => $lastPage],
-        //             'contentTemplate' => 'CustomObjectsBundle:CustomObject:list.html.php',
-        //             'passthroughVars' => [
-        //                 'mauticContent' => 'customObject',
-        //                 'route'         => $route,
-        //             ],
-        //         ]
-        //     );
-        // }
-
+    
         $this->session->set('custom.object.page', $page);
+        $this->session->set('custom.object.limit', $limit);
+        $this->session->set('custom.object.filter', $search);
 
         return $this->delegateView(
             [

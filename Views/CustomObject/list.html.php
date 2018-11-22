@@ -92,10 +92,9 @@ if ($tmpl == 'index') {
                 'totalItems' => count($items),
                 'page'       => $page,
                 'limit'      => $limit,
-                'menuLinkId' => 'mautic_campaign_index',
-                'baseUrl'    => $view['router']->path('mautic_social_index'),
-                'sessionVar' => 'social.monitoring',
-                'routeBase'  => 'social',
+                'baseUrl'    => $view['router']->path('mautic_custom_object_list'),
+                'sessionVar' => 'custom.object',
+                'routeBase'  => 'mautic_custom_object_list',
             ]
         ); ?>
     </div>

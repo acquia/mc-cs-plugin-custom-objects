@@ -22,7 +22,7 @@ return [
             'mautic_custom_object_list' => [
                 'path'       => '/custom/object/{page}',
                 'controller' => 'CustomObjectsBundle:CustomObjectList:list',
-                'method'     => 'GET',
+                'method'     => 'GET|POST',
             ],
             'mautic_custom_object_view' => [
                 'path'       => '/custom/object/view/{objectId}',
