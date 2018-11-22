@@ -19,6 +19,8 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 
 class CustomObjectPermissionProvider
 {
+    private const BASE = 'custom_objects:custom_objects:';
+
     /**
      * @var CorePermissions
      */
@@ -27,9 +29,7 @@ class CustomObjectPermissionProvider
     /**
      * @param CorePermissions $corePermissions
      */
-    public function __construct(
-        CorePermissions $corePermissions
-    )
+    public function __construct(CorePermissions $corePermissions)
     {
         $this->corePermissions = $corePermissions;
     }
@@ -39,7 +39,7 @@ class CustomObjectPermissionProvider
      */
     public function canCreate()
     {
-        if (!$this->corePermissions->isGranted('custom_objects:custom_objects:create')) {
+        if (!$this->corePermissions->isGranted(self::BASE.'create')) {
             throw new ForbiddenException('create');
         }
     }
@@ -51,7 +51,17 @@ class CustomObjectPermissionProvider
      */
     public function canView(UniqueEntityInterface $entity)
     {
-        if (!$this->corePermissions->hasEntityAccess('custom_objects:custom_objects:viewown', 'custom_objects:custom_objects:viewother', $entity->getCreatedBy())) {
+        if (!$this->corePermissions->hasEntityAccess(self::BASE.'viewown', self::BASE.'viewother', $entity->getCreatedBy())) {
+            throw new ForbiddenException('view', $entity);
+        }
+    }
+
+    /**
+     * @thorws ForbiddenException
+     */
+    public function canViewAtAll()
+    {
+        if (!$this->corePermissions->isGranted(self::BASE.'view')) {
             throw new ForbiddenException('view', $entity);
         }
     }
@@ -63,7 +73,7 @@ class CustomObjectPermissionProvider
      */
     public function canEdit(UniqueEntityInterface $entity)
     {
-        if (!$this->corePermissions->hasEntityAccess('custom_objects:custom_objects:editown', 'custom_objects:custom_objects:editother', $entity->getCreatedBy())) {
+        if (!$this->corePermissions->hasEntityAccess(self::BASE.'editown', self::BASE.'editother', $entity->getCreatedBy())) {
             throw new ForbiddenException('edit', $entity);
         }
     }
@@ -76,12 +86,12 @@ class CustomObjectPermissionProvider
     public function canClone(UniqueEntityInterface $entity)
     {
         // Check the create permission as new entity will be created.
-        if (!$this->corePermissions->isGranted('custom_objects:custom_objects:create')) {
+        if (!$this->corePermissions->isGranted(self::BASE.'create')) {
             throw new ForbiddenException('create');
         }
 
         // But check also if the user can view others as clone will show values of the original entity.
-        if (!$this->corePermissions->hasEntityAccess('custom_objects:custom_objects:viewown', 'custom_objects:custom_objects:viewother', $entity->getCreatedBy())) {
+        if (!$this->corePermissions->hasEntityAccess(self::BASE.'viewown', self::BASE.'viewother', $entity->getCreatedBy())) {
             throw new ForbiddenException('view', $entity);
         }
     }
@@ -93,7 +103,7 @@ class CustomObjectPermissionProvider
      */
     public function canDelete(UniqueEntityInterface $entity)
     {
-        if (!$this->corePermissions->hasEntityAccess('custom_objects:custom_objects:deleteown', 'custom_objects:custom_objects:deleteother', $entity->getCreatedBy())) {
+        if (!$this->corePermissions->hasEntityAccess(self::BASE.'deleteown', 'custom_objects:custom_objects:deleteother', $entity->getCreatedBy())) {
             throw new ForbiddenException('delete', $entity);
         }
     }
