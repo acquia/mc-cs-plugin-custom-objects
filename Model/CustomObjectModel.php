@@ -114,10 +114,7 @@ class CustomObjectModel extends FormModel
      */
     public function fetchEntities(array $args = []): Paginator
     {
-        $args     = $this->addCreatorLimit($args);
-        $entities = parent::getEntities($args);
-
-        return $entities;
+        return parent::getEntities($this->addCreatorLimit($args));
     }
 
     /**
@@ -175,7 +172,7 @@ class CustomObjectModel extends FormModel
 
         while ($isUnique) {
             $testAlias = $testAlias.$counter;
-            $isUnique  = $repo->isAliasUnique($testAlias, $entity->getId());
+            $isUnique  = $this->customObjectRepository->isAliasUnique($testAlias, $entity->getId());
             ++$counter;
         }
 
