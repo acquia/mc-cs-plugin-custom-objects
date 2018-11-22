@@ -75,7 +75,7 @@ class CustomObjectDeleteController extends CommonController
         try {
             $this->permissionProvider->canDelete($entity);
         } catch (ForbiddenException $e) {
-            return $this->accessDenied($e->getMessage());
+            $this->accessDenied(false, $e->getMessage());
         }
 
         $this->customObjectModel->deleteEntity($entity);

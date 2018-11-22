@@ -84,7 +84,7 @@ class CustomObjectViewController extends CommonController
         try {
             $this->permissionProvider->canView($entity);
         } catch (ForbiddenException $e) {
-            return $this->accessDenied($e->getMessage());
+            $this->accessDenied(false, $e->getMessage());
         }
 
         $route = $this->generateUrl('mautic_custom_object_view', ['objectId' => $objectId]);

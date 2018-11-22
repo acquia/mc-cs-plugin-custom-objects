@@ -65,7 +65,7 @@ class CustomObjectNewController extends CommonController
         try {
             $this->permissionProvider->canCreate();
         } catch (ForbiddenException $e) {
-            return $this->accessDenied($e->getMessage());
+            $this->accessDenied(false, $e->getMessage());
         }
         
         $entity  = new CustomObject();

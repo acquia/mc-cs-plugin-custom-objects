@@ -109,7 +109,7 @@ class CustomObjectSaveController extends CommonController
                 $this->permissionProvider->canEdit($entity);
             }
         } catch (ForbiddenException $e) {
-            return $this->accessDenied($e->getMessage());
+            $this->accessDenied(false, $e->getMessage());
         }
 
         $request = $this->requestStack->getCurrentRequest();

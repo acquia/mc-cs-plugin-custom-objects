@@ -83,7 +83,7 @@ class CustomObjectCloneController extends CommonController
         try {
             $this->permissionProvider->canClone($entity);
         } catch (ForbiddenException $e) {
-            return $this->accessDenied($e->getMessage());
+            $this->accessDenied(false, $e->getMessage());
         }
 
         $action = $this->router->generate('mautic_custom_object_save');
