@@ -53,6 +53,7 @@ class CustomObjectEditController extends CommonController
      * @param Router $router
      * @param FormFactory $formFactory
      * @param CustomObjectModel $customObjectModel
+     * @param CustomObjectPermissionProvider $permissionProvider
      */
     public function __construct(
         Router $router,

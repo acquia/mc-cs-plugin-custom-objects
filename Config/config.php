@@ -88,7 +88,7 @@ return [
                     'session',
                     'mautic.helper.core_parameters',
                     'custom_object.model',
-                    'mautic.security',
+                    'custom_object.permission.provider',
                 ],
                 'methodCalls' => [
                     'setContainer' => [

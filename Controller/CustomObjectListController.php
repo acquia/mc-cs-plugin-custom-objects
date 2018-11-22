@@ -20,7 +20,8 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Predis\Protocol\Text\RequestSerializer;
 use Mautic\CoreBundle\Controller\CommonController;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 
 class CustomObjectListController extends CommonController
 {
@@ -40,9 +41,9 @@ class CustomObjectListController extends CommonController
     private $customObjectModel;
 
     /**
-     * @var CorePermissions
+     * @var CustomObjectPermissionProvider
      */
-    private $corePermissions;
+    private $permissionProvider;
 
     /**
      * @param RequestStack $requestStack
@@ -56,24 +57,27 @@ class CustomObjectListController extends CommonController
         Session $session,
         CoreParametersHelper $coreParametersHelper,
         CustomObjectModel $customObjectModel,
-        CorePermissions $corePermissions
+        CustomObjectPermissionProvider $permissionProvider
     )
     {
         $this->requestStack         = $requestStack;
         $this->session              = $session;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->customObjectModel    = $customObjectModel;
-        $this->corePermissions      = $corePermissions;
+        $this->permissionProvider   = $permissionProvider;
     }
 
     /**
      * @param integer $page
+     * 
      * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse
      */
     public function listAction(int $page)
     {
-        if (!$this->corePermissions->isGranted('custom_objects:custom_objects:view')) {
-            return $this->accessDenied();
+        try {
+            $this->permissionProvider->canViewAtAll();
+        } catch (ForbiddenException $e) {
+            $this->accessDenied(false, $e->getMessage());
         }
 
         $request    = $this->requestStack->getCurrentRequest();
