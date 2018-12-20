@@ -19,7 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 
-class ButtonSubscriber extends CommonSubscriber
+class CustomObjectButtonSubscriber extends CommonSubscriber
 {
     /**
      * @var CustomObjectPermissionProvider
