@@ -18,5 +18,5 @@ interface UniqueEntityInterface
     /**
      * @return int|null
      */
-    public function getId(): ?int;
+    public function getId();
 }

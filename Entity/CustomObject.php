@@ -99,7 +99,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @return int|null
      */
-    public function getId(): ?int
+    public function getId()
     {
         return $this->id;
     }
@@ -107,7 +107,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $name
      */
-    public function setName(?string $name): void
+    public function setName($name)
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -116,7 +116,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @return string|null
      */
-    public function getName(): ?string
+    public function getName()
     {
         return $this->name;
     }
@@ -124,7 +124,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $alias
      */
-    public function setAlias(?string $alias): void
+    public function setAlias($alias)
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -133,7 +133,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @return string|null
      */
-    public function getAlias(): ?string
+    public function getAlias()
     {
         return $this->alias;
     }
@@ -141,7 +141,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $description
      */
-    public function setDescription(?string $description): void
+    public function setDescription($description)
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -150,7 +150,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @return string|null
      */
-    public function getDescription(): ?string
+    public function getDescription()
     {
         return $this->description;
     }
@@ -158,7 +158,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @return Category|null
      */
-    public function getCategory(): ?Category
+    public function getCategory()
     {
         return $this->category;
     }
@@ -166,7 +166,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param Category|null $category
      */
-    public function setCategory(?Category $category): void
+    public function setCategory($category)
     {
         $this->category = $category;
     }
@@ -174,7 +174,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @return string
      */
-    public function getLanguage(): ?string
+    public function getLanguage()
     {
         return $this->language;
     }
@@ -182,7 +182,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $language
      */
-    public function setLanguage(?string $language): void
+    public function setLanguage($language)
     {
         $this->isChanged('language', $language);
         $this->language = $language;
