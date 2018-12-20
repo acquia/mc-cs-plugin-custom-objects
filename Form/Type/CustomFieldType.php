@@ -25,6 +25,9 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 class CustomFieldType extends AbstractType
 {
@@ -34,11 +37,20 @@ class CustomFieldType extends AbstractType
     private $customObjectModel;
 
     /**
-     * @param CustomObjectModel $customObjectModel
+     * @var CustomFieldTypeProvider
      */
-    public function __construct(CustomObjectModel $customObjectModel)
+    private $customFieldTypeProvider;
+
+    /**
+     * @param CustomObjectModel       $customObjectModel
+     * @param CustomFieldTypeProvider $customFieldTypeProvider
+     */
+    public function __construct(
+        CustomObjectModel $customObjectModel,
+        CustomFieldTypeProvider $customFieldTypeProvider)
     {
-        $this->customObjectModel = $customObjectModel;
+        $this->customObjectModel       = $customObjectModel;
+        $this->customFieldTypeProvider = $customFieldTypeProvider;
     }
 
     /**
@@ -77,13 +89,19 @@ class CustomFieldType extends AbstractType
             'type',
             ChoiceType::class,
             [
-                'label'      => 'custom.field.type.label',
-                'required'   => false,
-                'label_attr' => ['class' => 'control-label'],
-                'choices'    => ['text'],
-                'attr'       => [
-                    'class' => 'form-control',
-                ],
+                'label'             => 'custom.field.type.label',
+                'required'          => false,
+                'label_attr'        => ['class' => 'control-label'],
+                'choices'           => ['text'],
+                'attr'              => ['class' => 'form-control',],
+                'choices_as_values' => true,
+                'choices'           => $this->customFieldTypeProvider->getTypes(),
+                'choice_label'      => function(CustomFieldTypeInterface $type) {
+                    return $type->getName();
+                },
+                'choice_value' => function($type) {
+                    return $type instanceof CustomFieldTypeInterface ? $type->getKey() :$type;
+                },
             ]
         );
 
@@ -97,7 +115,7 @@ class CustomFieldType extends AbstractType
                 'attr'              => ['class' => 'form-control'],
                 'choices_as_values' => true,
                 'choices'           => $this->customObjectModel->getEntities(['ignore_paginator' => true]),
-                'choice_label'      => function($customObject) {
+                'choice_label'      => function(CustomObject $customObject) {
                     return $customObject->getName();
                 },
             ]

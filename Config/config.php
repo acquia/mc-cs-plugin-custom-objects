@@ -410,6 +410,12 @@ return [
             ],
         ],
         'events' => [
+            'custom_field.type.subscriber' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldTypeSubscriber::class,
+                'arguments' => [
+                    'translator',
+                ],
+            ],
             'custom_field.button.subscriber' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldButtonSubscriber::class,
                 'arguments' => [
@@ -428,10 +434,17 @@ return [
                 'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType::class,
                 'arguments' => [
                     'mautic.custom.model.object',
+                    'custom_field.type.provider',
                 ],
             ],
         ],
         'other' => [
+            'custom_field.type.provider' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider::class,
+                'arguments' => [
+                    'event_dispatcher',
+                ],
+            ],
             'custom_field.permission.provider' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider::class,
                 'arguments' => [

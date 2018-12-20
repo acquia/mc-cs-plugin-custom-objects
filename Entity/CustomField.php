@@ -24,6 +24,7 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use MauticPlugin\CustomObjectsBundle\Entity\UniqueEntityInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
 
 class CustomField extends FormEntity implements UniqueEntityInterface
 {
@@ -156,13 +157,12 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @todo Use future CustomFieldInterface instead of string
-     * @param string|null $type
+     * @param CustomFieldTypeInterface|null $type
      */
-    public function setType(?string $type): void
+    public function setType(?CustomFieldTypeInterface $type): void
     {
-        $this->isChanged('type', $type);
-        $this->type = $type;
+        $this->isChanged('type', $type->getKey());
+        $this->type = $type->getKey();
     }
 
     /**
