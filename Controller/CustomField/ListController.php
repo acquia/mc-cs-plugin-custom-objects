@@ -23,6 +23,7 @@ use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Mautic\CoreBundle\Helper\InputHelper;
+use MauticPlugin\CustomObjectsBundle\Helper\PaginationHelper;
 
 class ListController extends CommonController
 {
@@ -87,8 +88,6 @@ class ListController extends CommonController
         $sessionLimit = (int) $this->session->get('mautic.custom.field.limit', $defaultlimit);
         $limit        = (int) $request->get('limit', $sessionLimit);
         $viewParams   = ['page' => $page];
-        $start        = ($page === 1) ? 0 : (($page - 1) * $limit);
-        $start        = $start < 0 ? 0 : $start;
         $filter       = ['string' => $search];
         $orderBy      = $this->session->get('mautic.custom.field.orderby', 'e.id');
         $orderByDir   = $this->session->get('mautic.custom.field.orderbydir', 'DESC');
@@ -104,7 +103,7 @@ class ListController extends CommonController
         
         $entities = $this->customFieldModel->fetchEntities(
             [
-                'start'      => $start,
+                'start'      => PaginationHelper::countOffset($page, $limit),
                 'limit'      => $limit,
                 'filter'     => $filter,
                 'orderBy'    => $orderBy,

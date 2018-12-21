@@ -116,9 +116,6 @@ class SaveController extends CommonController
         $action  = $this->router->generate('mautic_custom_field_save', ['objectId' => $objectId]);
         $form    = $this->formFactory->create(CustomFieldType::class, $entity, ['action' => $action]);
         $form->handleRequest($request);
-
-        // $validator = $this->get('validator');
-        // $errors = $validator->validate($entity);
         
         if ($form->isValid()) {
             $this->customFieldModel->save($entity);

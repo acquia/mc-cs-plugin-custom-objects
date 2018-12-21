@@ -87,8 +87,6 @@ class ListController extends CommonController
         $sessionLimit = (int) $this->session->get('mautic.custom.object.limit', $defaultlimit);
         $limit        = (int) $request->get('limit', $sessionLimit);
         $viewParams   = ['page' => $page];
-        $start        = ($page === 1) ? 0 : (($page - 1) * $limit);
-        $start        = $start < 0 ? 0 : $start;
         $filter       = ['string' => $search];
         $orderBy      = $this->session->get('mautic.custom.object.orderby', 'e.id');
         $orderByDir   = $this->session->get('mautic.custom.object.orderbydir', 'DESC');
@@ -102,9 +100,9 @@ class ListController extends CommonController
             $this->session->set("mautic.custom.object.orderbydir", $orderByDir);
         }
         
-        $entities     = $this->customObjectModel->fetchEntities(
+        $entities = $this->customObjectModel->fetchEntities(
             [
-                'start'      => $start,
+                'start'      => PaginationHelper::countOffset($page, $limit),
                 'limit'      => $limit,
                 'filter'     => $filter,
                 'orderBy'    => $orderBy,
