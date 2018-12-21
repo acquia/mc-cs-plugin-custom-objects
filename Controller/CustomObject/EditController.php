@@ -85,8 +85,8 @@ class EditController extends CommonController
             $this->accessDenied(false, $e->getMessage());
         }
 
-        $action  = $this->routeProvider->buildSaveRoute($objectId);
-        $form    = $this->formFactory->create(CustomObjectType::class, $entity, ['action' => $action]);
+        $action = $this->routeProvider->buildSaveRoute($objectId);
+        $form   = $this->formFactory->create(CustomObjectType::class, $entity, ['action' => $action]);
 
         return $this->delegateView(
             [

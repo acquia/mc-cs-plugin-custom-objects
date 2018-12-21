@@ -22,7 +22,7 @@ class CustomObjectPermissions extends AbstractPermissions
     public function __construct($params)
     {
         parent::__construct($params);
-        // $this->addStandardPermissions('categories');
+        $this->addExtendedPermissions('custom_fields');
         $this->addExtendedPermissions('custom_objects');
     }
 
@@ -44,7 +44,7 @@ class CustomObjectPermissions extends AbstractPermissions
      */
     public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
     {
-        // $this->addStandardFormFields('custom_objects', 'categories', $builder, $data);
+        $this->addExtendedFormFields('custom_objects', 'custom_fields', $builder, $data);
         $this->addExtendedFormFields('custom_objects', 'custom_objects', $builder, $data);
     }
 }
