@@ -1,13 +1,15 @@
 <?php
 
 /*
- * @copyright   2018 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+* @copyright   2018 Mautic, Inc. All rights reserved
+* @author      Mautic, Inc.
+*
+* @link        https://mautic.com
+*
+* @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+*/
+
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 
 if ($tmpl == 'index') {
     $view->extend('CustomObjectsBundle:CustomItem:index.html.php');
@@ -22,10 +24,10 @@ if ($tmpl == 'index') {
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'checkall'        => 'true',
-                        'target'          => '#custom-items-table',
-                        'langVar'         => 'custom.item',
-                        'routeBase'       => 'custom_item',
+                        'checkall'  => 'true',
+                        'target'    => '#custom-items-table',
+                        'langVar'   => 'custom.item',
+                        'routeBase' => 'custom_item',
                     ]
                 );
 
@@ -56,9 +58,7 @@ if ($tmpl == 'index') {
             <?php foreach ($items as $k => $item): ?>
                 <tr>
                     <td>
-                        <?php
-                        echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', ['item' => $item,]);
-                        ?>
+                        <?php echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', ['item' => $item]); ?>
                     </td>
                     <td>
                         <div>
@@ -69,7 +69,7 @@ if ($tmpl == 'index') {
                                     'model' => 'custom.item',
                                 ]
                             ); ?>
-                            <a href="<?php echo $view['router']->path('mautic_custom_item_view', ['objectId' => $item->getId()]); ?>" data-toggle="ajax">
+                            <a href="<?php echo $view['router']->path(CustomItemRouteProvider::ROUTE_VIEW, ['objectId' => $item->getId()]); ?>" data-toggle="ajax">
                                 <?php echo $item->getName(); ?>
                             </a>
                         </div>
@@ -92,9 +92,9 @@ if ($tmpl == 'index') {
                 'totalItems' => count($items),
                 'page'       => $page,
                 'limit'      => $limit,
-                'baseUrl'    => $view['router']->path('mautic_custom_item_list'),
+                'baseUrl'    => $view['router']->path(CustomItemRouteProvider::ROUTE_LIST),
                 'sessionVar' => 'custom.item',
-                'routeBase'  => 'mautic_custom_item_list',
+                'routeBase'  => CustomItemRouteProvider::ROUTE_LIST,
             ]
         ); ?>
     </div>

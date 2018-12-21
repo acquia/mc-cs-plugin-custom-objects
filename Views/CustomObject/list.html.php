@@ -9,6 +9,8 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
+
 if ($tmpl == 'index') {
     $view->extend('CustomObjectsBundle:CustomObject:index.html.php');
 }
@@ -22,10 +24,10 @@ if ($tmpl == 'index') {
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'checkall'        => 'true',
-                        'target'          => '#custom-objects-table',
-                        'langVar'         => 'custom.object',
-                        'routeBase'       => 'custom_object',
+                        'checkall'  => 'true',
+                        'target'    => '#custom-objects-table',
+                        'langVar'   => 'custom.object',
+                        'routeBase' => 'custom_object',
                     ]
                 );
 
@@ -56,9 +58,7 @@ if ($tmpl == 'index') {
             <?php foreach ($items as $k => $item): ?>
                 <tr>
                     <td>
-                        <?php
-                        echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', ['item' => $item,]);
-                        ?>
+                        <?php echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', ['item' => $item]); ?>
                     </td>
                     <td>
                         <div>
@@ -69,7 +69,7 @@ if ($tmpl == 'index') {
                                     'model' => 'custom.object',
                                 ]
                             ); ?>
-                            <a href="<?php echo $view['router']->path('mautic_custom_object_view', ['objectId' => $item->getId()]); ?>" data-toggle="ajax">
+                            <a href="<?php echo $view['router']->path(CustomObjectRouteProvider::ROUTE_VIEW, ['objectId' => $item->getId()]); ?>" data-toggle="ajax">
                                 <?php echo $item->getName(); ?>
                             </a>
                         </div>
@@ -92,9 +92,9 @@ if ($tmpl == 'index') {
                 'totalItems' => count($items),
                 'page'       => $page,
                 'limit'      => $limit,
-                'baseUrl'    => $view['router']->path('mautic_custom_object_list'),
+                'baseUrl'    => $view['router']->path(CustomObjectRouteProvider::ROUTE_LIST),
                 'sessionVar' => 'custom.object',
-                'routeBase'  => 'mautic_custom_object_list',
+                'routeBase'  => CustomObjectRouteProvider::ROUTE_LIST,
             ]
         ); ?>
     </div>

@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 $view->extend('MauticCoreBundle:Default:content.html.php');
-$view['slots']->set('mauticContent', 'customObject');
+$view['slots']->set('mauticContent', 'customItem');
 $view['slots']->set('headerTitle', $item->getName());
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', [
     'item' => $item,
