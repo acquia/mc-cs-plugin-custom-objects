@@ -25,6 +25,9 @@ return [
                 'path'       => '/custom/field/{page}',
                 'controller' => 'CustomObjectsBundle:CustomFieldList:list',
                 'method'     => 'GET|POST',
+                'defaults'   => [
+                    'page' => 1,
+                ],
             ],
             'mautic_custom_field_view' => [
                 'path'       => '/custom/field/view/{objectId}',
@@ -73,6 +76,9 @@ return [
                 'path'       => '/custom/object/{page}',
                 'controller' => 'CustomObjectsBundle:CustomObjectList:list',
                 'method'     => 'GET|POST',
+                'defaults'   => [
+                    'page' => 1,
+                ],
             ],
             'mautic_custom_object_view' => [
                 'path'       => '/custom/object/view/{objectId}',
@@ -120,18 +126,22 @@ return [
 
     'menu' => [
         'admin' => [
-            'custom.object.title' => [
-                'route'     => 'mautic_custom_object_list',
+            'custom.object.config.menu.parent.title' => [
                 'access'    => 'custom_objects:custom_objects:view',
                 'iconClass' => 'fa-list-alt',
-                'id'        => 'mautic_custom_object_list',
+                'id'        => 'mautic_custom_config_parent_list',
             ],
-            'custom.field.title' => [
+            'custom.object.config.menu.title' => [
+                'route'     => 'mautic_custom_object_list',
+                'access'    => 'custom_objects:custom_objects:view',
+                'id'        => 'mautic_custom_object_config_list',
+                'parent'    => 'custom.object.config.menu.parent.title',
+            ],
+            'custom.field.config.menu.title' => [
                 'route'     => 'mautic_custom_field_list',
                 'access'    => 'custom_fields:custom_fields:view',
-                'iconClass' => 'fa-list',
-                'id'        => 'mautic_custom_fieldt_list',
-                'parent'    => 'custom.object.title',
+                'id'        => 'mautic_custom_field_list',
+                'parent'    => 'custom.object.config.menu.parent.title',
             ],
         ],
     ],
@@ -410,6 +420,12 @@ return [
             ],
         ],
         'events' => [
+            'custom_object.menu.subscriber' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\EventListener\MenuSubscriber::class,
+                'arguments' => [
+                    'mautic.custom.model.object',
+                ],
+            ],
             'custom_field.type.subscriber' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldTypeSubscriber::class,
                 'arguments' => [
