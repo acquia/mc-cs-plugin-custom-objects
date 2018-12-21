@@ -11,7 +11,7 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\CustomObjectsBundle\Controller;
+namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -29,7 +29,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 
-class CustomFieldSaveController extends CommonController
+class SaveController extends CommonController
 {
     /**
      * @var RequestStack
@@ -187,6 +187,6 @@ class CustomFieldSaveController extends CommonController
         $request->setMethod('GET');
         $params = ['objectId' => $entity->getId()];
 
-        return $this->forward('CustomObjectsBundle:CustomFieldView:view', $params);
+        return $this->forward('CustomObjectsBundle:CustomField\View:view', $params);
     }
 }

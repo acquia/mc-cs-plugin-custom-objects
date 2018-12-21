@@ -11,7 +11,7 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\CustomObjectsBundle\Controller;
+namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
 use Symfony\Component\HttpFoundation\Session\Session;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class CustomFieldCancelController extends CommonController
+class CancelController extends CommonController
 {
     /**
      * @var Session
@@ -45,7 +45,6 @@ class CustomFieldCancelController extends CommonController
     }
 
     /**
-     * @todo implement permissions
      * @todo unlock entity?
      * 
      * @param int|null $objectId
@@ -62,7 +61,7 @@ class CustomFieldCancelController extends CommonController
             [
                 'returnUrl'       => $this->generateUrl('mautic_custom_field_list', $viewParameters),
                 'viewParameters'  => $viewParameters,
-                'contentTemplate' => 'CustomObjectsBundle:CustomFieldList:list',
+                'contentTemplate' => 'CustomObjectsBundle:CustomField\List:list',
                 'passthroughVars' => [
                     'mauticContent' => 'customField',
                 ],

@@ -23,7 +23,7 @@ return [
             // Custom Fields
             'mautic_custom_field_list' => [
                 'path'       => '/custom/field/{page}',
-                'controller' => 'CustomObjectsBundle:CustomFieldList:list',
+                'controller' => 'CustomObjectsBundle:CustomField\List:list',
                 'method'     => 'GET|POST',
                 'defaults'   => [
                     'page' => 1,
@@ -31,27 +31,27 @@ return [
             ],
             'mautic_custom_field_view' => [
                 'path'       => '/custom/field/view/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomFieldView:view',
+                'controller' => 'CustomObjectsBundle:CustomField\View:view',
                 'method'     => 'GET',
             ],
             'mautic_custom_field_new' => [
                 'path'       => '/custom/field/new',
-                'controller' => 'CustomObjectsBundle:CustomFieldNew:renderForm',
+                'controller' => 'CustomObjectsBundle:CustomField\New:renderForm',
                 'method'     => 'GET',
             ],
             'mautic_custom_field_edit' => [
                 'path'       => '/custom/field/edit/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomFieldEdit:renderForm',
+                'controller' => 'CustomObjectsBundle:CustomField\Edit:renderForm',
                 'method'     => 'GET',
             ],
             'mautic_custom_field_clone' => [
                 'path'       => '/custom/field/clone/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomFieldClone:clone',
+                'controller' => 'CustomObjectsBundle:CustomField\Clone:clone',
                 'method'     => 'GET',
             ],
             'mautic_custom_field_cancel' => [
-                'path'       => '/custom/object/cancel/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomFieldCancel:cancel',
+                'path'       => '/custom/field/cancel/{objectId}',
+                'controller' => 'CustomObjectsBundle:CustomField\Cancel:cancel',
                 'method'     => 'GET',
                 'defaults'   => [
                     'objectId' => null,
@@ -59,7 +59,7 @@ return [
             ],
             'mautic_custom_field_save' => [
                 'path'       => '/custom/field/save/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomFieldSave:save',
+                'controller' => 'CustomObjectsBundle:CustomField\Save:save',
                 'method'     => 'POST',
                 'defaults'   => [
                     'objectId' => null,
@@ -67,14 +67,14 @@ return [
             ],
             'mautic_custom_field_delete' => [
                 'path'       => '/custom/field/delete/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomFieldDelete:delete',
+                'controller' => 'CustomObjectsBundle:CustomField\Delete:delete',
                 'method'     => 'GET',
             ],
 
             // Custom Objects
             'mautic_custom_object_list' => [
                 'path'       => '/custom/object/{page}',
-                'controller' => 'CustomObjectsBundle:CustomObjectList:list',
+                'controller' => 'CustomObjectsBundle:CustomObject\List:list',
                 'method'     => 'GET|POST',
                 'defaults'   => [
                     'page' => 1,
@@ -82,27 +82,27 @@ return [
             ],
             'mautic_custom_object_view' => [
                 'path'       => '/custom/object/view/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomObjectView:view',
+                'controller' => 'CustomObjectsBundle:CustomObject\View:view',
                 'method'     => 'GET',
             ],
             'mautic_custom_object_new' => [
                 'path'       => '/custom/object/new',
-                'controller' => 'CustomObjectsBundle:CustomObjectNew:renderForm',
+                'controller' => 'CustomObjectsBundle:CustomObject\New:renderForm',
                 'method'     => 'GET',
             ],
             'mautic_custom_object_edit' => [
                 'path'       => '/custom/object/edit/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomObjectEdit:renderForm',
+                'controller' => 'CustomObjectsBundle:CustomObject\Edit:renderForm',
                 'method'     => 'GET',
             ],
             'mautic_custom_object_clone' => [
                 'path'       => '/custom/object/clone/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomObjectClone:clone',
+                'controller' => 'CustomObjectsBundle:CustomObject\Clone:clone',
                 'method'     => 'GET',
             ],
             'mautic_custom_object_cancel' => [
                 'path'       => '/custom/object/cancel/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomObjectCancel:cancel',
+                'controller' => 'CustomObjectsBundle:CustomObject\Cancel:cancel',
                 'method'     => 'GET',
                 'defaults'   => [
                     'objectId' => null,
@@ -110,7 +110,7 @@ return [
             ],
             'mautic_custom_object_save' => [
                 'path'       => '/custom/object/save/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomObjectSave:save',
+                'controller' => 'CustomObjectsBundle:CustomObject\Save:save',
                 'method'     => 'POST',
                 'defaults'   => [
                     'objectId' => null,
@@ -118,7 +118,7 @@ return [
             ],
             'mautic_custom_object_delete' => [
                 'path'       => '/custom/object/delete/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomObjectDelete:delete',
+                'controller' => 'CustomObjectsBundle:CustomObject\Delete:delete',
                 'method'     => 'GET',
             ],
         ],
@@ -151,7 +151,7 @@ return [
 
             // Custom Fields
             'custom_field.list_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomFieldListController::class,
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\ListController::class,
                 'arguments' => [
                     'request_stack',
                     'session',
@@ -166,7 +166,7 @@ return [
                 ],
             ],
             'custom_field.view_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomFieldViewController::class,
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\ViewController::class,
                 'arguments' => [
                     'request_stack',
                     'session',
@@ -181,7 +181,7 @@ return [
                 ],
             ],
             'custom_field.new_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomFieldNewController::class,
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\NewController::class,
                 'arguments' => [
                     'router',
                     'form.factory',
@@ -194,7 +194,7 @@ return [
                 ],
             ],
             'custom_field.edit_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomFieldEditController::class,
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\EditController::class,
                 'arguments' => [
                     'router',
                     'form.factory',
@@ -208,7 +208,7 @@ return [
                 ],
             ],
             'custom_field.clone_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomFieldCloneController::class,
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\CloneController::class,
                 'arguments' => [
                     'router',
                     'form.factory',
@@ -222,7 +222,7 @@ return [
                 ],
             ],
             'custom_field.save_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomFieldSaveController::class,
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\SaveController::class,
                 'arguments' => [
                     'request_stack',
                     'router',
@@ -240,7 +240,7 @@ return [
                 ],
             ],
             'custom_field.delete_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomFieldDeleteController::class,
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\DeleteController::class,
                 'arguments' => [
                     'mautic.custom.model.field',
                     'session',
@@ -254,7 +254,7 @@ return [
                 ],
             ],
             'custom_field.cancel_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomFieldCancelController::class,
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\CancelController::class,
                 'arguments' => [
                     'session',
                     'mautic.custom.model.field',
@@ -268,7 +268,7 @@ return [
 
             // Custom Objects
             'custom_object.list_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectListController::class,
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\ListController::class,
                 'arguments' => [
                     'request_stack',
                     'session',
@@ -283,7 +283,7 @@ return [
                 ],
             ],
             'custom_object.view_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectViewController::class,
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\ViewController::class,
                 'arguments' => [
                     'request_stack',
                     'session',
@@ -298,7 +298,7 @@ return [
                 ],
             ],
             'custom_object.new_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectNewController::class,
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\NewController::class,
                 'arguments' => [
                     'router',
                     'form.factory',
@@ -311,7 +311,7 @@ return [
                 ],
             ],
             'custom_object.edit_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectEditController::class,
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\EditController::class,
                 'arguments' => [
                     'router',
                     'form.factory',
@@ -325,7 +325,7 @@ return [
                 ],
             ],
             'custom_object.clone_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectCloneController::class,
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\CloneController::class,
                 'arguments' => [
                     'router',
                     'form.factory',
@@ -339,7 +339,7 @@ return [
                 ],
             ],
             'custom_object.save_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectSaveController::class,
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\SaveController::class,
                 'arguments' => [
                     'request_stack',
                     'router',
@@ -357,7 +357,7 @@ return [
                 ],
             ],
             'custom_object.delete_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectDeleteController::class,
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\DeleteController::class,
                 'arguments' => [
                     'mautic.custom.model.object',
                     'session',
@@ -371,7 +371,7 @@ return [
                 ],
             ],
             'custom_object.cancel_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObjectCancelController::class,
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\CancelController::class,
                 'arguments' => [
                     'session',
                     'mautic.custom.model.object',

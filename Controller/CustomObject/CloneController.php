@@ -11,7 +11,7 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\CustomObjectsBundle\Controller;
+namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
@@ -21,10 +21,12 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
-class CustomObjectNewController extends CommonController
+class CloneController extends CommonController
 {
     /**
      * @var Router
@@ -37,6 +39,11 @@ class CustomObjectNewController extends CommonController
     private $formFactory;
 
     /**
+     * @var CustomObjectModel
+     */
+    private $customObjectModel;
+
+    /**
      * @var CustomObjectPermissionProvider
      */
     private $permissionProvider;
@@ -44,33 +51,45 @@ class CustomObjectNewController extends CommonController
     /**
      * @param Router $router
      * @param FormFactory $formFactory
+     * @param CustomObjectModel $customObjectModel
      * @param CustomObjectPermissionProvider $permissionProvider
      */
     public function __construct(
         Router $router,
         FormFactory $formFactory,
+        CustomObjectModel $customObjectModel,
         CustomObjectPermissionProvider $permissionProvider
     )
     {
         $this->router             = $router;
         $this->formFactory        = $formFactory;
+        $this->customObjectModel  = $customObjectModel;
         $this->permissionProvider = $permissionProvider;
     }
 
     /**
+     * @param int $objectId
+     * 
      * @return Response|JsonResponse
      */
-    public function renderFormAction()
+    public function cloneAction(int $objectId)
     {
         try {
-            $this->permissionProvider->canCreate();
+            $entity = clone $this->customObjectModel->fetchEntity($objectId);
+        } catch (NotFoundException $e) {
+            return $this->notFound($e->getMessage());
+        }
+
+        try {
+            $this->permissionProvider->canClone($entity);
         } catch (ForbiddenException $e) {
             $this->accessDenied(false, $e->getMessage());
         }
-        
-        $entity  = new CustomObject();
-        $action  = $this->router->generate('mautic_custom_object_save');
-        $form    = $this->formFactory->create(CustomObjectType::class, $entity, ['action' => $action]);
+
+        $entity->setName($entity->getName().' '.$this->translator->trans('mautic.core.form.clone'));
+
+        $action = $this->router->generate('mautic_custom_object_save');
+        $form   = $this->formFactory->create(CustomObjectType::class, $entity, ['action' => $action]);
 
         return $this->delegateView(
             [
@@ -82,7 +101,7 @@ class CustomObjectNewController extends CommonController
                 'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
-                    'route'         => $this->router->generate('mautic_custom_object_new'),
+                    'route'         => $this->router->generate('mautic_custom_object_clone', ['objectId' => $objectId]),
                 ],
             ]
         );

@@ -11,20 +11,20 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\CustomObjectsBundle\Controller;
+namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use Predis\Protocol\Text\RequestSerializer;
 use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 
-class CustomObjectViewController extends CommonController
+class ViewController extends CommonController
 {
     /**
      * @var RequestStack
@@ -37,12 +37,12 @@ class CustomObjectViewController extends CommonController
     private $session;
 
     /**
-     * @var CustomObjectModel
+     * @var CustomFieldModel
      */
-    private $customObjectModel;
+    private $customFieldModel;
 
     /**
-     * @var CustomObjectPermissionProvider
+     * @var CustomFieldPermissionProvider
      */
     private $permissionProvider;
 
@@ -50,21 +50,21 @@ class CustomObjectViewController extends CommonController
      * @param RequestStack $requestStack
      * @param Session $session
      * @param CoreParametersHelper $coreParametersHelper
-     * @param CustomObjectModel $customObjectModel
-     * @param CustomObjectPermissionProvider $permissionProvider
+     * @param CustomFieldModel $customFieldModel
+     * @param CustomFieldPermissionProvider $permissionProvider
      */
     public function __construct(
         RequestStack $requestStack,
         Session $session,
         CoreParametersHelper $coreParametersHelper,
-        CustomObjectModel $customObjectModel,
-        CustomObjectPermissionProvider $permissionProvider
+        CustomFieldModel $customFieldModel,
+        CustomFieldPermissionProvider $permissionProvider
     )
     {
         $this->requestStack         = $requestStack;
         $this->session              = $session;
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->customObjectModel    = $customObjectModel;
+        $this->customFieldModel     = $customFieldModel;
         $this->permissionProvider   = $permissionProvider;
     }
 
@@ -76,7 +76,7 @@ class CustomObjectViewController extends CommonController
     public function viewAction(int $objectId)
     {
         try {
-            $entity = $this->customObjectModel->fetchEntity($objectId);
+            $entity = $this->customFieldModel->fetchEntity($objectId);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         }
@@ -87,7 +87,7 @@ class CustomObjectViewController extends CommonController
             $this->accessDenied(false, $e->getMessage());
         }
 
-        $route = $this->generateUrl('mautic_custom_object_view', ['objectId' => $objectId]);
+        $route = $this->generateUrl('mautic_custom_field_view', ['objectId' => $objectId]);
 
         return $this->delegateView(
             [
@@ -95,9 +95,9 @@ class CustomObjectViewController extends CommonController
                 'viewParameters' => [
                     'item' => $entity,
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObject:detail.html.php',
+                'contentTemplate' => 'CustomObjectsBundle:CustomField:detail.html.php',
                 'passthroughVars' => [
-                    'mauticContent' => 'customObject',
+                    'mauticContent' => 'customField',
                     'route'         => $route,
                 ],
             ]

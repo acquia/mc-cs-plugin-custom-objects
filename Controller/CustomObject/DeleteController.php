@@ -11,24 +11,24 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\CustomObjectsBundle\Controller;
+namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
 use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 
-class CustomFieldDeleteController extends CommonController
+class DeleteController extends CommonController
 {
     /**
-     * @var CustomFieldModel
+     * @var CustomObjectModel
      */
-    private $customFieldModel;
+    private $customObjectModel;
 
     /**
      * @var Session
@@ -36,26 +36,26 @@ class CustomFieldDeleteController extends CommonController
     private $session;
 
     /**
-     * @var CustomFieldPermissionProvider
+     * @var CustomObjectPermissionProvider
      */
     private $permissionProvider;
 
     /**
-     * @param CustomFieldModel $customFieldModel
+     * @param CustomObjectModel $customObjectModel
      * @param Session $session
      * @param TranslatorInterface $translator
-     * @param CustomFieldPermissionProvider $permissionProvider
+     * @param CustomObjectPermissionProvider $permissionProvider
      */
     public function __construct(
-        CustomFieldModel $customFieldModel,
+        CustomObjectModel $customObjectModel,
         Session $session,
         TranslatorInterface $translator,
-        CustomFieldPermissionProvider $permissionProvider
+        CustomObjectPermissionProvider $permissionProvider
     )
     {
-        $this->customFieldModel   = $customFieldModel;
-        $this->session            = $session;
-        $this->translator         = $translator;
+        $this->customObjectModel = $customObjectModel;
+        $this->session           = $session;
+        $this->translator        = $translator;
         $this->permissionProvider = $permissionProvider;
     }
 
@@ -67,7 +67,7 @@ class CustomFieldDeleteController extends CommonController
     public function deleteAction(int $objectId)
     {
         try {
-            $entity = $this->customFieldModel->fetchEntity($objectId);
+            $entity = $this->customObjectModel->fetchEntity($objectId);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         }
@@ -78,7 +78,7 @@ class CustomFieldDeleteController extends CommonController
             $this->accessDenied(false, $e->getMessage());
         }
 
-        $this->customFieldModel->deleteEntity($entity);
+        $this->customObjectModel->deleteEntity($entity);
 
         $this->session->getFlashBag()->add(
             'notice',
@@ -93,8 +93,8 @@ class CustomFieldDeleteController extends CommonController
         );
 
         return $this->forward(
-            'CustomObjectsBundle:CustomFieldList:list',
-            ['page' => $this->session->get('custom.field.page', 1)]
+            'CustomObjectsBundle:CustomObject\List:list',
+            ['page' => $this->session->get('custom.object.page', 1)]
         );
     }
 }

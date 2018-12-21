@@ -11,7 +11,8 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\CustomObjectsBundle\Controller;
+namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
+;
 
 use Symfony\Component\HttpFoundation\Session\Session;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
@@ -19,7 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class CustomObjectCancelController extends CommonController
+class CancelController extends CommonController
 {
     /**
      * @var Session
@@ -45,7 +46,6 @@ class CustomObjectCancelController extends CommonController
     }
 
     /**
-     * @todo implement permissions
      * @todo unlock entity?
      * 
      * @param int|null $objectId
@@ -62,7 +62,7 @@ class CustomObjectCancelController extends CommonController
             [
                 'returnUrl'       => $this->generateUrl('mautic_custom_object_list', $viewParameters),
                 'viewParameters'  => $viewParameters,
-                'contentTemplate' => 'CustomObjectsBundle:CustomObjectList:list',
+                'contentTemplate' => 'CustomObjectsBundle:CustomObject\List:list',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
                 ],

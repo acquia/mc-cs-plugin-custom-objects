@@ -11,22 +11,22 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\CustomObjectsBundle\Controller;
+namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 
-class CustomObjectEditController extends CommonController
+class EditController extends CommonController
 {
     /**
      * @var Router
@@ -39,12 +39,12 @@ class CustomObjectEditController extends CommonController
     private $formFactory;
 
     /**
-     * @var CustomObjectModel
+     * @var CustomFieldModel
      */
-    private $customObjectModel;
+    private $customFieldModel;
 
     /**
-     * @var CustomObjectPermissionProvider
+     * @var CustomFieldPermissionProvider
      */
     private $permissionProvider;
 
@@ -52,19 +52,19 @@ class CustomObjectEditController extends CommonController
     /**
      * @param Router $router
      * @param FormFactory $formFactory
-     * @param CustomObjectModel $customObjectModel
-     * @param CustomObjectPermissionProvider $permissionProvider
+     * @param CustomFieldModel $customFieldModel
+     * @param CustomFieldPermissionProvider $permissionProvider
      */
     public function __construct(
         Router $router,
         FormFactory $formFactory,
-        CustomObjectModel $customObjectModel,
-        CustomObjectPermissionProvider $permissionProvider
+        CustomFieldModel $customFieldModel,
+        CustomFieldPermissionProvider $permissionProvider
     )
     {
         $this->router            = $router;
         $this->formFactory       = $formFactory;
-        $this->customObjectModel = $customObjectModel;
+        $this->customFieldModel = $customFieldModel;
         $this->permissionProvider = $permissionProvider;
     }
 
@@ -78,7 +78,7 @@ class CustomObjectEditController extends CommonController
     public function renderFormAction(int $objectId)
     {
         try {
-            $entity = $this->customObjectModel->fetchEntity($objectId);
+            $entity = $this->customFieldModel->fetchEntity($objectId);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         }
@@ -89,20 +89,20 @@ class CustomObjectEditController extends CommonController
             $this->accessDenied(false, $e->getMessage());
         }
 
-        $action  = $this->router->generate('mautic_custom_object_save', ['objectId' => $objectId]);
-        $form    = $this->formFactory->create(CustomObjectType::class, $entity, ['action' => $action]);
+        $action  = $this->router->generate('mautic_custom_field_save', ['objectId' => $objectId]);
+        $form    = $this->formFactory->create(CustomFieldType::class, $entity, ['action' => $action]);
 
         return $this->delegateView(
             [
-                'returnUrl'      => $this->router->generate('mautic_custom_object_list'),
+                'returnUrl'      => $this->router->generate('mautic_custom_field_list'),
                 'viewParameters' => [
                     'entity' => $entity,
                     'form'   => $form->createView(),
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.php',
+                'contentTemplate' => 'CustomObjectsBundle:CustomField:form.html.php',
                 'passthroughVars' => [
-                    'mauticContent' => 'customObject',
-                    'route'         => $this->router->generate('mautic_custom_object_edit', ['objectId' => $objectId]),
+                    'mauticContent' => 'customField',
+                    'route'         => $this->router->generate('mautic_custom_field_edit', ['objectId' => $objectId]),
                 ],
             ]
         );
