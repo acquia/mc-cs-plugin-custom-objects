@@ -15,6 +15,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 
 class MenuSubscriber extends CommonSubscriber
 {
@@ -71,11 +72,11 @@ class MenuSubscriber extends CommonSubscriber
                 [
                     'items' => [
                         $customObject->getName() => [
-                            'route'     => 'mautic_custom_field_list', // @todo change this when the right route will be available
-                            'routeParameters' => ['page' => 2],
-                            'access'    => 'custom_fields:custom_fields:view',
-                            'id'        => 'mautic_custom_object_'.$customObject->getId(),
-                            'parent'    => 'custom.object.title',
+                            'route'           => CustomItemRouteProvider::ROUTE_LIST,
+                            'routeParameters' => ['objectId' => $customObject->getId(), 'page' => 1],
+                            'access'          => 'custom_fields:custom_fields:view',
+                            'id'              => 'mautic_custom_object_'.$customObject->getId(),
+                            'parent'          => 'custom.object.title',
                         ],
                     ],
                 ]
