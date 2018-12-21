@@ -331,6 +331,7 @@ return [
                     'session',
                     'mautic.helper.core_parameters',
                     'mautic.custom.model.item',
+                    'mautic.custom.model.object',
                     'custom_item.permission.provider',
                     'custom_item.route.provider',
                 ],

@@ -12,7 +12,7 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 
 $view['slots']->set('mauticContent', 'customItem');
-$view['slots']->set('headerTitle', 'CustomObject::getName()');
+$view['slots']->set('headerTitle', $customObject->getName());
 $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php'));
 ?>
 

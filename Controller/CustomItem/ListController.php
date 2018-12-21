@@ -25,6 +25,8 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Mautic\CoreBundle\Helper\InputHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Helper\PaginationHelper;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
 class ListController extends CommonController
 {
@@ -44,6 +46,11 @@ class ListController extends CommonController
     private $customItemModel;
 
     /**
+     * @var CustomObjectModel
+     */
+    private $customObjectModel;
+
+    /**
      * @var CustomItemPermissionProvider
      */
     private $permissionProvider;
@@ -58,6 +65,7 @@ class ListController extends CommonController
      * @param Session $session
      * @param CoreParametersHelper $coreParametersHelper
      * @param CustomItemModel $customItemModel
+     * @param CustomObjectModel $customObjectModel
      * @param CorePermissions $corePermissions
      * @param CustomItemRouteProvider $routeProvider
      */
@@ -66,6 +74,7 @@ class ListController extends CommonController
         Session $session,
         CoreParametersHelper $coreParametersHelper,
         CustomItemModel $customItemModel,
+        CustomObjectModel $customObjectModel,
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider
     )
@@ -74,6 +83,7 @@ class ListController extends CommonController
         $this->session              = $session;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->customItemModel      = $customItemModel;
+        $this->customObjectModel    = $customObjectModel;
         $this->permissionProvider   = $permissionProvider;
         $this->routeProvider        = $routeProvider;
     }
@@ -87,7 +97,10 @@ class ListController extends CommonController
     public function listAction(int $objectId, int $page = 1)
     {
         try {
+            $customObject = $this->customObjectModel->fetchEntity($objectId);
             $this->permissionProvider->canViewAtAll();
+        } catch (NotFoundException $e) {
+            return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
             $this->accessDenied(false, $e->getMessage());
         }
@@ -128,6 +141,7 @@ class ListController extends CommonController
                 'returnUrl'      => $route,
                 'viewParameters' => [
                     'searchValue'    => $search,
+                    'customObject'   => $customObject,
                     'items'          => $entities,
                     'page'           => $page,
                     'limit'          => $limit,
