@@ -11,20 +11,20 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
+namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use Predis\Protocol\Text\RequestSerializer;
 use Mautic\CoreBundle\Controller\CommonController;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Mautic\CoreBundle\Helper\InputHelper;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Helper\PaginationHelper;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
 
 class ListController extends CommonController
 {
@@ -39,17 +39,17 @@ class ListController extends CommonController
     private $session;
 
     /**
-     * @var CustomFieldModel
+     * @var CustomItemModel
      */
-    private $customFieldModel;
+    private $customItemModel;
 
     /**
-     * @var CustomFieldPermissionProvider
+     * @var CustomItemPermissionProvider
      */
     private $permissionProvider;
 
     /**
-     * @var CustomFieldRouteProvider
+     * @var CustomItemRouteProvider
      */
     private $routeProvider;
 
@@ -57,33 +57,34 @@ class ListController extends CommonController
      * @param RequestStack $requestStack
      * @param Session $session
      * @param CoreParametersHelper $coreParametersHelper
-     * @param CustomFieldModel $customFieldModel
+     * @param CustomItemModel $customItemModel
      * @param CorePermissions $corePermissions
-     * @param CustomFieldRouteProvider $routeProvider
+     * @param CustomItemRouteProvider $routeProvider
      */
     public function __construct(
         RequestStack $requestStack,
         Session $session,
         CoreParametersHelper $coreParametersHelper,
-        CustomFieldModel $customFieldModel,
-        CustomFieldPermissionProvider $permissionProvider,
-        CustomFieldRouteProvider $routeProvider
+        CustomItemModel $customItemModel,
+        CustomItemPermissionProvider $permissionProvider,
+        CustomItemRouteProvider $routeProvider
     )
     {
         $this->requestStack         = $requestStack;
         $this->session              = $session;
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->customFieldModel     = $customFieldModel;
+        $this->customItemModel      = $customItemModel;
         $this->permissionProvider   = $permissionProvider;
         $this->routeProvider        = $routeProvider;
     }
 
     /**
+     * @param integer $objectId
      * @param integer $page
      * 
      * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function listAction(int $page = 1)
+    public function listAction(int $objectId, int $page = 1)
     {
         try {
             $this->permissionProvider->canViewAtAll();
@@ -92,23 +93,23 @@ class ListController extends CommonController
         }
 
         $request      = $this->requestStack->getCurrentRequest();
-        $search       = InputHelper::clean($request->get('search', $this->session->get('mautic.custom.field.filter', '')));
+        $search       = InputHelper::clean($request->get('search', $this->session->get('mautic.custom.item.filter', '')));
         $defaultlimit = (int) $this->coreParametersHelper->getParameter('default_pagelimit');
-        $sessionLimit = (int) $this->session->get('mautic.custom.field.limit', $defaultlimit);
+        $sessionLimit = (int) $this->session->get('mautic.custom.item.limit', $defaultlimit);
         $limit        = (int) $request->get('limit', $sessionLimit);
-        $orderBy      = $this->session->get('mautic.custom.field.orderby', 'e.id');
-        $orderByDir   = $this->session->get('mautic.custom.field.orderbydir', 'DESC');
-        $route        = $this->routeProvider->buildListRoute($page);
+        $orderBy      = $this->session->get('mautic.custom.item.orderby', 'e.id');
+        $orderByDir   = $this->session->get('mautic.custom.item.orderbydir', 'DESC');
+        $route        = $this->routeProvider->buildListRoute($objectId, $page);
 
         if ($request->query->has('orderby')) {
             $orderBy    = InputHelper::clean($request->query->get('orderby'), true);
-            $orderByDir = $this->session->get("mautic.custom.field.orderbydir", 'ASC');
+            $orderByDir = $this->session->get("mautic.custom.item.orderbydir", 'ASC');
             $orderByDir = ($orderByDir == 'ASC') ? 'DESC' : 'ASC';
-            $this->session->set("mautic.custom.field.orderby", $orderBy);
-            $this->session->set("mautic.custom.field.orderbydir", $orderByDir);
+            $this->session->set("mautic.custom.item.orderby", $orderBy);
+            $this->session->set("mautic.custom.item.orderbydir", $orderByDir);
         }
         
-        $entities = $this->customFieldModel->fetchEntities(
+        $entities = $this->customItemModel->fetchEntities(
             [
                 'start'      => PaginationHelper::countOffset($page, $limit),
                 'limit'      => $limit,
@@ -118,23 +119,23 @@ class ListController extends CommonController
             ]
         );
     
-        $this->session->set('mautic.custom.field.page', $page);
-        $this->session->set('mautic.custom.field.limit', $limit);
-        $this->session->set('mautic.custom.field.filter', $search);
+        $this->session->set('mautic.custom.item.page', $page);
+        $this->session->set('mautic.custom.item.limit', $limit);
+        $this->session->set('mautic.custom.item.filter', $search);
 
         return $this->delegateView(
             [
                 'returnUrl'      => $route,
                 'viewParameters' => [
-                    'searchValue' => $search,
-                    'items'       => $entities,
-                    'page'        => $page,
-                    'limit'       => $limit,
-                    'tmpl'        => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'searchValue'    => $search,
+                    'items'          => $entities,
+                    'page'           => $page,
+                    'limit'          => $limit,
+                    'tmpl'           => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomField:list.html.php',
+                'contentTemplate' => 'CustomObjectsBundle:CustomItem:list.html.php',
                 'passthroughVars' => [
-                    'mauticContent' => 'customField',
+                    'mauticContent' => 'customItem',
                     'route'         => $route,
                 ],
             ]

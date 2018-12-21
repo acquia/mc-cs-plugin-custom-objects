@@ -83,7 +83,7 @@ class ListController extends CommonController
      * 
      * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function listAction(int $page)
+    public function listAction(int $page = 1)
     {
         try {
             $this->permissionProvider->canViewAtAll();
