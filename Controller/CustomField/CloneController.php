@@ -15,7 +15,6 @@ namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,14 +24,10 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
 
 class CloneController extends CommonController
 {
-    /**
-     * @var Router
-     */
-    private $router;
-
     /**
      * @var FormFactory
      */
@@ -49,22 +44,27 @@ class CloneController extends CommonController
     private $permissionProvider;
 
     /**
-     * @param Router $router
+     * @var CustomFieldRouteProvider
+     */
+    private $routeProvider;
+
+    /**
      * @param FormFactory $formFactory
      * @param CustomFieldModel $customFieldModel
      * @param CustomFieldPermissionProvider $permissionProvider
+     * @param CustomFieldRouteProvider $routeProvider
      */
     public function __construct(
-        Router $router,
         FormFactory $formFactory,
         CustomFieldModel $customFieldModel,
-        CustomFieldPermissionProvider $permissionProvider
+        CustomFieldPermissionProvider $permissionProvider,
+        CustomFieldRouteProvider $routeProvider
     )
     {
-        $this->router             = $router;
         $this->formFactory        = $formFactory;
         $this->customFieldModel   = $customFieldModel;
         $this->permissionProvider = $permissionProvider;
+        $this->routeProvider      = $routeProvider;
     }
 
     /**
@@ -76,24 +76,21 @@ class CloneController extends CommonController
     {
         try {
             $entity = clone $this->customFieldModel->fetchEntity($objectId);
+            $this->permissionProvider->canClone($entity);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
-        }
-
-        try {
-            $this->permissionProvider->canClone($entity);
         } catch (ForbiddenException $e) {
             $this->accessDenied(false, $e->getMessage());
         }
 
         $entity->setLabel($entity->getLabel().' '.$this->translator->trans('mautic.core.form.clone'));
 
-        $action = $this->router->generate('mautic_custom_field_save');
+        $action = $this->routeProvider->buildSaveRoute();
         $form   = $this->formFactory->create(CustomFieldType::class, $entity, ['action' => $action]);
 
         return $this->delegateView(
             [
-                'returnUrl'      => $this->router->generate('mautic_custom_field_list'),
+                'returnUrl'      => $this->routeProvider->buildListRoute(),
                 'viewParameters' => [
                     'entity' => $entity,
                     'form'   => $form->createView(),
@@ -101,7 +98,7 @@ class CloneController extends CommonController
                 'contentTemplate' => 'CustomObjectsBundle:CustomField:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customField',
-                    'route'         => $this->router->generate('mautic_custom_field_clone', ['objectId' => $objectId]),
+                    'route'         => $this->routeProvider->buildCloneRoute($objectId),
                 ],
             ]
         );

@@ -18,6 +18,7 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
 
 class CancelController extends CommonController
 {
@@ -32,16 +33,24 @@ class CancelController extends CommonController
     private $customFieldModel;
 
     /**
+     * @var CustomFieldRouteProvider
+     */
+    private $routeProvider;
+
+    /**
      * @param Session $session
      * @param CustomFieldModel $customFieldModel
+     * @param CustomFieldRouteProvider $routeProvider
      */
     public function __construct(
         Session $session,
-        CustomFieldModel $customFieldModel
+        CustomFieldModel $customFieldModel,
+        CustomFieldRouteProvider $routeProvider
     )
     {
-        $this->session           = $session;
+        $this->session          = $session;
         $this->customFieldModel = $customFieldModel;
+        $this->routeProvider    = $routeProvider;
     }
 
     /**
@@ -53,18 +62,14 @@ class CancelController extends CommonController
      */
     public function cancelAction(?int $objectId)
     {
-        $viewParameters = [
-            'page' => $this->session->get('custom.field.page', 1),
-        ];
+        $page = $this->session->get('custom.field.page', 1);
 
         return $this->postActionRedirect(
             [
-                'returnUrl'       => $this->generateUrl('mautic_custom_field_list', $viewParameters),
-                'viewParameters'  => $viewParameters,
+                'returnUrl'       => $this->routeProvider->buildListRoute($page),
+                'viewParameters'  => ['page' => $page],
                 'contentTemplate' => 'CustomObjectsBundle:CustomField\List:list',
-                'passthroughVars' => [
-                    'mauticContent' => 'customField',
-                ],
+                'passthroughVars' => ['mauticContent' => 'customField'],
             ]
         );
     }

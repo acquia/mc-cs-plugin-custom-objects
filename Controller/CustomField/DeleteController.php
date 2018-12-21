@@ -68,12 +68,9 @@ class DeleteController extends CommonController
     {
         try {
             $entity = $this->customFieldModel->fetchEntity($objectId);
+            $this->permissionProvider->canDelete($entity);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
-        }
-
-        try {
-            $this->permissionProvider->canDelete($entity);
         } catch (ForbiddenException $e) {
             $this->accessDenied(false, $e->getMessage());
         }

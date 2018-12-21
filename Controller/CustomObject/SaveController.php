@@ -18,7 +18,6 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -28,6 +27,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 
 class SaveController extends CommonController
 {
@@ -35,11 +35,6 @@ class SaveController extends CommonController
      * @var RequestStack
      */
     private $requestStack;
-
-    /**
-     * @var Router
-     */
-    private $router;
 
     /**
      * @var Session
@@ -62,31 +57,36 @@ class SaveController extends CommonController
     private $permissionProvider;
 
     /**
+     * @var CustomObjectRouteProvider
+     */
+    private $routeProvider;
+
+    /**
      * @param RequestStack $requestStack
-     * @param Router $router
      * @param Session $session
      * @param FormFactory $formFactory
      * @param TranslatorInterface $translator
      * @param CustomObjectModel $customObjectModel
      * @param CustomObjectPermissionProvider $permissionProvider
+     * @param CustomObjectRouteProvider $routeProvider
      */
     public function __construct(
         RequestStack $requestStack,
-        Router $router,
         Session $session,
         FormFactory $formFactory,
         TranslatorInterface $translator,
         CustomObjectModel $customObjectModel,
-        CustomObjectPermissionProvider $permissionProvider
+        CustomObjectPermissionProvider $permissionProvider,
+        CustomObjectRouteProvider $routeProvider
     )
     {
         $this->requestStack       = $requestStack;
-        $this->router             = $router;
         $this->session            = $session;
         $this->formFactory        = $formFactory;
         $this->translator         = $translator;
         $this->customObjectModel  = $customObjectModel;
         $this->permissionProvider = $permissionProvider;
+        $this->routeProvider      = $routeProvider;
     }
 
     /**
@@ -98,22 +98,19 @@ class SaveController extends CommonController
     {
         try {
             $entity = $objectId ? $this->customObjectModel->getEntity($objectId): new CustomObject();
-        } catch (NotFoundException $e) {
-            return $this->notFound($e->getMessage());
-        }
-
-        try {
             if ($entity->isNew()) {
                 $this->permissionProvider->canCreate();
             } else {
                 $this->permissionProvider->canEdit($entity);
             }
+        } catch (NotFoundException $e) {
+            return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
             $this->accessDenied(false, $e->getMessage());
         }
 
         $request = $this->requestStack->getCurrentRequest();
-        $action  = $this->router->generate('mautic_custom_object_save', ['objectId' => $objectId]);
+        $action  = $this->routeProvider->buildSaveRoute($objectId);
         $form    = $this->formFactory->create(CustomObjectType::class, $entity, ['action' => $action]);
         $form->handleRequest($request);
         
@@ -126,10 +123,7 @@ class SaveController extends CommonController
                     $objectId ? 'mautic.core.notice.updated' : 'mautic.core.notice.created',
                     [
                         '%name%' => $entity->getName(),
-                        '%url%'  => $this->router->generate(
-                            'mautic_custom_object_edit',
-                            ['objectId' => $entity->getId()]
-                        ),
+                        '%url%'  => $this->routeProvider->buildEditRoute($objectId),
                     ], 
                     'flashes'
                 )
@@ -144,7 +138,7 @@ class SaveController extends CommonController
 
         return $this->delegateView(
             [
-                'returnUrl'      => $this->router->generate('mautic_custom_object_new'),
+                'returnUrl'      => $this->routeProvider->buildNewRoute(),
                 'viewParameters' => [
                     'entity' => $entity,
                     'form'   => $form->createView(),
@@ -153,7 +147,7 @@ class SaveController extends CommonController
                 'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
-                    'route'         => $this->router->generate('mautic_custom_object_new'),
+                    'route'         => $this->routeProvider->buildNewRoute(),
                 ],
             ]
         );

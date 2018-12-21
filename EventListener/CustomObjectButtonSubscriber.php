@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 
 class CustomObjectButtonSubscriber extends CommonSubscriber
 {
@@ -26,11 +27,22 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
      */
     private $permissionProvider;
 
+    /**
+     * @var CustomObjectRouteProvider
+     */
+    private $routeProvider;
+
+    /**
+     * @param CustomObjectPermissionProvider $permissionProvider
+     * @param CustomObjectRouteProvider $routeProvider
+     */
     public function __construct(
-        CustomObjectPermissionProvider $permissionProvider
+        CustomObjectPermissionProvider $permissionProvider,
+        CustomObjectRouteProvider $routeProvider
     )
     {
         $this->permissionProvider = $permissionProvider;
+        $this->routeProvider      = $routeProvider;
     }
 
     public static function getSubscribedEvents()
@@ -46,14 +58,14 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
     public function injectViewButtons(CustomButtonEvent $event)
     {
         switch ($event->getRoute()) {
-            case 'mautic_custom_object_list':
+            case CustomObjectRouteProvider::ROUTE_LIST:
                 $this->addEntityButtons($event, ButtonHelper::LOCATION_LIST_ACTIONS);
                 try {
                     $event->addButton($this->defineNewButton(), ButtonHelper::LOCATION_PAGE_ACTIONS, $event->getRoute());
                 } catch (ForbiddenException $e) {}
                 break;
             
-            case 'mautic_custom_object_view':
+            case CustomObjectRouteProvider::ROUTE_VIEW:
                 $this->addEntityButtons($event, ButtonHelper::LOCATION_PAGE_ACTIONS);
                 $event->addButton($this->defineCloseButton(), ButtonHelper::LOCATION_PAGE_ACTIONS, $event->getRoute());
                 break;
@@ -95,7 +107,7 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
 
         return [
             'attr' => [
-                'href' => $this->router->generate('mautic_custom_object_edit', ['objectId' => $entity->getId()]),
+                'href' => $this->routeProvider->buildEditRoute($entity->getId()),
             ],
             'btnText'   => 'mautic.core.form.edit',
             'iconClass' => 'fa fa-pencil-square-o',
@@ -110,7 +122,7 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
     {
         return [
             'attr' => [
-                'href' => $this->router->generate('mautic_custom_object_list'),
+                'href' => $this->routeProvider->buildListRoute(),
                 'class' => 'btn btn-default',
             ],
             'class' => 'btn btn-default',
@@ -133,7 +145,7 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
 
         return [
             'attr' => [
-                'href' => $this->router->generate('mautic_custom_object_clone', ['objectId' => $entity->getId()]),
+                'href' => $this->routeProvider->buildCloneRoute($entity->getId()),
             ],
             'btnText'   => 'mautic.core.form.clone',
             'iconClass' => 'fa fa-copy',
@@ -154,7 +166,7 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
 
         return [
             'attr' => [
-                'href' => $this->router->generate('mautic_custom_object_delete', ['objectId' => $entity->getId()]),
+                'href' => $this->routeProvider->buildDeleteRoute($entity->getId()),
             ],
             'btnText'   => 'mautic.core.form.delete',
             'iconClass' => 'fa fa-fw fa-trash-o text-danger',
@@ -173,7 +185,7 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
 
         return [
             'attr' => [
-                'href' => $this->router->generate('mautic_custom_object_new'),
+                'href' => $this->routeProvider->buildNewRoute(),
             ],
             'btnText'   => $this->translator->trans('mautic.core.form.new'),
             'iconClass' => 'fa fa-plus',

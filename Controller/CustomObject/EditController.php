@@ -15,7 +15,6 @@ namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,14 +24,10 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 
 class EditController extends CommonController
 {
-    /**
-     * @var Router
-     */
-    private $router;
-
     /**
      * @var FormFactory
      */
@@ -48,24 +43,28 @@ class EditController extends CommonController
      */
     private $permissionProvider;
 
+    /**
+     * @var CustomObjectRouteProvider
+     */
+    private $routeProvider;
 
     /**
-     * @param Router $router
      * @param FormFactory $formFactory
      * @param CustomObjectModel $customObjectModel
      * @param CustomObjectPermissionProvider $permissionProvider
+     * @param CustomObjectRouteProvider $routeProvider
      */
     public function __construct(
-        Router $router,
         FormFactory $formFactory,
         CustomObjectModel $customObjectModel,
-        CustomObjectPermissionProvider $permissionProvider
+        CustomObjectPermissionProvider $permissionProvider,
+        CustomObjectRouteProvider $routeProvider
     )
     {
-        $this->router            = $router;
-        $this->formFactory       = $formFactory;
-        $this->customObjectModel = $customObjectModel;
+        $this->formFactory        = $formFactory;
+        $this->customObjectModel  = $customObjectModel;
         $this->permissionProvider = $permissionProvider;
+        $this->routeProvider      = $routeProvider;
     }
 
     /**
@@ -79,22 +78,19 @@ class EditController extends CommonController
     {
         try {
             $entity = $this->customObjectModel->fetchEntity($objectId);
+            $this->permissionProvider->canEdit($entity);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
-        }
-
-        try {
-            $this->permissionProvider->canEdit($entity);
         } catch (ForbiddenException $e) {
             $this->accessDenied(false, $e->getMessage());
         }
 
-        $action  = $this->router->generate('mautic_custom_object_save', ['objectId' => $objectId]);
+        $action  = $this->routeProvider->buildSaveRoute($objectId);
         $form    = $this->formFactory->create(CustomObjectType::class, $entity, ['action' => $action]);
 
         return $this->delegateView(
             [
-                'returnUrl'      => $this->router->generate('mautic_custom_object_list'),
+                'returnUrl'      => $this->routeProvider->buildListRoute(),
                 'viewParameters' => [
                     'entity' => $entity,
                     'form'   => $form->createView(),
@@ -102,7 +98,7 @@ class EditController extends CommonController
                 'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
-                    'route'         => $this->router->generate('mautic_custom_object_edit', ['objectId' => $objectId]),
+                    'route'         => $this->routeProvider->buildEditRoute($objectId),
                 ],
             ]
         );

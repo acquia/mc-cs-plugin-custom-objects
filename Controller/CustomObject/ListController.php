@@ -23,6 +23,8 @@ use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Mautic\CoreBundle\Helper\InputHelper;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Helper\PaginationHelper;
 
 class ListController extends CommonController
 {
@@ -47,18 +49,25 @@ class ListController extends CommonController
     private $permissionProvider;
 
     /**
+     * @var CustomObjectRouteProvider
+     */
+    private $routeProvider;
+
+    /**
      * @param RequestStack $requestStack
      * @param Session $session
      * @param CoreParametersHelper $coreParametersHelper
      * @param CustomObjectModel $customObjectModel
      * @param CorePermissions $corePermissions
+     * @param CustomObjectRouteProvider $routeProvider
      */
     public function __construct(
         RequestStack $requestStack,
         Session $session,
         CoreParametersHelper $coreParametersHelper,
         CustomObjectModel $customObjectModel,
-        CustomObjectPermissionProvider $permissionProvider
+        CustomObjectPermissionProvider $permissionProvider,
+        CustomObjectRouteProvider $routeProvider
     )
     {
         $this->requestStack         = $requestStack;
@@ -66,6 +75,7 @@ class ListController extends CommonController
         $this->coreParametersHelper = $coreParametersHelper;
         $this->customObjectModel    = $customObjectModel;
         $this->permissionProvider   = $permissionProvider;
+        $this->routeProvider        = $routeProvider;
     }
 
     /**
@@ -86,11 +96,9 @@ class ListController extends CommonController
         $defaultlimit = (int) $this->coreParametersHelper->getParameter('default_pagelimit');
         $sessionLimit = (int) $this->session->get('mautic.custom.object.limit', $defaultlimit);
         $limit        = (int) $request->get('limit', $sessionLimit);
-        $viewParams   = ['page' => $page];
-        $filter       = ['string' => $search];
         $orderBy      = $this->session->get('mautic.custom.object.orderby', 'e.id');
         $orderByDir   = $this->session->get('mautic.custom.object.orderbydir', 'DESC');
-        $route        = $this->generateUrl('mautic_custom_object_list', $viewParams);
+        $route        = $this->routeProvider->buildListRoute($page);
 
         if ($request->query->has('orderby')) {
             $orderBy    = InputHelper::clean($request->query->get('orderby'), true);
@@ -104,7 +112,7 @@ class ListController extends CommonController
             [
                 'start'      => PaginationHelper::countOffset($page, $limit),
                 'limit'      => $limit,
-                'filter'     => $filter,
+                'filter'     => ['string' => $search],
                 'orderBy'    => $orderBy,
                 'orderByDir' => $orderByDir,
             ]

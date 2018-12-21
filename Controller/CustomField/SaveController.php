@@ -18,7 +18,6 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -28,6 +27,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
 
 class SaveController extends CommonController
 {
@@ -35,11 +35,6 @@ class SaveController extends CommonController
      * @var RequestStack
      */
     private $requestStack;
-
-    /**
-     * @var Router
-     */
-    private $router;
 
     /**
      * @var Session
@@ -62,31 +57,36 @@ class SaveController extends CommonController
     private $permissionProvider;
 
     /**
+     * @var CustomFieldRouteProvider
+     */
+    private $routeProvider;
+
+    /**
      * @param RequestStack $requestStack
-     * @param Router $router
      * @param Session $session
      * @param FormFactory $formFactory
      * @param TranslatorInterface $translator
      * @param CustomFieldModel $customFieldModel
      * @param CustomFieldPermissionProvider $permissionProvider
+     * @param CustomFieldRouteProvider $routeProvider
      */
     public function __construct(
         RequestStack $requestStack,
-        Router $router,
         Session $session,
         FormFactory $formFactory,
         TranslatorInterface $translator,
         CustomFieldModel $customFieldModel,
-        CustomFieldPermissionProvider $permissionProvider
+        CustomFieldPermissionProvider $permissionProvider,
+        CustomFieldRouteProvider $routeProvider
     )
     {
         $this->requestStack       = $requestStack;
-        $this->router             = $router;
         $this->session            = $session;
         $this->formFactory        = $formFactory;
         $this->translator         = $translator;
-        $this->customFieldModel  = $customFieldModel;
+        $this->customFieldModel   = $customFieldModel;
         $this->permissionProvider = $permissionProvider;
+        $this->routeProvider      = $routeProvider;
     }
 
     /**
@@ -98,22 +98,19 @@ class SaveController extends CommonController
     {
         try {
             $entity = $objectId ? $this->customFieldModel->getEntity($objectId): new CustomField();
-        } catch (NotFoundException $e) {
-            return $this->notFound($e->getMessage());
-        }
-
-        try {
             if ($entity->isNew()) {
                 $this->permissionProvider->canCreate();
             } else {
                 $this->permissionProvider->canEdit($entity);
             }
+        } catch (NotFoundException $e) {
+            return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
             $this->accessDenied(false, $e->getMessage());
         }
 
         $request = $this->requestStack->getCurrentRequest();
-        $action  = $this->router->generate('mautic_custom_field_save', ['objectId' => $objectId]);
+        $action  = $this->routeProvider->buildSaveRoute($objectId);
         $form    = $this->formFactory->create(CustomFieldType::class, $entity, ['action' => $action]);
         $form->handleRequest($request);
         
@@ -126,10 +123,7 @@ class SaveController extends CommonController
                     $objectId ? 'mautic.core.notice.updated' : 'mautic.core.notice.created',
                     [
                         '%name%' => $entity->getName(),
-                        '%url%'  => $this->router->generate(
-                            'mautic_custom_field_edit',
-                            ['objectId' => $entity->getId()]
-                        ),
+                        '%url%'  => $this->routeProvider->buildEditRoute($objectId),
                     ], 
                     'flashes'
                 )
@@ -144,7 +138,7 @@ class SaveController extends CommonController
 
         return $this->delegateView(
             [
-                'returnUrl'      => $this->router->generate('mautic_custom_field_new'),
+                'returnUrl'      => $this->routeProvider->buildNewRoute(),
                 'viewParameters' => [
                     'entity' => $entity,
                     'form'   => $form->createView(),
@@ -153,7 +147,7 @@ class SaveController extends CommonController
                 'contentTemplate' => 'CustomObjectsBundle:CustomField:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customField',
-                    'route'         => $this->router->generate('mautic_custom_field_new'),
+                    'route'         => $this->routeProvider->buildNewRoute(),
                 ],
             ]
         );

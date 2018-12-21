@@ -15,7 +15,6 @@ namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,14 +22,10 @@ use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 
 class NewController extends CommonController
 {
-    /**
-     * @var Router
-     */
-    private $router;
-
     /**
      * @var FormFactory
      */
@@ -42,19 +37,24 @@ class NewController extends CommonController
     private $permissionProvider;
 
     /**
-     * @param Router $router
+     * @var CustomObjectRouteProvider
+     */
+    private $routeProvider;
+
+    /**
      * @param FormFactory $formFactory
      * @param CustomObjectPermissionProvider $permissionProvider
+     * @param CustomObjectRouteProvider $routeProvider
      */
     public function __construct(
-        Router $router,
         FormFactory $formFactory,
-        CustomObjectPermissionProvider $permissionProvider
+        CustomObjectPermissionProvider $permissionProvider,
+        CustomObjectRouteProvider $routeProvider
     )
     {
-        $this->router             = $router;
         $this->formFactory        = $formFactory;
         $this->permissionProvider = $permissionProvider;
+        $this->routeProvider      = $routeProvider;
     }
 
     /**
@@ -69,12 +69,12 @@ class NewController extends CommonController
         }
         
         $entity  = new CustomObject();
-        $action  = $this->router->generate('mautic_custom_object_save');
+        $action  = $this->routeProvider->buildSaveRoute();
         $form    = $this->formFactory->create(CustomObjectType::class, $entity, ['action' => $action]);
 
         return $this->delegateView(
             [
-                'returnUrl'      => $this->router->generate('mautic_custom_object_list'),
+                'returnUrl'      => $this->routeProvider->buildListRoute(),
                 'viewParameters' => [
                     'entity' => $entity,
                     'form'   => $form->createView(),
@@ -82,7 +82,7 @@ class NewController extends CommonController
                 'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
-                    'route'         => $this->router->generate('mautic_custom_object_new'),
+                    'route'         => $this->routeProvider->buildNewRoute(),
                 ],
             ]
         );

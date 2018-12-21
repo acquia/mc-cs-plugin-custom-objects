@@ -19,6 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 
 class CancelController extends CommonController
 {
@@ -33,16 +34,24 @@ class CancelController extends CommonController
     private $customObjectModel;
 
     /**
+     * @var CustomObjectRouteProvider
+     */
+    private $routeProvider;
+
+    /**
      * @param Session $session
      * @param CustomObjectModel $customObjectModel
+     * @param CustomObjectRouteProvider $routeProvider
      */
     public function __construct(
         Session $session,
-        CustomObjectModel $customObjectModel
+        CustomObjectModel $customObjectModel,
+        CustomObjectRouteProvider $routeProvider
     )
     {
         $this->session           = $session;
         $this->customObjectModel = $customObjectModel;
+        $this->routeProvider     = $routeProvider;
     }
 
     /**
@@ -54,14 +63,12 @@ class CancelController extends CommonController
      */
     public function cancelAction(?int $objectId)
     {
-        $viewParameters = [
-            'page' => $this->session->get('custom.object.page', 1),
-        ];
+        $page = $this->session->get('custom.object.page', 1);
 
         return $this->postActionRedirect(
             [
-                'returnUrl'       => $this->generateUrl('mautic_custom_object_list', $viewParameters),
-                'viewParameters'  => $viewParameters,
+                'returnUrl'       => $this->routeProvider->buildListRoute($page),
+                'viewParameters'  => ['page' => $page],
                 'contentTemplate' => 'CustomObjectsBundle:CustomObject\List:list',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',

@@ -25,14 +25,10 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 
 class CloneController extends CommonController
 {
-    /**
-     * @var Router
-     */
-    private $router;
-
     /**
      * @var FormFactory
      */
@@ -49,22 +45,27 @@ class CloneController extends CommonController
     private $permissionProvider;
 
     /**
-     * @param Router $router
+     * @var CustomObjectRouteProvider
+     */
+    private $routeProvider;
+
+    /**
      * @param FormFactory $formFactory
      * @param CustomObjectModel $customObjectModel
      * @param CustomObjectPermissionProvider $permissionProvider
+     * @param CustomObjectRouteProvider $routeProvider
      */
     public function __construct(
-        Router $router,
         FormFactory $formFactory,
         CustomObjectModel $customObjectModel,
-        CustomObjectPermissionProvider $permissionProvider
+        CustomObjectPermissionProvider $permissionProvider,
+        CustomObjectRouteProvider $routeProvider
     )
     {
-        $this->router             = $router;
         $this->formFactory        = $formFactory;
         $this->customObjectModel  = $customObjectModel;
         $this->permissionProvider = $permissionProvider;
+        $this->routeProvider      = $routeProvider;
     }
 
     /**
@@ -76,24 +77,21 @@ class CloneController extends CommonController
     {
         try {
             $entity = clone $this->customObjectModel->fetchEntity($objectId);
+            $this->permissionProvider->canClone($entity);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
-        }
-
-        try {
-            $this->permissionProvider->canClone($entity);
         } catch (ForbiddenException $e) {
             $this->accessDenied(false, $e->getMessage());
         }
 
         $entity->setName($entity->getName().' '.$this->translator->trans('mautic.core.form.clone'));
 
-        $action = $this->router->generate('mautic_custom_object_save');
+        $action = $this->routeProvider->buildSaveRoute();
         $form   = $this->formFactory->create(CustomObjectType::class, $entity, ['action' => $action]);
 
         return $this->delegateView(
             [
-                'returnUrl'      => $this->router->generate('mautic_custom_object_list'),
+                'returnUrl'      => $this->routeProvider->buildListRoute(),
                 'viewParameters' => [
                     'entity' => $entity,
                     'form'   => $form->createView(),
@@ -101,7 +99,7 @@ class CloneController extends CommonController
                 'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
-                    'route'         => $this->router->generate('mautic_custom_object_clone', ['objectId' => $objectId]),
+                    'route'         => $this->routeProvider->buildCloneRoute($objectId),
                 ],
             ]
         );

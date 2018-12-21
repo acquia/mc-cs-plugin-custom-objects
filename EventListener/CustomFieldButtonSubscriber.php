@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
 
 class CustomFieldButtonSubscriber extends CommonSubscriber
 {
@@ -26,11 +27,22 @@ class CustomFieldButtonSubscriber extends CommonSubscriber
      */
     private $permissionProvider;
 
+    /**
+     * @var CustomFieldRouteProvider
+     */
+    private $routeProvider;
+
+    /**
+     * @param CustomFieldPermissionProvider $permissionProvider
+     * @param CustomFieldRouteProvider $routeProvide
+     */
     public function __construct(
-        CustomFieldPermissionProvider $permissionProvider
+        CustomFieldPermissionProvider $permissionProvider,
+        CustomFieldRouteProvider $routeProvider
     )
     {
         $this->permissionProvider = $permissionProvider;
+        $this->routeProvider      = $routeProvider;
     }
 
     public static function getSubscribedEvents()
@@ -46,14 +58,14 @@ class CustomFieldButtonSubscriber extends CommonSubscriber
     public function injectViewButtons(CustomButtonEvent $event)
     {
         switch ($event->getRoute()) {
-            case 'mautic_custom_field_list':
+            case CustomFieldRouteProvider::ROUTE_LIST:
                 $this->addEntityButtons($event, ButtonHelper::LOCATION_LIST_ACTIONS);
                 try {
                     $event->addButton($this->defineNewButton(), ButtonHelper::LOCATION_PAGE_ACTIONS, $event->getRoute());
                 } catch (ForbiddenException $e) {}
                 break;
             
-            case 'mautic_custom_field_view':
+            case CustomFieldRouteProvider::ROUTE_VIEW:
                 $this->addEntityButtons($event, ButtonHelper::LOCATION_PAGE_ACTIONS);
                 $event->addButton($this->defineCloseButton(), ButtonHelper::LOCATION_PAGE_ACTIONS, $event->getRoute());
                 break;
@@ -94,9 +106,7 @@ class CustomFieldButtonSubscriber extends CommonSubscriber
         $this->permissionProvider->canEdit($entity);
 
         return [
-            'attr' => [
-                'href' => $this->router->generate('mautic_custom_field_edit', ['objectId' => $entity->getId()]),
-            ],
+            'attr'      => ['href' => $this->routeProvider->buildEditRoute($entity->getId())],
             'btnText'   => 'mautic.core.form.edit',
             'iconClass' => 'fa fa-pencil-square-o',
             'priority'  => 500,
@@ -110,7 +120,7 @@ class CustomFieldButtonSubscriber extends CommonSubscriber
     {
         return [
             'attr' => [
-                'href' => $this->router->generate('mautic_custom_field_list'),
+                'href' => $this->routeProvider->buildListRoute(),
                 'class' => 'btn btn-default',
             ],
             'class' => 'btn btn-default',
@@ -132,9 +142,7 @@ class CustomFieldButtonSubscriber extends CommonSubscriber
         $this->permissionProvider->canClone($entity);
 
         return [
-            'attr' => [
-                'href' => $this->router->generate('mautic_custom_field_clone', ['objectId' => $entity->getId()]),
-            ],
+            'attr'      => ['href' => $this->routeProvider->buildCloneRoute($entity->getId())],
             'btnText'   => 'mautic.core.form.clone',
             'iconClass' => 'fa fa-copy',
             'priority'  => 300,
@@ -153,9 +161,7 @@ class CustomFieldButtonSubscriber extends CommonSubscriber
         $this->permissionProvider->canDelete($entity);        
 
         return [
-            'attr' => [
-                'href' => $this->router->generate('mautic_custom_field_delete', ['objectId' => $entity->getId()]),
-            ],
+            'attr'      => ['href' => $this->routeProvider->buildDeleteRoute($entity->getId())],
             'btnText'   => 'mautic.core.form.delete',
             'iconClass' => 'fa fa-fw fa-trash-o text-danger',
             'priority'  => 0,
@@ -172,9 +178,7 @@ class CustomFieldButtonSubscriber extends CommonSubscriber
         $this->permissionProvider->canCreate();        
 
         return [
-            'attr' => [
-                'href' => $this->router->generate('mautic_custom_field_new'),
-            ],
+            'attr'      => ['href' => $this->routeProvider->buildNewRoute()],
             'btnText'   => $this->translator->trans('mautic.core.form.new'),
             'iconClass' => 'fa fa-plus',
             'priority'  => 500,

@@ -23,6 +23,7 @@ use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 
 class ViewController extends CommonController
 {
@@ -47,18 +48,25 @@ class ViewController extends CommonController
     private $permissionProvider;
 
     /**
+     * @var CustomObjectRouteProvider
+     */
+    private $routeProvider;
+
+    /**
      * @param RequestStack $requestStack
      * @param Session $session
      * @param CoreParametersHelper $coreParametersHelper
      * @param CustomObjectModel $customObjectModel
      * @param CustomObjectPermissionProvider $permissionProvider
+     * @param CustomObjectRouteProvider $routeProvider
      */
     public function __construct(
         RequestStack $requestStack,
         Session $session,
         CoreParametersHelper $coreParametersHelper,
         CustomObjectModel $customObjectModel,
-        CustomObjectPermissionProvider $permissionProvider
+        CustomObjectPermissionProvider $permissionProvider,
+        CustomObjectRouteProvider $routeProvider
     )
     {
         $this->requestStack         = $requestStack;
@@ -66,6 +74,7 @@ class ViewController extends CommonController
         $this->coreParametersHelper = $coreParametersHelper;
         $this->customObjectModel    = $customObjectModel;
         $this->permissionProvider   = $permissionProvider;
+        $this->routeProvider      = $routeProvider;
     }
 
     /**
@@ -77,17 +86,14 @@ class ViewController extends CommonController
     {
         try {
             $entity = $this->customObjectModel->fetchEntity($objectId);
+            $this->permissionProvider->canView($entity);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
-        }
-
-        try {
-            $this->permissionProvider->canView($entity);
         } catch (ForbiddenException $e) {
             $this->accessDenied(false, $e->getMessage());
         }
 
-        $route = $this->generateUrl('mautic_custom_object_view', ['objectId' => $objectId]);
+        $route = $this->routeProvider->buildViewRoute($objectId);
 
         return $this->delegateView(
             [
