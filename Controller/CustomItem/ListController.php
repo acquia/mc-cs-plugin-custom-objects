@@ -126,9 +126,18 @@ class ListController extends CommonController
             [
                 'start'      => PaginationHelper::countOffset($page, $limit),
                 'limit'      => $limit,
-                'filter'     => ['string' => $search],
                 'orderBy'    => $orderBy,
                 'orderByDir' => $orderByDir,
+                'filter'     => [
+                    'string' => $search,
+                    'force'  => [
+                        [
+                            'column' => 'e.customObject',
+                            'value'  => $objectId,
+                            'expr'   => 'eq',
+                        ],
+                    ],
+                ],
             ]
         );
     
