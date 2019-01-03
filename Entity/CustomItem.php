@@ -23,6 +23,7 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\FormEntity;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use MauticPlugin\CustomObjectsBundle\Entity\UniqueEntityInterface;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 class CustomItem extends FormEntity implements UniqueEntityInterface
 {
@@ -37,14 +38,14 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     private $name;
 
     /**
+     * @var CustomObject
+     */
+    private $customObject;
+
+    /**
      * @var DateTimeInterface|null
      */
     private $dateAdded;
-
-    /**
-     * @var string|null
-     */
-    private $description;
 
     /**
      * @var string|null
@@ -62,6 +63,14 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     }
 
     /**
+     * @param CustomObject $customObject
+     */
+    public function __construct(CustomObject $customObject)
+    {
+        $this->customObject = $customObject;
+    }
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -70,6 +79,10 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
 
         $builder->setTable('custom_item')
             ->setCustomRepositoryClass(CustomItemRepository::class);
+
+        $builder->createManyToOne('customObject', CustomObject::class)
+            ->addJoinColumn('custom_object_id', 'id', false, false, 'CASCADE')
+            ->build();
 
         $builder->addId();
         $builder->addCategory();
@@ -84,7 +97,6 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank());
         $metadata->addPropertyConstraint('name', new Assert\Length(['max' => 255]));
-        $metadata->addPropertyConstraint('description', new Assert\Length(['max' => 65535]));
     }
 
     /**
@@ -113,20 +125,11 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param string|null $description
+     * @return CustomObject
      */
-    public function setDescription($description)
+    public function getCustomObject()
     {
-        $this->isChanged('description', $description);
-        $this->description = $description;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getDescription()
-    {
-        return $this->description;
+        return $this->customObject;
     }
 
     /**

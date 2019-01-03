@@ -23,6 +23,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 
 class NewController extends CommonController
 {
@@ -42,39 +43,50 @@ class NewController extends CommonController
     private $routeProvider;
 
     /**
+     * @var CustomObjectModel
+     */
+    private $customObjectModel;
+
+    /**
      * @param FormFactory $formFactory
      * @param CustomItemPermissionProvider $permissionProvider
      * @param CustomItemRouteProvider $routeProvider
+     * @param CustomObjectModel $customObjectModel
      */
     public function __construct(
         FormFactory $formFactory,
         CustomItemPermissionProvider $permissionProvider,
-        CustomItemRouteProvider $routeProvider
+        CustomItemRouteProvider $routeProvider,
+        CustomObjectModel $customObjectModel
     )
     {
         $this->formFactory        = $formFactory;
         $this->permissionProvider = $permissionProvider;
         $this->routeProvider      = $routeProvider;
+        $this->customObjectModel  = $customObjectModel;
     }
 
     /**
      * @return Response|JsonResponse
      */
-    public function renderFormAction()
+    public function renderFormAction(int $objectId)
     {
         try {
+            $customObject = $this->customObjectModel->fetchEntity($objectId);
             $this->permissionProvider->canCreate();
+        } catch (NotFoundException $e) {
+            return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
             $this->accessDenied(false, $e->getMessage());
         }
         
-        $entity  = new CustomItem();
-        $action  = $this->routeProvider->buildSaveRoute();
+        $entity  = new CustomItem($customObject);
+        $action  = $this->routeProvider->buildSaveRoute($objectId);
         $form    = $this->formFactory->create(CustomItemType::class, $entity, ['action' => $action]);
 
         return $this->delegateView(
             [
-                'returnUrl'      => $this->routeProvider->buildListRoute(),
+                'returnUrl'      => $this->routeProvider->buildListRoute($objectId),
                 'viewParameters' => [
                     'entity' => $entity,
                     'form'   => $form->createView(),
@@ -82,7 +94,7 @@ class NewController extends CommonController
                 'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customItem',
-                    'route'         => $this->routeProvider->buildNewRoute(),
+                    'route'         => $this->routeProvider->buildNewRoute($objectId),
                 ],
             ]
         );

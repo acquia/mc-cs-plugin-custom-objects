@@ -68,10 +68,8 @@ class CustomItemModel extends FormModel
      */
     public function save(CustomItem $entity): CustomItem
     {
-        $user   = $this->userHelper->getUser();
-        $entity = $this->sanitizeAlias($entity);
-        $entity = $this->ensureUniqueAlias($entity);
-        $now    = new DateTimeHelper();
+        $user = $this->userHelper->getUser();
+        $now  = new DateTimeHelper();
 
         if ($entity->isNew()) {
             $entity->setCreatedBy($user->getId());

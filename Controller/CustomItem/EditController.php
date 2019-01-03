@@ -62,19 +62,18 @@ class EditController extends CommonController
     )
     {
         $this->formFactory        = $formFactory;
-        $this->customItemModel  = $customItemModel;
+        $this->customItemModel    = $customItemModel;
         $this->permissionProvider = $permissionProvider;
         $this->routeProvider      = $routeProvider;
     }
 
     /**
-     * @todo implement permissions
-     * 
      * @param int $objectId
+     * @param int $itemId
      * 
      * @return Response|JsonResponse
      */
-    public function renderFormAction(int $objectId)
+    public function renderFormAction(int $objectId, int $itemId)
     {
         try {
             $entity = $this->customItemModel->fetchEntity($objectId);
@@ -85,12 +84,12 @@ class EditController extends CommonController
             $this->accessDenied(false, $e->getMessage());
         }
 
-        $action = $this->routeProvider->buildSaveRoute($objectId);
+        $action = $this->routeProvider->buildSaveRoute($objectId, $itemId);
         $form   = $this->formFactory->create(CustomItemType::class, $entity, ['action' => $action]);
 
         return $this->delegateView(
             [
-                'returnUrl'      => $this->routeProvider->buildListRoute(),
+                'returnUrl'      => $this->routeProvider->buildListRoute($objectId),
                 'viewParameters' => [
                     'entity' => $entity,
                     'form'   => $form->createView(),
@@ -98,7 +97,7 @@ class EditController extends CommonController
                 'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customItem',
-                    'route'         => $this->routeProvider->buildEditRoute($objectId),
+                    'route'         => $this->routeProvider->buildEditRoute($objectId, $itemId),
                 ],
             ]
         );

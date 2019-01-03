@@ -49,26 +49,27 @@ class CancelController extends CommonController
         CustomItemRouteProvider $routeProvider
     )
     {
-        $this->session           = $session;
+        $this->session         = $session;
         $this->customItemModel = $customItemModel;
-        $this->routeProvider     = $routeProvider;
+        $this->routeProvider   = $routeProvider;
     }
 
     /**
      * @todo unlock entity?
      * 
-     * @param int|null $objectId
+     * @param int      $objectId
+     * @param int|null $itemId
      * 
      * @return Response|JsonResponse
      */
-    public function cancelAction(?int $objectId)
+    public function cancelAction(int $objectId, int $itemId = null)
     {
         $page = $this->session->get('custom.item.page', 1);
 
         return $this->postActionRedirect(
             [
-                'returnUrl'       => $this->routeProvider->buildListRoute($page),
-                'viewParameters'  => ['page' => $page],
+                'returnUrl'       => $this->routeProvider->buildListRoute($objectId, $page),
+                'viewParameters'  => ['objectId' => $objectId, 'page' => $page],
                 'contentTemplate' => 'CustomObjectsBundle:CustomItem\List:list',
                 'passthroughVars' => [
                     'mauticContent' => 'customItem',

@@ -53,21 +53,22 @@ class DeleteController extends CommonController
         CustomItemPermissionProvider $permissionProvider
     )
     {
-        $this->customItemModel = $customItemModel;
-        $this->session           = $session;
-        $this->translator        = $translator;
+        $this->customItemModel    = $customItemModel;
+        $this->session            = $session;
+        $this->translator         = $translator;
         $this->permissionProvider = $permissionProvider;
     }
 
     /**
      * @param int $objectId
+     * @param int $itemId
      * 
      * @return Response|JsonResponse
      */
-    public function deleteAction(int $objectId)
+    public function deleteAction(int $objectId, int $itemId)
     {
         try {
-            $entity = $this->customItemModel->fetchEntity($objectId);
+            $entity = $this->customItemModel->fetchEntity($itemId);
             $this->permissionProvider->canDelete($entity);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
@@ -91,7 +92,10 @@ class DeleteController extends CommonController
 
         return $this->forward(
             'CustomObjectsBundle:CustomItem\List:list',
-            ['page' => $this->session->get('custom.item.page', 1)]
+            [
+                'objectId' => $objectId,
+                'page'     => $this->session->get('custom.item.page', 1),
+            ]
         );
     }
 }

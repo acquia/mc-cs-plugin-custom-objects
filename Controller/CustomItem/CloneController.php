@@ -70,13 +70,14 @@ class CloneController extends CommonController
 
     /**
      * @param int $objectId
+     * @param int $itemId
      * 
      * @return Response|JsonResponse
      */
-    public function cloneAction(int $objectId)
+    public function cloneAction(int $objectId, int $itemId)
     {
         try {
-            $entity = clone $this->customItemModel->fetchEntity($objectId);
+            $entity = clone $this->customItemModel->fetchEntity($itemId);
             $this->permissionProvider->canClone($entity);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
@@ -86,12 +87,12 @@ class CloneController extends CommonController
 
         $entity->setName($entity->getName().' '.$this->translator->trans('mautic.core.form.clone'));
 
-        $action = $this->routeProvider->buildSaveRoute();
+        $action = $this->routeProvider->buildSaveRoute($objectId);
         $form   = $this->formFactory->create(CustomItemType::class, $entity, ['action' => $action]);
 
         return $this->delegateView(
             [
-                'returnUrl'      => $this->routeProvider->buildListRoute(),
+                'returnUrl'      => $this->routeProvider->buildListRoute($objectId),
                 'viewParameters' => [
                     'entity' => $entity,
                     'form'   => $form->createView(),
@@ -99,7 +100,7 @@ class CloneController extends CommonController
                 'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customItem',
-                    'route'         => $this->routeProvider->buildCloneRoute($objectId),
+                    'route'         => $this->routeProvider->buildCloneRoute($objectId, $itemId),
                 ],
             ]
         );

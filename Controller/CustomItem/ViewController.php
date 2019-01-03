@@ -72,20 +72,21 @@ class ViewController extends CommonController
         $this->requestStack         = $requestStack;
         $this->session              = $session;
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->customItemModel    = $customItemModel;
+        $this->customItemModel      = $customItemModel;
         $this->permissionProvider   = $permissionProvider;
-        $this->routeProvider      = $routeProvider;
+        $this->routeProvider        = $routeProvider;
     }
 
     /**
      * @param int $objectId
+     * @param int $itemId
      * 
      * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse
      */
-    public function viewAction(int $objectId)
+    public function viewAction(int $objectId, int $itemId)
     {
         try {
-            $entity = $this->customItemModel->fetchEntity($objectId);
+            $entity = $this->customItemModel->fetchEntity($itemId);
             $this->permissionProvider->canView($entity);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
@@ -93,7 +94,7 @@ class ViewController extends CommonController
             $this->accessDenied(false, $e->getMessage());
         }
 
-        $route = $this->routeProvider->buildViewRoute($objectId);
+        $route = $this->routeProvider->buildViewRoute($objectId, $itemId);
 
         return $this->delegateView(
             [

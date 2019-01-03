@@ -77,7 +77,7 @@ return [
 
             // Custom Items
             CustomItemRouteProvider::ROUTE_LIST => [
-                'path'       => '/custom/item/{objectId}/{page}',
+                'path'       => '/custom/object/{objectId}/item/{page}',
                 'controller' => 'CustomObjectsBundle:CustomItem\List:list',
                 'method'     => 'GET|POST',
                 'defaults'   => [
@@ -85,43 +85,43 @@ return [
                 ],
             ],
             CustomItemRouteProvider::ROUTE_VIEW => [
-                'path'       => '/custom/item/view/{objectId}',
+                'path'       => '/custom/object/{objectId}/item/view/{itemId}',
                 'controller' => 'CustomObjectsBundle:CustomItem\View:view',
                 'method'     => 'GET',
             ],
             CustomItemRouteProvider::ROUTE_NEW => [
-                'path'       => '/custom/item/new',
+                'path'       => '/custom/object/{objectId}/item/new',
                 'controller' => 'CustomObjectsBundle:CustomItem\New:renderForm',
                 'method'     => 'GET',
             ],
             CustomItemRouteProvider::ROUTE_EDIT => [
-                'path'       => '/custom/item/edit/{objectId}',
+                'path'       => '/custom/object/{objectId}/item/edit/{itemId}',
                 'controller' => 'CustomObjectsBundle:CustomItem\Edit:renderForm',
                 'method'     => 'GET',
             ],
             CustomItemRouteProvider::ROUTE_CLONE => [
-                'path'       => '/custom/item/clone/{objectId}',
+                'path'       => '/custom/object/{objectId}/item/clone/{itemId}',
                 'controller' => 'CustomObjectsBundle:CustomItem\Clone:clone',
                 'method'     => 'GET',
             ],
             CustomItemRouteProvider::ROUTE_CANCEL => [
-                'path'       => '/custom/item/cancel/{objectId}',
+                'path'       => '/custom/object/{objectId}/item/cancel/{itemId}',
                 'controller' => 'CustomObjectsBundle:CustomItem\Cancel:cancel',
                 'method'     => 'GET',
                 'defaults'   => [
-                    'objectId' => null,
+                    'itemId' => null,
                 ],
             ],
             CustomItemRouteProvider::ROUTE_SAVE => [
-                'path'       => '/custom/item/save/{objectId}',
+                'path'       => '/custom/object/{objectId}/item/save/{itemId}',
                 'controller' => 'CustomObjectsBundle:CustomItem\Save:save',
                 'method'     => 'POST',
                 'defaults'   => [
-                    'objectId' => null,
+                    'itemId' => null,
                 ],
             ],
             CustomItemRouteProvider::ROUTE_DELETE => [
-                'path'       => '/custom/item/delete/{objectId}',
+                'path'       => '/custom/object/{objectId}/item/delete/{itemId}',
                 'controller' => 'CustomObjectsBundle:CustomItem\Delete:delete',
                 'method'     => 'GET',
             ],
@@ -363,6 +363,7 @@ return [
                     'form.factory',
                     'custom_item.permission.provider',
                     'custom_item.route.provider',
+                    'mautic.custom.model.object',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -406,6 +407,7 @@ return [
                     'form.factory',
                     'translator',
                     'mautic.custom.model.item',
+                    'mautic.custom.model.object',
                     'custom_item.permission.provider',
                     'custom_item.route.provider',
                 ],
@@ -634,6 +636,13 @@ return [
                     'custom_field.route.provider',
                 ],
             ],
+            'custom_item.button.subscriber' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CustomItemButtonSubscriber::class,
+                'arguments' => [
+                    'custom_item.permission.provider',
+                    'custom_item.route.provider',
+                ],
+            ],
             'custom_object.button.subscriber' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectButtonSubscriber::class,
                 'arguments' => [
@@ -643,6 +652,9 @@ return [
             ],
         ],
         'forms' => [
+            'custom_item.item.form' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemType::class,
+            ],
             'custom_field.field.form' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType::class,
                 'arguments' => [

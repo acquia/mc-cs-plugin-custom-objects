@@ -69,15 +69,10 @@ if ($tmpl == 'index') {
                                     'model' => 'custom.item',
                                 ]
                             ); ?>
-                            <a href="<?php echo $view['router']->path(CustomItemRouteProvider::ROUTE_VIEW, ['objectId' => $item->getId()]); ?>" data-toggle="ajax">
+                            <a href="<?php echo $view['router']->path(CustomItemRouteProvider::ROUTE_VIEW, ['objectId' => $item->getCustomObject()->getId(), 'itemId' => $item->getId()]); ?>" data-toggle="ajax">
                                 <?php echo $item->getName(); ?>
                             </a>
                         </div>
-                        <?php if ($description = $item->getDescription()): ?>
-                            <div class="text-muted mt-4">
-                                <small><?php echo $description; ?></small>
-                            </div>
-                        <?php endif; ?>
                     </td>
                     <td><?php echo $item->getId(); ?></td>
                 </tr>

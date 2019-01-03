@@ -52,58 +52,63 @@ class CustomItemRouteProvider
     }
 
     /**
-     * @throws ForbiddenException
-     */
-    public function buildNewRoute(): string
-    {
-        return $this->router->generate(static::ROUTE_NEW);
-    }
-
-    /**
-     * @throws ForbiddenException
-     */
-    public function buildSaveRoute(?int $id = null): string
-    {
-        return $this->router->generate(static::ROUTE_SAVE, ['objectId' => $id]);
-    }
-
-    /**
-     * @param int $id
+     * @param int $objectId
      * 
      * @throws ForbiddenException
      */
-    public function buildViewRoute(int $id): string
+    public function buildNewRoute(int $objectId): string
     {
-        return $this->router->generate(static::ROUTE_VIEW, ['objectId' => $id]);
+        return $this->router->generate(static::ROUTE_NEW, ['objectId' => $objectId]);
     }
 
     /**
-     * @param int $id
+     * @param int      $objectId
+     * @param int|null $itemId
      * 
      * @throws ForbiddenException
      */
-    public function buildEditRoute(int $id): string
+    public function buildSaveRoute(int $objectId, ?int $itemId = null): string
     {
-        return $this->router->generate(static::ROUTE_EDIT, ['objectId' => $id]);
+        return $this->router->generate(static::ROUTE_SAVE, ['objectId' => $objectId, 'itemId' => $itemId]);
     }
 
     /**
-     * @param int $id
+     * @param int $itemId
      * 
      * @throws ForbiddenException
      */
-    public function buildCloneRoute(int $id): string
+    public function buildViewRoute(int $objectId, int $itemId): string
     {
-        return $this->router->generate(static::ROUTE_CLONE, ['objectId' => $id]);
+        return $this->router->generate(static::ROUTE_VIEW, ['objectId' => $objectId, 'itemId' => $itemId]);
     }
 
     /**
-     * @param int $id
+     * @param int $itemId
      * 
      * @throws ForbiddenException
      */
-    public function buildDeleteRoute(int $id): string
+    public function buildEditRoute(int $objectId, int $itemId): string
     {
-        return $this->router->generate(static::ROUTE_DELETE, ['objectId' => $id]);
+        return $this->router->generate(static::ROUTE_EDIT, ['objectId' => $objectId, 'itemId' => $itemId]);
+    }
+
+    /**
+     * @param int $itemId
+     * 
+     * @throws ForbiddenException
+     */
+    public function buildCloneRoute(int $objectId, int $itemId): string
+    {
+        return $this->router->generate(static::ROUTE_CLONE, ['objectId' => $objectId, 'itemId' => $itemId]);
+    }
+
+    /**
+     * @param int $itemId
+     * 
+     * @throws ForbiddenException
+     */
+    public function buildDeleteRoute(int $objectId, int $itemId): string
+    {
+        return $this->router->generate(static::ROUTE_DELETE, ['objectId' => $objectId, 'itemId' => $itemId]);
     }
 }

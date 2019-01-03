@@ -68,8 +68,6 @@ class EditController extends CommonController
     }
 
     /**
-     * @todo implement permissions
-     * 
      * @param int $objectId
      * 
      * @return Response|JsonResponse
