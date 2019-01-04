@@ -97,8 +97,8 @@ class ListController extends CommonController
     public function listAction(int $objectId, int $page = 1)
     {
         try {
-            $customObject = $this->customObjectModel->fetchEntity($objectId);
             $this->permissionProvider->canViewAtAll();
+            $customObject = $this->customObjectModel->fetchEntity($objectId);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {

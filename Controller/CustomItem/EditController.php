@@ -76,7 +76,7 @@ class EditController extends CommonController
     public function renderFormAction(int $objectId, int $itemId)
     {
         try {
-            $entity = $this->customItemModel->fetchEntity($objectId);
+            $entity = $this->customItemModel->fetchEntity($itemId);
             $this->permissionProvider->canEdit($entity);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
@@ -85,7 +85,7 @@ class EditController extends CommonController
         }
 
         $action = $this->routeProvider->buildSaveRoute($objectId, $itemId);
-        $form   = $this->formFactory->create(CustomItemType::class, $entity, ['action' => $action]);
+        $form   = $this->formFactory->create(CustomItemType::class, $entity, ['action' => $action, 'objectId' => $objectId]);
 
         return $this->delegateView(
             [

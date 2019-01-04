@@ -122,7 +122,7 @@ class SaveController extends CommonController
 
         $request = $this->requestStack->getCurrentRequest();
         $action  = $this->routeProvider->buildSaveRoute($objectId, $itemId);
-        $form    = $this->formFactory->create(CustomItemType::class, $entity, ['action' => $action]);
+        $form    = $this->formFactory->create(CustomItemType::class, $entity, ['action' => $action, 'objectId' => $objectId]);
         $form->handleRequest($request);
         
         if ($form->isValid()) {

@@ -88,7 +88,7 @@ class CloneController extends CommonController
         $entity->setName($entity->getName().' '.$this->translator->trans('mautic.core.form.clone'));
 
         $action = $this->routeProvider->buildSaveRoute($objectId);
-        $form   = $this->formFactory->create(CustomItemType::class, $entity, ['action' => $action]);
+        $form   = $this->formFactory->create(CustomItemType::class, $entity, ['action' => $action, 'objectId' => $objectId]);
 
         return $this->delegateView(
             [

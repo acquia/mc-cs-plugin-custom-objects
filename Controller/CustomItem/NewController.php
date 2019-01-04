@@ -82,7 +82,7 @@ class NewController extends CommonController
         
         $entity  = new CustomItem($customObject);
         $action  = $this->routeProvider->buildSaveRoute($objectId);
-        $form    = $this->formFactory->create(CustomItemType::class, $entity, ['action' => $action]);
+        $form    = $this->formFactory->create(CustomItemType::class, $entity, ['action' => $action, 'objectId' => $objectId]);
 
         return $this->delegateView(
             [
