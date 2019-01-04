@@ -15,17 +15,13 @@ namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemFieldsType;
 
 class CustomItemType extends AbstractType
 {
@@ -42,12 +38,21 @@ class CustomItemType extends AbstractType
                 'label'      => 'custom.item.name.label',
                 'required'   => true,
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class' => 'form-control',
-                ],
+                'attr'       => ['class' => 'form-control'],
             ]
         );
 
+        $builder->add(
+            'custom_fields',
+            CustomItemFieldsType::class,
+            [
+                'label'      => false,
+                'required'   => false,
+                'objectId'   => $options['objectId'],
+            ]
+        );
+
+        $builder->add('category', CategoryListType::class, ['bundle' => 'global']);
         $builder->add('isPublished', YesNoButtonGroupType::class);
 
         $builder->add(
@@ -66,10 +71,7 @@ class CustomItemType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(
-            [
-                'data_class' => CustomItem::class,
-            ]
-        );
+        $resolver->setDefaults(['data_class' => CustomItem::class]);
+        $resolver->setRequired(['objectId']);
     }
 }

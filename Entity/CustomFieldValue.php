@@ -18,12 +18,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
-use DateTimeInterface;
-use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\FormEntity;
 use MauticPlugin\CustomObjectsBundle\Entity\UniqueEntityInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldValueRepository;
 
 class CustomFieldValue extends FormEntity implements UniqueEntityInterface

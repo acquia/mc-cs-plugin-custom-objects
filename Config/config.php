@@ -662,6 +662,12 @@ return [
                     'custom_field.type.provider',
                 ],
             ],
+            'custom_item.fields.form' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemFieldsType::class,
+                'arguments' => [
+                    'mautic.custom.model.field',
+                ],
+            ],
         ],
         'other' => [
             'custom_field.type.provider' => [

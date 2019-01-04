@@ -24,6 +24,9 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValue;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 
 class CustomItemModel extends FormModel
 {
@@ -82,6 +85,15 @@ class CustomItemModel extends FormModel
         $entity->setDateModified($now->getUtcDateTime());
 
         $this->entityManager->persist($entity);
+
+        foreach ($entity->getCustomFields() as $fieldId => $value) {
+            $field          = $this->em->getReference(CustomField::class, $fieldId);
+            $fieldValue     = new CustomFieldValue($entity->getCustomObject(), $field);
+            $fieldValueText = new CustomFieldValueText($fieldValue, $value);
+            $this->entityManager->persist($fieldValue);
+            $this->entityManager->persist($fieldValueText);
+        }
+
         $this->entityManager->flush();
 
         return $entity;

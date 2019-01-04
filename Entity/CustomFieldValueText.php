@@ -22,6 +22,8 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValue;
 
 class CustomFieldValueText extends FormEntity
 {
+    private $id;
+
     /**
      * @var CustomFieldValue
      */
@@ -34,7 +36,7 @@ class CustomFieldValueText extends FormEntity
 
     /**
      * @param CustomFieldValue $customFieldValue
-     * @param string $value
+     * @param string           $value
      */
     public function __construct(CustomFieldValue $customFieldValue, string $value)
     {
@@ -51,14 +53,20 @@ class CustomFieldValueText extends FormEntity
 
         $builder->setTable('custom_field_value_text');
         // Doctrine doesn't support prefix indexes. It's being added in the updatePluginSchema method.
-        // $builder->addIndex(['value(64)', 'custom_field_value_id'], 'value_index');
+        // $builder->addIndex(['value(64)'], 'value_index');
+
+        $builder->addUuid();
 
         $builder->createManyToOne('customFieldValue', CustomFieldValue::class)
             ->addJoinColumn('custom_field_value_id', 'id', false, false, 'CASCADE')
-            ->makePrimaryKey()
             ->build();
 
         $builder->addField('value', Type::TEXT);
+    }
+
+    public function getId()
+    {
+        return $this->id;
     }
 
     /**

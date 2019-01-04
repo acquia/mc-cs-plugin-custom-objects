@@ -57,6 +57,8 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      **/
     private $category;
 
+    private $customFields = [];
+
     public function __clone()
     {
         $this->id = null;
@@ -163,5 +165,21 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     {
         $this->isChanged('language', $language);
         $this->language = $language;
+    }
+
+    /**
+     * @param array $customFields
+     */
+    public function setCustomFields(array $customFields)
+    {
+        $this->customFields = $customFields;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCustomFields()
+    {
+        return $this->customFields;
     }
 }

@@ -35,13 +35,14 @@ $view['slots']->set('headerTitle', $header);
             <div class="row">
                 <div class="col-md-4">
                     <?php echo $view['form']->row($form['name']); ?>
+                    <?php echo $view['form']->row($form['custom_fields']); ?>
                 </div>
             </div>
         </div>
     </div>
     <div class="col-md-3 bg-white height-auto">
         <div class="pr-lg pl-lg pt-md pb-md">
-            <?php //echo $view['form']->row($form['category']); ?>
+            <?php echo $view['form']->row($form['category']); ?>
             <?php echo $view['form']->row($form['isPublished']); ?>
         </div>
     </div>
