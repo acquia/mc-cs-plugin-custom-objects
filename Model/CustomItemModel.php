@@ -86,9 +86,14 @@ class CustomItemModel extends FormModel
 
         $this->entityManager->persist($entity);
 
+        if ($entity->isNew()) {
+            $this->entityManager->flush();
+        }
+
         foreach ($entity->getCustomFields() as $fieldId => $value) {
-            $field          = $this->em->getReference(CustomField::class, $fieldId);
+            $field          = $this->entityManager->getReference(CustomField::class, $fieldId);
             $fieldValue     = new CustomFieldValue($entity->getCustomObject(), $field);
+            // @todo we have to know the field type to create correct value type entity here:
             $fieldValueText = new CustomFieldValueText($fieldValue, $value);
             $this->entityManager->persist($fieldValue);
             $this->entityManager->persist($fieldValueText);

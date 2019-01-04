@@ -19,9 +19,13 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Entity\FormEntity;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValue;
+use Ramsey\Uuid\Uuid;
 
 class CustomFieldValueText extends FormEntity
 {
+    /**
+     * @var string
+     */
     private $id;
 
     /**
@@ -40,11 +44,15 @@ class CustomFieldValueText extends FormEntity
      */
     public function __construct(CustomFieldValue $customFieldValue, string $value)
     {
+        $this->id               = Uuid::uuid4()->toString();
         $this->customFieldValue = $customFieldValue;
         $this->value            = $value;
     }
 
     /**
+     * Doctrine doesn't support prefix indexes. It's being added in the updatePluginSchema method.
+     * $builder->addIndex(['value(64)'], 'value_index');
+     * 
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -52,8 +60,6 @@ class CustomFieldValueText extends FormEntity
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('custom_field_value_text');
-        // Doctrine doesn't support prefix indexes. It's being added in the updatePluginSchema method.
-        // $builder->addIndex(['value(64)'], 'value_index');
 
         $builder->addUuid();
 
@@ -64,7 +70,10 @@ class CustomFieldValueText extends FormEntity
         $builder->addField('value', Type::TEXT);
     }
 
-    public function getId()
+    /**
+     * @return string
+     */
+    public function getId(): string
     {
         return $this->id;
     }

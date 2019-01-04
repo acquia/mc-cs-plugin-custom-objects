@@ -22,11 +22,12 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use MauticPlugin\CustomObjectsBundle\Entity\UniqueEntityInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldValueRepository;
+use Ramsey\Uuid\Uuid;
 
 class CustomFieldValue extends FormEntity implements UniqueEntityInterface
 {
     /**
-     * @var int|null
+     * @var string
      */
     private $id;
 
@@ -46,6 +47,7 @@ class CustomFieldValue extends FormEntity implements UniqueEntityInterface
      */
     public function __construct(CustomObject $customObject, CustomField $customField)
     {
+        $this->id           = Uuid::uuid4()->toString();
         $this->customObject = $customObject;
         $this->customField  = $customField;
     }
@@ -68,7 +70,7 @@ class CustomFieldValue extends FormEntity implements UniqueEntityInterface
             ->addJoinColumn('custom_field_id', 'id', false, false, 'CASCADE')
             ->build();
 
-        $builder->addId();
+        $builder->addUuid();
     }
 
     /**
@@ -81,9 +83,9 @@ class CustomFieldValue extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @return int|null
+     * @return string
      */
-    public function getId(): ?int
+    public function getId(): string
     {
         return $this->id;
     }
