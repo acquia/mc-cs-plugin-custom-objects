@@ -43,12 +43,13 @@ class CustomItemType extends AbstractType
         );
 
         $builder->add(
-            'custom_fields',
+            'custom_field_values',
             CustomItemFieldsType::class,
             [
                 'label'      => false,
                 'required'   => false,
                 'objectId'   => $options['objectId'],
+                'customFieldValues' => $builder->getData()->getCustomFieldValues(),
             ]
         );
 

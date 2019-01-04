@@ -61,7 +61,7 @@ class CustomItemFieldsType extends AbstractType
                     'required'   => false, // make this dynamic
                     'label_attr' => ['class' => 'control-label'],
                     'attr'       => ['class' => 'form-control'],
-                    'data'       => 'make this dynamic',
+                    'data'       => $options['customFieldValues'][$customField->getId()],
                 ]
             );
         }
@@ -73,5 +73,6 @@ class CustomItemFieldsType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setRequired(['objectId']);
+        $resolver->setOptional(['customFieldValues']);
     }
 }

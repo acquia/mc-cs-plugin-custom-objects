@@ -65,6 +65,7 @@ class CustomFieldValueText extends FormEntity
 
         $builder->createManyToOne('customFieldValue', CustomFieldValue::class)
             ->addJoinColumn('custom_field_value_id', 'id', false, false, 'CASCADE')
+            ->fetchExtraLazy()
             ->build();
 
         $builder->addField('value', Type::TEXT);

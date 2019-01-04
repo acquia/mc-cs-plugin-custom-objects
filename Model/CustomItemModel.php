@@ -27,6 +27,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValue;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldValueRepository;
 
 class CustomItemModel extends FormModel
 {
@@ -46,22 +47,30 @@ class CustomItemModel extends FormModel
     private $permissionProvider;
 
     /**
+     * @var CustomFieldValueRepository
+     */
+    private $customFieldValueRepostory;
+
+    /**
      * @param EntityManager $entityManager
      * @param CustomItemRepository $customItemRepository
      * @param CustomItemPermissionProvider $permissionProvider
      * @param UserHelper $userHelper
+     * @param CustomFieldValueRepository $customFieldValueRepostory
      */
     public function __construct(
         EntityManager $entityManager,
         CustomItemRepository $customItemRepository,
         CustomItemPermissionProvider $permissionProvider,
-        UserHelper $userHelper
+        UserHelper $userHelper,
+        CustomFieldValueRepository $customFieldValueRepostory
     )
     {
         $this->entityManager        = $entityManager;
         $this->customItemRepository = $customItemRepository;
         $this->permissionProvider   = $permissionProvider;
         $this->userHelper           = $userHelper;
+        $this->customFieldValueRepostory = $customFieldValueRepostory;
     }
 
     /**
@@ -90,7 +99,7 @@ class CustomItemModel extends FormModel
             $this->entityManager->flush();
         }
 
-        foreach ($entity->getCustomFields() as $fieldId => $value) {
+        foreach ($entity->getCustomFieldValues() as $fieldId => $value) {
             $field          = $this->entityManager->getReference(CustomField::class, $fieldId);
             $fieldValue     = new CustomFieldValue($entity->getCustomObject(), $field);
             // @todo we have to know the field type to create correct value type entity here:
@@ -118,6 +127,8 @@ class CustomItemModel extends FormModel
         if (null === $entity) {
             throw new NotFoundException("Custom Item with ID = {$id} was not found");
         }
+
+        $entity->setCustomFieldValues($this->customFieldValueRepostory->getValuesForItem($entity));
 
         return $entity;
     }

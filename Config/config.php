@@ -581,6 +581,7 @@ return [
                     'custom_item.repository',
                     'custom_item.permission.provider',
                     'mautic.helper.user',
+                    'custom_field.value.repository',
                 ],
             ],
             'mautic.custom.model.object' => [
@@ -599,6 +600,13 @@ return [
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \MauticPlugin\CustomObjectsBundle\Entity\CustomField::class,
+                ],
+            ],
+            'custom_field.value.repository' => [
+                'class'     => Doctrine\ORM\EntityRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValue::class,
                 ],
             ],
             'custom_item.repository' => [

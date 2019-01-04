@@ -57,7 +57,10 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      **/
     private $category;
 
-    private $customFields = [];
+    /**
+     * @var array [ID => value]
+     */
+    private $customFieldValues = [];
 
     public function __clone()
     {
@@ -168,18 +171,18 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param array $customFields
+     * @param array $customFieldValues
      */
-    public function setCustomFields(array $customFields)
+    public function setCustomFieldValues(array $customFieldValues)
     {
-        $this->customFields = $customFields;
+        $this->customFieldValues = $customFieldValues;
     }
 
     /**
      * @return array
      */
-    public function getCustomFields()
+    public function getCustomFieldValues()
     {
-        return $this->customFields;
+        return $this->customFieldValues;
     }
 }

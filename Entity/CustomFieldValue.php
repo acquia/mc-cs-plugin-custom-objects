@@ -64,10 +64,12 @@ class CustomFieldValue extends FormEntity implements UniqueEntityInterface
 
         $builder->createManyToOne('customObject', CustomObject::class)
             ->addJoinColumn('custom_object_id', 'id', false, false, 'CASCADE')
+            ->fetchExtraLazy()
             ->build();
 
         $builder->createManyToOne('customField', CustomField::class)
             ->addJoinColumn('custom_field_id', 'id', false, false, 'CASCADE')
+            ->fetchExtraLazy()
             ->build();
 
         $builder->addUuid();
@@ -85,7 +87,7 @@ class CustomFieldValue extends FormEntity implements UniqueEntityInterface
     /**
      * @return string
      */
-    public function getId(): string
+    public function getId()
     {
         return $this->id;
     }
@@ -93,7 +95,7 @@ class CustomFieldValue extends FormEntity implements UniqueEntityInterface
     /**
      * @return CustomObject
      */
-    public function getCustomObject(): CustomObject
+    public function getCustomObject()
     {
         return $this->customObject;
     }
@@ -101,7 +103,7 @@ class CustomFieldValue extends FormEntity implements UniqueEntityInterface
     /**
      * @return CustomObject
      */
-    public function getCustomField(): CustomField
+    public function getCustomField()
     {
         return $this->customField;
     }

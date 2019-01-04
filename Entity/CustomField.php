@@ -65,11 +65,6 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         $this->alias = null;
     }
 
-    public function __toString(): string
-    {
-        return $this->getLabel();
-    }
-
     public function __construct()
     {
         $this->id = Uuid::uuid4()->toString();
@@ -87,8 +82,8 @@ class CustomField extends FormEntity implements UniqueEntityInterface
             ->addIndex(['alias'], 'alias');
 
         $builder->createManyToOne('customObject', CustomObject::class)
-            // ->inversedBy('customField')
             ->addJoinColumn('custom_object_id', 'id', false, false, 'CASCADE')
+            ->fetchExtraLazy()
             ->build();
 
         $builder->addUuid();
@@ -113,7 +108,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @return string
      */
-    public function getId(): string
+    public function getId()
     {
         return $this->id;
     }
@@ -121,7 +116,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $label
      */
-    public function setLabel(?string $label): void
+    public function setLabel($label)
     {
         $this->isChanged('label', $label);
         $this->label = $label;
@@ -130,7 +125,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @return string|null
      */
-    public function getLabel(): ?string
+    public function getLabel()
     {
         return $this->label;
     }
@@ -140,7 +135,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      * 
      * @return string|null
      */
-    public function getName(): ?string
+    public function getName()
     {
         return $this->getLabel();
     }
@@ -148,7 +143,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $alias
      */
-    public function setAlias(?string $alias): void
+    public function setAlias($alias)
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -157,15 +152,15 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @return string|null
      */
-    public function getAlias(): ?string
+    public function getAlias()
     {
         return $this->alias;
     }
 
     /**
-     * @param CustomFieldTypeInterface|null $type
+     * @param CustomFieldTypeInterface $type
      */
-    public function setType(?CustomFieldTypeInterface $type): void
+    public function setType(CustomFieldTypeInterface $type)
     {
         $this->isChanged('type', $type->getKey());
         $this->type = $type->getKey();
@@ -174,7 +169,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @return string|null
      */
-    public function getType(): ?string
+    public function getType()
     {
         return $this->type;
     }
@@ -182,15 +177,15 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @return CustomObject
      */
-    public function getCustomObject(): ?CustomObject
+    public function getCustomObject()
     {
         return $this->customObject;
     }
 
     /**
-     * @param CustomObject|null $customObject
+     * @param CustomObject $customObject
      */
-    public function setCustomObject(?CustomObject $customObject): void
+    public function setCustomObject(CustomObject $customObject)
     {
         $this->isChanged('customObject', $customObject->getId());
         $this->customObject = $customObject;
