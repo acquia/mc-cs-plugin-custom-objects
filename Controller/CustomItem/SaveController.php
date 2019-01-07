@@ -108,11 +108,13 @@ class SaveController extends CommonController
     {
         try {
             $customObject = $this->customObjectModel->fetchEntity($objectId);
-            $entity       = $itemId ? $this->customItemModel->getEntity($itemId): new CustomItem($customObject);
-            if ($entity->isNew()) {
-                $this->permissionProvider->canCreate();
-            } else {
+
+            if ($itemId) {
+                $entity = $this->customItemModel->fetchEntity($itemId);
                 $this->permissionProvider->canEdit($entity);
+            } else {
+                $this->permissionProvider->canCreate();
+                $entity = $this->customItemModel->populateCustomFields(new CustomItem($customObject));
             }
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
@@ -147,9 +149,11 @@ class SaveController extends CommonController
             }
         }
 
+        $route = $itemId ? $this->routeProvider->buildEditRoute($objectId, $itemId) : $this->routeProvider->buildNewRoute($objectId);
+
         return $this->delegateView(
             [
-                'returnUrl'      => $this->routeProvider->buildNewRoute(),
+                'returnUrl'      => $route,
                 'viewParameters' => [
                     'entity' => $entity,
                     'form'   => $form->createView(),
@@ -158,7 +162,7 @@ class SaveController extends CommonController
                 'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customItem',
-                    'route'         => $this->routeProvider->buildNewRoute(),
+                    'route'         => $route,
                 ],
             ]
         );

@@ -24,10 +24,9 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValue;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Model\CustomFieldValueModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldValueRepository;
 
 class CustomItemModel extends FormModel
 {
@@ -47,30 +46,38 @@ class CustomItemModel extends FormModel
     private $permissionProvider;
 
     /**
-     * @var CustomFieldValueRepository
+     * @var CustomFieldModel
      */
-    private $customFieldValueRepostory;
+    private $customFieldModel;
+
+    /**
+     * @var CustomFieldValueModel
+     */
+    private $customFieldValueModel;
 
     /**
      * @param EntityManager $entityManager
      * @param CustomItemRepository $customItemRepository
      * @param CustomItemPermissionProvider $permissionProvider
      * @param UserHelper $userHelper
-     * @param CustomFieldValueRepository $customFieldValueRepostory
+     * @param CustomFieldModel $customFieldModel
+     * @param CustomFieldValueModel $customFieldValueModel
      */
     public function __construct(
         EntityManager $entityManager,
         CustomItemRepository $customItemRepository,
         CustomItemPermissionProvider $permissionProvider,
         UserHelper $userHelper,
-        CustomFieldValueRepository $customFieldValueRepostory
+        CustomFieldModel $customFieldModel,
+        CustomFieldValueModel $customFieldValueModel
     )
     {
-        $this->entityManager        = $entityManager;
-        $this->customItemRepository = $customItemRepository;
-        $this->permissionProvider   = $permissionProvider;
-        $this->userHelper           = $userHelper;
-        $this->customFieldValueRepostory = $customFieldValueRepostory;
+        $this->entityManager         = $entityManager;
+        $this->customItemRepository  = $customItemRepository;
+        $this->permissionProvider    = $permissionProvider;
+        $this->userHelper            = $userHelper;
+        $this->customFieldModel      = $customFieldModel;
+        $this->customFieldValueModel = $customFieldValueModel;
     }
 
     /**
@@ -99,13 +106,8 @@ class CustomItemModel extends FormModel
             $this->entityManager->flush();
         }
 
-        foreach ($entity->getCustomFieldValues() as $fieldId => $value) {
-            $field          = $this->entityManager->getReference(CustomField::class, $fieldId);
-            $fieldValue     = new CustomFieldValue($entity->getCustomObject(), $field);
-            // @todo we have to know the field type to create correct value type entity here:
-            $fieldValueText = new CustomFieldValueText($fieldValue, $value);
-            $this->entityManager->persist($fieldValue);
-            $this->entityManager->persist($fieldValueText);
+        foreach ($entity->getCustomFieldValues() as $value) {
+            $this->entityManager->persist($value);
         }
 
         $this->entityManager->flush();
@@ -128,9 +130,32 @@ class CustomItemModel extends FormModel
             throw new NotFoundException("Custom Item with ID = {$id} was not found");
         }
 
-        $entity->setCustomFieldValues($this->customFieldValueRepostory->getValuesForItem($entity));
+        return $this->populateCustomFields($entity);
+    }
 
-        return $entity;
+    /**
+     * @param CustomItem $customItem
+     * 
+     * @return CustomItem
+     */
+    public function populateCustomFields(CustomItem $customItem): CustomItem
+    {
+        $values            = $customItem->getCustomFieldValues();
+        $customFieldValues = $this->customFieldValueModel->getValuesForItem($customItem);
+        $customFields      = $this->customFieldModel->fetchCustomFieldsForObject($customItem->getCustomObject());
+
+        foreach ($customFieldValues as $customFieldValue) {
+            $values->set($customFieldValue->getCustomField()->getId(), $customFieldValue);
+        }
+
+        foreach ($customFields as $customField) {
+            if (null === $values->get($customField->getId())) {
+                // @todo the default value should come form the custom field.
+                $values->set($customField->getId(), new CustomFieldValueText($customField, $customItem, ''));
+            }
+        }
+
+        return $customItem;
     }
 
     /**

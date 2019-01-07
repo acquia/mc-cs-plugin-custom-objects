@@ -17,36 +17,26 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Mautic\CoreBundle\Entity\FormEntity;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValue;
-use Ramsey\Uuid\Uuid;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemValue;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueStandard;
 
-class CustomFieldValueText extends FormEntity
+class CustomFieldValueText extends CustomFieldValueStandard
 {
-    /**
-     * @var string
-     */
-    private $id;
-
-    /**
-     * @var CustomFieldValue
-     */
-    private $customFieldValue;
-
     /**
      * @var string
      */
     private $value;
 
     /**
-     * @param CustomFieldValue $customFieldValue
-     * @param string           $value
+     * @param CustomField $customField
+     * @param CustomItem  $customItem
+     * @param string      $value
      */
-    public function __construct(CustomFieldValue $customFieldValue, string $value)
+    public function __construct(CustomField $customField, CustomItem $customItem, string $value)
     {
-        $this->id               = Uuid::uuid4()->toString();
-        $this->customFieldValue = $customFieldValue;
-        $this->value            = $value;
+        parent::__construct($customField, $customItem);
+
+        $this->value = $value;
     }
 
     /**
@@ -55,50 +45,27 @@ class CustomFieldValueText extends FormEntity
      * 
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata(ORM\ClassMetadata $metadata): void
+    public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
-
         $builder->setTable('custom_field_value_text');
-
-        $builder->addUuid();
-
-        $builder->createManyToOne('customFieldValue', CustomFieldValue::class)
-            ->addJoinColumn('custom_field_value_id', 'id', false, false, 'CASCADE')
-            ->fetchExtraLazy()
-            ->build();
-
         $builder->addField('value', Type::TEXT);
+        
+        parent::addReferenceColumns($builder);
+    }
+
+    /**
+     * @param string $value
+     */
+    public function setValue(string $value)
+    {
+        $this->value = $value;
     }
 
     /**
      * @return string
      */
-    public function getId(): string
-    {
-        return $this->id;
-    }
-
-    /**
-     * @param ClassMetadata $metadata
-     */
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('customFieldValue', new Assert\NotBlank());
-    }
-
-    /**
-     * @return CustomFieldValue
-     */
-    public function getCustomFieldValue(): CustomFieldValue
-    {
-        return $this->customFieldValue;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCustomValue(): string
+    public function getValue()
     {
         return $this->value;
     }

@@ -24,6 +24,8 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use MauticPlugin\CustomObjectsBundle\Entity\UniqueEntityInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Iterator\CustomFieldValues;
+use Doctrine\Common\Collections\ArrayCollection;
 
 class CustomItem extends FormEntity implements UniqueEntityInterface
 {
@@ -58,9 +60,9 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     private $category;
 
     /**
-     * @var array [ID => value]
+     * @var ArrayCollection
      */
-    private $customFieldValues = [];
+    private $customFieldValues;
 
     public function __clone()
     {
@@ -72,7 +74,8 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     public function __construct(CustomObject $customObject)
     {
-        $this->customObject = $customObject;
+        $this->customObject      = $customObject;
+        $this->customFieldValues = new ArrayCollection();
     }
 
     /**
@@ -171,18 +174,14 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param array $customFieldValues
-     */
-    public function setCustomFieldValues(array $customFieldValues)
-    {
-        $this->customFieldValues = $customFieldValues;
-    }
-
-    /**
-     * @return array
+     * @return ArrayCollection
      */
     public function getCustomFieldValues()
     {
+        if (null === $this->customFieldValues) {
+            $this->customFieldValues = new ArrayCollection();
+        }
+        
         return $this->customFieldValues;
     }
 }

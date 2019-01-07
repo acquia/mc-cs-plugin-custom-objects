@@ -97,7 +97,7 @@ class SaveController extends CommonController
     public function saveAction(?int $objectId = null)
     {
         try {
-            $entity = $objectId ? $this->customObjectModel->getEntity($objectId): new CustomObject();
+            $entity = $objectId ? $this->customObjectModel->fetchEntity($objectId): new CustomObject();
             if ($entity->isNew()) {
                 $this->permissionProvider->canCreate();
             } else {
@@ -136,9 +136,11 @@ class SaveController extends CommonController
             }
         }
 
+        $route = $objectId ? $this->routeProvider->buildEditRoute($objectId) : $this->routeProvider->buildNewRoute();
+
         return $this->delegateView(
             [
-                'returnUrl'      => $this->routeProvider->buildNewRoute(),
+                'returnUrl'      => $route,
                 'viewParameters' => [
                     'entity' => $entity,
                     'form'   => $form->createView(),
@@ -147,7 +149,7 @@ class SaveController extends CommonController
                 'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
-                    'route'         => $this->routeProvider->buildNewRoute(),
+                    'route'         => $route,
                 ],
             ]
         );

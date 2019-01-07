@@ -364,6 +364,7 @@ return [
                     'custom_item.permission.provider',
                     'custom_item.route.provider',
                     'mautic.custom.model.object',
+                    'mautic.custom.model.item',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -574,6 +575,12 @@ return [
                     'mautic.helper.user',
                 ],
             ],
+            'mautic.custom.model.field.value' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomFieldValueModel::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
             'mautic.custom.model.item' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomItemModel::class,
                 'arguments' => [
@@ -581,7 +588,8 @@ return [
                     'custom_item.repository',
                     'custom_item.permission.provider',
                     'mautic.helper.user',
-                    'custom_field.value.repository',
+                    'mautic.custom.model.field',
+                    'mautic.custom.model.field.value',
                 ],
             ],
             'mautic.custom.model.object' => [
@@ -600,13 +608,6 @@ return [
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \MauticPlugin\CustomObjectsBundle\Entity\CustomField::class,
-                ],
-            ],
-            'custom_field.value.repository' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
-                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
-                'arguments' => [
-                    \MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValue::class,
                 ],
             ],
             'custom_item.repository' => [
@@ -668,12 +669,6 @@ return [
                 'arguments' => [
                     'mautic.custom.model.object',
                     'custom_field.type.provider',
-                ],
-            ],
-            'custom_item.fields.form' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemFieldsType::class,
-                'arguments' => [
-                    'mautic.custom.model.field',
                 ],
             ],
         ],

@@ -24,6 +24,8 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 class CustomFieldModel extends FormModel
 {
@@ -108,11 +110,32 @@ class CustomFieldModel extends FormModel
     }
 
     /**
+     * @param CustomObject $customObject
+     * 
+     * @return array
+     */
+    public function fetchCustomFieldsForObject(CustomObject $customObject): array
+    {
+        return $this->fetchEntities([
+            'filter' => [
+                'force' => [
+                    [
+                        'column' => 'e.customObject',
+                        'value'  => $customObject->getId(),
+                        'expr'   => 'eq',
+                    ],
+                ],
+            ],
+            'ignore_paginator' => true,
+        ]);
+    }
+
+    /**
      * @param array $args
      * 
-     * @return Paginator
+     * @return Paginator|array
      */
-    public function fetchEntities(array $args = []): Paginator
+    public function fetchEntities(array $args = [])
     {
         return parent::getEntities($this->addCreatorLimit($args));
     }

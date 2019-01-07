@@ -21,10 +21,10 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
-use MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemFieldsType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
 class CustomItemType extends AbstractType
-{
+{   
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
@@ -44,12 +44,15 @@ class CustomItemType extends AbstractType
 
         $builder->add(
             'custom_field_values',
-            CustomItemFieldsType::class,
+            CollectionType::class,
             [
+                'entry_type' => CustomFieldValueType::class,
+                'entry_options' => [
+                    'label'            => false,
+                    'entityCollection' => $builder->getData()->getCustomFieldValues(),
+                ],
                 'label'      => false,
                 'required'   => false,
-                'objectId'   => $options['objectId'],
-                'customFieldValues' => $builder->getData()->getCustomFieldValues(),
             ]
         );
 

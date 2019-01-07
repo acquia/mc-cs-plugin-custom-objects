@@ -30,7 +30,7 @@ use Ramsey\Uuid\Uuid;
 class CustomField extends FormEntity implements UniqueEntityInterface
 {
     /**
-     * @var string
+     * @var int|null
      */
     private $id;
 
@@ -65,11 +65,6 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         $this->alias = null;
     }
 
-    public function __construct()
-    {
-        $this->id = Uuid::uuid4()->toString();
-    }
-
     /**
      * @param ORM\ClassMetadata $metadata
      */
@@ -86,7 +81,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
             ->fetchExtraLazy()
             ->build();
 
-        $builder->addUuid();
+        $builder->addId();
         $builder->addField('label', Type::STRING);
         $builder->addField('alias', Type::STRING);
         $builder->addField('type', Type::STRING);
@@ -106,7 +101,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @return string
+     * @return int|null
      */
     public function getId()
     {

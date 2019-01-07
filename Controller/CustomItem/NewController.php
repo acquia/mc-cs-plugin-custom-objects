@@ -24,6 +24,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 
 class NewController extends CommonController
 {
@@ -48,22 +49,30 @@ class NewController extends CommonController
     private $customObjectModel;
 
     /**
+     * @var CustomItemModel
+     */
+    private $customItemModel;
+
+    /**
      * @param FormFactory $formFactory
      * @param CustomItemPermissionProvider $permissionProvider
      * @param CustomItemRouteProvider $routeProvider
      * @param CustomObjectModel $customObjectModel
+     * @param CustomItemModel $customItemModel
      */
     public function __construct(
         FormFactory $formFactory,
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider,
-        CustomObjectModel $customObjectModel
+        CustomObjectModel $customObjectModel,
+        CustomItemModel $customItemModel
     )
     {
         $this->formFactory        = $formFactory;
         $this->permissionProvider = $permissionProvider;
         $this->routeProvider      = $routeProvider;
         $this->customObjectModel  = $customObjectModel;
+        $this->customItemModel    = $customItemModel;
     }
 
     /**
@@ -80,7 +89,7 @@ class NewController extends CommonController
             $this->accessDenied(false, $e->getMessage());
         }
         
-        $entity  = new CustomItem($customObject);
+        $entity  = $this->customItemModel->populateCustomFields(new CustomItem($customObject));
         $action  = $this->routeProvider->buildSaveRoute($objectId);
         $form    = $this->formFactory->create(CustomItemType::class, $entity, ['action' => $action, 'objectId' => $objectId]);
 
