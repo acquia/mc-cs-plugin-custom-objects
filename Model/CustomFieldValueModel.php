@@ -57,6 +57,10 @@ class CustomFieldValueModel
      */
     public function getValuesForItem(CustomItem $customItem): array
     {
+        if (!$customItem->getId()) {
+            return [];
+        }
+
         $qb         = $this->entityManager->createQueryBuilder();
         $fieldTypes = $this->customFieldTypeProvider->getTypes();
         $firstType  = array_shift($fieldTypes);
