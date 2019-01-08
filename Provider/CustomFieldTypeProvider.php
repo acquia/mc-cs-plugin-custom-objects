@@ -17,6 +17,8 @@ use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use MauticPlugin\CustomObjectsBundle\CustomFieldEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomFieldTypeEvent;
 use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
 class CustomFieldTypeProvider
 {
@@ -52,5 +54,23 @@ class CustomFieldTypeProvider
         }
         
         return $this->customFieldTypes;
+    }
+
+    /**
+     * @param string $key
+     * 
+     * @return CustomFieldTypeInterface
+     * 
+     * @throws NotFoundException
+     */
+    public function getType(string $key): CustomFieldTypeInterface
+    {
+        $this->getTypes();
+        
+        if (isset($this->customFieldTypes[$key])) {
+            return $this->customFieldTypes[$key];
+        }
+
+        throw new NotFoundException("Field type '{$key}' does not exist.");
     }
 }

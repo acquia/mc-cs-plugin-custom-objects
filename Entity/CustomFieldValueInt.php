@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * @copyright   2018 Mautic, Inc. All rights reserved
+ * @copyright   2019 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
  *
  * @link        https://mautic.com
@@ -20,19 +20,19 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemValue;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueStandard;
 
-class CustomFieldValueText extends CustomFieldValueStandard
+class CustomFieldValueInt extends CustomFieldValueStandard
 {
     /**
-     * @var string|null
+     * @var int|null
      */
     private $value;
 
     /**
      * @param CustomField $customField
      * @param CustomItem  $customItem
-     * @param string|null $value
+     * @param int|null    $value
      */
-    public function __construct(CustomField $customField, CustomItem $customItem, ?string $value = null)
+    public function __construct(CustomField $customField, CustomItem $customItem, ?int $value = null)
     {
         parent::__construct($customField, $customItem);
 
@@ -40,22 +40,20 @@ class CustomFieldValueText extends CustomFieldValueStandard
     }
 
     /**
-     * Doctrine doesn't support prefix indexes. It's being added in the updatePluginSchema method.
-     * $builder->addIndex(['value(64)'], 'value_index');
-     * 
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable('custom_field_value_text');
-        $builder->addNullableField('value', Type::TEXT);
+        $builder->setTable('custom_field_value_int');
+        $builder->addIndex(['value'], 'value_index');
+        $builder->addNullableField('value', Type::INTEGER);
         
         parent::addReferenceColumns($builder);
     }
 
     /**
-     * @param string|null $value
+     * @param int|null $value
      */
     public function setValue($value = null)
     {
@@ -63,7 +61,7 @@ class CustomFieldValueText extends CustomFieldValueStandard
     }
 
     /**
-     * @return string|null
+     * @return int|null
      */
     public function getValue()
     {

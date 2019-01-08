@@ -27,6 +27,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldValueModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 
 class CustomItemModel extends FormModel
 {
@@ -56,12 +57,18 @@ class CustomItemModel extends FormModel
     private $customFieldValueModel;
 
     /**
+     * @var CustomFieldTypeProvider
+     */
+    private $customFieldTypeProvider;
+
+    /**
      * @param EntityManager $entityManager
      * @param CustomItemRepository $customItemRepository
      * @param CustomItemPermissionProvider $permissionProvider
      * @param UserHelper $userHelper
      * @param CustomFieldModel $customFieldModel
      * @param CustomFieldValueModel $customFieldValueModel
+     * @param CustomFieldTypeProvider $customFieldTypeProvider
      */
     public function __construct(
         EntityManager $entityManager,
@@ -69,15 +76,17 @@ class CustomItemModel extends FormModel
         CustomItemPermissionProvider $permissionProvider,
         UserHelper $userHelper,
         CustomFieldModel $customFieldModel,
-        CustomFieldValueModel $customFieldValueModel
+        CustomFieldValueModel $customFieldValueModel,
+        CustomFieldTypeProvider $customFieldTypeProvider
     )
     {
-        $this->entityManager         = $entityManager;
-        $this->customItemRepository  = $customItemRepository;
-        $this->permissionProvider    = $permissionProvider;
-        $this->userHelper            = $userHelper;
-        $this->customFieldModel      = $customFieldModel;
-        $this->customFieldValueModel = $customFieldValueModel;
+        $this->entityManager           = $entityManager;
+        $this->customItemRepository    = $customItemRepository;
+        $this->permissionProvider      = $permissionProvider;
+        $this->userHelper              = $userHelper;
+        $this->customFieldModel        = $customFieldModel;
+        $this->customFieldValueModel   = $customFieldValueModel;
+        $this->customFieldTypeProvider = $customFieldTypeProvider;
     }
 
     /**
@@ -143,15 +152,20 @@ class CustomItemModel extends FormModel
         $values            = $customItem->getCustomFieldValues();
         $customFieldValues = $this->customFieldValueModel->getValuesForItem($customItem);
         $customFields      = $this->customFieldModel->fetchCustomFieldsForObject($customItem->getCustomObject());
-
+        
         foreach ($customFieldValues as $customFieldValue) {
             $values->set($customFieldValue->getCustomField()->getId(), $customFieldValue);
         }
-
+        
         foreach ($customFields as $customField) {
+            // Create default value for field that does not exist yet.
             if (null === $values->get($customField->getId())) {
+                $customFieldType = $this->customFieldTypeProvider->getType($customField->getType());
                 // @todo the default value should come form the custom field.
-                $values->set($customField->getId(), new CustomFieldValueText($customField, $customItem, ''));
+                $values->set(
+                    $customField->getId(),
+                    $customFieldType->createValueEntity($customField, $customItem)
+                );
             }
         }
 

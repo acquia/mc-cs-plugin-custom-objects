@@ -579,6 +579,7 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomFieldValueModel::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
+                    'custom_field.type.provider',
                 ],
             ],
             'mautic.custom.model.item' => [
@@ -590,6 +591,7 @@ return [
                     'mautic.helper.user',
                     'mautic.custom.model.field',
                     'mautic.custom.model.field.value',
+                    'custom_field.type.provider',
                 ],
             ],
             'mautic.custom.model.object' => [
@@ -668,6 +670,12 @@ return [
                 'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType::class,
                 'arguments' => [
                     'mautic.custom.model.object',
+                    'custom_field.type.provider',
+                ],
+            ],
+            'custom_field.field.value.form' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldValueType::class,
+                'arguments' => [
                     'custom_field.type.provider',
                 ],
             ],

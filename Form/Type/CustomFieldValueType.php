@@ -19,21 +19,39 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 
 class CustomFieldValueType extends AbstractType
 {
+    /**
+     * @var CustomFieldTypeProvider
+     */
+    private $customFieldTypeProvider;
+
+    /**
+     * @param CustomFieldTypeProvider $customFieldTypeProvider
+     */
+    public function __construct(CustomFieldTypeProvider $customFieldTypeProvider)
+    {
+        $this->customFieldTypeProvider = $customFieldTypeProvider;
+    }
+
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $collection = $options['entityCollection'];
-        $customFieldId = (int) $builder->getName();
+        $collection       = $options['entityCollection'];
+        $customFieldId    = (int) $builder->getName();
         $customFieldValue = $collection->get($customFieldId);
+        $customField      = $customFieldValue->getCustomField();
+        $fieldType        = $this->customFieldTypeProvider->getType($customField->getType());
+
         $builder->add(
             'value',
-            'text',
+            $fieldType->getSymfonyFormFiledType(),
             [
                 'label'      => $customFieldValue->getCustomField()->getLabel(),
                 'required'   => true, // make this dynamic
@@ -48,7 +66,7 @@ class CustomFieldValueType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array('data_class' => CustomFieldValueText::class,));
+        $resolver->setDefaults(array('data_class' => CustomFieldValueInterface::class,));
         $resolver->setRequired(['entityCollection']);
     }
 }

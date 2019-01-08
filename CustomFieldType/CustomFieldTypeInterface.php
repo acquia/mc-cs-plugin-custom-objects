@@ -13,15 +13,38 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
+
 interface CustomFieldTypeInterface
 {
     /**
-     * @return string|null
+     * @return string
      */
-    public function getName();
+    public function getName(): string;
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getKey();
+    public function getKey(): string;
+
+    /**
+     * @return string
+     */
+    public function getSymfonyFormFiledType(): string;
+
+    /**
+     * @return string
+     */
+    public function getEntityClass(): string;
+
+    /**
+     * @param CustomField $customField
+     * @param CustomItem  $customItem
+     * @param mixed|null  $value
+     * 
+     * @return CustomFieldValueInterface
+     */
+    public function createValueEntity(CustomField $customField, CustomItem $customItem, $value = null): CustomFieldValueInterface;
 }

@@ -19,6 +19,9 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInt;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
 
 class CustomFieldValueModel
 {
@@ -28,30 +31,62 @@ class CustomFieldValueModel
     private $entityManager;
 
     /**
-     * @param EntityManager $entityManager
+     * @var CustomFieldTypeProvider
      */
-    public function __construct(EntityManager $entityManager)
+    private $customFieldTypeProvider;
+
+    /**
+     * @param EntityManager           $entityManager
+     * @param CustomFieldTypeProvider $customFieldTypeProvider
+     */
+    public function __construct(
+        EntityManager $entityManager,
+        CustomFieldTypeProvider $customFieldTypeProvider
+    )
     {
-        $this->entityManager = $entityManager;
+        $this->entityManager           = $entityManager;
+        $this->customFieldTypeProvider = $customFieldTypeProvider;
     }
 
     /**
+     * The values are joined from several tables. Each value type can have own table.
+     * 
      * @param CustomItem $customItem
      * 
      * @return array
      */
     public function getValuesForItem(CustomItem $customItem): array
     {
-        $qb = $this->entityManager->createQueryBuilder();
-        $qb->select('cfvt');
-        $qb->from(CustomFieldValueText::class, 'cfvt');
-        $qb->where(
-            $qb->expr()->andX(
-                $qb->expr()->eq('cfvt.customItem', ':customItem')
-            )
-        );
+        $qb         = $this->entityManager->createQueryBuilder();
+        $fieldTypes = $this->customFieldTypeProvider->getTypes();
+        $firstType  = array_shift($fieldTypes);
+        $or         = $qb->expr()->orX();
+
+        $qb->from($firstType->getEntityClass(), $this->getAlias($firstType));
+        $qb->select($this->getAlias($firstType));
+        $or->add($qb->expr()->eq("{$this->getAlias($firstType)}.customItem", ':customItem'));
+
+        foreach ($fieldTypes as $type) {
+            $qb->leftJoin($type->getEntityClass(), $this->getAlias($type));
+            $qb->addSelect($this->getAlias($type));
+            $or->add($qb->expr()->eq("{$this->getAlias($type)}.customItem", ':customItem'));
+        }
+
+        $qb->where($or);
         $qb->setParameter('customItem', $customItem->getId());
 
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Create unique table alias for field type.
+     *
+     * @param CustomFieldTypeInterface $fieldType
+     * 
+     * @return string
+     */
+    private function getAlias(CustomFieldTypeInterface $fieldType): string
+    {
+        return "cfv{$fieldType->getKey()}";
     }
 }

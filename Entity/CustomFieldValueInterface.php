@@ -37,4 +37,14 @@ interface CustomFieldValueInterface extends UniqueEntityInterface
      * @return CustomItem
      */
     public function getCustomItem();
+
+    /**
+     * @return mixed
+     */
+    public function getValue();
+
+    /**
+     * @param mixed $value
+     */
+    public function setValue($value);
 }
