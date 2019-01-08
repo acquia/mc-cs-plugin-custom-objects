@@ -89,16 +89,17 @@ class NewController extends CommonController
             $this->accessDenied(false, $e->getMessage());
         }
         
-        $entity  = $this->customItemModel->populateCustomFields(new CustomItem($customObject));
-        $action  = $this->routeProvider->buildSaveRoute($objectId);
-        $form    = $this->formFactory->create(CustomItemType::class, $entity, ['action' => $action, 'objectId' => $objectId]);
+        $entity = $this->customItemModel->populateCustomFields(new CustomItem($customObject));
+        $action = $this->routeProvider->buildSaveRoute($objectId);
+        $form   = $this->formFactory->create(CustomItemType::class, $entity, ['action' => $action, 'objectId' => $objectId]);
 
         return $this->delegateView(
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute($objectId),
                 'viewParameters' => [
-                    'entity' => $entity,
-                    'form'   => $form->createView(),
+                    'entity'       => $entity,
+                    'customObject' => $customObject,
+                    'form'         => $form->createView(),
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.php',
                 'passthroughVars' => [

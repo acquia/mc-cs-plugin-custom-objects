@@ -16,10 +16,16 @@ $view['slots']->set('mauticContent', 'customItem');
 if ($entity->getId()) {
     $header = $view['translator']->trans(
         'custom.item.edit',
-        ['%name%' => $view['translator']->trans($entity->getName())]
+        [
+            '%object%' => $view['translator']->trans($customObject->getName()),
+            '%item%' => $view['translator']->trans($entity->getName()),
+        ]
     );
 } else {
-    $header = $view['translator']->trans('custom.item.new');
+    $header = $view['translator']->trans(
+        'custom.item.new',
+        ['%object%' => $view['translator']->trans($customObject->getName())]
+    );
 }
 
 $view['slots']->set('headerTitle', $header);
