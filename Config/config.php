@@ -181,22 +181,11 @@ return [
 
     'menu' => [
         'admin' => [
-            'custom.object.config.menu.parent.title' => [
-                'id'        => 'mautic_custom_config_parent_list',
-                'access'    => 'custom_objects:custom_objects:view',
-                'iconClass' => 'fa-list-alt',
-            ],
             'custom.object.config.menu.title' => [
                 'id'        => CustomObjectRouteProvider::ROUTE_LIST,
                 'route'     => CustomObjectRouteProvider::ROUTE_LIST,
                 'access'    => 'custom_objects:custom_objects:view',
-                'parent'    => 'custom.object.config.menu.parent.title',
-            ],
-            'custom.field.config.menu.title' => [
-                'id'        => CustomFieldRouteProvider::ROUTE_LIST,
-                'route'     => CustomFieldRouteProvider::ROUTE_LIST,
-                'access'    => 'custom_fields:custom_fields:view',
-                'parent'    => 'custom.object.config.menu.parent.title',
+                'iconClass' => 'fa-list-alt',
             ],
         ],
     ],
