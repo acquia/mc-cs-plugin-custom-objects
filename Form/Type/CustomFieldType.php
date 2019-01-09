@@ -73,19 +73,6 @@ class CustomFieldType extends AbstractType
         );
 
         $builder->add(
-            'alias',
-            TextType::class,
-            [
-                'label'      => 'custom.field.alias.label',
-                'required'   => true,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class' => 'form-control',
-                ],
-            ]
-        );
-
-        $builder->add(
             'type',
             ChoiceType::class,
             [

@@ -34,12 +34,12 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @var string|null
      */
-    private $name;
+    private $namePlural;
 
     /**
      * @var string|null
      */
-    private $alias;
+    private $nameSingular;
 
     /**
      * @var DateTimeInterface|null
@@ -63,8 +63,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
 
     public function __clone()
     {
-        $this->id    = null;
-        $this->alias = null;
+        $this->id = null;
     }
 
     /**
@@ -75,13 +74,12 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('custom_object')
-            ->setCustomRepositoryClass(CustomObjectRepository::class)
-            ->addIndex(['alias'], 'alias');
+            ->setCustomRepositoryClass(CustomObjectRepository::class);
 
         $builder->addId();
         $builder->addCategory();
-        $builder->addField('name', Type::STRING);
-        $builder->addField('alias', Type::STRING);
+        $builder->addNamedField('namePlural', Type::STRING, 'name_plural');
+        $builder->addNamedField('nameSingular', Type::STRING, 'name_singular');
         $builder->addNullableField('language', Type::STRING, 'lang');
     }
 
@@ -90,9 +88,10 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('name', new Assert\NotBlank());
-        $metadata->addPropertyConstraint('name', new Assert\Length(['max' => 255]));
-        $metadata->addPropertyConstraint('alias', new Assert\Length(['max' => 255]));
+        $metadata->addPropertyConstraint('namePlural', new Assert\NotBlank());
+        $metadata->addPropertyConstraint('namePlural', new Assert\Length(['max' => 255]));
+        $metadata->addPropertyConstraint('nameSingular', new Assert\NotBlank());
+        $metadata->addPropertyConstraint('nameSingular', new Assert\Length(['max' => 255]));
         $metadata->addPropertyConstraint('description', new Assert\Length(['max' => 65535]));
     }
 
@@ -105,37 +104,47 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param string|null $name
-     */
-    public function setName($name)
-    {
-        $this->isChanged('name', $name);
-        $this->name = $name;
-    }
-
-    /**
+     * This is alias method that is required by Mautic.
+     * 
      * @return string|null
      */
     public function getName()
     {
-        return $this->name;
+        return $this->getNamePlural();
     }
 
     /**
-     * @param string|null $alias
+     * @param string|null $namePlural
      */
-    public function setAlias($alias)
+    public function setNamePlural($namePlural)
     {
-        $this->isChanged('alias', $alias);
-        $this->alias = $alias;
+        $this->isChanged('namePlural', $namePlural);
+        $this->namePlural = $namePlural;
     }
 
     /**
      * @return string|null
      */
-    public function getAlias()
+    public function getNamePlural()
     {
-        return $this->alias;
+        return $this->namePlural;
+    }
+
+    /**
+     * @param string|null $nameSingular
+     */
+    public function setNameSingular($nameSingular)
+    {
+        $this->isChanged('nameSingular', $nameSingular);
+        $this->nameSingular = $nameSingular;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getNameSingular()
+    {
+        return $this->nameSingular;
     }
 
     /**

@@ -33,10 +33,10 @@ class CustomObjectType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
-            'name',
+            'namePlural',
             TextType::class,
             [
-                'label'      => 'custom.object.name.label',
+                'label'      => 'custom.object.name.plural.label',
                 'required'   => true,
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
@@ -46,10 +46,10 @@ class CustomObjectType extends AbstractType
         );
 
         $builder->add(
-            'alias',
+            'nameSingular',
             TextType::class,
             [
-                'label'      => 'custom.object.alias.label',
+                'label'      => 'custom.object.name.singular.label',
                 'required'   => true,
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [

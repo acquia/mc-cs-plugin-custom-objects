@@ -70,10 +70,8 @@ class CustomFieldModel extends FormModel
      */
     public function save(CustomField $entity): CustomField
     {
-        $user   = $this->userHelper->getUser();
-        $entity = $this->sanitizeAlias($entity);
-        $entity = $this->ensureUniqueAlias($entity);
-        $now    = new DateTimeHelper();
+        $user = $this->userHelper->getUser();
+        $now  = new DateTimeHelper();
 
         if ($entity->isNew()) {
             $entity->setCreatedBy($user->getId());
@@ -158,52 +156,6 @@ class CustomFieldModel extends FormModel
     public function getPermissionBase(): string
     {
         return 'custom_fields:custom_fields';
-    }
-
-    /**
-     * @param CustomField $entity
-     * 
-     * @return CustomFieldt
-     */
-    private function sanitizeAlias(CustomField $entity): CustomField
-    {
-        $dirtyAlias = $entity->getAlias();
-
-        if (empty($dirtyAlias)) {
-            $dirtyAlias = $entity->getName();
-        }
-
-        $cleanAlias = $this->cleanAlias($dirtyAlias, '', false, '-');
-
-        $entity->setAlias($cleanAlias);
-
-        return $entity;
-    }
-
-    /**
-     * Make sure alias is not already taken.
-     *
-     * @param CustomField $entity
-     * 
-     * @return CustomField
-     */
-    private function ensureUniqueAlias(CustomField $entity): CustomField
-    {
-        $testAlias = $entity->getAlias();
-        $isUnique  = $this->customFieldRepository->isAliasUnique($testAlias, $entity->getId());
-        $counter   = 1;
-
-        while ($isUnique) {
-            $testAlias = $testAlias.$counter;
-            $isUnique  = $this->customFieldRepository->isAliasUnique($testAlias, $entity->getId());
-            ++$counter;
-        }
-
-        if ($testAlias !== $entity->getAlias()) {
-            $entity->setAlias($testAlias);
-        }
-
-        return $entity;
     }
 
     /**
