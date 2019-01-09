@@ -376,6 +376,7 @@ return [
                 'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\EditController::class,
                 'arguments' => [
                     'form.factory',
+                    'mautic.custom.model.object',
                     'mautic.custom.model.item',
                     'custom_item.permission.provider',
                     'custom_item.route.provider',

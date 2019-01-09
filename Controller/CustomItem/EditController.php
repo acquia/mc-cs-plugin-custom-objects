@@ -25,6 +25,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 
 class EditController extends CommonController
 {
@@ -39,6 +40,11 @@ class EditController extends CommonController
     private $customItemModel;
 
     /**
+     * @var CustomObjectModel
+     */
+    private $customObjectModel;
+
+    /**
      * @var CustomItemPermissionProvider
      */
     private $permissionProvider;
@@ -50,18 +56,21 @@ class EditController extends CommonController
 
     /**
      * @param FormFactory $formFactory
+     * @param CustomObjectModel $customObjectModel
      * @param CustomItemModel $customItemModel
      * @param CustomItemPermissionProvider $permissionProvider
      * @param CustomItemRouteProvider $routeProvider
      */
     public function __construct(
         FormFactory $formFactory,
+        CustomObjectModel $customObjectModel,
         CustomItemModel $customItemModel,
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider
     )
     {
         $this->formFactory        = $formFactory;
+        $this->customObjectModel  = $customObjectModel;
         $this->customItemModel    = $customItemModel;
         $this->permissionProvider = $permissionProvider;
         $this->routeProvider      = $routeProvider;
@@ -76,7 +85,8 @@ class EditController extends CommonController
     public function renderFormAction(int $objectId, int $itemId)
     {
         try {
-            $entity = $this->customItemModel->fetchEntity($itemId);
+            $customObject = $this->customObjectModel->fetchEntity($objectId);
+            $entity       = $this->customItemModel->fetchEntity($itemId);
             $this->permissionProvider->canEdit($entity);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
@@ -91,8 +101,9 @@ class EditController extends CommonController
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute($objectId),
                 'viewParameters' => [
-                    'entity' => $entity,
-                    'form'   => $form->createView(),
+                    'entity'       => $entity,
+                    'customObject' => $customObject,
+                    'form'         => $form->createView(),
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.php',
                 'passthroughVars' => [
