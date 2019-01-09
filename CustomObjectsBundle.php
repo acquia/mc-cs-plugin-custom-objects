@@ -22,17 +22,32 @@ use Doctrine\DBAL\Connection;
 class CustomObjectsBundle extends PluginBundleBase
 {
     /**
+     * @var string
+     */
+    private static $tableName = MAUTIC_TABLE_PREFIX.'custom_field_value_text';
+
+    /**
+     * @var string
+     */
+    private static $indexName = MAUTIC_TABLE_PREFIX.'value_index';
+
+    /**
      * @param Plugin        $plugin
      * @param MauticFactory $factory
      * @param array|null    $metadata
-     * @param Schema|null   $installedSchema
+     * @param Schema|bool|null   $installedSchema
      *
      * @throws \Exception
      */
-    public static function onPluginInstall(Plugin $plugin, MauticFactory $factory, $metadata = null, $installedSchema = null)
+    public static function onPluginInstall(Plugin $plugin, MauticFactory $factory, $metadata = null, $installedSchema = null): void
     {
+        if ($installedSchema === true) {
+            // Schema exists
+            return;
+        }
+
         parent::onPluginInstall($plugin, $factory, $metadata, $installedSchema);
-        $queries = [self::createIndexQueryIfDoesNotExist($installedSchema)];
+        $queries[] = self::createIndexQuery();
         self::commit($factory->getDatabase(), $queries);
     }
 
@@ -44,7 +59,7 @@ class CustomObjectsBundle extends PluginBundleBase
     *
     * @throws \Exception
     */
-    static public function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, Schema $installedSchema = null)
+    public static function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, Schema $installedSchema = null): void
     {
         $queries = [self::createIndexQueryIfDoesNotExist($installedSchema)];
         self::commit($factory->getDatabase(), $queries);
@@ -55,27 +70,32 @@ class CustomObjectsBundle extends PluginBundleBase
      * 
      * @return string
      */
-    static private function createIndexQueryIfDoesNotExist(Schema $schema): string
+    private static function createIndexQueryIfDoesNotExist(Schema $schema): string
     {
-        $tableName = MAUTIC_TABLE_PREFIX.'custom_field_value_text';
-        $indexName = MAUTIC_TABLE_PREFIX.'value_index';
+        if (!$schema->hasTable(self::$tableName)) {
+            return '';
+        }
+        
+        if ($schema->getTable(self::$tableName)->hasIndex(self::$indexName)) {
+            return '';
+        }
+        
+        return self::createIndexQuery();
+    }
 
-        if (!$schema->hasTable($tableName)) {
-            return '';
-        }
-        
-        if ($schema->getTable($tableName)->hasIndex($indexName)) {
-            return '';
-        }
-        
-        return "CREATE INDEX {$indexName} ON {$tableName} (value(64))";
+    /**
+     * @return string
+     */
+    private static function createIndexQuery(): string
+    {
+        return sprintf('CREATE INDEX %s ON %s (value(64))', self::$indexName, self::$tableName);
     }
 
     /**
      * @param Connection $connection
      * @param array $queries
      */
-    static private function commit(Connection $connection, array $queries): void
+    private static function commit(Connection $connection, array $queries): void
     {
         if (!empty($queries)) {
 
@@ -90,7 +110,7 @@ class CustomObjectsBundle extends PluginBundleBase
 
                 $connection->commit();
             } catch (\Exception $e) {
-                $connection->rollback();
+                $connection->rollBack();
 
                 throw $e;
             }
