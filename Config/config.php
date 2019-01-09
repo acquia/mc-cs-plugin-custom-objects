@@ -229,8 +229,6 @@ return [
             'custom_field.view_controller' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\ViewController::class,
                 'arguments' => [
-                    'request_stack',
-                    'session',
                     'mautic.helper.core_parameters',
                     'mautic.custom.model.field',
                     'custom_field.permission.provider',
