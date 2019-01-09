@@ -84,7 +84,7 @@ class CloneController extends CommonController
             $this->accessDenied(false, $e->getMessage());
         }
 
-        $entity->setName($entity->getName().' '.$this->translator->trans('mautic.core.form.clone'));
+        $entity->setNamePlural($entity->getNamePlural().' '.$this->translator->trans('mautic.core.form.clone'));
 
         $action = $this->routeProvider->buildSaveRoute();
         $form   = $this->formFactory->create(CustomObjectType::class, $entity, ['action' => $action]);
