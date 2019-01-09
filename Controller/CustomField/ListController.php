@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
-use Predis\Protocol\Text\RequestSerializer;
 use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
@@ -54,12 +54,12 @@ class ListController extends CommonController
     private $routeProvider;
 
     /**
-     * @param RequestStack $requestStack
-     * @param Session $session
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param CustomFieldModel $customFieldModel
-     * @param CorePermissions $corePermissions
-     * @param CustomFieldRouteProvider $routeProvider
+     * @param RequestStack                  $requestStack
+     * @param Session                       $session
+     * @param CoreParametersHelper          $coreParametersHelper
+     * @param CustomFieldModel              $customFieldModel
+     * @param CustomFieldPermissionProvider $permissionProvider
+     * @param CustomFieldRouteProvider      $routeProvider
      */
     public function __construct(
         RequestStack $requestStack,
@@ -81,7 +81,7 @@ class ListController extends CommonController
     /**
      * @param integer $page
      * 
-     * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse
+     * @return Response|JsonResponse
      */
     public function listAction(int $page = 1)
     {
@@ -92,7 +92,9 @@ class ListController extends CommonController
         }
 
         $request      = $this->requestStack->getCurrentRequest();
-        $search       = InputHelper::clean($request->get('search', $this->session->get('mautic.custom.field.filter', '')));
+        $search       = InputHelper::clean(
+            $request->get('search', $this->session->get('mautic.custom.field.filter', ''))
+        );
         $defaultlimit = (int) $this->coreParametersHelper->getParameter('default_pagelimit');
         $sessionLimit = (int) $this->session->get('mautic.custom.field.limit', $defaultlimit);
         $limit        = (int) $request->get('limit', $sessionLimit);
@@ -102,10 +104,10 @@ class ListController extends CommonController
 
         if ($request->query->has('orderby')) {
             $orderBy    = InputHelper::clean($request->query->get('orderby'), true);
-            $orderByDir = $this->session->get("mautic.custom.field.orderbydir", 'ASC');
-            $orderByDir = ($orderByDir == 'ASC') ? 'DESC' : 'ASC';
-            $this->session->set("mautic.custom.field.orderby", $orderBy);
-            $this->session->set("mautic.custom.field.orderbydir", $orderByDir);
+            $orderByDir = $this->session->get('mautic.custom.field.orderbydir', 'ASC');
+            $orderByDir = ($orderByDir === 'ASC') ? 'DESC' : 'ASC';
+            $this->session->set('mautic.custom.field.orderby', $orderBy);
+            $this->session->set('mautic.custom.field.orderbydir', $orderByDir);
         }
         
         $entities = $this->customFieldModel->fetchEntities(
