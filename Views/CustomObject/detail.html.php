@@ -11,9 +11,17 @@
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'customObject');
 $view['slots']->set('headerTitle', $item->getName());
-$view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actions.html.php', [
-    'item' => $item,
-]));
+$view['slots']->set(
+    'actions',
+    $view->render(
+        'MauticCoreBundle:Helper:page_actions.html.php',
+        ['item' => $item]
+    )
+);
+$view['slots']->set(
+    'publishStatus',
+    $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $item])
+);
 ?>
 
 <!-- start: box layout -->
@@ -21,24 +29,32 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
     <!-- left section -->
     <div class="col-md-9 bg-white height-auto">
         <div class="bg-auto">
-            <!-- page detail header -->
+            <!-- form detail header -->
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
                     <div class="col-xs-10">
                         <div class="text-muted"><?php echo $item->getDescription(); ?></div>
                     </div>
-                    <div class="col-xs-2 text-right">
-                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $item]); ?>
+                </div>
+            </div>
+            <!--/ form detail header -->
+
+            <!-- form detail collapseable -->
+            <div class="collapse" id="form-details">
+                <div class="pr-md pl-md pb-md">
+                    <div class="panel shd-none mb-0">
+                        <table class="table table-bordered table-striped mb-0">
+                            <tbody>
+                            <?php echo $view->render(
+                                'MauticCoreBundle:Helper:details.html.php',
+                                ['entity' => $item]
+                            ); ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-            <!--/ page detail header -->
-        </div>
-        <div class="pa-md">
-            <div class="row">
-                <div class="col-md-12">
-                </div>
-            </div>
+            <!--/ form detail collapseable -->
         </div>
     </div>
 
