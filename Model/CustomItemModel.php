@@ -24,9 +24,6 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use MauticPlugin\CustomObjectsBundle\Model\CustomFieldValueModel;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use Doctrine\ORM\QueryBuilder;
@@ -148,7 +145,7 @@ class CustomItemModel extends FormModel
     {
         $queryBuilder = $this->customItemRepository->getTableDataQuery($tableConfig);
         $queryBuilder = $this->applyOwnerFilter($queryBuilder);
-        // dump($queryBuilder->getQuery()->getSql(), $queryBuilder->getQuery()->getParameters());die;
+
         return $queryBuilder->getQuery()->getResult();
     }
 
@@ -258,7 +255,7 @@ class CustomItemModel extends FormModel
                 ],
             ];
 
-            $args['filter']['force'] = $args['filter']['force'] + $limitOwnerFilter;
+            $args['filter']['force'] += $limitOwnerFilter;
         }
 
         return $args;

@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\DTO;
 
-use MauticPlugin\CustomObjectsBundle\Helper\PaginationHelper;
-
 class TableConfig
 {
     /**
@@ -88,7 +86,7 @@ class TableConfig
      * @param mixed  $value
      * @param string $expression
      */
-    public function addFilter(string $entityClass, string $column, $value, $expression = 'eq'): void
+    public function addFilter(string $entityClass, string $column, $value, string $expression = 'eq'): void
     {
         if (!isset($this->filters[$entityClass])) {
             $this->filters[$entityClass] = [];

@@ -26,9 +26,8 @@ CustomObjects = {
     },
 
     refreshTabContent: function(customObjectId, content) {
-        let tabContent = mQuery('#custom-object-'+customObjectId+'-container');
+        let tabContent = mQuery('#custom-object-'+customObjectId+'-container .custom-item-list');
         tabContent.html(content);
-        console.log(tabContent, content);
     },
 
 }

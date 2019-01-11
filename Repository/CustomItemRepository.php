@@ -44,12 +44,12 @@ class CustomItemRepository extends CommonRepository
     public function applyTableFilters(QueryBuilder $queryBuilder, TableConfig $tableConfig): QueryBuilder
     {
         $aliases   = $queryBuilder->getAllAliases();
-        $rootAlias = $queryBuilder->getRootAlias();
+        $rootAlias = $queryBuilder->getRootAliases()[0];
         foreach ($tableConfig->getFilters() as $entityClass => $filters) {
             foreach ($filters as $filter) {
                 $alias = self::getAlias($entityClass);
                 if (!in_array($alias, $aliases)) {
-                    $queryBuilder->innerJoin($entityClass, $alias, Expr\Join::WITH, "{$rootAlias}.id = {$alias}.customItem");
+                    $queryBuilder->innerJoin($rootAlias.'.contactsReference', $alias);
                 }
                 $queryBuilder->andWhere(
                     $queryBuilder->expr()->andX(

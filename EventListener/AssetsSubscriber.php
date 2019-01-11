@@ -11,9 +11,7 @@
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Event\CustomTemplateEvent;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;

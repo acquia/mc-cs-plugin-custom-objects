@@ -26,8 +26,6 @@ use DateTimeZone;
 
 class CustomItemXrefContact
 {
-    const ALIAS = 'cixc';
-    
     /**
      * @var Lead
      */
@@ -48,7 +46,7 @@ class CustomItemXrefContact
      * @param Lead                   $contact
      * @param DateTimeInterface|null $dateAdded
      */
-    public function __construct(CustomItem $customItem, string $entityType, int $entityId, ?DateTimeInterface $dateAdded = null)
+    public function __construct(CustomItem $customItem, Leas $contact, ?DateTimeInterface $dateAdded = null)
     {
         $this->customItem = $customItem;
         $this->contact    = $contact;
@@ -66,6 +64,7 @@ class CustomItemXrefContact
 
         $builder->createManyToOne('customItem', CustomItem::class)
             ->addJoinColumn('custom_item_id', 'id', false, false, 'CASCADE')
+            ->inversedBy('contactsReference')
             ->makePrimaryKey()
             ->build();
 

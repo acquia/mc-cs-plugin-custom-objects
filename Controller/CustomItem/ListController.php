@@ -130,7 +130,7 @@ class ListController extends CommonController
             $this->session->set("mautic.custom.item.orderbydir", $orderByDir);
         }
         
-        $tableConfig  = new TableConfig($limit, $page, $orderBy, $orderByDir);
+        $tableConfig = new TableConfig($limit, $page, $orderBy, $orderByDir);
         $tableConfig->addFilter(CustomItem::class, 'customObject', $objectId);
 
         if ($contactId) {

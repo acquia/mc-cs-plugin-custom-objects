@@ -12,16 +12,10 @@
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
-use Mautic\CoreBundle\Event\CustomButtonEvent;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
 use Mautic\CoreBundle\Event\CustomContentEvent;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 class TabSubscriber extends CommonSubscriber
 {
@@ -31,26 +25,18 @@ class TabSubscriber extends CommonSubscriber
     private $customObjectModel;
 
     /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
      * @var CustomObject[]
      */
     private $customObjects = [];
 
     /**
      * @param CustomObjectModel $customObjectModel
-     * @param CustomItemModel   $customItemModel
      */
     public function __construct(
-        CustomObjectModel $customObjectModel,
-        CustomItemModel $customItemModel
+        CustomObjectModel $customObjectModel
     )
     {
         $this->customObjectModel = $customObjectModel;
-        $this->customItemModel   = $customItemModel;
     }
 
     public static function getSubscribedEvents()
@@ -67,7 +53,6 @@ class TabSubscriber extends CommonSubscriber
     {
         if ($event->checkContext('MauticLeadBundle:Lead:lead.html.php', 'tabs')) {
             $vars    = $event->getVars();
-            $contact = $vars['lead'];
             $objects = $this->getCustomObjects();
 
             foreach ($objects as $object) {
@@ -89,6 +74,8 @@ class TabSubscriber extends CommonSubscriber
             foreach ($objects as $object) {
                 $data = [
                     'key'   => "custom-object-{$object->getId()}",
+                    'page'  => 1,
+                    'search' => '',
                     // 'count' => 55,
                     // 'title' => $object->getNamePlural(),
                 ];
@@ -105,31 +92,6 @@ class TabSubscriber extends CommonSubscriber
     {
         if (!$this->customObjects) {
             $this->customObjects = $this->customObjectModel->fetchAllPublishedEntities();
-        }
-        
-        return $this->customObjects;
-    }
-
-    private function getCustomItems(CustomContentEvent $event)
-    {
-        if (!$this->customObjects) {
-            $this->customObjects = $this->customObjectModel->fetchEntities([
-                'start'      => PaginationHelper::countOffset($page, $limit),
-                'limit'      => $limit,
-                'filter'     => ['string' => $search],
-                'orderBy'    => $orderBy,
-                'orderByDir' => $orderByDir,
-                'filter'     => [
-                    'string' => $search,
-                    'force'  => [
-                        [
-                            'column' => 'e.customObject',
-                            'value'  => $objectId,
-                            'expr'   => 'eq',
-                        ],
-                    ],
-                ],
-            ]);
         }
         
         return $this->customObjects;
