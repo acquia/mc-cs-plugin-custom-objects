@@ -28,6 +28,8 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldValueModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
+use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
+use Doctrine\ORM\QueryBuilder;
 
 class CustomItemModel extends FormModel
 {
@@ -142,6 +144,14 @@ class CustomItemModel extends FormModel
         return $this->populateCustomFields($entity);
     }
 
+    public function getTableData(TableConfig $tableConfig)
+    {
+        $queryBuilder = $this->customItemRepository->getTableDataQuery($tableConfig);
+        $queryBuilder = $this->applyOwnerFilter($queryBuilder);
+        // dump($queryBuilder->getQuery()->getSql(), $queryBuilder->getQuery()->getParameters());die;
+        return $queryBuilder->getQuery()->getResult();
+    }
+
     /**
      * @param CustomItem $customItem
      * 
@@ -175,9 +185,9 @@ class CustomItemModel extends FormModel
     /**
      * @param array $args
      * 
-     * @return Paginator
+     * @return Paginator|array
      */
-    public function fetchEntities(array $args = []): Paginator
+    public function fetchEntities(array $args = [])
     {
         return parent::getEntities($this->addCreatorLimit($args));
     }
@@ -200,6 +210,24 @@ class CustomItemModel extends FormModel
     public function getPermissionBase(): string
     {
         return 'custom_objects:custom_items';
+    }
+
+    /**
+     * Adds condition for owner if the user doesn't have permissions to view other.
+     *
+     * @param QueryBuilder $queryBuilder
+     * 
+     * @return QueryBuilder
+     */
+    private function applyOwnerFilter(QueryBuilder $queryBuilder): QueryBuilder
+    {
+        try {
+            $this->permissionProvider->isGranted('viewother');
+        } catch (ForbiddenException $e) {
+            $this->customItemRepository->applyOwnerFilter($queryBuilder, $this->userHelper->getUser()->getId());
+        }
+
+        return $queryBuilder;
     }
 
     /**

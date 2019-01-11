@@ -618,10 +618,23 @@ return [
             ],
         ],
         'events' => [
+            'custom_object.assets.subscriber' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\EventListener\AssetsSubscriber::class,
+                'arguments' => [
+                    'templating.helper.assets',
+                ]
+            ],
             'custom_object.menu.subscriber' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\MenuSubscriber::class,
                 'arguments' => [
                     'mautic.custom.model.object',
+                ],
+            ],
+            'custom_object.tab.subscriber' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\EventListener\TabSubscriber::class,
+                'arguments' => [
+                    'mautic.custom.model.object',
+                    'mautic.custom.model.item',
                 ],
             ],
             'custom_field.type.subscriber' => [
