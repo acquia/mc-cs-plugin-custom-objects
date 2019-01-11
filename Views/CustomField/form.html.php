@@ -35,7 +35,6 @@ $view['slots']->set('headerTitle', $header);
             <div class="row">
                 <div class="col-md-4">
                     <?php echo $view['form']->row($form['label']); ?>
-                    <?php echo $view['form']->row($form['alias']); ?>
                     <?php echo $view['form']->row($form['type']); ?>
                     <?php echo $view['form']->row($form['customObject']); ?>
                 </div>

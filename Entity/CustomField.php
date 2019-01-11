@@ -40,11 +40,6 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     private $label;
 
     /**
-     * @var string|null
-     */
-    private $alias;
-
-    /**
      * @var DateTimeInterface|null
      */
     private $dateAdded;
@@ -61,8 +56,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
     public function __clone()
     {
-        $this->id    = null;
-        $this->alias = null;
+        $this->id = null;
     }
 
     /**
@@ -73,8 +67,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('custom_field')
-            ->setCustomRepositoryClass(CustomFieldRepository::class)
-            ->addIndex(['alias'], 'alias');
+            ->setCustomRepositoryClass(CustomFieldRepository::class);
 
         $builder->createManyToOne('customObject', CustomObject::class)
             ->addJoinColumn('custom_object_id', 'id', false, false, 'CASCADE')
@@ -83,7 +76,6 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
         $builder->addId();
         $builder->addField('label', Type::STRING);
-        $builder->addField('alias', Type::STRING);
         $builder->addField('type', Type::STRING);
     }
 
@@ -96,7 +88,6 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         $metadata->addPropertyConstraint('type', new Assert\NotBlank());
         $metadata->addPropertyConstraint('customObject', new Assert\NotBlank());
         $metadata->addPropertyConstraint('label', new Assert\Length(['max' => 255]));
-        $metadata->addPropertyConstraint('alias', new Assert\Length(['max' => 255]));
         $metadata->addPropertyConstraint('type', new Assert\Length(['max' => 255]));
     }
 
@@ -133,23 +124,6 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     public function getName()
     {
         return $this->getLabel();
-    }
-
-    /**
-     * @param string|null $alias
-     */
-    public function setAlias($alias)
-    {
-        $this->isChanged('alias', $alias);
-        $this->alias = $alias;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getAlias()
-    {
-        return $this->alias;
     }
 
     /**

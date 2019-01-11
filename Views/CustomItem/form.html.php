@@ -17,14 +17,14 @@ if ($entity->getId()) {
     $header = $view['translator']->trans(
         'custom.item.edit',
         [
-            '%object%' => $view['translator']->trans($customObject->getName()),
+            '%object%' => $view['translator']->trans($customObject->getNameSingular()),
             '%item%' => $view['translator']->trans($entity->getName()),
         ]
     );
 } else {
     $header = $view['translator']->trans(
         'custom.item.new',
-        ['%object%' => $view['translator']->trans($customObject->getName())]
+        ['%object%' => $view['translator']->trans($customObject->getNameSingular())]
     );
 }
 

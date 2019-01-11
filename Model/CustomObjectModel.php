@@ -68,10 +68,8 @@ class CustomObjectModel extends FormModel
      */
     public function save(CustomObject $entity): CustomObject
     {
-        $user   = $this->userHelper->getUser();
-        $entity = $this->sanitizeAlias($entity);
-        $entity = $this->ensureUniqueAlias($entity);
-        $now    = new DateTimeHelper();
+        $user = $this->userHelper->getUser();
+        $now  = new DateTimeHelper();
 
         if ($entity->isNew()) {
             $entity->setCreatedBy($user->getId());
@@ -135,52 +133,6 @@ class CustomObjectModel extends FormModel
     public function getPermissionBase(): string
     {
         return 'custom_objects:custom_objects';
-    }
-
-    /**
-     * @param CustomObject $entity
-     * 
-     * @return CustomObject
-     */
-    private function sanitizeAlias(CustomObject $entity): CustomObject
-    {
-        $dirtyAlias = $entity->getAlias();
-
-        if (empty($dirtyAlias)) {
-            $dirtyAlias = $entity->getName();
-        }
-
-        $cleanAlias = $this->cleanAlias($dirtyAlias, '', false, '-');
-
-        $entity->setAlias($cleanAlias);
-
-        return $entity;
-    }
-
-    /**
-     * Make sure alias is not already taken.
-     *
-     * @param CustomObject $entity
-     * 
-     * @return CustomObject
-     */
-    private function ensureUniqueAlias(CustomObject $entity): CustomObject
-    {
-        $testAlias = $entity->getAlias();
-        $isUnique  = $this->customObjectRepository->isAliasUnique($testAlias, $entity->getId());
-        $counter   = 1;
-
-        while ($isUnique) {
-            $testAlias = $testAlias.$counter;
-            $isUnique  = $this->customObjectRepository->isAliasUnique($testAlias, $entity->getId());
-            ++$counter;
-        }
-
-        if ($testAlias !== $entity->getAlias()) {
-            $entity->setAlias($testAlias);
-        }
-
-        return $entity;
     }
 
     /**
