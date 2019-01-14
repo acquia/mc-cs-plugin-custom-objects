@@ -51,7 +51,7 @@ $view['slots']->set('headerTitle', $header);
                     <div class="available-fields mb-md col-sm-4">
                         <select class="chosen form-builder-new-component" data-placeholder="<?php echo $view['translator']->trans('mautic.form.form.component.fields'); ?>">
                             <option value=""></option>
-                            <?php foreach ($availableFields as $fieldType => $field): ?>
+                            <?php foreach ($availableFields as $field): ?>
 
                                 <option data-toggle="ajaxmodal"
                                         data-target="#formComponentModal"
@@ -59,13 +59,13 @@ $view['slots']->set('headerTitle', $header);
                                             'mautic_formfield_action',
                                             [
                                                 'objectAction' => 'new',
-                                                'type'         => $fieldType,
+                                                'type'         => $field->getType(),
                                                 'tmpl'         => 'field',
-                                                'formId'       => $formId,
-                                                'inBuilder'    => $inBuilder,
+//                                                'formId'       => $formId,
+//                                                'inBuilder'    => $inBuilder,
                                             ]
                                         ); ?>">
-                                    <?php echo $field; ?>
+                                    <?php echo $field->getLabel(); ?>
                                 </option>
                             <?php endforeach; ?>
 
@@ -88,10 +88,10 @@ $view['slots']->set('headerTitle', $header);
                                     'field'         => $field,
                                     'inForm'        => true,
                                     'id'            => $field['id'],
-                                    'formId'        => $formId,
-                                    'contactFields' => $contactFields,
-                                    'companyFields' => $companyFields,
-                                    'inBuilder'     => $inBuilder,
+//                                    'formId'        => $formId,
+//                                    'contactFields' => $contactFields,
+//                                    'companyFields' => $companyFields,
+//                                    'inBuilder'     => $inBuilder,
                                 ]
                             ); ?>
                         <?php endif; ?>
