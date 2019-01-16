@@ -13,23 +13,19 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use Predis\Protocol\Text\RequestSerializer;
 use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Mautic\CoreBundle\Helper\InputHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Helper\PaginationHelper;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use Mautic\CampaignBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 
@@ -71,7 +67,7 @@ class ListController extends CommonController
      * @param CoreParametersHelper $coreParametersHelper
      * @param CustomItemModel $customItemModel
      * @param CustomObjectModel $customObjectModel
-     * @param CorePermissions $corePermissions
+     * @param CustomItemPermissionProvider $permissionProvider
      * @param CustomItemRouteProvider $routeProvider
      */
     public function __construct(
@@ -99,7 +95,7 @@ class ListController extends CommonController
      * @param integer $objectId
      * @param integer $page
      * 
-     * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse
+     * @return \Symfony\Component\HttpFoundation\Response|\Symfony\Component\HttpFoundation\JsonResponse
      */
     public function listAction(int $objectId, int $page = 1)
     {

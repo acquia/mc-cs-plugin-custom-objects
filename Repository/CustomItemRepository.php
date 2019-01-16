@@ -16,7 +16,6 @@ namespace MauticPlugin\CustomObjectsBundle\Repository;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Query\Expr;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Mautic\LeadBundle\Entity\Lead;
 
@@ -51,7 +50,7 @@ class CustomItemRepository extends CommonRepository
             foreach ($filters as $filter) {
                 $alias = self::getAlias($entityClass);
                 if (!in_array($alias, $aliases)) {
-                    $queryBuilder->innerJoin($rootAlias.'.contactsReference', $alias);
+                    $queryBuilder->innerJoin($rootAlias.'.contactReferences', $alias);
                 }
                 $queryBuilder->andWhere(
                     $queryBuilder->expr()->andX(
@@ -100,7 +99,7 @@ class CustomItemRepository extends CommonRepository
     {
         $queryBuilder = $this->createQueryBuilder('ci', 'ci.id');
         $queryBuilder->select('COUNT(ci.id) as linkedItemsCount');
-        $queryBuilder->innerJoin('ci.contactsReference', 'cixctct');
+        $queryBuilder->innerJoin('ci.contactReferences', 'cixctct');
         $queryBuilder->where('ci.customObject = :customObjectId');
         $queryBuilder->andWhere('cixctct.contact = :contactId');
         $queryBuilder->setParameter('customObjectId', $customObject->getId());

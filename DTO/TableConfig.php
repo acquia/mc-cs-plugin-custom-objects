@@ -92,12 +92,10 @@ class TableConfig
             $this->filters[$entityClass] = [];
         }
 
-        $this->filters[$entityClass] = [
-            [
-                'column' => $column,
-                'value'  => $value,
-                'expr'   => $expression,
-            ],
+        $this->filters[$entityClass][] = [
+            'column' => $column,
+            'value'  => $value,
+            'expr'   => $expression,
         ];
     }
 

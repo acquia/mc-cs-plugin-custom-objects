@@ -48,7 +48,10 @@ class TabSubscriber extends CommonSubscriber
         $this->customItemModel   = $customItemModel;
     }
 
-    public static function getSubscribedEvents()
+    /**
+     * @return array
+     */
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::VIEW_INJECT_CUSTOM_CONTENT => ['injectTabs', 0],
@@ -58,7 +61,7 @@ class TabSubscriber extends CommonSubscriber
     /**
      * @param CustomContentEvent $event
      */
-    public function injectTabs(CustomContentEvent $event)
+    public function injectTabs(CustomContentEvent $event): void
     {
         if ($event->checkContext('MauticLeadBundle:Lead:lead.html.php', 'tabs')) {
             $vars    = $event->getVars();
@@ -82,11 +85,9 @@ class TabSubscriber extends CommonSubscriber
 
             foreach ($objects as $object) {
                 $data = [
-                    'key'   => "custom-object-{$object->getId()}",
+                    'customObject' => $object,
                     'page'  => 1,
                     'search' => '',
-                    // 'count' => 55,
-                    // 'title' => $object->getNamePlural(),
                 ];
     
                 $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:content.html.php', $data);
@@ -95,9 +96,9 @@ class TabSubscriber extends CommonSubscriber
     }
 
     /**
-     * @return array
+     * @return CustomObject[]
      */
-    private function getCustomObjects()
+    private function getCustomObjects(): array
     {
         if (!$this->customObjects) {
             $this->customObjects = $this->customObjectModel->fetchAllPublishedEntities();

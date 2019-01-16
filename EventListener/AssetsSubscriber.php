@@ -32,7 +32,10 @@ class AssetsSubscriber extends CommonSubscriber
         $this->assetHelper = $assetHelper;
     }
 
-    public static function getSubscribedEvents()
+    /**
+     * @return array
+     */
+    public static function getSubscribedEvents(): array
     {
         return [
             KernelEvents::REQUEST => ['loadAssets', -255],
@@ -42,7 +45,7 @@ class AssetsSubscriber extends CommonSubscriber
     /**
      * @param GetResponseEvent $event
      */
-    public function loadAssets(GetResponseEvent $event)
+    public function loadAssets(GetResponseEvent $event): void
     {
         if ($event->isMasterRequest()) {
             $this->assetHelper->addScript('plugins/CustomObjectsBundle/Assets/js/custom-objects.js');
