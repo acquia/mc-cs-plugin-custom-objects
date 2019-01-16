@@ -15,9 +15,17 @@ namespace MauticPlugin\CustomObjectsBundle\Helper;
 
 class PaginationHelper
 {
+    /**
+     * @deprecated Use TableConfig instead
+     *
+     * @param integer $page
+     * @param integer $limit
+     * @return integer
+     */
     public static function countOffset(int $page, int $limit): int
     {
         $offset = ($page === 1) ? 0 : (($page - 1) * $limit);
+
         return $offset < 0 ? 0 : $offset;
     }
 }

@@ -45,11 +45,6 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     private $customObject;
 
     /**
-     * @var DateTimeInterface|null
-     */
-    private $dateAdded;
-
-    /**
      * @var string|null
      */
     private $language;
@@ -64,6 +59,11 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     private $customFieldValues;
 
+    /**
+     * @var ArrayCollection
+     */
+    private $contactReferences;
+
     public function __clone()
     {
         $this->id = null;
@@ -76,6 +76,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     {
         $this->customObject      = $customObject;
         $this->customFieldValues = new ArrayCollection();
+        $this->contactReferences = new ArrayCollection();
     }
 
     /**
@@ -90,6 +91,11 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
 
         $builder->createManyToOne('customObject', CustomObject::class)
             ->addJoinColumn('custom_object_id', 'id', false, false, 'CASCADE')
+            ->build();
+
+        $builder->createOneToMany('contactReferences', CustomItemXrefContact::class)
+            ->addJoinColumn('custom_item_id', 'id', false, false, 'CASCADE')
+            ->mappedBy('customItem')
             ->build();
 
         $builder->addId();
@@ -183,5 +189,13 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         }
         
         return $this->customFieldValues;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getContactReferences()
+    {
+        return $this->contactReferences;
     }
 }

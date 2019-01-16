@@ -24,10 +24,11 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use MauticPlugin\CustomObjectsBundle\Model\CustomFieldValueModel;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
+use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
+use Doctrine\ORM\QueryBuilder;
+use Mautic\LeadBundle\Entity\Lead;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 class CustomItemModel extends FormModel
 {
@@ -142,6 +143,14 @@ class CustomItemModel extends FormModel
         return $this->populateCustomFields($entity);
     }
 
+    public function getTableData(TableConfig $tableConfig)
+    {
+        $queryBuilder = $this->customItemRepository->getTableDataQuery($tableConfig);
+        $queryBuilder = $this->applyOwnerFilter($queryBuilder);
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
     /**
      * @param CustomItem $customItem
      * 
@@ -175,9 +184,9 @@ class CustomItemModel extends FormModel
     /**
      * @param array $args
      * 
-     * @return Paginator
+     * @return Paginator|array
      */
-    public function fetchEntities(array $args = []): Paginator
+    public function fetchEntities(array $args = [])
     {
         return parent::getEntities($this->addCreatorLimit($args));
     }
@@ -193,6 +202,17 @@ class CustomItemModel extends FormModel
     }
 
     /**
+     * @param Lead         $contact
+     * @param CustomObject $customObject
+     * 
+     * @return int
+     */
+    public function countItemsLinkedToContact(CustomObject $customObject, Lead $contact): int
+    {
+        return $this->customItemRepository->countItemsLinkedToContact($customObject, $contact);
+    }
+
+    /**
      * Used only by Mautic's generic methods. Use CustomFieldPermissionProvider instead.
      * 
      * @return string
@@ -200,6 +220,24 @@ class CustomItemModel extends FormModel
     public function getPermissionBase(): string
     {
         return 'custom_objects:custom_items';
+    }
+
+    /**
+     * Adds condition for owner if the user doesn't have permissions to view other.
+     *
+     * @param QueryBuilder $queryBuilder
+     * 
+     * @return QueryBuilder
+     */
+    private function applyOwnerFilter(QueryBuilder $queryBuilder): QueryBuilder
+    {
+        try {
+            $this->permissionProvider->isGranted('viewother');
+        } catch (ForbiddenException $e) {
+            $this->customItemRepository->applyOwnerFilter($queryBuilder, $this->userHelper->getUser()->getId());
+        }
+
+        return $queryBuilder;
     }
 
     /**
@@ -230,7 +268,7 @@ class CustomItemModel extends FormModel
                 ],
             ];
 
-            $args['filter']['force'] = $args['filter']['force'] + $limitOwnerFilter;
+            $args['filter']['force'] += $limitOwnerFilter;
         }
 
         return $args;

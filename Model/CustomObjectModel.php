@@ -108,11 +108,30 @@ class CustomObjectModel extends FormModel
     /**
      * @param array $args
      * 
-     * @return Paginator
+     * @return Paginator|array
      */
-    public function fetchEntities(array $args = []): Paginator
+    public function fetchEntities(array $args = [])
     {
         return parent::getEntities($this->addCreatorLimit($args));
+    }
+
+    /**
+     * @return array
+     */
+    public function fetchAllPublishedEntities(): array
+    {
+        return $this->fetchEntities([
+            'ignore_paginator' => true,
+            'filter'           => [
+                'force' => [
+                    [
+                        'column' => 'e.isPublished',
+                        'value'  => true,
+                        'expr'   => 'eq',
+                    ],
+                ],
+            ],
+        ]);
     }
 
     /**

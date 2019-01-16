@@ -48,7 +48,7 @@ class MenuSubscriber extends CommonSubscriber
             return;
         }
 
-        $customObjects = $this->getPublicCustomObjects();
+        $customObjects = $this->customObjectModel->fetchAllPublishedEntities();
 
         if (!$customObjects) {
             return;
@@ -82,24 +82,5 @@ class MenuSubscriber extends CommonSubscriber
                 ]
             );
         }
-    }
-
-    /**
-     * @return array
-     */
-    private function getPublicCustomObjects(): array
-    {
-        return $this->customObjectModel->getEntities([
-            'ignore_paginator' => true,
-            'filter'           => [
-                'force' => [
-                    [
-                        'column' => 'e.isPublished',
-                        'value'  => true,
-                        'expr'   => 'eq',
-                    ],
-                ],
-            ],
-        ]);
     }
 }

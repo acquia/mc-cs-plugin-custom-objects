@@ -13,20 +13,21 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use Predis\Protocol\Text\RequestSerializer;
 use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Mautic\CoreBundle\Helper\InputHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Helper\PaginationHelper;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 
 class ListController extends CommonController
 {
@@ -66,7 +67,7 @@ class ListController extends CommonController
      * @param CoreParametersHelper $coreParametersHelper
      * @param CustomItemModel $customItemModel
      * @param CustomObjectModel $customObjectModel
-     * @param CorePermissions $corePermissions
+     * @param CustomItemPermissionProvider $permissionProvider
      * @param CustomItemRouteProvider $routeProvider
      */
     public function __construct(
@@ -89,10 +90,12 @@ class ListController extends CommonController
     }
 
     /**
+     * @todo make the search filter work.
+     * 
      * @param integer $objectId
      * @param integer $page
      * 
-     * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse
+     * @return \Symfony\Component\HttpFoundation\Response|\Symfony\Component\HttpFoundation\JsonResponse
      */
     public function listAction(int $objectId, int $page = 1)
     {
@@ -110,10 +113,11 @@ class ListController extends CommonController
         $defaultlimit = (int) $this->coreParametersHelper->getParameter('default_pagelimit');
         $sessionLimit = (int) $this->session->get('mautic.custom.item.limit', $defaultlimit);
         $limit        = (int) $request->get('limit', $sessionLimit);
-        $orderBy      = $this->session->get('mautic.custom.item.orderby', 'e.id');
+        $orderBy      = $this->session->get('mautic.custom.item.orderby', CustomItemRepository::getAlias().'.id');
         $orderByDir   = $this->session->get('mautic.custom.item.orderbydir', 'DESC');
         $route        = $this->routeProvider->buildListRoute($objectId, $page);
-
+        $contactId    = (int) $request->get('contactId');
+        
         if ($request->query->has('orderby')) {
             $orderBy    = InputHelper::clean($request->query->get('orderby'), true);
             $orderByDir = $this->session->get("mautic.custom.item.orderbydir", 'ASC');
@@ -122,25 +126,13 @@ class ListController extends CommonController
             $this->session->set("mautic.custom.item.orderbydir", $orderByDir);
         }
         
-        $entities = $this->customItemModel->fetchEntities(
-            [
-                'start'      => PaginationHelper::countOffset($page, $limit),
-                'limit'      => $limit,
-                'orderBy'    => $orderBy,
-                'orderByDir' => $orderByDir,
-                'filter'     => [
-                    'string' => $search,
-                    'force'  => [
-                        [
-                            'column' => 'e.customObject',
-                            'value'  => $objectId,
-                            'expr'   => 'eq',
-                        ],
-                    ],
-                ],
-            ]
-        );
-    
+        $tableConfig = new TableConfig($limit, $page, $orderBy, $orderByDir);
+        $tableConfig->addFilter(CustomItem::class, 'customObject', $objectId);
+
+        if ($contactId) {
+            $tableConfig->addFilter(CustomItemXrefContact::class, 'contact', $contactId);
+        }
+
         $this->session->set('mautic.custom.item.page', $page);
         $this->session->set('mautic.custom.item.limit', $limit);
         $this->session->set('mautic.custom.item.filter', $search);
@@ -151,7 +143,7 @@ class ListController extends CommonController
                 'viewParameters' => [
                     'searchValue'    => $search,
                     'customObject'   => $customObject,
-                    'items'          => $entities,
+                    'items'          => $this->customItemModel->getTableData($tableConfig),
                     'page'           => $page,
                     'limit'          => $limit,
                     'tmpl'           => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
