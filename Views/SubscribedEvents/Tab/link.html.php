@@ -10,10 +10,10 @@
  */
 ?>
 <li>
-    <a class="custom-object-tab" href="#custom-object-<?php echo $customObjectId; ?>-container" role="tab" data-toggle="tab" data-custom-object-id="<?php echo $customObjectId; ?>" id="custom-object-<?php echo $customObjectId; ?>">
-        <span class="label label-primary mr-sm" id="custom-object-<?php echo $customObjectId; ?>-count">
+    <a class="custom-object-tab" href="#custom-object-<?php echo $customObject->getId(); ?>-container" role="tab" data-toggle="tab" data-custom-object-id="<?php echo $customObject->getId(); ?>" id="custom-object-<?php echo $customObject->getId(); ?>">
+        <span class="label label-primary mr-sm" id="custom-object-<?php echo $customObject->getId(); ?>-count">
             <?php echo $count; ?>
         </span>
-        <?php echo $view['translator']->trans($title); ?>
+        <?php echo $view['translator']->trans($customObject->getNamePlural()); ?>
     </a>
 </li>

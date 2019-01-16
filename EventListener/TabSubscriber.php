@@ -16,6 +16,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Event\CustomContentEvent;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 
 class TabSubscriber extends CommonSubscriber
 {
@@ -25,18 +26,26 @@ class TabSubscriber extends CommonSubscriber
     private $customObjectModel;
 
     /**
+     * @var CustomItemModel
+     */
+    private $customItemModel;
+
+    /**
      * @var CustomObject[]
      */
     private $customObjects = [];
 
     /**
      * @param CustomObjectModel $customObjectModel
+     * @param CustomItemModel $customItemModel
      */
     public function __construct(
-        CustomObjectModel $customObjectModel
+        CustomObjectModel $customObjectModel,
+        CustomItemModel $customItemModel
     )
     {
         $this->customObjectModel = $customObjectModel;
+        $this->customItemModel   = $customItemModel;
     }
 
     public static function getSubscribedEvents()
@@ -54,12 +63,12 @@ class TabSubscriber extends CommonSubscriber
         if ($event->checkContext('MauticLeadBundle:Lead:lead.html.php', 'tabs')) {
             $vars    = $event->getVars();
             $objects = $this->getCustomObjects();
+            $contact = $vars['lead'];
 
             foreach ($objects as $object) {
                 $data = [
-                    'customObjectId' => $object->getId(),
-                    'count'          => 55,
-                    'title'          => $object->getNamePlural(),
+                    'customObject' => $object,
+                    'count'        => $this->customItemModel->countItemsLinkedToContact($object, $contact),
                 ];
     
                 $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:link.html.php', $data);

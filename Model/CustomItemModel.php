@@ -27,6 +27,8 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use Doctrine\ORM\QueryBuilder;
+use Mautic\LeadBundle\Entity\Lead;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 class CustomItemModel extends FormModel
 {
@@ -197,6 +199,17 @@ class CustomItemModel extends FormModel
     public function getRepository(): CommonRepository
     {
         return $this->customItemRepository;
+    }
+
+    /**
+     * @param Lead         $contact
+     * @param CustomObject $customObject
+     * 
+     * @return int
+     */
+    public function countItemsLinkedToContact(CustomObject $customObject, Lead $contact): int
+    {
+        return $this->customItemRepository->countItemsLinkedToContact($customObject, $contact);
     }
 
     /**

@@ -634,6 +634,7 @@ return [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\TabSubscriber::class,
                 'arguments' => [
                     'mautic.custom.model.object',
+                    'mautic.custom.model.item',
                 ],
             ],
             'custom_field.type.subscriber' => [

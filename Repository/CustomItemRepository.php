@@ -17,6 +17,8 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\Expr;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use Mautic\LeadBundle\Entity\Lead;
 
 class CustomItemRepository extends CommonRepository
 {
@@ -86,5 +88,25 @@ class CustomItemRepository extends CommonRepository
         }
         $path = explode('\\', $repositoryName);
         return rtrim(end($path), 'Repository');
+    }
+
+    /**
+     * @param Lead         $contact
+     * @param CustomObject $customObject
+     * 
+     * @return int
+     */
+    public function countItemsLinkedToContact(CustomObject $customObject, Lead $contact): int
+    {
+        $queryBuilder = $this->createQueryBuilder('ci', 'ci.id');
+        $queryBuilder->select('COUNT(ci.id) as linkedItemsCount');
+        $queryBuilder->innerJoin('ci.contactsReference', 'cixctct');
+        $queryBuilder->where('ci.customObject = :customObjectId');
+        $queryBuilder->andWhere('cixctct.contact = :contactId');
+        $queryBuilder->setParameter('customObjectId', $customObject->getId());
+        $queryBuilder->setParameter('contactId', $contact->getId());
+        $result = $queryBuilder->getQuery()->getSingleScalarResult();
+
+        return (int) $result;
     }
 }
