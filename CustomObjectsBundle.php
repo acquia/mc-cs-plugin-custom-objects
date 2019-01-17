@@ -24,6 +24,11 @@ class CustomObjectsBundle extends PluginBundleBase
     /**
      * @var string
      */
+    public const CONFIG_PARAM_ENABLED = 'custom_objects_enabled';
+
+    /**
+     * @var string
+     */
     private static $tableName = MAUTIC_TABLE_PREFIX.'custom_field_value_text';
 
     /**
@@ -32,10 +37,10 @@ class CustomObjectsBundle extends PluginBundleBase
     private static $indexName = MAUTIC_TABLE_PREFIX.'value_index';
 
     /**
-     * @param Plugin        $plugin
-     * @param MauticFactory $factory
-     * @param array|null    $metadata
-     * @param Schema|bool|null   $installedSchema
+     * @param Plugin           $plugin
+     * @param MauticFactory    $factory
+     * @param array|null       $metadata
+     * @param Schema|bool|null $installedSchema
      *
      * @throws \Exception
      */

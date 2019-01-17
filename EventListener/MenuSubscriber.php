@@ -16,6 +16,8 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use MauticPlugin\CustomObjectsBundle\CustomObjectsBundle;
 
 class MenuSubscriber extends CommonSubscriber
 {
@@ -25,11 +27,18 @@ class MenuSubscriber extends CommonSubscriber
     private $customObjectModel;
 
     /**
-     * @param CustomObjectModel $customObjectModel
+     * @var CoreParametersHelper
      */
-    public function __construct(CustomObjectModel $customObjectModel)
+    private $coreParametersHelper;
+
+    /**
+     * @param CustomObjectModel $customObjectModel
+     * @param CoreParametersHelper $coreParametersHelper
+     */
+    public function __construct(CustomObjectModel $customObjectModel, CoreParametersHelper $coreParametersHelper)
     {
-        $this->customObjectModel = $customObjectModel;
+        $this->customObjectModel    = $customObjectModel;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     public static function getSubscribedEvents(): array
@@ -44,6 +53,12 @@ class MenuSubscriber extends CommonSubscriber
      */
     public function onBuildMenu(MenuEvent $event): void
     {
+        $isEnabled = $this->coreParametersHelper->getParameter(CustomObjectsBundle::CONFIG_PARAM_ENABLED);
+
+        if (!$isEnabled) {
+            return;
+        }
+        
         if ('main' !== $event->getType()) {
             return;
         }

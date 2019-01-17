@@ -14,6 +14,7 @@ declare(strict_types=1);
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use MauticPlugin\CustomObjectsBundle\CustomObjectsBundle;
 
 return [
     'name'        => 'Custom Objects',
@@ -196,6 +197,11 @@ return [
                 'route'     => CustomObjectRouteProvider::ROUTE_LIST,
                 'access'    => 'custom_objects:custom_objects:view',
                 'iconClass' => 'fa-list-alt',
+                'checks'    => [
+                    'parameters' => [
+                        CustomObjectsBundle::CONFIG_PARAM_ENABLED => true,
+                    ],
+                ],
             ],
         ],
     ],
@@ -657,12 +663,14 @@ return [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\AssetsSubscriber::class,
                 'arguments' => [
                     'templating.helper.assets',
+                    'mautic.helper.core_parameters',
                 ]
             ],
             'custom_object.menu.subscriber' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\MenuSubscriber::class,
                 'arguments' => [
                     'mautic.custom.model.object',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'custom_object.tab.subscriber' => [
@@ -670,6 +678,7 @@ return [
                 'arguments' => [
                     'mautic.custom.model.object',
                     'mautic.custom.model.item',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'custom_field.type.subscriber' => [
@@ -762,5 +771,8 @@ return [
                 ],
             ],
         ],
+    ],
+    'parameters' => [
+        'custom_objects_enabled' => true,
     ],
 ];

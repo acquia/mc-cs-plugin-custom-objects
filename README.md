@@ -24,6 +24,12 @@ Defines a type of objects with same properties (fields). Imagine it as a bluepri
 
 Custom Item is an instance of a Custom Object and defines 1 concrete thing. A Custom Item holds values of Custom Fields defined in Custom Object. Examples: Toaster, Order 1234, White House.
 
+## Configuration
+
+### `custom_objects_enabled`
+
+If you need to turn off the plugin without removing the plugin completelly, place `custom_objects_enabled => false` to your `app/config/local.php`.
+
 ## Unit tests
 
 With this command you can run the plugin unit tests:
