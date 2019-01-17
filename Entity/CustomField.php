@@ -44,8 +44,9 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      */
     private $dateAdded;
 
-    /**
-     * @var string|null
+    /*
+    *
+     * @var CustomFieldTypeInterface
      */
     private $type;
 
@@ -94,7 +95,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @return int|null
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -111,17 +112,17 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @return string|null
      */
-    public function getLabel()
+    public function getLabel(): ?string
     {
         return $this->label;
     }
 
     /**
-     * Alias for astractions. Do not use.
+     * Alias for abstractions. Do not use.
      * 
      * @return string|null
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->getLabel();
     }
@@ -131,14 +132,13 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      */
     public function setType(CustomFieldTypeInterface $type)
     {
-        $this->isChanged('type', $type->getKey());
-        $this->type = $type->getKey();
+        $this->type = $type;
     }
 
     /**
-     * @return string|null
+     * @return CustomFieldTypeInterface
      */
-    public function getType()
+    public function getType(): CustomFieldTypeInterface
     {
         return $this->type;
     }
@@ -146,7 +146,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @return CustomObject
      */
-    public function getCustomObject()
+    public function getCustomObject(): CustomObject
     {
         return $this->customObject;
     }
