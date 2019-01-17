@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\DTO;
 
+use MauticPlugin\CustomObjectsBundle\DTO\TableFilterConfig;
+
 class TableConfig
 {
     /**
@@ -81,26 +83,31 @@ class TableConfig
     }
 
     /**
-     * @param string $entityClass
-     * @param string $column
-     * @param mixed  $value
-     * @param string $expression
+     * @param TableFilterConfig $tableFilterConfig
      */
-    public function addFilter(string $entityClass, string $column, $value, string $expression = 'eq'): void
+    public function addFilter(TableFilterConfig $tableFilterConfig): void
     {
-        if (!isset($this->filters[$entityClass])) {
-            $this->filters[$entityClass] = [];
+        if (!isset($this->filters[$tableFilterConfig->getTableAlias()])) {
+            $this->filters[$tableFilterConfig->getTableAlias()] = [];
         }
 
-        $this->filters[$entityClass][] = [
-            'column' => $column,
-            'value'  => $value,
-            'expr'   => $expression,
-        ];
+        $this->filters[$tableFilterConfig->getTableAlias()][] = $tableFilterConfig;
     }
 
     /**
-     * @return array
+     * Checks if the filter value is not empty before adding the filter.
+     * 
+     * @param TableFilterConfig $tableFilterConfig
+     */
+    public function addFilterIfNotEmpty(TableFilterConfig $tableFilterConfig): void
+    {
+        if (!empty($tableFilterConfig->getValue())) {
+            $this->addFilter($tableFilterConfig);
+        }
+    }
+
+    /**
+     * @return TableFilterConfig[]
      */
     public function getFilters(): array
     {

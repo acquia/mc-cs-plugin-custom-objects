@@ -125,6 +125,16 @@ return [
                 'controller' => 'CustomObjectsBundle:CustomItem\Delete:delete',
                 'method'     => 'GET',
             ],
+            CustomItemRouteProvider::ROUTE_LOOKUP => [
+                'path'       => '/custom/object/{objectId}/item.json',
+                'controller' => 'CustomObjectsBundle:CustomItem\Lookup:list',
+                'method'     => 'GET',
+            ],
+            CustomItemRouteProvider::ROUTE_LINK => [
+                'path'       => '/custom/item/{itemId}/link/{entityType}/{entityId}.json',
+                'controller' => 'CustomObjectsBundle:CustomItem\Link:save',
+                'method'     => 'POST',
+            ],
 
             // Custom Objects
             CustomObjectRouteProvider::ROUTE_LIST => [
@@ -428,6 +438,31 @@ return [
                     'session',
                     'mautic.custom.model.item',
                     'custom_item.route.provider',
+                ],
+                'methodCalls' => [
+                    'setContainer' => [
+                        '@service_container'
+                    ],
+                ],
+            ],
+            'custom_item.lookup_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\LookupController::class,
+                'arguments' => [
+                    'request_stack',
+                    'mautic.custom.model.item',
+                    'custom_item.permission.provider',
+                ],
+                'methodCalls' => [
+                    'setContainer' => [
+                        '@service_container'
+                    ],
+                ],
+            ],
+            'custom_item.link_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\LinkController::class,
+                'arguments' => [
+                    'mautic.custom.model.item',
+                    'custom_item.permission.provider',
                 ],
                 'methodCalls' => [
                     'setContainer' => [

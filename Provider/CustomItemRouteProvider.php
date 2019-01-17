@@ -26,6 +26,8 @@ class CustomItemRouteProvider
     public const ROUTE_NEW    = 'mautic_custom_item_new';
     public const ROUTE_CANCEL = 'mautic_custom_item_cancel';
     public const ROUTE_SAVE   = 'mautic_custom_item_save';
+    public const ROUTE_LOOKUP = 'mautic_custom_item_lookup';
+    public const ROUTE_LINK   = 'mautic_custom_item_link';
 
     /**
      * @var RouterInterface

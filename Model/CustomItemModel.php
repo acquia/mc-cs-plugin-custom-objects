@@ -29,6 +29,7 @@ use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 
 class CustomItemModel extends FormModel
 {
@@ -126,6 +127,20 @@ class CustomItemModel extends FormModel
     }
 
     /**
+     * @param integer $customItemId
+     * @param integer $contactId
+     */
+    public function linkContact(int $customItemId, int $contactId): void
+    {
+        $customItem = $this->entityManager->getReference(CustomItem::class, $customItemId);
+        $contact    = $this->entityManager->getReference(Lead::class, $contactId);
+        $entity     = new CustomItemXrefContact($customItem, $contact);
+
+        $this->entityManager->persist($entity);
+        $this->entityManager->flush();
+    }
+
+    /**
      * @param integer $id
      * 
      * @return CustomItem
@@ -143,12 +158,32 @@ class CustomItemModel extends FormModel
         return $this->populateCustomFields($entity);
     }
 
-    public function getTableData(TableConfig $tableConfig)
+    /**
+     * @param TableConfig $tableConfig
+     * 
+     * @return array
+     */
+    public function getTableData(TableConfig $tableConfig): array
     {
         $queryBuilder = $this->customItemRepository->getTableDataQuery($tableConfig);
         $queryBuilder = $this->applyOwnerFilter($queryBuilder);
 
         return $queryBuilder->getQuery()->getResult();
+    }
+
+    /**
+     * @param TableConfig $tableConfig
+     * 
+     * @return array
+     */
+    public function getLookupData(TableConfig $tableConfig): array
+    {
+        $queryBuilder = $this->customItemRepository->getTableDataQuery($tableConfig);
+        $queryBuilder = $this->applyOwnerFilter($queryBuilder);
+        $rootAlias    = $queryBuilder->getRootAliases()[0];
+        $queryBuilder->select("{$rootAlias}.name as value, {$rootAlias}.id");//
+
+        return array_values($queryBuilder->getQuery()->getArrayResult());
     }
 
     /**
