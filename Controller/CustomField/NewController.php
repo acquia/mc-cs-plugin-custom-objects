@@ -13,8 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,33 +43,56 @@ class NewController extends CommonController
     private $routeProvider;
 
     /**
-     * @param FormFactory $formFactory
+     * @var CustomObjectRepository
+     */
+    private $customObjectRepository;
+
+    /**
+     * @var CustomFieldFactory
+     */
+    private $customFieldFactory;
+
+    /**
+     * @param FormFactory                   $formFactory
      * @param CustomFieldPermissionProvider $permissionProvider
-     * @param CustomFieldRouteProvider $routeProvider
+     * @param CustomFieldRouteProvider      $routeProvider
+     * @param CustomObjectRepository        $customObjectRepository
+     * @param CustomFieldFactory            $customFieldFactory
      */
     public function __construct(
         FormFactory $formFactory,
         CustomFieldPermissionProvider $permissionProvider,
-        CustomFieldRouteProvider $routeProvider
+        CustomFieldRouteProvider $routeProvider,
+        CustomObjectRepository $customObjectRepository,
+        CustomFieldFactory $customFieldFactory
     )
     {
         $this->formFactory        = $formFactory;
         $this->permissionProvider = $permissionProvider;
         $this->routeProvider      = $routeProvider;
+        $this->customObjectRepository = $customObjectRepository;
+        $this->customFieldFactory = $customFieldFactory;
     }
 
     /**
+     * @param Request $request
+     *
      * @return Response|JsonResponse
      */
-    public function renderFormAction()
+    public function renderFormAction(Request $request)
     {
         try {
             $this->permissionProvider->canCreate();
         } catch (ForbiddenException $e) {
             $this->accessDenied(false, $e->getMessage());
         }
-        
-        $entity = new CustomField();
+
+        if (!$customObject = $this->customObjectRepository->findOneById($request->get('objectId'))) {
+            return $this->notFound();
+        }
+
+        $entity = $this->customFieldFactory->create($request->get('fieldType'));
+        $entity->setCustomObject($customObject);
         $action = $this->routeProvider->buildSaveRoute();
         $form   = $this->formFactory->create(CustomFieldType::class, $entity, ['action' => $action]);
 

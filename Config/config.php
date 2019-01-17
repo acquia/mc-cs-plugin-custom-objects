@@ -40,7 +40,7 @@ return [
                 'method'     => 'GET',
             ],
             CustomFieldRouteProvider::ROUTE_NEW => [
-                'path'       => '/custom/field/new',
+                'path'       => '/custom/field/new/{objectId}/{fieldType}',
                 'controller' => 'CustomObjectsBundle:CustomField\New:renderForm',
                 'method'     => 'GET',
             ],
@@ -246,6 +246,8 @@ return [
                     'form.factory',
                     'custom_field.permission.provider',
                     'custom_field.route.provider',
+                    'custom_object.repository',
+                    'custom_object.custom_field_factory',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -636,21 +638,21 @@ return [
         ],
         'repositories' => [
             'custom_field.repository' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
+                'class'     => \MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \MauticPlugin\CustomObjectsBundle\Entity\CustomField::class,
                 ],
             ],
             'custom_item.repository' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
+                'class'     => \MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \MauticPlugin\CustomObjectsBundle\Entity\CustomItem::class,
                 ],
             ],
             'custom_object.repository' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
+                'class'     => \MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \MauticPlugin\CustomObjectsBundle\Entity\CustomObject::class,
@@ -769,6 +771,9 @@ return [
                     'mautic.security',
                 ],
             ],
+            'custom_object.custom_field_factory' => [
+                'class' =>\MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory::class,
+            ]
         ],
     ],
     'parameters' => [
