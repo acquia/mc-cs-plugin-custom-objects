@@ -45,6 +45,9 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
         $this->routeProvider      = $routeProvider;
     }
 
+    /**
+     * @return array
+     */
     public static function getSubscribedEvents()
     {
         return [

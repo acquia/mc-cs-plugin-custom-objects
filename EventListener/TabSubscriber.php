@@ -17,6 +17,8 @@ use Mautic\CoreBundle\Event\CustomContentEvent;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use MauticPlugin\CustomObjectsBundle\CustomObjectsBundle;
 
 class TabSubscriber extends CommonSubscriber
 {
@@ -31,21 +33,29 @@ class TabSubscriber extends CommonSubscriber
     private $customItemModel;
 
     /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
+    /**
      * @var CustomObject[]
      */
     private $customObjects = [];
 
     /**
-     * @param CustomObjectModel $customObjectModel
-     * @param CustomItemModel $customItemModel
+     * @param CustomObjectModel    $customObjectModel
+     * @param CustomItemModel      $customItemModel
+     * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(
         CustomObjectModel $customObjectModel,
-        CustomItemModel $customItemModel
+        CustomItemModel $customItemModel,
+        CoreParametersHelper $coreParametersHelper
     )
     {
-        $this->customObjectModel = $customObjectModel;
-        $this->customItemModel   = $customItemModel;
+        $this->customObjectModel    = $customObjectModel;
+        $this->customItemModel      = $customItemModel;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -63,6 +73,12 @@ class TabSubscriber extends CommonSubscriber
      */
     public function injectTabs(CustomContentEvent $event): void
     {
+        $isEnabled = $this->coreParametersHelper->getParameter(CustomObjectsBundle::CONFIG_PARAM_ENABLED);
+
+        if (!$isEnabled) {
+            return;
+        }
+
         if ($event->checkContext('MauticLeadBundle:Lead:lead.html.php', 'tabs')) {
             $vars    = $event->getVars();
             $objects = $this->getCustomObjects();
@@ -96,6 +112,9 @@ class TabSubscriber extends CommonSubscriber
     }
 
     /**
+     * Apart from fetching the custom object list this method also caches them to the memory and
+     * use the list from memory if called multiple times.
+     * 
      * @return CustomObject[]
      */
     private function getCustomObjects(): array

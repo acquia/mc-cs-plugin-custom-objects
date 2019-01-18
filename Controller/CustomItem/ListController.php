@@ -28,6 +28,7 @@ use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
+use MauticPlugin\CustomObjectsBundle\DTO\TableFilterConfig;
 
 class ListController extends CommonController
 {
@@ -127,11 +128,8 @@ class ListController extends CommonController
         }
         
         $tableConfig = new TableConfig($limit, $page, $orderBy, $orderByDir);
-        $tableConfig->addFilter(CustomItem::class, 'customObject', $objectId);
-
-        if ($contactId) {
-            $tableConfig->addFilter(CustomItemXrefContact::class, 'contact', $contactId);
-        }
+        $tableConfig->addFilter(new TableFilterConfig(CustomItem::class, 'customObject', $objectId));
+        $tableConfig->addFilterIfNotEmpty(new TableFilterConfig(CustomItemXrefContact::class, 'contact', $contactId));
 
         $this->session->set('mautic.custom.item.page', $page);
         $this->session->set('mautic.custom.item.limit', $limit);

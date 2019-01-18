@@ -50,7 +50,7 @@ class CustomItemXrefContact
     {
         $this->customItem = $customItem;
         $this->contact    = $contact;
-        $this->dateAdded  = $dateAdded ?: new DateTimeImmutable(new DateTimeZone('UTC'));
+        $this->dateAdded  = $dateAdded ?: new DateTimeImmutable('now', new DateTimeZone('UTC'));
     }
 
     /**

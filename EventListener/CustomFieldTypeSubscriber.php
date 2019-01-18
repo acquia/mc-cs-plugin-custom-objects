@@ -28,6 +28,9 @@ class CustomFieldTypeSubscriber extends CommonSubscriber
         $this->translator = $translator;
     }
 
+    /**
+     * @return array
+     */
     public static function getSubscribedEvents()
     {
         return [

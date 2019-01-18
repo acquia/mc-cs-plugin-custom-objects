@@ -18,6 +18,7 @@ use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use Doctrine\ORM\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Mautic\LeadBundle\Entity\Lead;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 
 class CustomItemRepository extends CommonRepository
 {
@@ -44,20 +45,21 @@ class CustomItemRepository extends CommonRepository
      */
     public function applyTableFilters(QueryBuilder $queryBuilder, TableConfig $tableConfig): QueryBuilder
     {
-        $aliases   = $queryBuilder->getAllAliases();
+        $metadata  = $this->getClassMetadata();
         $rootAlias = $queryBuilder->getRootAliases()[0];
         foreach ($tableConfig->getFilters() as $entityClass => $filters) {
             foreach ($filters as $filter) {
-                $alias = self::getAlias($entityClass);
-                if (!in_array($alias, $aliases)) {
-                    $queryBuilder->innerJoin($rootAlias.'.contactReferences', $alias);
+                if (!in_array($filter->getTableAlias(), $queryBuilder->getAllAliases())) {
+                    $cloumnNameArr = array_keys($metadata->getAssociationsByTargetClass($filter->getEntityName()));
+                    if (empty($cloumnNameArr[0])) {
+                        throw new \UnexpectedValueException("Entity {$this->getEntityName()} does not have association with {$filter->getEntityName()}");
+                    }
+                    $queryBuilder->innerJoin($rootAlias.'.'.$cloumnNameArr[0], $filter->getTableAlias());
                 }
                 $queryBuilder->andWhere(
-                    $queryBuilder->expr()->andX(
-                        $queryBuilder->expr()->{$filter['expr']}($alias.'.'.$filter['column'], ':'.$filter['column'])
-                    )
+                    $queryBuilder->expr()->{$filter->getExpression()}($filter->getTableAlias().'.'.$filter->getColumnName(), ':'.$filter->getColumnName())
                 );
-                $queryBuilder->setParameter($filter['column'], $filter['value']);
+                $queryBuilder->setParameter($filter->getColumnName(), $filter->getValue());
             }
         }
 
