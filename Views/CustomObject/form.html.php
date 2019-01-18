@@ -11,8 +11,6 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 
-echo $view['assets']->includeScript('plugins/CustomObjectsBundle/Assets/js/form.js', 'formOnLoad', 'formOnLoad');
-
 $view['slots']->set('mauticContent', 'customObject');
 
 if ($entity->getId()) {
