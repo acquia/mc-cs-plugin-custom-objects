@@ -112,7 +112,7 @@ class TabSubscriber extends CommonSubscriber
     }
 
     /**
-     * Apart from fetchin the custom object list this method also caches them to the memory and
+     * Apart from fetching the custom object list this method also caches them to the memory and
      * use the list from memory if called multiple times.
      * 
      * @return CustomObject[]

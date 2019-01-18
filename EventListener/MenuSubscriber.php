@@ -41,6 +41,9 @@ class MenuSubscriber extends CommonSubscriber
         $this->coreParametersHelper = $coreParametersHelper;
     }
 
+    /**
+     * @return array
+     */
     public static function getSubscribedEvents(): array
     {
         return [
