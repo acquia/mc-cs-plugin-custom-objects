@@ -46,7 +46,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
     /*
     *
-     * @var CustomFieldTypeInterface
+     * @var CustomFieldTypeInterface|null
      */
     private $type;
 
@@ -77,7 +77,6 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
         $builder->addId();
         $builder->addField('label', Type::STRING);
-        $builder->addField('type', Type::STRING);
     }
 
     /**
@@ -89,7 +88,6 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         $metadata->addPropertyConstraint('type', new Assert\NotBlank());
         $metadata->addPropertyConstraint('customObject', new Assert\NotBlank());
         $metadata->addPropertyConstraint('label', new Assert\Length(['max' => 255]));
-        $metadata->addPropertyConstraint('type', new Assert\Length(['max' => 255]));
     }
 
     /**
@@ -136,9 +134,9 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @return CustomFieldTypeInterface
+     * @return CustomFieldTypeInterface|null
      */
-    public function getType(): CustomFieldTypeInterface
+    public function getType(): ?CustomFieldTypeInterface
     {
         return $this->type;
     }
