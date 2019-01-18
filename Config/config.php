@@ -531,6 +531,7 @@ return [
                     'mautic.custom.model.field',
                     'custom_object.permission.provider',
                     'custom_object.route.provider',
+                    'custom_field.type.provider',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -773,6 +774,9 @@ return [
             ],
             'custom_object.custom_field_factory' => [
                 'class' =>\MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory::class,
+                'arguments' => [
+                    'custom_field.type.provider'
+                ]
             ]
         ],
     ],

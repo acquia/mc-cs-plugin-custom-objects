@@ -11,9 +11,23 @@
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
+
 class CustomFieldFactory
 {
-    private const CUSTOM_FIELD_CLASS_NAME_PATTERN = 'MauticPlugin\CustomObjectsBundle\CustomFieldType\%sType';
+    /**
+     * @var CustomFieldTypeProvider
+     */
+    private $customFieldTypeProvider;
+
+    /**
+     * @param CustomFieldTypeProvider $customFieldTypeProvider
+     */
+    public function __construct(CustomFieldTypeProvider $customFieldTypeProvider)
+    {
+        $this->customFieldTypeProvider = $customFieldTypeProvider;
+    }
 
     /**
      * @param string $type
@@ -24,11 +38,9 @@ class CustomFieldFactory
     {
         $customField = new CustomField();
 
-        $typeClass = sprintf(self::CUSTOM_FIELD_CLASS_NAME_PATTERN, ucfirst($type));
-
         try {
-            $type = new $typeClass('type');
-        } catch (\Error $e) {
+            $type = $this->customFieldTypeProvider->getType($type);
+        } catch (NotFoundException $e) {
             throw new \InvalidArgumentException(
                 sprintf("Undefined custom field type '%s'", $type)
             );

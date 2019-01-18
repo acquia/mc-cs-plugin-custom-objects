@@ -154,7 +154,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      */
     public function setCustomObject(CustomObject $customObject)
     {
-        $this->isChanged('customObject', $customObject->getId());
         $this->customObject = $customObject;
+        $this->isChanged('customObject', $customObject->getId());
     }
 }

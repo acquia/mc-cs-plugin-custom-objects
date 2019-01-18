@@ -91,7 +91,9 @@ class NewController extends CommonController
             return $this->notFound();
         }
 
-        $entity = $this->customFieldFactory->create($request->get('fieldType'));
+        $fieldType = $request->get('fieldType');
+
+        $entity = $this->customFieldFactory->create($fieldType);
         $entity->setCustomObject($customObject);
         $action = $this->routeProvider->buildSaveRoute();
         $form   = $this->formFactory->create(CustomFieldType::class, $entity, ['action' => $action]);
@@ -106,7 +108,7 @@ class NewController extends CommonController
                 'contentTemplate' => 'CustomObjectsBundle:CustomField:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customField',
-                    'route'         => $this->routeProvider->buildNewRoute(),
+                    'route'         => $this->routeProvider->buildNewRoute($customObject->getId(), $fieldType),
                 ],
             ]
         );

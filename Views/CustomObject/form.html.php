@@ -11,6 +11,8 @@
 
 $view->extend('MauticCoreBundle:Default:content.html.php');
 
+echo $view['assets']->includeScript('plugins/CustomObjectsBundle/Assets/js/form.js', 'formOnLoad', 'formOnLoad');
+
 $view['slots']->set('mauticContent', 'customObject');
 
 if ($entity->getId()) {
@@ -45,30 +47,25 @@ $view['slots']->set('headerTitle', $header);
         <hr>
 
         <div class="pa-md" id="fields-container">
-            <?php echo $view->render('MauticFormBundle:Builder:style.html.php'); ?>
-            <div id="mauticforms_fields">
+            <div id="mautic-customobject-fields">
                 <div class="row">
                     <div class="available-fields mb-md col-sm-4">
                         <select class="chosen form-builder-new-component" data-placeholder="<?php echo $view['translator']->trans('mautic.form.form.component.fields'); ?>">
                             <option value=""></option>
-                            <?php foreach ($availableFields as $field): ?>
+                            <?php foreach ($availableFieldTypes as $fieldType): ?>
 
                                 <option data-toggle="ajaxmodal"
-                                        data-target="#formComponentModal"
+                                        data-target="#objectFieldModal"
                                         data-href="<?php echo $view['router']->path(
-                                            'mautic_formfield_action',
+                                            'mautic_custom_field_new',
                                             [
-                                                'objectAction' => 'new',
-                                                'type'         => $field->getType(),
-                                                'tmpl'         => 'field',
-//                                                'formId'       => $formId,
-//                                                'inBuilder'    => $inBuilder,
+                                                'objectId'  => $entity->getId(),
+                                                'fieldType' => $fieldType->getKey(),
                                             ]
                                         ); ?>">
-                                    <?php echo $field->getLabel(); ?>
+                                    <?php echo $fieldType->getName(); ?>
                                 </option>
                             <?php endforeach; ?>
-
                         </select>
                     </div>
                 </div>
@@ -79,10 +76,10 @@ $view['slots']->set('headerTitle', $header);
                                 $params   = $field['customParameters'];
                                 $template = $params['template'];
                             else:
-                                $template = 'MauticFormBundle:Field:'.$field['type'].'.html.php';
+                                $template = 'CustomObjectBundle:Field:'.$field['type'].'.html.php';
                             endif; ?>
                             <?php echo $view->render(
-                                'MauticFormBundle:Builder:fieldwrapper.html.php',
+                                'CustomObjectBundle:Builder:fieldwrapper.html.php',
                                 [
                                     'template'      => $template,
                                     'field'         => $field,

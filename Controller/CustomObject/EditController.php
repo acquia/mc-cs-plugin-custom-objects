@@ -15,6 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
 use Mautic\CoreBundle\Controller\CommonController;
@@ -53,6 +54,11 @@ class EditController extends CommonController
     private $routeProvider;
 
     /**
+     * @var CustomFieldTypeProvider
+     */
+    private $customFieldTypeProvider;
+
+    /**
      * @param FormFactory                    $formFactory
      * @param CustomObjectModel              $customObjectModel
      * @param CustomFieldModel               $customFieldModel
@@ -64,7 +70,8 @@ class EditController extends CommonController
         CustomObjectModel $customObjectModel,
         CustomFieldModel $customFieldModel,
         CustomObjectPermissionProvider $permissionProvider,
-        CustomObjectRouteProvider $routeProvider
+        CustomObjectRouteProvider $routeProvider,
+        CustomFieldTypeProvider $customFieldTypeProvider
     )
     {
         $this->formFactory        = $formFactory;
@@ -72,6 +79,7 @@ class EditController extends CommonController
         $this->customFieldModel = $customFieldModel;
         $this->permissionProvider = $permissionProvider;
         $this->routeProvider      = $routeProvider;
+        $this->customFieldTypeProvider = $customFieldTypeProvider;
     }
 
     /**
@@ -90,7 +98,7 @@ class EditController extends CommonController
             $this->accessDenied(false, $e->getMessage());
         }
 
-        $fields = $this->customFieldModel->fetchCustomFieldsForObject($entity);
+        $availableFieldTypes = $this->customFieldTypeProvider->getTypes();
 
         $action = $this->routeProvider->buildSaveRoute($objectId);
         $form   = $this->formFactory->create(CustomObjectType::class, $entity, ['action' => $action]);
@@ -100,7 +108,7 @@ class EditController extends CommonController
                 'returnUrl'      => $this->routeProvider->buildListRoute(),
                 'viewParameters' => [
                     'entity' => $entity,
-                    'availableFields' => $fields,
+                    'availableFieldTypes' => $availableFieldTypes,
                     'formFields' => [],
                     'deletedFields' => [],
                     'form'   => $form->createView(),
