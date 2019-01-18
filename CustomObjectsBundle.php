@@ -46,6 +46,11 @@ class CustomObjectsBundle extends PluginBundleBase
      */
     public static function onPluginInstall(Plugin $plugin, MauticFactory $factory, $metadata = null, $installedSchema = null): void
     {
+        if (!$factory->getParameter('mautic.'.self::CONFIG_PARAM_ENABLED)) {
+            // Plugin disabled.
+            return;
+        }
+
         if ($installedSchema === true) {
             // Schema exists
             return;
@@ -57,15 +62,20 @@ class CustomObjectsBundle extends PluginBundleBase
     }
 
     /**
-    * @param Plugin        $plugin
-    * @param MauticFactory $factory
-    * @param array|null    $metadata
-    * @param Schema|null   $installedSchema
-    *
-    * @throws \Exception
-    */
+     * @param Plugin        $plugin
+     * @param MauticFactory $factory
+     * @param array|null    $metadata
+     * @param Schema|null   $installedSchema
+     *
+     * @throws \Exception
+     */
     public static function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, Schema $installedSchema = null): void
     {
+        if (!$factory->getParameter('mautic.'.self::CONFIG_PARAM_ENABLED)) {
+            // Plugin disabled.
+            return;
+        }
+
         $queries = [self::createIndexQueryIfDoesNotExist($installedSchema)];
         self::commit($factory->getDatabase(), $queries);
     }
