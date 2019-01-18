@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
-use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
@@ -39,11 +38,6 @@ class EditController extends CommonController
     private $customObjectModel;
 
     /**
-     * @var CustomFieldModel
-     */
-    private $customFieldModel;
-
-    /**
      * @var CustomObjectPermissionProvider
      */
     private $permissionProvider;
@@ -61,22 +55,19 @@ class EditController extends CommonController
     /**
      * @param FormFactory                    $formFactory
      * @param CustomObjectModel              $customObjectModel
-     * @param CustomFieldModel               $customFieldModel
      * @param CustomObjectPermissionProvider $permissionProvider
      * @param CustomObjectRouteProvider      $routeProvider
+     * @param CustomFieldTypeProvider        $customFieldTypeProvider
      */
     public function __construct(
         FormFactory $formFactory,
         CustomObjectModel $customObjectModel,
-        CustomFieldModel $customFieldModel,
         CustomObjectPermissionProvider $permissionProvider,
         CustomObjectRouteProvider $routeProvider,
         CustomFieldTypeProvider $customFieldTypeProvider
-    )
-    {
+    ){
         $this->formFactory        = $formFactory;
         $this->customObjectModel  = $customObjectModel;
-        $this->customFieldModel = $customFieldModel;
         $this->permissionProvider = $permissionProvider;
         $this->routeProvider      = $routeProvider;
         $this->customFieldTypeProvider = $customFieldTypeProvider;
