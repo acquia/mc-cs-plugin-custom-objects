@@ -108,7 +108,12 @@ class NewController extends CommonController
                 'contentTemplate' => 'CustomObjectsBundle:CustomField:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customField',
-                    'route'         => $this->routeProvider->buildNewRoute($customObject->getId(), $fieldType),
+                    'route'         => $this->routeProvider->buildNewRoute(
+                        [
+                            'objectId' => $customObject->getId(),
+                            'fieldType' => $fieldType,
+                        ]
+                    ),
                 ],
             ]
         );

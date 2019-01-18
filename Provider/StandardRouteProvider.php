@@ -50,20 +50,13 @@ abstract class StandardRouteProvider
     }
 
     /**
-     * @param int    $objectId
-     * @param string $fieldType
+     * @param array $params
      *
      * @return string
      */
-    public function buildNewRoute(int $objectId, string $fieldType): string
+    public function buildNewRoute(array $params = []): string
     {
-        return $this->router->generate(
-            static::ROUTE_NEW,
-            [
-                'objectId' => $objectId,
-                'fieldType' => $fieldType,
-            ]
-        );
+        return $this->router->generate(static::ROUTE_NEW, $params);
     }
 
     /**
