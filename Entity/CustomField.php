@@ -46,7 +46,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
     /*
     *
-     * @var CustomFieldTypeInterface|null
+     * @var CustomFieldTypeInterface
      */
     private $type;
 
@@ -134,9 +134,9 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @return CustomFieldTypeInterface|null
+     * @return CustomFieldTypeInterface
      */
-    public function getType(): ?CustomFieldTypeInterface
+    public function getType(): CustomFieldTypeInterface
     {
         return $this->type;
     }
