@@ -74,7 +74,7 @@ $view['slots']->set('headerTitle', $header);
                                 $params   = $field['customParameters'];
                                 $template = $params['template'];
                             else:
-                                $template = 'CustomObjectBundle:Field:'.$field['type'].'.html.php';
+                                $template = 'CustomObjectBundle:Field:field.'.$field['type'].'.html.php';
                             endif; ?>
                             <?php echo $view->render(
                                 'CustomObjectBundle:Builder:fieldwrapper.html.php',
@@ -112,3 +112,16 @@ $view['slots']->set('headerTitle', $header);
 </div>
 
 <?php echo $view['form']->end($form); ?>
+
+<?php
+$view['slots']->append(
+    'modal',
+    $view->render(
+        'MauticCoreBundle:Helper:modal.html.php',
+        [
+            'id'            => 'objectFieldModal',
+            'header'        => false,
+            'footerButtons' => true,
+        ]
+    )
+);
