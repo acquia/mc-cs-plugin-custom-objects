@@ -24,7 +24,7 @@ class CustomFieldTypeEvent extends Event
     private $customFieldTypes = [];
 
     /**
-     * @param CustomFieldTypeInterface
+     * @param CustomFieldTypeInterface $customFieldType
      */
     public function addCustomFieldType(CustomFieldTypeInterface $customFieldType): void
     {
