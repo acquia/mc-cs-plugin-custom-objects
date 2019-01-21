@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
@@ -91,24 +92,32 @@ class NewController extends CommonController
             return $this->notFound();
         }
 
-        $fieldType = $request->get('fieldType');
+        $success = false;
 
-        $entity = $this->customFieldFactory->create($fieldType);
-        $entity->setCustomObject($customObject);
+        if ($this->request->getMethod() === Request::METHOD_POST) {
+            throw new \RuntimeException('Not implemented');
+        } else {
+            // GET - create specified field type
+            $field = $this->customFieldFactory->create($request->get('fieldType'));
+            $field->setCustomObject($customObject);
+        }
+
         $action = $this->routeProvider->buildSaveRoute();
-        $form   = $this->formFactory->create(CustomFieldType::class, $entity, ['action' => $action]);
+        $form   = $this->formFactory->create(CustomFieldType::class, $field, ['action' => $action]);
 
         return $this->delegateView(
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute(),
                 'viewParameters' => [
-                    'entity' => $entity,
+                    'customObject' => $customObject,
+                    'field' => $field,
                     'form'   => $form->createView(),
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomField:form.html.php',
+                'contentTemplate' => "CustomObjectsBundle:CustomObject:Builder\\field.{$field->getType()->getKey()}.html.twig",
                 'passthroughVars' => [
                     'mauticContent' => 'customField',
-                    'route'         => $this->routeProvider->buildNewRoute($customObject, $fieldType),
+                    'route'         => $this->routeProvider->buildNewRoute($customObject, $field->getType()->getKey()),
+                    'success'       => $success
                 ],
             ]
         );
