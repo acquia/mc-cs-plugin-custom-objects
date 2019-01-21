@@ -28,7 +28,7 @@ class CustomFieldTypeEvent extends Event
      */
     public function addCustomFieldType(CustomFieldTypeInterface $customFieldType): void
     {
-        $this->customFieldTypes[$customFieldType->getKey()] = $customFieldType;;
+        $this->customFieldTypes[$customFieldType->getKey()] = $customFieldType;
     }
 
     /**
