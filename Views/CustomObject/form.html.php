@@ -13,10 +13,10 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 
 $view['slots']->set('mauticContent', 'customObject');
 
-if ($entity->getId()) {
+if ($customObject->getId()) {
     $header = $view['translator']->trans(
         'custom.object.edit',
-        ['%name%' => $view['translator']->trans($entity->getName())]
+        ['%name%' => $view['translator']->trans($customObject->getName())]
     );
 } else {
     $header = $view['translator']->trans('custom.object.new');
@@ -45,7 +45,7 @@ $view['slots']->set('headerTitle', $header);
         <hr>
 
         <div class="pa-md" id="fields-container">
-            <div id="mautic-customobject-fields">
+            <div id="mauticforms_fields">
                 <div class="row">
                     <div class="available-fields mb-md col-sm-4">
                         <select class="chosen form-builder-new-component" data-placeholder="<?php echo $view['translator']->trans('mautic.form.form.component.fields'); ?>">
@@ -57,7 +57,7 @@ $view['slots']->set('headerTitle', $header);
                                         data-href="<?php echo $view['router']->path(
                                             \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider::ROUTE_NEW,
                                             [
-                                                'objectId'  => $entity->getId(),
+                                                'objectId'  => $customObject->getId(),
                                                 'fieldType' => $fieldType->getKey(),
                                             ]
                                         ); ?>">
@@ -68,31 +68,18 @@ $view['slots']->set('headerTitle', $header);
                     </div>
                 </div>
                 <div class="drop-here">
-                    <?php foreach ($formFields as $field): ?>
-                        <?php if (!in_array($field['id'], $deletedFields)) : ?>
-                            <?php if (!empty($field['isCustom'])):
-                                $params   = $field['customParameters'];
-                                $template = $params['template'];
-                            else:
-                                $template = 'CustomObjectBundle:Field:field.'.$field['type'].'.html.php';
-                            endif; ?>
-                            <?php echo $view->render(
-                                'CustomObjectBundle:Builder:fieldwrapper.html.php',
-                                [
-                                    'template'      => $template,
-                                    'field'         => $field,
-                                    'inForm'        => true,
-                                    'id'            => $field['id'],
-//                                    'formId'        => $formId,
-//                                    'contactFields' => $contactFields,
-//                                    'companyFields' => $companyFields,
-//                                    'inBuilder'     => $inBuilder,
-                                ]
-                            ); ?>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
+                    <?php
+                        foreach ($customFields as $field):
+                            if (!in_array($field->getId(), $deletedFields)) :
+                                echo $view->render(
+                                    "CustomObjectsBundle:CustomObject:Fields\\field.{$field->getType()}.html.php",
+                                    ['field' => $field]
+                                );
+                            endif;
+                        endforeach;
+                    ?>
                 </div>
-                <?php if (!count($formFields)): ?>
+                <?php if (!count($customFields)): ?>
                     <div class="alert alert-info" id="form-field-placeholder">
                         <p><?php echo $view['translator']->trans('mautic.form.form.addfield'); ?></p>
                     </div>
