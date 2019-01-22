@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\DTO;
 
 use MauticPlugin\CustomObjectsBundle\DTO\TableFilterConfig;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
 class TableConfig
 {
@@ -112,5 +113,46 @@ class TableConfig
     public function getFilters(): array
     {
         return $this->filters;
+    }
+
+    /**
+     * @param string $entityName
+     * @param string $columnName
+     * 
+     * @return TableFilterConfig
+     * 
+     * @throws NotFoundException
+     */
+    public function getFilter(string $entityName, string $columnName): TableFilterConfig
+    {
+        if (empty($this->filters[$entityName])) {
+            throw new NotFoundException("No filter for entity {$entityName} exists");
+        }
+
+        foreach ($this->filters[$entityName] as $filter) {
+            if ($filter->getColumnName() === $columnName) {
+                return $filter;
+            }
+        }
+
+        throw new NotFoundException("Filter for entity {$entityName} and column {$columnName} does not exist");
+    }
+
+    /**
+     * @param string $entityName
+     * @param string $columnName
+     * 
+     * @return boolean
+     */
+    public function hasFilter(string $entityName, string $columnName): bool
+    {
+        try {
+            $this->getFilter($entityName, $columnName);
+
+            return true;
+        } catch (NotFoundException $e) {
+
+            return false;
+        }
     }
 }

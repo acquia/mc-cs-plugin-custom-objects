@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Mautic\CoreBundle\Helper\InputHelper;
@@ -22,8 +21,12 @@ use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use MauticPlugin\CustomObjectsBundle\DTO\TableFilterConfig;
+use MauticPlugin\CustomObjectsBundle\Controller\JsonController;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class LinkController extends Controller
+class LinkController extends JsonController
 {
     /**
      * @var CustomItemModel
@@ -36,16 +39,24 @@ class LinkController extends Controller
     private $permissionProvider;
 
     /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    /**
      * @param CustomItemModel $customItemModel
      * @param CustomItemPermissionProvider $permissionProvider
+     * @param TranslatorInterface $translator
      */
     public function __construct(
         CustomItemModel $customItemModel,
-        CustomItemPermissionProvider $permissionProvider
+        CustomItemPermissionProvider $permissionProvider,
+        TranslatorInterface $translator
     )
     {
         $this->customItemModel    = $customItemModel;
         $this->permissionProvider = $permissionProvider;
+        $this->translator         = $translator;
     }
 
     /**
@@ -55,14 +66,34 @@ class LinkController extends Controller
      * 
      * @return JsonResponse
      */
-    public function saveAction(int $itemId, string $entityType, int $entityId)
+    public function saveAction(int $itemId, string $entityType, int $entityId): JsonResponse
     {
         try {
             $this->permissionProvider->canViewAtAll();
+            $this->makeLinkBasedOnEntityType($itemId, $entityType, $entityId);
         } catch (ForbiddenException $e) {
             return new AccessDeniedException($e->getMessage(), $e);
+        } catch (UniqueConstraintViolationException $e) {
+            $this->addFlash('error', $this->translator->trans(
+                'custom.item.error.link.exists.already',
+                ['%itemId%' => $itemId, '%entityType%' => $entityType, '%entityId%' => $entityId],
+                'flashes'
+            ));
         }
 
+        return $this->renderJson();
+    }
+
+    /**
+     * @param integer $itemId
+     * @param string  $entityType
+     * @param integer $entityId
+     * 
+     * @throws \UnexpectedValueException
+     * @throws UniqueConstraintViolationException
+     */
+    private function makeLinkBasedOnEntityType(int $itemId, string $entityType, int $entityId): void
+    {
         switch ($entityType) {
             case 'contact':
                 $this->customItemModel->linkContact($itemId, $entityId);
@@ -71,8 +102,5 @@ class LinkController extends Controller
                 throw new \UnexpectedValueException("Entity {$entityType} cannot be linked to a custom item");
                 break;
         }
-
-
-        return new JsonResponse();
     }
 }

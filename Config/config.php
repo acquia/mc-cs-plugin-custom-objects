@@ -127,7 +127,7 @@ return [
                 'method'     => 'GET',
             ],
             CustomItemRouteProvider::ROUTE_LOOKUP => [
-                'path'       => '/custom/object/{objectId}/item.json',
+                'path'       => '/custom/object/{objectId}/item/lookup.json',
                 'controller' => 'CustomObjectsBundle:CustomItem\Lookup:list',
                 'method'     => 'GET',
             ],
@@ -469,6 +469,7 @@ return [
                 'arguments' => [
                     'mautic.custom.model.item',
                     'custom_item.permission.provider',
+                    'translator',
                 ],
                 'methodCalls' => [
                     'setContainer' => [

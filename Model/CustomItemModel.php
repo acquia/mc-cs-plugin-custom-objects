@@ -181,7 +181,7 @@ class CustomItemModel extends FormModel
         $queryBuilder = $this->customItemRepository->getTableDataQuery($tableConfig);
         $queryBuilder = $this->applyOwnerFilter($queryBuilder);
         $rootAlias    = $queryBuilder->getRootAliases()[0];
-        $queryBuilder->select("{$rootAlias}.name as value, {$rootAlias}.id");//
+        $queryBuilder->select("{$rootAlias}.name as value, {$rootAlias}.id");
 
         return array_values($queryBuilder->getQuery()->getArrayResult());
     }

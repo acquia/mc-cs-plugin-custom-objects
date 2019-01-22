@@ -22,13 +22,24 @@ CustomObjects = {
     initLinkInput: function(customObjectId, contactId) {
         let selector = CustomObjects.createTabSelector(customObjectId, '[data-toggle="typeahead"]');
         let input = mQuery(selector);
-        let url = mauticBaseUrl+'s/custom/object/'+customObjectId+'/item.json';
+
+        // Initialize only once
+        if (input.attr('data-typeahead-initialized')) {
+            return;
+        }
+
+        input.attr('data-typeahead-initialized', true);
+        console.log(input.attr('data-action'), input.attr('data-contact-id'))
+        let url = input.attr('data-action');
         let customItems = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value', 'id'),
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             remote: {
-                url: url+'?filter=%QUERY',
-                wildcard: '%QUERY'
+                url: url+'?filter=%QUERY&contactId='+input.attr('data-contact-id'),
+                wildcard: '%QUERY',
+                filter: function(response) {
+                    return response.items;
+                },
             }
         });
 
@@ -42,6 +53,7 @@ CustomObjects = {
             display: 'value',
             source: customItems.ttAdapter()
         }).bind('typeahead:selected', function(e, selectedItem) {
+            if (!selectedItem || !selectedItem.id) return;
             CustomObjects.linkContactWithCustomItem(contactId, selectedItem.id, function() {
                 CustomObjects.reloadItemsTable(customObjectId, contactId);
                 input.val('');
