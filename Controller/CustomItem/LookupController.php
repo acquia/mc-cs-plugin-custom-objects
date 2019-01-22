@@ -20,7 +20,6 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Mautic\CoreBundle\Helper\InputHelper;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\DTO\TableFilterConfig;
 use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Controller\JsonController;
@@ -75,9 +74,9 @@ class LookupController extends JsonController
         $nameFilter  = InputHelper::clean($request->get('filter'));
         $contactId   = (int) InputHelper::clean($request->get('contactId'));
         $tableConfig = new TableConfig(10, 1, 'CustomItem.name', 'ASC');
-        $tableConfig->addFilter(new TableFilterConfig(CustomItem::class, 'customObject', $objectId));
-        $tableConfig->addFilterIfNotEmpty(new TableFilterConfig(CustomItem::class, 'name', "%{$nameFilter}%", 'like'));
-        $tableConfig->addFilterIfNotEmpty(new TableFilterConfig(CustomItemXrefContact::class, 'contact', $contactId, 'neq'));
+        $tableConfig->addFilter(CustomItem::class, 'customObject', $objectId);
+        $tableConfig->addFilterIfNotEmpty(CustomItem::class, 'name', "%{$nameFilter}%", 'like');
+        $tableConfig->addFilterIfNotEmpty(CustomItemXrefContact::class, 'contact', $contactId, 'neq');
 
         return $this->renderJson(['items' => $this->customItemModel->getLookupData($tableConfig)]);
     }

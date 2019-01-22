@@ -84,26 +84,32 @@ class TableConfig
     }
 
     /**
-     * @param TableFilterConfig $tableFilterConfig
+     * @param string $entityName
+     * @param string $columnName
+     * @param mixed  $value
+     * @param string $expression
      */
-    public function addFilter(TableFilterConfig $tableFilterConfig): void
+    public function addFilter(string $entityName, string $columnName, $value, string $expression = 'eq'): void
     {
-        if (!isset($this->filters[$tableFilterConfig->getTableAlias()])) {
-            $this->filters[$tableFilterConfig->getTableAlias()] = [];
+        if (!isset($this->filters[$entityName])) {
+            $this->filters[$entityName] = [];
         }
 
-        $this->filters[$tableFilterConfig->getTableAlias()][] = $tableFilterConfig;
+        $this->filters[$entityName][] = new TableFilterConfig($entityName, $columnName, $value, $expression);
     }
 
     /**
      * Checks if the filter value is not empty before adding the filter.
      * 
-     * @param TableFilterConfig $tableFilterConfig
+     * @param string $entityName
+     * @param string $columnName
+     * @param mixed  $value
+     * @param string $expression
      */
-    public function addFilterIfNotEmpty(TableFilterConfig $tableFilterConfig): void
+    public function addFilterIfNotEmpty(string $entityName, string $columnName, $value, string $expression = 'eq'): void
     {
-        if (!empty($tableFilterConfig->getValue())) {
-            $this->addFilter($tableFilterConfig);
+        if (!empty($value)) {
+            $this->addFilter($entityName, $columnName, $value, $expression);
         }
     }
 
