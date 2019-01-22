@@ -68,14 +68,14 @@ class EditController extends CommonController
     }
 
     /**
-     * @param int $objectId
-     * 
+     * @param int $fieldId
+     *
      * @return Response|JsonResponse
      */
-    public function renderFormAction(int $objectId)
+    public function renderFormAction(int $fieldId)
     {
         try {
-            $entity = $this->customFieldModel->fetchEntity($objectId);
+            $entity = $this->customFieldModel->fetchEntity($fieldId);
             $this->permissionProvider->canEdit($entity);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
@@ -83,7 +83,7 @@ class EditController extends CommonController
             $this->accessDenied(false, $e->getMessage());
         }
 
-        $action  = $this->routeProvider->buildSaveRoute($objectId);
+        $action  = $this->routeProvider->buildSaveRoute($fieldId);
         $form    = $this->formFactory->create(CustomFieldType::class, $entity, ['action' => $action]);
 
         return $this->delegateView(
@@ -96,7 +96,7 @@ class EditController extends CommonController
                 'contentTemplate' => 'CustomObjectsBundle:CustomField:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customField',
-                    'route'         => $this->routeProvider->buildEditRoute($objectId),
+                    'route'         => $this->routeProvider->buildEditRoute($fieldId),
                 ],
             ]
         );

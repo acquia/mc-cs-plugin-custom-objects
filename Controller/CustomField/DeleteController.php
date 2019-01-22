@@ -60,14 +60,14 @@ class DeleteController extends CommonController
     }
 
     /**
-     * @param int $objectId
+     * @param int $fieldId
      * 
      * @return Response|JsonResponse
      */
-    public function deleteAction(int $objectId)
+    public function deleteAction(int $fieldId)
     {
         try {
-            $entity = $this->customFieldModel->fetchEntity($objectId);
+            $entity = $this->customFieldModel->fetchEntity($fieldId);
             $this->permissionProvider->canDelete($entity);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());

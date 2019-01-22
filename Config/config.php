@@ -45,7 +45,7 @@ return [
                 'method'     => 'GET|POST',
             ],
             CustomFieldRouteProvider::ROUTE_EDIT => [
-                'path'       => '/custom/field/edit/{objectId}',
+                'path'       => '/custom/field/edit/{fieldId}',
                 'controller' => 'CustomObjectsBundle:CustomField\Edit:renderForm',
                 'method'     => 'GET',
             ],
@@ -71,9 +71,9 @@ return [
                 ],
             ],
             CustomFieldRouteProvider::ROUTE_DELETE => [
-                'path'       => '/custom/field/delete/{objectId}',
+                'path'       => '/custom/field/delete/{fieldId}',
                 'controller' => 'CustomObjectsBundle:CustomField\Delete:delete',
-                'method'     => 'GET',
+                'method'     => 'GET|POST',
             ],
 
             // Custom Items
