@@ -26,6 +26,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\UniqueEntityInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Iterator\CustomFieldValues;
 use Doctrine\Common\Collections\ArrayCollection;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCompany;
 
 class CustomItem extends FormEntity implements UniqueEntityInterface
 {
@@ -64,6 +65,11 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     private $contactReferences;
 
+    /**
+     * @var ArrayCollection
+     */
+    private $companyReferences;
+
     public function __clone()
     {
         $this->id = null;
@@ -77,6 +83,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         $this->customObject      = $customObject;
         $this->customFieldValues = new ArrayCollection();
         $this->contactReferences = new ArrayCollection();
+        $this->companyReferences = new ArrayCollection();
     }
 
     /**
@@ -98,7 +105,12 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
             ->mappedBy('customItem')
             ->build();
 
-        $builder->addId();
+        $builder->createOneToMany('companyReferences', CustomItemXrefCompany::class)
+            ->addJoinColumn('custom_item_id', 'id', false, false, 'CASCADE')
+            ->mappedBy('customItem')
+            ->build();
+
+        $builder->addBigIntIdField();
         $builder->addCategory();
         $builder->addField('name', Type::STRING);
         $builder->addNullableField('language', Type::STRING, 'lang');
