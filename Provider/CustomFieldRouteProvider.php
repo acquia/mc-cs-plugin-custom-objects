@@ -43,6 +43,7 @@ class CustomFieldRouteProvider
     /**
      * @param int $page
      *
+     * @return string
      * @throws ForbiddenException
      */
     public function buildListRoute(int $page = 1): string
@@ -78,6 +79,7 @@ class CustomFieldRouteProvider
     /**
      * @param int $id
      *
+     * @return string
      * @throws ForbiddenException
      */
     public function buildViewRoute(int $id): string
@@ -88,16 +90,18 @@ class CustomFieldRouteProvider
     /**
      * @param int $id
      *
+     * @return string
      * @throws ForbiddenException
      */
     public function buildEditRoute(int $id): string
     {
-        return $this->router->generate(static::ROUTE_EDIT, ['objectId' => $id]);
+        return $this->router->generate(static::ROUTE_EDIT, ['fieldId' => $id]);
     }
 
     /**
      * @param int $id
      *
+     * @return string
      * @throws ForbiddenException
      */
     public function buildCloneRoute(int $id): string
@@ -108,6 +112,7 @@ class CustomFieldRouteProvider
     /**
      * @param int $id
      *
+     * @return string
      * @throws ForbiddenException
      */
     public function buildDeleteRoute(int $id): string
