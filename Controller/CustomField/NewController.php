@@ -124,7 +124,8 @@ class NewController extends CommonController
                 'passthroughVars' => [
                     'mauticContent' => 'customField',
                     'route'         => $route,
-                    'success'       => $success
+                    'success'       => $success,
+                    'closeModal'    => $success,
                 ],
             ]
         );
