@@ -35,15 +35,8 @@ $view['slots']->set('headerTitle', $header);
             <div class="row">
                 <div class="col-md-4">
                     <?php echo $view['form']->row($form['label']); ?>
-                    <?php echo $view['form']->row($form['type']); ?>
-                    <?php echo $view['form']->row($form['customObject']); ?>
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="col-md-3 bg-white height-auto">
-        <div class="pr-lg pl-lg pt-md pb-md">
-            <?php echo $view['form']->row($form['isPublished']); ?>
         </div>
     </div>
 </div>
