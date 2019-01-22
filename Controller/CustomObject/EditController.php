@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
+use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
@@ -38,6 +39,11 @@ class EditController extends CommonController
     private $customObjectModel;
 
     /**
+     * @var CustomFieldModel
+     */
+    private $customFieldModel;
+
+    /**
      * @var CustomObjectPermissionProvider
      */
     private $permissionProvider;
@@ -55,6 +61,7 @@ class EditController extends CommonController
     /**
      * @param FormFactory                    $formFactory
      * @param CustomObjectModel              $customObjectModel
+     * @param CustomFieldModel               $customFieldModel
      * @param CustomObjectPermissionProvider $permissionProvider
      * @param CustomObjectRouteProvider      $routeProvider
      * @param CustomFieldTypeProvider        $customFieldTypeProvider
@@ -62,12 +69,14 @@ class EditController extends CommonController
     public function __construct(
         FormFactory $formFactory,
         CustomObjectModel $customObjectModel,
+        CustomFieldModel $customFieldModel,
         CustomObjectPermissionProvider $permissionProvider,
         CustomObjectRouteProvider $routeProvider,
         CustomFieldTypeProvider $customFieldTypeProvider
     ){
         $this->formFactory        = $formFactory;
         $this->customObjectModel  = $customObjectModel;
+        $this->customFieldModel = $customFieldModel;
         $this->permissionProvider = $permissionProvider;
         $this->routeProvider      = $routeProvider;
         $this->customFieldTypeProvider = $customFieldTypeProvider;
@@ -81,8 +90,8 @@ class EditController extends CommonController
     public function renderFormAction(int $objectId)
     {
         try {
-            $entity = $this->customObjectModel->fetchEntity($objectId);
-            $this->permissionProvider->canEdit($entity);
+            $customObject = $this->customObjectModel->fetchEntity($objectId);
+            $this->permissionProvider->canEdit($customObject);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
@@ -92,15 +101,17 @@ class EditController extends CommonController
         $availableFieldTypes = $this->customFieldTypeProvider->getTypes();
 
         $action = $this->routeProvider->buildSaveRoute($objectId);
-        $form   = $this->formFactory->create(CustomObjectType::class, $entity, ['action' => $action]);
+        $form   = $this->formFactory->create(CustomObjectType::class, $customObject, ['action' => $action]);
+
+        $customFields = $this->customFieldModel->fetchCustomFieldsForObject($customObject);
 
         return $this->delegateView(
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute(),
                 'viewParameters' => [
-                    'entity' => $entity,
+                    'customObject' => $customObject,
                     'availableFieldTypes' => $availableFieldTypes,
-                    'formFields' => [],
+                    'customFields' => $customFields,
                     'deletedFields' => [],
                     'form'   => $form->createView(),
                 ],
