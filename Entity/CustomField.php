@@ -16,6 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Entity;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
 use DateTimeInterface;
@@ -69,7 +70,9 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
         $builder->setTable('custom_field')
             ->setCustomRepositoryClass(CustomFieldRepository::class)
-            ->addLifecycleEvent('prePersist', 'prePersist');
+            ->addLifecycleEvent('prePersist', 'prePersist')
+            ->addLifecycleEvent('postLoad', 'postLoad');
+
 
         $builder->createManyToOne('customObject', CustomObject::class)
             ->addJoinColumn('custom_object_id', 'id', false, false, 'CASCADE')
@@ -159,6 +162,16 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     {
         $this->customObject = $customObject;
         $this->isChanged('customObject', $customObject->getId());
+    }
+
+    /**
+     * Changes made on onPostFetch event
+     */
+    public function postLoad()
+    {
+        $customFieldTypeObjectName = '\MauticPlugin\CustomObjectsBundle\CustomFieldType\\'.ucfirst($this->type).'Type';
+        // @todo Name should be translated from CustomFieldTypeProvider
+        $this->type = new $customFieldTypeObjectName($this->type);
     }
 
     /**
