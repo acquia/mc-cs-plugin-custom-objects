@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType2;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
@@ -94,16 +94,18 @@ class NewController extends CommonController
 
         $success = false;
 
-        if ($this->request->getMethod() === Request::METHOD_POST) {
-            throw new \RuntimeException('Not implemented');
-        } else {
-            // GET - create specified field type
-            $field = $this->customFieldFactory->create($request->get('fieldType'));
-            $field->setCustomObject($customObject);
-        }
+        $field = $this->customFieldFactory->create($request->get('fieldType'));
+        $field->setCustomObject($customObject);
 
         $action = $this->routeProvider->buildSaveRoute();
         $form   = $this->formFactory->create(CustomFieldType::class, $field, ['action' => $action]);
+
+        if ($this->request->getMethod() === Request::METHOD_POST) {
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                $this->customObjectRepository->saveEntity($form->getData());
+            }
+        }
 
         return $this->delegateView(
             [

@@ -46,7 +46,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
     /*
     *
-     * @var CustomFieldTypeInterface
+     * @var CustomFieldTypeInterface|string
      */
     private $type;
 
@@ -68,7 +68,8 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('custom_field')
-            ->setCustomRepositoryClass(CustomFieldRepository::class);
+            ->setCustomRepositoryClass(CustomFieldRepository::class)
+            ->addLifecycleEvent('prePersist', 'prePersist');
 
         $builder->createManyToOne('customObject', CustomObject::class)
             ->addJoinColumn('custom_object_id', 'id', false, false, 'CASCADE')
@@ -77,6 +78,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
         $builder->addId();
         $builder->addField('label', Type::STRING);
+        $builder->addField('type', Type::STRING);
     }
 
     /**
@@ -85,9 +87,10 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('label', new Assert\NotBlank());
-        $metadata->addPropertyConstraint('type', new Assert\NotBlank());
-        $metadata->addPropertyConstraint('customObject', new Assert\NotBlank());
         $metadata->addPropertyConstraint('label', new Assert\Length(['max' => 255]));
+        $metadata->addPropertyConstraint('type', new Assert\NotBlank());
+        $metadata->addPropertyConstraint('type', new Assert\Length(['max' => 255]));
+        $metadata->addPropertyConstraint('customObject', new Assert\NotBlank());
     }
 
     /**
@@ -134,9 +137,9 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @return CustomFieldTypeInterface
+     * @return CustomFieldTypeInterface|string
      */
-    public function getType(): CustomFieldTypeInterface
+    public function getType()
     {
         return $this->type;
     }
@@ -156,5 +159,13 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     {
         $this->customObject = $customObject;
         $this->isChanged('customObject', $customObject->getId());
+    }
+
+    /**
+     * Changes to made before persisting entity
+     */
+    public function prePersist()
+    {
+        $this->type = $this->type->getKey();
     }
 }

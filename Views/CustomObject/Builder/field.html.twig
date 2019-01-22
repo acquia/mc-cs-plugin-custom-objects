@@ -2,7 +2,7 @@
     <div class="bundle-form-header">
         <h3 class="mb-lg">{{ field.type.name }}</h3>
     </div>
-    <form novalidate autocomplete="false" data-toggle="ajax" role="form" name="formfield" method="post" action="/index_dev.php/s/forms/field/new">
+    <form novalidate autocomplete="false" data-toggle="ajax" role="form" name="formfield" method="post" action="{{ path('mautic_custom_field_new', {objectId : customObject.id, fieldType : field.type.key}) }}">
         <div class="tab-content pa-lg">
             <div role="tabpanel" class="tab-pane active" id="general">
                 <div class="row">
@@ -11,18 +11,6 @@
                             <div class="form-group col-xs-12">
                                 {{ form_row(form.label) }}
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="row">
-                            <div class="form-group col-xs-12">
-                                {{ form_row(form.type) }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="row">
-                            {{ form_row(form.customObject) }}
                         </div>
                     </div>
                 </div>
@@ -34,5 +22,6 @@
             <button type="submit" id="formfield_buttons_save" name="formfield[buttons][save]" class="btn btn-default btn-save"> <i class="fa fa-plus "></i> Add</button>
         </div>
         <input type="hidden" id="formfield_formId" name="formfield[formId]" autocomplete="false" value="1" />
+        {{ form_rest(form) }}
     </form>
 </div>

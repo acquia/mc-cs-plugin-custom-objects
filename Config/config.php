@@ -42,7 +42,7 @@ return [
             CustomFieldRouteProvider::ROUTE_NEW => [
                 'path'       => '/custom/field/new/{objectId}/{fieldType}',
                 'controller' => 'CustomObjectsBundle:CustomField\New:renderForm',
-                'method'     => 'GET',
+                'method'     => 'GET|POST',
             ],
             CustomFieldRouteProvider::ROUTE_EDIT => [
                 'path'       => '/custom/field/edit/{objectId}',
@@ -716,10 +716,6 @@ return [
             ],
             'custom_field.field.form' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType::class,
-                'arguments' => [
-                    'mautic.custom.model.object',
-                    'custom_field.type.provider',
-                ],
             ],
             'custom_field.field.value.form' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldValueType::class,
