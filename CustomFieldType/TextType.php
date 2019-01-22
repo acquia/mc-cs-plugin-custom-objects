@@ -21,6 +21,8 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 
 class TextType implements CustomFieldTypeInterface
 {
+    const KEY = 'text';
+
     /**
      * @var string
      */
@@ -47,7 +49,7 @@ class TextType implements CustomFieldTypeInterface
      */
     public function getKey(): string
     {
-        return 'text';
+        return self::KEY;
     }
 
     /**

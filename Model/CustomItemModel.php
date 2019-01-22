@@ -113,12 +113,12 @@ class CustomItemModel extends FormModel
 
         $this->entityManager->persist($entity);
 
-        if ($entity->isNew()) {
-            $this->entityManager->flush();
-        }
-
         foreach ($entity->getCustomFieldValues() as $value) {
             $this->entityManager->persist($value);
+        }
+
+        foreach ($entity->getContactReferences() as $reference) {
+            $this->entityManager->persist($reference);
         }
 
         $this->entityManager->flush();

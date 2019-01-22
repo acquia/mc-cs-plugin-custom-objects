@@ -32,6 +32,12 @@ If you need to turn off the plugin without removing the plugin completelly, plac
 
 If the plugin is disabled before the plugin is installed then the row to the `plugins` table will be created, but the tables that the plugin normally creates on install won't be created. When you enable the plugin again you have to delete the row in the `plugins` table and then hit the install button/command again. The tables will be created.
 
+## Commands
+
+### `mautic:customobjects:generatesampledata --object-id=X --limit=Y`
+
+The main purpose of this command is to generate big enough sample data to perform performance tests. Will generate Y randomly-named custom items for an existing custom object X. It will put some random value to all its cusom fields and it will generate 0 to 10 randomly-named contacts and connects them to the custom item.
+
 ## Unit tests
 
 With this command you can run the plugin unit tests:

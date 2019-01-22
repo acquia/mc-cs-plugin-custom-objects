@@ -71,6 +71,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
         $builder->createManyToOne('customObject', CustomObject::class)
             ->addJoinColumn('custom_object_id', 'id', false, false, 'CASCADE')
+            ->inversedBy('fields')
             ->fetchExtraLazy()
             ->build();
 

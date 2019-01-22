@@ -27,6 +27,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Iterator\CustomFieldValues;
 use Doctrine\Common\Collections\ArrayCollection;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCompany;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 
 class CustomItem extends FormEntity implements UniqueEntityInterface
 {
@@ -192,6 +193,14 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     }
 
     /**
+     * @param CustomFieldValueInterface $customFieldValue
+     */
+    public function addCustomFieldValue(CustomFieldValueInterface $customFieldValue)
+    {
+        $this->customFieldValues->add($customFieldValue);
+    }
+
+    /**
      * @return ArrayCollection
      */
     public function getCustomFieldValues()
@@ -201,6 +210,14 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         }
         
         return $this->customFieldValues;
+    }
+
+    /**
+     * @param CustomItemXrefContact $reference
+     */
+    public function addContactReference(CustomItemXrefContact $reference)
+    {
+        $this->contactReferences->add($reference);
     }
 
     /**

@@ -41,16 +41,14 @@ class CustomFieldValueDateTime extends CustomFieldValueStandard
     }
 
     /**
-     * Doctrine doesn't support prefix indexes. It's being added in the updatePluginSchema method.
-     * $builder->addIndex(['value(64)'], 'value_index');
-     * 
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata)
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable('custom_field_value_text');
-        $builder->addNullableField('value', Type::TEXT);
+        $builder->setTable('custom_field_value_datetime');
+        $builder->addIndex(['value'], 'value_index');
+        $builder->addNullableField('value', Type::DATETIME);
         
         parent::addReferenceColumns($builder);
     }

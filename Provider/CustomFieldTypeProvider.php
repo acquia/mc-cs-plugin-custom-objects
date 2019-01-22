@@ -13,17 +13,16 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Provider;
 
-use Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher;
 use MauticPlugin\CustomObjectsBundle\CustomFieldEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomFieldTypeEvent;
-use Symfony\Component\EventDispatcher\Debug\TraceableEventDispatcherInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CustomFieldTypeProvider
 {
     /**
-     * @var TraceableEventDispatcherInterface
+     * @var EventDispatcherInterface
      */
     private $dispatcher;
 
@@ -33,9 +32,9 @@ class CustomFieldTypeProvider
     private $customFieldTypes = [];
 
     /**
-     * @param TraceableEventDispatcherInterface $dispatcher
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function __construct(TraceableEventDispatcherInterface $dispatcher)
+    public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
