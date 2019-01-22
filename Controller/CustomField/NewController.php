@@ -92,10 +92,13 @@ class NewController extends CommonController
             return $this->notFound();
         }
 
-        $success = false;
+        $success = 0;
 
         $field = $this->customFieldFactory->create($request->get('fieldType'));
         $field->setCustomObject($customObject);
+
+        $route = $this->routeProvider->buildNewRoute($customObject, $field->getType()->getKey());
+        $template = "CustomObjectsBundle:CustomObject:Builder\\field.{$field->getType()->getKey()}.html.twig";
 
         $action = $this->routeProvider->buildSaveRoute();
         $form   = $this->formFactory->create(CustomFieldType::class, $field, ['action' => $action]);
@@ -104,6 +107,8 @@ class NewController extends CommonController
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
                 $this->customObjectRepository->saveEntity($form->getData());
+                $success = 1;
+                $route = $template = "";
             }
         }
 
@@ -115,10 +120,10 @@ class NewController extends CommonController
                     'field' => $field,
                     'form'   => $form->createView(),
                 ],
-                'contentTemplate' => "CustomObjectsBundle:CustomObject:Builder\\field.{$field->getType()->getKey()}.html.twig",
+                'contentTemplate' => $template,
                 'passthroughVars' => [
                     'mauticContent' => 'customField',
-                    'route'         => $this->routeProvider->buildNewRoute($customObject, $field->getType()->getKey()),
+                    'route'         => $route,
                     'success'       => $success
                 ],
             ]
