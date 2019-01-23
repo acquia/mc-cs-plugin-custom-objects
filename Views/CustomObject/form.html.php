@@ -45,6 +45,7 @@ $view['slots']->set('headerTitle', $header);
         <hr>
 
         <div class="pa-md" id="fields-container">
+            <?php echo $view->render('MauticFormBundle:Builder:style.html.php'); ?>
             <div id="mauticforms_fields">
                 <div class="row">
                     <div class="available-fields mb-md col-sm-4">
