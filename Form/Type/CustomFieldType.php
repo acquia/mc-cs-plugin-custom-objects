@@ -41,13 +41,13 @@ class CustomFieldType extends AbstractType
             ]
         );
 
-//        $builder->add(
-//            'buttons',
-//            FormButtonsType::class,
-//            [
-//                'cancel_onclick' => "mQuery('form[name=custom_field]').attr('method', 'get').attr('action', mQuery('form[name=custom_field]').attr('action').replace('/save', '/cancel'));",
-//            ]
-//        );
+        $builder->add(
+            'buttons',
+            FormButtonsType::class,
+            [
+                'cancel_onclick' => "mQuery('form[name=custom_field]').attr('method', 'get').attr('action', mQuery('form[name=custom_field]').attr('action').replace('/save', '/cancel'));",
+            ]
+        );
 
         $builder->setAction($options['action']);
     }
