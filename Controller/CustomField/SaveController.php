@@ -176,18 +176,4 @@ class SaveController extends CommonController
 
         return $this->forward('custom_field.edit_controller:renderFormAction', $params);
     }
-
-    /**
-     * @param Request     $request
-     * @param CustomField $entity
-     * 
-     * @return Response
-     */
-    private function redirectToDetail(Request $request, CustomField $entity): Response
-    {
-        $request->setMethod('GET');
-        $params = ['fieldId' => $entity->getId()];
-
-        return $this->forward('CustomObjectsBundle:CustomField\View:view', $params);
-    }
 }
