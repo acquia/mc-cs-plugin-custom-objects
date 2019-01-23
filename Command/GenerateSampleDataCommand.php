@@ -150,7 +150,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         for ($i = 1; $i <= $limit; $i++) {
             $customItem = $this->generateCustomItem($customObject);
             $customItem = $this->generateCustomFieldValues($customItem, $customObject);
-            $customItem = $this->generateContactReference($customItem);
+            $customItem = $this->generateContactReferences($customItem);
             $this->customItemModel->save($customItem);
             $this->clearMemory($customItem);
             $progress->advance();
@@ -158,9 +158,9 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
 
 
         $progress->finish();
-        $runTime = number_format(microtime(true) - $startTime, 3);
+        $runTime = gmdate('H:i:s', microtime(true) - $startTime);
 
-        $io->success("Execution time: {$runTime} seconds");
+        $io->success("Execution time: {$runTime}");
 
         return 0;
     }
@@ -206,7 +206,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
      * 
      * @return CustomItem
      */
-    private function generateContactReference(CustomItem $customItem): CustomItem
+    private function generateContactReferences(CustomItem $customItem): CustomItem
     {
         for ($i = 1; $i <= rand(0, 10); $i++) {
             $contact   = new Lead();
