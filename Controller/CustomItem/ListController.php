@@ -141,6 +141,7 @@ class ListController extends CommonController
                     'searchValue'    => $search,
                     'customObject'   => $customObject,
                     'items'          => $this->customItemModel->getTableData($tableConfig),
+                    'itemCount'      => $this->customItemModel->getCountForTable($tableConfig),
                     'page'           => $page,
                     'limit'          => $limit,
                     'tmpl'           => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',

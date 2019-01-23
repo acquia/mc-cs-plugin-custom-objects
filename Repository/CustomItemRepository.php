@@ -40,6 +40,20 @@ class CustomItemRepository extends CommonRepository
     }
 
     /**
+     * @param TableConfig $tableConfig
+     * 
+     * @return QueryBuilder
+     */
+    public function getTableCountQuery(TableConfig $tableConfig): QueryBuilder
+    {
+        $alias        = self::getAlias();
+        $queryBuilder = $this->createQueryBuilder($alias, $alias.'.id');
+        $queryBuilder->select("COUNT({$alias}) AS theCount");
+
+        return $this->applyTableFilters($queryBuilder, $tableConfig);
+    }
+
+    /**
      * @param QueryBuilder $queryBuilder
      * @param TableConfig $tableConfig
      * 

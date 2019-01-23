@@ -85,7 +85,7 @@ if ($tmpl == 'index') {
         <?php echo $view->render(
             'MauticCoreBundle:Helper:pagination.html.php',
             [
-                'totalItems' => count($items),
+                'totalItems' => $itemCount,
                 'page'       => $page,
                 'limit'      => $limit,
                 'baseUrl'    => $view['router']->path(CustomItemRouteProvider::ROUTE_LIST),

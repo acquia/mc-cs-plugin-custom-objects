@@ -174,6 +174,19 @@ class CustomItemModel extends FormModel
     /**
      * @param TableConfig $tableConfig
      * 
+     * @return integer
+     */
+    public function getCountForTable(TableConfig $tableConfig): int
+    {
+        $queryBuilder = $this->customItemRepository->getTableCountQuery($tableConfig);
+        $queryBuilder = $this->applyOwnerFilter($queryBuilder);
+
+        return (int) $queryBuilder->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * @param TableConfig $tableConfig
+     * 
      * @return array
      */
     public function getLookupData(TableConfig $tableConfig): array
