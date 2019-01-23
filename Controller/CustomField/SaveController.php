@@ -130,7 +130,15 @@ class SaveController extends CommonController
             );
 
             if ($form->get('buttons')->get('save')->isClicked()) {
-                return $this->redirectToDetail($request, $field);
+                // Close modal
+                return $this->delegateView(
+                    [
+                        'passthroughVars' => [
+                            'success'       => 1,
+                            'closeModal'    => 1,
+                        ],
+                    ]
+                );
             } else {
                 return $this->redirectToEdit($request, $field);
             }
