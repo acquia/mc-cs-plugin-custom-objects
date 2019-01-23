@@ -690,6 +690,17 @@ return [
                     'translator',
                 ],
             ],
+            'custom_field.subscriber' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldSubscriber::class,
+                'arguments' => [
+                    'custom_field.type.provider',
+                ],
+                'tag' => 'doctrine.event_listener',
+                'tagArguments' => [
+                    'event' => 'postLoad',
+                    'lazy' => true,
+                ]
+            ],
             'custom_field.button.subscriber' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldButtonSubscriber::class,
                 'arguments' => [

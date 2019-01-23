@@ -69,9 +69,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('custom_field')
-            ->setCustomRepositoryClass(CustomFieldRepository::class)
-            ->addLifecycleEvent('prePersist', 'prePersist')
-            ->addLifecycleEvent('postLoad', 'postLoad');
+            ->setCustomRepositoryClass(CustomFieldRepository::class);
 
 
         $builder->createManyToOne('customObject', CustomObject::class)
@@ -132,9 +130,9 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param CustomFieldTypeInterface $type
+     * @param CustomFieldTypeInterface|string $type
      */
-    public function setType(CustomFieldTypeInterface $type)
+    public function setType($type): void
     {
         $this->type = $type;
     }
@@ -162,23 +160,5 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     {
         $this->customObject = $customObject;
         $this->isChanged('customObject', $customObject->getId());
-    }
-
-    /**
-     * Changes made on onPostFetch event
-     */
-    public function postLoad()
-    {
-        $customFieldTypeObjectName = '\MauticPlugin\CustomObjectsBundle\CustomFieldType\\'.ucfirst($this->type).'Type';
-        // @todo Name should be translated from CustomFieldTypeProvider
-        $this->type = new $customFieldTypeObjectName($this->type);
-    }
-
-    /**
-     * Changes to made before persisting entity
-     */
-    public function prePersist()
-    {
-        $this->type = $this->type->getKey();
     }
 }
