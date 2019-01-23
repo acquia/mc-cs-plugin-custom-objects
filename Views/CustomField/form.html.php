@@ -13,10 +13,10 @@ $view->extend('MauticCoreBundle:Default:content.html.php');
 
 $view['slots']->set('mauticContent', 'customField');
 
-if ($entity->getId()) {
+if ($customField->getId()) {
     $header = $view['translator']->trans(
         'custom.field.edit',
-        ['%name%' => $view['translator']->trans($entity->getName())]
+        ['%name%' => $view['translator']->trans($customField->getName())]
     );
 } else {
     $header = $view['translator']->trans('custom.field.new');

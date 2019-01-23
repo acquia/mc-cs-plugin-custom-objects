@@ -75,8 +75,8 @@ class EditController extends CommonController
     public function renderFormAction(int $fieldId)
     {
         try {
-            $entity = $this->customFieldModel->fetchEntity($fieldId);
-            $this->permissionProvider->canEdit($entity);
+            $customField = $this->customFieldModel->fetchEntity($fieldId);
+            $this->permissionProvider->canEdit($customField);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
@@ -84,13 +84,13 @@ class EditController extends CommonController
         }
 
         $action  = $this->routeProvider->buildSaveRoute($fieldId);
-        $form    = $this->formFactory->create(CustomFieldType::class, $entity, ['action' => $action]);
+        $form    = $this->formFactory->create(CustomFieldType::class, $customField, ['action' => $action]);
 
         return $this->delegateView(
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute(),
                 'viewParameters' => [
-                    'entity' => $entity,
+                    'customField' => $customField,
                     'form'   => $form->createView(),
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomField:form.html.php',
