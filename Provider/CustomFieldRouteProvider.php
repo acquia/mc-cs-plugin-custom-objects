@@ -73,7 +73,7 @@ class CustomFieldRouteProvider
      */
     public function buildSaveRoute(?int $id = null): string
     {
-        return $this->router->generate(static::ROUTE_SAVE, ['objectId' => $id]);
+        return $this->router->generate(static::ROUTE_SAVE, ['fieldId' => $id]);
     }
 
     /**
@@ -84,7 +84,7 @@ class CustomFieldRouteProvider
      */
     public function buildViewRoute(int $id): string
     {
-        return $this->router->generate(static::ROUTE_VIEW, ['objectId' => $id]);
+        return $this->router->generate(static::ROUTE_VIEW, ['fieldId' => $id]);
     }
 
     /**
@@ -117,6 +117,6 @@ class CustomFieldRouteProvider
      */
     public function buildDeleteRoute(int $id): string
     {
-        return $this->router->generate(static::ROUTE_DELETE, ['objectId' => $id]);
+        return $this->router->generate(static::ROUTE_DELETE, ['fieldId' => $id]);
     }
 }

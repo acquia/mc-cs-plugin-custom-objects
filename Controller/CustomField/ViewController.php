@@ -59,14 +59,14 @@ class ViewController extends CommonController
     }
 
     /**
-     * @param int $objectId
+     * @param int $fieldId
      * 
      * @return Response|JsonResponse
      */
-    public function viewAction(int $objectId)
+    public function viewAction(int $fieldId)
     {
         try {
-            $entity = $this->customFieldModel->fetchEntity($objectId);
+            $entity = $this->customFieldModel->fetchEntity($fieldId);
             $this->permissionProvider->canView($entity);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
@@ -74,7 +74,7 @@ class ViewController extends CommonController
             $this->accessDenied(false, $e->getMessage());
         }
 
-        $route = $this->routeProvider->buildViewRoute($objectId);
+        $route = $this->routeProvider->buildViewRoute($fieldId);
 
         return $this->delegateView(
             [

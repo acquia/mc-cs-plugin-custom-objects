@@ -35,7 +35,7 @@ return [
                 ],
             ],
             CustomFieldRouteProvider::ROUTE_VIEW => [
-                'path'       => '/custom/field/view/{objectId}',
+                'path'       => '/custom/field/view/{fieldId}',
                 'controller' => 'CustomObjectsBundle:CustomField\View:view',
                 'method'     => 'GET',
             ],
@@ -55,7 +55,7 @@ return [
                 'method'     => 'GET',
             ],
             CustomFieldRouteProvider::ROUTE_CANCEL => [
-                'path'       => '/custom/field/cancel/{objectId}',
+                'path'       => '/custom/field/cancel/{fieldId}',
                 'controller' => 'CustomObjectsBundle:CustomField\Cancel:cancel',
                 'method'     => 'GET',
                 'defaults'   => [
@@ -63,7 +63,7 @@ return [
                 ],
             ],
             CustomFieldRouteProvider::ROUTE_SAVE => [
-                'path'       => '/custom/field/save/{objectId}',
+                'path'       => '/custom/field/save/{fieldId}',
                 'controller' => 'CustomObjectsBundle:CustomField\Save:save',
                 'method'     => 'POST',
                 'defaults'   => [

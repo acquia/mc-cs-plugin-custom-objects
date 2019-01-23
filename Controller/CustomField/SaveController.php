@@ -90,18 +90,18 @@ class SaveController extends CommonController
     }
 
     /**
-     * @param int|null $objectId
+     * @param int|null $fieldId
      * 
      * @return Response|JsonResponse
      */
-    public function saveAction(?int $objectId = null)
+    public function saveAction(?int $fieldId = null)
     {
         try {
-            $entity = $objectId ? $this->customFieldModel->fetchEntity($objectId): new CustomField();
-            if ($entity->isNew()) {
+            $field = $fieldId ? $this->customFieldModel->fetchEntity($fieldId): new CustomField();
+            if ($field->isNew()) {
                 $this->permissionProvider->canCreate();
             } else {
-                $this->permissionProvider->canEdit($entity);
+                $this->permissionProvider->canEdit($field);
             }
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
@@ -110,39 +110,39 @@ class SaveController extends CommonController
         }
 
         $request = $this->requestStack->getCurrentRequest();
-        $action  = $this->routeProvider->buildSaveRoute($objectId);
-        $form    = $this->formFactory->create(CustomFieldType::class, $entity, ['action' => $action]);
+        $action  = $this->routeProvider->buildSaveRoute($fieldId);
+        $form    = $this->formFactory->create(CustomFieldType::class, $field, ['action' => $action]);
         $form->handleRequest($request);
         
         if ($form->isValid()) {
-            $this->customFieldModel->save($entity);
+            $this->customFieldModel->save($field);
 
             $this->session->getFlashBag()->add(
                 'notice',
                 $this->translator->trans(
-                    $objectId ? 'mautic.core.notice.updated' : 'mautic.core.notice.created',
+                    $fieldId ? 'mautic.core.notice.updated' : 'mautic.core.notice.created',
                     [
-                        '%name%' => $entity->getName(),
-                        '%url%'  => $this->routeProvider->buildEditRoute($objectId),
+                        '%name%' => $field->getName(),
+                        '%url%'  => $this->routeProvider->buildEditRoute($fieldId),
                     ], 
                     'flashes'
                 )
             );
 
             if ($form->get('buttons')->get('save')->isClicked()) {
-                return $this->redirectToDetail($request, $entity);
+                return $this->redirectToDetail($request, $field);
             } else {
-                return $this->redirectToEdit($request, $entity);
+                return $this->redirectToEdit($request, $field);
             }
         }
 
-        $route = $objectId ? $this->routeProvider->buildEditRoute($objectId) : $this->routeProvider->buildNewRoute();
+        $route = $fieldId ? $this->routeProvider->buildEditRoute($fieldId) : $this->routeProvider->buildNewRoute();
 
         return $this->delegateView(
             [
                 'returnUrl'      => $route,
                 'viewParameters' => [
-                    'entity' => $entity,
+                    'field' => $field,
                     'form'   => $form->createView(),
                     'tmpl'   => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                 ],
@@ -164,7 +164,7 @@ class SaveController extends CommonController
     private function redirectToEdit(Request $request, CustomField $entity): Response
     {
         $request->setMethod('GET');
-        $params = ['objectId' => $entity->getId()];
+        $params = ['fieldId' => $entity->getId()];
 
         return $this->forward('custom_field.edit_controller:renderFormAction', $params);
     }
@@ -178,7 +178,7 @@ class SaveController extends CommonController
     private function redirectToDetail(Request $request, CustomField $entity): Response
     {
         $request->setMethod('GET');
-        $params = ['objectId' => $entity->getId()];
+        $params = ['fieldId' => $entity->getId()];
 
         return $this->forward('CustomObjectsBundle:CustomField\View:view', $params);
     }
