@@ -84,6 +84,14 @@ class TableConfig
     }
 
     /**
+     * @return integer
+     */
+    public function getLimit(): int
+    {
+        return $this->limit;
+    }
+
+    /**
      * @param string $entityName
      * @param string $columnName
      * @param mixed  $value

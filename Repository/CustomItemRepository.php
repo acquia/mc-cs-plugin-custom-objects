@@ -32,6 +32,8 @@ class CustomItemRepository extends CommonRepository
         $alias        = self::getAlias();
         $queryBuilder = $this->createQueryBuilder($alias, $alias.'.id');
         $queryBuilder->select($alias);
+        $queryBuilder->setMaxResults($tableConfig->getLimit());
+        $queryBuilder->setFirstResult($tableConfig->getOffset());
         $queryBuilder->orderBy($tableConfig->getOrderBy(), $tableConfig->getOrderDirection());
 
         return $this->applyTableFilters($queryBuilder, $tableConfig);
