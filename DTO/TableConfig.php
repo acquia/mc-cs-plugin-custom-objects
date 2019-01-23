@@ -15,6 +15,9 @@ namespace MauticPlugin\CustomObjectsBundle\DTO;
 
 use MauticPlugin\CustomObjectsBundle\DTO\TableFilterConfig;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use Doctrine\ORM\QueryBuilder;
+use MauticPlugin\CustomObjectsBundle\Helper\TableQueryBuilder;
+use Doctrine\ORM\Mapping\ClassMetadata;
 
 class TableConfig
 {
@@ -99,11 +102,29 @@ class TableConfig
      */
     public function addFilter(string $entityName, string $columnName, $value, string $expression = 'eq'): void
     {
-        if (!isset($this->filters[$entityName])) {
-            $this->filters[$entityName] = [];
+        $this->addFilterDTO($this->createFilter($entityName, $columnName, $value, $expression));
+    }
+
+    public function addFilterDTO(TableFilterConfig $tableFilterConfig): void
+    {
+        if (!isset($this->filters[$tableFilterConfig->getEntityName()])) {
+            $this->filters[$tableFilterConfig->getEntityName()] = [];
         }
 
-        $this->filters[$entityName][] = new TableFilterConfig($entityName, $columnName, $value, $expression);
+        $this->filters[$tableFilterConfig->getEntityName()][] = $tableFilterConfig;
+    }
+
+    /**
+     * @param string $entityName
+     * @param string $columnName
+     * @param mixed  $value
+     * @param string $expression
+     * 
+     * @return TableFilterConfig
+     */
+    public function createFilter(string $entityName, string $columnName, $value, string $expression = 'eq'): TableFilterConfig
+    {
+        return new TableFilterConfig($entityName, $columnName, $value, $expression);
     }
 
     /**
@@ -116,7 +137,14 @@ class TableConfig
      */
     public function addFilterIfNotEmpty(string $entityName, string $columnName, $value, string $expression = 'eq'): void
     {
-        if (!empty($value)) {
+        // Remove SQL wild cards for NOT/LIKE:
+        if (in_array($expression, ['like', 'notLike']) && is_string($value)) {
+            $trimmedValue = trim($value, '%');
+        } else {
+            $trimmedValue = $value;
+        }
+
+        if (!empty($trimmedValue)) {
             $this->addFilter($entityName, $columnName, $value, $expression);
         }
     }
@@ -168,5 +196,31 @@ class TableConfig
 
             return false;
         }
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @param ClassMetadata $metadata
+     * 
+     * @return QueryBuilder
+     */
+    public function configureSelectQueryBuilder(QueryBuilder $queryBuilder, ClassMetadata $metadata): QueryBuilder
+    {
+        $tableQueryBuilder = new TableQueryBuilder($this, $queryBuilder, $metadata);
+
+        return $tableQueryBuilder->getTableDataQuery();
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @param ClassMetadata $metadata
+     * 
+     * @return QueryBuilder
+     */
+    public function configureCountQueryBuilder(QueryBuilder $queryBuilder, ClassMetadata $metadata): QueryBuilder
+    {
+        $tableQueryBuilder = new TableQueryBuilder($this, $queryBuilder, $metadata);
+
+        return $tableQueryBuilder->getTableCountQuery();
     }
 }

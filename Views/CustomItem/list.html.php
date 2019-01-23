@@ -36,7 +36,7 @@ if ($tmpl == 'index') {
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
                         'sessionVar' => 'custom.item',
-                        'orderBy'    => CustomItemRepository::getAlias().'.name',
+                        'orderBy'    => CustomItemRepository::TABLE_ALIAS.'.name',
                         'text'       => 'mautic.core.name',
                         'class'      => 'col-custom_item_name',
                     ]
@@ -46,7 +46,7 @@ if ($tmpl == 'index') {
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
                         'sessionVar' => 'custom.item',
-                        'orderBy'    => CustomItemRepository::getAlias().'.id',
+                        'orderBy'    => CustomItemRepository::TABLE_ALIAS.'.id',
                         'text'       => 'mautic.core.id',
                         'class'      => 'visible-md visible-lg col-asset-id',
                         'default'    => true,

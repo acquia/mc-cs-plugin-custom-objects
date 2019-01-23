@@ -23,6 +23,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Controller\JsonController;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 
 class LookupController extends JsonController
 {
@@ -73,10 +74,16 @@ class LookupController extends JsonController
         $request     = $this->requestStack->getCurrentRequest();
         $nameFilter  = InputHelper::clean($request->get('filter'));
         $contactId   = (int) InputHelper::clean($request->get('contactId'));
-        $tableConfig = new TableConfig(10, 1, 'CustomItem.name', 'ASC');
+        $tableConfig = new TableConfig(10, 1, CustomItemRepository::TABLE_ALIAS.'.name', 'ASC');
         $tableConfig->addFilter(CustomItem::class, 'customObject', $objectId);
         $tableConfig->addFilterIfNotEmpty(CustomItem::class, 'name', "%{$nameFilter}%", 'like');
-        $tableConfig->addFilterIfNotEmpty(CustomItemXrefContact::class, 'contact', $contactId, 'neq');
+
+        if ($contactId) {
+            $notContact = $tableConfig->createFilter(CustomItemXrefContact::class, 'contact', $contactId, 'neq');
+            $isNull     = $tableConfig->createFilter(CustomItemXrefContact::class, 'contact', null, 'isNull');
+            $orX        = $tableConfig->createFilter(CustomItemXrefContact::class, 'contact', [$notContact, $isNull], 'orX');
+            $tableConfig->addFilterDTO($orX);
+        }
 
         return $this->renderJson(['items' => $this->customItemModel->getLookupData($tableConfig)]);
     }

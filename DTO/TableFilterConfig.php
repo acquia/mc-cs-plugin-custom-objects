@@ -76,6 +76,14 @@ class TableFilterConfig
     /**
      * @return string
      */
+    public function getFullColumnName(): string
+    {
+        return "{$this->getTableAlias()}.{$this->getColumnName()}";
+    }
+
+    /**
+     * @return string
+     */
     public function getExpression(): string
     {
         return $this->expression;

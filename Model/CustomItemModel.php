@@ -161,7 +161,7 @@ class CustomItemModel extends FormModel
     /**
      * @param TableConfig $tableConfig
      * 
-     * @return array
+     * @return CustomItem[]
      */
     public function getTableData(TableConfig $tableConfig): array
     {
