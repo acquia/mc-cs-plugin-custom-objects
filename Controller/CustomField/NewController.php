@@ -98,7 +98,6 @@ class NewController extends CommonController
         $field->setCustomObject($customObject);
 
         $route = $this->routeProvider->buildNewRoute($customObject, $field->getType()->getKey());
-        $template = "CustomObjectsBundle:CustomObject:Builder\\field.{$field->getType()->getKey()}.html.twig";
 
         $action = $this->routeProvider->buildSaveRoute();
         $form   = $this->formFactory->create(CustomFieldType::class, $field, ['action' => $action]);
@@ -108,7 +107,7 @@ class NewController extends CommonController
             if ($form->isSubmitted() && $form->isValid()) {
                 $this->customObjectRepository->saveEntity($form->getData());
                 $success = 1;
-                $route = $template = "";
+                $route = "";
             }
         }
 
@@ -117,10 +116,10 @@ class NewController extends CommonController
                 'returnUrl'      => $this->routeProvider->buildListRoute(),
                 'viewParameters' => [
                     'customObject' => $customObject,
-                    'field' => $field,
+                    'customField' => $field,
                     'form'   => $form->createView(),
                 ],
-                'contentTemplate' => $template,
+                'contentTemplate' => 'CustomObjectsBundle:CustomField:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customField',
                     'route'         => $route,

@@ -59,7 +59,7 @@ return [
                 'controller' => 'CustomObjectsBundle:CustomField\Cancel:cancel',
                 'method'     => 'GET',
                 'defaults'   => [
-                    'objectId' => null,
+                    'fieldId' => null,
                 ],
             ],
             CustomFieldRouteProvider::ROUTE_SAVE => [
@@ -67,7 +67,7 @@ return [
                 'controller' => 'CustomObjectsBundle:CustomField\Save:save',
                 'method'     => 'POST',
                 'defaults'   => [
-                    'objectId' => null,
+                    'fieldId' => null,
                 ],
             ],
             CustomFieldRouteProvider::ROUTE_DELETE => [

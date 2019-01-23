@@ -144,7 +144,7 @@ class SaveController extends CommonController
             }
         }
 
-        $route = $fieldId ? $this->routeProvider->buildEditRoute($fieldId) : $this->routeProvider->buildNewRoute();
+        $route = $fieldId ? $this->routeProvider->buildEditRoute($fieldId) : '';
 
         return $this->delegateView(
             [

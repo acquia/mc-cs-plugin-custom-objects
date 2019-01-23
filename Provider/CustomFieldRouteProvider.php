@@ -69,7 +69,9 @@ class CustomFieldRouteProvider
     }
 
     /**
-     * @throws ForbiddenException
+     * @param int|null $id
+     *
+     * @return string
      */
     public function buildSaveRoute(?int $id = null): string
     {
@@ -84,7 +86,8 @@ class CustomFieldRouteProvider
      */
     public function buildViewRoute(int $id): string
     {
-        return $this->router->generate(static::ROUTE_VIEW, ['fieldId' => $id]);
+        $params = $id ? ['fieldId' => $id] : [];
+        return $this->router->generate(static::ROUTE_VIEW, $params);
     }
 
     /**
