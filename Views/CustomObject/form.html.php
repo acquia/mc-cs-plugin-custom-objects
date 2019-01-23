@@ -55,13 +55,15 @@ $view['slots']->set('headerTitle', $header);
 
                                 <option data-toggle="ajaxmodal"
                                         data-target="#objectFieldModal"
-                                        data-href="<?php echo $view['router']->path(
-                                            \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider::ROUTE_NEW,
-                                            [
-                                                'objectId'  => $customObject->getId(),
-                                                'fieldType' => $fieldType->getKey(),
-                                            ]
-                                        ); ?>">
+                                        data-href="<?php
+//                                            echo $view['router']->path(
+//                                                \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider::ROUTE_NEW,
+//                                                [
+//                                                    'objectId'  => $customObject->getId(),
+//                                                    'fieldType' => $fieldType->getKey(),
+//                                                ]
+//                                            );
+                                        ?>">
                                     <?php echo $fieldType->getName(); ?>
                                 </option>
                             <?php endforeach; ?>
