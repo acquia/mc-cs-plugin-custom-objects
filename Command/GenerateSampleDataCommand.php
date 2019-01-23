@@ -142,7 +142,9 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
             return 0;
         }
 
-        $progress = new ProgressBar($output, $limit);
+        $startTime = microtime(true);
+        $progress  = new ProgressBar($output, $limit);
+        $progress->setFormat(' %current%/%max% [%bar%] | %percent:3s%% | Elapsed: %elapsed:6s% | Estimated: %estimated:-6s% | Memory Usage: %memory:6s%');
         $progress->start();
 
         for ($i = 1; $i <= $limit; $i++) {
@@ -156,8 +158,9 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
 
 
         $progress->finish();
+        $runTime = number_format(microtime(true) - $startTime, 3);
 
-        $io->success('Execution time: '.number_format(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 3));
+        $io->success("Execution time: {$runTime} seconds");
 
         return 0;
     }
