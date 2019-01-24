@@ -61,13 +61,29 @@ class CustomFieldType extends AbstractType
             'customObject',
             HiddenType::class,
             [
-                'required' => true
+                'required' => true,
             ]
         );
 
         $builder
             ->get('customObject')
             ->addModelTransformer(new CustomObjectHiddenTransformer($this->customObjectRepository));
+
+        $builder->add(
+            'isPublished',
+            HiddenType::class,
+            [
+                'required' => true,
+            ]
+        );
+
+        $builder->add(
+            'type',
+            HiddenType::class,
+            [
+                'required' => true,
+            ]
+        );
 
         $builder->add(
             'buttons',
