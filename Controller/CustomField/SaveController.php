@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
@@ -123,7 +124,7 @@ class SaveController extends CommonController
                     $fieldId ? 'mautic.core.notice.updated' : 'mautic.core.notice.created',
                     [
                         '%name%' => $field->getName(),
-                        '%url%'  => $this->routeProvider->buildEditRoute($fieldId),
+                        '%url%'  => '', // No url provided as it does not make sense
                     ], 
                     'flashes'
                 )
