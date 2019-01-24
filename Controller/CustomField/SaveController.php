@@ -150,7 +150,7 @@ class SaveController extends CommonController
             [
                 'returnUrl'      => $route,
                 'viewParameters' => [
-                    'field' => $field,
+                    'customField' => $field,
                     'form'   => $form->createView(),
                     'tmpl'   => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                 ],
