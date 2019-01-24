@@ -62,13 +62,8 @@ class CancelController extends CommonController
      */
     public function cancelAction(?int $fieldId)
     {
-//        $page = $this->session->get('custom.field.page', 1);
-
         return $this->postActionRedirect(
             [
-//                'returnUrl'       => $this->routeProvider->buildListRoute($page),
-//                'viewParameters'  => ['page' => $page],
-//                'contentTemplate' => 'CustomObjectsBundle:CustomField\List:list',
                 'passthroughVars' => [
                     'mauticContent' => 'customField',
                     'closeModal' => 1,
