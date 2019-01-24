@@ -146,6 +146,22 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
+     * @param CustomFieldTypeInterface|string $type
+     */
+    public function setTypeObject($type): void
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * @return CustomFieldTypeInterface|string
+     */
+    public function getTypeObject()
+    {
+        return $this->type;
+    }
+
+    /**
      * @return CustomObject:null
      */
     public function getCustomObject()

@@ -105,8 +105,7 @@ class NewController extends CommonController
 
         $success = 0;
 
-        $field = $this->customFieldFactory->create($request->get('fieldType'));
-        $field->setCustomObject($customObject);
+        $field = $this->customFieldFactory->create($request->get('fieldType'), $customObject);
 
         $route = $this->routeProvider->buildNewRoute($customObject, $field->getType()->getKey());
 

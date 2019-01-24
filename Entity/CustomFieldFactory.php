@@ -30,23 +30,21 @@ class CustomFieldFactory
     }
 
     /**
-     * @param string $type
+     * @param string       $type
+     * @param CustomObject $customObject
      *
      * @return CustomField
+     * @throws NotFoundException
      */
-    public function create(string $type): CustomField
+    public function create(string $type, CustomObject $customObject): CustomField
     {
+        $typeObject = $this->customFieldTypeProvider->getType($type);
+
         $customField = new CustomField();
 
-        try {
-            $type = $this->customFieldTypeProvider->getType($type);
-        } catch (NotFoundException $e) {
-            throw new \InvalidArgumentException(
-                sprintf("Undefined custom field type '%s'", $type)
-            );
-        }
-
         $customField->setType($type);
+        $customField->setTypeObject($typeObject);
+        $customField->setCustomObject($customObject);
 
         return $customField;
     }
