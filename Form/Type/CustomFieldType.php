@@ -13,7 +13,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
+use MauticPlugin\CustomObjectsBundle\Form\CustomObjectHiddenTransformer;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
@@ -22,6 +25,19 @@ use Mautic\CoreBundle\Form\Type\FormButtonsType;
 
 class CustomFieldType extends AbstractType
 {
+    /**
+     * @var CustomObjectRepository
+     */
+    private $customObjectRepository;
+
+    /**
+     * @param CustomObjectRepository $customObjectRepository
+     */
+    public function __construct(CustomObjectRepository $customObjectRepository)
+    {
+        $this->customObjectRepository = $customObjectRepository;
+    }
+
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
@@ -40,6 +56,18 @@ class CustomFieldType extends AbstractType
                 ],
             ]
         );
+
+        $builder->add(
+            'customObject',
+            HiddenType::class,
+            [
+                'required' => true
+            ]
+        );
+
+        $builder
+            ->get('customObject')
+            ->addModelTransformer(new CustomObjectHiddenTransformer($this->customObjectRepository));
 
         $builder->add(
             'buttons',

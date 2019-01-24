@@ -729,6 +729,10 @@ return [
             ],
             'custom_field.field.form' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType::class,
+                'arguments' => [
+                    'custom_object.repository'
+                ],
+                'tag' => 'form.type'
             ],
             'custom_field.field.value.form' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldValueType::class,

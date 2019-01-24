@@ -146,9 +146,9 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @return CustomObject
+     * @return CustomObject:null
      */
-    public function getCustomObject(): CustomObject
+    public function getCustomObject()
     {
         return $this->customObject;
     }
