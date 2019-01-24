@@ -135,7 +135,6 @@ class SaveController extends CommonController
                 return $this->delegateView(
                     [
                         'passthroughVars' => [
-                            'success'       => 1,
                             'closeModal'    => 1,
                         ],
                     ]
