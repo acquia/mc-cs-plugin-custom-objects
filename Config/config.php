@@ -247,6 +247,7 @@ return [
                     'custom_field.permission.provider',
                     'custom_field.route.provider',
                     'custom_object.repository',
+                    'mautic.custom.model.object',
                     'custom_object.custom_field_factory',
                 ],
                 'methodCalls' => [

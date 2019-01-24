@@ -14,8 +14,9 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
-use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType2;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
@@ -49,6 +50,11 @@ class NewController extends CommonController
     private $customObjectRepository;
 
     /**
+     * @var CustomObjectModel
+     */
+    private $customObjectModel;
+
+    /**
      * @var CustomFieldFactory
      */
     private $customFieldFactory;
@@ -58,6 +64,7 @@ class NewController extends CommonController
      * @param CustomFieldPermissionProvider $permissionProvider
      * @param CustomFieldRouteProvider      $routeProvider
      * @param CustomObjectRepository        $customObjectRepository
+     * @param CustomObjectModel             $customObjectModel
      * @param CustomFieldFactory            $customFieldFactory
      */
     public function __construct(
@@ -65,6 +72,7 @@ class NewController extends CommonController
         CustomFieldPermissionProvider $permissionProvider,
         CustomFieldRouteProvider $routeProvider,
         CustomObjectRepository $customObjectRepository,
+        CustomObjectModel $customObjectModel,
         CustomFieldFactory $customFieldFactory
     )
     {
@@ -72,6 +80,7 @@ class NewController extends CommonController
         $this->permissionProvider = $permissionProvider;
         $this->routeProvider      = $routeProvider;
         $this->customObjectRepository = $customObjectRepository;
+        $this->customObjectModel = $customObjectModel;
         $this->customFieldFactory = $customFieldFactory;
     }
 
@@ -88,8 +97,10 @@ class NewController extends CommonController
             $this->accessDenied(false, $e->getMessage());
         }
 
-        if (!$customObject = $this->customObjectRepository->findOneById($request->get('objectId'))) {
-            return $this->notFound();
+        try {
+            $customObject = $this->customObjectModel->fetchEntity((int) $request->get('objectId'));
+        } catch (NotFoundException $e) {
+            return $this->notFound($e->getMessage());
         }
 
         $success = 0;
@@ -107,7 +118,7 @@ class NewController extends CommonController
             if ($form->isSubmitted() && $form->isValid()) {
                 $this->customObjectRepository->saveEntity($form->getData());
                 $success = 1;
-                $route = "";
+                $route = '';
             }
         }
 
