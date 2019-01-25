@@ -113,12 +113,12 @@ class CustomItemModel extends FormModel
 
         $this->entityManager->persist($entity);
 
-        if ($entity->isNew()) {
-            $this->entityManager->flush();
-        }
-
         foreach ($entity->getCustomFieldValues() as $value) {
             $this->entityManager->persist($value);
+        }
+
+        foreach ($entity->getContactReferences() as $reference) {
+            $this->entityManager->persist($reference);
         }
 
         $this->entityManager->flush();
@@ -161,7 +161,7 @@ class CustomItemModel extends FormModel
     /**
      * @param TableConfig $tableConfig
      * 
-     * @return array
+     * @return CustomItem[]
      */
     public function getTableData(TableConfig $tableConfig): array
     {
@@ -174,6 +174,19 @@ class CustomItemModel extends FormModel
     /**
      * @param TableConfig $tableConfig
      * 
+     * @return integer
+     */
+    public function getCountForTable(TableConfig $tableConfig): int
+    {
+        $queryBuilder = $this->customItemRepository->getTableCountQuery($tableConfig);
+        $queryBuilder = $this->applyOwnerFilter($queryBuilder);
+
+        return (int) $queryBuilder->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * @param TableConfig $tableConfig
+     * 
      * @return array
      */
     public function getLookupData(TableConfig $tableConfig): array
@@ -181,7 +194,7 @@ class CustomItemModel extends FormModel
         $queryBuilder = $this->customItemRepository->getTableDataQuery($tableConfig);
         $queryBuilder = $this->applyOwnerFilter($queryBuilder);
         $rootAlias    = $queryBuilder->getRootAliases()[0];
-        $queryBuilder->select("{$rootAlias}.name as value, {$rootAlias}.id");//
+        $queryBuilder->select("{$rootAlias}.name as value, {$rootAlias}.id");
 
         return array_values($queryBuilder->getQuery()->getArrayResult());
     }

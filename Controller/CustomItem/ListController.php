@@ -28,7 +28,6 @@ use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
-use MauticPlugin\CustomObjectsBundle\DTO\TableFilterConfig;
 
 class ListController extends CommonController
 {
@@ -114,7 +113,7 @@ class ListController extends CommonController
         $defaultlimit = (int) $this->coreParametersHelper->getParameter('default_pagelimit');
         $sessionLimit = (int) $this->session->get('mautic.custom.item.limit', $defaultlimit);
         $limit        = (int) $request->get('limit', $sessionLimit);
-        $orderBy      = $this->session->get('mautic.custom.item.orderby', CustomItemRepository::getAlias().'.id');
+        $orderBy      = $this->session->get('mautic.custom.item.orderby', CustomItemRepository::TABLE_ALIAS.'.id');
         $orderByDir   = $this->session->get('mautic.custom.item.orderbydir', 'DESC');
         $route        = $this->routeProvider->buildListRoute($objectId, $page);
         $contactId    = (int) $request->get('contactId');
@@ -128,8 +127,8 @@ class ListController extends CommonController
         }
         
         $tableConfig = new TableConfig($limit, $page, $orderBy, $orderByDir);
-        $tableConfig->addFilter(new TableFilterConfig(CustomItem::class, 'customObject', $objectId));
-        $tableConfig->addFilterIfNotEmpty(new TableFilterConfig(CustomItemXrefContact::class, 'contact', $contactId));
+        $tableConfig->addFilter(CustomItem::class, 'customObject', $objectId);
+        $tableConfig->addFilterIfNotEmpty(CustomItemXrefContact::class, 'contact', $contactId);
 
         $this->session->set('mautic.custom.item.page', $page);
         $this->session->set('mautic.custom.item.limit', $limit);
@@ -142,6 +141,7 @@ class ListController extends CommonController
                     'searchValue'    => $search,
                     'customObject'   => $customObject,
                     'items'          => $this->customItemModel->getTableData($tableConfig),
+                    'itemCount'      => $this->customItemModel->getCountForTable($tableConfig),
                     'page'           => $page,
                     'limit'          => $limit,
                     'tmpl'           => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',

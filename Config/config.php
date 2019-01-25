@@ -127,7 +127,7 @@ return [
                 'method'     => 'GET',
             ],
             CustomItemRouteProvider::ROUTE_LOOKUP => [
-                'path'       => '/custom/object/{objectId}/item.json',
+                'path'       => '/custom/object/{objectId}/item/lookup.json',
                 'controller' => 'CustomObjectsBundle:CustomItem\Lookup:list',
                 'method'     => 'GET',
             ],
@@ -470,6 +470,7 @@ return [
                 'arguments' => [
                     'mautic.custom.model.item',
                     'custom_item.permission.provider',
+                    'translator',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -742,6 +743,19 @@ return [
                 ],
             ],
         ],
+        'commands' => [
+            'custom_object.command.generate_sample_data' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Command\GenerateSampleDataCommand::class,
+                'arguments' => [
+                    'mautic.custom.model.object',
+                    'mautic.custom.model.item',
+                    'mautic.lead.model.lead',
+                    'doctrine.orm.entity_manager',
+                    'custom_object.random.helper',
+                ],
+                'tag' => 'console.command',
+            ],
+        ],
         'other' => [
             'custom_field.type.provider' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider::class,
@@ -784,6 +798,9 @@ return [
                 'arguments' => [
                     'mautic.security',
                 ],
+            ],
+            'custom_object.random.helper' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Helper\RandomHelper::class,
             ],
             'custom_object.custom_field_factory' => [
                 'class' =>\MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory::class,

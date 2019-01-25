@@ -143,10 +143,12 @@ class SaveController extends CommonController
             );
 
             if ($form->get('buttons')->get('save')->isClicked()) {
-                return $this->redirectToDetail($request, $entity);
+                $where = 'CustomObjectsBundle:CustomItem\View:view';
             } else {
-                return $this->redirectToEdit($request, $entity);
+                $where = 'CustomObjectsBundle:CustomItem\View:renderForm';
             }
+
+            return $this->redirectTo($where, $request, $entity);
         }
 
         $route = $itemId ? $this->routeProvider->buildEditRoute($objectId, $itemId) : $this->routeProvider->buildNewRoute($objectId);
@@ -169,30 +171,17 @@ class SaveController extends CommonController
     }
 
     /**
+     * @param string     $where
      * @param Request    $request
      * @param CustomItem $entity
      * 
      * @return Response
      */
-    private function redirectToEdit(Request $request, CustomItem $entity): Response
+    private function redirectTo(string $where, Request $request, CustomItem $entity): Response
     {
         $request->setMethod('GET');
         $params = ['objectId' => $entity->getCustomObject()->getId(), 'itemId' => $entity->getId()];
 
-        return $this->forward('custom_item.edit_controller:renderFormAction', $params);
-    }
-
-    /**
-     * @param Request    $request
-     * @param CustomItem $entity
-     * 
-     * @return Response
-     */
-    private function redirectToDetail(Request $request, CustomItem $entity): Response
-    {
-        $request->setMethod('GET');
-        $params = ['objectId' => $entity->getCustomObject()->getId(), 'itemId' => $entity->getId()];
-
-        return $this->forward('CustomObjectsBundle:CustomItem\View:view', $params);
+        return $this->forward($where, $params);
     }
 }

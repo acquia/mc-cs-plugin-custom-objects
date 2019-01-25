@@ -22,6 +22,8 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 
 class CustomItemRepository extends CommonRepository
 {
+    const TABLE_ALIAS = 'CustomItem';
+
     /**
      * @param TableConfig $tableConfig
      * 
@@ -29,41 +31,21 @@ class CustomItemRepository extends CommonRepository
      */
     public function getTableDataQuery(TableConfig $tableConfig): QueryBuilder
     {
-        $alias        = self::getAlias();
-        $queryBuilder = $this->createQueryBuilder($alias, $alias.'.id');
-        $queryBuilder->select($alias);
-        $queryBuilder->orderBy($tableConfig->getOrderBy(), $tableConfig->getOrderDirection());
+        $queryBuilder = $this->createQueryBuilder(self::TABLE_ALIAS, self::TABLE_ALIAS.'.id');
 
-        return $this->applyTableFilters($queryBuilder, $tableConfig);
+        return $tableConfig->configureSelectQueryBuilder($queryBuilder, $this->getClassMetadata());
     }
 
     /**
-     * @param QueryBuilder $queryBuilder
      * @param TableConfig $tableConfig
      * 
      * @return QueryBuilder
      */
-    public function applyTableFilters(QueryBuilder $queryBuilder, TableConfig $tableConfig): QueryBuilder
+    public function getTableCountQuery(TableConfig $tableConfig): QueryBuilder
     {
-        $metadata  = $this->getClassMetadata();
-        $rootAlias = $queryBuilder->getRootAliases()[0];
-        foreach ($tableConfig->getFilters() as $entityClass => $filters) {
-            foreach ($filters as $filter) {
-                if (!in_array($filter->getTableAlias(), $queryBuilder->getAllAliases())) {
-                    $cloumnNameArr = array_keys($metadata->getAssociationsByTargetClass($filter->getEntityName()));
-                    if (empty($cloumnNameArr[0])) {
-                        throw new \UnexpectedValueException("Entity {$this->getEntityName()} does not have association with {$filter->getEntityName()}");
-                    }
-                    $queryBuilder->innerJoin($rootAlias.'.'.$cloumnNameArr[0], $filter->getTableAlias());
-                }
-                $queryBuilder->andWhere(
-                    $queryBuilder->expr()->{$filter->getExpression()}($filter->getTableAlias().'.'.$filter->getColumnName(), ':'.$filter->getColumnName())
-                );
-                $queryBuilder->setParameter($filter->getColumnName(), $filter->getValue());
-            }
-        }
+        $queryBuilder = $this->createQueryBuilder(self::TABLE_ALIAS, self::TABLE_ALIAS.'.id');
 
-        return $queryBuilder;
+        return $tableConfig->configureCountQueryBuilder($queryBuilder, $this->getClassMetadata());
     }
 
     /**
@@ -74,21 +56,7 @@ class CustomItemRepository extends CommonRepository
      */
     public function applyOwnerId(QueryBuilder $queryBuilder, int $userId): QueryBuilder
     {
-        return $queryBuilder->andWhere(self::getAlias().'.createdBy', $userId);
-    }
-
-    /**
-     * @param string $repositoryName
-     * 
-     * @return string
-     */
-    public static function getAlias(string $repositoryName = null): string
-    {
-        if (null === $repositoryName) {
-            $repositoryName = self::class;
-        }
-        $path = explode('\\', $repositoryName);
-        return rtrim(end($path), 'Repository');
+        return $queryBuilder->andWhere(self::TABLE_ALIAS.'.createdBy', $userId);
     }
 
     /**
@@ -100,7 +68,7 @@ class CustomItemRepository extends CommonRepository
     public function countItemsLinkedToContact(CustomObject $customObject, Lead $contact): int
     {
         $queryBuilder = $this->createQueryBuilder('ci', 'ci.id');
-        $queryBuilder->select('COUNT(ci.id) as linkedItemsCount');
+        $queryBuilder->select($queryBuilder->expr()->countDistinct('ci.id'));
         $queryBuilder->innerJoin('ci.contactReferences', 'cixctct');
         $queryBuilder->where('ci.customObject = :customObjectId');
         $queryBuilder->andWhere('cixctct.contact = :contactId');
@@ -109,5 +77,13 @@ class CustomItemRepository extends CommonRepository
         $result = $queryBuilder->getQuery()->getSingleScalarResult();
 
         return (int) $result;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTableAlias()
+    {
+        return self::TABLE_ALIAS;
     }
 }

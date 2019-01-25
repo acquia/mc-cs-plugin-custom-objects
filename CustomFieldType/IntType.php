@@ -20,6 +20,8 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 
 class IntType extends AbstractCustomFieldType
 {
+    const KEY = 'int';
+
     /**
      * @var string
      */
@@ -46,7 +48,7 @@ class IntType extends AbstractCustomFieldType
      */
     public function getKey(): string
     {
-        return 'int';
+        return self::KEY;
     }
 
     /**

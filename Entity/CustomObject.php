@@ -23,6 +23,8 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\FormEntity;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use MauticPlugin\CustomObjectsBundle\Entity\UniqueEntityInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 
 class CustomObject extends FormEntity implements UniqueEntityInterface
 {
@@ -61,6 +63,16 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
      **/
     private $category;
 
+    /**
+     * @var ArrayCollection
+     */
+    private $fields;
+
+    public function __construct()
+    {
+        $this->fields = new ArrayCollection();
+    }
+
     public function __clone()
     {
         $this->id = null;
@@ -75,6 +87,12 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
 
         $builder->setTable('custom_object')
             ->setCustomRepositoryClass(CustomObjectRepository::class);
+
+        $builder->createOneToMany('fields', CustomField::class)
+            ->addJoinColumn('custom_item_id', 'id', false, false, 'CASCADE')
+            ->mappedBy('customObject')
+            ->fetchExtraLazy()
+            ->build();
 
         $builder->addId();
         $builder->addCategory();
@@ -195,5 +213,13 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     {
         $this->isChanged('language', $language);
         $this->language = $language;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getFields()
+    {
+        return $this->fields;
     }
 }

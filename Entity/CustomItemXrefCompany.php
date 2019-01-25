@@ -19,17 +19,17 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use Mautic\LeadBundle\Entity\Lead;
 use DateTimeInterface;
 use DateTimeImmutable;
 use DateTimeZone;
+use Mautic\LeadBundle\Entity\Company;
 
-class CustomItemXrefContact
+class CustomItemXrefCompany
 {
     /**
-     * @var Lead
+     * @var Company
      */
-    private $contact;
+    private $company;
 
     /**
      * @var CustomItem
@@ -43,13 +43,13 @@ class CustomItemXrefContact
 
     /**
      * @param CustomItem             $customItem
-     * @param Lead                   $contact
+     * @param Company                $company
      * @param DateTimeInterface|null $dateAdded
      */
-    public function __construct(CustomItem $customItem, Lead $contact, ?DateTimeInterface $dateAdded = null)
+    public function __construct(CustomItem $customItem, Company $company, ?DateTimeInterface $dateAdded = null)
     {
         $this->customItem = $customItem;
-        $this->contact    = $contact;
+        $this->company    = $company;
         $this->dateAdded  = $dateAdded ?: new DateTimeImmutable('now', new DateTimeZone('UTC'));
     }
 
@@ -60,16 +60,16 @@ class CustomItemXrefContact
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('custom_item_xref_contact');
+        $builder->setTable('custom_item_xref_company');
 
         $builder->createManyToOne('customItem', CustomItem::class)
             ->addJoinColumn('custom_item_id', 'id', false, false, 'CASCADE')
-            ->inversedBy('contactReferences')
+            ->inversedBy('companyReferences')
             ->makePrimaryKey()
             ->build();
 
-        $builder->createManyToOne('contact', Lead::class)
-            ->addJoinColumn('contact_id', 'id', false, false, 'CASCADE')
+        $builder->createManyToOne('company', Company::class)
+            ->addJoinColumn('company_id', 'id', false, false, 'CASCADE')
             ->makePrimaryKey()
             ->build();
 
@@ -87,11 +87,11 @@ class CustomItemXrefContact
     }
 
     /**
-     * @return Lead
+     * @return Company
      */
-    public function getContact()
+    public function getCompany()
     {
-        return $this->contact;
+        return $this->company;
     }
 
     /**

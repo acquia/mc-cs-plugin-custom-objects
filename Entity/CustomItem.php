@@ -26,6 +26,8 @@ use MauticPlugin\CustomObjectsBundle\Entity\UniqueEntityInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Iterator\CustomFieldValues;
 use Doctrine\Common\Collections\ArrayCollection;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCompany;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 
 class CustomItem extends FormEntity implements UniqueEntityInterface
 {
@@ -64,6 +66,11 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     private $contactReferences;
 
+    /**
+     * @var ArrayCollection
+     */
+    private $companyReferences;
+
     public function __clone()
     {
         $this->id = null;
@@ -77,6 +84,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         $this->customObject      = $customObject;
         $this->customFieldValues = new ArrayCollection();
         $this->contactReferences = new ArrayCollection();
+        $this->companyReferences = new ArrayCollection();
     }
 
     /**
@@ -98,7 +106,12 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
             ->mappedBy('customItem')
             ->build();
 
-        $builder->addId();
+        $builder->createOneToMany('companyReferences', CustomItemXrefCompany::class)
+            ->addJoinColumn('custom_item_id', 'id', false, false, 'CASCADE')
+            ->mappedBy('customItem')
+            ->build();
+
+        $builder->addBigIntIdField();
         $builder->addCategory();
         $builder->addField('name', Type::STRING);
         $builder->addNullableField('language', Type::STRING, 'lang');
@@ -180,6 +193,14 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     }
 
     /**
+     * @param CustomFieldValueInterface $customFieldValue
+     */
+    public function addCustomFieldValue(CustomFieldValueInterface $customFieldValue)
+    {
+        $this->customFieldValues->add($customFieldValue);
+    }
+
+    /**
      * @return ArrayCollection
      */
     public function getCustomFieldValues()
@@ -189,6 +210,14 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         }
         
         return $this->customFieldValues;
+    }
+
+    /**
+     * @param CustomItemXrefContact $reference
+     */
+    public function addContactReference(CustomItemXrefContact $reference)
+    {
+        $this->contactReferences->add($reference);
     }
 
     /**

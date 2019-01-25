@@ -81,8 +81,8 @@ class TabSubscriber extends CommonSubscriber
 
         if ($event->checkContext('MauticLeadBundle:Lead:lead.html.php', 'tabs')) {
             $vars    = $event->getVars();
-            $objects = $this->getCustomObjects();
             $contact = $vars['lead'];
+            $objects = $this->getCustomObjects();
 
             foreach ($objects as $object) {
                 $data = [
@@ -102,8 +102,9 @@ class TabSubscriber extends CommonSubscriber
             foreach ($objects as $object) {
                 $data = [
                     'customObject' => $object,
-                    'page'  => 1,
-                    'search' => '',
+                    'page'         => 1,
+                    'search'       => '',
+                    'contactId'    => $contact->getId(),
                 ];
     
                 $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:content.html.php', $data);
