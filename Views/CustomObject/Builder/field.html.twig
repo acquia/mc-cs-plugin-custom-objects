@@ -1,0 +1,27 @@
+<div class="bundle-form">
+    <div class="bundle-form-header">
+        <h3 class="mb-lg">{{ field.type.name }}</h3>
+    </div>
+    <form novalidate autocomplete="false" data-toggle="ajax" role="form" name="formfield" method="post" action="{{ path('mautic_custom_field_new', {objectId : customObject.id, fieldType : field.type.key}) }}">
+        <div class="tab-content pa-lg">
+            <div role="tabpanel" class="tab-pane active" id="general">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="row">
+                            <div class="form-group col-xs-12">
+                                {{ form_row(form.label) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input type="hidden" id="formfield_type" name="formfield[type]" autocomplete="false" value="captcha" />
+        <div id="formfield_buttons" class="bottom-form-buttons">
+            <button type="submit" id="formfield_buttons_cancel" name="formfield[buttons][cancel]" class="btn btn-default btn-cancel"> <i class="fa fa-times text-danger "></i> Cancel</button>
+            <button type="submit" id="formfield_buttons_save" name="formfield[buttons][save]" class="btn btn-default btn-save"> <i class="fa fa-plus "></i> Add</button>
+        </div>
+        <input type="hidden" id="formfield_formId" name="formfield[formId]" autocomplete="false" value="1" />
+        {{ form_rest(form) }}
+    </form>
+</div>

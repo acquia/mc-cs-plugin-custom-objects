@@ -13,51 +13,36 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
+use MauticPlugin\CustomObjectsBundle\Form\CustomObjectHiddenTransformer;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
-use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
-use Mautic\CategoryBundle\Form\Type\CategoryListType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 class CustomFieldType extends AbstractType
 {
     /**
-     * @var CustomObjectModel
+     * @var CustomObjectRepository
      */
-    private $customObjectModel;
+    private $customObjectRepository;
 
     /**
-     * @var CustomFieldTypeProvider
+     * @param CustomObjectRepository $customObjectRepository
      */
-    private $customFieldTypeProvider;
-
-    /**
-     * @param CustomObjectModel       $customObjectModel
-     * @param CustomFieldTypeProvider $customFieldTypeProvider
-     */
-    public function __construct(
-        CustomObjectModel $customObjectModel,
-        CustomFieldTypeProvider $customFieldTypeProvider)
+    public function __construct(CustomObjectRepository $customObjectRepository)
     {
-        $this->customObjectModel       = $customObjectModel;
-        $this->customFieldTypeProvider = $customFieldTypeProvider;
+        $this->customObjectRepository = $customObjectRepository;
     }
 
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'label',
@@ -73,42 +58,32 @@ class CustomFieldType extends AbstractType
         );
 
         $builder->add(
-            'type',
-            ChoiceType::class,
+            'customObject',
+            HiddenType::class,
             [
-                'label'             => 'custom.field.type.label',
-                'required'          => false,
-                'label_attr'        => ['class' => 'control-label'],
-                'choices'           => ['text'],
-                'attr'              => ['class' => 'form-control',],
-                'choices_as_values' => true,
-                'choices'           => $this->customFieldTypeProvider->getTypes(),
-                'choice_label'      => function(CustomFieldTypeInterface $type) {
-                    return $type->getName();
-                },
-                'choice_value' => function($type) {
-                    return $type instanceof CustomFieldTypeInterface ? $type->getKey() :$type;
-                },
+                'required' => true,
+            ]
+        );
+
+        $builder
+            ->get('customObject')
+            ->addModelTransformer(new CustomObjectHiddenTransformer($this->customObjectRepository));
+
+        $builder->add(
+            'isPublished',
+            HiddenType::class,
+            [
+                'required' => true,
             ]
         );
 
         $builder->add(
-            'customObject',
-            ChoiceType::class,
+            'type',
+            HiddenType::class,
             [
-                'label'             => 'custom.field.object.label',
-                'required'          => false,
-                'label_attr'        => ['class' => 'control-label'],
-                'attr'              => ['class' => 'form-control'],
-                'choices_as_values' => true,
-                'choices'           => $this->customObjectModel->getEntities(['ignore_paginator' => true]),
-                'choice_label'      => function(CustomObject $customObject) {
-                    return $customObject->getName();
-                },
+                'required' => true,
             ]
         );
-
-        $builder->add('isPublished', YesNoButtonGroupType::class);
 
         $builder->add(
             'buttons',
@@ -124,7 +99,7 @@ class CustomFieldType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function setDefaultOptions(OptionsResolverInterface $resolver): void
     {
         $resolver->setDefaults(
             [

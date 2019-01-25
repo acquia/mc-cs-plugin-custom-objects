@@ -16,6 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Entity;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
 use DateTimeInterface;
@@ -44,8 +45,9 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      */
     private $dateAdded;
 
-    /**
-     * @var string|null
+    /*
+    *
+     * @var CustomFieldTypeInterface|string
      */
     private $type;
 
@@ -69,6 +71,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         $builder->setTable('custom_field')
             ->setCustomRepositoryClass(CustomFieldRepository::class);
 
+
         $builder->createManyToOne('customObject', CustomObject::class)
             ->addJoinColumn('custom_object_id', 'id', false, false, 'CASCADE')
             ->inversedBy('fields')
@@ -86,16 +89,16 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('label', new Assert\NotBlank());
-        $metadata->addPropertyConstraint('type', new Assert\NotBlank());
-        $metadata->addPropertyConstraint('customObject', new Assert\NotBlank());
         $metadata->addPropertyConstraint('label', new Assert\Length(['max' => 255]));
+        $metadata->addPropertyConstraint('type', new Assert\NotBlank());
         $metadata->addPropertyConstraint('type', new Assert\Length(['max' => 255]));
+        $metadata->addPropertyConstraint('customObject', new Assert\NotBlank());
     }
 
     /**
      * @return int|null
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -112,32 +115,31 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @return string|null
      */
-    public function getLabel()
+    public function getLabel(): ?string
     {
         return $this->label;
     }
 
     /**
-     * Alias for astractions. Do not use.
+     * Alias for abstractions. Do not use.
      * 
      * @return string|null
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->getLabel();
     }
 
     /**
-     * @param CustomFieldTypeInterface $type
+     * @param CustomFieldTypeInterface|string $type
      */
-    public function setType(CustomFieldTypeInterface $type)
+    public function setType($type): void
     {
-        $this->isChanged('type', $type->getKey());
-        $this->type = $type->getKey();
+        $this->type = $type;
     }
 
     /**
-     * @return string|null
+     * @return CustomFieldTypeInterface|string
      */
     public function getType()
     {
@@ -145,7 +147,23 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @return CustomObject
+     * @param CustomFieldTypeInterface|string $type
+     */
+    public function setTypeObject($type): void
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * @return CustomFieldTypeInterface|string
+     */
+    public function getTypeObject()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @return CustomObject:null
      */
     public function getCustomObject()
     {
@@ -157,7 +175,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      */
     public function setCustomObject(CustomObject $customObject)
     {
-        $this->isChanged('customObject', $customObject->getId());
         $this->customObject = $customObject;
+        $this->isChanged('customObject', $customObject->getId());
     }
 }
