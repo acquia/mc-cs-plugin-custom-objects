@@ -26,19 +26,6 @@ return [
         'main' => [
 
             // Custom Fields
-            CustomFieldRouteProvider::ROUTE_LIST => [
-                'path'       => '/custom/field/{page}',
-                'controller' => 'CustomObjectsBundle:CustomField\List:list',
-                'method'     => 'GET|POST',
-                'defaults'   => [
-                    'page' => 1,
-                ],
-            ],
-            CustomFieldRouteProvider::ROUTE_VIEW => [
-                'path'       => '/custom/field/view/{fieldId}',
-                'controller' => 'CustomObjectsBundle:CustomField\View:view',
-                'method'     => 'GET',
-            ],
             CustomFieldRouteProvider::ROUTE_FORM => [
                 'path'       => '/custom/field/edit',
                 'controller' => 'CustomObjectsBundle:CustomField\Form:renderForm',
@@ -205,36 +192,6 @@ return [
         'controllers' => [
 
             // Custom Fields
-            'custom_field.list_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\ListController::class,
-                'arguments' => [
-                    'request_stack',
-                    'session',
-                    'mautic.helper.core_parameters',
-                    'mautic.custom.model.field',
-                    'custom_field.permission.provider',
-                    'custom_field.route.provider',
-                ],
-                'methodCalls' => [
-                    'setContainer' => [
-                        '@service_container'
-                    ],
-                ],
-            ],
-            'custom_field.view_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\ViewController::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.custom.model.field',
-                    'custom_field.permission.provider',
-                    'custom_field.route.provider',
-                ],
-                'methodCalls' => [
-                    'setContainer' => [
-                        '@service_container'
-                    ],
-                ],
-            ],
             'custom_field.form_controller' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\FormController::class,
                 'arguments' => [
@@ -684,13 +641,6 @@ return [
                     'event' => 'postLoad',
                     'lazy' => true,
                 ]
-            ],
-            'custom_field.button.subscriber' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldButtonSubscriber::class,
-                'arguments' => [
-                    'custom_field.permission.provider',
-                    'custom_field.route.provider',
-                ],
             ],
             'custom_item.button.subscriber' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CustomItemButtonSubscriber::class,

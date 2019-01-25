@@ -96,6 +96,14 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
+     * @param int $id
+     */
+    public function setId(int $id): void
+    {
+        $this->id = $id;
+    }
+
+    /**
      * @return int|null
      */
     public function getId(): ?int

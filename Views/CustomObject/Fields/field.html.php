@@ -1,15 +1,20 @@
 <div class="panel form-field-wrapper ui-sortable-handle" data-sortable-id="mauticform_1">
     <div class="form-buttons btn-group" role="group" aria-label="Field options" style="width: 77px;">
-        <button type="button" data-toggle="ajaxmodal" data-target="#objectFieldModal" href="<?php echo $view['router']->path(\MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider::ROUTE_FORM, ['fieldId' => $customField->getId()]) ?>" class="btn btn-default btn-edit">
+        <button type="button" data-toggle="ajaxmodal" data-target="#objectFieldModal" href="<?php
+        echo $view['router']->path(
+            \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider::ROUTE_FORM,
+            [
+                'fieldId' => $customField->getId(),
+                'objectId' => $customObject->getId(),
+            ]
+        );
+        ?>" class="btn btn-default btn-edit">
             <i class="fa fa-pencil-square-o text-primary"></i>
         </button>
         <a type="button" data-hide-panel="true" data-toggle="ajax" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="<?php
         echo $view['router']->path(
             'mautic_custom_field_delete',
-            [
-                'fieldId' => $customField->getId(),
-                'objectId' => $customObject->getId(),
-            ]
+            ['fieldId' => $customField->getId()]
         )
         ?>" class="btn btn-default">
             <i class="fa fa-trash-o text-danger"></i>

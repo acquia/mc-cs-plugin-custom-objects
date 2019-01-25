@@ -89,9 +89,6 @@ class DeleteController extends CommonController
             )
         );
 
-        return $this->forward(
-            'CustomObjectsBundle:CustomField\List:list',
-            ['page' => $this->session->get('custom.field.page', 1)]
-        );
+        return $this->delegateView([]);
     }
 }

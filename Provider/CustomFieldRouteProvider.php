@@ -18,8 +18,6 @@ use Symfony\Component\Routing\RouterInterface;
 
 class CustomFieldRouteProvider
 {
-    public const ROUTE_LIST   = 'mautic_custom_field_list';
-    public const ROUTE_VIEW   = 'mautic_custom_field_view';
     public const ROUTE_FORM   = 'mautic_custom_field_form';
     public const ROUTE_CLONE  = 'mautic_custom_field_clone';
     public const ROUTE_DELETE = 'mautic_custom_field_delete';
@@ -40,18 +38,6 @@ class CustomFieldRouteProvider
     }
 
     /**
-     * @param int $page
-     *
-     * @return string
-     * @throws ForbiddenException
-     * @deprecated Remove list!
-     */
-    public function buildListRoute(int $page = 1): string
-    {
-        return $this->router->generate(static::ROUTE_LIST, ['page' => $page]);
-    }
-
-    /**
      * @param int|null $id
      *
      * @return string
@@ -59,18 +45,6 @@ class CustomFieldRouteProvider
     public function buildSaveRoute(?int $id = null): string
     {
         return $this->router->generate(static::ROUTE_SAVE, ['fieldId' => $id]);
-    }
-
-    /**
-     * @param int $id
-     *
-     * @return string
-     * @throws ForbiddenException
-     */
-    public function buildViewRoute(int $id): string
-    {
-        $params = $id ? ['fieldId' => $id] : [];
-        return $this->router->generate(static::ROUTE_VIEW, $params);
     }
 
     /**

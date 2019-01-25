@@ -57,26 +57,6 @@ abstract class CustomFieldButtonSubscriber extends CommonSubscriber
 
     /**
      * @param CustomButtonEvent $event
-     */
-    public function injectViewButtons(CustomButtonEvent $event)
-    {
-        switch ($event->getRoute()) {
-            case CustomFieldRouteProvider::ROUTE_LIST:
-                $this->addEntityButtons($event, ButtonHelper::LOCATION_LIST_ACTIONS);
-                try {
-                    $event->addButton($this->defineNewButton(), ButtonHelper::LOCATION_PAGE_ACTIONS, $event->getRoute());
-                } catch (ForbiddenException $e) {}
-                break;
-            
-            case CustomFieldRouteProvider::ROUTE_VIEW:
-                $this->addEntityButtons($event, ButtonHelper::LOCATION_PAGE_ACTIONS);
-                $event->addButton($this->defineCloseButton(), ButtonHelper::LOCATION_PAGE_ACTIONS, $event->getRoute());
-                break;
-        }
-    }
-
-    /**
-     * @param CustomButtonEvent $event
      * @param string            $location
      */
     private function addEntityButtons(CustomButtonEvent $event, $location): void
