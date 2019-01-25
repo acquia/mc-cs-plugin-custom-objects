@@ -59,7 +59,7 @@ class SaveController extends CommonController
     /**
      * @var CustomFieldRouteProvider
      */
-    private $routeProvider;
+    private $fieldRouteProvider;
 
     /**
      * @param RequestStack $requestStack
@@ -86,7 +86,7 @@ class SaveController extends CommonController
         $this->translator         = $translator;
         $this->customFieldModel   = $customFieldModel;
         $this->permissionProvider = $permissionProvider;
-        $this->routeProvider      = $routeProvider;
+        $this->fieldRouteProvider      = $routeProvider;
     }
 
     /**
@@ -110,7 +110,7 @@ class SaveController extends CommonController
         }
 
         $request = $this->requestStack->getCurrentRequest();
-        $action  = $this->routeProvider->buildSaveRoute($fieldId);
+        $action  = $this->fieldRouteProvider->buildSaveRoute($fieldId);
         $form    = $this->formFactory->create(CustomFieldType::class, $field, ['action' => $action]);
         $form->handleRequest($request);
         
@@ -143,7 +143,7 @@ class SaveController extends CommonController
             }
         }
 
-        $route = $fieldId ? $this->routeProvider->buildFormRoute($fieldId) : '';
+        $route = $fieldId ? $this->fieldRouteProvider->buildFormRoute($fieldId) : '';
 
         return $this->delegateView(
             [
