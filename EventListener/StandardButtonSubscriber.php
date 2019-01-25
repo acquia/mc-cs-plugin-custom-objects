@@ -109,7 +109,7 @@ abstract class CustomFieldButtonSubscriber extends CommonSubscriber
         $this->permissionProvider->canEdit($entity);
 
         return [
-            'attr'      => ['href' => $this->routeProvider->buildEditRoute($entity->getId())],
+            'attr'      => ['href' => $this->routeProvider->buildFormRoute($entity->getId())],
             'btnText'   => 'mautic.core.form.edit',
             'iconClass' => 'fa fa-pencil-square-o',
             'priority'  => 500,

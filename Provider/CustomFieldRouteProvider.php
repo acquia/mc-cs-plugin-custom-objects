@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Provider;
 
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Symfony\Component\Routing\RouterInterface;
 
 class CustomFieldRouteProvider
 {
     public const ROUTE_LIST   = 'mautic_custom_field_list';
     public const ROUTE_VIEW   = 'mautic_custom_field_view';
-    public const ROUTE_EDIT   = 'mautic_custom_field_edit';
+    public const ROUTE_FORM   = 'mautic_custom_field_form';
     public const ROUTE_CLONE  = 'mautic_custom_field_clone';
     public const ROUTE_DELETE = 'mautic_custom_field_delete';
     public const ROUTE_NEW    = 'mautic_custom_field_new';
@@ -45,27 +45,11 @@ class CustomFieldRouteProvider
      *
      * @return string
      * @throws ForbiddenException
+     * @deprecated Remove list!
      */
     public function buildListRoute(int $page = 1): string
     {
         return $this->router->generate(static::ROUTE_LIST, ['page' => $page]);
-    }
-
-    /**
-     * @param CustomObject $customObject
-     * @param string       $fieldType
-     *
-     * @return string
-     */
-    public function buildNewRoute(CustomObject $customObject, string $fieldType): string
-    {
-        return $this->router->generate(
-            static::ROUTE_NEW,
-            [
-                'objectId' => $customObject->getId(),
-                'fieldType' => $fieldType,
-            ]
-        );
     }
 
     /**
@@ -91,14 +75,15 @@ class CustomFieldRouteProvider
     }
 
     /**
-     * @param int $id
+     * @param int|null $id
      *
      * @return string
      * @throws ForbiddenException
      */
-    public function buildEditRoute(int $id): string
+    public function buildFormRoute(int $id = null): string
     {
-        return $this->router->generate(static::ROUTE_EDIT, ['fieldId' => $id]);
+        $params = $id ? ['fieldId' => $id] : [];
+        return $this->router->generate(static::ROUTE_FORM, $params);
     }
 
     /**

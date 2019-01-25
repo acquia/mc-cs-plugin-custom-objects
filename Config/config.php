@@ -39,14 +39,9 @@ return [
                 'controller' => 'CustomObjectsBundle:CustomField\View:view',
                 'method'     => 'GET',
             ],
-            CustomFieldRouteProvider::ROUTE_NEW => [
-                'path'       => '/custom/field/new/{objectId}/{fieldType}',
-                'controller' => 'CustomObjectsBundle:CustomField\New:renderForm',
-                'method'     => 'GET|POST',
-            ],
-            CustomFieldRouteProvider::ROUTE_EDIT => [
-                'path'       => '/custom/field/edit/{fieldId}',
-                'controller' => 'CustomObjectsBundle:CustomField\Edit:renderForm',
+            CustomFieldRouteProvider::ROUTE_FORM => [
+                'path'       => '/custom/field/edit',
+                'controller' => 'CustomObjectsBundle:CustomField\Form:renderForm',
                 'method'     => 'GET',
             ],
             CustomFieldRouteProvider::ROUTE_CLONE => [
@@ -240,29 +235,16 @@ return [
                     ],
                 ],
             ],
-            'custom_field.new_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\NewController::class,
-                'arguments' => [
-                    'form.factory',
-                    'custom_field.permission.provider',
-                    'custom_field.route.provider',
-                    'custom_object.repository',
-                    'mautic.custom.model.object',
-                    'custom_object.custom_field_factory',
-                ],
-                'methodCalls' => [
-                    'setContainer' => [
-                        '@service_container'
-                    ],
-                ],
-            ],
-            'custom_field.edit_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\EditController::class,
+            'custom_field.form_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\FormController::class,
                 'arguments' => [
                     'form.factory',
                     'mautic.custom.model.field',
+                    'custom_object.custom_field_factory',
                     'custom_field.permission.provider',
                     'custom_field.route.provider',
+                    'mautic.custom.model.object',
+                    'custom_object.route.provider',
                 ],
                 'methodCalls' => [
                     'setContainer' => [

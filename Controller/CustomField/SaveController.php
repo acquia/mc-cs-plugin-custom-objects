@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
-use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
@@ -144,7 +143,7 @@ class SaveController extends CommonController
             }
         }
 
-        $route = $fieldId ? $this->routeProvider->buildEditRoute($fieldId) : '';
+        $route = $fieldId ? $this->routeProvider->buildFormRoute($fieldId) : '';
 
         return $this->delegateView(
             [
@@ -174,6 +173,6 @@ class SaveController extends CommonController
         $request->setMethod('GET');
         $params = ['fieldId' => $entity->getId()];
 
-        return $this->forward('custom_field.edit_controller:renderFormAction', $params);
+        return $this->forward('custom_field.form_controller:renderFormAction', $params);
     }
 }

@@ -58,7 +58,7 @@ $view['slots']->set('headerTitle', $header);
                                         data-target="#objectFieldModal"
                                         data-href="<?php
                                             echo $view['router']->path(
-                                                \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider::ROUTE_NEW,
+                                                \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider::ROUTE_FORM,
                                                 [
                                                     'objectId'  => $customObject->getId(),
                                                     'fieldType' => $fieldType->getKey(),
