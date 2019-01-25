@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
@@ -32,11 +34,6 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
 class SaveController extends CommonController
 {
     /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
      * @var Session
      */
     private $session;
@@ -52,6 +49,11 @@ class SaveController extends CommonController
     private $customFieldModel;
 
     /**
+     * @var CustomFieldFactory
+     */
+    private $customFieldFactory;
+
+    /**
      * @var CustomFieldPermissionProvider
      */
     private $permissionProvider;
@@ -62,46 +64,65 @@ class SaveController extends CommonController
     private $fieldRouteProvider;
 
     /**
-     * @param RequestStack $requestStack
-     * @param Session $session
-     * @param FormFactory $formFactory
-     * @param TranslatorInterface $translator
-     * @param CustomFieldModel $customFieldModel
+     * @var CustomObjectModel
+     */
+    private $customObjectModel;
+
+    /**
+     * @param Session                       $session
+     * @param FormFactory                   $formFactory
+     * @param TranslatorInterface           $translator
+     * @param CustomFieldModel              $customFieldModel
+     * @param CustomFieldFactory            $customFieldFactory
      * @param CustomFieldPermissionProvider $permissionProvider
-     * @param CustomFieldRouteProvider $routeProvider
+     * @param CustomFieldRouteProvider      $routeProvider
+     * @param CustomObjectModel             $customObjectModel
      */
     public function __construct(
-        RequestStack $requestStack,
         Session $session,
         FormFactory $formFactory,
         TranslatorInterface $translator,
         CustomFieldModel $customFieldModel,
+        CustomFieldFactory $customFieldFactory,
         CustomFieldPermissionProvider $permissionProvider,
-        CustomFieldRouteProvider $routeProvider
-    )
-    {
-        $this->requestStack       = $requestStack;
+        CustomFieldRouteProvider $routeProvider,
+        CustomObjectModel $customObjectModel
+    ){
         $this->session            = $session;
         $this->formFactory        = $formFactory;
         $this->translator         = $translator;
         $this->customFieldModel   = $customFieldModel;
+        $this->customFieldFactory = $customFieldFactory;
         $this->permissionProvider = $permissionProvider;
         $this->fieldRouteProvider      = $routeProvider;
+        $this->customObjectModel = $customObjectModel;
     }
 
     /**
-     * @param int|null $fieldId
-     * 
+     * @param Request $request
+     *
      * @return Response|JsonResponse
+     * @throws ForbiddenException
      */
-    public function saveAction(?int $fieldId = null)
+    public function saveAction(Request $request)
     {
+        $objectId = (int) $request->get('objectId');
+        $fieldId = (int) $request->get('fieldId');
+        $fieldType = $request->get('fieldType');
+
         try {
-            $field = $fieldId ? $this->customFieldModel->fetchEntity($fieldId): new CustomField();
-            if ($field->isNew()) {
-                $this->permissionProvider->canCreate();
+            $customObject = $this->customObjectModel->fetchEntity($objectId);
+        } catch (NotFoundException $e) {
+            return $this->notFound($e->getMessage());
+        }
+
+        try {
+            if ($fieldId) {
+                $customField = $this->customFieldModel->fetchEntity($fieldId);
+                $this->permissionProvider->canEdit($customField);
             } else {
-                $this->permissionProvider->canEdit($field);
+                $this->permissionProvider->canCreate();
+                $customField = $this->customFieldFactory->create($fieldType, $customObject);
             }
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
@@ -109,20 +130,20 @@ class SaveController extends CommonController
             $this->accessDenied(false, $e->getMessage());
         }
 
-        $request = $this->requestStack->getCurrentRequest();
-        $action  = $this->fieldRouteProvider->buildSaveRoute($fieldId);
-        $form    = $this->formFactory->create(CustomFieldType::class, $field, ['action' => $action]);
+        $action = $this->fieldRouteProvider->buildSaveRoute($fieldId, $customObject->getId(), $fieldType);
+        $form   = $this->formFactory->create(CustomFieldType::class, $customField, ['action' => $action]);
+
         $form->handleRequest($request);
         
         if ($form->isValid()) {
-            $this->customFieldModel->save($field);
+            $this->customFieldModel->save($customField);
 
             $this->session->getFlashBag()->add(
                 'notice',
                 $this->translator->trans(
                     $fieldId ? 'mautic.core.notice.updated' : 'mautic.core.notice.created',
                     [
-                        '%name%' => $field->getName(),
+                        '%name%' => $customField->getName(),
                         '%url%'  => '', // No url provided as it does not make sense
                     ], 
                     'flashes'
@@ -139,7 +160,7 @@ class SaveController extends CommonController
                     ]
                 );
             } else {
-                return $this->redirectToEdit($request, $field);
+                return $this->redirectToEdit($request, $customField);
             }
         }
 
@@ -149,7 +170,7 @@ class SaveController extends CommonController
             [
                 'returnUrl'      => $route,
                 'viewParameters' => [
-                    'customField' => $field,
+                    'customField' => $customField,
                     'form'   => $form->createView(),
                     'tmpl'   => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                 ],

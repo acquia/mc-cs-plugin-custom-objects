@@ -45,7 +45,7 @@ return [
                 ],
             ],
             CustomFieldRouteProvider::ROUTE_SAVE => [
-                'path'       => '/custom/field/save',
+                'path'       => '/custom/field/save/{objectId}/{fieldType}',
                 'controller' => 'CustomObjectsBundle:CustomField\Save:save',
                 'method'     => 'POST',
                 'defaults'   => [
@@ -226,13 +226,14 @@ return [
             'custom_field.save_controller' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\SaveController::class,
                 'arguments' => [
-                    'request_stack',
                     'session',
                     'form.factory',
                     'translator',
                     'mautic.custom.model.field',
+                    'custom_object.custom_field_factory',
                     'custom_field.permission.provider',
                     'custom_field.route.provider',
+                    'mautic.custom.model.object',
                 ],
                 'methodCalls' => [
                     'setContainer' => [

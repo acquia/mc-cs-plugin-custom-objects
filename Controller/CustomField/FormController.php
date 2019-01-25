@@ -125,7 +125,7 @@ class FormController extends CommonController
         }
 
         $route = $this->fieldRouteProvider->buildFormRoute($customObject->getId());
-        $action = $this->fieldRouteProvider->buildSaveRoute();
+        $action = $this->fieldRouteProvider->buildSaveRoute($fieldId, $customObject->getId(), $fieldType);
         $form   = $this->formFactory->create(CustomFieldType::class, $customField, ['action' => $action]);
 
         return $this->delegateView(

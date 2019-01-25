@@ -42,9 +42,17 @@ class CustomFieldRouteProvider
      *
      * @return string
      */
-    public function buildSaveRoute(?int $id = null): string
+    public function buildSaveRoute(?int $id = null, int $objectId, string $fieldType): string
     {
-        $params = $id ? ['fieldId' => $id] : [];
+        $params = [
+            'objectId' => $objectId,
+            'fieldType' => $fieldType,
+        ];
+
+        if ($id) {
+            $params['fieldId'] = $id;
+        }
+
         return $this->router->generate(static::ROUTE_SAVE, $params);
     }
 
