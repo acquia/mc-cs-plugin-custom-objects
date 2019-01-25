@@ -74,11 +74,11 @@ $view['slots']->set('headerTitle', $header);
                 <?php endif; ?>
                 <div class="drop-here">
                     <?php
-                        foreach ($customFields as $field):
-                            if (!in_array($field->getId(), $deletedFields)) :
+                        foreach ($customFields as $customField):
+                            if (!in_array($customField->getId(), $deletedFields)) :
                                 echo $view->render(
-                                    "CustomObjectsBundle:CustomObject:Fields\\field.{$field->getType()}.html.php",
-                                    ['field' => $field]
+                                    "CustomObjectsBundle:CustomObject:Fields\\field.{$customField->getType()}.html.php",
+                                    ['customField' => $customField, 'customObject' => $customObject]
                                 );
                             endif;
                         endforeach;
