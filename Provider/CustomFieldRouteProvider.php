@@ -44,7 +44,8 @@ class CustomFieldRouteProvider
      */
     public function buildSaveRoute(?int $id = null): string
     {
-        return $this->router->generate(static::ROUTE_SAVE, ['fieldId' => $id]);
+        $params = $id ? ['fieldId' => $id] : [];
+        return $this->router->generate(static::ROUTE_SAVE, $params);
     }
 
     /**
@@ -67,7 +68,7 @@ class CustomFieldRouteProvider
      */
     public function buildCloneRoute(int $id): string
     {
-        return $this->router->generate(static::ROUTE_CLONE, ['objectId' => $id]);
+        return $this->router->generate(static::ROUTE_CLONE, ['fieldId' => $id]);
     }
 
     /**

@@ -32,7 +32,7 @@ return [
                 'method'     => 'GET',
             ],
             CustomFieldRouteProvider::ROUTE_CLONE => [
-                'path'       => '/custom/field/clone/{objectId}',
+                'path'       => '/custom/field/clone/{fieldId}',
                 'controller' => 'CustomObjectsBundle:CustomField\Clone:clone',
                 'method'     => 'GET',
             ],
@@ -256,11 +256,6 @@ return [
             ],
             'custom_field.cancel_controller' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\CancelController::class,
-                'arguments' => [
-                    'session',
-                    'mautic.custom.model.field',
-                    'custom_field.route.provider',
-                ],
                 'methodCalls' => [
                     'setContainer' => [
                         '@service_container'

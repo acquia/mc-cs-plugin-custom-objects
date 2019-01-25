@@ -68,37 +68,37 @@ class CloneController extends CommonController
     }
 
     /**
-     * @param int $objectId
+     * @param int $fieldId
      * 
      * @return Response|JsonResponse
      */
-    public function cloneAction(int $objectId)
+    public function cloneAction(int $fieldId)
     {
         try {
-            $entity = clone $this->customFieldModel->fetchEntity($objectId);
-            $this->permissionProvider->canClone($entity);
+            $customField = clone $this->customFieldModel->fetchEntity($fieldId);
+            $this->permissionProvider->canClone($customField);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
             $this->accessDenied(false, $e->getMessage());
         }
 
-        $entity->setLabel($entity->getLabel().' '.$this->translator->trans('mautic.core.form.clone'));
+        $customField->setLabel($customField->getLabel().' '.$this->translator->trans('mautic.core.form.clone'));
 
         $action = $this->routeProvider->buildSaveRoute();
-        $form   = $this->formFactory->create(CustomFieldType::class, $entity, ['action' => $action]);
+        $form   = $this->formFactory->create(CustomFieldType::class, $customField, ['action' => $action]);
 
         return $this->delegateView(
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute(),
                 'viewParameters' => [
-                    'entity' => $entity,
+                    'customField' => $customField,
                     'form'   => $form->createView(),
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomField:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customField',
-                    'route'         => $this->routeProvider->buildCloneRoute($objectId),
+                    'route'         => $this->routeProvider->buildCloneRoute($fieldId),
                 ],
             ]
         );
