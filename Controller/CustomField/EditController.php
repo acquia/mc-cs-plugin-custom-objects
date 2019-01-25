@@ -68,35 +68,35 @@ class EditController extends CommonController
     }
 
     /**
-     * @param int $objectId
-     * 
+     * @param int $fieldId
+     *
      * @return Response|JsonResponse
      */
-    public function renderFormAction(int $objectId)
+    public function renderFormAction(int $fieldId)
     {
         try {
-            $entity = $this->customFieldModel->fetchEntity($objectId);
-            $this->permissionProvider->canEdit($entity);
+            $customField = $this->customFieldModel->fetchEntity($fieldId);
+            $this->permissionProvider->canEdit($customField);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
             $this->accessDenied(false, $e->getMessage());
         }
 
-        $action  = $this->routeProvider->buildSaveRoute($objectId);
-        $form    = $this->formFactory->create(CustomFieldType::class, $entity, ['action' => $action]);
+        $action  = $this->routeProvider->buildSaveRoute($fieldId);
+        $form    = $this->formFactory->create(CustomFieldType::class, $customField, ['action' => $action]);
 
         return $this->delegateView(
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute(),
                 'viewParameters' => [
-                    'entity' => $entity,
+                    'customField' => $customField,
                     'form'   => $form->createView(),
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomField:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customField',
-                    'route'         => $this->routeProvider->buildEditRoute($objectId),
+                    'route'         => $this->routeProvider->buildEditRoute($fieldId),
                 ],
             ]
         );

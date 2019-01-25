@@ -35,17 +35,17 @@ return [
                 ],
             ],
             CustomFieldRouteProvider::ROUTE_VIEW => [
-                'path'       => '/custom/field/view/{objectId}',
+                'path'       => '/custom/field/view/{fieldId}',
                 'controller' => 'CustomObjectsBundle:CustomField\View:view',
                 'method'     => 'GET',
             ],
             CustomFieldRouteProvider::ROUTE_NEW => [
-                'path'       => '/custom/field/new',
+                'path'       => '/custom/field/new/{objectId}/{fieldType}',
                 'controller' => 'CustomObjectsBundle:CustomField\New:renderForm',
-                'method'     => 'GET',
+                'method'     => 'GET|POST',
             ],
             CustomFieldRouteProvider::ROUTE_EDIT => [
-                'path'       => '/custom/field/edit/{objectId}',
+                'path'       => '/custom/field/edit/{fieldId}',
                 'controller' => 'CustomObjectsBundle:CustomField\Edit:renderForm',
                 'method'     => 'GET',
             ],
@@ -55,25 +55,25 @@ return [
                 'method'     => 'GET',
             ],
             CustomFieldRouteProvider::ROUTE_CANCEL => [
-                'path'       => '/custom/field/cancel/{objectId}',
+                'path'       => '/custom/field/cancel/{fieldId}',
                 'controller' => 'CustomObjectsBundle:CustomField\Cancel:cancel',
                 'method'     => 'GET',
                 'defaults'   => [
-                    'objectId' => null,
+                    'fieldId' => null,
                 ],
             ],
             CustomFieldRouteProvider::ROUTE_SAVE => [
-                'path'       => '/custom/field/save/{objectId}',
+                'path'       => '/custom/field/save/{fieldId}',
                 'controller' => 'CustomObjectsBundle:CustomField\Save:save',
                 'method'     => 'POST',
                 'defaults'   => [
-                    'objectId' => null,
+                    'fieldId' => null,
                 ],
             ],
             CustomFieldRouteProvider::ROUTE_DELETE => [
-                'path'       => '/custom/field/delete/{objectId}',
+                'path'       => '/custom/field/delete/{fieldId}',
                 'controller' => 'CustomObjectsBundle:CustomField\Delete:delete',
-                'method'     => 'GET',
+                'method'     => 'GET|POST',
             ],
 
             // Custom Items
@@ -229,8 +229,6 @@ return [
             'custom_field.view_controller' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\ViewController::class,
                 'arguments' => [
-                    'request_stack',
-                    'session',
                     'mautic.helper.core_parameters',
                     'mautic.custom.model.field',
                     'custom_field.permission.provider',
@@ -248,6 +246,9 @@ return [
                     'form.factory',
                     'custom_field.permission.provider',
                     'custom_field.route.provider',
+                    'custom_object.repository',
+                    'mautic.custom.model.object',
+                    'custom_object.custom_field_factory',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -516,6 +517,7 @@ return [
                     'form.factory',
                     'custom_object.permission.provider',
                     'custom_object.route.provider',
+                    'custom_field.type.provider',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -528,8 +530,10 @@ return [
                 'arguments' => [
                     'form.factory',
                     'mautic.custom.model.object',
+                    'mautic.custom.model.field',
                     'custom_object.permission.provider',
                     'custom_object.route.provider',
+                    'custom_field.type.provider',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -637,21 +641,21 @@ return [
         ],
         'repositories' => [
             'custom_field.repository' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
+                'class'     => \MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \MauticPlugin\CustomObjectsBundle\Entity\CustomField::class,
                 ],
             ],
             'custom_item.repository' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
+                'class'     => \MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \MauticPlugin\CustomObjectsBundle\Entity\CustomItem::class,
                 ],
             ],
             'custom_object.repository' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
+                'class'     => \MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \MauticPlugin\CustomObjectsBundle\Entity\CustomObject::class,
@@ -687,6 +691,17 @@ return [
                     'translator',
                 ],
             ],
+            'custom_field.subscriber' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldSubscriber::class,
+                'arguments' => [
+                    'custom_field.type.provider',
+                ],
+                'tag' => 'doctrine.event_listener',
+                'tagArguments' => [
+                    'event' => 'postLoad',
+                    'lazy' => true,
+                ]
+            ],
             'custom_field.button.subscriber' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldButtonSubscriber::class,
                 'arguments' => [
@@ -716,9 +731,9 @@ return [
             'custom_field.field.form' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType::class,
                 'arguments' => [
-                    'mautic.custom.model.object',
-                    'custom_field.type.provider',
+                    'custom_object.repository'
                 ],
+                'tag' => 'form.type'
             ],
             'custom_field.field.value.form' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldValueType::class,
@@ -770,6 +785,12 @@ return [
                     'mautic.security',
                 ],
             ],
+            'custom_object.custom_field_factory' => [
+                'class' =>\MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory::class,
+                'arguments' => [
+                    'custom_field.type.provider'
+                ]
+            ]
         ],
     ],
     'parameters' => [

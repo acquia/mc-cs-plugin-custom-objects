@@ -15,6 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,19 +43,27 @@ class NewController extends CommonController
     private $routeProvider;
 
     /**
-     * @param FormFactory $formFactory
+     * @var CustomFieldTypeProvider
+     */
+    private $customFieldTypeProvider;
+
+    /**
+     * @param FormFactory                    $formFactory
      * @param CustomObjectPermissionProvider $permissionProvider
-     * @param CustomObjectRouteProvider $routeProvider
+     * @param CustomObjectRouteProvider      $routeProvider
+     * @param CustomFieldTypeProvider        $customFieldTypeProvider
      */
     public function __construct(
         FormFactory $formFactory,
         CustomObjectPermissionProvider $permissionProvider,
-        CustomObjectRouteProvider $routeProvider
+        CustomObjectRouteProvider $routeProvider,
+        CustomFieldTypeProvider $customFieldTypeProvider
     )
     {
         $this->formFactory        = $formFactory;
         $this->permissionProvider = $permissionProvider;
         $this->routeProvider      = $routeProvider;
+        $this->customFieldTypeProvider = $customFieldTypeProvider;
     }
 
     /**
@@ -68,15 +77,19 @@ class NewController extends CommonController
             $this->accessDenied(false, $e->getMessage());
         }
         
-        $entity  = new CustomObject();
+        $customObject  = new CustomObject();
         $action  = $this->routeProvider->buildSaveRoute();
-        $form    = $this->formFactory->create(CustomObjectType::class, $entity, ['action' => $action]);
+        $form    = $this->formFactory->create(CustomObjectType::class, $customObject, ['action' => $action]);
+
+        $availableFieldTypes = $this->customFieldTypeProvider->getTypes();
 
         return $this->delegateView(
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute(),
                 'viewParameters' => [
-                    'entity' => $entity,
+                    'customObject' => $customObject,
+                    'availableFieldTypes' => $availableFieldTypes,
+                    'customFields' => [],
                     'form'   => $form->createView(),
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.php',

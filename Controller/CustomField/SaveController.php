@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
@@ -90,18 +91,18 @@ class SaveController extends CommonController
     }
 
     /**
-     * @param int|null $objectId
+     * @param int|null $fieldId
      * 
      * @return Response|JsonResponse
      */
-    public function saveAction(?int $objectId = null)
+    public function saveAction(?int $fieldId = null)
     {
         try {
-            $entity = $objectId ? $this->customFieldModel->fetchEntity($objectId): new CustomField();
-            if ($entity->isNew()) {
+            $field = $fieldId ? $this->customFieldModel->fetchEntity($fieldId): new CustomField();
+            if ($field->isNew()) {
                 $this->permissionProvider->canCreate();
             } else {
-                $this->permissionProvider->canEdit($entity);
+                $this->permissionProvider->canEdit($field);
             }
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
@@ -110,39 +111,46 @@ class SaveController extends CommonController
         }
 
         $request = $this->requestStack->getCurrentRequest();
-        $action  = $this->routeProvider->buildSaveRoute($objectId);
-        $form    = $this->formFactory->create(CustomFieldType::class, $entity, ['action' => $action]);
+        $action  = $this->routeProvider->buildSaveRoute($fieldId);
+        $form    = $this->formFactory->create(CustomFieldType::class, $field, ['action' => $action]);
         $form->handleRequest($request);
         
         if ($form->isValid()) {
-            $this->customFieldModel->save($entity);
+            $this->customFieldModel->save($field);
 
             $this->session->getFlashBag()->add(
                 'notice',
                 $this->translator->trans(
-                    $objectId ? 'mautic.core.notice.updated' : 'mautic.core.notice.created',
+                    $fieldId ? 'mautic.core.notice.updated' : 'mautic.core.notice.created',
                     [
-                        '%name%' => $entity->getName(),
-                        '%url%'  => $this->routeProvider->buildEditRoute($objectId),
+                        '%name%' => $field->getName(),
+                        '%url%'  => '', // No url provided as it does not make sense
                     ], 
                     'flashes'
                 )
             );
 
             if ($form->get('buttons')->get('save')->isClicked()) {
-                return $this->redirectToDetail($request, $entity);
+                // Close modal
+                return $this->delegateView(
+                    [
+                        'passthroughVars' => [
+                            'closeModal'    => 1,
+                        ],
+                    ]
+                );
             } else {
-                return $this->redirectToEdit($request, $entity);
+                return $this->redirectToEdit($request, $field);
             }
         }
 
-        $route = $objectId ? $this->routeProvider->buildEditRoute($objectId) : $this->routeProvider->buildNewRoute();
+        $route = $fieldId ? $this->routeProvider->buildEditRoute($fieldId) : '';
 
         return $this->delegateView(
             [
                 'returnUrl'      => $route,
                 'viewParameters' => [
-                    'entity' => $entity,
+                    'customField' => $field,
                     'form'   => $form->createView(),
                     'tmpl'   => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                 ],
@@ -164,22 +172,8 @@ class SaveController extends CommonController
     private function redirectToEdit(Request $request, CustomField $entity): Response
     {
         $request->setMethod('GET');
-        $params = ['objectId' => $entity->getId()];
+        $params = ['fieldId' => $entity->getId()];
 
         return $this->forward('custom_field.edit_controller:renderFormAction', $params);
-    }
-
-    /**
-     * @param Request     $request
-     * @param CustomField $entity
-     * 
-     * @return Response
-     */
-    private function redirectToDetail(Request $request, CustomField $entity): Response
-    {
-        $request->setMethod('GET');
-        $params = ['objectId' => $entity->getId()];
-
-        return $this->forward('CustomObjectsBundle:CustomField\View:view', $params);
     }
 }
