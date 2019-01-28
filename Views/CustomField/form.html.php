@@ -15,7 +15,7 @@ $view['slots']->set('mauticContent', 'customField');
 
 if ($customField->getId()) {
     $header = $view['translator']->trans(
-        'custom.field.edit',
+        $customField->getId() ? 'custom.field.edit' : 'custom.field.new',
         ['%name%' => $view['translator']->trans($customField->getName())]
     );
 } else {

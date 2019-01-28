@@ -15,22 +15,35 @@ namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
+use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
-use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 
-class NewController extends CommonController
+class FormController extends CommonController
 {
     /**
      * @var FormFactory
      */
     private $formFactory;
+
+    /**
+     * @var CustomObjectModel
+     */
+    private $customObjectModel;
+
+    /**
+     * @var CustomFieldModel
+     */
+    private $customFieldModel;
 
     /**
      * @var CustomObjectPermissionProvider
@@ -49,39 +62,58 @@ class NewController extends CommonController
 
     /**
      * @param FormFactory                    $formFactory
+     * @param CustomObjectModel              $customObjectModel
+     * @param CustomFieldModel               $customFieldModel
      * @param CustomObjectPermissionProvider $permissionProvider
      * @param CustomObjectRouteProvider      $routeProvider
      * @param CustomFieldTypeProvider        $customFieldTypeProvider
      */
     public function __construct(
         FormFactory $formFactory,
+        CustomObjectModel $customObjectModel,
+        CustomFieldModel $customFieldModel,
         CustomObjectPermissionProvider $permissionProvider,
         CustomObjectRouteProvider $routeProvider,
         CustomFieldTypeProvider $customFieldTypeProvider
-    )
-    {
+    ){
         $this->formFactory        = $formFactory;
+        $this->customObjectModel  = $customObjectModel;
+        $this->customFieldModel = $customFieldModel;
         $this->permissionProvider = $permissionProvider;
         $this->routeProvider      = $routeProvider;
         $this->customFieldTypeProvider = $customFieldTypeProvider;
     }
 
     /**
+     * @param Request $request
+     *
      * @return Response|JsonResponse
      */
-    public function renderFormAction()
+    public function renderFormAction(Request $request)
     {
+        $objectId = (int) $request->get('objectId');
+
         try {
-            $this->permissionProvider->canCreate();
+            if ($objectId) {
+                $customObject = $this->customObjectModel->fetchEntity($objectId);
+                $this->permissionProvider->canEdit($customObject);
+            } else {
+                $this->permissionProvider->canCreate();
+                $customObject = new CustomObject();
+            }
+        } catch (NotFoundException $e) {
+            return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
             $this->accessDenied(false, $e->getMessage());
         }
-        
-        $customObject  = new CustomObject();
-        $action  = $this->routeProvider->buildSaveRoute();
-        $form    = $this->formFactory->create(CustomObjectType::class, $customObject, ['action' => $action]);
 
         $availableFieldTypes = $this->customFieldTypeProvider->getTypes();
+
+        $route = $this->routeProvider->buildFormRoute($customObject->getId());
+        $action = $this->routeProvider->buildSaveRoute($objectId);
+        $form   = $this->formFactory->create(CustomObjectType::class, $customObject, ['action' => $action]);
+
+        $customFields = $this->customFieldModel->fetchCustomFieldsForObject($customObject);
 
         return $this->delegateView(
             [
@@ -89,13 +121,14 @@ class NewController extends CommonController
                 'viewParameters' => [
                     'customObject' => $customObject,
                     'availableFieldTypes' => $availableFieldTypes,
-                    'customFields' => [],
+                    'customFields' => $customFields,
+                    'deletedFields' => [],
                     'form'   => $form->createView(),
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
-                    'route'         => $this->routeProvider->buildNewRoute(),
+                    'route'         => $route,
                 ],
             ]
         );
