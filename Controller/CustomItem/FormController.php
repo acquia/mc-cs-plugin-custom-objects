@@ -91,6 +91,7 @@ class FormController extends CommonController
                 $route  = $this->routeProvider->buildEditRoute($objectId, $itemId);
                 $this->permissionProvider->canEdit($entity);
             } else {
+                $this->permissionProvider->canCreate();
                 $entity = $this->customItemModel->populateCustomFields(new CustomItem($customObject));
                 $route  = $this->routeProvider->buildNewRoute($objectId);
             }
