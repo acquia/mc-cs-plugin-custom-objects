@@ -145,7 +145,7 @@ class SaveController extends CommonController
             if ($form->get('buttons')->get('save')->isClicked()) {
                 $where = 'CustomObjectsBundle:CustomItem\View:view';
             } else {
-                $where = 'CustomObjectsBundle:CustomItem\View:renderForm';
+                $where = 'CustomObjectsBundle:CustomItem\Form:renderForm';
             }
 
             return $this->redirectTo($where, $request, $entity);
@@ -177,10 +177,10 @@ class SaveController extends CommonController
      * 
      * @return Response
      */
-    private function redirectTo(string $where, Request $request, CustomItem $entity): Response
+    private function redirectTo(string $where, Request $request, CustomItem $customItem): Response
     {
         $request->setMethod('GET');
-        $params = ['objectId' => $entity->getCustomObject()->getId(), 'itemId' => $entity->getId()];
+        $params = ['objectId' => $customItem->getCustomObject()->getId(), 'itemId' => $customItem->getId()];
 
         return $this->forward($where, $params);
     }
