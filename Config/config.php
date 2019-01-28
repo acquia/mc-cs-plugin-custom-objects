@@ -92,12 +92,12 @@ return [
             ],
             CustomItemRouteProvider::ROUTE_NEW => [
                 'path'       => '/custom/object/{objectId}/item/new',
-                'controller' => 'CustomObjectsBundle:CustomItem\New:renderForm',
+                'controller' => 'CustomObjectsBundle:CustomItem\Form:renderForm',
                 'method'     => 'GET',
             ],
             CustomItemRouteProvider::ROUTE_EDIT => [
                 'path'       => '/custom/object/{objectId}/item/edit/{itemId}',
-                'controller' => 'CustomObjectsBundle:CustomItem\Edit:renderForm',
+                'controller' => 'CustomObjectsBundle:CustomItem\Form:renderForm',
                 'method'     => 'GET',
             ],
             CustomItemRouteProvider::ROUTE_CLONE => [
@@ -362,23 +362,8 @@ return [
                     ],
                 ],
             ],
-            'custom_item.new_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\NewController::class,
-                'arguments' => [
-                    'form.factory',
-                    'custom_item.permission.provider',
-                    'custom_item.route.provider',
-                    'mautic.custom.model.object',
-                    'mautic.custom.model.item',
-                ],
-                'methodCalls' => [
-                    'setContainer' => [
-                        '@service_container'
-                    ],
-                ],
-            ],
-            'custom_item.edit_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\EditController::class,
+            'custom_item.form_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\FormController::class,
                 'arguments' => [
                     'form.factory',
                     'mautic.custom.model.object',
