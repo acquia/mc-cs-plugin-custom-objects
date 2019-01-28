@@ -123,7 +123,7 @@ class SaveController extends CommonController
                     $objectId ? 'mautic.core.notice.updated' : 'mautic.core.notice.created',
                     [
                         '%name%' => $entity->getName(),
-                        '%url%'  => $this->routeProvider->buildEditRoute($objectId),
+                        '%url%'  => $this->routeProvider->buildFormRoute($objectId),
                     ], 
                     'flashes'
                 )
@@ -136,7 +136,7 @@ class SaveController extends CommonController
             }
         }
 
-        $route = $objectId ? $this->routeProvider->buildEditRoute($objectId) : $this->routeProvider->buildNewRoute();
+        $route = $this->routeProvider->buildFormRoute($objectId);
 
         return $this->delegateView(
             [
@@ -166,7 +166,7 @@ class SaveController extends CommonController
         $request->setMethod('GET');
         $params = ['objectId' => $entity->getId()];
 
-        return $this->forward('custom_object.edit_controller:renderFormAction', $params);
+        return $this->forward('custom_object.form_controller:renderFormAction', $params);
     }
 
     /**

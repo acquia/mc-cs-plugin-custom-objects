@@ -15,7 +15,7 @@ $view['slots']->set('mauticContent', 'customObject');
 
 if ($customObject->getId()) {
     $header = $view['translator']->trans(
-        'custom.object.edit',
+        $customObject->getId() ? 'custom.object.edit' : 'custom.object.new',
         ['%name%' => $view['translator']->trans($customObject->getName())]
     );
 } else {
