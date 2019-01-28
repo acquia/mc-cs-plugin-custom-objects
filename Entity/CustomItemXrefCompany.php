@@ -66,11 +66,13 @@ class CustomItemXrefCompany
             ->addJoinColumn('custom_item_id', 'id', false, false, 'CASCADE')
             ->inversedBy('companyReferences')
             ->makePrimaryKey()
+            ->fetchExtraLazy()
             ->build();
 
         $builder->createManyToOne('company', Company::class)
             ->addJoinColumn('company_id', 'id', false, false, 'CASCADE')
             ->makePrimaryKey()
+            ->fetchExtraLazy()
             ->build();
 
         $builder->createField('dateAdded', Type::DATETIME)

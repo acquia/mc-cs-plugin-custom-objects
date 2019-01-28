@@ -22,6 +22,8 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInt;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use Doctrine\Common\Collections\ArrayCollection;
 
 class CustomFieldValueModel
 {
@@ -53,33 +55,84 @@ class CustomFieldValueModel
      * 
      * @param CustomItem $customItem
      * 
-     * @return array
+     * @return ArrayCollection
      */
-    public function getValuesForItem(CustomItem $customItem): array
+    public function getValuesForItem(CustomItem $customItem): ArrayCollection
     {
+        $customFieldValues = new ArrayCollection();
+
         if (!$customItem->getId()) {
-            return [];
+            return $customFieldValues;
         }
 
-        $qb         = $this->entityManager->createQueryBuilder();
         $fieldTypes = $this->customFieldTypeProvider->getTypes();
-        $firstType  = array_shift($fieldTypes);
-        $or         = $qb->expr()->orX();
-
-        $qb->from($firstType->getEntityClass(), $this->getAlias($firstType));
-        $qb->select($this->getAlias($firstType));
-        $or->add($qb->expr()->eq("{$this->getAlias($firstType)}.customItem", ':customItem'));
+        $queries    = [];
+        $params     = [];
 
         foreach ($fieldTypes as $type) {
-            $qb->leftJoin($type->getEntityClass(), $this->getAlias($type));
-            $qb->addSelect($this->getAlias($type));
-            $or->add($qb->expr()->eq("{$this->getAlias($type)}.customItem", ':customItem'));
+            $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
+            $queryBuilder->select("{$type->getTableAlias()}.custom_field_id, {$type->getTableAlias()}.value, '{$type->getKey()}' AS type");
+            $queryBuilder->from($type->getTableName(), $type->getTableAlias());
+            $queryBuilder->where("{$type->getTableAlias()}.custom_item_id = :customItemId");
+            $params['customItemId'] = $customItem->getId();
+            $queries[] = $queryBuilder->getSQL();
         }
 
-        $qb->where($or);
-        $qb->setParameter('customItem', $customItem->getId());
+        $statement = $this->entityManager->getConnection()->prepare(implode(' UNION ', $queries));
 
-        return $qb->getQuery()->getResult();
+        foreach ($params as $param => $value) {
+            $statement->bindValue($param, $value);
+        }
+
+        $statement->execute();
+        $rows = $statement->fetchAll();
+
+        foreach ($rows as $row) {
+            $fieldType      = $this->customFieldTypeProvider->getType($row['type']);
+            $entityClass    = $fieldType->getEntityClass();
+            $customFieldRef = $this->entityManager->getReference(CustomField::class, (int) $row['custom_field_id']);
+            $customFieldRef->setType($fieldType);
+            $customFieldValueRef = $this->entityManager->getReference($entityClass, ['customField' => $customFieldRef, 'customItem' => $customItem]);
+            $customFieldValueRef->setValue($row['value']);
+            $customFieldValueRef->updateThisEntityManually();
+            $customFieldValues->set($customFieldValueRef->getId(), $customFieldValueRef);
+        }
+
+        return $customFieldValues;
+    }
+
+    /**
+     * If the entities were created manually, not fetched by Entity Manager
+     * then we have to update them manually without help of EntityManager.
+     *
+     * @param CustomFieldValueInterface $customFieldValue
+     */
+    public function save(CustomFieldValueInterface $customFieldValue)
+    {
+        if ($customFieldValue->shouldBeUpdatedManually()) {
+            $this->updateManually($customFieldValue);
+            $this->entityManager->detach($customFieldValue);
+        } else {
+            $this->entityManager->persist($customFieldValue);
+        }
+    }
+
+    /**
+     * @param CustomFieldValueInterface $customFieldValue
+     */
+    public function updateManually(CustomFieldValueInterface $customFieldValue)
+    {
+        $fieldType    = $customFieldValue->getCustomField()->getType(); // must be changed to `getTypeObject()`
+        $fieldType    = $this->customFieldTypeProvider->getType($fieldType); // and then remove this line 
+        $queryBuilder = $this->entityManager->createQueryBuilder();
+        $queryBuilder->update($fieldType->getEntityClass(), $fieldType->getTableAlias())
+            ->set("{$fieldType->getTableAlias()}.value", $queryBuilder->expr()->literal($customFieldValue->getValue()))
+            ->where("{$fieldType->getTableAlias()}.customField = :customFieldId")
+            ->andWhere("{$fieldType->getTableAlias()}.customItem = :customItemId")
+            ->setParameter('customFieldId', (int) $customFieldValue->getCustomField()->getId())
+            ->setParameter('customItemId', (int) $customFieldValue->getCustomItem()->getId());
+        $query = $queryBuilder->getQuery();
+        $query->execute();
     }
 
     /**

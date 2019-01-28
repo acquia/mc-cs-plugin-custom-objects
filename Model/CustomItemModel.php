@@ -113,8 +113,8 @@ class CustomItemModel extends FormModel
 
         $this->entityManager->persist($entity);
 
-        foreach ($entity->getCustomFieldValues() as $value) {
-            $this->entityManager->persist($value);
+        foreach ($entity->getCustomFieldValues() as $customFieldValue) {
+            $this->customFieldValueModel->save($customFieldValue);
         }
 
         foreach ($entity->getContactReferences() as $reference) {
@@ -207,16 +207,17 @@ class CustomItemModel extends FormModel
     public function populateCustomFields(CustomItem $customItem): CustomItem
     {
         $values            = $customItem->getCustomFieldValues();
-        $customFieldValues = $this->customFieldValueModel->getValuesForItem($customItem);
         $customFields      = $this->customFieldModel->fetchCustomFieldsForObject($customItem->getCustomObject());
+        $customFieldValues = $this->customFieldValueModel->getValuesForItem($customItem);
+        $customItem->setCustomFieldValues($values);
         
         foreach ($customFieldValues as $customFieldValue) {
-            $values->set($customFieldValue->getCustomField()->getId(), $customFieldValue);
+            $values->set($customFieldValue->getId(), $customFieldValue);
         }
         
         foreach ($customFields as $customField) {
             // Create default value for field that does not exist yet.
-            if (null === $values->get($customField->getId())) {
+            if (null === $values->get("{$customField->getId()}_{$customItem->getId()}")) {
                 $customFieldType = $this->customFieldTypeProvider->getType($customField->getType());
                 // @todo the default value should come form the custom field.
                 $values->set(

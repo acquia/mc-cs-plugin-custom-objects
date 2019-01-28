@@ -34,6 +34,13 @@ abstract class CustomFieldValueStandard implements CustomFieldValueInterface
     protected $customItem;
 
     /**
+     * Flag to know whether to update this entity manually or let EntityManager to handle it.
+     *
+     * @var boolean
+     */
+    protected $updateManually = false;
+
+    /**
      * @param CustomField $customField
      * @param CustomItem  $customItem
      */
@@ -92,5 +99,18 @@ abstract class CustomFieldValueStandard implements CustomFieldValueInterface
     public function getCustomItem()
     {
         return $this->customItem;
+    }
+
+    public function updateThisEntityManually()
+    {
+        $this->updateManually = true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function shouldBeUpdatedManually()
+    {
+        return $this->updateManually;
     }
 }

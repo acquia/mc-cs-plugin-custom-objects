@@ -17,7 +17,6 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemType;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
-use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
@@ -27,7 +26,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 
-class EditController extends CommonController
+class FormController extends CommonController
 {
     /**
      * @var FormFactory
@@ -82,12 +81,20 @@ class EditController extends CommonController
      * 
      * @return Response|JsonResponse
      */
-    public function renderFormAction(int $objectId, int $itemId)
+    public function renderFormAction(int $objectId, ?int $itemId)
     {
         try {
             $customObject = $this->customObjectModel->fetchEntity($objectId);
-            $entity       = $this->customItemModel->fetchEntity($itemId);
-            $this->permissionProvider->canEdit($entity);
+
+            if ($itemId) {
+                $entity = $this->customItemModel->fetchEntity($itemId);
+                $route  = $this->routeProvider->buildEditRoute($objectId, $itemId);
+                $this->permissionProvider->canEdit($entity);
+            } else {
+                $this->permissionProvider->canCreate();
+                $entity = $this->customItemModel->populateCustomFields(new CustomItem($customObject));
+                $route  = $this->routeProvider->buildNewRoute($objectId);
+            }
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
@@ -108,7 +115,7 @@ class EditController extends CommonController
                 'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customItem',
-                    'route'         => $this->routeProvider->buildEditRoute($objectId, $itemId),
+                    'route'         => $route,
                 ],
             ]
         );

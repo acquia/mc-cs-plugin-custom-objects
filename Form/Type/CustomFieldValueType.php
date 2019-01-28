@@ -43,9 +43,10 @@ class CustomFieldValueType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $collection       = $options['entityCollection'];
+        $customItem       = $options['customItem'];
+        $collection       = $customItem->getCustomFieldValues();
         $customFieldId    = (int) $builder->getName();
-        $customFieldValue = $collection->get($customFieldId);
+        $customFieldValue = $customItem->getId() ? $collection->get("{$customFieldId}_{$customItem->getId()}") : $collection->get($customFieldId);
         $customField      = $customFieldValue->getCustomField();
         $fieldType        = $this->customFieldTypeProvider->getType($customField->getType());
 
@@ -67,6 +68,6 @@ class CustomFieldValueType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(array('data_class' => CustomFieldValueInterface::class,));
-        $resolver->setRequired(['entityCollection']);
+        $resolver->setRequired(['customItem']);
     }
 }

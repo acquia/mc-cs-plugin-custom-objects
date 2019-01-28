@@ -47,4 +47,14 @@ interface CustomFieldTypeInterface
      * @return CustomFieldValueInterface
      */
     public function createValueEntity(CustomField $customField, CustomItem $customItem, $value = null): CustomFieldValueInterface;
+
+    /**
+     * @return string
+     */
+    public function getTableName(): string;
+
+    /**
+     * @return string
+     */
+    public function getTableAlias(): string;
 }
