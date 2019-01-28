@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -110,10 +111,10 @@ class SaveController extends CommonController
         $fieldId = (int) $request->get('fieldId');
         $fieldType = $request->get('fieldType');
 
-        try {
+        if ($objectId) {
             $customObject = $this->customObjectModel->fetchEntity($objectId);
-        } catch (NotFoundException $e) {
-            return $this->notFound($e->getMessage());
+        } else {
+            $customObject = new CustomObject();
         }
 
         try {
