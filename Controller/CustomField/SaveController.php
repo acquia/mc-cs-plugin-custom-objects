@@ -139,18 +139,6 @@ class SaveController extends CommonController
         if ($form->isValid()) {
             $this->customFieldModel->save($customField);
 
-            $this->session->getFlashBag()->add(
-                'notice',
-                $this->translator->trans(
-                    $fieldId ? 'mautic.core.notice.updated' : 'mautic.core.notice.created',
-                    [
-                        '%name%' => $customField->getName(),
-                        '%url%'  => '', // No url provided as it does not make sense
-                    ], 
-                    'flashes'
-                )
-            );
-
             if ($form->get('buttons')->get('save')->isClicked()) {
                 // Close modal
                 return $this->delegateView(
