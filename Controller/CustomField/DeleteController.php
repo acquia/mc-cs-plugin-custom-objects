@@ -67,31 +67,28 @@ class DeleteController extends CommonController
     public function deleteAction(int $fieldId)
     {
         try {
-            $entity = $this->customFieldModel->fetchEntity($fieldId);
-            $this->permissionProvider->canDelete($entity);
+            $customField = $this->customFieldModel->fetchEntity($fieldId);
+            $this->permissionProvider->canDelete($customField);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
             $this->accessDenied(false, $e->getMessage());
         }
 
-        $this->customFieldModel->deleteEntity($entity);
+        $this->customFieldModel->deleteEntity($customField);
 
         $this->session->getFlashBag()->add(
             'notice',
             $this->translator->trans(
                 'mautic.core.notice.deleted',
                 [
-                    '%name%' => $entity->getName(),
-                    '%id%'   => $entity->getId(),
+                    '%name%' => $customField->getName(),
+                    '%id%'   => $customField->getId(),
                 ], 
                 'flashes'
             )
         );
 
-        return $this->forward(
-            'CustomObjectsBundle:CustomField\List:list',
-            ['page' => $this->session->get('custom.field.page', 1)]
-        );
+        return $this->delegateView([]);
     }
 }

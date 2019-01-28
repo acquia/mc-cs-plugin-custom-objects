@@ -14,30 +14,22 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
-use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
 
-class SaveController extends CommonController
+class FormController extends CommonController
 {
-    /**
-     * @var Session
-     */
-    private $session;
-
     /**
      * @var FormFactory
      */
@@ -47,11 +39,6 @@ class SaveController extends CommonController
      * @var CustomFieldModel
      */
     private $customFieldModel;
-
-    /**
-     * @var CustomFieldFactory
-     */
-    private $customFieldFactory;
 
     /**
      * @var CustomFieldPermissionProvider
@@ -64,38 +51,45 @@ class SaveController extends CommonController
     private $fieldRouteProvider;
 
     /**
+     * @var CustomFieldFactory
+     */
+    private $customFieldFactory;
+
+    /**
      * @var CustomObjectModel
      */
     private $customObjectModel;
 
     /**
-     * @param Session                       $session
+     * @var CustomObjectRouteProvider
+     */
+    private $objectRouteProvider;
+
+    /**
      * @param FormFactory                   $formFactory
-     * @param TranslatorInterface           $translator
      * @param CustomFieldModel              $customFieldModel
      * @param CustomFieldFactory            $customFieldFactory
      * @param CustomFieldPermissionProvider $permissionProvider
-     * @param CustomFieldRouteProvider      $routeProvider
+     * @param CustomFieldRouteProvider      $fieldRouteProvider
      * @param CustomObjectModel             $customObjectModel
+     * @param CustomObjectRouteProvider     $objectRouteProvider
      */
     public function __construct(
-        Session $session,
         FormFactory $formFactory,
-        TranslatorInterface $translator,
         CustomFieldModel $customFieldModel,
         CustomFieldFactory $customFieldFactory,
         CustomFieldPermissionProvider $permissionProvider,
-        CustomFieldRouteProvider $routeProvider,
-        CustomObjectModel $customObjectModel
+        CustomFieldRouteProvider $fieldRouteProvider,
+        CustomObjectModel $customObjectModel,
+        CustomObjectRouteProvider $objectRouteProvider
     ){
-        $this->session            = $session;
         $this->formFactory        = $formFactory;
-        $this->translator         = $translator;
         $this->customFieldModel   = $customFieldModel;
         $this->customFieldFactory = $customFieldFactory;
         $this->permissionProvider = $permissionProvider;
-        $this->fieldRouteProvider      = $routeProvider;
+        $this->fieldRouteProvider      = $fieldRouteProvider;
         $this->customObjectModel = $customObjectModel;
+        $this->objectRouteProvider = $objectRouteProvider;
     }
 
     /**
@@ -104,7 +98,7 @@ class SaveController extends CommonController
      * @return Response|JsonResponse
      * @throws ForbiddenException
      */
-    public function saveAction(Request $request)
+    public function renderFormAction(Request $request)
     {
         $objectId = (int) $request->get('objectId');
         $fieldId = (int) $request->get('fieldId');
@@ -130,49 +124,17 @@ class SaveController extends CommonController
             $this->accessDenied(false, $e->getMessage());
         }
 
+        $route = $this->fieldRouteProvider->buildFormRoute($customObject->getId());
         $action = $this->fieldRouteProvider->buildSaveRoute($fieldId, $customObject->getId(), $fieldType);
         $form   = $this->formFactory->create(CustomFieldType::class, $customField, ['action' => $action]);
 
-        $form->handleRequest($request);
-        
-        if ($form->isValid()) {
-            $this->customFieldModel->save($customField);
-
-            $this->session->getFlashBag()->add(
-                'notice',
-                $this->translator->trans(
-                    $fieldId ? 'mautic.core.notice.updated' : 'mautic.core.notice.created',
-                    [
-                        '%name%' => $customField->getName(),
-                        '%url%'  => '', // No url provided as it does not make sense
-                    ], 
-                    'flashes'
-                )
-            );
-
-            if ($form->get('buttons')->get('save')->isClicked()) {
-                // Close modal
-                return $this->delegateView(
-                    [
-                        'passthroughVars' => [
-                            'closeModal'    => 1,
-                        ],
-                    ]
-                );
-            } else {
-                return $this->redirectToEdit($request, $customField);
-            }
-        }
-
-        $route = $fieldId ? $this->fieldRouteProvider->buildFormRoute($fieldId) : '';
-
         return $this->delegateView(
             [
-                'returnUrl'      => $route,
+                'returnUrl'      => $this->objectRouteProvider->buildEditRoute($customObject->getId()),
                 'viewParameters' => [
+                    'customObject' => $customObject,
                     'customField' => $customField,
                     'form'   => $form->createView(),
-                    'tmpl'   => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomField:form.html.php',
                 'passthroughVars' => [
@@ -181,19 +143,5 @@ class SaveController extends CommonController
                 ],
             ]
         );
-    }
-
-    /**
-     * @param Request     $request
-     * @param CustomField $entity
-     * 
-     * @return Response
-     */
-    private function redirectToEdit(Request $request, CustomField $entity): Response
-    {
-        $request->setMethod('GET');
-        $params = ['fieldId' => $entity->getId()];
-
-        return $this->forward('custom_field.form_controller:renderFormAction', $params);
     }
 }

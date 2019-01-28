@@ -26,31 +26,13 @@ return [
         'main' => [
 
             // Custom Fields
-            CustomFieldRouteProvider::ROUTE_LIST => [
-                'path'       => '/custom/field/{page}',
-                'controller' => 'CustomObjectsBundle:CustomField\List:list',
-                'method'     => 'GET|POST',
-                'defaults'   => [
-                    'page' => 1,
-                ],
-            ],
-            CustomFieldRouteProvider::ROUTE_VIEW => [
-                'path'       => '/custom/field/view/{fieldId}',
-                'controller' => 'CustomObjectsBundle:CustomField\View:view',
-                'method'     => 'GET',
-            ],
-            CustomFieldRouteProvider::ROUTE_NEW => [
-                'path'       => '/custom/field/new/{objectId}/{fieldType}',
-                'controller' => 'CustomObjectsBundle:CustomField\New:renderForm',
-                'method'     => 'GET|POST',
-            ],
-            CustomFieldRouteProvider::ROUTE_EDIT => [
-                'path'       => '/custom/field/edit/{fieldId}',
-                'controller' => 'CustomObjectsBundle:CustomField\Edit:renderForm',
+            CustomFieldRouteProvider::ROUTE_FORM => [
+                'path'       => '/custom/field/edit',
+                'controller' => 'CustomObjectsBundle:CustomField\Form:renderForm',
                 'method'     => 'GET',
             ],
             CustomFieldRouteProvider::ROUTE_CLONE => [
-                'path'       => '/custom/field/clone/{objectId}',
+                'path'       => '/custom/field/clone/{fieldId}',
                 'controller' => 'CustomObjectsBundle:CustomField\Clone:clone',
                 'method'     => 'GET',
             ],
@@ -63,7 +45,7 @@ return [
                 ],
             ],
             CustomFieldRouteProvider::ROUTE_SAVE => [
-                'path'       => '/custom/field/save/{fieldId}',
+                'path'       => '/custom/field/save/{objectId}/{fieldType}',
                 'controller' => 'CustomObjectsBundle:CustomField\Save:save',
                 'method'     => 'POST',
                 'defaults'   => [
@@ -210,59 +192,16 @@ return [
         'controllers' => [
 
             // Custom Fields
-            'custom_field.list_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\ListController::class,
-                'arguments' => [
-                    'request_stack',
-                    'session',
-                    'mautic.helper.core_parameters',
-                    'mautic.custom.model.field',
-                    'custom_field.permission.provider',
-                    'custom_field.route.provider',
-                ],
-                'methodCalls' => [
-                    'setContainer' => [
-                        '@service_container'
-                    ],
-                ],
-            ],
-            'custom_field.view_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\ViewController::class,
-                'arguments' => [
-                    'mautic.helper.core_parameters',
-                    'mautic.custom.model.field',
-                    'custom_field.permission.provider',
-                    'custom_field.route.provider',
-                ],
-                'methodCalls' => [
-                    'setContainer' => [
-                        '@service_container'
-                    ],
-                ],
-            ],
-            'custom_field.new_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\NewController::class,
+            'custom_field.form_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\FormController::class,
                 'arguments' => [
                     'form.factory',
-                    'custom_field.permission.provider',
-                    'custom_field.route.provider',
-                    'custom_object.repository',
-                    'mautic.custom.model.object',
+                    'mautic.custom.model.field',
                     'custom_object.custom_field_factory',
-                ],
-                'methodCalls' => [
-                    'setContainer' => [
-                        '@service_container'
-                    ],
-                ],
-            ],
-            'custom_field.edit_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\EditController::class,
-                'arguments' => [
-                    'form.factory',
-                    'mautic.custom.model.field',
                     'custom_field.permission.provider',
                     'custom_field.route.provider',
+                    'mautic.custom.model.object',
+                    'custom_object.route.provider',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -287,13 +226,14 @@ return [
             'custom_field.save_controller' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\SaveController::class,
                 'arguments' => [
-                    'request_stack',
                     'session',
                     'form.factory',
                     'translator',
                     'mautic.custom.model.field',
+                    'custom_object.custom_field_factory',
                     'custom_field.permission.provider',
                     'custom_field.route.provider',
+                    'mautic.custom.model.object',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -317,11 +257,6 @@ return [
             ],
             'custom_field.cancel_controller' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\CancelController::class,
-                'arguments' => [
-                    'session',
-                    'mautic.custom.model.field',
-                    'custom_field.route.provider',
-                ],
                 'methodCalls' => [
                     'setContainer' => [
                         '@service_container'
@@ -702,13 +637,6 @@ return [
                     'event' => 'postLoad',
                     'lazy' => true,
                 ]
-            ],
-            'custom_field.button.subscriber' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldButtonSubscriber::class,
-                'arguments' => [
-                    'custom_field.permission.provider',
-                    'custom_field.route.provider',
-                ],
             ],
             'custom_item.button.subscriber' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CustomItemButtonSubscriber::class,

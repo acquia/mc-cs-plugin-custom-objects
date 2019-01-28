@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Provider;
 
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Symfony\Component\Routing\RouterInterface;
 
 class CustomObjectRouteProvider
@@ -43,6 +42,7 @@ class CustomObjectRouteProvider
     /**
      * @param int $page
      *
+     * @return string
      * @throws ForbiddenException
      */
     public function buildListRoute(int $page = 1): string
@@ -63,7 +63,8 @@ class CustomObjectRouteProvider
      */
     public function buildSaveRoute(?int $id = null): string
     {
-        return $this->router->generate(static::ROUTE_SAVE, ['objectId' => $id]);
+        $params = $id ? ['objectId' => $id] : [];
+        return $this->router->generate(static::ROUTE_SAVE, $params);
     }
 
     /**

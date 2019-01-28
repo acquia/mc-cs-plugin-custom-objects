@@ -13,17 +13,14 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Provider;
 
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Symfony\Component\Routing\RouterInterface;
 
 class CustomFieldRouteProvider
 {
-    public const ROUTE_LIST   = 'mautic_custom_field_list';
-    public const ROUTE_VIEW   = 'mautic_custom_field_view';
-    public const ROUTE_EDIT   = 'mautic_custom_field_edit';
+    public const ROUTE_FORM   = 'mautic_custom_field_form';
     public const ROUTE_CLONE  = 'mautic_custom_field_clone';
     public const ROUTE_DELETE = 'mautic_custom_field_delete';
-    public const ROUTE_NEW    = 'mautic_custom_field_new';
     public const ROUTE_CANCEL = 'mautic_custom_field_cancel';
     public const ROUTE_SAVE   = 'mautic_custom_field_save';
 
@@ -41,64 +38,34 @@ class CustomFieldRouteProvider
     }
 
     /**
-     * @param int $page
+     * @param int|null $id
      *
      * @return string
-     * @throws ForbiddenException
      */
-    public function buildListRoute(int $page = 1): string
+    public function buildSaveRoute(?int $id = null, int $objectId, string $fieldType): string
     {
-        return $this->router->generate(static::ROUTE_LIST, ['page' => $page]);
-    }
+        $params = [
+            'objectId' => $objectId,
+            'fieldType' => $fieldType,
+        ];
 
-    /**
-     * @param CustomObject $customObject
-     * @param string       $fieldType
-     *
-     * @return string
-     */
-    public function buildNewRoute(CustomObject $customObject, string $fieldType): string
-    {
-        return $this->router->generate(
-            static::ROUTE_NEW,
-            [
-                'objectId' => $customObject->getId(),
-                'fieldType' => $fieldType,
-            ]
-        );
+        if ($id) {
+            $params['fieldId'] = $id;
+        }
+
+        return $this->router->generate(static::ROUTE_SAVE, $params);
     }
 
     /**
      * @param int|null $id
      *
      * @return string
-     */
-    public function buildSaveRoute(?int $id = null): string
-    {
-        return $this->router->generate(static::ROUTE_SAVE, ['fieldId' => $id]);
-    }
-
-    /**
-     * @param int $id
-     *
-     * @return string
      * @throws ForbiddenException
      */
-    public function buildViewRoute(int $id): string
+    public function buildFormRoute(int $id = null): string
     {
         $params = $id ? ['fieldId' => $id] : [];
-        return $this->router->generate(static::ROUTE_VIEW, $params);
-    }
-
-    /**
-     * @param int $id
-     *
-     * @return string
-     * @throws ForbiddenException
-     */
-    public function buildEditRoute(int $id): string
-    {
-        return $this->router->generate(static::ROUTE_EDIT, ['fieldId' => $id]);
+        return $this->router->generate(static::ROUTE_FORM, $params);
     }
 
     /**
@@ -109,7 +76,7 @@ class CustomFieldRouteProvider
      */
     public function buildCloneRoute(int $id): string
     {
-        return $this->router->generate(static::ROUTE_CLONE, ['objectId' => $id]);
+        return $this->router->generate(static::ROUTE_CLONE, ['fieldId' => $id]);
     }
 
     /**
