@@ -137,7 +137,6 @@ class SaveController extends CommonController
         $form->handleRequest($request);
         
         if ($form->isValid()) {
-            $this->customFieldModel->save($customField);
 
             if ($form->get('buttons')->get('save')->isClicked()) {
                 // Close modal
@@ -145,11 +144,10 @@ class SaveController extends CommonController
                     [
                         'passthroughVars' => [
                             'closeModal'    => 1,
+                            'customField' => serialize($customField),
                         ],
                     ]
                 );
-            } else {
-                return $this->redirectToEdit($request, $customField);
             }
         }
 
@@ -170,19 +168,5 @@ class SaveController extends CommonController
                 ],
             ]
         );
-    }
-
-    /**
-     * @param Request     $request
-     * @param CustomField $entity
-     * 
-     * @return Response
-     */
-    private function redirectToEdit(Request $request, CustomField $entity): Response
-    {
-        $request->setMethod('GET');
-        $params = ['fieldId' => $entity->getId()];
-
-        return $this->forward('custom_field.form_controller:renderFormAction', $params);
     }
 }
