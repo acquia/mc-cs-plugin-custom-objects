@@ -193,22 +193,12 @@ CustomObjects = {
                         mQuery(this).width(mQuery(this).width());
                     });
 
-                    // Fix body overflow that messes sortable up
-                    bodyOverflow.overflowX = mQuery('body').css('overflow-x');
-                    bodyOverflow.overflowY = mQuery('body').css('overflow-y');
-                    mQuery('body').css({
-                        overflowX: 'visible',
-                        overflowY: 'visible'
-                    });
-
                     return ui;
                 },
                 scroll: true,
                 axis: 'y',
                 containment: '#mauticforms_fields .drop-here',
                 stop: function(e, ui) {
-                    // Restore original overflow
-                    mQuery('body').css(bodyOverflow);
                     mQuery(ui.item).attr('style', '');
 
                     mQuery.ajax({
