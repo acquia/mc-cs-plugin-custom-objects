@@ -66,11 +66,13 @@ class CustomItemXrefContact
             ->addJoinColumn('custom_item_id', 'id', false, false, 'CASCADE')
             ->inversedBy('contactReferences')
             ->makePrimaryKey()
+            ->fetchExtraLazy()
             ->build();
 
         $builder->createManyToOne('contact', Lead::class)
             ->addJoinColumn('contact_id', 'id', false, false, 'CASCADE')
             ->makePrimaryKey()
+            ->fetchExtraLazy()
             ->build();
 
         $builder->createField('dateAdded', Type::DATETIME)

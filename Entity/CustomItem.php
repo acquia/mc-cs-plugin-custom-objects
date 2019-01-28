@@ -28,6 +28,7 @@ use MauticPlugin\CustomObjectsBundle\Iterator\CustomFieldValues;
 use Doctrine\Common\Collections\ArrayCollection;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCompany;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 
 class CustomItem extends FormEntity implements UniqueEntityInterface
 {
@@ -99,16 +100,19 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
 
         $builder->createManyToOne('customObject', CustomObject::class)
             ->addJoinColumn('custom_object_id', 'id', false, false, 'CASCADE')
+            ->fetchExtraLazy()
             ->build();
 
         $builder->createOneToMany('contactReferences', CustomItemXrefContact::class)
             ->addJoinColumn('custom_item_id', 'id', false, false, 'CASCADE')
             ->mappedBy('customItem')
+            ->fetchExtraLazy()
             ->build();
 
         $builder->createOneToMany('companyReferences', CustomItemXrefCompany::class)
             ->addJoinColumn('custom_item_id', 'id', false, false, 'CASCADE')
             ->mappedBy('customItem')
+            ->fetchExtraLazy()
             ->build();
 
         $builder->addBigIntIdField();
@@ -131,7 +135,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     public function getId()
     {
-        return $this->id;
+        return (int) $this->id;
     }
 
     /**
@@ -198,6 +202,14 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     public function addCustomFieldValue(CustomFieldValueInterface $customFieldValue)
     {
         $this->customFieldValues->add($customFieldValue);
+    }
+
+    /**
+     * @param ArrayCollection $customFieldValues
+     */
+    public function setCustomFieldValues(ArrayCollection $customFieldValues)
+    {
+        $this->customFieldValues = $customFieldValues;
     }
 
     /**

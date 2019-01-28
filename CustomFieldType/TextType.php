@@ -69,6 +69,22 @@ class TextType implements CustomFieldTypeInterface
     }
 
     /**
+     * @return string
+     */
+    public function getTableName(): string
+    {
+        return MAUTIC_TABLE_PREFIX.'custom_field_value_text';
+    }
+
+    /**
+     * @return string
+     */
+    public function getTableAlias(): string
+    {
+        return 'cfvtext';
+    }
+
+    /**
      * @param CustomField $customField
      * @param CustomItem  $customItem
      * @param string|null $value
