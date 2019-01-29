@@ -45,11 +45,15 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      */
     private $dateAdded;
 
-    /*
-    *
-     * @var CustomFieldTypeInterface|string
+    /**
+     * @var string|null
      */
     private $type;
+
+    /**
+     * @var CustomFieldTypeInterface|null
+     */
+    private $typeObject;
 
     /**
      * @var CustomObject|null
@@ -139,7 +143,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param CustomFieldTypeInterface|string $type
+     * @param string|null $type
      */
     public function setType($type): void
     {
@@ -147,7 +151,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @return CustomFieldTypeInterface|string
+     * @return string|null
      */
     public function getType()
     {
@@ -157,21 +161,21 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @param CustomFieldTypeInterface|string $type
      */
-    public function setTypeObject($type): void
+    public function setTypeObject(CustomFieldTypeInterface $typeObject): void
     {
-        $this->type = $type;
+        $this->typeObject = $typeObject;
     }
 
     /**
-     * @return CustomFieldTypeInterface|string
+     * @return CustomFieldTypeInterface|null
      */
     public function getTypeObject()
     {
-        return $this->type;
+        return $this->typeObject;
     }
 
     /**
-     * @return CustomObject:null
+     * @return CustomObject|null
      */
     public function getCustomObject()
     {

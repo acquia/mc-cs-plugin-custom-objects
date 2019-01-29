@@ -122,8 +122,7 @@ class CustomFieldValueModel
      */
     public function updateManually(CustomFieldValueInterface $customFieldValue)
     {
-        $fieldType    = $customFieldValue->getCustomField()->getType(); // must be changed to `getTypeObject()`
-        $fieldType    = $this->customFieldTypeProvider->getType($fieldType); // and then remove this line 
+        $fieldType    = $customFieldValue->getCustomField()->getTypeObject();
         $queryBuilder = $this->entityManager->createQueryBuilder();
         $queryBuilder->update($fieldType->getEntityClass(), $fieldType->getTableAlias())
             ->set("{$fieldType->getTableAlias()}.value", $queryBuilder->expr()->literal($customFieldValue->getValue()))
