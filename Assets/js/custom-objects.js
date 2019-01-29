@@ -241,12 +241,6 @@ CustomObjects = {
                     // Restore original overflow
                     mQuery('body').css(bodyOverflow);
                     mQuery(ui.item).attr('style', '');
-
-                    mQuery.ajax({
-                        type: "POST",
-                        url: mauticAjaxUrl + "?action=form:reorderActions",
-                        data: mQuery('#mauticforms_actions').sortable("serialize") + "&formId=" + mQuery('#mauticform_sessionId').val()
-                    });
                 }
             });
 
