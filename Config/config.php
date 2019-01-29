@@ -618,6 +618,14 @@ return [
                     'custom_object.route.provider',
                 ],
             ],
+            'custom_object.segments.filters_generate.subscriber' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\EventListener\SegmentFiltersChoicesGenerateSubscriber::class,
+                'arguments'=> [
+                    'custom_object.repository',
+                    'custom_field.repository',
+                    'custom_item.repository',
+                ]
+            ]
         ],
         'forms' => [
             'custom_item.item.form' => [
