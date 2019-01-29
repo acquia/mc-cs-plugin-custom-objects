@@ -6,7 +6,7 @@
             [
                 'fieldId' => $customField->getId(),
                 'objectId' => $customObject->getId(),
-                'fieldType' => $customField->getType()->getKey(),
+                'fieldType' => $customField->getTypeObject()->getKey(),
             ]
         );
         ?>" class="btn btn-default btn-edit">

@@ -640,9 +640,6 @@ return [
             ],
             'custom_field.field.value.form' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldValueType::class,
-                'arguments' => [
-                    'custom_field.type.provider',
-                ],
             ],
         ],
         'commands' => [

@@ -36,10 +36,7 @@ class CustomFieldSubscriber implements EventSubscriber
      */
     public function getSubscribedEvents(): array
     {
-        return [
-            'postLoad',
-            'prePersist',
-        ];
+        return ['postLoad'];
     }
 
     /**
@@ -49,22 +46,10 @@ class CustomFieldSubscriber implements EventSubscriber
      */
     public function postLoad(LifecycleEventArgs $args): void
     {
-        $customField =$args->getObject();
+        $customField = $args->getObject();
 
         if ($customField instanceof CustomField) {
-            $customField->setType($this->customFieldTypeProvider->getType($customField->getType()));
-        }
-    }
-
-    /**
-     * @param LifecycleEventArgs $args
-     */
-    public function prePersist(LifecycleEventArgs $args): void
-    {
-        $customField =$args->getObject();
-
-        if ($customField instanceof CustomField) {
-            $customField->setType($customField)->type->getKey();
+            $customField->setTypeObject($this->customFieldTypeProvider->getType($customField->getType()));
         }
     }
 }

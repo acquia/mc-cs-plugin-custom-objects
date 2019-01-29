@@ -130,7 +130,7 @@ class FormController extends CommonController
 
         return $this->delegateView(
             [
-                'returnUrl'      => $this->objectRouteProvider->buildEditRoute($customObject->getId()),
+                'returnUrl'      => $this->objectRouteProvider->buildFormRoute($customObject->getId()),
                 'viewParameters' => [
                     'customObject' => $customObject,
                     'customField' => $customField,
