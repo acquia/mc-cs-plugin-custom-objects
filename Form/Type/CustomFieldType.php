@@ -20,6 +20,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 
@@ -44,6 +45,8 @@ class CustomFieldType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $completeForm = !empty($options['complete_form']);
+
         $builder->add('id', HiddenType::class);
 
         $builder->add(
@@ -88,15 +91,23 @@ class CustomFieldType extends AbstractType
         );
 
         $builder->add(
-            'buttons',
-            FormButtonsType::class,
-            [
-                'apply_text' => '',
-                'cancel_onclick' => "mQuery('form[name=custom_field]').attr('method', 'get').attr('action', mQuery('form[name=custom_field]').attr('action').replace('/save', '/cancel'));",
-            ]
+            'order',
+            HiddenType::class
         );
 
-        $builder->setAction($options['action']);
+        if (!$completeForm) {
+
+            $builder->add(
+                'buttons',
+                FormButtonsType::class,
+                [
+                    'apply_text' => '',
+                    'cancel_onclick' => "mQuery('form[name=custom_field]').attr('method', 'get').attr('action', mQuery('form[name=custom_field]').attr('action').replace('/save', '/cancel'));",
+                ]
+            );
+
+            $builder->setAction($options['action']);
+        }
     }
 
     /**
@@ -107,6 +118,7 @@ class CustomFieldType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class' => CustomField::class,
+                'complete_form' => false, // Is form used as subform?
             ]
         );
     }

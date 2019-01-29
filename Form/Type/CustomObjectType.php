@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
@@ -73,6 +73,11 @@ class CustomObjectType extends AbstractType
 
         $builder->add('category', CategoryListType::class, ['bundle' => 'global']);
         $builder->add('isPublished', YesNoButtonGroupType::class);
+
+        $builder->add('fields', CollectionType::class, [
+            'entry_type' => CustomFieldType::class,
+            'entry_options' => ['complete_form' => true],
+        ]);
 
         $builder->add(
             'buttons',
