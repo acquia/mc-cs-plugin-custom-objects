@@ -189,6 +189,7 @@ CustomObjects = {
                 items: '.panel',
                 cancel: '',
                 helper: function(e, ui) {
+                    // Before sorting
                     ui.children().each(function() {
                         mQuery(this).width(mQuery(this).width());
                     });
@@ -236,6 +237,7 @@ CustomObjects = {
                 axis: 'y',
                 containment: '#mauticforms_actions .drop-here',
                 stop: function(e, ui) {
+                    // Sorting done
                     // Restore original overflow
                     mQuery('body').css(bodyOverflow);
                     mQuery(ui.item).attr('style', '');
