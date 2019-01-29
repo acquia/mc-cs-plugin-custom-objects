@@ -19,24 +19,10 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 
 class CustomFieldValueType extends AbstractType
 {
-    /**
-     * @var CustomFieldTypeProvider
-     */
-    private $customFieldTypeProvider;
-
-    /**
-     * @param CustomFieldTypeProvider $customFieldTypeProvider
-     */
-    public function __construct(CustomFieldTypeProvider $customFieldTypeProvider)
-    {
-        $this->customFieldTypeProvider = $customFieldTypeProvider;
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
@@ -48,11 +34,10 @@ class CustomFieldValueType extends AbstractType
         $customFieldId    = (int) $builder->getName();
         $customFieldValue = $customItem->getId() ? $collection->get("{$customFieldId}_{$customItem->getId()}") : $collection->get($customFieldId);
         $customField      = $customFieldValue->getCustomField();
-        $fieldType        = $this->customFieldTypeProvider->getType($customField->getType());
 
         $builder->add(
             'value',
-            $fieldType->getSymfonyFormFiledType(),
+            $customField->getTypeObject()->getSymfonyFormFiledType(),
             [
                 'label'      => $customFieldValue->getCustomField()->getLabel(),
                 'required'   => true, // make this dynamic
