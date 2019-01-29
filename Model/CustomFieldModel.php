@@ -124,6 +124,8 @@ class CustomFieldModel extends FormModel
                     ],
                 ],
             ],
+            'orderBy'        => 'e.order',
+            'orderByDir'     => 'ASC',
             'ignore_paginator' => true,
         ]);
     }

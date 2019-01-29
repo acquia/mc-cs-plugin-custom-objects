@@ -60,6 +60,11 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      */
     private $customObject;
 
+    /**
+     * @var int|null
+     */
+    private $order;
+
     public function __clone()
     {
         $this->id = null;
@@ -85,6 +90,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         $builder->addId();
         $builder->addField('label', Type::STRING);
         $builder->addField('type', Type::STRING);
+        $builder->addField('order', Type::INTEGER);
     }
 
     /**
@@ -191,5 +197,21 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         if ($customObject) {
             $this->isChanged('customObject', $customObject->getId());
         }
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getOrder(): ?int
+    {
+        return $this->order;
+    }
+
+    /**
+     * @param int|null $order
+     */
+    public function setOrder(?int $order): void
+    {
+        $this->order = $order;
     }
 }
