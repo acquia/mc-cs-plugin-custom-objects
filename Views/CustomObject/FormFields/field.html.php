@@ -20,12 +20,7 @@ $customFieldEntity = $customField->vars['data'];
             <i class="fa fa-pencil-square-o text-primary"></i>
         </button>
 
-        <a type="button" data-hide-panel="true" data-toggle="ajax" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="<?php
-        echo $view['router']->path(
-            'mautic_custom_field_delete',
-            ['fieldId' => $customFieldEntity->getId()]
-        )
-        ?>" class="btn btn-default">
+        <a type="button" data-hide-panel="true" data-toggle="ajax" data-ignore-formexit="true" data-method="POST" data-hide-loadingbar="true" href="<?php // @todo ?>" class="btn btn-default">
             <i class="fa fa-trash-o text-danger"></i>
         </a>
 

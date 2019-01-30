@@ -136,19 +136,8 @@ class SaveController extends CommonController
 
         $form->handleRequest($request);
         
-        if ($form->isValid()) {
-
-            if ($form->get('buttons')->get('save')->isClicked()) {
-                // Close modal
-                return $this->delegateView(
-                    [
-                        'passthroughVars' => [
-                            'closeModal'    => 1,
-                            'customField' => serialize($customField),
-                        ],
-                    ]
-                );
-            }
+        if ($form->isValid() && $form->get('buttons')->get('save')->isClicked()) {
+            return $this->buildCustomFieldFormPart($customObject, $form->getData());
         }
 
         $route = $fieldId ? $this->fieldRouteProvider->buildFormRoute($fieldId) : '';
@@ -168,5 +157,36 @@ class SaveController extends CommonController
                 ],
             ]
         );
+    }
+
+    /**
+     * Build custom field form to be used in custom object form
+     *
+     * @param CustomObject $customObject
+     * @param CustomField  $customField
+     *
+     * @return JsonResponse
+     */
+    private function buildCustomFieldFormPart(CustomObject $customObject, CustomField $customField)
+    {
+        $customFieldForm = $this->formFactory->create(
+            CustomFieldType::class,
+            $customField,
+            ['custom_object_form' => true]
+        );
+
+         $template = $this->render(
+            "CustomObjectsBundle:CustomObject:FormFields\\field.{$customField->getType()}.html.php",
+            [
+                'customObject' => $customObject,
+                'customFieldEntity' => $customField,
+                'customField' => $customFieldForm->createView(),
+            ]
+         );
+
+        return new JsonResponse([
+            'content' => $template->getContent(),
+            'closeModal'    => 1,
+        ]);
     }
 }
