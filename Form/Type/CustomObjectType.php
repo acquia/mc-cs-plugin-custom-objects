@@ -76,7 +76,7 @@ class CustomObjectType extends AbstractType
 
         $builder->add('fields', CollectionType::class, [
             'entry_type' => CustomFieldType::class,
-            'entry_options' => ['complete_form' => true],
+            'entry_options' => ['custom_object_form' => true],
         ]);
 
         $builder->add(

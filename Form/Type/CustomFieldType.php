@@ -45,7 +45,8 @@ class CustomFieldType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $completeForm = !empty($options['complete_form']);
+        // Is part of custom object form?
+        $customObjectForm = !empty($options['custom_object_form']);
 
         $builder->add('id', HiddenType::class);
 
@@ -95,7 +96,7 @@ class CustomFieldType extends AbstractType
             HiddenType::class
         );
 
-        if (!$completeForm) {
+        if (!$customObjectForm) {
 
             $builder->add(
                 'buttons',
@@ -118,7 +119,7 @@ class CustomFieldType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class' => CustomField::class,
-                'complete_form' => false, // Is form used as subform?
+                'custom_object_form' => false, // Is form used as subform?
             ]
         );
     }
