@@ -20,7 +20,6 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 
