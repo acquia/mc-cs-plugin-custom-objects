@@ -255,7 +255,6 @@ CustomObjects = {
         }
 
         Mautic.initHideItemButton('#mauticforms_fields');
-        Mautic.initHideItemButton('#mauticforms_actions');
     },
 };
 
