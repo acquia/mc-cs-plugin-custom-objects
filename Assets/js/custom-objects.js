@@ -172,6 +172,13 @@ CustomObjects = {
         return '#custom-object-'+customObjectId+'-container '+suffix;
     },
 
+    initDeleteFieldButton: function() {
+        mQuery('#mauticforms_fields').find('[data-hide-panel]').click(function(e) {
+            e.preventDefault();
+            mQuery(this).closest('.panel').hide('fast');
+        });
+    },
+
     formOnLoad: function (container) {
         mQuery('select.form-builder-new-component').change(function (e) {
             mQuery(this).find('option:selected');
@@ -254,7 +261,7 @@ CustomObjects = {
             mQuery('body').addClass('noscroll');
         }
 
-        Mautic.initHideItemButton('#mauticforms_fields');
+        CustomObjects.initDeleteFieldButton();
     },
 };
 
