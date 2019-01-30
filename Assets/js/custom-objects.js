@@ -30,7 +30,6 @@ CustomObjects = {
         }
 
         input.attr('data-typeahead-initialized', true);
-        console.log(input.attr('data-action'), input.attr('data-contact-id'))
         let url = input.attr('data-action');
         let customItems = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value', 'id'),
