@@ -37,7 +37,7 @@ return [
                 'method'     => 'GET',
             ],
             CustomFieldRouteProvider::ROUTE_CANCEL => [
-                'path'       => '/custom/field/cancel/{fieldId}',
+                'path'       => '/custom/field/cancel/{fieldId}/{fieldType}',
                 'controller' => 'CustomObjectsBundle:CustomField\Cancel:cancel',
                 'method'     => 'GET',
                 'defaults'   => [
