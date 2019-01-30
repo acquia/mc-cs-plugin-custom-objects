@@ -624,6 +624,7 @@ return [
                     'custom_object.repository',
                     'custom_field.repository',
                     'custom_item.repository',
+                    'translator',
                 ]
             ]
         ],

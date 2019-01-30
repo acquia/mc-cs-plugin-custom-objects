@@ -12,16 +12,22 @@
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Doctrine\Common\Collections\Criteria;
+use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\LeadEvents;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\Loader\ArrayLoader;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterface
 {
+    use OperatorListTrait;
+
     /**
      * @var CustomObjectRepository
      */
@@ -34,24 +40,23 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
      * @var CustomItemRepository
      */
     private $customItemRepository;
-
     /**
-     * SegmentFiltersChoicesGenerateSubscriber constructor.
-     *
-     * @param CustomObjectRepository $customObjectRepository
-     * @param CustomFieldRepository  $customFieldRepository
-     * @param CustomItemRepository   $customItemRepository
+     * @var TranslatorInterface
      */
+    private $translator;
+
     public function __construct(
         CustomObjectRepository $customObjectRepository,
         CustomFieldRepository $customFieldRepository,
-        CustomItemRepository $customItemRepository
+        CustomItemRepository $customItemRepository,
+        TranslatorInterface $translator
     )
     {
 
         $this->customObjectRepository = $customObjectRepository;
         $this->customFieldRepository  = $customFieldRepository;
         $this->customItemRepository   = $customItemRepository;
+        $this->translator             = $translator;
     }
 
     /**
@@ -64,27 +69,25 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
 
     public function onGenerateSegmentFilters(LeadListFiltersChoicesEvent $event)
     {
-        $criteria = new Criteria(Criteria::expr()->eq('isPublished', 1));
+        $criteria     = new Criteria(Criteria::expr()->eq('isPublished', 1));
+        $translations = [];
 
-        $customObjects = $this->customObjectRepository->matching($criteria)->forAll(
-            function (int $index, CustomObject $customObject) {
-                $customFields = $customObject->getFields()->forAll(
-                    function (int $i, $customField) {
-                        var_dump($customField);
-                        $choiceItem = [
-                            'lead' => [
-                                'date_added' => [
-                                    'label'      => $this->translator->trans('mautic.core.date.added'),
-                                    'properties' => ['type' => 'date'],
-                                    'operators'  => $this->getOperatorsForFieldType('default'),
-                                    'object'     => 'lead',
-                                ],
-                            ]
-                        ];
-                    }
-                );
+        $this->customObjectRepository->matching($criteria)->forAll(
+            function (int $index, CustomObject $customObject) use ($event, &$translations) {
+                $translations['mautic.lead.custom_object_' . $customObject->getId()] = $customObject->getNamePlural();
+                foreach ($customObject->getFields()->getIterator() as $customField) {
+                    $event->addChoice(
+                        'custom_object', // . $customObject->getId(), //$event->getTranslator()->trans('custom.object.menu.title'),
+                        'cmf_' . $customField->getId(),
+                        [
+                            'label'      => $customField->getCustomObject()->getName() . " : " . $customField->getLabel(),
+                            'properties' => ['type' => $customField->getType()],
+                            'operators'  => $this->getOperatorsForFieldType($customField->getType()),
+                            'object'     => $customField->getId(),
+                        ]
+                    );
+                };
             }
         );
-        die();
     }
 }
