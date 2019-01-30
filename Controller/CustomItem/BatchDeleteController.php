@@ -79,7 +79,7 @@ class BatchDeleteController extends CommonController
         $itemIds  = json_decode($request->get('ids', '[]'), true);
         $notFound = [];
         $denied   = [];
-        $delete   = [];
+        $deleted  = [];
 
         foreach ($itemIds as $itemId) {
             try {
