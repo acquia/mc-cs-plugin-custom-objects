@@ -18,16 +18,17 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 
 class CustomItemRouteProvider
 {
-    public const ROUTE_LIST   = 'mautic_custom_item_list';
-    public const ROUTE_VIEW   = 'mautic_custom_item_view';
-    public const ROUTE_EDIT   = 'mautic_custom_item_edit';
-    public const ROUTE_CLONE  = 'mautic_custom_item_clone';
-    public const ROUTE_DELETE = 'mautic_custom_item_delete';
-    public const ROUTE_NEW    = 'mautic_custom_item_new';
-    public const ROUTE_CANCEL = 'mautic_custom_item_cancel';
-    public const ROUTE_SAVE   = 'mautic_custom_item_save';
-    public const ROUTE_LOOKUP = 'mautic_custom_item_lookup';
-    public const ROUTE_LINK   = 'mautic_custom_item_link';
+    public const ROUTE_LIST         = 'mautic_custom_item_list';
+    public const ROUTE_VIEW         = 'mautic_custom_item_view';
+    public const ROUTE_EDIT         = 'mautic_custom_item_edit';
+    public const ROUTE_CLONE        = 'mautic_custom_item_clone';
+    public const ROUTE_DELETE       = 'mautic_custom_item_delete';
+    public const ROUTE_BATCH_DELETE = 'mautic_custom_item_batch_delete';
+    public const ROUTE_NEW          = 'mautic_custom_item_new';
+    public const ROUTE_CANCEL       = 'mautic_custom_item_cancel';
+    public const ROUTE_SAVE         = 'mautic_custom_item_save';
+    public const ROUTE_LOOKUP       = 'mautic_custom_item_lookup';
+    public const ROUTE_LINK         = 'mautic_custom_item_link';
 
     /**
      * @var RouterInterface
@@ -112,5 +113,15 @@ class CustomItemRouteProvider
     public function buildDeleteRoute(int $objectId, int $itemId): string
     {
         return $this->router->generate(static::ROUTE_DELETE, ['objectId' => $objectId, 'itemId' => $itemId]);
+    }
+
+    /**
+     * @param int $itemId
+     * 
+     * @throws ForbiddenException
+     */
+    public function buildBatchDeleteRoute(int $objectId): string
+    {
+        return $this->router->generate(static::ROUTE_BATCH_DELETE, ['objectId' => $objectId]);
     }
 }

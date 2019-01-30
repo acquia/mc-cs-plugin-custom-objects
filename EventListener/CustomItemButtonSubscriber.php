@@ -19,6 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomItemButtonSubscriber extends CommonSubscriber
 {
@@ -33,16 +34,24 @@ class CustomItemButtonSubscriber extends CommonSubscriber
     private $routeProvider;
 
     /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
      * @param CustomItemPermissionProvider $permissionProvider
      * @param CustomItemRouteProvider $routeProvider
+     * @param TranslatorInterface $translator
      */
     public function __construct(
         CustomItemPermissionProvider $permissionProvider,
-        CustomItemRouteProvider $routeProvider
+        CustomItemRouteProvider $routeProvider,
+        TranslatorInterface $translator
     )
     {
         $this->permissionProvider = $permissionProvider;
         $this->routeProvider      = $routeProvider;
+        $this->translator         = $translator;
     }
 
     /**
@@ -69,9 +78,14 @@ class CustomItemButtonSubscriber extends CommonSubscriber
                         ButtonHelper::LOCATION_PAGE_ACTIONS,
                         $event->getRoute()
                     );
+                    $event->addButton(
+                        $this->defineBatchDeleteButton($this->getCustomObjectIdFromEvent($event)),
+                        ButtonHelper::LOCATION_BULK_ACTIONS,
+                        $event->getRoute()
+                    );
                 } catch (ForbiddenException $e) {}
                 break;
-            
+
             case CustomItemRouteProvider::ROUTE_VIEW:
                 $this->addEntityButtons($event, ButtonHelper::LOCATION_PAGE_ACTIONS);
                 $event->addButton(
@@ -209,6 +223,27 @@ class CustomItemButtonSubscriber extends CommonSubscriber
             'btnText'   => $this->translator->trans('mautic.core.form.new'),
             'iconClass' => 'fa fa-plus',
             'priority'  => 500,
+        ];
+    }
+
+    /**
+     * @param int $customObjectId
+     * 
+     * @return array
+     * 
+     * @throws ForbiddenException
+     */
+    private function defineBatchDeleteButton(int $customObjectId): array
+    {
+        return [
+            'confirm' => [
+                'message'       => $this->translator->trans('mautic.core.form.confirmbatchdelete'),
+                'confirmAction' => $this->routeProvider->buildBatchDeleteRoute($customObjectId),
+                'template'      => 'batchdelete',
+            ],
+            'btnText'   => 'mautic.core.form.delete',
+            'iconClass' => 'fa fa-fw fa-trash-o text-danger',
+            'priority'  => 0,
         ];
     }
 

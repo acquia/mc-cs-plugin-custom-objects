@@ -108,6 +108,11 @@ return [
                 'controller' => 'CustomObjectsBundle:CustomItem\Delete:delete',
                 'method'     => 'GET',
             ],
+            CustomItemRouteProvider::ROUTE_BATCH_DELETE => [
+                'path'       => '/custom/object/{objectId}/item/batch/delete',
+                'controller' => 'CustomObjectsBundle:CustomItem\BatchDelete:delete',
+                'method'     => 'POST',
+            ],
             CustomItemRouteProvider::ROUTE_LOOKUP => [
                 'path'       => '/custom/object/{objectId}/item/lookup.json',
                 'controller' => 'CustomObjectsBundle:CustomItem\Lookup:list',
@@ -343,6 +348,21 @@ return [
             'custom_item.delete_controller' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\DeleteController::class,
                 'arguments' => [
+                    'mautic.custom.model.item',
+                    'session',
+                    'translator',
+                    'custom_item.permission.provider',
+                ],
+                'methodCalls' => [
+                    'setContainer' => [
+                        '@service_container'
+                    ],
+                ],
+            ],
+            'custom_item.batch_delete_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\BatchDeleteController::class,
+                'arguments' => [
+                    'request_stack',
                     'mautic.custom.model.item',
                     'session',
                     'translator',
@@ -609,6 +629,7 @@ return [
                 'arguments' => [
                     'custom_item.permission.provider',
                     'custom_item.route.provider',
+                    'translator',
                 ],
             ],
             'custom_object.button.subscriber' => [
