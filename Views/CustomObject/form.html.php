@@ -59,7 +59,7 @@ $view['slots']->set('headerTitle', $header);
                                             echo $view['router']->path(
                                                 \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider::ROUTE_FORM,
                                                 [
-                                                    'objectId'  => $customObject->getId(),
+                                                    'object¨Id'  => $customObject->getId(),
                                                     'fieldType' => $fieldType->getKey(),
                                                 ]
                                             );
@@ -72,10 +72,11 @@ $view['slots']->set('headerTitle', $header);
                 </div>
                 <div class="drop-here">
                     <?php
-                        foreach ($customFields as $customField):
-                            if (!in_array($customField->getId(), $deletedFields)) :
+                        foreach ($form->children['fields']->getIterator() as $customField):
+                            $customFieldEntity = $customField->vars['data'];
+                            if (!in_array($customFieldEntity->getId(), $deletedFields)) :
                                 echo $view->render(
-                                    "CustomObjectsBundle:CustomObject:Fields\\field.{$customField->getType()}.html.php",
+                                    "CustomObjectsBundle:CustomObject:FormFields\\field.{$customFieldEntity->getType()}.html.php",
                                     ['customField' => $customField, 'customObject' => $customObject]
                                 );
                             endif;

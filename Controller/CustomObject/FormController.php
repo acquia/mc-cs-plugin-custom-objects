@@ -107,28 +107,26 @@ class FormController extends CommonController
             $this->accessDenied(false, $e->getMessage());
         }
 
-        $availableFieldTypes = $this->customFieldTypeProvider->getTypes();
-
-        $route = $this->routeProvider->buildFormRoute($customObject->getId());
-        $action = $this->routeProvider->buildSaveRoute($objectId);
-        $form   = $this->formFactory->create(CustomObjectType::class, $customObject, ['action' => $action]);
-
-        $customFields = $this->customFieldModel->fetchCustomFieldsForObject($customObject);
+        $form = $this->formFactory->create(
+            CustomObjectType::class,
+            $customObject,
+            ['action' => $this->routeProvider->buildSaveRoute($objectId)]
+        );
 
         return $this->delegateView(
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute(),
                 'viewParameters' => [
                     'customObject' => $customObject,
-                    'availableFieldTypes' => $availableFieldTypes,
-                    'customFields' => $customFields,
+                    'availableFieldTypes' => $this->customFieldTypeProvider->getTypes(),
+                    'customFields' => $this->customFieldModel->fetchCustomFieldsForObject($customObject),
                     'deletedFields' => [],
                     'form'   => $form->createView(),
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
-                    'route'         => $route,
+                    'route'         => $this->routeProvider->buildFormRoute($customObject->getId()),
                 ],
             ]
         );

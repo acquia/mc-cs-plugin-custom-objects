@@ -1,0 +1,1 @@
+<?php $view->extend("CustomObjectsBundle:CustomObject:FormFields\\field.html.php");
