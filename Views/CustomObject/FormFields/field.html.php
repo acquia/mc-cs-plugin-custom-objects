@@ -3,7 +3,7 @@
 $customFieldEntity = $customField->vars['data'];
 
 ?>
-<div class="panel form-field-wrapper ui-sortable-handle" data-sortable-id="mauticform_1">
+<div class="panel form-field-wrapper ui-sortable-handle">
 
     <div class="form-buttons btn-group" role="group" aria-label="Field options" style="width: 77px;">
 
