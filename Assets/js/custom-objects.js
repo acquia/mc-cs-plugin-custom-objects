@@ -181,6 +181,13 @@ CustomObjects = {
         });
     },
 
+    reorderFields: function() {
+        let elements = mQuery('.drop-here').find('[id*=order]');
+        elements.each(function(i, selector) {
+            mQuery(selector).val(i);
+        });
+    },
+
     formOnLoad: function (container) {
         mQuery('select.form-builder-new-component').change(function (e) {
             mQuery(this).find('option:selected');
