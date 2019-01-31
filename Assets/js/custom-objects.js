@@ -175,7 +175,9 @@ CustomObjects = {
     initDeleteFieldButton: function() {
         mQuery('#mauticforms_fields').find('[data-hide-panel]').click(function(e) {
             e.preventDefault();
-            mQuery(this).closest('.panel').hide('fast');
+            let panel = mQuery(this).closest('.panel');
+            panel.hide('fast');
+            panel.find('.cf-deleted').val('1');
         });
     },
 
