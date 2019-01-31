@@ -177,7 +177,7 @@ CustomObjects = {
             e.preventDefault();
             let panel = mQuery(this).closest('.panel');
             panel.hide('fast');
-            panel.find('.cf-deleted').val('1');
+            panel.find('[id*=deleted]').val(1);
         });
     },
 
