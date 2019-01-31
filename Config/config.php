@@ -622,11 +622,23 @@ return [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\SegmentFiltersChoicesGenerateSubscriber::class,
                 'arguments'=> [
                     'custom_object.repository',
-                    'custom_field.repository',
-                    'custom_item.repository',
                     'translator',
                 ]
-            ]
+            ],
+            'custom_object.segments.filters_dictionary.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\SegmentFiltersDictionarySubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
+            //            'custom_object.segments.filters_dictionary.subscriber' => [
+            //                'class' => \MauticPlugin\CustomObjectsBundle\EventListener\SegmentFiltersDictionarySubscriber::class,
+            //                'arguments'=> [
+            //                    'custom_object.repository',
+            //                    'custom_item.repository',
+            //                    'translator',
+            //                ]
+            //            ]
         ],
         'forms' => [
             'custom_item.item.form' => [
@@ -707,7 +719,11 @@ return [
                 'arguments' => [
                     'custom_field.type.provider'
                 ]
-            ]
+            ],
+            'mautic.lead.query.builder.custom_field.value' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder::class,
+                'arguments' => ['mautic.lead.model.random_parameter_name'],
+            ],
         ],
     ],
     'parameters' => [
