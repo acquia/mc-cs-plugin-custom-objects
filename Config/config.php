@@ -652,14 +652,6 @@ return [
                     'doctrine.orm.entity_manager',
                 ],
             ],
-            //            'custom_object.segments.filters_dictionary.subscriber' => [
-            //                'class' => \MauticPlugin\CustomObjectsBundle\EventListener\SegmentFiltersDictionarySubscriber::class,
-            //                'arguments'=> [
-            //                    'custom_object.repository',
-            //                    'custom_item.repository',
-            //                    'translator',
-            //                ]
-            //            ]
         ],
         'forms' => [
             'custom_item.item.form' => [
