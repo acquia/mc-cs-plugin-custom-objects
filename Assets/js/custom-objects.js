@@ -232,8 +232,14 @@ CustomObjects = {
         CustomObjects.initDeleteFieldButton();
     },
 
-    formConvertDataFromModal: function (html, fieldIndex) {
-        jQuery(html).find('input').each(function(i, input) {
+    /**
+     * Transfer modal data to CO form
+     * @param panel CF panel content
+     * @param fieldIndex numeric index of CF in form
+     * @returns html content of panel
+     */
+    formConvertDataFromModal: function (panel, fieldIndex) {
+        jQuery(panel).find('input').each(function(i, input) {
             let id = jQuery(input).attr('id');
             id = id.slice(id.lastIndexOf('_') + 1, id.length);
             let name = 'custom_object[fields][' + fieldIndex + '][' + id + ']';
@@ -241,8 +247,22 @@ CustomObjects = {
             id = 'custom_object_fields_' + fieldIndex + '_' + id;
             jQuery(input).attr('id', id);
         });
-        return html;
+        return panel;
     },
+
+    /**
+     * Transfer CF data from CO form to modal
+     * @param panel CF panel content
+     * @param index numeric index of CF in form
+     * @param modal modal content
+     */
+    formConvertDataToModal: function (panel, index, modal) {
+        jQuery(panel).find('input').each(function(i, input) {
+            let id = jQuery(input).attr('id');
+            let name = id.slice(id.lastIndexOf('_') + 1, id.length);
+            jQuery(modal).find('#custom_field_' + name).val(jQuery(input).val());
+        };
+    }
 };
 
 /**
