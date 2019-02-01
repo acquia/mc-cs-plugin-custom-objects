@@ -1,16 +1,29 @@
+// Init stuff on refresh:
 mQuery(function() {
-    CustomObjects.handleTabOnShow();
     CustomObjects.formOnLoad();
 });
 
 CustomObjects = {
 
-    handleTabOnShow: function() {
-        mQuery('a.custom-object-tab[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-            let customObjectId = mQuery(e.target).attr('data-custom-object-id');
-            let contactId = mQuery('input#leadId').val();
-            CustomObjects.initLinkInput(customObjectId, contactId);
-            CustomObjects.reloadItemsTable(customObjectId, contactId);
+    // Called from tab content HTML:
+    initContactTabForCustomObject: function(customObjectId) {
+        let contactId = mQuery('input#leadId').val();
+        let selector = CustomObjects.createTabSelector(customObjectId, '[data-toggle="typeahead"]');
+        let input = mQuery(selector);
+        CustomObjects.initCustomItemTypeahead(input, customObjectId, contactId, function(selectedItem) {
+            CustomObjects.linkContactWithCustomItem(contactId, selectedItem.id, function() {
+                CustomObjects.reloadItemsTable(customObjectId, contactId);
+                input.val('');
+            });
+        });
+        CustomObjects.reloadItemsTable(customObjectId, contactId);
+    },
+
+    // Called from campaign action on input focus
+    initTypeaheadOnFocus: function(inputHtml, customObjectId) {
+        let input = mQuery(inputHtml);
+        CustomObjects.initCustomItemTypeahead(input, customObjectId, null, function(selectedItem) {
+            mQuery('#campaignevent_properties_customItemId').val(selectedItem.id);
         });
     },
 
@@ -20,23 +33,20 @@ CustomObjects = {
         });
     },
 
-    initLinkInput: function(customObjectId, contactId) {
-        let selector = CustomObjects.createTabSelector(customObjectId, '[data-toggle="typeahead"]');
-        let input = mQuery(selector);
-
+    initCustomItemTypeahead: function(input, customObjectId, contactId, onSelectCallback) {
         // Initialize only once
         if (input.attr('data-typeahead-initialized')) {
             return;
         }
 
         input.attr('data-typeahead-initialized', true);
-        console.log(input.attr('data-action'), input.attr('data-contact-id'))
+        let hasFocus = input.is(":focus");
         let url = input.attr('data-action');
         let customItems = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value', 'id'),
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             remote: {
-                url: url+'?filter=%QUERY&contactId='+input.attr('data-contact-id'),
+                url: url+'?filter=%QUERY&contactId='+contactId,
                 wildcard: '%QUERY',
                 filter: function(response) {
                     return response.items;
@@ -48,18 +58,19 @@ CustomObjects = {
           
         input.typeahead({
             minLength: 0,
-            highlight: true
+            highlight: true,
         }, {
-            name: 'custom-items-'+customObjectId,
+            name: 'custom-items-'+customObjectId+'-'+contactId,
             display: 'value',
             source: customItems.ttAdapter()
         }).bind('typeahead:selected', function(e, selectedItem) {
             if (!selectedItem || !selectedItem.id) return;
-            CustomObjects.linkContactWithCustomItem(contactId, selectedItem.id, function() {
-                CustomObjects.reloadItemsTable(customObjectId, contactId);
-                input.val('');
-            });
+            onSelectCallback(selectedItem);
         });
+
+        if (hasFocus) {
+            input.focus();
+        }
     },
 
     linkContactWithCustomItem: function(contactId, customItemId, callback) {

@@ -120,6 +120,16 @@ class CustomItemRouteProvider
      * 
      * @throws ForbiddenException
      */
+    public function buildLookupRoute(int $objectId): string
+    {
+        return $this->router->generate(static::ROUTE_LOOKUP, ['objectId' => $objectId]);
+    }
+
+    /**
+     * @param int $itemId
+     * 
+     * @throws ForbiddenException
+     */
     public function buildBatchDeleteRoute(int $objectId): string
     {
         return $this->router->generate(static::ROUTE_BATCH_DELETE, ['objectId' => $objectId]);
