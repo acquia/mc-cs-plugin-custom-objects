@@ -235,8 +235,10 @@ CustomObjects = {
     formConvertDataFromModal: function (html, fieldIndex) {
         jQuery(html).find('input').each(function(i, input) {
             let id = jQuery(input).attr('id');
-            id = id.slice(id.lastIndexOf('_'), id.length);
-            id = 'custom_object_fields_' + fieldIndex + id;
+            id = id.slice(id.lastIndexOf('_') + 1, id.length);
+            let name = 'custom_object[fields][' + fieldIndex + '][' + id + ']';
+            jQuery(input).attr('name', name);
+            id = 'custom_object_fields_' + fieldIndex + '_' + id;
             jQuery(input).attr('id', id);
         });
         return html;
