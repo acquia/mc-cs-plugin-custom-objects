@@ -714,7 +714,7 @@ return [
             'custom_object.random.helper' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Helper\RandomHelper::class,
             ],
-            'custom_object.custom_field_factory' => [
+            'custom_object.custom_field_factory'           => [
                 'class' =>\MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory::class,
                 'arguments' => [
                     'custom_field.type.provider'
@@ -722,6 +722,10 @@ return [
             ],
             'mautic.lead.query.builder.custom_field.value' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder::class,
+                'arguments' => ['mautic.lead.model.random_parameter_name'],
+            ],
+            'mautic.lead.query.builder.custom_item.value'  => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemFilterQueryBuilder::class,
                 'arguments' => ['mautic.lead.model.random_parameter_name'],
             ],
         ],

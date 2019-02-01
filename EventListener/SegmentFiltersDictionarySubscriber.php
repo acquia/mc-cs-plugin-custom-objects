@@ -1,31 +1,29 @@
 <?php
-
+declare(strict_types=1);
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
+ * @author      Mautic Inc., Jan Kozak <galvani78@gmail.com>
  *
- * @link        http://mautic.org
+ * @link        http://mautic.com
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManager;
-use Mautic\LeadBundle\Entity\OperatorListTrait;
-use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
 use Mautic\LeadBundle\LeadEvents;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder;
+use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemFilterQueryBuilder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * SegmentFiltersDictionarySubscriber
+ *
+ * @package MauticPlugin\CustomObjectsBundle\EventListener
+ */
 class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
 {
 
@@ -34,9 +32,7 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
      */
     private $entityManager;
 
-    public function __construct(
-        EntityManager $entityManager
-    )
+    public function __construct(EntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
     }
@@ -53,30 +49,34 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
     {
         $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
         $queryBuilder
-            ->select('f.id, f.label, f.type')
+            ->select('f.id, f.label, f.type, o.id as custom_object_id')
             ->from(MAUTIC_TABLE_PREFIX . "custom_field", 'f')
             ->innerJoin('f', MAUTIC_TABLE_PREFIX . "custom_object", 'o', 'f.custom_object_id = o.id and o.is_published = 1');
 
+        $registeredObjects = [];
+
         foreach ($queryBuilder->execute()->fetchAll() as $field) {
+            if (!in_array($COId = $field['custom_object_id'], $registeredObjects)) {
+                $event->addTranslation('cmo_' . $COId, [
+                    'type'  => CustomItemFilterQueryBuilder::getServiceId(),
+                    'field' => $COId,
+                ]);
+                $registeredObjects[] = $COId;
+            }
             $event->addTranslation('cmf_' . $field['id'], $this->createTranslation($field));
         }
     }
 
+    /**
+     * @param array $fieldAttributes
+     *
+     * @return array
+     * @throws InvalidArgumentException
+     */
     private function createTranslation(array $fieldAttributes)
     {
-
-        switch ($type = $fieldAttributes['type']) {
-            case 'int':
-                $segmentValueType = 'number';
-                break;
-            case 'text':
-                $segmentValueType = 'text';
-                break;
-            case 'datetime':
-                $segmentValueType = 'datetime';
-                break;
-            default:
-                throw new InvalidArgumentException('Given custom field type does not exist: ' . $type);
+        if (!in_array($type = $fieldAttributes['type'], ['number', 'text', 'datetime'])) {
+            throw new InvalidArgumentException('Given custom field type does not exist: ' . $type);
         }
 
         $segmentValueType = 'custom_field_value_' . $type;

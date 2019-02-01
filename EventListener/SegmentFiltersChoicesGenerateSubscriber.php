@@ -2,9 +2,9 @@
 
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
+ * @author      Mautic Inc, Jan Kozak <galvani78@gmail.com>
  *
- * @link        http://mautic.org
+ * @link        http://mautic.com
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -63,6 +63,16 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
         $this->customObjectRepository->matching($criteria)->forAll(
             function (int $index, CustomObject $customObject) use ($event, &$translations) {
                 $translations['mautic.lead.custom_object_' . $customObject->getId()] = $customObject->getNamePlural();
+                $event->addChoice(
+                    'custom_object',
+                    'cmo_' . $customObject->getId(),
+                    [
+                        'label'      => $customObject->getName() . " " . $this->translator->trans('custom.item.name.label'),
+                        'properties' => ['type' => 'text'],
+                        'operators'  => $this->getOperatorsForFieldType('text'),
+                        'object'     => $customObject->getId(),
+                    ]
+                );
                 foreach ($customObject->getFields()->getIterator() as $customField) {
                     $event->addChoice(
                         'custom_object',
