@@ -231,6 +231,11 @@ CustomObjects = {
 
         CustomObjects.initDeleteFieldButton();
     },
+
+    formConvertDataFromModal: function (html, fieldIndex) {
+        // @todo
+        return html;
+    },
 };
 
 /**
@@ -238,8 +243,20 @@ CustomObjects = {
  * \MauticPlugin\CustomObjectsBundle\Controller\CustomField\SaveController::saveAction
  */
 Mautic.createCustomField = function(response) {
+    let content = jQuery(response.content);
+
+    if (content.find('#custom_field_id').val().length) {
+        // Custom field has id, this was edit
+        let fieldIndex = 1; // @todo this must be kept in modal
+        content = CustomObjects.formConvertDataFromModal(content, fieldIndex);
+    } else {
+        // New custom field without id
+        let fieldIndex = jQuery('.panel').length - 1;
+        content = CustomObjects.formConvertDataFromModal(content, fieldIndex);
+        jQuery('.drop-here').prepend(content);
+    }
+
     mQuery('#objectFieldModal').modal('hide');
-    jQuery('.drop-here').prepend(response.content);
     CustomObjects.formRecalculateFieldOrder();
 };
 
