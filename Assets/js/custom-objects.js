@@ -181,8 +181,12 @@ CustomObjects = {
         });
     },
 
+    /**
+     * Custom object form events
+     */
     formOnLoad: function (container) {
         mQuery('select.form-builder-new-component').change(function (e) {
+            // @todo new field in list after create
             mQuery(this).find('option:selected');
             Mautic.ajaxifyModal(mQuery(this).find('option:selected'));
             // Reset the dropdown
