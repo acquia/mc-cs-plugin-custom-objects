@@ -73,7 +73,7 @@ class TableQueryBuilder
      */
     public function getTableCountQuery(): QueryBuilder
     {
-        $this->queryBuilder->select($this->queryBuilder->expr()->countDistinct($this->rootAlias));
+        $this->queryBuilder->select($this->queryBuilder->expr()->count($this->rootAlias));
 
         return $this->applyTableFilters();
     }
