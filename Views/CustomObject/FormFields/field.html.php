@@ -1,7 +1,8 @@
 <?php
 $customFieldEntity = $customField->vars['data'];
+$customField->vars['index'] = $customField->vars['name'];
 ?>
-<div class="panel form-field-wrapper ui-sortable-handle">
+<div class="panel form-field-wrapper ui-sortable-handle" id="customField_<?php echo $customField->vars['name'] ?>">
 
     <div class="form-buttons btn-group" role="group" aria-label="Field options" style="width: 77px;">
 
@@ -14,7 +15,7 @@ $customFieldEntity = $customField->vars['data'];
                 'fieldType' => $customFieldEntity->getTypeObject()->getKey(),
             ]
         );
-        ?>" class="btn btn-default btn-edit" data-index="<?php echo $customField->vars['name'] ?>">
+        ?>" class="btn btn-default btn-edit">
             <i class="fa fa-pencil-square-o text-primary"></i>
         </button>
 
