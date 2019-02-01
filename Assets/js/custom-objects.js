@@ -233,7 +233,12 @@ CustomObjects = {
     },
 
     formConvertDataFromModal: function (html, fieldIndex) {
-        // @todo
+        jQuery(html).find('input').each(function(i, input) {
+            let id = jQuery(input).attr('id');
+            id = id.slice(id.lastIndexOf('_'), id.length);
+            id = 'custom_object_fields_' + fieldIndex + id;
+            jQuery(input).attr('id', id);
+        });
         return html;
     },
 };
@@ -249,9 +254,10 @@ Mautic.createCustomField = function(response) {
         // Custom field has id, this was edit
         let fieldIndex = 1; // @todo this must be kept in modal
         content = CustomObjects.formConvertDataFromModal(content, fieldIndex);
+        jQuery('.drop-here').prepend(content);
     } else {
         // New custom field without id
-        let fieldIndex = jQuery('.panel').length - 1;
+        let fieldIndex = jQuery('.panel').length - 2;
         content = CustomObjects.formConvertDataFromModal(content, fieldIndex);
         jQuery('.drop-here').prepend(content);
     }
