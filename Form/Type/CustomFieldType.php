@@ -95,8 +95,6 @@ class CustomFieldType extends AbstractType
             HiddenType::class
         );
 
-        $builder->add('index',HiddenType::class,['mapped' => false]);
-
         if ($customObjectForm) {
             // Possibility to mark field as deleted in POST data
             $builder->add('deleted',HiddenType::class,['mapped' => false]);
