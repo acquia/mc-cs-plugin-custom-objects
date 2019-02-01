@@ -185,8 +185,9 @@ class SaveController extends CommonController
          );
 
         return new JsonResponse([
-            'content' => $template->getContent(),
-            'closeModal'    => 1,
+            'content'    => $template->getContent(),
+            'closeModal' => 1,
+            'callback'   => 'createCustomField',
         ]);
     }
 }

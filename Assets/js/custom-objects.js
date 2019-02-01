@@ -229,5 +229,13 @@ CustomObjects = {
     },
 };
 
+/**
+ * Create custom field from
+ * \MauticPlugin\CustomObjectsBundle\Controller\CustomField\SaveController::saveAction
+ */
+Mautic.createCustomField = function(response) {
+    mQuery('#objectFieldModal').modal('hide');
+    jQuery('.drop-here').prepend(response.content);
+};
 
 
