@@ -181,6 +181,12 @@ CustomObjects = {
         });
     },
 
+    formRecalculateFieldOrder: function() {
+        mQuery('.drop-here').find('[id*=order]').each(function(i, selector) {
+            mQuery(selector).val(i);
+        });
+    },
+
     /**
      * Custom object form events
      */
@@ -212,9 +218,7 @@ CustomObjects = {
                 containment: '#mauticforms_fields .drop-here',
                 stop: function(e, ui) {
                     mQuery(ui.item).attr('style', '');
-                    mQuery('.drop-here').find('[id*=order]').each(function(i, selector) {
-                        mQuery(selector).val(i);
-                    });
+                    CustomObjects.formRecalculateFieldOrder();
                 }
             });
 
@@ -236,6 +240,7 @@ CustomObjects = {
 Mautic.createCustomField = function(response) {
     mQuery('#objectFieldModal').modal('hide');
     jQuery('.drop-here').prepend(response.content);
+    CustomObjects.formRecalculateFieldOrder();
 };
 
 
