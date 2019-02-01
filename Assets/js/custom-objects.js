@@ -23,7 +23,7 @@ CustomObjects = {
     initTypeaheadOnFocus: function(inputHtml, customObjectId) {
         let input = mQuery(inputHtml);
         CustomObjects.initCustomItemTypeahead(input, customObjectId, null, function(selectedItem) {
-            mQuery('#campaignevent_properties_customItemId').val(selectedItem.id);
+            mQuery(input.attr('data-id-input-selector')).val(selectedItem.id);
         });
     },
 

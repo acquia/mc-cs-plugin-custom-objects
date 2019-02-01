@@ -643,6 +643,7 @@ return [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.custom.model.object',
+                    'mautic.custom.model.item',
                     'translator',
                 ],
             ],

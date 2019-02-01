@@ -21,6 +21,9 @@ use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CampaignActionLinkType;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Mautic\CoreBundle\Helper\ArrayHelper;
 
 class CampaignSubscriber extends CommonSubscriber
 {
@@ -30,6 +33,11 @@ class CampaignSubscriber extends CommonSubscriber
     private $customObjectModel;
 
     /**
+     * @var CustomItemModel
+     */
+    private $customItemModel;
+
+    /**
      * @var TranslatorInterface
      */
     protected $translator;
@@ -37,15 +45,18 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      *
      * @param CustomObjectModel $customObjectModel
+     * @param CustomItemModel $customItemModel
      * @param TranslatorInterface $translator
      */
     public function __construct(
         CustomObjectModel $customObjectModel,
+        CustomItemModel $customItemModel,
         TranslatorInterface $translator
     )
     {
         $this->customObjectModel = $customObjectModel;
-        $this->translator = $translator;
+        $this->customItemModel   = $customItemModel;
+        $this->translator        = $translator;
     }
 
     /**
@@ -75,7 +86,6 @@ class CampaignSubscriber extends CommonSubscriber
                 'eventName'       => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
                 'formType'        => CampaignActionLinkType::class,
                 'formTypeOptions' => ['customObjectId' => $customObject->getId()],
-                // 'formTheme'       => 'CustomObjectsBundle:FormTheme\LinkCustomItem',
             ]);
         }
     }
@@ -83,18 +93,22 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * @param CampaignExecutionEvent $event
      */
-    public function onCampaignTriggerActionAddToCompany(CampaignExecutionEvent $event)
+    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
     {
-        if (!$event->checkContext('lead.addtocompany')) {
+        if (!preg_match('/custom_item.(\d).linkcontact/', $event->getEvent()['type'])) {
             return;
         }
 
-        $company           = $event->getConfig()['company'];
-        $lead              = $event->getLead();
-        $somethingHappened = false;
+        $linkCustomItemId   = ArrayHelper::getValue('linkCustomItemId', $event->getConfig());
+        $unlinkCustomItemId = ArrayHelper::getValue('unlinkCustomItemId', $event->getConfig());
+        $contactId          = (int) $event->getLead()->getId();
 
-        if (!empty($company)) {
-            $somethingHappened = $this->leadModel->addToCompany($lead, $company);
+        if ($linkCustomItemId) {
+            $this->customItemModel->linkContact($linkCustomItemId, $contactId);
+        }
+
+        if ($unlinkCustomItemId ) {
+            $this->customItemModel->unlinkContact($unlinkCustomItemId, $contactId);
         }
     }
 }

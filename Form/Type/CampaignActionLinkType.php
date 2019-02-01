@@ -48,30 +48,58 @@ class CampaignActionLinkType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
-            'customItemName',
+            'linkCustomItemName',
             TextType::class,
             [
-                'required'    => true,
-                'constraints' => [new NotBlank(['message' => 'custom.item.choose.notblank'])],
+                'required'    => false,
                 'attr'        => [
-                    'data-toggle' => 'typeahead',
-                    'data-action' => 'route provider here',
-                    'class'       => 'form-control',
-                    'data-action' => $this->routeProvider->buildLookupRoute($options['customObjectId']),
-                    'onfocus'     => "CustomObjects.initTypeaheadOnFocus(this, {$options['customObjectId']})",
+                    'data-toggle'            => 'typeahead',
+                    'data-action'            => 'route provider here',
+                    'data-id-input-selector' => '.link-custom-item-id',
+                    'data-action'            => $this->routeProvider->buildLookupRoute($options['customObjectId']),
+                    'onfocus'                => "CustomObjects.initTypeaheadOnFocus(this, {$options['customObjectId']})",
+                    'class'                  => 'form-control',
                 ],
             ]
         );
 
         $builder->add(
-            'customItemId',
+            'linkCustomItemId',
             NumberType::class,
             [
-                'required'    => true,
-                'constraints' => [new NotBlank(['message' => 'custom.item.choose.notblank'])],
+                'required'    => false,
+                'attr'        => [
+
+                    'readonly' => 'typeahead',
+                    'class'    => 'form-control link-custom-item-id',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'unlinkCustomItemName',
+            TextType::class,
+            [
+                'required'    => false,
+                'attr'        => [
+                    'data-toggle'            => 'typeahead',
+                    'data-action'            => 'route provider here',
+                    'data-id-input-selector' => '.unlink-custom-item-id',
+                    'data-action'            => $this->routeProvider->buildLookupRoute($options['customObjectId']),
+                    'onfocus'                => "CustomObjects.initTypeaheadOnFocus(this, {$options['customObjectId']})",
+                    'class'                  => 'form-control',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'unlinkCustomItemId',
+            NumberType::class,
+            [
+                'required'    => false,
                 'attr'        => [
                     'readonly' => 'typeahead',
-                    'class'    => 'form-control',
+                    'class'    => 'form-control unlink-custom-item-id',
                 ],
             ]
         );
