@@ -97,11 +97,11 @@ class SaveController extends CommonController
     public function saveAction(?int $objectId = null)
     {
         try {
-            $entity = $objectId ? $this->customObjectModel->fetchEntity($objectId): new CustomObject();
-            if ($entity->isNew()) {
+            $customObject = $objectId ? $this->customObjectModel->fetchEntity($objectId): new CustomObject();
+            if ($customObject->isNew()) {
                 $this->permissionProvider->canCreate();
             } else {
-                $this->permissionProvider->canEdit($entity);
+                $this->permissionProvider->canEdit($customObject);
             }
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
@@ -111,18 +111,18 @@ class SaveController extends CommonController
 
         $request = $this->requestStack->getCurrentRequest();
         $action  = $this->routeProvider->buildSaveRoute($objectId);
-        $form    = $this->formFactory->create(CustomObjectType::class, $entity, ['action' => $action]);
+        $form    = $this->formFactory->create(CustomObjectType::class, $customObject, ['action' => $action]);
         $form->handleRequest($request);
         
         if ($form->isValid()) {
-            $this->customObjectModel->save($entity);
+            $this->customObjectModel->save($customObject);
 
             $this->session->getFlashBag()->add(
                 'notice',
                 $this->translator->trans(
                     $objectId ? 'mautic.core.notice.updated' : 'mautic.core.notice.created',
                     [
-                        '%name%' => $entity->getName(),
+                        '%name%' => $customObject->getName(),
                         '%url%'  => $this->routeProvider->buildFormRoute($objectId),
                     ], 
                     'flashes'
@@ -130,29 +130,11 @@ class SaveController extends CommonController
             );
 
             if ($form->get('buttons')->get('save')->isClicked()) {
-                return $this->redirectToDetail($request, $entity);
-            } else {
-                return $this->redirectToEdit($request, $entity);
+                return $this->forwardToDetail($request, $customObject);
             }
         }
 
-        $route = $this->routeProvider->buildFormRoute($objectId);
-
-        return $this->delegateView(
-            [
-                'returnUrl'      => $route,
-                'viewParameters' => [
-                    'entity' => $entity,
-                    'form'   => $form->createView(),
-                    'tmpl'   => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
-                ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.php',
-                'passthroughVars' => [
-                    'mauticContent' => 'customObject',
-                    'route'         => $route,
-                ],
-            ]
-        );
+        return $this->forwardToEdit($request, $customObject);
     }
 
     /**
@@ -161,7 +143,7 @@ class SaveController extends CommonController
      * 
      * @return Response
      */
-    private function redirectToEdit(Request $request, CustomObject $entity): Response
+    private function forwardToEdit(Request $request, CustomObject $entity): Response
     {
         $request->setMethod('GET');
         $params = ['objectId' => $entity->getId()];
@@ -175,7 +157,7 @@ class SaveController extends CommonController
      * 
      * @return Response
      */
-    private function redirectToDetail(Request $request, CustomObject $entity): Response
+    private function forwardToDetail(Request $request, CustomObject $entity): Response
     {
         $request->setMethod('GET');
         $params = ['objectId' => $entity->getId()];
