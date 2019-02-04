@@ -91,7 +91,10 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         $builder->addId();
         $builder->addField('label', Type::STRING);
         $builder->addField('type', Type::STRING);
-        $builder->addField('order', Type::INTEGER);
+        $builder->createField('order', 'integer')
+            ->columnName('field_order')
+            ->nullable()
+            ->build();
     }
 
     /**
