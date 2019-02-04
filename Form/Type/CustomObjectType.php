@@ -107,7 +107,6 @@ class CustomObjectType extends AbstractType
             [
                 'data_class' => CustomObject::class,
                 'allow_extra_fields' => true,
-//                'validation_groups' => false,
                 'csrf_protection'   => false,
             ]
         );
