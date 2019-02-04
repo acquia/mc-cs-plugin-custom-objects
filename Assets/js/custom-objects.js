@@ -183,7 +183,8 @@ CustomObjects = {
 
     formRecalculateFieldOrder: function() {
         mQuery('.drop-here').find('[id*=order]').each(function(i, selector) {
-            mQuery(selector).val(i);
+            mQuery(selector).val(i)
+                .parent().attr('id', 'customField_' + i);
         });
     },
 
