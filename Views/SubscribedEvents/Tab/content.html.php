@@ -23,7 +23,6 @@ $route       = $view['router']->path(CustomItemRouteProvider::ROUTE_LOOKUP, ['ob
                 data-toggle='typeahead' 
                 class="form-control bdr-w-0"
                 placeholder="<?php echo $placeholder; ?>" 
-                data-contact-id="<?php echo isset($contactId) ? $contactId : ''; ?>"
                 data-action="<?php echo $route; ?>">
         </div>
     </div>
@@ -31,3 +30,4 @@ $route       = $view['router']->path(CustomItemRouteProvider::ROUTE_LOOKUP, ['ob
         Loading...
     </div>
 </div>
+<script type="text/javascript">CustomObjects.initContactTabForCustomObject(<?php echo $customObject->getId(); ?>)</script>

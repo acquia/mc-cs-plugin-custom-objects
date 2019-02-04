@@ -639,6 +639,14 @@ return [
                     'custom_object.route.provider',
                 ],
             ],
+            'custom_item.campaign.subscriber' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CampaignSubscriber::class,
+                'arguments' => [
+                    'mautic.custom.model.object',
+                    'mautic.custom.model.item',
+                    'translator',
+                ],
+            ],
         ],
         'forms' => [
             'custom_item.item.form' => [
@@ -653,6 +661,16 @@ return [
             ],
             'custom_field.field.value.form' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldValueType::class,
+            ],
+            'custom_field.field.value.form' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldValueType::class,
+            ],
+            'custom_item.campaign.link.form' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CampaignActionLinkType::class,
+                'arguments' => [
+                    'custom_item.route.provider',
+                    'translator',
+                ],
             ],
         ],
         'commands' => [
