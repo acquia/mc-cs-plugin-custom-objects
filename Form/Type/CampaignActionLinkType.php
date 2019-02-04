@@ -24,7 +24,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CampaignActionLinkType extends AbstractType
 {
@@ -34,11 +34,18 @@ class CampaignActionLinkType extends AbstractType
     protected $routeProvider;
 
     /**
-     * @param CustomItemRouteProvider $router
+     * @var TranslatorInterface
      */
-    public function __construct(CustomItemRouteProvider $routeProvider)
+    protected $translator;
+
+    /**
+     * @param CustomItemRouteProvider $router
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(CustomItemRouteProvider $routeProvider, TranslatorInterface $translator)
     {
         $this->routeProvider = $routeProvider;
+        $this->translator = $translator;
     }
 
     /**
@@ -51,13 +58,16 @@ class CampaignActionLinkType extends AbstractType
             'linkCustomItemName',
             TextType::class,
             [
-                'required'    => false,
-                'attr'        => [
+                'required' => false,
+                'label'    => 'custom.item.link.contact',
+                'attr'     => [
+                    'tooltip'                => 'custom.item.link.contact.descr',
                     'data-toggle'            => 'typeahead',
                     'data-action'            => 'route provider here',
                     'data-id-input-selector' => '.link-custom-item-id',
                     'data-action'            => $this->routeProvider->buildLookupRoute($options['customObjectId']),
-                    'onfocus'                => "CustomObjects.initTypeaheadOnFocus(this, {$options['customObjectId']})",
+                    'data-selected-message'  => $this->translator->trans('custom.item.selected'),
+                    'data-custom-object-id'  => $options['customObjectId'],
                     'class'                  => 'form-control',
                 ],
             ]
@@ -65,14 +75,10 @@ class CampaignActionLinkType extends AbstractType
 
         $builder->add(
             'linkCustomItemId',
-            NumberType::class,
+            HiddenType::class,
             [
-                'required'    => false,
-                'attr'        => [
-
-                    'readonly' => 'typeahead',
-                    'class'    => 'form-control link-custom-item-id',
-                ],
+                'required' => false,
+                'attr'     => ['class' => 'link-custom-item-id'],
             ]
         );
 
@@ -80,13 +86,16 @@ class CampaignActionLinkType extends AbstractType
             'unlinkCustomItemName',
             TextType::class,
             [
-                'required'    => false,
-                'attr'        => [
+                'required' => false,
+                'label'    => 'custom.item.unlink.contact',
+                'attr'     => [
+                    'tooltip'                => 'custom.item.unlink.contact.descr',
                     'data-toggle'            => 'typeahead',
                     'data-action'            => 'route provider here',
                     'data-id-input-selector' => '.unlink-custom-item-id',
                     'data-action'            => $this->routeProvider->buildLookupRoute($options['customObjectId']),
-                    'onfocus'                => "CustomObjects.initTypeaheadOnFocus(this, {$options['customObjectId']})",
+                    'data-selected-message'  => $this->translator->trans('custom.item.selected'),
+                    'data-custom-object-id'  => $options['customObjectId'],
                     'class'                  => 'form-control',
                 ],
             ]
@@ -94,13 +103,10 @@ class CampaignActionLinkType extends AbstractType
 
         $builder->add(
             'unlinkCustomItemId',
-            NumberType::class,
+            HiddenType::class,
             [
-                'required'    => false,
-                'attr'        => [
-                    'readonly' => 'typeahead',
-                    'class'    => 'form-control unlink-custom-item-id',
-                ],
+                'required' => false,
+                'attr'     => ['class' => 'unlink-custom-item-id'],
             ]
         );
     }

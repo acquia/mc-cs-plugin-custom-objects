@@ -669,6 +669,7 @@ return [
                 'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CampaignActionLinkType::class,
                 'arguments' => [
                     'custom_item.route.provider',
+                    'translator',
                 ],
             ],
         ],

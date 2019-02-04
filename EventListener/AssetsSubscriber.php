@@ -59,6 +59,7 @@ class AssetsSubscriber extends CommonSubscriber
         $isEnabled = $this->coreParametersHelper->getParameter(CustomObjectsBundle::CONFIG_PARAM_ENABLED);
         if ($isEnabled && $event->isMasterRequest()) {
             $this->assetHelper->addScript('plugins/CustomObjectsBundle/Assets/js/custom-objects.js');
+            $this->assetHelper->addStylesheet('plugins/CustomObjectsBundle/Assets/css/custom-objects.css');
         }
     }
 }
