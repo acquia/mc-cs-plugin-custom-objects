@@ -154,6 +154,7 @@ class SaveController extends CommonController
                 'passthroughVars' => [
                     'mauticContent' => 'customField',
                     'route'         => $route,
+                    'fieldOrderNo'  => $request->get('fieldOrderNo'),
                 ],
             ]
         );
@@ -187,7 +188,7 @@ class SaveController extends CommonController
         return new JsonResponse([
             'content'    => $template->getContent(),
             'closeModal' => 1,
-            'callback'   => 'createCustomField',
+            'callback'   => 'saveCustomFieldPanel',
         ]);
     }
 }

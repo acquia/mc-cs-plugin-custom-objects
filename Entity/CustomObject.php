@@ -22,9 +22,7 @@ use DateTimeInterface;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\FormEntity;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
-use MauticPlugin\CustomObjectsBundle\Entity\UniqueEntityInterface;
 use Doctrine\Common\Collections\ArrayCollection;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 
 class CustomObject extends FormEntity implements UniqueEntityInterface
 {
@@ -66,11 +64,11 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @var ArrayCollection
      */
-    private $fields;
+    private $customFields;
 
     public function __construct()
     {
-        $this->fields = new ArrayCollection();
+        $this->customFields = new ArrayCollection();
     }
 
     public function __clone()
@@ -88,9 +86,10 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         $builder->setTable('custom_object')
             ->setCustomRepositoryClass(CustomObjectRepository::class);
 
-        $builder->createOneToMany('fields', CustomField::class)
+        $builder->createOneToMany('customFields', CustomField::class)
             ->addJoinColumn('custom_item_id', 'id', false, false, 'CASCADE')
             ->mappedBy('customObject')
+            ->cascadePersist()
             ->fetchExtraLazy()
             ->build();
 
@@ -216,10 +215,28 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     }
 
     /**
+     * @param \MauticPlugin\CustomObjectsBundle\Entity\CustomField $customField
+     */
+    public function addCustomField(CustomField $customField)
+    {
+        $customField->setCustomObject($this);
+        $this->customFields->add($customField);
+    }
+
+    /**
+     * @param \MauticPlugin\CustomObjectsBundle\Entity\CustomField $customField
+     */
+    public function removeCustomField(CustomField $customField)
+    {
+        $this->customFields->removeElement($customField);
+        $customField->setCustomObject();
+    }
+
+    /**
      * @return ArrayCollection
      */
-    public function getFields()
+    public function getCustomFields()
     {
-        return $this->fields;
+        return $this->customFields;
     }
 }

@@ -19,6 +19,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -74,12 +75,15 @@ class CustomObjectType extends AbstractType
         $builder->add('category', CategoryListType::class, ['bundle' => 'global']);
         $builder->add('isPublished', YesNoButtonGroupType::class);
 
-        $builder->add('fields',
+        $builder->add('customFields',
             CollectionType::class,
             [
                 'entry_type' => CustomFieldType::class,
                 'entry_options' => ['custom_object_form' => true],
                 'allow_extra_fields' => true,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'by_reference' => false,
             ]
         );
 
@@ -102,6 +106,9 @@ class CustomObjectType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class' => CustomObject::class,
+                'allow_extra_fields' => true,
+//                'validation_groups' => false,
+                'csrf_protection'   => false,
             ]
         );
     }

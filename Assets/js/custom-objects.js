@@ -126,7 +126,7 @@ CustomObjects = {
         });
 
         customItems.initialize();
-          
+
         input.typeahead({
             minLength: 0,
             highlight: true,
@@ -243,9 +243,9 @@ CustomObjects = {
         jQuery(panel).find('input').each(function(i, input) {
             let id = jQuery(input).attr('id');
             id = id.slice(id.lastIndexOf('_') + 1, id.length);
-            let name = 'custom_object[fields][' + fieldIndex + '][' + id + ']';
+            let name = 'custom_object[customFields][' + fieldIndex + '][' + id + ']';
             jQuery(input).attr('name', name);
-            id = 'custom_object_fields_' + fieldIndex + '_' + id;
+            id = 'custom_object_custom_fields_' + fieldIndex + '_' + id;
             jQuery(input).attr('id', id);
         });
         return panel;
@@ -270,23 +270,21 @@ CustomObjects = {
  * Create custom field from
  * \MauticPlugin\CustomObjectsBundle\Controller\CustomField\SaveController::saveAction
  */
-Mautic.createCustomField = function(response) {
+Mautic.saveCustomFieldPanel = function(response) {
     let content = jQuery(response.content);
 
     if (content.find('#custom_field_id').val().length) {
         // Custom field has id, this was edit
-        let fieldIndex = 1; // @todo this must be kept in modal
-        content = CustomObjects.formConvertDataFromModal(content, fieldIndex);
+        let fieldOrderNo = response.fieldOrderNo;
+        content = CustomObjects.formConvertDataFromModal(content, fieldOrderNo);
         jQuery('.drop-here').prepend(content);
     } else {
         // New custom field without id
-        let fieldIndex = jQuery('.panel').length - 2;
-        content = CustomObjects.formConvertDataFromModal(content, fieldIndex);
+        let fieldOrderNo = jQuery('.panel').length - 2;
+        content = CustomObjects.formConvertDataFromModal(content, fieldOrderNo);
         jQuery('.drop-here').prepend(content);
     }
 
     mQuery('#objectFieldModal').modal('hide');
     CustomObjects.formRecalculateFieldOrder();
 };
-
-

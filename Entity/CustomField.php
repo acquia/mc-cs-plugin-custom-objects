@@ -83,7 +83,8 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
         $builder->createManyToOne('customObject', CustomObject::class)
             ->addJoinColumn('custom_object_id', 'id', false, false, 'CASCADE')
-            ->inversedBy('fields')
+            ->inversedBy('customFields')
+            ->cascadePersist()
             ->fetchExtraLazy()
             ->build();
 
@@ -165,7 +166,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param CustomFieldTypeInterface|string $type
+     * @param CustomFieldTypeInterface $typeObject
      */
     public function setTypeObject(CustomFieldTypeInterface $typeObject): void
     {

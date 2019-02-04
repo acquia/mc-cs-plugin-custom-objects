@@ -72,7 +72,7 @@ $view['slots']->set('headerTitle', $header);
                 </div>
                 <div class="drop-here">
                     <?php
-                        foreach ($form->children['fields']->getIterator() as $customField):
+                        foreach ($form->children['customFields']->getIterator() as $customField):
                             $customFieldEntity = $customField->vars['data'];
                             if (!in_array($customFieldEntity->getId(), $deletedFields)) :
                                 echo $view->render(
