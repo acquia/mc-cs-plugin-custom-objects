@@ -74,10 +74,14 @@ class CustomObjectType extends AbstractType
         $builder->add('category', CategoryListType::class, ['bundle' => 'global']);
         $builder->add('isPublished', YesNoButtonGroupType::class);
 
-        $builder->add('fields', CollectionType::class, [
-            'entry_type' => CustomFieldType::class,
-            'entry_options' => ['custom_object_form' => true],
-        ]);
+        $builder->add('fields',
+            CollectionType::class,
+            [
+                'entry_type' => CustomFieldType::class,
+                'entry_options' => ['custom_object_form' => true],
+                'allow_extra_fields' => true,
+            ]
+        );
 
         $builder->add(
             'buttons',
