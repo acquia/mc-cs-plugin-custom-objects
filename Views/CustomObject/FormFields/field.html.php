@@ -2,7 +2,7 @@
 $customFieldEntity = $customField->vars['data'];
 $customField->vars['index'] = $customField->vars['name'];
 ?>
-<div class="panel form-field-wrapper ui-sortable-handle" id="customField_<?php echo $customField->vars['name'] ?>">
+<div class="panel form-field-wrapper ui-sortable-handle" id="customField_<?php echo (int) $customField->vars['value']->getOrder() ?>">
 
     <div class="form-buttons btn-group" role="group" aria-label="Field options" style="width: 77px;">
 
