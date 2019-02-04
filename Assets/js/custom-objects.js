@@ -257,13 +257,13 @@ CustomObjects = {
      * @param index numeric index of CF in form
      * @param modal modal content
      */
-    formConvertDataToModal: function (panel, index, modal) {
-        jQuery(panel).find('input').each(function(i, input) {
+    formConvertDataToModal: function (panel, modal) {
+        jQuery(panel).find('input').each(function (i, input) {
             let id = jQuery(input).attr('id');
             let name = id.slice(id.lastIndexOf('_') + 1, id.length);
             jQuery(modal).find('#custom_field_' + name).val(jQuery(input).val());
-        };
-    }
+        });
+    },
 };
 
 /**
