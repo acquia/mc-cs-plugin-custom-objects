@@ -89,6 +89,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         $builder->createOneToMany('customFields', CustomField::class)
             ->addJoinColumn('custom_item_id', 'id', false, false, 'CASCADE')
             ->mappedBy('customObject')
+            ->setOrderBy(['order' => 'ASC'])
             ->cascadePersist()
             ->fetchExtraLazy()
             ->build();
