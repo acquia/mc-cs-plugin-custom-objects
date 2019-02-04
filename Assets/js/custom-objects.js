@@ -201,9 +201,9 @@ CustomObjects = {
             mQuery(this).trigger('chosen:updated');
         });
 
-        if (mQuery('#mauticforms_fields')) {
+        if (mQuery('#mauticforms_fields .drop-here')) {
             // Make the fields sortable
-            mQuery('#mauticforms_fields').sortable({
+            mQuery('#mauticforms_fields .drop-here').sortable({
                 items: '.panel',
                 cancel: '',
                 helper: function(e, ui) {
