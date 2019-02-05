@@ -1,0 +1,6 @@
+MauticPlugin\CustomObjectsBundle\Entity\CustomObject:
+  custom_object1:
+    is_published: 1
+    date_added: '<dateTimeBetween("-20 days","-2 days")>'
+    name_singular: '<sentence(2)>'
+    name_plural: '<sentence(2)>'

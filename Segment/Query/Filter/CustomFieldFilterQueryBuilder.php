@@ -2,8 +2,8 @@
 declare(strict_types=1);
 
 /*
- * @copyright   2018 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc.
+ * @copyright   2019 Mautic Contributors. All rights reserved
+ * @author      Mautic, Inc., Jan Kozak <galvani78@gmail.com
  *
  * @link        https://mautic.org
  *

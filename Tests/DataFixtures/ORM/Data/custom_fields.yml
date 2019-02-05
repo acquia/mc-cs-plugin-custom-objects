@@ -1,0 +1,20 @@
+MauticPlugin\CustomObjectsBundle\Entity\CustomField:
+  custom_field1:
+    custom_object: '@custom_object1'
+    is_published: true
+    date_added: '<date()>'
+    label: '<word()> String'
+    type: 'string'
+  custom_field2:
+    custom_object: '@custom_object1'
+    is_published: true
+    date_added: '<date()>'
+    label: '<word()> Integer'
+    type: 'int'
+  custom_field3:
+    custom_object: '@custom_object1'
+    is_published: true
+    date_added: '<date()>'
+    label: '<word()> DateTime'
+    type: 'DateTime'
+
