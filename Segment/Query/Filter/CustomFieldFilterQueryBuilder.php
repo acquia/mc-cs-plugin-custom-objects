@@ -115,7 +115,7 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
                 $queryBuilder->addLogic($queryBuilder->expr()->exists($customQuery->getSQL()), $filter->getGlue());
         }
 
-        $queryBuilder->setParametersPairs($parameters, $filterParameters);
+        $queryBuilder->setParametersPairs($filterParametersHolder, $filterParameters);
 
         return $queryBuilder;
     }
