@@ -30,6 +30,8 @@ use Doctrine\ORM\QueryBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
+use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
+use Doctrine\ORM\NoResultException;
 
 class CustomItemModel extends FormModel
 {
@@ -130,14 +132,57 @@ class CustomItemModel extends FormModel
      * @param integer $customItemId
      * @param integer $contactId
      */
-    public function linkContact(int $customItemId, int $contactId): void
+    public function linkContact(int $customItemId, int $contactId): CustomItemXrefContact
     {
-        $customItem = $this->entityManager->getReference(CustomItem::class, $customItemId);
-        $contact    = $this->entityManager->getReference(Lead::class, $contactId);
-        $entity     = new CustomItemXrefContact($customItem, $contact);
+        try {
+            $xRef = $this->getContactReference($customItemId, $contactId);
+        } catch (NoResultException $e) {
+            $xRef = new CustomItemXrefContact(
+                $this->entityManager->getReference(CustomItem::class, $customItemId),
+                $this->entityManager->getReference(Lead::class, $contactId)
+            );
+    
+            $this->entityManager->persist($xRef);
+            $this->entityManager->flush();
+        }
 
-        $this->entityManager->persist($entity);
-        $this->entityManager->flush();
+        return $xRef;
+    }
+
+    /**
+     * @param integer $customItemId
+     * @param integer $contactId
+     */
+    public function unlinkContact(int $customItemId, int $contactId): void
+    {
+        try {
+            $xRef = $this->getContactReference($customItemId, $contactId);
+            $this->entityManager->remove($xRef);
+            $this->entityManager->flush();
+        } catch (NoResultException $e) {
+            // If not found then we are done here.
+        }
+    }
+
+    /**
+     * @param integer $customItemId
+     * @param integer $contactId
+     * 
+     * @return CustomItemXrefContact
+     * 
+     * @throws NoResultException if the reference does not exist
+     */
+    public function getContactReference(int $customItemId, int $contactId): CustomItemXrefContact
+    {
+        $queryBuilder = $this->entityManager->createQueryBuilder();
+        $statement    = $queryBuilder->select('cixcont')
+            ->from(CustomItemXrefContact::class, 'cixcont')
+            ->where('cixcont.customItem = :customItemId')
+            ->andWhere('cixcont.contact = :contactId')
+            ->setParameter('customItemId', $customItemId)
+            ->setParameter('contactId', $contactId);
+
+        return $statement->getQuery()->getSingleResult();
     }
 
     /**

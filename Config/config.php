@@ -639,7 +639,15 @@ return [
                     'custom_object.route.provider',
                 ],
             ],
-            'custom_object.segments.filters_generate.subscriber' => [
+            'custom_item.campaign.subscriber' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CampaignSubscriber::class,
+                'arguments' => [
+                    'mautic.custom.model.object',
+                    'mautic.custom.model.item',
+                    'translator',
+                ]
+            ],
+	   'custom_object.segments.filters_generate.subscriber' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\SegmentFiltersChoicesGenerateSubscriber::class,
                 'arguments'=> [
                     'custom_object.repository',
@@ -666,6 +674,13 @@ return [
             ],
             'custom_field.field.value.form' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldValueType::class,
+            ],
+            'custom_item.campaign.link.form' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CampaignActionLinkType::class,
+                'arguments' => [
+                    'custom_item.route.provider',
+                    'translator',
+                ],
             ],
         ],
         'commands' => [
