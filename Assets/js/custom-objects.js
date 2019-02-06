@@ -268,13 +268,18 @@ CustomObjects = {
 
     /**
      * Init ajax modal on .panel element
-     * @param el
+     * @param panel
      */
-    initModal: function(el) {
-        mQuery(el).find("[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
-            event.preventDefault();
-            Mautic.ajaxifyModal(this, event);
-        });
+    initModal: function(panel) {
+        mQuery(panel).find("[data-toggle='ajaxmodal']")
+            .off('click.ajaxmodal')
+            .on('click.ajaxmodal', function (event) {
+                event.preventDefault();
+                Mautic.ajaxifyModal(this, event);
+                jQuery(document).ajaxComplete(function(){
+                    CustomObjects.formConvertDataToModal(panel, mQuery('#objectFieldModal'));
+                });
+            });
     }
 };
 
