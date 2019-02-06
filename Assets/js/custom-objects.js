@@ -275,9 +275,9 @@ Mautic.saveCustomFieldPanel = function(response) {
 
     if (content.find('#custom_field_id').val().length) {
         // Custom field has id, this was edit
-        let fieldOrderNo = response.fieldOrderNo;
+        let fieldOrderNo = jQuery(content).find('[id*=order]').val();
         content = CustomObjects.formConvertDataFromModal(content, fieldOrderNo);
-        jQuery('.drop-here').prepend(content);
+        jQuery('[id*=order][value="' + fieldOrderNo +'"]').parent().replaceWith(content);
     } else {
         // New custom field without id
         let fieldOrderNo = jQuery('.panel').length - 2;
