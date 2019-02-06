@@ -65,6 +65,11 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         $this->id = null;
     }
 
+    public function __toString()
+    {
+        return $this->getName();
+    }
+
     /**
      * @param ORM\ClassMetadata $metadata
      */

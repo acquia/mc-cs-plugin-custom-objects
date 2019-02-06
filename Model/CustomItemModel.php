@@ -32,6 +32,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\NoResultException;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 
 class CustomItemModel extends FormModel
 {
@@ -293,6 +294,19 @@ class CustomItemModel extends FormModel
     public function getRepository(): CommonRepository
     {
         return $this->customItemRepository;
+    }
+
+    /**
+     * @param CustomField $customField
+     * @param Lead $contact
+     * @param string $expr
+     * @param mixed $value
+     * 
+     * @return int
+     */
+    public function findItemIdForValue(CustomField $customField, Lead $contact, string $expr, $value): int
+    {
+        return $this->customItemRepository->findItemIdForValue($customField, $contact, $expr, $value);
     }
 
     /**

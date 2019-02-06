@@ -16,6 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 interface CustomFieldTypeInterface
 {
@@ -57,4 +58,16 @@ interface CustomFieldTypeInterface
      * @return string
      */
     public function getTableAlias(): string;
+
+    /**
+     * @return array
+     */
+    public function getOperators(): array;
+
+    /**
+     * @param TranslatorInterface $translator
+     * 
+     * @return array
+     */
+    public function getOperatorOptions(TranslatorInterface $translator): array;
 }
