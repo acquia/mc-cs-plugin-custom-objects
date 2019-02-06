@@ -10,12 +10,16 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\CustomObjectsBundle\Tests\Segment\Query\Filter;
-
+namespace MauticPlugin\CustomObjectsBundle\Tests\DataFixtures\Traits;
 
 use Mautic\CoreBundle\Entity\CommonEntity;
 use MauticPlugin\CustomObjectsBundle\Tests\Exception\FixtureNotFoundException;
 
+/**
+ * Trait FixtureObjectsTrait implements Liip fixtures with Alice and offers helper methods for handling them
+ *
+ * @package MauticPlugin\CustomObjectsBundle\Tests\Segment\Query\Filter
+ */
 trait FixtureObjectsTrait
 {
     /**
@@ -28,7 +32,11 @@ trait FixtureObjectsTrait
      */
     private $entityMap = [];
 
-    
+    /**
+     * The result of loadFixtureFiles should be passed here to initialize the thread
+     *
+     * @param array $objects
+     */
     public function setFixtureObjects(array $objects): void
     {
         foreach ($objects as $key => $object) {
@@ -70,7 +78,13 @@ trait FixtureObjectsTrait
         return $fixtures[$index];
     }
 
-    public function getFixtureById($id) {
+    /**
+     * @param string $id key specified in fixtures
+     *
+     * @return CommonEntity
+     * @throws FixtureNotFoundException
+     */
+    public function getFixtureById($id): CommonEntity {
         if (!isset($this->entityMap[$id])) {
             throw new FixtureNotFoundException('No fixture with id "' . $id. '"" defined');
         }

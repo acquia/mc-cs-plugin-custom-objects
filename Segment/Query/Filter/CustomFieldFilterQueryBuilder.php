@@ -50,7 +50,7 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
         $filterParametersHolder = $filter->getParameterHolder($parameters);
         $tableAlias             = $this->generateRandomParameterName();
 
-        $customQuery = $this->getCustomFieldJoin($queryBuilder, $type, $tableAlias, $filterFieldId);
+        $customQuery = $this->getCustomFieldJoin($queryBuilder, $type, $tableAlias);
         $customQuery->select($tableAlias . '_contact.contact_id as lead_id');
         $queryBuilder->setParameter('customFieldId_' . $tableAlias, (int) $filterFieldId);
 
@@ -146,7 +146,7 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    private function getCustomFieldJoin(QueryBuilder $queryBuilder, string $fieldType, string $alias, string $joinType = 'inclusion')
+    private function getCustomFieldJoin(QueryBuilder $queryBuilder, string $fieldType, string $alias)
     {
         $customFieldQueryBuilder = $queryBuilder->createQueryBuilder();
 

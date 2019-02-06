@@ -1,5 +1,6 @@
 <?php
 declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic Inc., Jan Kozak <galvani78@gmail.com>
@@ -45,7 +46,10 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
         return [LeadEvents::SEGMENT_DICTIONARY_ON_GENERATE => 'onGenerateSegmentDictionary'];
     }
 
-    public function onGenerateSegmentDictionary(SegmentDictionaryGenerationEvent $event)
+    /**
+     * @param SegmentDictionaryGenerationEvent $event
+     */
+    public function onGenerateSegmentDictionary(SegmentDictionaryGenerationEvent $event): void
     {
         try {
             $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
@@ -68,7 +72,7 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
             }
         }
         catch (\Exception $e) {
-            return false;
+            return;
         }
     }
 

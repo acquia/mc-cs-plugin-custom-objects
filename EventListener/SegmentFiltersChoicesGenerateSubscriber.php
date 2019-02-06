@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic Inc, Jan Kozak <galvani78@gmail.com>
@@ -20,6 +20,11 @@ use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+/**
+ * SegmentFiltersChoicesGenerateSubscriber
+ *
+ * @package MauticPlugin\CustomObjectsBundle\EventListener
+ */
 class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterface
 {
     use OperatorListTrait;
@@ -34,6 +39,12 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
      */
     private $translator;
 
+    /**
+     * SegmentFiltersChoicesGenerateSubscriber constructor.
+     *
+     * @param CustomObjectRepository $customObjectRepository
+     * @param TranslatorInterface    $translator
+     */
     public function __construct(
         CustomObjectRepository $customObjectRepository,
         TranslatorInterface $translator
