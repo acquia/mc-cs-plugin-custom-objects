@@ -265,6 +265,17 @@ CustomObjects = {
             jQuery(modal).find('#custom_field_' + name).val(jQuery(input).val());
         });
     },
+
+    /**
+     * Init ajax modal on .panel element
+     * @param el
+     */
+    initModal: function(el) {
+        mQuery(el).find("[data-toggle='ajaxmodal']").on('click.ajaxmodal', function (event) {
+            event.preventDefault();
+            Mautic.ajaxifyModal(this, event);
+        });
+    }
 };
 
 /**
@@ -273,19 +284,22 @@ CustomObjects = {
  */
 Mautic.saveCustomFieldPanel = function(response) {
     let content = jQuery(response.content);
+    let fieldOrderNo = 0;
 
     if (content.find('#custom_field_id').val().length) {
         // Custom field has id, this was edit
-        let fieldOrderNo = jQuery(content).find('[id*=order]').val();
+        fieldOrderNo = jQuery(content).find('[id*=order]').val();
         content = CustomObjects.formConvertDataFromModal(content, fieldOrderNo);
         jQuery('[id*=order][value="' + fieldOrderNo +'"]').parent().replaceWith(content);
     } else {
         // New custom field without id
-        let fieldOrderNo = jQuery('.panel').length - 2;
+        fieldOrderNo = jQuery('.panel').length - 2;
         content = CustomObjects.formConvertDataFromModal(content, fieldOrderNo);
         jQuery('.drop-here').prepend(content);
+        CustomObjects.formRecalculateFieldOrder();
+        fieldOrderNo = 0;
     }
 
     mQuery('#objectFieldModal').modal('hide');
-    CustomObjects.formRecalculateFieldOrder();
+    CustomObjects.initModal(jQuery('[id*=order][value="' + fieldOrderNo +'"]').parent());
 };
