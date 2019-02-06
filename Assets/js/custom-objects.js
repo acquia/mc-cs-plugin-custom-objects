@@ -253,20 +253,6 @@ CustomObjects = {
     },
 
     /**
-     * Transfer CF data from CO form to modal
-     * @param panel CF panel content
-     * @param index numeric index of CF in form
-     * @param modal modal content
-     */
-    formConvertDataToModal: function (panel, modal) {
-        jQuery(panel).find('input').each(function (i, input) {
-            let id = jQuery(input).attr('id');
-            let name = id.slice(id.lastIndexOf('_') + 1, id.length);
-            jQuery(modal).find('#custom_field_' + name).val(jQuery(input).val());
-        });
-    },
-
-    /**
      * Init ajax modal on .panel element
      * @param panel
      */
@@ -276,9 +262,6 @@ CustomObjects = {
             .on('click.ajaxmodal', function (event) {
                 event.preventDefault();
                 Mautic.ajaxifyModal(this, event);
-                jQuery(document).ajaxComplete(function(){
-                    CustomObjects.formConvertDataToModal(panel, mQuery('#objectFieldModal'));
-                });
             });
     }
 };
@@ -308,3 +291,20 @@ Mautic.saveCustomFieldPanel = function(response) {
     mQuery('#objectFieldModal').modal('hide');
     CustomObjects.initModal(jQuery('[id*=order][value="' + fieldOrderNo +'"]').parent());
 };
+
+/**
+ * Transfer CF data from CO form to modal
+ * @param response
+ */
+Mautic.formConvertDataToModal = function (response) {
+    let fieldOrderNo = jQuery(response).find('[id*=order]').val();
+    if (fieldOrderNo !== undefined) {
+        let panel = jQuery('[id*=order][value="' + fieldOrderNo +'"]').parent();
+        panel.find('input').each(function (i, input) {
+            let id = jQuery(input).attr('id');
+            let name = id.slice(id.lastIndexOf('_') + 1, id.length);
+            jQuery('#objectFieldModal').find('#custom_field_' + name).val(jQuery(input).val());
+        });
+    }
+};
+
