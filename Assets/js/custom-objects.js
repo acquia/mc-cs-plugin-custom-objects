@@ -173,12 +173,14 @@ CustomObjects = {
     },
 
     initDeleteFieldButton: function() {
-        mQuery('#mauticforms_fields').find('[data-hide-panel]').click(function(e) {
-            e.preventDefault();
-            let panel = mQuery(this).closest('.panel');
-            panel.hide('fast');
-            panel.find('[id*=deleted]').val(1);
-        });
+        mQuery('#mauticforms_fields').find('[data-hide-panel]')
+            .unbind('click')
+            .click(function(e) {
+                e.preventDefault();
+                let panel = mQuery(this).closest('.panel');
+                panel.hide('fast');
+                panel.find('[id*=deleted]').val(1);
+            });
     },
 
     formRecalculateFieldOrder: function() {
@@ -193,7 +195,6 @@ CustomObjects = {
      */
     formOnLoad: function (container) {
         mQuery('select.form-builder-new-component').change(function (e) {
-            // @todo new field in list after create
             mQuery(this).find('option:selected');
             Mautic.ajaxifyModal(mQuery(this).find('option:selected'));
             // Reset the dropdown
