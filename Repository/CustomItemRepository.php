@@ -19,6 +19,8 @@ use Doctrine\ORM\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
 class CustomItemRepository extends CommonRepository
 {
@@ -75,6 +77,41 @@ class CustomItemRepository extends CommonRepository
         $queryBuilder->setParameter('customObjectId', $customObject->getId());
         $queryBuilder->setParameter('contactId', $contact->getId());
         $result = $queryBuilder->getQuery()->getSingleScalarResult();
+
+        return (int) $result;
+    }
+
+    /**
+     * @param CustomField $customField
+     * @param Lead $contact
+     * @param string $expr
+     * @param mixed $value
+     * 
+     * @return integer
+     * 
+     * @throws NotFoundException
+     */
+    public function findItemIdForValue(CustomField $customField, Lead $contact, string $expr, $value): int
+    {
+        $fieldType = $customField->getTypeObject();
+        $queryBuilder = $this->_em->getConnection()->createQueryBuilder();
+        $queryBuilder->select('ci.id');
+        $queryBuilder->from(MAUTIC_TABLE_PREFIX.'custom_item', 'ci');
+        $queryBuilder->innerJoin('ci', MAUTIC_TABLE_PREFIX.'custom_item_xref_contact', 'cixcont', 'cixcont.custom_item_id = ci.id');
+        $queryBuilder->innerJoin('ci', $fieldType->getTableName(), $fieldType->getTableAlias(), "{$fieldType->getTableAlias()}.custom_item_id = ci.id");
+        $queryBuilder->where('cixcont.contact_id = :contactId');
+        $queryBuilder->setParameter('contactId', $contact->getId());
+        $queryBuilder->andWhere("{$fieldType->getTableAlias()}.custom_field_id = :customFieldId");
+        $queryBuilder->setParameter('customFieldId', $customField->getId());
+        $queryBuilder->andWhere($queryBuilder->expr()->{$expr}("{$fieldType->getTableAlias()}.value", $value));
+
+        $result = $queryBuilder->execute()->fetchColumn();
+
+        if (false === $result) {
+            $stringValue = print_r($value, true);
+            $msg         = "Custom Item for contact {$contact->getId()}, custom field {$customField->getId()} and value {$expr} {$stringValue} was not found.";
+            throw new NotFoundException($msg);
+        }
 
         return (int) $result;
     }
