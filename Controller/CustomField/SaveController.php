@@ -136,7 +136,7 @@ class SaveController extends CommonController
 
         $form->handleRequest($request);
         
-        if ($form->isValid() && $form->get('buttons')->get('save')->isClicked()) {
+        if ($form->isValid()) {
             return $this->buildCustomFieldFormPart($customObject, $form->getData());
         }
 
@@ -148,7 +148,6 @@ class SaveController extends CommonController
                 'viewParameters' => [
                     'customField' => $customField,
                     'form'   => $form->createView(),
-                    'tmpl'   => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomField:form.html.php',
                 'passthroughVars' => [
@@ -188,7 +187,6 @@ class SaveController extends CommonController
         return new JsonResponse([
             'content'    => $template->getContent(),
             'closeModal' => 1,
-            'callback'   => 'saveCustomFieldPanel',
         ]);
     }
 }

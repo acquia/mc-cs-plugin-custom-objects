@@ -141,7 +141,6 @@ class FormController extends CommonController
                 'passthroughVars' => [
                     'mauticContent' => 'customField',
                     'route'         => $route,
-                    'successCallback'      => 'formConvertDataToModal',
                 ],
             ]
         );
