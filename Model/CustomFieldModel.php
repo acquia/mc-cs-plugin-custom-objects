@@ -161,6 +161,18 @@ class CustomFieldModel extends FormModel
     }
 
     /**
+     * @param int $id
+     *
+     * @throws NotFoundException
+     */
+    public function deleteById($id)
+    {
+        if ($customObject = $this->fetchEntity($id)) {
+            $this->deleteEntity($customObject);
+        }
+    }
+
+    /**
      * Adds condition for creator if the user doesn't have permissions to view other.
      *
      * @param array $args

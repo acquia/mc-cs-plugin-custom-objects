@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
+use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
@@ -52,6 +53,11 @@ class SaveController extends CommonController
     private $customObjectModel;
 
     /**
+     * @var CustomFieldModel
+     */
+    private $customFieldModel;
+
+    /**
      * @var CustomObjectPermissionProvider
      */
     private $permissionProvider;
@@ -62,13 +68,14 @@ class SaveController extends CommonController
     private $routeProvider;
 
     /**
-     * @param RequestStack $requestStack
-     * @param Session $session
-     * @param FormFactory $formFactory
-     * @param TranslatorInterface $translator
-     * @param CustomObjectModel $customObjectModel
+     * @param RequestStack                   $requestStack
+     * @param Session                        $session
+     * @param FormFactory                    $formFactory
+     * @param TranslatorInterface            $translator
+     * @param CustomObjectModel              $customObjectModel
+     * @param CustomFieldModel               $customFieldModel
      * @param CustomObjectPermissionProvider $permissionProvider
-     * @param CustomObjectRouteProvider $routeProvider
+     * @param CustomObjectRouteProvider      $routeProvider
      */
     public function __construct(
         RequestStack $requestStack,
@@ -76,6 +83,7 @@ class SaveController extends CommonController
         FormFactory $formFactory,
         TranslatorInterface $translator,
         CustomObjectModel $customObjectModel,
+        CustomFieldModel $customFieldModel,
         CustomObjectPermissionProvider $permissionProvider,
         CustomObjectRouteProvider $routeProvider
     )
@@ -85,6 +93,7 @@ class SaveController extends CommonController
         $this->formFactory        = $formFactory;
         $this->translator         = $translator;
         $this->customObjectModel  = $customObjectModel;
+        $this->customFieldModel = $customFieldModel;
         $this->permissionProvider = $permissionProvider;
         $this->routeProvider      = $routeProvider;
     }
@@ -116,6 +125,12 @@ class SaveController extends CommonController
         
         if ($form->isValid()) {
             $this->customObjectModel->save($customObject);
+
+            foreach ($_POST['custom_object']['customFields'] as $customField) {
+                if ($customField['deleted'] && $customField['id']) {
+                    $this->customFieldModel->deleteById((int) $customField['id']);
+                }
+            }
 
             $this->session->getFlashBag()->add(
                 'notice',
