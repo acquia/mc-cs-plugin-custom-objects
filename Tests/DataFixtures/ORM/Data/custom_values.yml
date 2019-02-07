@@ -1,0 +1,14 @@
+MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText:
+  custom_field_value_text1:
+    __construct: ['@custom_field1', '@custom_itememotion','love']
+  custom_field_value_text2:
+    __construct: ['@custom_field1', '@custom_item1','love']
+  custom_field_value_text3:
+    __construct: ['@custom_field1', '@custom_item2','hate']
+  custom_field_value_text4:
+    __construct: ['@custom_field1', '@custom_item3','sadness']
+  custom_field_value_text5:
+    __construct: ['@custom_field1', '@custom_item4','love']
+  custom_field_value_text6:
+    __construct: ['@custom_field1', '@custom_item5','hate']
+

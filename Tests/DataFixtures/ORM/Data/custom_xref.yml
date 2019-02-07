@@ -1,0 +1,13 @@
+MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact:
+  custom_item_xref1:
+    __construct: ['@custom_itememotion', '@contact1']
+  custom_item_xref2:
+    __construct: ['@custom_item1', '@contact2']
+  custom_item_xref3:
+    __construct: ['@custom_item2', '@contact3']
+  custom_item_xref4:
+    __construct: ['@custom_item3', '@contact4']
+  custom_item_xref5:
+    __construct: ['@custom_item4', '@contact5']
+  custom_item_xref6:
+    __construct: ['@custom_item5', '@contact6']

@@ -646,6 +646,20 @@ return [
                     'mautic.custom.model.object',
                     'mautic.custom.model.item',
                     'translator',
+                ]
+            ],
+	   'custom_object.segments.filters_generate.subscriber' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\EventListener\SegmentFiltersChoicesGenerateSubscriber::class,
+                'arguments'=> [
+                    'custom_object.repository',
+                    'translator',
+                ]
+            ],
+            'custom_object.segments.filters_dictionary.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\SegmentFiltersDictionarySubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.helper.core_parameters'
                 ],
             ],
         ],
@@ -659,9 +673,6 @@ return [
                     'custom_object.repository'
                 ],
                 'tag' => 'form.type'
-            ],
-            'custom_field.field.value.form' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldValueType::class,
             ],
             'custom_field.field.value.form' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldValueType::class,
@@ -741,12 +752,20 @@ return [
             'custom_object.random.helper' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Helper\RandomHelper::class,
             ],
-            'custom_object.custom_field_factory' => [
+            'custom_object.custom_field_factory'           => [
                 'class' =>\MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory::class,
                 'arguments' => [
                     'custom_field.type.provider'
                 ]
-            ]
+            ],
+            'mautic.lead.query.builder.custom_field.value' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder::class,
+                'arguments' => ['mautic.lead.model.random_parameter_name'],
+            ],
+            'mautic.lead.query.builder.custom_item.value'  => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemFilterQueryBuilder::class,
+                'arguments' => ['mautic.lead.model.random_parameter_name'],
+            ],
         ],
     ],
     'parameters' => [
