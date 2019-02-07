@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc., Jan Kozak <galvani78@gmail.com
+ * @author      Mautic, Inc.
  *
  * @link        https://mautic.org
  *
