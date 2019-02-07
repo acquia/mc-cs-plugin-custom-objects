@@ -659,6 +659,7 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\SegmentFiltersDictionarySubscriber::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
+                    'mautic.helper.core_parameters'
                 ],
             ],
         ],

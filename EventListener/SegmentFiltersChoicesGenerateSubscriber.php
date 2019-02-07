@@ -15,6 +15,7 @@ use Doctrine\Common\Collections\Criteria;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\LeadEvents;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -82,6 +83,7 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
                         'object'     => $customObject->getId(),
                     ]
                 );
+                /** @var CustomField $customField */
                 foreach ($customObject->getFields()->getIterator() as $customField) {
                     $event->addChoice(
                         'custom_object',
@@ -89,7 +91,7 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
                         [
                             'label'      => $customField->getCustomObject()->getName() . " : " . $customField->getLabel(),
                             'properties' => ['type' => $customField->getType()],
-                            'operators'  => $this->getOperatorsForFieldType($customField->getType()),
+                            'operators'  => $customField->getTypeObject()->getOperators(),
                             'object'     => $customField->getId(),
                         ]
                     );
