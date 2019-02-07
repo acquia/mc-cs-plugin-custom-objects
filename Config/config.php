@@ -642,6 +642,7 @@ return [
             'custom_item.campaign.subscriber' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
+                    'mautic.custom.model.field',
                     'mautic.custom.model.object',
                     'mautic.custom.model.item',
                     'translator',
@@ -678,6 +679,14 @@ return [
             'custom_item.campaign.link.form' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CampaignActionLinkType::class,
                 'arguments' => [
+                    'custom_item.route.provider',
+                    'translator',
+                ],
+            ],
+            'custom_item.campaign.link.form' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CampaignConditionFieldValueType::class,
+                'arguments' => [
+                    'mautic.custom.model.field',
                     'custom_item.route.provider',
                     'translator',
                 ],

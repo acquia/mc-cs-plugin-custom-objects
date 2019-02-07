@@ -17,6 +17,24 @@ CustomObjects = {
         })
     },
 
+    updateFormFieldOptions(fieldSelectHtml) {
+        let fieldSelect = mQuery(fieldSelectHtml);
+        let operators = JSON.parse(fieldSelect.find(':selected').attr('data-operators'));
+        let operatorSelect = mQuery('#campaignevent_properties_operator');
+        let selectedOperator = operatorSelect.find(':selected').attr('value');
+        operatorSelect.empty();
+
+        for (var operatorKey in operators) {
+            let option = mQuery('<option/>').attr('value', operatorKey).text(operators[operatorKey]);
+            if (operatorKey == selectedOperator) {
+                option.attr('selected', true);
+            }
+            operatorSelect.append(option);
+        }
+
+        operatorSelect.trigger("chosen:updated");
+    },
+
     // Called from tab content HTML:
     initContactTabForCustomObject(customObjectId) {
         let contactId = mQuery('input#leadId').val();

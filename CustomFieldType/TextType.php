@@ -94,4 +94,15 @@ class TextType extends AbstractCustomFieldType
     {
         return new CustomFieldValueText($customField, $customItem, $value);
     }
+
+    /**
+     * @return array
+     */
+    public function getOperators(): array
+    {
+        $allOperators = parent::getOperators();
+        $allowedOperators = array_flip(['=', '!=', 'empty', '!empty', 'like', '!like', 'in', '!in', 'startsWith', 'endsWith', 'contains']);
+        
+        return array_intersect_key($allOperators, $allowedOperators);
+    }
 }
