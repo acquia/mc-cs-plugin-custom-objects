@@ -17,9 +17,6 @@ use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 
-/**
- * Class ForeignValueFilterQueryBuilder.
- */
 class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
 {
     /** {@inheritdoc} */
@@ -33,7 +30,6 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
      * @param ContactSegmentFilter $filter
      *
      * @return QueryBuilder
-     * @throws InvalidArgumentException
      */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
@@ -41,16 +37,11 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
         $filterParameters = $filter->getParameterValue();
         $filterFieldId    = $filter->getField();
 
-
-        if (!in_array($type = $filter->getType(), ['int', 'text', 'datetime'], true)) {
-            throw new InvalidArgumentException('Invalid object type ' . $filter->getType());
-        }
-
         $parameters             = $this->getParametersAliases($filterParameters);
         $filterParametersHolder = $filter->getParameterHolder($parameters);
         $tableAlias             = $this->generateRandomParameterName();
 
-        $customQuery = $this->getCustomFieldJoin($queryBuilder, $type, $tableAlias);
+        $customQuery = $this->getCustomFieldJoin($queryBuilder, $filter->getType(), $tableAlias);
         $customQuery->select($tableAlias . '_contact.contact_id as lead_id');
         $queryBuilder->setParameter('customFieldId_' . $tableAlias, (int) $filterFieldId);
 
@@ -95,15 +86,6 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
                 $customQuery->andWhere($expression);
 
                 $queryBuilder->addLogic($queryBuilder->expr()->notExists($customQuery->getSQL()), $filter->getGlue());
-                break;
-            case 'regexp':
-            case 'notRegexp':
-                $not        = ($filterOperator === 'notRegexp') ? ' NOT' : '';
-                $expression = $tableAlias . '_value.value' . $not . ' REGEXP ' . $filterParametersHolder;
-
-                $customQuery->andWhere($expression);
-
-                $queryBuilder->addLogic($queryBuilder->expr()->exists($customQuery->getSQL()), $filter->getGlue());
                 break;
             default:
                 $expression = $customQuery->expr()->$filterOperator(

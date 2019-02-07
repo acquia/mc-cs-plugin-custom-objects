@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic Inc., Jan Kozak <galvani78@gmail.com>
+ * @author      Mautic Inc.
  *
  * @link        http://mautic.com
  *
@@ -13,8 +13,10 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
 use Mautic\LeadBundle\LeadEvents;
+use MauticPlugin\CustomObjectsBundle\CustomObjectsBundle;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemFilterQueryBuilder;
@@ -32,10 +34,19 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
      * @var EntityManager
      */
     private $entityManager;
+    /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
 
-    public function __construct(EntityManager $entityManager)
+    /**
+     * @param EntityManager        $entityManager
+     * @param CoreParametersHelper $coreParametersHelper
+     */
+    public function __construct(EntityManager $entityManager, CoreParametersHelper $coreParametersHelper)
     {
-        $this->entityManager = $entityManager;
+        $this->entityManager        = $entityManager;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -48,31 +59,32 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
 
     /**
      * @param SegmentDictionaryGenerationEvent $event
+     *
+     * @throws InvalidArgumentException
      */
     public function onGenerateSegmentDictionary(SegmentDictionaryGenerationEvent $event): void
     {
-        try {
-            $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
-            $queryBuilder
-                ->select('f.id, f.label, f.type, o.id as custom_object_id')
-                ->from(MAUTIC_TABLE_PREFIX . "custom_field", 'f')
-                ->innerJoin('f', MAUTIC_TABLE_PREFIX . "custom_object", 'o', 'f.custom_object_id = o.id and o.is_published = 1');
-
-            $registeredObjects = [];
-
-            foreach ($queryBuilder->execute()->fetchAll() as $field) {
-                if (!in_array($COId = $field['custom_object_id'], $registeredObjects)) {
-                    $event->addTranslation('cmo_' . $COId, [
-                        'type'  => CustomItemFilterQueryBuilder::getServiceId(),
-                        'field' => $COId,
-                    ]);
-                    $registeredObjects[] = $COId;
-                }
-                $event->addTranslation('cmf_' . $field['id'], $this->createTranslation($field));
-            }
-        }
-        catch (\Exception $e) {
+        if (!$this->coreParametersHelper->getParameter(CustomObjectsBundle::CONFIG_PARAM_ENABLED)) {
             return;
+        }
+
+        $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
+        $queryBuilder
+            ->select('f.id, f.label, f.type, o.id as custom_object_id')
+            ->from(MAUTIC_TABLE_PREFIX . "custom_field", 'f')
+            ->innerJoin('f', MAUTIC_TABLE_PREFIX . "custom_object", 'o', 'f.custom_object_id = o.id and o.is_published = 1');
+
+        $registeredObjects = [];
+
+        foreach ($queryBuilder->execute()->fetchAll() as $field) {
+            if (!in_array($COId = $field['custom_object_id'], $registeredObjects)) {
+                $event->addTranslation('cmo_' . $COId, [
+                    'type'  => CustomItemFilterQueryBuilder::getServiceId(),
+                    'field' => $COId,
+                ]);
+                $registeredObjects[] = $COId;
+            }
+            $event->addTranslation('cmf_' . $field['id'], $this->createTranslation($field));
         }
     }
 
@@ -80,15 +92,10 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
      * @param array $fieldAttributes
      *
      * @return array
-     * @throws InvalidArgumentException
      */
-    private function createTranslation(array $fieldAttributes)
+    private function createTranslation(array $fieldAttributes): array
     {
-        if (!in_array($type = $fieldAttributes['type'], ['int', 'text', 'datetime'])) {
-            throw new InvalidArgumentException('Given custom field type does not exist: ' . $type);
-        }
-
-        $segmentValueType = 'custom_field_value_' . $type;
+        $segmentValueType = 'custom_field_value_' . $fieldAttributes['type'];
 
         $translation = [
             'type'  => CustomFieldFilterQueryBuilder::getServiceId(),

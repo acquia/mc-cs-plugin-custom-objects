@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc., Jan Kozak <galvani78@gmail.com
+ * @author      Mautic, Inc.
  *
  * @link        https://mautic.org
  *
@@ -17,9 +17,6 @@ use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 
-/**
- * Class ForeignValueFilterQueryBuilder.
- */
 class CustomItemFilterQueryBuilder extends BaseFilterQueryBuilder
 {
     /**
@@ -43,10 +40,6 @@ class CustomItemFilterQueryBuilder extends BaseFilterQueryBuilder
         $filterOperator   = $filter->getOperator();
         $filterParameters = $filter->getParameterValue();
         $filterFieldId    = $filter->getField();
-
-        if (!in_array($type = $filter->getType(), ['int', 'text', 'datetime'], true)) {
-            throw new InvalidArgumentException('Invalid object type ' . $filter->getType());
-        }
 
         $parameters             = $this->getParametersAliases($filterParameters);
         $filterParametersHolder = $filter->getParameterHolder($parameters);
@@ -97,15 +90,6 @@ class CustomItemFilterQueryBuilder extends BaseFilterQueryBuilder
                 $customQuery->andWhere($expression);
 
                 $queryBuilder->addLogic($queryBuilder->expr()->notExists($customQuery->getSQL()), $filter->getGlue());
-                break;
-            case 'regexp':
-            case 'notRegexp':
-                $not        = ($filterOperator === 'notRegexp') ? ' NOT' : '';
-                $expression = $tableAlias . '_item.name' . $not . ' REGEXP ' . $filterParametersHolder;
-
-                $customQuery->andWhere($expression);
-
-                $queryBuilder->addLogic($queryBuilder->expr()->exists($customQuery->getSQL()), $filter->getGlue());
                 break;
             default:
                 $expression = $customQuery->expr()->$filterOperator(
