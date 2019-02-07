@@ -89,7 +89,7 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
                         [
                             'label'      => $customField->getCustomObject()->getName() . " : " . $customField->getLabel(),
                             'properties' => ['type' => $customField->getType()],
-                            'operators'  => $this->getOperatorsForFieldType($customField->getType()),
+                            'operators'  => $customField->getType(), //@todo wip
                             'object'     => $customField->getId(),
                         ]
                     );
