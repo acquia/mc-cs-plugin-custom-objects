@@ -69,11 +69,9 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
     public function onGenerateSegmentFilters(LeadListFiltersChoicesEvent $event): void
     {
         $criteria     = new Criteria(Criteria::expr()->eq('isPublished', 1));
-        $translations = [];
 
-        $this->customObjectRepository->matching($criteria)->forAll(
-            function (int $index, CustomObject $customObject) use ($event, &$translations) {
-                $translations['mautic.lead.custom_object_' . $customObject->getId()] = $customObject->getNamePlural();
+        $this->customObjectRepository->matching($criteria)->map(
+            function (CustomObject $customObject) use ($event) {
                 $event->addChoice(
                     'custom_object',
                     'cmo_' . $customObject->getId(),
