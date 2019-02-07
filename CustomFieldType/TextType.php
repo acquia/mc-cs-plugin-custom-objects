@@ -72,7 +72,7 @@ class TextType extends AbstractCustomFieldType
      */
     public function getTableName(): string
     {
-        return MAUTIC_TABLE_PREFIX.'custom_field_value_text';
+        return 'custom_field_value_text';
     }
 
     /**
