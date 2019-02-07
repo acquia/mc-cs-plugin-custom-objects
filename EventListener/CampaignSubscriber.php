@@ -24,9 +24,18 @@ use MauticPlugin\CustomObjectsBundle\Form\Type\CampaignActionLinkType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Mautic\CoreBundle\Helper\ArrayHelper;
+use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CampaignConditionFieldValueType;
+use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
 class CampaignSubscriber extends CommonSubscriber
 {
+    /**
+     * @var CustomFieldModel
+     */
+    private $customFieldModel;
+
     /**
      * @var CustomObjectModel
      */
@@ -44,16 +53,19 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      *
+     * @param CustomFieldModel $customFieldModel
      * @param CustomObjectModel $customObjectModel
      * @param CustomItemModel $customItemModel
      * @param TranslatorInterface $translator
      */
     public function __construct(
+        CustomFieldModel $customFieldModel,
         CustomObjectModel $customObjectModel,
         CustomItemModel $customItemModel,
         TranslatorInterface $translator
     )
     {
+        $this->customFieldModel  = $customFieldModel;
         $this->customObjectModel = $customObjectModel;
         $this->customItemModel   = $customItemModel;
         $this->translator        = $translator;
@@ -65,12 +77,15 @@ class CampaignSubscriber extends CommonSubscriber
     public static function getSubscribedEvents(): array
     {
         return [
-            CampaignEvents::CAMPAIGN_ON_BUILD      => ['onCampaignBuild'],
-            LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION => ['onCampaignTriggerAction'],
+            CampaignEvents::CAMPAIGN_ON_BUILD               => ['onCampaignBuild'],
+            CustomItemEvents::ON_CAMPAIGN_TRIGGER_ACTION    => ['onCampaignTriggerAction'],
+            CustomItemEvents::ON_CAMPAIGN_TRIGGER_CONDITION => ['onCampaignTriggerCondition'],
         ];
     }
 
     /**
+     * @todo don't forget to disable these methods when the plugin is disabled
+     *
      * Add event triggers and actions.
      *
      * @param CampaignBuilderEvent $event
@@ -83,9 +98,18 @@ class CampaignSubscriber extends CommonSubscriber
             $event->addAction("custom_item.{$customObject->getId()}.linkcontact", [
                 'label'           => $this->translator->trans('custom.item.events.link.contact', ['%customObject%' => $customObject->getNameSingular()]),
                 'description'     => $this->translator->trans('custom.item.events.link.contact_descr', ['%customObject%' => $customObject->getNameSingular()]),
-                'eventName'       => LeadEvents::ON_CAMPAIGN_TRIGGER_ACTION,
+                'eventName'       => CustomItemEvents::ON_CAMPAIGN_TRIGGER_ACTION,
                 'formType'        => CampaignActionLinkType::class,
                 'formTypeOptions' => ['customObjectId' => $customObject->getId()],
+            ]);
+
+            $event->addCondition("custom_item.{$customObject->getId()}.fieldvalue", [
+                'label'           => $this->translator->trans('custom.item.events.field.value', ['%customObject%' => $customObject->getNameSingular()]),
+                'description'     => $this->translator->trans('custom.item.events.field.value_descr', ['%customObject%' => $customObject->getNameSingular()]),
+                'formType'        => CampaignConditionFieldValueType::class,
+                'formTheme'       => 'CustomObjectsBundle:FormTheme\FieldValueCondition',
+                'eventName'       => CustomItemEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
+                'formTypeOptions' => ['customObject' => $customObject],
             ]);
         }
     }
@@ -109,6 +133,45 @@ class CampaignSubscriber extends CommonSubscriber
 
         if ($unlinkCustomItemId ) {
             $this->customItemModel->unlinkContact($unlinkCustomItemId, $contactId);
+        }
+    }
+
+    /**
+     * @param CampaignExecutionEvent $event
+     */
+    public function onCampaignTriggerCondition(CampaignExecutionEvent $event)
+    {
+        if (!preg_match('/custom_item.(\d).fieldvalue/', $event->getEvent()['type'])) {
+            return;
+        }
+
+        $contact = $event->getLead();
+
+        if (!$contact || !$contact->getId()) {
+            return $event->setResult(false);
+        }
+
+        try {
+            $customField = $this->customFieldModel->fetchEntity($event->getConfig()['field']);
+        } catch (NotFoundException $e) {
+            return $event->setResult(false);
+        }
+
+        $expr = $customField->getTypeObject()->getOperators()[$event->getConfig()['operator']]['expr'];
+
+        try {
+            $customItemId = $this->customItemModel->findItemIdForValue(
+                $customField,
+                $contact,
+                $expr,
+                $event->getConfig()['value']
+            );
+            
+            $event->setChannel('customItem', $customItemId);
+    
+            return $event->setResult(true);
+        } catch (NotFoundException $e) {
+            return $event->setResult(false);
         }
     }
 }

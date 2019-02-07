@@ -94,4 +94,15 @@ class IntType extends AbstractCustomFieldType
     {
         return new CustomFieldValueInt($customField, $customItem, $value);
     }
+
+    /**
+     * @return array
+     */
+    public function getOperators(): array
+    {
+        $allOperators = parent::getOperators();
+        $allowedOperators = array_flip(['=', '!=', 'gt', 'gte', 'lt', 'lte', 'empty', '!empty', 'between', '!between', 'in', '!in']);
+        
+        return array_intersect_key($allOperators, $allowedOperators);
+    }
 }
