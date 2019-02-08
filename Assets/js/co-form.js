@@ -129,13 +129,22 @@ CustomObjectsForm = {
                 },
                 complete: function () {
                     Mautic.stopModalLoadingBar(target);
-                    CustomObjectsForm.initSaveFromModal(target);
+                    CustomObjectsForm.initSaveModal(target);
+                    CustomObjectsForm.initCancelModal();
                 }
             });
         });
     },
 
-    initSaveFromModal(target) {
+    initCancelModal() {
+        mQuery('button.btn-cancel')
+            .unbind('click')
+            .bind('click', function() {
+                mQuery('#objectFieldModal').modal('hide');
+            });
+    },
+
+    initSaveModal(target) {
         mQuery(target).find('button.btn-save')
             .unbind('click')
             .bind('click', function() {
