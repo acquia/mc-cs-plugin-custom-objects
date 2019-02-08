@@ -59,7 +59,7 @@ $view['slots']->set('headerTitle', $header);
                                             echo $view['router']->path(
                                                 \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider::ROUTE_FORM,
                                                 [
-                                                    'object¨Id'  => $customObject->getId(),
+                                                    'objectId'  => $customObject->getId(),
                                                     'fieldType' => $fieldType->getKey(),
                                                 ]
                                             );
