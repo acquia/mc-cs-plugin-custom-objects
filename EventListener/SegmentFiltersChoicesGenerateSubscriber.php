@@ -84,7 +84,7 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
                     ]
                 );
                 /** @var CustomField $customField */
-                foreach ($customObject->getFields()->getIterator() as $customField) {
+                foreach ($customObject->getCustomFields()->getIterator() as $customField) {
                     $event->addChoice(
                         'custom_object',
                         'cmf_' . $customField->getId(),
