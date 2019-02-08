@@ -75,7 +75,7 @@ class CustomFieldRouteProvider
      * @param int $id
      *
      * @return string
-     * @throws ForbiddenExceptions
+     * @throws ForbiddenException
      */
     public function buildCloneRoute(int $id): string
     {
