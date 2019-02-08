@@ -178,7 +178,7 @@ CustomObjects = {
     formOnLoad: function () {
         CustomObjects.formInitCFAdder();
         CustomObjects.formInitSortable();
-        jQuery('.panel').each(function (i, panel) {
+        mQuery('.panel').each(function (i, panel) {
             CustomObjects.formInitPanel(panel);
         });
     },
@@ -337,9 +337,9 @@ CustomObjects = {
      */
     formConvertDataToModal: function (panel) {
         mQuery(panel).find('input').each(function (i, input) {
-            let id = jQuery(input).attr('id');
+            let id = mQuery(input).attr('id');
             let name = id.slice(id.lastIndexOf('_') + 1, id.length);
-            jQuery('#objectFieldModal').find('#custom_field_' + name).val(jQuery(input).val());
+            mQuery('#objectFieldModal').find('#custom_field_' + name).val(mQuery(input).val());
         });
     },
 
@@ -363,19 +363,19 @@ CustomObjects = {
      * \MauticPlugin\CustomObjectsBundle\Controller\CustomField\SaveController::saveAction
      */
     saveCustomFieldPanel: function(response, target) {
-        let content = jQuery(response.content);
+        let content = mQuery(response.content);
         let fieldOrderNo = 0;
 
         if (content.find('#custom_field_id').val()) {
             // Custom field has id, this was edit
-            fieldOrderNo = jQuery(content).find('[id*=order]').val();
+            fieldOrderNo = mQuery(content).find('[id*=order]').val();
             content = CustomObjects.formConvertDataFromModal(content, fieldOrderNo);
-            jQuery('form[name="custom_object"] [id*=order][value="' + fieldOrderNo +'"]').parent().replaceWith(content);
+            mQuery('form[name="custom_object"] [id*=order][value="' + fieldOrderNo +'"]').parent().replaceWith(content);
         } else {
             // New custom field without id
-            fieldOrderNo = jQuery('.panel').length - 2;
+            fieldOrderNo = mQuery('.panel').length - 2;
             content = CustomObjects.formConvertDataFromModal(content, fieldOrderNo);
-            jQuery('.drop-here').prepend(content);
+            mQuery('.drop-here').prepend(content);
             CustomObjects.formRecalculateCFOrder();
             fieldOrderNo = 0;
         }
@@ -384,7 +384,7 @@ CustomObjects = {
         mQuery('body').removeClass('modal-open');
         mQuery('.modal-backdrop').remove();
 
-        CustomObjects.formInitModal(jQuery('[id*=order][value="' + fieldOrderNo +'"]').parent());
+        CustomObjects.formInitModal(mQuery('[id*=order][value="' + fieldOrderNo +'"]').parent());
     },
 
     /**
@@ -394,13 +394,13 @@ CustomObjects = {
      * @returns html content of panel
      */
     formConvertDataFromModal: function (panel, fieldIndex) {
-        jQuery(panel).find('input').each(function(i, input) {
-            let id = jQuery(input).attr('id');
+        mQuery(panel).find('input').each(function(i, input) {
+            let id = mQuery(input).attr('id');
             id = id.slice(id.lastIndexOf('_') + 1, id.length);
             let name = 'custom_object[customFields][' + fieldIndex + '][' + id + ']';
-            jQuery(input).attr('name', name);
+            mQuery(input).attr('name', name);
             id = 'custom_object_custom_fields_' + fieldIndex + '_' + id;
-            jQuery(input).attr('id', id);
+            mQuery(input).attr('id', id);
         });
         return panel;
     },
