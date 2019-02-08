@@ -74,7 +74,7 @@ CustomObjectsForm = {
      * @param panel
      */
     initPanel: function(panel) {
-        CustomObjectsForm.initModal(panel);
+        CustomObjectsForm.initEditFieldButton(panel);
         CustomObjectsForm.initDeleteFieldButton(panel);
     },
 
@@ -82,17 +82,30 @@ CustomObjectsForm = {
      * Init ajax modal on .panel element
      * @param panel
      */
-    initModal: function(panel) {
-        mQuery(panel).find("[data-toggle='ajaxmodal']")
-            .off('click.ajaxmodal')
-            .on('click.ajaxmodal', function (event) {
-
+    initEditFieldButton: function(panel) {
+        mQuery(panel).find('button.btn-edit')
+            .unbind('click')
+            .bind('click', function (event) {
                 event.preventDefault();
-                // Mautic.ajaxifyModal(this, event);
                 CustomObjectsForm.showModal(mQuery(this));
             });
 
         CustomObjectsForm.initSortable();
+    },
+
+    /**
+     * Init CF delete button
+     * @param panel
+     */
+    initDeleteFieldButton: function(panel) {
+        mQuery(panel).find('[data-hide-panel]')
+            .unbind('click')
+            .click(function(e) {
+                e.preventDefault();
+                let panel = mQuery(this).closest('.panel');
+                panel.hide('fast');
+                panel.find('[id*=deleted]').val(1);
+            });
     },
 
     showModal: function(element) {
@@ -145,6 +158,8 @@ CustomObjectsForm = {
     },
 
     initSaveModal(target) {
+        Mautic.startIconSpinOnEvent();
+
         mQuery(target).find('button.btn-save')
             .unbind('click')
             .bind('click', function() {
@@ -174,21 +189,6 @@ CustomObjectsForm = {
     },
 
     /**
-     * Init CF delete button
-     * @param panel
-     */
-    initDeleteFieldButton: function(panel) {
-        mQuery(panel).find('[data-hide-panel]')
-            .unbind('click')
-            .click(function(e) {
-                e.preventDefault();
-                let panel = mQuery(this).closest('.panel');
-                panel.hide('fast');
-                panel.find('[id*=deleted]').val(1);
-            });
-    },
-
-    /**
      * Create custom field from
      * \MauticPlugin\CustomObjectsFormBundle\Controller\CustomField\SaveController::saveAction
      */
@@ -214,7 +214,8 @@ CustomObjectsForm = {
         mQuery('body').removeClass('modal-open');
         mQuery('.modal-backdrop').remove();
 
-        CustomObjectsForm.initModal(mQuery('[id*=order][value="' + fieldOrderNo +'"]').parent());
+        let panel = mQuery('#customField_' + fieldOrderNo);
+        CustomObjectsForm.initPanel(panel);
     },
 
     /**
