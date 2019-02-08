@@ -633,6 +633,13 @@ return [
                     'translator',
                 ],
             ],
+            'custom_item.import.subscriber' => [
+                'class'     => MauticPlugin\CustomObjectsBundle\EventListener\ImportSubscriber::class,
+                'arguments' => [
+                    'mautic.custom.model.object',
+                    'mautic.custom.model.item',
+                ],
+            ],
             'custom_object.button.subscriber' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectButtonSubscriber::class,
                 'arguments' => [

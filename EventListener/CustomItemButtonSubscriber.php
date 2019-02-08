@@ -73,13 +73,24 @@ class CustomItemButtonSubscriber extends CommonSubscriber
             case CustomItemRouteProvider::ROUTE_LIST:
                 $this->addEntityButtons($event, ButtonHelper::LOCATION_LIST_ACTIONS);
                 try {
+                    $customObjectId = $this->getCustomObjectIdFromEvent($event);
                     $event->addButton(
-                        $this->defineNewButton($this->getCustomObjectIdFromEvent($event)),
+                        $this->defineNewButton($customObjectId),
                         ButtonHelper::LOCATION_PAGE_ACTIONS,
                         $event->getRoute()
                     );
                     $event->addButton(
-                        $this->defineBatchDeleteButton($this->getCustomObjectIdFromEvent($event)),
+                        $this->defineImportNewButton($customObjectId),
+                        ButtonHelper::LOCATION_PAGE_ACTIONS,
+                        $event->getRoute()
+                    );
+                    $event->addButton(
+                        $this->defineImportListButton($customObjectId),
+                        ButtonHelper::LOCATION_PAGE_ACTIONS,
+                        $event->getRoute()
+                    );
+                    $event->addButton(
+                        $this->defineBatchDeleteButton($customObjectId),
                         ButtonHelper::LOCATION_BULK_ACTIONS,
                         $event->getRoute()
                     );
@@ -223,6 +234,48 @@ class CustomItemButtonSubscriber extends CommonSubscriber
             'btnText'   => $this->translator->trans('mautic.core.form.new'),
             'iconClass' => 'fa fa-plus',
             'priority'  => 500,
+        ];
+    }
+
+    /**
+     * @param int $customObjectId
+     * 
+     * @return array
+     * 
+     * @throws ForbiddenException
+     */
+    private function defineImportNewButton(int $customObjectId): array
+    {
+        $this->permissionProvider->canCreate();        
+
+        return [
+            'attr' => [
+                'href' => $this->routeProvider->buildNewImportRoute($customObjectId),
+            ],
+            'btnText'   => $this->translator->trans('mautic.lead.import'),
+            'iconClass' => 'fa fa-upload',
+            'priority'  => 350,
+        ];
+    }
+
+    /**
+     * @param int $customObjectId
+     * 
+     * @return array
+     * 
+     * @throws ForbiddenException
+     */
+    private function defineImportListButton(int $customObjectId): array
+    {
+        $this->permissionProvider->canCreate();        
+
+        return [
+            'attr' => [
+                'href' => $this->routeProvider->buildListImportRoute($customObjectId),
+            ],
+            'btnText'   => $this->translator->trans('mautic.lead.lead.import.index'),
+            'iconClass' => 'fa fa-history',
+            'priority'  => 300,
         ];
     }
 

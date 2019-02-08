@@ -33,6 +33,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\NoResultException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use Mautic\LeadBundle\Entity\Import;
 
 class CustomItemModel extends FormModel
 {
@@ -127,6 +128,19 @@ class CustomItemModel extends FormModel
         $this->entityManager->flush();
 
         return $entity;
+    }
+
+    /**
+     * @param Import $import
+     * @param array $rowData
+     * 
+     * @return boolean
+     */
+    public function import(Import $import, array $rowData): bool
+    {
+        // @todo implement this
+
+        return false;
     }
 
     /**
