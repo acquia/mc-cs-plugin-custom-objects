@@ -45,7 +45,7 @@ return [
                 ],
             ],
             CustomFieldRouteProvider::ROUTE_SAVE => [
-                'path'       => '/custom/field/save/{objectId}/{fieldType}',
+                'path'       => '/custom/field/save/{fieldType}',
                 'controller' => 'CustomObjectsBundle:CustomField\Save:save',
                 'method'     => 'POST',
                 'defaults'   => [
