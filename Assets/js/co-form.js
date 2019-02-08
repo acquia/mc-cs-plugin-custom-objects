@@ -1,6 +1,6 @@
 // Init stuff on refresh:
 mQuery(function() {
-    CustomObjectsForm.formOnLoad();
+    CustomObjectsForm.onLoad();
 });
 
 CustomObjectsForm = {
@@ -8,21 +8,21 @@ CustomObjectsForm = {
     /**
      * Custom object form events
      */
-    formOnLoad: function () {
-        CustomObjectsForm.formInitCFAdder();
-        CustomObjectsForm.formInitSortable();
+    onLoad: function () {
+        CustomObjectsForm.initAdder();
+        CustomObjectsForm.initSortable();
         mQuery('.panel').each(function (i, panel) {
-            CustomObjectsForm.formInitPanel(panel);
+            CustomObjectsForm.initPanel(panel);
         });
     },
 
     /**
      * Init CF adding feature
      */
-    formInitCFAdder: function() {
+    initAdder: function() {
         mQuery('select.form-builder-new-component').change(function (e) {
             mQuery(this).find('option:selected');
-            CustomObjectsForm.formShowModal(mQuery(this).find('option:selected'));
+            CustomObjectsForm.showModal(mQuery(this).find('option:selected'));
             // Reset the dropdown
             mQuery(this).val('');
             mQuery(this).trigger('chosen:updated');
@@ -32,7 +32,7 @@ CustomObjectsForm = {
     /**
      * Init CF sorting feature
      */
-    formInitSortable: function () {
+    initSortable: function () {
         if (mQuery('#mauticforms_fields .drop-here')) {
             // Make the fields sortable
             mQuery('#mauticforms_fields .drop-here').sortable({
@@ -51,7 +51,7 @@ CustomObjectsForm = {
                 containment: '#mauticforms_fields .drop-here',
                 stop: function(e, ui) {
                     mQuery(ui.item).attr('style', '');
-                    CustomObjectsForm.formRecalculateCFOrder();
+                    CustomObjectsForm.recalculateOrder();
                 }
             });
 
@@ -62,7 +62,7 @@ CustomObjectsForm = {
     /**
      * Recalculate CF order
      */
-    formRecalculateCFOrder: function() {
+    recalculateOrder: function() {
         mQuery('.drop-here').find('[id*=order]').each(function(i, selector) {
             mQuery(selector).val(i)
                 .parent().attr('id', 'customField_' + i);
@@ -73,29 +73,29 @@ CustomObjectsForm = {
      * Init CF panel events (except sortable)
      * @param panel
      */
-    formInitPanel: function(panel) {
-        CustomObjectsForm.formInitModal(panel);
-        CustomObjectsForm.formInitDeleteFieldButton(panel);
+    initPanel: function(panel) {
+        CustomObjectsForm.initModal(panel);
+        CustomObjectsForm.initDeleteFieldButton(panel);
     },
 
     /**
      * Init ajax modal on .panel element
      * @param panel
      */
-    formInitModal: function(panel) {
+    initModal: function(panel) {
         mQuery(panel).find("[data-toggle='ajaxmodal']")
             .off('click.ajaxmodal')
             .on('click.ajaxmodal', function (event) {
 
                 event.preventDefault();
                 // Mautic.ajaxifyModal(this, event);
-                CustomObjectsForm.formShowModal(mQuery(this));
+                CustomObjectsForm.showModal(mQuery(this));
             });
 
-        CustomObjectsForm.formInitSortable();
+        CustomObjectsForm.initSortable();
     },
 
-    formShowModal: function(element) {
+    showModal: function(element) {
         let target = element.attr('data-target');
         if (element.attr('href')) {
             var route = element.attr('href');
@@ -119,7 +119,7 @@ CustomObjectsForm = {
                         Mautic.processModalContent(response, target);
                     }
                     if (edit) {
-                        CustomObjectsForm.formConvertDataToModal(element);
+                        CustomObjectsForm.convertDataToModal(element);
                     }
                     Mautic.stopIconSpinPostEvent();
                 },
@@ -129,13 +129,13 @@ CustomObjectsForm = {
                 },
                 complete: function () {
                     Mautic.stopModalLoadingBar(target);
-                    CustomObjectsForm.formBindSaveFromModal(target);
+                    CustomObjectsForm.initSaveFromModal(target);
                 }
             });
         });
     },
 
-    formBindSaveFromModal(target) {
+    initSaveFromModal(target) {
         mQuery(target).find('button.btn-save')
             .unbind('click')
             .bind('click', function() {
@@ -150,7 +150,7 @@ CustomObjectsForm = {
                     success: function (response) {
                         if (response.closeModal) {
                             // Valid post, lets create panel
-                            CustomObjectsForm.saveCustomFieldPanel(response, target);
+                            CustomObjectsForm.saveToPanel(response, target);
                         } else {
                             // Rerender invalid form
                             Mautic.processModalContent(response, target);
@@ -165,22 +165,10 @@ CustomObjectsForm = {
     },
 
     /**
-     * Transfer CF data from CO form to modal
-     * @param panel
-     */
-    formConvertDataToModal: function (panel) {
-        mQuery(panel).find('input').each(function (i, input) {
-            let id = mQuery(input).attr('id');
-            let name = id.slice(id.lastIndexOf('_') + 1, id.length);
-            mQuery('#objectFieldModal').find('#custom_field_' + name).val(mQuery(input).val());
-        });
-    },
-
-    /**
      * Init CF delete button
      * @param panel
      */
-    formInitDeleteFieldButton: function(panel) {
+    initDeleteFieldButton: function(panel) {
         mQuery(panel).find('[data-hide-panel]')
             .unbind('click')
             .click(function(e) {
@@ -195,21 +183,21 @@ CustomObjectsForm = {
      * Create custom field from
      * \MauticPlugin\CustomObjectsFormBundle\Controller\CustomField\SaveController::saveAction
      */
-    saveCustomFieldPanel: function(response, target) {
+    saveToPanel: function(response, target) {
         let content = mQuery(response.content);
         let fieldOrderNo = 0;
 
         if (content.find('#custom_field_id').val()) {
             // Custom field has id, this was edit
             fieldOrderNo = mQuery(content).find('[id*=order]').val();
-            content = CustomObjectsForm.formConvertDataFromModal(content, fieldOrderNo);
+            content = CustomObjectsForm.convertDataFromModal(content, fieldOrderNo);
             mQuery('form[name="custom_object"] [id*=order][value="' + fieldOrderNo +'"]').parent().replaceWith(content);
         } else {
             // New custom field without id
             fieldOrderNo = mQuery('.panel').length - 2;
-            content = CustomObjectsForm.formConvertDataFromModal(content, fieldOrderNo);
+            content = CustomObjectsForm.convertDataFromModal(content, fieldOrderNo);
             mQuery('.drop-here').prepend(content);
-            CustomObjectsForm.formRecalculateCFOrder();
+            CustomObjectsForm.recalculateOrder();
             fieldOrderNo = 0;
         }
 
@@ -217,7 +205,19 @@ CustomObjectsForm = {
         mQuery('body').removeClass('modal-open');
         mQuery('.modal-backdrop').remove();
 
-        CustomObjectsForm.formInitModal(mQuery('[id*=order][value="' + fieldOrderNo +'"]').parent());
+        CustomObjectsForm.initModal(mQuery('[id*=order][value="' + fieldOrderNo +'"]').parent());
+    },
+
+    /**
+     * Transfer CF data from CO form to modal
+     * @param panel
+     */
+    convertDataToModal: function (panel) {
+        mQuery(panel).find('input').each(function (i, input) {
+            let id = mQuery(input).attr('id');
+            let name = id.slice(id.lastIndexOf('_') + 1, id.length);
+            mQuery('#objectFieldModal').find('#custom_field_' + name).val(mQuery(input).val());
+        });
     },
 
     /**
@@ -226,7 +226,7 @@ CustomObjectsForm = {
      * @param fieldIndex numeric index of CF in form
      * @returns html content of panel
      */
-    formConvertDataFromModal: function (panel, fieldIndex) {
+    convertDataFromModal: function (panel, fieldIndex) {
         mQuery(panel).find('input').each(function(i, input) {
             let id = mQuery(input).attr('id');
             id = id.slice(id.lastIndexOf('_') + 1, id.length);
@@ -237,5 +237,4 @@ CustomObjectsForm = {
         });
         return panel;
     },
-
 };
