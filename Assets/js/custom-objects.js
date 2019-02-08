@@ -258,6 +258,8 @@ CustomObjects = {
                 // Mautic.ajaxifyModal(this, event);
                 CustomObjects.formShowModal(mQuery(this));
             });
+
+        CustomObjects.formInitSortable();
     },
 
     formShowModal: function(element) {
