@@ -47,7 +47,6 @@ $view['slots']->set('headerTitle', $header);
         <div class="pa-md" id="fields-container">
             <?php echo $view->render('MauticFormBundle:Builder:style.html.php'); ?>
             <div id="mauticforms_fields">
-                <?php if ($customObject->getId()) : ?>
                 <div class="row">
                     <div class="available-fields mb-md col-sm-4">
                         <select class="chosen form-builder-new-component" data-placeholder="<?php echo $view['translator']->trans('mautic.form.form.component.fields'); ?>">
@@ -71,13 +70,13 @@ $view['slots']->set('headerTitle', $header);
                         </select>
                     </div>
                 </div>
-                <?php endif; ?>
                 <div class="drop-here">
                     <?php
-                        foreach ($customFields as $customField):
-                            if (!in_array($customField->getId(), $deletedFields)) :
+                        foreach ($form->children['customFields']->getIterator() as $customField):
+                            $customFieldEntity = $customField->vars['data'];
+                            if (!in_array($customFieldEntity->getId(), $deletedFields)) :
                                 echo $view->render(
-                                    "CustomObjectsBundle:CustomObject:Fields\\field.{$customField->getType()}.html.php",
+                                    "CustomObjectsBundle:CustomObject:FormFields\\field.{$customFieldEntity->getType()}.html.php",
                                     ['customField' => $customField, 'customObject' => $customObject]
                                 );
                             endif;

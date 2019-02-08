@@ -44,6 +44,9 @@ class CustomFieldType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        // Is part of custom object form?
+        $customObjectForm = !empty($options['custom_object_form']);
+
         $builder->add('id', HiddenType::class);
 
         $builder->add(
@@ -88,14 +91,26 @@ class CustomFieldType extends AbstractType
         );
 
         $builder->add(
-            'buttons',
-            FormButtonsType::class,
-            [
-                'cancel_onclick' => "mQuery('form[name=custom_field]').attr('method', 'get').attr('action', mQuery('form[name=custom_field]').attr('action').replace('/save', '/cancel'));",
-            ]
+            'order',
+            HiddenType::class
         );
 
-        $builder->setAction($options['action']);
+        if ($customObjectForm) {
+            // Possibility to mark field as deleted in POST data
+            $builder->add('deleted',HiddenType::class,['mapped' => false]);
+        } else {
+
+            $builder->add(
+                'buttons',
+                FormButtonsType::class,
+                [
+                    'apply_text' => '',
+                    'cancel_onclick' => "mQuery('form[name=custom_field]').attr('method', 'get').attr('action', mQuery('form[name=custom_field]').attr('action').replace('/save', '/cancel'));",
+                ]
+            );
+
+            $builder->setAction($options['action']);
+        }
     }
 
     /**
@@ -106,6 +121,8 @@ class CustomFieldType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class' => CustomField::class,
+                'custom_object_form' => false, // Is form used as subform?
+                'csrf_protection'   => false,
             ]
         );
     }

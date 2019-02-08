@@ -37,7 +37,7 @@ return [
                 'method'     => 'GET',
             ],
             CustomFieldRouteProvider::ROUTE_CANCEL => [
-                'path'       => '/custom/field/cancel/{fieldId}',
+                'path'       => '/custom/field/cancel/{fieldId}/{fieldType}',
                 'controller' => 'CustomObjectsBundle:CustomField\Cancel:cancel',
                 'method'     => 'GET',
                 'defaults'   => [
@@ -45,7 +45,7 @@ return [
                 ],
             ],
             CustomFieldRouteProvider::ROUTE_SAVE => [
-                'path'       => '/custom/field/save/{objectId}/{fieldType}',
+                'path'       => '/custom/field/save/{fieldType}',
                 'controller' => 'CustomObjectsBundle:CustomField\Save:save',
                 'method'     => 'POST',
                 'defaults'   => [
@@ -485,6 +485,7 @@ return [
                     'form.factory',
                     'translator',
                     'mautic.custom.model.object',
+                    'mautic.custom.model.field',
                     'custom_object.permission.provider',
                     'custom_object.route.provider',
                 ],

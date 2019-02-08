@@ -124,6 +124,8 @@ class CustomFieldModel extends FormModel
                     ],
                 ],
             ],
+            'orderBy'        => 'e.order',
+            'orderByDir'     => 'ASC',
             'ignore_paginator' => true,
         ]);
     }
@@ -156,6 +158,18 @@ class CustomFieldModel extends FormModel
     public function getPermissionBase(): string
     {
         return 'custom_fields:custom_fields';
+    }
+
+    /**
+     * @param int $id
+     *
+     * @throws NotFoundException
+     */
+    public function deleteById($id)
+    {
+        if ($customObject = $this->fetchEntity($id)) {
+            $this->deleteEntity($customObject);
+        }
     }
 
     /**

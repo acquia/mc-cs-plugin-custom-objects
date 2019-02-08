@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\CustomObjectsBundle\Form;
 
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
@@ -48,7 +49,7 @@ class CustomObjectHiddenTransformer implements DataTransformerInterface
     public function reverseTransform($value)
     {
         if (!$value) {
-            return null;
+            return new CustomObject();
         }
 
         $entity = $this->customObjectRepository->findOneById($value);
