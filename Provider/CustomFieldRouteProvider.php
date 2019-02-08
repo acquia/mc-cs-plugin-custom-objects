@@ -44,7 +44,7 @@ class CustomFieldRouteProvider
      *
      * @return string
      */
-    public function buildSaveRoute(?int $id = null, ?int $objectId = null, string $fieldType): string
+    public function buildSaveRoute(string $fieldType, ?int $id = null, ?int $objectId = null): string
     {
         $params['fieldType'] = $fieldType;
 

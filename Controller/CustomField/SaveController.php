@@ -131,7 +131,7 @@ class SaveController extends CommonController
             $this->accessDenied(false, $e->getMessage());
         }
 
-        $action = $this->fieldRouteProvider->buildSaveRoute($fieldId, $customObject->getId(), $fieldType);
+        $action = $this->fieldRouteProvider->buildSaveRoute($fieldType, $fieldId, $customObject->getId());
         $form   = $this->formFactory->create(CustomFieldType::class, $customField, ['action' => $action]);
 
         $form->handleRequest($request);
