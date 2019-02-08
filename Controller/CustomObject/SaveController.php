@@ -126,7 +126,8 @@ class SaveController extends CommonController
         if ($form->isValid()) {
             $this->customObjectModel->save($customObject);
 
-            foreach ($_POST['custom_object']['customFields'] as $customField) {
+            $rawCustomObject = $request->get('custom_object');
+            foreach ($rawCustomObject['customFields'] as $customField) {
                 if ($customField['deleted'] && $customField['id']) {
                     $this->customFieldModel->deleteById((int) $customField['id']);
                 }
