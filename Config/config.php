@@ -665,15 +665,6 @@ return [
             'custom_object.dynamic_content.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\DynamicContentSubscriber::class,
                 'arguments' => [
-                    'mautic.page.model.trackable',
-                    'mautic.page.helper.token',
-                    'mautic.asset.helper.token',
-                    'mautic.form.helper.token',
-                    'mautic.focus.helper.token',
-                    'mautic.core.model.auditlog',
-                    'mautic.lead.model.lead',
-                    'mautic.helper.dynamicContent',
-                    'mautic.dynamicContent.model.dynamicContent',
                     'doctrine.orm.entity_manager'
                 ],
             ],
