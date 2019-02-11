@@ -14,6 +14,7 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\DebugBundle\Service\MauticDebugHelper;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\EmailBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
@@ -60,20 +61,27 @@ class DynamicContentSubscriber extends CommonSubscriber
             if ($eventFilter['object'] != 'custom_object') {
                 continue;
             }
-            $isCustomFieldValueFilter = preg_match('/^cmf_([0-9]+)$/', $eventFilter['field'], $matches);
+            if (!$isCustomFieldValueFilter = preg_match('/^cmf_([0-9]+)$/', $eventFilter['field'], $matches)) {
+                $isCustomObjectNameFilter = preg_match('/^cmo_([0-9]+)$/', $eventFilter['field'], $matches);
+            }
 
             $operator = OperatorOptions::getFilterExpressionFunctions()[$eventFilter['operator']]['expr'];
 
-            $tableAlias = 'cfq_' . (int) $matches[1] . '';
-
             if ($isCustomFieldValueFilter) {
+                $tableAlias        = 'cfwq_' . (int) $matches[1] . '';
                 $valueQueryBuilder = $this->createValueQueryBuilder($connection, $tableAlias, (int) $matches[1], $eventFilter['type']);
                 $this->addCustomFieldValueExpression($valueQueryBuilder, $tableAlias, $operator, $eventFilter['filter']);
+            } elseif ($isCustomObjectNameFilter) {
+                $tableAlias        = 'cowq_' . (int) $matches[1] . '';
+                $nameQueryBuilder = $this->createItemNameQueryBuilder($connection, $tableAlias);
+                $this->addCustomFieldValueExpression($nameQueryBuilder, $tableAlias, $operator, $eventFilter['filter']);
             } else {
                 throw new \Exception('Not implemented');
             }
 
             $this->addContactIdRestriction($valueQueryBuilder, $tableAlias, (int) $event->getContact()->getId());
+
+            MauticDebugHelper::dumpSQL($valueQueryBuilder);
 
             if ($valueQueryBuilder->execute()->rowCount()) {
                 $event->setIsEvaluated(true);

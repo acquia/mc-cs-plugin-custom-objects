@@ -83,15 +83,20 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
                         'object'     => $customObject->getId(),
                     ]
                 );
+
                 /** @var CustomField $customField */
                 foreach ($customObject->getFields()->getIterator() as $customField) {
+                    $availableOperator = $this->getOperatorsForFieldType($customField->getType());
+                    $allowedOperators = $customField->getTypeObject()->getOperators();
+                    $operators = array_intersect_key($availableOperator, $allowedOperators);
+
                     $event->addChoice(
                         'custom_object',
                         'cmf_' . $customField->getId(),
                         [
                             'label'      => $customField->getCustomObject()->getName() . " : " . $customField->getLabel(),
                             'properties' => ['type' => $customField->getType()],
-                            'operators'  => $customField->getTypeObject()->getOperators(),
+                            'operators'  => $operators,
                             'object'     => $customField->getId(),
                         ]
                     );

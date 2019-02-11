@@ -106,8 +106,17 @@ trait QueryFilterHelper
      */
     public function addCustomFieldValueExpression(QueryBuilder $queryBuilder, string $tableAlias, string $operator, $value)
     {
-        $valueType  = null;
         $expression = $this->getCustomValueValueExpression($queryBuilder, $tableAlias, $operator);
+        $this->addOperatorExpression($queryBuilder, $tableAlias, $expression, $operator, $value);
+    }
+
+    public function addCustomObjectNameExpression(QueryBuilder $queryBuilder, string $tableAlias, string $operator, $value) {
+        $expression = $this->getCustomObjectNameExpression($queryBuilder, $tableAlias, $operator);
+        $this->addOperatorExpression($queryBuilder, $tableAlias, $expression, $operator, $value);
+    }
+    public function addOperatorExpression(QueryBuilder $queryBuilder, string $tableAlias, $expression, $operator, $value)
+    {
+        $valueType  = null;
 
         switch ($operator) {
             case 'empty':
@@ -229,6 +238,12 @@ trait QueryFilterHelper
                     $customQuery->expr()->isNull($tableAlias . '_value.value')
                 );
                 break;
+            case 'contains':
+                $valueParameter = $tableAlias . '_value_value';
+
+                $expression = $customQuery->expr()->like($tableAlias . '_value.value', "%:{$valueParameter}%");
+                break;
+
             case 'notLike':
                 $valueParameter = $tableAlias . '_value_value';
 
@@ -241,6 +256,63 @@ trait QueryFilterHelper
                 $valueParameter = $tableAlias . '_value_value';
                 $expression     = $customQuery->expr()->$operator(
                     $tableAlias . '_value.value',
+                    ":$valueParameter"
+                );
+
+        }
+
+        return $expression;
+    }
+
+    /**
+     * Form the logical expression needed to limit the CustomValue's value for given operator
+     *
+     * @param QueryBuilder $customQuery
+     * @param              $tableAlias
+     * @param              $operator
+     *
+     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|string
+     */
+    private function getCustomObjectNameExpression(QueryBuilder $customQuery, $tableAlias, $operator)
+    {
+        switch ($operator) {
+            case 'empty':
+            case 'notEmpty':
+                $expression = $customQuery->expr()->isNotNull($tableAlias . '_value.value');
+                break;
+            case 'notIn':
+                $valueParameter = $tableAlias . '_name_value';
+                $expression     = $customQuery->expr()->in(
+                    $tableAlias . '_item.name',
+                    ":$valueParameter"
+                );
+                break;
+            case 'in':
+                $valueParameter = $tableAlias . '_name_value';
+                $expression     = $customQuery->expr()->in(
+                    $tableAlias . '_item.name',
+                    ":$valueParameter"
+                );
+                break;
+            case 'neq':
+                $valueParameter = $tableAlias . '_name_value';
+                $expression     = $customQuery->expr()->orX(
+                    $customQuery->expr()->eq($tableAlias . '_item.name', ":$valueParameter"),
+                    $customQuery->expr()->isNull($tableAlias . '_item.name')
+                );
+                break;
+            case 'notLike':
+                $valueParameter = $tableAlias . '_name_value';
+
+                $expression = $customQuery->expr()->orX(
+                    $customQuery->expr()->isNull($tableAlias . '_item.name'),
+                    $customQuery->expr()->like($tableAlias . '_item.name', ":$valueParameter")
+                );
+                break;
+            default:
+                $valueParameter = $tableAlias . '_name_value';
+                $expression     = $customQuery->expr()->$operator(
+                    $tableAlias . '_item.name',
                     ":$valueParameter"
                 );
 
