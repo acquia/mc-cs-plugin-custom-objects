@@ -14,6 +14,7 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Mautic\DebugBundle\Service\MauticDebugHelper;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\EmailBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
@@ -159,43 +160,29 @@ class DynamicContentSubscriber extends CommonSubscriber
             return;
         }
 
+        $connection = $this->entityManager->getConnection();
+        $queryBuilder = new QueryBuilder($connection);
+
         foreach ($eventFilters as $eventFilter) {
             if ($eventFilter['object'] != 'custom_object') {
                 continue;
             }
             $isCustomFieldValueFilter = preg_match('/^cmf_([0-9]+)$/', $eventFilter['field'], $matches);
 
-            $queryBuilder = new QueryBuilder($this->entityManager->getConnection());
-            $queryBuilder->select('*')->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');;
-
-
             $operator = OperatorOptions::getFilterExpressionFunctions()[$eventFilter['operator']]['expr'];
 
             $tableAlias = 'cfq_' . (int) $matches[1] . '';
 
             if ($isCustomFieldValueFilter) {
-                $customQueryBuilder = $this->getCustomValueValueLogicQueryBuilder(
-                    $queryBuilder,
-                    (int) $matches[1],
-                    $eventFilter['glue'],
-                    $eventFilter['type'],
-                    $operator,
-                    $eventFilter['filter'],
-                    $tableAlias
-                );
+                $valueQueryBuilder = $this->createValueQueryBuilder($connection, $tableAlias, (int) $matches[1], $eventFilter['type']);
+                $this->addCustomFieldValueExpression($valueQueryBuilder, $tableAlias, $operator, $eventFilter['filter']);
             } else {
                 throw new \Exception('Not implemented');
             }
 
-            // Restrict to contact ID
-            $contact_id_parameter = $tableAlias . '_contact_id';
-            $customQueryBuilder->andWhere(
-                $customQueryBuilder->expr()->eq($tableAlias . '_contact.contact_id', ":$contact_id_parameter")
-            );
+            $this->addContactIdRestriction($valueQueryBuilder, $tableAlias, (int) $event->getContact()->getId());
 
-            $customQueryBuilder->setParameter($contact_id_parameter, $event->getContact()->getId());
-
-            if ($customQueryBuilder->execute()->rowCount()) {
+            if ($valueQueryBuilder->execute()->rowCount()) {
                 $event->setIsEvaluated(true);
                 $event->setIsMatched(true);
             } else {

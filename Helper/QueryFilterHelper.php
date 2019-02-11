@@ -13,41 +13,78 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Helper;
 
 
+use Doctrine\DBAL\Connection;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 
 trait QueryFilterHelper
 {
-    public function getCustomValueValueLogicQueryBuilder(
-        QueryBuilder $queryBuilder,
-        int $customFieldId,
-        $glue,
-        $type,
-        $operator,
-        $value,
-        $tableAlias): QueryBuilder
+    public function createValueQueryBuilder(Connection $connection, string $queryBuilderAlias, int $customFieldId, $customFieldType = null)
     {
-        $customQuery = $this->getCustomFieldJoin($queryBuilder, $type, $tableAlias);
-        $customQuery->setParameter( $tableAlias. "custom_field_id", $customFieldId);
+        $queryBuilder      = new QueryBuilder($connection);
+        $customFieldType   = $customFieldType ?: $this->getCustomFieldType($queryBuilder, $customFieldId);
+        $valueQueryBuilder = $this->getBasicItemQueryBuilder($queryBuilder, $queryBuilderAlias);
+        $this->addCustomFieldValueJoin($valueQueryBuilder, $queryBuilderAlias, $customFieldType);
+        $this->addCustomFieldIdRestriction($valueQueryBuilder, $queryBuilderAlias, $customFieldId);
 
-        $valueType      = null;
-        $expression = $this->getCustomValueValueExpression($customQuery, $tableAlias, $operator);
+        return $valueQueryBuilder;
+    }
+
+
+    public function createItemNameQueryBuilder(Connection $connection, $queryBuilderAlias = null)
+    {
+        $queryBuilder      = new QueryBuilder($connection);
+        $valueQueryBuilder = $this->getBasicItemQueryBuilder($queryBuilder, $queryBuilderAlias);
+
+        return $valueQueryBuilder;
+    }
+
+    public function addCustomFieldIdRestriction(QueryBuilder $queryBuilder, string $queryBuilderAlias, $customFieldId)
+    {
+        $queryBuilder->andWhere($queryBuilder->expr()->eq($queryBuilderAlias . "_value.custom_field_id", ":{$queryBuilderAlias}_custom_field_id"));
+        $queryBuilder->setParameter("{$queryBuilderAlias}_custom_field_id", $customFieldId);
+    }
+
+    public function addContactIdRestriction(QueryBuilder $queryBuilder, string $queryAlias, int $contactId)
+    {
+        if (!in_array($queryAlias . '_contact', $this->getQueryJoinAliases($queryBuilder))) {
+            if (!in_array($queryAlias . '_item', $this->getQueryJoinAliases($queryBuilder))) {
+                throw new InvalidArgumentException('QueryBuilder contains no usable tables for contact restriction.');
+            }
+            $tableAlias = $queryAlias . '_item.contact_id';
+        } else {
+            $tableAlias = $queryAlias . '_contact.contact_id';
+        }
+        $queryBuilder->andWhere(
+            $queryBuilder->expr()->eq($tableAlias, ":contact_id_" . $contactId)
+        );
+        $queryBuilder->setParameter("contact_id_" . $contactId, $contactId);
+    }
+
+    private function getQueryJoinAliases(QueryBuilder $queryBuilder): array
+    {
+        $joins    = array_column($queryBuilder->getQueryParts()['join'], 0);
+        $tables   = array_column($joins, 'joinAlias');
+        $tables[] = $queryBuilder->getQueryParts()['from'][0]['alias'];
+
+        return $tables;
+    }
+
+    public function addCustomFieldValueExpression(QueryBuilder $queryBuilder, string $tableAlias, string $operator, $value)
+    {
+        $valueType  = null;
+        $expression = $this->getCustomValueValueExpression($queryBuilder, $tableAlias, $operator);
 
         switch ($operator) {
             case 'empty':
             case 'notEmpty':
                 break;
             case 'notIn':
-                $valueType = $queryBuilder->getConnection()::PARAM_STR_ARRAY;
+                $valueType      = $queryBuilder->getConnection()::PARAM_STR_ARRAY;
                 $valueParameter = $tableAlias . '_value_value';
                 break;
             case 'in':
-                $valueType = $queryBuilder->getConnection()::PARAM_STR_ARRAY;
-                $valueParameter = $tableAlias . '_value_value';
-                break;
-            case 'neq':
-                $valueParameter = $tableAlias . '_value_value';
-                break;
-            case 'notLike':
+                $valueType      = $queryBuilder->getConnection()::PARAM_STR_ARRAY;
                 $valueParameter = $tableAlias . '_value_value';
                 break;
             default:
@@ -60,32 +97,39 @@ trait QueryFilterHelper
                 break;
             case 'neq':
             case 'notLike':
-                $customQuery->andWhere($expression);
+                $queryBuilder->andWhere($expression);
                 break;
             default:
-                $customQuery->andWhere($expression);
+                $queryBuilder->andWhere($expression);
                 break;
         }
 
         if (isset($valueParameter)) {
-            $customQuery->setParameter($valueParameter, $value, $valueType);
+            $queryBuilder->setParameter($valueParameter, $value, $valueType);
         }
-
-        return $customQuery;
     }
 
-    public function addCustomValueValueLogic(
-        QueryBuilder $queryBuilder,
-        int $customFieldId,
-        $glue,
-        $type,
-        $operator,
-        $value)
+    private function getCustomFieldType(
+        \Doctrine\DBAL\Query\QueryBuilder $queryBuilder, $customFieldId
+    ): string
     {
-        $tableAlias = 'cqf_' . $customFieldId;
+        $qb = $queryBuilder->getConnection()->
+        createQueryBuilder();
 
-        $customQuery = $this->getCustomValueValueLogicQueryBuilder($queryBuilder, $customFieldId,$glue,$type,$operator,$value, $tableAlias);
+        $customFieldData = $qb->select('f.*')->from(MAUTIC_TABLE_PREFIX . 'custom_field', 'f')->where(
+            $qb->expr()->eq('f.id', $customFieldId)
+        )->getFirstResult();
 
+        return $customFieldData['type'];
+    }
+
+    public function restrictToValueQueryBuilderResult(
+        QueryBuilder $queryBuilder,
+        QueryBuilder $customQuery,
+        $glue,
+        $operator
+    )
+    {
         switch ($operator) {
             case 'empty':
             case 'notIn':
@@ -100,13 +144,7 @@ trait QueryFilterHelper
         $queryBuilder->setParametersPairs(array_keys($customQuery->getParameters()), array_values($customQuery->getParameters()));
     }
 
-    /**
-     * @param $filterParameters
-     *
-     * @return array|string
-     */
-    public
-    function getParametersAliases($filterParameters)
+    private function getParametersAliases($filterParameters)
     {
         if (is_array($filterParameters)) {
             $parameters = [];
@@ -120,8 +158,7 @@ trait QueryFilterHelper
         return $parameters;
     }
 
-    public
-    function getCustomValueValueExpression(QueryBuilder $customQuery, $tableAlias, $operator)
+    private function getCustomValueValueExpression(QueryBuilder $customQuery, $tableAlias, $operator)
     {
         switch ($operator) {
             case 'empty':
@@ -169,15 +206,18 @@ trait QueryFilterHelper
         return $expression;
     }
 
-    /**
-     * @param QueryBuilder $queryBuilder
-     * @param string       $fieldType
-     * @param string|null  $alias
-     *
-     * @return \Doctrine\DBAL\Query\QueryBuilder
-     */
-    private
-    function getCustomFieldJoin(QueryBuilder $queryBuilder, string $fieldType, string $alias)
+    private function addCustomFieldValueJoin(QueryBuilder $customFieldQueryBuilder, string $alias, string $fieldType)
+    {
+        $customFieldQueryBuilder->leftJoin(
+            $alias . '_item',
+            MAUTIC_TABLE_PREFIX . 'custom_field_value_' . $fieldType,
+            $alias . '_value',
+            $alias . '_value.custom_item_id = ' . $alias . '_item.id');
+
+        return $customFieldQueryBuilder;
+    }
+
+    private function getBasicItemQueryBuilder(QueryBuilder $queryBuilder, string $alias): QueryBuilder
     {
         $customFieldQueryBuilder = $queryBuilder->createQueryBuilder();
 
@@ -188,15 +228,7 @@ trait QueryFilterHelper
                 $alias . '_contact',
                 MAUTIC_TABLE_PREFIX . 'custom_item',
                 $alias . '_item',
-                $alias . '_item.id=' . $alias . '_contact.custom_item_id')
-            ->leftJoin(
-                $alias . '_item',
-                MAUTIC_TABLE_PREFIX . 'custom_field_value_' . $fieldType,
-                $alias . '_value',
-                $alias . '_value.custom_item_id = ' . $alias . '_item.id');
-        $customFieldQueryBuilder->andWhere(
-            $customFieldQueryBuilder->expr()->eq($alias . '_value.custom_field_id', ":{$alias}custom_field_id")
-        );
+                $alias . '_item.id=' . $alias . '_contact.custom_item_id');
 
         return $customFieldQueryBuilder;
     }
