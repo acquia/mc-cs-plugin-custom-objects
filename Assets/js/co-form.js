@@ -118,7 +118,8 @@ CustomObjectsForm = {
             var edit = false;
         }
 
-        Mautic.showModal(target);
+        mQuery('body').addClass('noscroll');
+        mQuery(target).modal('show');
 
         // Fill modal with form loaded via ajax
         mQuery(target).on('shown.bs.modal', function() {
@@ -146,6 +147,11 @@ CustomObjectsForm = {
                     CustomObjectsForm.initCancelModal();
                 }
             });
+        });
+
+        mQuery(target).on('hidden.bs.modal', function () {
+            mQuery('body').removeClass('noscroll');
+            Mautic.resetModal(target);
         });
     },
 
@@ -210,7 +216,7 @@ CustomObjectsForm = {
             fieldOrderNo = 0;
         }
 
-        mQuery(target).hide();
+        mQuery(target).modal('hide');
         mQuery('body').removeClass('modal-open');
         mQuery('.modal-backdrop').remove();
 
