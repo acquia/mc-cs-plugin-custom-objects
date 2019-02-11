@@ -92,7 +92,7 @@ class TextType extends AbstractCustomFieldType
      */
     public function createValueEntity(CustomField $customField, CustomItem $customItem, $value = null): CustomFieldValueInterface
     {
-        return new CustomFieldValueText($customField, $customItem, $value);
+        return new CustomFieldValueText($customField, $customItem, (string) $value);
     }
 
     /**

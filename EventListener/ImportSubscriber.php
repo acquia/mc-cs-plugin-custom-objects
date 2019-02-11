@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Event\ImportProcessEvent;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 
 class ImportSubscriber extends CommonSubscriber
 {
@@ -48,7 +49,7 @@ class ImportSubscriber extends CommonSubscriber
     /**
      * @return array
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             LeadEvents::IMPORT_ON_INITIALIZE    => 'onImportInit',
@@ -60,7 +61,7 @@ class ImportSubscriber extends CommonSubscriber
     /**
      * @param ImportInitEvent $event
      */
-    public function onImportInit(ImportInitEvent $event)
+    public function onImportInit(ImportInitEvent $event): void
     {
         try {
             $customObjectId = $this->getCustomObjectId($event->getRouteObjectName());
@@ -69,22 +70,21 @@ class ImportSubscriber extends CommonSubscriber
             $event->setObjectSingular($event->getRouteObjectName());
             $event->setObjectName($customObject->getNamePlural());
             $event->setActiveLink("#mautic_custom_object_{$customObjectId}");
+            $event->setIndexRoute(CustomItemRouteProvider::ROUTE_LIST, ['objectId' => $customObjectId]);
+            $event->stopPropagation();
         } catch (NotFoundException $e) {}
     }
 
     /**
      * @param ImportMappingEvent $event
      */
-    public function onFieldMapping(ImportMappingEvent $event)
+    public function onFieldMapping(ImportMappingEvent $event): void
     {
         try {
             $customObjectId = $this->getCustomObjectId($event->getRouteObjectName());
             $customObject   = $this->customObjectModel->fetchEntity($customObjectId);
             $specialFields  = [
-                'dateAdded'      => 'mautic.lead.import.label.dateAdded',
-                'createdByUser'  => 'mautic.lead.import.label.createdByUser',
-                'dateModified'   => 'mautic.lead.import.label.dateModified',
-                'modifiedByUser' => 'mautic.lead.import.label.modifiedByUser',
+                'linkedContactIds' => 'custom.item.link.contact.ids',
             ];
 
             $fieldList = ['customItemName' => 'custom.item.name.label'];
@@ -104,12 +104,13 @@ class ImportSubscriber extends CommonSubscriber
     /**
      * @param ImportProcessEvent $event
      */
-    public function onImportProcess(ImportProcessEvent $event)
+    public function onImportProcess(ImportProcessEvent $event): void
     {
         try {
             $customObjectId = $this->getCustomObjectId($event->getImport()->getObject());
+            $customObject   = $this->customObjectModel->fetchEntity($customObjectId);
             $import         = $event->getImport();
-            $merged         = $this->customItemModel->import($import, $event->getRowData());
+            $merged         = $this->customItemModel->import($import, $event->getRowData(), $customObject);
             $event->setWasMerged($merged);
         } catch (NotFoundException $e) {}
     }

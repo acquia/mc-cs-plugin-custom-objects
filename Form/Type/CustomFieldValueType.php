@@ -30,9 +30,8 @@ class CustomFieldValueType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $customItem       = $options['customItem'];
-        $collection       = $customItem->getCustomFieldValues();
         $customFieldId    = (int) $builder->getName();
-        $customFieldValue = $customItem->getId() ? $collection->get("{$customFieldId}_{$customItem->getId()}") : $collection->get($customFieldId);
+        $customFieldValue = $customItem->findCustomFieldValueForFieldId($customFieldId);
         $customField      = $customFieldValue->getCustomField();
 
         $builder->add(

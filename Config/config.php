@@ -550,6 +550,7 @@ return [
                     'mautic.custom.model.field',
                     'mautic.custom.model.field.value',
                     'custom_field.type.provider',
+                    'mautic.helper.template.formatter',
                 ],
             ],
             'mautic.custom.model.object' => [

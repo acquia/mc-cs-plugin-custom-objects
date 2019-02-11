@@ -32,6 +32,24 @@ If you need to turn off the plugin without removing the plugin completelly, plac
 
 If the plugin is disabled before the plugin is installed then the row to the `plugins` table will be created, but the tables that the plugin normally creates on install won't be created. When you enable the plugin again you have to delete the row in the `plugins` table and then hit the install button/command again. The tables will be created.
 
+## Import
+
+Each custom object has its own import button on the list of custom items and each has its own import history.
+
+Here is an example of CSV that can be imported:
+```
+customItemName,3,linkedContactIds
+Pampers,Stuff babies **** into,
+Gloves,Heat insulation for your hands,5319
+Bread, Stuff you can eat for breakfast,"5319, 2,5"
+```
+
+CSV above will automatically map the custom item name field, custom field with ID 3 and special field for defining links between custom items and contacts. The CSV headers can be named differently and then mapped manually.
+
+- `customItemName` Name is the only default field for each custom object. This field is **unique identifier**. It means that if you'll import the same CSV file twice the custom items will get merged by this name field and not create duplicates.
+- `3` or any other custom field ID. The value will be added to the custom field for the specific custom item.
+- `linkedContactIds` can be a list of one or more existing Mautic contacts separated by comma. Make sure you'll add the comma-separated list of contact IDs into double quotes to escape this CSV from the main CSV file.
+
 ## Commands
 
 ### `mautic:customobjects:generatesampledata --object-id=X --limit=Y`
