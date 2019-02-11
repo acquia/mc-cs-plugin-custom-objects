@@ -119,6 +119,7 @@ CustomObjectsForm = {
         }
 
         mQuery('body').addClass('noscroll');
+        mQuery(target).find('.loading-placeholder').removeClass('hide');
         mQuery(target).modal('show');
 
         // Fill modal with form loaded via ajax
