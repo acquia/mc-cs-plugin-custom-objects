@@ -228,7 +228,7 @@ CustomObjectsForm = {
 
     /**
      * Transfer CF data from CO form to modal
-     * @param panel
+     * @param panel DOM element with .panel class
      */
     convertDataToModal: function (panel) {
         mQuery(panel).find('input').each(function (i, input) {
