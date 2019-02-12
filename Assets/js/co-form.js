@@ -131,7 +131,7 @@ CustomObjectsForm = {
                 dataType: 'json',
                 success: function (response) {
                     if (response) {
-                        Mautic.processModalContent(response, target);
+                        CustomObjectsForm.refreshModalContent(response, target);
                     }
                     if (edit) {
                         let panel = element.closest('.panel');
@@ -185,7 +185,7 @@ CustomObjectsForm = {
                             CustomObjectsForm.saveToPanel(response, target);
                         } else {
                             // Rerender invalid form
-                            Mautic.processModalContent(response, target);
+                            CustomObjectsForm.refreshModalContent(response, target);
                         }
                     },
                     error: function (request, textStatus, errorThrown) {
@@ -224,6 +224,34 @@ CustomObjectsForm = {
 
         let panel = mQuery('#customField_' + fieldOrderNo);
         CustomObjectsForm.initPanel(panel);
+    },
+
+    /**
+     * Load modal wit stuff from response
+     * @param response
+     * @param target
+     */
+    refreshModalContent(response, target) {
+        Mautic.stopIconSpinPostEvent();
+
+        if (response.target) {
+            mQuery(response.target).html(response.newContent);
+
+            //activate content specific stuff
+            Mautic.onPageLoad(response.target, response, true);
+        } else if (response.newContent) {
+            //load the content
+            if (mQuery(target + ' .loading-placeholder').length) {
+                mQuery(target + ' .loading-placeholder').addClass('hide');
+                mQuery(target + ' .modal-body-content').html(response.newContent);
+                mQuery(target + ' .modal-body-content').removeClass('hide');
+            } else {
+                mQuery(target + ' .modal-body').html(response.newContent);
+            }
+        }
+
+        //activate content specific stuff
+        Mautic.onPageLoad(target, response, true);
     },
 
     /**
