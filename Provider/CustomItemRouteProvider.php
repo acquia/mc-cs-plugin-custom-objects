@@ -48,6 +48,8 @@ class CustomItemRouteProvider
     /**
      * @param int $objectId
      * @param int $page
+     * 
+     * @return string
      */
     public function buildListRoute(int $objectId, int $page = 1): string
     {
@@ -56,6 +58,8 @@ class CustomItemRouteProvider
 
     /**
      * @param int $objectId
+     * 
+     * @return string
      */
     public function buildNewRoute(int $objectId): string
     {
@@ -65,6 +69,8 @@ class CustomItemRouteProvider
     /**
      * @param int      $objectId
      * @param int|null $itemId
+     * 
+     * @return string
      */
     public function buildSaveRoute(int $objectId, ?int $itemId = null): string
     {
@@ -73,6 +79,8 @@ class CustomItemRouteProvider
 
     /**
      * @param int $itemId
+     * 
+     * @return string
      */
     public function buildViewRoute(int $objectId, int $itemId): string
     {
@@ -81,6 +89,8 @@ class CustomItemRouteProvider
 
     /**
      * @param int $itemId
+     * 
+     * @return string
      */
     public function buildEditRoute(int $objectId, int $itemId): string
     {
@@ -97,6 +107,8 @@ class CustomItemRouteProvider
 
     /**
      * @param int $itemId
+     * 
+     * @return string
      */
     public function buildDeleteRoute(int $objectId, int $itemId): string
     {
@@ -105,6 +117,8 @@ class CustomItemRouteProvider
 
     /**
      * @param int $itemId
+     * 
+     * @return string
      */
     public function buildLookupRoute(int $objectId): string
     {
@@ -113,6 +127,8 @@ class CustomItemRouteProvider
 
     /**
      * @param int $itemId
+     * 
+     * @return string
      */
     public function buildBatchDeleteRoute(int $objectId): string
     {
@@ -121,14 +137,18 @@ class CustomItemRouteProvider
 
     /**
      * @param int $objectId
+     * 
+     * @return string
      */
     public function buildNewImportRoute(int $objectId): string
     {
         return $this->buildImportRoute($objectId, 'new');
     }
 
-        /**
+    /**
      * @param int $objectId
+     * 
+     * @return string
      */
     public function buildListImportRoute(int $objectId): string
     {
@@ -138,6 +158,8 @@ class CustomItemRouteProvider
     /**
      * @param int $objectId
      * @param string $objectAction
+     * 
+     * @return string
      */
     private function buildImportRoute(int $objectId, string $objectAction): string
     {
@@ -147,6 +169,11 @@ class CustomItemRouteProvider
         ]);
     }
 
+    /**
+     * @param int $objectId
+     * 
+     * @return string
+     */
     private function buildImportRouteObject(int $objectId): string
     {
         return "custom-object:{$objectId}";

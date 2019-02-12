@@ -19,11 +19,9 @@ use Mautic\CoreBundle\Model\FormModel;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use Mautic\UserBundle\Entity\User;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemImportModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
@@ -33,11 +31,6 @@ class CustomItemImportModel extends FormModel
      * @var EntityManager
      */
     private $entityManager;
-
-    /**
-     * @var CustomItemRepository
-     */
-    private $customItemRepository;
 
     /**
      * @var CustomItemPermissionProvider
@@ -56,21 +49,18 @@ class CustomItemImportModel extends FormModel
 
     /**
      * @param EntityManager $entityManager
-     * @param CustomItemRepository $customItemRepository
      * @param CustomItemPermissionProvider $permissionProvider
      * @param CustomItemModel $customItemModel
      * @param FormatterHelper $formatterHelper
      */
     public function __construct(
         EntityManager $entityManager,
-        CustomItemRepository $customItemRepository,
         CustomItemPermissionProvider $permissionProvider,
         CustomItemModel $customItemModel,
         FormatterHelper $formatterHelper
     )
     {
         $this->entityManager        = $entityManager;
-        $this->customItemRepository = $customItemRepository;
         $this->permissionProvider   = $permissionProvider;
         $this->customItemModel      = $customItemModel;
         $this->formatterHelper      = $formatterHelper;
@@ -131,7 +121,7 @@ class CustomItemImportModel extends FormModel
      *
      * @param CustomObject $customObject
      * @param CustomItem $customItem
-     * @param integer $customFieldId
+     * @param int $customFieldId
      * @param int $csvValue
      * 
      * @return CustomFieldValueInterface

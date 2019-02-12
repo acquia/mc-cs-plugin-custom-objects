@@ -52,11 +52,6 @@ class CustomItemModel extends FormModel
     private $permissionProvider;
 
     /**
-     * @var UserHelper
-     */
-    protected $userHelper;
-
-    /**
      * @var CustomFieldModel
      */
     private $customFieldModel;
