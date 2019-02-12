@@ -113,7 +113,7 @@ class SaveController extends CommonController
     public function saveAction(?int $objectId = null)
     {
         try {
-            $customObject = $objectId ? $this->customObjectModel->fetchEntity($objectId): new CustomObject();
+            $customObject = $objectId ? $this->customObjectModel->fetchEntity($objectId) : new CustomObject();
             if ($customObject->isNew()) {
                 $this->permissionProvider->canCreate();
             } else {
@@ -126,21 +126,25 @@ class SaveController extends CommonController
         }
 
         $request = $this->requestStack->getCurrentRequest();
-        $action  = $this->routeProvider->buildSaveRoute($objectId);
-        $form    = $this->formFactory->create(
+        $action = $this->routeProvider->buildSaveRoute($objectId);
+        $form = $this->formFactory->create(
             CustomObjectType::class,
             $customObject,
             ['action' => $action]
         );
         $form->handleRequest($request);
-        
+
         if ($form->isValid()) {
             $this->customObjectModel->save($customObject);
 
             $rawCustomObject = $request->get('custom_object');
-            foreach ($rawCustomObject['customFields'] as $customField) {
-                if ($customField['deleted'] && $customField['id']) {
-                    $this->customFieldModel->deleteById((int) $customField['id']);
+
+            if (!empty($rawCustomObject['customFields'])) {
+
+                foreach ($rawCustomObject['customFields'] as $customField) {
+                    if ($customField['deleted'] && $customField['id']) {
+                        $this->customObjectModel->removeCustomFieldById($customObject, (int) $customField['id']);
+                    }
                 }
             }
 
@@ -150,8 +154,8 @@ class SaveController extends CommonController
                     $objectId ? 'mautic.core.notice.updated' : 'mautic.core.notice.created',
                     [
                         '%name%' => $customObject->getName(),
-                        '%url%'  => $this->routeProvider->buildFormRoute($objectId),
-                    ], 
+                        '%url%' => $this->routeProvider->buildFormRoute($objectId),
+                    ],
                     'flashes'
                 )
             );
@@ -161,23 +165,7 @@ class SaveController extends CommonController
             }
         }
 
-        return $this->delegateView(
-            [
-                'returnUrl'      => $this->routeProvider->buildListRoute(),
-                'viewParameters' => [
-                    'customObject' => $customObject,
-                    'availableFieldTypes' => $this->customFieldTypeProvider->getTypes(),
-                    'customFields' => $this->customFieldModel->fetchCustomFieldsForObject($customObject),
-                    'deletedFields' => [],
-                    'form'   => $form->createView(),
-                ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.php',
-                'passthroughVars' => [
-                    'mauticContent' => 'customObject',
-                    'route'         => $this->routeProvider->buildFormRoute($customObject->getId()),
-                ],
-            ]
-        );
+        return $this->forwardToEdit($request, $customObject);
     }
 
     /**
@@ -192,5 +180,19 @@ class SaveController extends CommonController
         $params = ['objectId' => $entity->getId()];
 
         return $this->forward('CustomObjectsBundle:CustomObject\View:view', $params);
+    }
+
+    /**
+     * @param Request               $request
+     * @param CustomObject $entity
+     *
+     * @return Response
+     */
+    private function forwardToEdit(Request $request, CustomObject $entity): Response
+    {
+        $request->setMethod('GET');
+        $params = ['objectId' => $entity->getId()];
+
+        return $this->forward('custom_object.form_controller:renderFormAction', $params);
     }
 }

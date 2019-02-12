@@ -43,22 +43,29 @@ class CustomObjectModel extends FormModel
     private $permissionProvider;
 
     /**
-     * @param EntityManager $entityManager
-     * @param CustomObjectRepository $customObjectRepository
+     * @var CustomFieldModel
+     */
+    private $customFieldModel;
+
+    /**
+     * @param EntityManager                  $entityManager
+     * @param CustomObjectRepository         $customObjectRepository
      * @param CustomObjectPermissionProvider $permissionProvider
-     * @param UserHelper $userHelper
+     * @param UserHelper                     $userHelper
+     * @param CustomFieldModel               $customFieldModel
      */
     public function __construct(
         EntityManager $entityManager,
         CustomObjectRepository $customObjectRepository,
         CustomObjectPermissionProvider $permissionProvider,
-        UserHelper $userHelper
-    )
-    {
+        UserHelper $userHelper,
+        CustomFieldModel $customFieldModel
+    ) {
         $this->entityManager          = $entityManager;
         $this->customObjectRepository = $customObjectRepository;
         $this->permissionProvider     = $permissionProvider;
         $this->userHelper             = $userHelper;
+        $this->customFieldModel = $customFieldModel;
     }
 
     /**
@@ -132,6 +139,16 @@ class CustomObjectModel extends FormModel
                 ],
             ],
         ]);
+    }
+
+    public function removeCustomFieldById(CustomObject $customObject, int $customFieldId)
+    {
+        foreach($customObject->getCustomFields() as $customField) {
+            if ($customField->getId() === $customFieldId) {
+                $customObject->removeCustomField($customField);
+                $this->customFieldModel->deleteEntity($customField);
+            }
+        }
     }
 
     /**

@@ -560,6 +560,7 @@ return [
                     'custom_object.repository',
                     'custom_object.permission.provider',
                     'mautic.helper.user',
+                    'mautic.custom.model.field',
                 ],
             ],
         ],
