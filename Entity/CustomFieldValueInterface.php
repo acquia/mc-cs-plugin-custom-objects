@@ -24,7 +24,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\UniqueEntityInterface;
 interface CustomFieldValueInterface extends UniqueEntityInterface
 {
     /**
-     * @return int
+     * @return mixed
      */
     public function getId();
 
@@ -46,5 +46,12 @@ interface CustomFieldValueInterface extends UniqueEntityInterface
     /**
      * @param mixed $value
      */
-    public function setValue($value);
+    public function setValue($value = null);
+
+    public function updateThisEntityManually();
+
+    /**
+     * @return bool
+     */
+    public function shouldBeUpdatedManually();
 }

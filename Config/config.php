@@ -552,6 +552,15 @@ return [
                     'custom_field.type.provider',
                 ],
             ],
+            'mautic.custom.model.import.item' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomItemImportModel::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'custom_item.permission.provider',
+                    'mautic.custom.model.item',
+                    'mautic.helper.template.formatter',
+                ],
+            ],
             'mautic.custom.model.object' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel::class,
                 'arguments' => [
@@ -631,6 +640,13 @@ return [
                     'custom_item.permission.provider',
                     'custom_item.route.provider',
                     'translator',
+                ],
+            ],
+            'custom_item.import.subscriber' => [
+                'class'     => MauticPlugin\CustomObjectsBundle\EventListener\ImportSubscriber::class,
+                'arguments' => [
+                    'mautic.custom.model.object',
+                    'mautic.custom.model.import.item',
                 ],
             ],
             'custom_object.button.subscriber' => [

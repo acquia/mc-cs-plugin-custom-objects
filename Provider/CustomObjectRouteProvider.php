@@ -42,7 +42,6 @@ class CustomObjectRouteProvider
      * @param int $page
      *
      * @return string
-     * @throws ForbiddenException
      */
     public function buildListRoute(int $page = 1): string
     {
@@ -50,7 +49,9 @@ class CustomObjectRouteProvider
     }
 
     /**
-     * @throws ForbiddenException
+     * @param int|null $id
+     * 
+     * @return string
      */
     public function buildSaveRoute(?int $id = null): string
     {
@@ -61,7 +62,7 @@ class CustomObjectRouteProvider
     /**
      * @param int $id
      *
-     * @throws ForbiddenException
+     * @return string
      */
     public function buildViewRoute(int $id): string
     {
@@ -71,7 +72,7 @@ class CustomObjectRouteProvider
     /**
      * @param int $id
      *
-     * @throws ForbiddenException
+     * @return string
      */
     public function buildFormRoute(int $id = null): string
     {
@@ -82,7 +83,7 @@ class CustomObjectRouteProvider
     /**
      * @param int $id
      *
-     * @throws ForbiddenException
+     * @return string
      */
     public function buildCloneRoute(int $id): string
     {
@@ -92,7 +93,7 @@ class CustomObjectRouteProvider
     /**
      * @param int $id
      *
-     * @throws ForbiddenException
+     * @return string
      */
     public function buildDeleteRoute(int $id): string
     {

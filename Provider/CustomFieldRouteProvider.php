@@ -63,7 +63,6 @@ class CustomFieldRouteProvider
      * @param int|null $id
      *
      * @return string
-     * @throws ForbiddenException
      */
     public function buildFormRoute(int $id = null): string
     {
@@ -75,7 +74,6 @@ class CustomFieldRouteProvider
      * @param int $id
      *
      * @return string
-     * @throws ForbiddenException
      */
     public function buildCloneRoute(int $id): string
     {
@@ -86,7 +84,6 @@ class CustomFieldRouteProvider
      * @param int $id
      *
      * @return string
-     * @throws ForbiddenException
      */
     public function buildDeleteRoute(int $id): string
     {
