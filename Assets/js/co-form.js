@@ -134,7 +134,7 @@ CustomObjectsForm = {
                         Mautic.processModalContent(response, target);
                     }
                     if (edit) {
-                        let panel = element.parent().parent();
+                        let panel = element.closest('.panel');
                         CustomObjectsForm.convertDataToModal(panel);
                     }
                     Mautic.stopIconSpinPostEvent();
