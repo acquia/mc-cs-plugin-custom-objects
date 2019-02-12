@@ -10,6 +10,10 @@ CustomObjectsForm = {
      */
     onLoad: function () {
         CustomObjectsForm.initAdder();
+        CustomObjectsForm.initPanels();
+    },
+
+    initPanels: function() {
         CustomObjectsForm.initSortable();
         mQuery('.panel').each(function (i, panel) {
             CustomObjectsForm.initPanel(panel);
@@ -60,6 +64,15 @@ CustomObjectsForm = {
     },
 
     /**
+     * Init CF panel events (except sortable)
+     * @param panel
+     */
+    initPanel: function(panel) {
+        CustomObjectsForm.initEditFieldButton(panel);
+        CustomObjectsForm.initDeleteFieldButton(panel);
+    },
+
+    /**
      * Recalculate CF order
      */
     recalculateOrder: function() {
@@ -67,15 +80,6 @@ CustomObjectsForm = {
             mQuery(selector).val(i)
                 .parent().attr('id', 'customField_' + i);
         });
-    },
-
-    /**
-     * Init CF panel events (except sortable)
-     * @param panel
-     */
-    initPanel: function(panel) {
-        CustomObjectsForm.initEditFieldButton(panel);
-        CustomObjectsForm.initDeleteFieldButton(panel);
     },
 
     /**
@@ -123,7 +127,7 @@ CustomObjectsForm = {
         mQuery(target).modal('show');
 
         // Fill modal with form loaded via ajax
-        mQuery(target).on('shown.bs.modal', function() {
+        mQuery(target).off('shown.bs.modal').on('shown.bs.modal', function() {
             // Fill modal with form loaded via ajax
             mQuery.ajax({
                 url: route,
@@ -151,9 +155,10 @@ CustomObjectsForm = {
             });
         });
 
-        mQuery(target).on('hidden.bs.modal', function () {
+        mQuery(target).off('hidden.bs.modal').on('hidden.bs.modal', function () {
             mQuery('body').removeClass('noscroll');
             Mautic.resetModal(target);
+            CustomObjectsForm.initPanels();
         });
     },
 
@@ -263,13 +268,16 @@ CustomObjectsForm = {
 
         mQuery(panel).find('input').each(function (i, input) {
 
+            let value = mQuery(input).val();
             let id = mQuery(input).attr('id');
             let inputName = id.slice(id.lastIndexOf('_') + 1, id.length);
-            let value = mQuery(input).val();
 
             mQuery(content) // @todo bug here
                 .find('#custom_field_' + inputName)
                 .val(value);
+
+            console.log(inputName);
+            console.log(value);
         });
 
         return content;
@@ -282,7 +290,9 @@ CustomObjectsForm = {
      * @returns html content of panel
      */
     convertDataFromModal: function (panel, fieldIndex) {
+
         mQuery(panel).find('input').each(function(i, input) {
+
             let id = mQuery(input).attr('id');
             id = id.slice(id.lastIndexOf('_') + 1, id.length);
             let name = 'custom_object[customFields][' + fieldIndex + '][' + id + ']';
