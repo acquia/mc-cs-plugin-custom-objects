@@ -488,6 +488,7 @@ return [
                     'mautic.custom.model.field',
                     'custom_object.permission.provider',
                     'custom_object.route.provider',
+                    'custom_field.type.provider',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
