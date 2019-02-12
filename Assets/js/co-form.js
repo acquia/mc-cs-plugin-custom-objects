@@ -131,11 +131,11 @@ CustomObjectsForm = {
                 dataType: 'json',
                 success: function (response) {
                     if (response) {
+                        if (edit) {
+                            let panel = element.closest('.panel');
+                            response.newContent = CustomObjectsForm.convertDataToModal(panel, response.newContent);
+                        }
                         CustomObjectsForm.refreshModalContent(response, target);
-                    }
-                    if (edit) {
-                        let panel = element.closest('.panel');
-                        CustomObjectsForm.convertDataToModal(panel);
                     }
                     Mautic.stopIconSpinPostEvent();
                 },
@@ -257,13 +257,22 @@ CustomObjectsForm = {
     /**
      * Transfer CF data from CO form to modal
      * @param panel DOM element with .panel class
+     * @param content modal content
      */
-    convertDataToModal: function (panel) {
+    convertDataToModal: function (panel, content) {
+
         mQuery(panel).find('input').each(function (i, input) {
+
             let id = mQuery(input).attr('id');
-            let name = id.slice(id.lastIndexOf('_') + 1, id.length);
-            mQuery('#objectFieldModal').find('#custom_field_' + name).val(mQuery(input).val());
+            let inputName = id.slice(id.lastIndexOf('_') + 1, id.length);
+            let value = mQuery(input).val();
+
+            mQuery(content) // @todo bug here
+                .find('#custom_field_' + inputName)
+                .val(value);
         });
+
+        return content;
     },
 
     /**
