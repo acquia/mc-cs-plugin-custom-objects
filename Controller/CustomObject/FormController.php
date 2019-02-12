@@ -113,6 +113,11 @@ class FormController extends CommonController
             ['action' => $this->routeProvider->buildSaveRoute($objectId)]
         );
 
+        if ($request->getMethod() === Request::METHOD_POST) {
+            //We need to see validation messages if POST was sent
+            $form->handleRequest($request);
+        }
+
         return $this->delegateView(
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute(),
