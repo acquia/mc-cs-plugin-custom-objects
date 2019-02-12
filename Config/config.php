@@ -665,7 +665,8 @@ return [
             'custom_object.dynamic_content.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\DynamicContentSubscriber::class,
                 'arguments' => [
-                    'doctrine.orm.entity_manager'
+                    'doctrine.orm.entity_manager',
+                    'mautic.lead.model.lead_segment_filter_factory'
                 ],
             ],
         ],

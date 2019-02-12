@@ -14,6 +14,7 @@ namespace MauticPlugin\CustomObjectsBundle\Helper;
 
 
 use Doctrine\DBAL\Connection;
+use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 
@@ -49,7 +50,7 @@ trait QueryFilterHelper
      *
      * @return QueryBuilder
      */
-    public function createItemNameQueryBuilder(Connection $connection, $queryBuilderAlias = null)
+    public function createItemNameQueryBuilder(Connection $connection, $queryBuilderAlias)
     {
         $queryBuilder      = new QueryBuilder($connection);
         $valueQueryBuilder = $this->getBasicItemQueryBuilder($queryBuilder, $queryBuilderAlias);
@@ -94,6 +95,27 @@ trait QueryFilterHelper
             $queryBuilder->expr()->eq($tableAlias, ":contact_id_" . $contactId)
         );
         $queryBuilder->setParameter("contact_id_" . $contactId, $contactId);
+    }
+
+    /**
+     * @param                      $queryBuilder
+     * @param                      $tableAlias
+     * @param ContactSegmentFilter $filter
+     */
+    public function addCustomFieldValueExpressionFromSegmentFilter($queryBuilder, $tableAlias, ContactSegmentFilter $filter) {
+        $expression = $this->getCustomValueValueExpression($queryBuilder, $tableAlias, $filter->getOperator());
+        $this->addOperatorExpression($queryBuilder, $tableAlias, $expression, $filter->getOperator(),
+            $filter->getParameterValue());
+    }
+
+    /**
+     * @param QueryBuilder         $queryBuilder
+     * @param string               $tableAlias
+     * @param ContactSegmentFilter $filter
+     */
+    public function addCustomObjectNameExpressionFromSegmentFilter(QueryBuilder $queryBuilder, string $tableAlias, ContactSegmentFilter $filter) {
+        $expression = $this->getCustomObjectNameExpression($queryBuilder, $tableAlias, $filter->getOperator());
+        $this->addOperatorExpression($queryBuilder, $tableAlias, $expression, $filter->getOperator(), $filter->getParameterValue());
     }
 
     /**
@@ -281,28 +303,28 @@ trait QueryFilterHelper
                 $expression = $customQuery->expr()->isNotNull($tableAlias . '_value.value');
                 break;
             case 'notIn':
-                $valueParameter = $tableAlias . '_name_value';
+                $valueParameter = $tableAlias . '_value_value';
                 $expression     = $customQuery->expr()->in(
                     $tableAlias . '_item.name',
                     ":$valueParameter"
                 );
                 break;
             case 'in':
-                $valueParameter = $tableAlias . '_name_value';
+                $valueParameter = $tableAlias . '_value_value';
                 $expression     = $customQuery->expr()->in(
                     $tableAlias . '_item.name',
                     ":$valueParameter"
                 );
                 break;
             case 'neq':
-                $valueParameter = $tableAlias . '_name_value';
+                $valueParameter = $tableAlias . '_value_value';
                 $expression     = $customQuery->expr()->orX(
                     $customQuery->expr()->eq($tableAlias . '_item.name', ":$valueParameter"),
                     $customQuery->expr()->isNull($tableAlias . '_item.name')
                 );
                 break;
             case 'notLike':
-                $valueParameter = $tableAlias . '_name_value';
+                $valueParameter = $tableAlias . '_value_value';
 
                 $expression = $customQuery->expr()->orX(
                     $customQuery->expr()->isNull($tableAlias . '_item.name'),
@@ -310,7 +332,7 @@ trait QueryFilterHelper
                 );
                 break;
             default:
-                $valueParameter = $tableAlias . '_name_value';
+                $valueParameter = $tableAlias . '_value_value';
                 $expression     = $customQuery->expr()->$operator(
                     $tableAlias . '_item.name',
                     ":$valueParameter"

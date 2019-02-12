@@ -81,6 +81,7 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
                 $event->addTranslation('cmo_' . $COId, [
                     'type'  => CustomItemFilterQueryBuilder::getServiceId(),
                     'field' => $COId,
+                    'foreign_table' => 'custom_objects'
                 ]);
                 $registeredObjects[] = $COId;
             }
@@ -101,6 +102,7 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
             'type'  => CustomFieldFilterQueryBuilder::getServiceId(),
             'table' => $segmentValueType,
             'field' => $fieldAttributes['id'],
+            'foreign_table' => 'custom_objects'
         ];
 
         return $translation;

@@ -18,6 +18,9 @@ use Mautic\DebugBundle\Service\MauticDebugHelper;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\EmailBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
+use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
+use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
+use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
@@ -31,11 +34,16 @@ class DynamicContentSubscriber extends CommonSubscriber
      * @var EntityManager
      */
     private $entityManager;
+    /**
+     * @var ContactSegmentFilterFactory
+     */
+    private $filterFactory;
 
 
-    public function __construct(EntityManager $entityManager)
+    public function __construct(EntityManager $entityManager, ContactSegmentFilterFactory $filterFactory)
     {
-        $this->entityManager        = $entityManager;
+        $this->entityManager = $entityManager;
+        $this->filterFactory = $filterFactory;
     }
 
     /**
@@ -58,32 +66,39 @@ class DynamicContentSubscriber extends CommonSubscriber
         $connection = $this->entityManager->getConnection();
 
         foreach ($eventFilters as $eventFilter) {
-            if ($eventFilter['object'] != 'custom_object') {
+            $segmentFilter = $this->filterFactory->factorSegmentFilter($eventFilter);
+
+            if ($segmentFilter->getTable() != MAUTIC_TABLE_PREFIX.'custom_objects') {
                 continue;
             }
-            if (!$isCustomFieldValueFilter = preg_match('/^cmf_([0-9]+)$/', $eventFilter['field'], $matches)) {
-                $isCustomObjectNameFilter = preg_match('/^cmo_([0-9]+)$/', $eventFilter['field'], $matches);
-            }
 
-            $operator = OperatorOptions::getFilterExpressionFunctions()[$eventFilter['operator']]['expr'];
-
-            if ($isCustomFieldValueFilter) {
-                $tableAlias        = 'cfwq_' . (int) $matches[1] . '';
-                $valueQueryBuilder = $this->createValueQueryBuilder($connection, $tableAlias, (int) $matches[1], $eventFilter['type']);
-                $this->addCustomFieldValueExpression($valueQueryBuilder, $tableAlias, $operator, $eventFilter['filter']);
-            } elseif ($isCustomObjectNameFilter) {
-                $tableAlias        = 'cowq_' . (int) $matches[1] . '';
-                $nameQueryBuilder = $this->createItemNameQueryBuilder($connection, $tableAlias);
-                $this->addCustomFieldValueExpression($nameQueryBuilder, $tableAlias, $operator, $eventFilter['filter']);
+            if ($segmentFilter->getQueryType()=='mautic.lead.query.builder.custom_field.value') {
+                $tableAlias        = 'cfwq_' . (int) $segmentFilter->getField();
+                $filterQueryBuilder = $this->createValueQueryBuilder(
+                    $connection,
+                    $tableAlias,
+                    (int) $segmentFilter->getField(),
+                    $segmentFilter->getType()
+                );
+                $this->addCustomFieldValueExpressionFromSegmentFilter($filterQueryBuilder, $tableAlias, $segmentFilter);
+            } elseif ($segmentFilter->getQueryType()=='mautic.lead.query.builder.custom_item.value') {
+                $tableAlias       = 'cowq_' . (int) $segmentFilter->getField();
+                $filterQueryBuilder = $this->createItemNameQueryBuilder($connection, $tableAlias);
+                $this->addCustomObjectNameExpression(
+                    $filterQueryBuilder,
+                    $tableAlias,
+                    $segmentFilter->getOperator(),
+                    $segmentFilter->getParameterValue()
+                );
             } else {
                 throw new \Exception('Not implemented');
             }
 
-            $this->addContactIdRestriction($valueQueryBuilder, $tableAlias, (int) $event->getContact()->getId());
+            $this->addContactIdRestriction($filterQueryBuilder, $tableAlias, (int) $event->getContact()->getId());
 
-            MauticDebugHelper::dumpSQL($valueQueryBuilder);
+            MauticDebugHelper::dumpSQL($filterQueryBuilder);
 
-            if ($valueQueryBuilder->execute()->rowCount()) {
+            if ($filterQueryBuilder->execute()->rowCount()) {
                 $event->setIsEvaluated(true);
                 $event->setIsMatched(true);
             } else {
