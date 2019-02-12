@@ -51,7 +51,7 @@ class CustomFieldValueType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(array('data_class' => CustomFieldValueInterface::class,));
+        $resolver->setDefaults(['data_class' => CustomFieldValueInterface::class]);
         $resolver->setRequired(['customItem']);
     }
 }

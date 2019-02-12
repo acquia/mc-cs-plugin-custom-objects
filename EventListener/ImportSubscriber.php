@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Event\ImportMappingEvent;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemImportModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 
 class ImportSubscriber extends CommonSubscriber
@@ -29,21 +29,21 @@ class ImportSubscriber extends CommonSubscriber
     private $customObjectModel;
 
     /**
-     * @var CustomItemModel
+     * @var CustomItemImportModel
      */
-    private $customItemModel;
+    private $customItemImportModel;
 
     /**
      * @param CustomObjectModel $customObjectModel
-     * @param CustomItemModel $customItemModel
+     * @param CustomItemImportModel $customItemImportModel
      */
     public function __construct(
         CustomObjectModel $customObjectModel,
-        CustomItemModel $customItemModel
+        CustomItemImportModel $customItemImportModel
     )
     {
-        $this->customObjectModel = $customObjectModel;
-        $this->customItemModel   = $customItemModel;
+        $this->customObjectModel     = $customObjectModel;
+        $this->customItemImportModel = $customItemImportModel;
     }
 
     /**
@@ -83,12 +83,15 @@ class ImportSubscriber extends CommonSubscriber
         try {
             $customObjectId = $this->getCustomObjectId($event->getRouteObjectName());
             $customObject   = $this->customObjectModel->fetchEntity($customObjectId);
+            $customFields   = $customObject->getCustomFields();
             $specialFields  = [
                 'linkedContactIds' => 'custom.item.link.contact.ids',
             ];
 
-            $fieldList = ['customItemName' => 'custom.item.name.label'];
-            $customFields = $customObject->getCustomFields();
+            $fieldList = [
+                'customItemId' => 'mautic.core.id',
+                'customItemName' => 'custom.item.name.label',
+            ];
 
             foreach ($customFields as $customField) {
                 $fieldList[$customField->getId()] = $customField->getName();
@@ -110,7 +113,7 @@ class ImportSubscriber extends CommonSubscriber
             $customObjectId = $this->getCustomObjectId($event->getImport()->getObject());
             $customObject   = $this->customObjectModel->fetchEntity($customObjectId);
             $import         = $event->getImport();
-            $merged         = $this->customItemModel->import($import, $event->getRowData(), $customObject);
+            $merged         = $this->customItemImportModel->import($import, $event->getRowData(), $customObject);
             $event->setWasMerged($merged);
         } catch (NotFoundException $e) {}
     }

@@ -38,15 +38,16 @@ Each custom object has its own import button on the list of custom items and eac
 
 Here is an example of CSV that can be imported:
 ```
-customItemName,3,linkedContactIds
-Pampers,Stuff babies **** into,
-Gloves,Heat insulation for your hands,5319
-Bread, Stuff you can eat for breakfast,"5319, 2,5"
+customItemId,customItemName,3,linkedContactIds
+1020224,Pampers,Stuff babies **** into,
+1020225,Gloves,Heat insulation for your hands,5319
+,Bread, Stuff you can eat for breakfast,"5319, 2,5"
 ```
 
-CSV above will automatically map the custom item name field, custom field with ID 3 and special field for defining links between custom items and contacts. The CSV headers can be named differently and then mapped manually.
+The CSV headers can be named differently and then mapped manually.
 
-- `customItemName` Name is the only default field for each custom object. This field is **unique identifier**. It means that if you'll import the same CSV file twice the custom items will get merged by this name field and not create duplicates.
+- `customItemId` Must be real, existing Mautic custom item ID. If provided then the import will merge the values from the CSV row with the existing custom item. If not, it will create new one.
+- `customItemName` Name is the only default field for each custom object and therefore doesn't have a number, but this special key.
 - `3` or any other custom field ID. The value will be added to the custom field for the specific custom item.
 - `linkedContactIds` can be a list of one or more existing Mautic contacts separated by comma. Make sure you'll add the comma-separated list of contact IDs into double quotes to escape this CSV from the main CSV file.
 

@@ -33,9 +33,6 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\NoResultException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use Mautic\LeadBundle\Entity\Import;
-use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
-use Mautic\UserBundle\Entity\User;
 
 class CustomItemModel extends FormModel
 {
@@ -55,6 +52,11 @@ class CustomItemModel extends FormModel
     private $permissionProvider;
 
     /**
+     * @var UserHelper
+     */
+    protected $userHelper;
+
+    /**
      * @var CustomFieldModel
      */
     private $customFieldModel;
@@ -70,11 +72,6 @@ class CustomItemModel extends FormModel
     private $customFieldTypeProvider;
 
     /**
-     * @var FormatterHelper
-     */
-    private $formatterHelper;
-
-    /**
      * @param EntityManager $entityManager
      * @param CustomItemRepository $customItemRepository
      * @param CustomItemPermissionProvider $permissionProvider
@@ -82,7 +79,6 @@ class CustomItemModel extends FormModel
      * @param CustomFieldModel $customFieldModel
      * @param CustomFieldValueModel $customFieldValueModel
      * @param CustomFieldTypeProvider $customFieldTypeProvider
-     * @param FormatterHelper $formatterHelper
      */
     public function __construct(
         EntityManager $entityManager,
@@ -91,8 +87,7 @@ class CustomItemModel extends FormModel
         UserHelper $userHelper,
         CustomFieldModel $customFieldModel,
         CustomFieldValueModel $customFieldValueModel,
-        CustomFieldTypeProvider $customFieldTypeProvider,
-        FormatterHelper $formatterHelper
+        CustomFieldTypeProvider $customFieldTypeProvider
     )
     {
         $this->entityManager           = $entityManager;
@@ -102,7 +97,6 @@ class CustomItemModel extends FormModel
         $this->customFieldModel        = $customFieldModel;
         $this->customFieldValueModel   = $customFieldValueModel;
         $this->customFieldTypeProvider = $customFieldTypeProvider;
-        $this->formatterHelper         = $formatterHelper;
     }
 
     /**
@@ -138,84 +132,6 @@ class CustomItemModel extends FormModel
         $this->entityManager->flush();
 
         return $entity;
-    }
-
-    /**
-     * @param Import $import
-     * @param array $rowData
-     * @param CustomObject $customObject
-     * 
-     * @return boolean updated = true, inserted = false
-     */
-    public function import(Import $import, array $rowData, CustomObject $customObject): bool
-    {
-        $matchedFields = $import->getMatchedFields();
-        $customFields  = $customObject->getCustomFields();
-        $contactIds    = [];
-        $customItem    = new CustomItem($customObject);
-        $merged        = false;
-        $nameKey       = array_search(
-            strtolower('customItemName'),
-            array_map('strtolower', $matchedFields)
-        );
-
-        if (false !== $nameKey) {
-            $name             = $rowData[$nameKey];
-            $customItemFromDb = $this->customItemRepository->findOneBy([
-                'name'         => $name,
-                'customObject' => $customObject->getId()
-            ]);
-
-            if ($customItemFromDb) {
-                $merged     = true;
-                $customItem = $customItemFromDb;
-                $this->populateCustomFields($customItem);
-            } else {
-                $customItem->setName($name);
-            }
-        }
-
-        if ($owner = $import->getDefault('owner')) {
-            $customItem->setCreatedBy($this->entityManager->find(User::class, $owner));
-        }
-
-        foreach ($matchedFields as $csvField => $customFieldId) {
-            $csvValue = $rowData[$csvField];
-
-            if (strcasecmp('linkedContactIds', $customFieldId) === 0) {
-                $contactIds = $this->formatterHelper->simpleCsvToArray($csvValue, 'int');
-                continue;
-            }
-
-            if (strcasecmp('customItemName', $customFieldId) === 0) {
-                continue;
-            }
-
-            foreach ($customFields as $customField) {
-                if ($customField->getId() === (int) $customFieldId) {
-                    $fieldType  = $customField->getTypeObject();
-                    $fieldValue = $customItem->findCustomFieldValueForFieldId($customFieldId);
-
-                    if (!$fieldValue) {
-                        $fieldValue = $fieldType->createValueEntity($customField, $customItem, $fieldValue);
-                    } else {
-                        $fieldValue->updateThisEntityManually();
-                    }
-
-                    $fieldValue->setValue($csvValue);
-
-                    $customItem->addCustomFieldValue($fieldValue);
-                }
-            }
-        }
-
-        $this->save($customItem);
-
-        foreach ($contactIds as $contactId) {
-            $this->linkContact($customItem->getId(), $contactId);
-        }
-
-        return $merged;
     }
 
     /**
