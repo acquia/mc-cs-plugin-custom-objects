@@ -133,7 +133,7 @@ CustomObjects = {
                     beforeSend: function() {
                         CustomObjects.addIconToInput(input, 'spinner');
                     },
-                    complete: function(){
+                    complete: function() {
                         CustomObjects.removeIconFromInput(input);
                     }
                 },

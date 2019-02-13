@@ -14,12 +14,13 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 $placeholder = $view['translator']->trans('custom.item.link.search.placeholder', ['%object%' => $customObject->getNameSingular()]);
 $route       = $view['router']->path(CustomItemRouteProvider::ROUTE_LOOKUP, ['objectId' => $customObject->getId()]);
 ?>
-<div class="tab-pane fade bdr-w-0" id="custom-object-<?php echo $customObject->getId(); ?>-container">
+<div class="tab-pane fade bdr-w-0 custom-object-search" id="custom-object-<?php echo $customObject->getId(); ?>-container">
     <div class="box-layout mb-lg panel">
-        <div class="form-control-icon pa-xs">
+        <div class="form-group form-control-icon pa-xs">
             <span class="the-icon fa fa-search text-muted mt-xs"></span>
             <input 
                 type="text" 
+                id="custom-object-search-<?php echo $customObject->getId(); ?>"
                 data-toggle='typeahead' 
                 class="form-control bdr-w-0"
                 placeholder="<?php echo $placeholder; ?>" 
