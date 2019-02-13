@@ -81,6 +81,7 @@ $view['slots']->set('headerTitle', $header);
                                 );
                             endif;
                         endforeach;
+                        $form->children['customFields']->setRendered();
                     ?>
                 </div>
                 <?php if (!count($customFields)): ?>
