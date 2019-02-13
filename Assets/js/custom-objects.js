@@ -74,13 +74,13 @@ CustomObjects = {
         })
     },
 
-    addIconToInput(input, icon) {
+    addIconToInput(input, icon, spinIt) {
         CustomObjects.removeIconFromInput(input);
         let id = input.attr('id')+'-input-icon';
         let formGroup = input.closest('.form-group');
         let iconEl = mQuery('<span/>').addClass('fa fa-'+icon+' form-control-feedback');
         let ariaEl = mQuery('<span/>').addClass('sr-only').text('('+icon+')').attr('id', id);
-        if (icon === 'spinner') {
+        if (spinIt) {
             iconEl.addClass('fa-spin');
         }
         formGroup.addClass('has-feedback');
@@ -131,7 +131,7 @@ CustomObjects = {
                 wildcard: '%QUERY',
                 ajax: {
                     beforeSend: function() {
-                        CustomObjects.addIconToInput(input, 'spinner');
+                        CustomObjects.addIconToInput(input, 'spinner', true);
                     },
                     complete: function() {
                         CustomObjects.removeIconFromInput(input);
