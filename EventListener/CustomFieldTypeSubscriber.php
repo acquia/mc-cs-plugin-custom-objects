@@ -18,6 +18,7 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomFieldTypeEvent;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextareaType;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomFieldTypeSubscriber extends CommonSubscriber
@@ -49,5 +50,6 @@ class CustomFieldTypeSubscriber extends CommonSubscriber
     {
         $event->addCustomFieldType(new IntType($this->translator->trans('custom.field.type.int')));
         $event->addCustomFieldType(new TextType($this->translator->trans('custom.field.type.text')));
+        $event->addCustomFieldType(new TextareaType($this->translator->trans('custom.field.type.textarea')));
     }
 }
