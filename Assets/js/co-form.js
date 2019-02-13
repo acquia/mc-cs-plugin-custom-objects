@@ -127,7 +127,9 @@ CustomObjectsForm = {
         mQuery(target).modal('show');
 
         // Fill modal with form loaded via ajax
-        mQuery(target).off('shown.bs.modal').on('shown.bs.modal', function() {
+        mQuery(target)
+            .off('shown.bs.modal')
+            .on('shown.bs.modal', function() {
             // Fill modal with form loaded via ajax
             mQuery.ajax({
                 url: route,
@@ -179,6 +181,9 @@ CustomObjectsForm = {
                 let form = mQuery('form[name="custom_field"]');
                 let route = form.attr('action');
 
+                mQuery(target).find('button.btn-save').attr('disabled', 'disabled');
+                mQuery(target).find('button.btn-cancel').attr('disabled', 'disabled');
+
                 mQuery.ajax({
                     url: route,
                     type: 'POST',
@@ -196,6 +201,8 @@ CustomObjectsForm = {
                     error: function (request, textStatus, errorThrown) {
                         Mautic.processAjaxError(request, textStatus, errorThrown);
                         Mautic.stopIconSpinPostEvent();
+                        mQuery(target).find('button.btn-save').removeAttr('disabled');
+                        mQuery(target).find('button.btn-cancel').removeAttr('disabled');
                     },
                 });
             });
