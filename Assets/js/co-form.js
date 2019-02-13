@@ -1,7 +1,8 @@
 // Init stuff on refresh:
-mQuery(function() {
+
+Mautic.customObjectOnLoad = function() {
     CustomObjectsForm.onLoad();
-});
+};
 
 CustomObjectsForm = {
 
