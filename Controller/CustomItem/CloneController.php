@@ -63,7 +63,7 @@ class CloneController extends CommonController
     )
     {
         $this->formFactory        = $formFactory;
-        $this->customItemModel  = $customItemModel;
+        $this->customItemModel    = $customItemModel;
         $this->permissionProvider = $permissionProvider;
         $this->routeProvider      = $routeProvider;
     }
