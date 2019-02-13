@@ -35,7 +35,7 @@ class IntType extends AbstractCustomFieldType
      */
     public function getEntityClass(): string
     {
-        return \MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInt::class;
+        return CustomFieldValueInt::class;
     }
 
     /**
