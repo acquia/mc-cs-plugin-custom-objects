@@ -214,10 +214,11 @@ CustomObjectsForm = {
      */
     saveToPanel: function(response, target) {
         let content = mQuery(response.content);
-        let fieldOrderNo = 0;
 
-        if (content.find('#custom_field_id').val()) {
-            // Custom field has id, this was edit
+        fieldOrderNo = mQuery(content).find('[id*=order]').val();
+
+        if (fieldOrderNo !== "") {
+            // Custom field has order defined, this was edit
             fieldOrderNo = mQuery(content).find('[id*=order]').val();
             content = CustomObjectsForm.convertDataFromModal(content, fieldOrderNo);
             mQuery('form[name="custom_object"] [id*=order][value="' + fieldOrderNo +'"]').parent().replaceWith(content);
