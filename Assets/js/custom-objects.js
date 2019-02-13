@@ -172,7 +172,7 @@ CustomObjects = {
     getItemsForObject(customObjectId, contactId, callback) {
         mQuery.ajax({
             type: 'GET',
-            url: mauticBaseUrl+'s/custom/object/'+customObjectId+'/item',
+            url: mauticBaseUrl+'s/custom/object/'+customObjectId+'/item?tmpl=list',
             data: {contactId: contactId},
             success: function (response) {
                 callback(response);

@@ -27,7 +27,7 @@ $route       = $view['router']->path(CustomItemRouteProvider::ROUTE_LOOKUP, ['ob
                 data-action="<?php echo $route; ?>">
         </div>
     </div>
-    <div class='custom-item-list'>
+    <div class='custom-item-list page-list'>
         Loading...
     </div>
 </div>

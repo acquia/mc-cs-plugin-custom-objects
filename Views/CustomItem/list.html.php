@@ -15,6 +15,15 @@ use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 if ($tmpl == 'index') {
     $view->extend('CustomObjectsBundle:CustomItem:index.html.php');
 }
+
+$routeSelf = $view['router']->path(
+    CustomItemRouteProvider::ROUTE_LIST,
+    [
+        'objectId'  => $customObject->getId(),
+        'contactId' => $contactId,
+        'tmpl'      => 'list',
+    ]
+);
 ?>
 <?php if (count($items)): ?>
     <div class="table-responsive">
@@ -29,6 +38,7 @@ if ($tmpl == 'index') {
                         'target'    => '#custom-items-table',
                         'langVar'   => 'custom.item',
                         'routeBase' => 'custom_item',
+                        'baseUrl'   => $routeSelf,
                     ]
                 );
 
@@ -39,6 +49,7 @@ if ($tmpl == 'index') {
                         'orderBy'    => CustomItemRepository::TABLE_ALIAS.'.name',
                         'text'       => 'mautic.core.name',
                         'class'      => 'col-custom_item_name',
+                        'baseUrl'    => $routeSelf,
                     ]
                 );
 
@@ -50,6 +61,7 @@ if ($tmpl == 'index') {
                         'text'       => 'mautic.core.id',
                         'class'      => 'visible-md visible-lg col-asset-id',
                         'default'    => true,
+                        'baseUrl'    => $routeSelf,
                     ]
                 );
                 ?>
@@ -70,7 +82,7 @@ if ($tmpl == 'index') {
                                     'model' => 'custom.item',
                                 ]
                             ); ?>
-                            <a href="<?php echo $view['router']->path(CustomItemRouteProvider::ROUTE_VIEW, ['objectId' => $item->getCustomObject()->getId(), 'itemId' => $item->getId()]); ?>" data-toggle="ajax">
+                            <a href="<?php echo $view['router']->path(CustomItemRouteProvider::ROUTE_VIEW, ['objectId' => $customObject->getId(), 'itemId' => $item->getId()]); ?>" data-toggle="ajax">
                                 <?php echo $item->getName(); ?>
                             </a>
                         </div>
@@ -85,12 +97,13 @@ if ($tmpl == 'index') {
         <?php echo $view->render(
             'MauticCoreBundle:Helper:pagination.html.php',
             [
-                'totalItems' => $itemCount,
-                'page'       => $page,
-                'limit'      => $limit,
-                'baseUrl'    => $view['router']->path(CustomItemRouteProvider::ROUTE_LIST),
-                'sessionVar' => 'custom.item',
-                'routeBase'  => CustomItemRouteProvider::ROUTE_LIST,
+                'totalItems'  => $itemCount,
+                'page'        => $page,
+                'limit'       => $limit,
+                'baseUrl'     => $routeSelf = $view['router']->path(CustomItemRouteProvider::ROUTE_LIST,['objectId'  => $customObject->getId(),]),
+                'queryString' => "&contactId={$contactId}",
+                'sessionVar'  => 'custom.item',
+                'routeBase'   => CustomItemRouteProvider::ROUTE_LIST,
             ]
         ); ?>
     </div>
