@@ -677,6 +677,13 @@ return [
                 ],
                 'tag' => 'form.type'
             ],
+            'custom_object.object.form' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType::class,
+                'arguments' => [
+                    'custom_field.type.provider'
+                ],
+                'tag' => 'form.type'
+            ],
             'custom_field.field.value.form' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldValueType::class,
             ],

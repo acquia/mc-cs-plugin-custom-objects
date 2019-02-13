@@ -117,6 +117,7 @@ class FormController extends CommonController
             //We need to see validation messages if POST was sent
             // Process all changes made with CFs to be visible
             $form->handleRequest($request);
+            $form->isValid(); // Validate POST to have errors visible
             $customObject = $form->getData();
         }
 
