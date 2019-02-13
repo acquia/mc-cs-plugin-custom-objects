@@ -16,7 +16,7 @@
 $customFieldEntity = $customField->vars['data'];
 $customField->vars['index'] = $customField->vars['name'];
 $order = (int) $customField->vars['value']->getOrder();
-$deleted = (!empty($_POST) && $_POST['custom_object']['customFields'][$order]['deleted']) ? 'style="display:none;"' : '';
+$deleted = (!empty($_POST['custom_object']['customFields'][$order]['deleted'])) ? 'style="display:none;"' : '';
 ?>
 <div class="panel form-field-wrapper ui-sortable-handle" id="customField_<?php echo (int) $customField->vars['value']->getOrder() ?>" <?php echo $deleted ?>>
 
