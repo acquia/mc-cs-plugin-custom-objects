@@ -102,6 +102,7 @@ class CustomObjectType extends AbstractType
                 'allow_add' => true,
                 'allow_delete' => true,
                 'by_reference' => false,
+                'prototype' => false, // Do not use CF panel prototype in DOM
             ]
         );
 
