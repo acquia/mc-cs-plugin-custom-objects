@@ -701,7 +701,7 @@ return [
                     'translator',
                 ],
             ],
-            'custom_item.campaign.link.form' => [
+            'custom_item.campaign.field.value.form' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CampaignConditionFieldValueType::class,
                 'arguments' => [
                     'mautic.custom.model.field',
