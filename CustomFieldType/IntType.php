@@ -92,7 +92,7 @@ class IntType extends AbstractCustomFieldType
      */
     public function createValueEntity(CustomField $customField, CustomItem $customItem, $value = null): CustomFieldValueInterface
     {
-        return new CustomFieldValueInt($customField, $customItem, $value);
+        return new CustomFieldValueInt($customField, $customItem, (int) $value);
     }
 
     /**

@@ -144,7 +144,7 @@ CustomObjects = {
         });
 
         customItems.initialize();
-          
+
         input.typeahead({
             minLength: 0,
             highlight: true,
@@ -190,33 +190,43 @@ CustomObjects = {
         return '#custom-object-'+customObjectId+'-container '+suffix;
     },
 
-    formOnLoad: function (container) {
+    /**
+     * Custom object form events
+     */
+    formOnLoad: function () {
+        CustomObjects.formInitCFAdder();
+        CustomObjects.formInitSortable();
+        mQuery('.panel').each(function (i, panel) {
+            CustomObjects.formInitPanel(panel);
+        });
+    },
+
+    /**
+     * Init CF adding feature
+     */
+    formInitCFAdder: function() {
         mQuery('select.form-builder-new-component').change(function (e) {
             mQuery(this).find('option:selected');
-            Mautic.ajaxifyModal(mQuery(this).find('option:selected'));
+            CustomObjects.formShowModal(mQuery(this).find('option:selected'));
             // Reset the dropdown
             mQuery(this).val('');
             mQuery(this).trigger('chosen:updated');
         });
+    },
 
-
-
-        if (mQuery('#mauticforms_fields')) {
-            //make the fields sortable
-            mQuery('#mauticforms_fields').sortable({
+    /**
+     * Init CF sorting feature
+     */
+    formInitSortable: function () {
+        if (mQuery('#mauticforms_fields .drop-here')) {
+            // Make the fields sortable
+            mQuery('#mauticforms_fields .drop-here').sortable({
                 items: '.panel',
                 cancel: '',
                 helper: function(e, ui) {
+                    // Before sorting
                     ui.children().each(function() {
                         mQuery(this).width(mQuery(this).width());
-                    });
-
-                    // Fix body overflow that messes sortable up
-                    bodyOverflow.overflowX = mQuery('body').css('overflow-x');
-                    bodyOverflow.overflowY = mQuery('body').css('overflow-y');
-                    mQuery('body').css({
-                        overflowX: 'visible',
-                        overflowY: 'visible'
                     });
 
                     return ui;
@@ -225,71 +235,192 @@ CustomObjects = {
                 axis: 'y',
                 containment: '#mauticforms_fields .drop-here',
                 stop: function(e, ui) {
-                    // Restore original overflow
-                    mQuery('body').css(bodyOverflow);
                     mQuery(ui.item).attr('style', '');
-
-                    mQuery.ajax({
-                        type: "POST",
-                        url: mauticAjaxUrl + "?action=form:reorderFields",
-                        data: mQuery('#mauticforms_fields').sortable("serialize", {attribute: 'data-sortable-id'}) + "&formId=" + mQuery('#mauticform_sessionId').val()
-                    });
+                    CustomObjects.formRecalculateCFOrder();
                 }
             });
 
             Mautic.initFormFieldButtons();
         }
+    },
 
-        if (mQuery('#mauticforms_actions')) {
-            //make the fields sortable
-            mQuery('#mauticforms_actions').sortable({
-                items: '.panel',
-                cancel: '',
-                helper: function(e, ui) {
-                    ui.children().each(function() {
-                        mQuery(this).width(mQuery(this).width());
-                    });
+    /**
+     * Recalculate CF order
+     */
+    formRecalculateCFOrder: function() {
+        mQuery('.drop-here').find('[id*=order]').each(function(i, selector) {
+            mQuery(selector).val(i)
+                .parent().attr('id', 'customField_' + i);
+        });
+    },
 
-                    // Fix body overflow that messes sortable up
-                    bodyOverflow.overflowX = mQuery('body').css('overflow-x');
-                    bodyOverflow.overflowY = mQuery('body').css('overflow-y');
-                    mQuery('body').css({
-                        overflowX: 'visible',
-                        overflowY: 'visible'
-                    });
+    /**
+     * Init CF panel events (except sortable)
+     * @param panel
+     */
+    formInitPanel: function(panel) {
+        CustomObjects.formInitModal(panel);
+        CustomObjects.formInitDeleteFieldButton(panel);
+    },
 
-                    return ui;
+    /**
+     * Init ajax modal on .panel element
+     * @param panel
+     */
+    formInitModal: function(panel) {
+        mQuery(panel).find("[data-toggle='ajaxmodal']")
+            .off('click.ajaxmodal')
+            .on('click.ajaxmodal', function (event) {
+
+                event.preventDefault();
+                // Mautic.ajaxifyModal(this, event);
+                CustomObjects.formShowModal(mQuery(this));
+            });
+
+        CustomObjects.formInitSortable();
+    },
+
+    formShowModal: function(element) {
+        let target = element.attr('data-target');
+        if (element.attr('href')) {
+            var route = element.attr('href');
+            var edit = true;
+        } else {
+            var route = element.attr('data-href');
+            var edit = false;
+        }
+
+        Mautic.showModal(target);
+
+        // Fill modal with form loaded via ajax
+        mQuery(target).on('shown.bs.modal', function() {
+            // Fill modal with form loaded via ajax
+            mQuery.ajax({
+                url: route,
+                type: 'GET',
+                dataType: 'json',
+                success: function (response) {
+                    if (response) {
+                        Mautic.processModalContent(response, target);
+                    }
+                    if (edit) {
+                        CustomObjects.formConvertDataToModal(element);
+                    }
+                    Mautic.stopIconSpinPostEvent();
                 },
-                scroll: true,
-                axis: 'y',
-                containment: '#mauticforms_actions .drop-here',
-                stop: function(e, ui) {
-                    // Restore original overflow
-                    mQuery('body').css(bodyOverflow);
-                    mQuery(ui.item).attr('style', '');
-
-                    mQuery.ajax({
-                        type: "POST",
-                        url: mauticAjaxUrl + "?action=form:reorderActions",
-                        data: mQuery('#mauticforms_actions').sortable("serialize") + "&formId=" + mQuery('#mauticform_sessionId').val()
-                    });
+                error: function (request, textStatus, errorThrown) {
+                    Mautic.processAjaxError(request, textStatus, errorThrown);
+                    Mautic.stopIconSpinPostEvent();
+                },
+                complete: function () {
+                    Mautic.stopModalLoadingBar(target);
+                    CustomObjects.formBindSaveFromModal(target);
                 }
             });
-
-            mQuery('#mauticforms_actions .mauticform-row').on('dblclick.mauticformactions', function(event) {
-                event.preventDefault();
-                mQuery(this).find('.btn-edit').first().click();
-            });
-        }
-
-        if (mQuery('#mauticform_formType').length && mQuery('#mauticform_formType').val() == '') {
-            mQuery('body').addClass('noscroll');
-        }
-
-        Mautic.initHideItemButton('#mauticforms_fields');
-        Mautic.initHideItemButton('#mauticforms_actions');
+        });
     },
+
+    formBindSaveFromModal(target) {
+        mQuery(target).find('button.btn-save')
+            .unbind('click')
+            .bind('click', function() {
+                let form = mQuery('form[name="custom_field"]');
+                let route = form.attr('action');
+
+                mQuery.ajax({
+                    url: route,
+                    type: 'POST',
+                    dataType: 'json',
+                    data: form.serialize(),
+                    success: function (response) {
+                        if (response.closeModal) {
+                            // Valid post, lets create panel
+                            CustomObjects.saveCustomFieldPanel(response, target);
+                        } else {
+                            // Rerender invalid form
+                            Mautic.processModalContent(response, target);
+                        }
+                    },
+                    error: function (request, textStatus, errorThrown) {
+                        Mautic.processAjaxError(request, textStatus, errorThrown);
+                        Mautic.stopIconSpinPostEvent();
+                    },
+                });
+            });
+    },
+
+    /**
+     * Transfer CF data from CO form to modal
+     * @param panel
+     */
+    formConvertDataToModal: function (panel) {
+        mQuery(panel).find('input').each(function (i, input) {
+            let id = mQuery(input).attr('id');
+            let name = id.slice(id.lastIndexOf('_') + 1, id.length);
+            mQuery('#objectFieldModal').find('#custom_field_' + name).val(mQuery(input).val());
+        });
+    },
+
+    /**
+     * Init CF delete button
+     * @param panel
+     */
+    formInitDeleteFieldButton: function(panel) {
+        mQuery(panel).find('[data-hide-panel]')
+            .unbind('click')
+            .click(function(e) {
+                e.preventDefault();
+                let panel = mQuery(this).closest('.panel');
+                panel.hide('fast');
+                panel.find('[id*=deleted]').val(1);
+            });
+    },
+
+    /**
+     * Create custom field from
+     * \MauticPlugin\CustomObjectsBundle\Controller\CustomField\SaveController::saveAction
+     */
+    saveCustomFieldPanel: function(response, target) {
+        let content = mQuery(response.content);
+        let fieldOrderNo = 0;
+
+        if (content.find('#custom_field_id').val()) {
+            // Custom field has id, this was edit
+            fieldOrderNo = mQuery(content).find('[id*=order]').val();
+            content = CustomObjects.formConvertDataFromModal(content, fieldOrderNo);
+            mQuery('form[name="custom_object"] [id*=order][value="' + fieldOrderNo +'"]').parent().replaceWith(content);
+        } else {
+            // New custom field without id
+            fieldOrderNo = mQuery('.panel').length - 2;
+            content = CustomObjects.formConvertDataFromModal(content, fieldOrderNo);
+            mQuery('.drop-here').prepend(content);
+            CustomObjects.formRecalculateCFOrder();
+            fieldOrderNo = 0;
+        }
+
+        mQuery(target).hide();
+        mQuery('body').removeClass('modal-open');
+        mQuery('.modal-backdrop').remove();
+
+        CustomObjects.formInitModal(mQuery('[id*=order][value="' + fieldOrderNo +'"]').parent());
+    },
+
+    /**
+     * Transfer modal data to CO form
+     * @param panel CF panel content
+     * @param fieldIndex numeric index of CF in form
+     * @returns html content of panel
+     */
+    formConvertDataFromModal: function (panel, fieldIndex) {
+        mQuery(panel).find('input').each(function(i, input) {
+            let id = mQuery(input).attr('id');
+            id = id.slice(id.lastIndexOf('_') + 1, id.length);
+            let name = 'custom_object[customFields][' + fieldIndex + '][' + id + ']';
+            mQuery(input).attr('name', name);
+            id = 'custom_object_custom_fields_' + fieldIndex + '_' + id;
+            mQuery(input).attr('id', id);
+        });
+        return panel;
+    },
+
 };
-
-
-

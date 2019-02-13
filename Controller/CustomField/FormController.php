@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
@@ -104,10 +105,10 @@ class FormController extends CommonController
         $fieldId = (int) $request->get('fieldId');
         $fieldType = $request->get('fieldType');
 
-        try {
+        if ($objectId) {
             $customObject = $this->customObjectModel->fetchEntity($objectId);
-        } catch (NotFoundException $e) {
-            return $this->notFound($e->getMessage());
+        } else {
+            $customObject = new CustomObject();
         }
 
         try {
@@ -125,7 +126,7 @@ class FormController extends CommonController
         }
 
         $route = $this->fieldRouteProvider->buildFormRoute($customField->getId());
-        $action = $this->fieldRouteProvider->buildSaveRoute($fieldId, $customObject->getId(), $fieldType);
+        $action = $this->fieldRouteProvider->buildSaveRoute($fieldType, $fieldId, $customObject->getId());
         $form   = $this->formFactory->create(CustomFieldType::class, $customField, ['action' => $action]);
 
         return $this->delegateView(

@@ -39,18 +39,21 @@ class CustomFieldRouteProvider
 
     /**
      * @param int|null $id
+     * @param int|null $objectId
+     * @param string   $fieldType
      *
      * @return string
      */
-    public function buildSaveRoute(?int $id = null, int $objectId, string $fieldType): string
+    public function buildSaveRoute(string $fieldType, ?int $id = null, ?int $objectId = null): string
     {
-        $params = [
-            'objectId' => $objectId,
-            'fieldType' => $fieldType,
-        ];
+        $params['fieldType'] = $fieldType;
 
         if ($id) {
             $params['fieldId'] = $id;
+        }
+
+        if ($objectId) {
+            $params['objectId'] = $objectId;
         }
 
         return $this->router->generate(static::ROUTE_SAVE, $params);
@@ -60,7 +63,6 @@ class CustomFieldRouteProvider
      * @param int|null $id
      *
      * @return string
-     * @throws ForbiddenException
      */
     public function buildFormRoute(int $id = null): string
     {
@@ -72,7 +74,6 @@ class CustomFieldRouteProvider
      * @param int $id
      *
      * @return string
-     * @throws ForbiddenException
      */
     public function buildCloneRoute(int $id): string
     {
@@ -83,7 +84,6 @@ class CustomFieldRouteProvider
      * @param int $id
      *
      * @return string
-     * @throws ForbiddenException
      */
     public function buildDeleteRoute(int $id): string
     {

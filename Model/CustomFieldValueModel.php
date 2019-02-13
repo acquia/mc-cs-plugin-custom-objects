@@ -125,9 +125,10 @@ class CustomFieldValueModel
         $fieldType    = $customFieldValue->getCustomField()->getTypeObject();
         $queryBuilder = $this->entityManager->createQueryBuilder();
         $queryBuilder->update($fieldType->getEntityClass(), $fieldType->getTableAlias())
-            ->set("{$fieldType->getTableAlias()}.value", $queryBuilder->expr()->literal($customFieldValue->getValue()))
+            ->set("{$fieldType->getTableAlias()}.value", ':value')
             ->where("{$fieldType->getTableAlias()}.customField = :customFieldId")
             ->andWhere("{$fieldType->getTableAlias()}.customItem = :customItemId")
+            ->setParameter('value', $customFieldValue->getValue())
             ->setParameter('customFieldId', (int) $customFieldValue->getCustomField()->getId())
             ->setParameter('customItemId', (int) $customFieldValue->getCustomItem()->getId());
         $query = $queryBuilder->getQuery();

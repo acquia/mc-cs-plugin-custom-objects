@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -110,10 +111,10 @@ class SaveController extends CommonController
         $fieldId = (int) $request->get('fieldId');
         $fieldType = $request->get('fieldType');
 
-        try {
+        if ($objectId) {
             $customObject = $this->customObjectModel->fetchEntity($objectId);
-        } catch (NotFoundException $e) {
-            return $this->notFound($e->getMessage());
+        } else {
+            $customObject = new CustomObject();
         }
 
         try {
@@ -130,38 +131,13 @@ class SaveController extends CommonController
             $this->accessDenied(false, $e->getMessage());
         }
 
-        $action = $this->fieldRouteProvider->buildSaveRoute($fieldId, $customObject->getId(), $fieldType);
+        $action = $this->fieldRouteProvider->buildSaveRoute($fieldType, $fieldId, $customObject->getId());
         $form   = $this->formFactory->create(CustomFieldType::class, $customField, ['action' => $action]);
 
         $form->handleRequest($request);
         
         if ($form->isValid()) {
-            $this->customFieldModel->save($customField);
-
-            $this->session->getFlashBag()->add(
-                'notice',
-                $this->translator->trans(
-                    $fieldId ? 'mautic.core.notice.updated' : 'mautic.core.notice.created',
-                    [
-                        '%name%' => $customField->getName(),
-                        '%url%'  => '', // No url provided as it does not make sense
-                    ], 
-                    'flashes'
-                )
-            );
-
-            if ($form->get('buttons')->get('save')->isClicked()) {
-                // Close modal
-                return $this->delegateView(
-                    [
-                        'passthroughVars' => [
-                            'closeModal'    => 1,
-                        ],
-                    ]
-                );
-            } else {
-                return $this->redirectToEdit($request, $customField);
-            }
+            return $this->buildCustomFieldFormPart($customObject, $form->getData());
         }
 
         $route = $fieldId ? $this->fieldRouteProvider->buildFormRoute($fieldId) : '';
@@ -172,28 +148,45 @@ class SaveController extends CommonController
                 'viewParameters' => [
                     'customField' => $customField,
                     'form'   => $form->createView(),
-                    'tmpl'   => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomField:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customField',
                     'route'         => $route,
+                    'fieldOrderNo'  => $request->get('fieldOrderNo'),
                 ],
             ]
         );
     }
 
     /**
-     * @param Request     $request
-     * @param CustomField $entity
-     * 
-     * @return Response
+     * Build custom field form to be used in custom object form
+     *
+     * @param CustomObject $customObject
+     * @param CustomField  $customField
+     *
+     * @return JsonResponse
      */
-    private function redirectToEdit(Request $request, CustomField $entity): Response
+    private function buildCustomFieldFormPart(CustomObject $customObject, CustomField $customField)
     {
-        $request->setMethod('GET');
-        $params = ['fieldId' => $entity->getId()];
+        $customFieldForm = $this->formFactory->create(
+            CustomFieldType::class,
+            $customField,
+            ['custom_object_form' => true]
+        );
 
-        return $this->forward('custom_field.form_controller:renderFormAction', $params);
+         $template = $this->render(
+            "CustomObjectsBundle:CustomObject:FormFields\\field.{$customField->getType()}.html.php",
+            [
+                'customObject' => $customObject,
+                'customFieldEntity' => $customField,
+                'customField' => $customFieldForm->createView(),
+            ]
+         );
+
+        return new JsonResponse([
+            'content'    => $template->getContent(),
+            'closeModal' => 1,
+        ]);
     }
 }

@@ -26,40 +26,40 @@ return [
         'main' => [
 
             // Custom Fields
-            CustomFieldRouteProvider::ROUTE_FORM        => [
+            CustomFieldRouteProvider::ROUTE_FORM => [
                 'path'       => '/custom/field/edit',
                 'controller' => 'CustomObjectsBundle:CustomField\Form:renderForm',
                 'method'     => 'GET',
             ],
-            CustomFieldRouteProvider::ROUTE_CLONE       => [
+            CustomFieldRouteProvider::ROUTE_CLONE => [
                 'path'       => '/custom/field/clone/{fieldId}',
                 'controller' => 'CustomObjectsBundle:CustomField\Clone:clone',
                 'method'     => 'GET',
             ],
-            CustomFieldRouteProvider::ROUTE_CANCEL      => [
-                'path'       => '/custom/field/cancel/{fieldId}',
+            CustomFieldRouteProvider::ROUTE_CANCEL => [
+                'path'       => '/custom/field/cancel/{fieldId}/{fieldType}',
                 'controller' => 'CustomObjectsBundle:CustomField\Cancel:cancel',
                 'method'     => 'GET',
                 'defaults'   => [
                     'fieldId' => null,
                 ],
             ],
-            CustomFieldRouteProvider::ROUTE_SAVE        => [
-                'path'       => '/custom/field/save/{objectId}/{fieldType}',
+            CustomFieldRouteProvider::ROUTE_SAVE => [
+                'path'       => '/custom/field/save/{fieldType}',
                 'controller' => 'CustomObjectsBundle:CustomField\Save:save',
                 'method'     => 'POST',
                 'defaults'   => [
                     'fieldId' => null,
                 ],
             ],
-            CustomFieldRouteProvider::ROUTE_DELETE      => [
+            CustomFieldRouteProvider::ROUTE_DELETE => [
                 'path'       => '/custom/field/delete/{fieldId}',
                 'controller' => 'CustomObjectsBundle:CustomField\Delete:delete',
                 'method'     => 'GET|POST',
             ],
 
             // Custom Items
-            CustomItemRouteProvider::ROUTE_LIST         => [
+            CustomItemRouteProvider::ROUTE_LIST => [
                 'path'       => '/custom/object/{objectId}/item/{page}',
                 'controller' => 'CustomObjectsBundle:CustomItem\List:list',
                 'method'     => 'GET|POST',
@@ -67,27 +67,27 @@ return [
                     'page' => 1,
                 ],
             ],
-            CustomItemRouteProvider::ROUTE_VIEW         => [
+            CustomItemRouteProvider::ROUTE_VIEW => [
                 'path'       => '/custom/object/{objectId}/item/view/{itemId}',
                 'controller' => 'CustomObjectsBundle:CustomItem\View:view',
                 'method'     => 'GET',
             ],
-            CustomItemRouteProvider::ROUTE_NEW          => [
+            CustomItemRouteProvider::ROUTE_NEW => [
                 'path'       => '/custom/object/{objectId}/item/new',
                 'controller' => 'CustomObjectsBundle:CustomItem\Form:renderForm',
                 'method'     => 'GET',
             ],
-            CustomItemRouteProvider::ROUTE_EDIT         => [
+            CustomItemRouteProvider::ROUTE_EDIT => [
                 'path'       => '/custom/object/{objectId}/item/edit/{itemId}',
                 'controller' => 'CustomObjectsBundle:CustomItem\Form:renderForm',
                 'method'     => 'GET',
             ],
-            CustomItemRouteProvider::ROUTE_CLONE        => [
+            CustomItemRouteProvider::ROUTE_CLONE => [
                 'path'       => '/custom/object/{objectId}/item/clone/{itemId}',
                 'controller' => 'CustomObjectsBundle:CustomItem\Clone:clone',
                 'method'     => 'GET',
             ],
-            CustomItemRouteProvider::ROUTE_CANCEL       => [
+            CustomItemRouteProvider::ROUTE_CANCEL => [
                 'path'       => '/custom/object/{objectId}/item/cancel/{itemId}',
                 'controller' => 'CustomObjectsBundle:CustomItem\Cancel:cancel',
                 'method'     => 'GET',
@@ -95,7 +95,7 @@ return [
                     'itemId' => null,
                 ],
             ],
-            CustomItemRouteProvider::ROUTE_SAVE         => [
+            CustomItemRouteProvider::ROUTE_SAVE => [
                 'path'       => '/custom/object/{objectId}/item/save/{itemId}',
                 'controller' => 'CustomObjectsBundle:CustomItem\Save:save',
                 'method'     => 'POST',
@@ -103,7 +103,7 @@ return [
                     'itemId' => null,
                 ],
             ],
-            CustomItemRouteProvider::ROUTE_DELETE       => [
+            CustomItemRouteProvider::ROUTE_DELETE => [
                 'path'       => '/custom/object/{objectId}/item/delete/{itemId}',
                 'controller' => 'CustomObjectsBundle:CustomItem\Delete:delete',
                 'method'     => 'GET',
@@ -113,19 +113,19 @@ return [
                 'controller' => 'CustomObjectsBundle:CustomItem\BatchDelete:delete',
                 'method'     => 'POST',
             ],
-            CustomItemRouteProvider::ROUTE_LOOKUP       => [
+            CustomItemRouteProvider::ROUTE_LOOKUP => [
                 'path'       => '/custom/object/{objectId}/item/lookup.json',
                 'controller' => 'CustomObjectsBundle:CustomItem\Lookup:list',
                 'method'     => 'GET',
             ],
-            CustomItemRouteProvider::ROUTE_LINK         => [
+            CustomItemRouteProvider::ROUTE_LINK => [
                 'path'       => '/custom/item/{itemId}/link/{entityType}/{entityId}.json',
                 'controller' => 'CustomObjectsBundle:CustomItem\Link:save',
                 'method'     => 'POST',
             ],
 
             // Custom Objects
-            CustomObjectRouteProvider::ROUTE_LIST       => [
+            CustomObjectRouteProvider::ROUTE_LIST => [
                 'path'       => '/custom/object/{page}',
                 'controller' => 'CustomObjectsBundle:CustomObject\List:list',
                 'method'     => 'GET|POST',
@@ -133,22 +133,22 @@ return [
                     'page' => 1,
                 ],
             ],
-            CustomObjectRouteProvider::ROUTE_VIEW       => [
+            CustomObjectRouteProvider::ROUTE_VIEW => [
                 'path'       => '/custom/object/view/{objectId}',
                 'controller' => 'CustomObjectsBundle:CustomObject\View:view',
                 'method'     => 'GET',
             ],
-            CustomObjectRouteProvider::ROUTE_FORM       => [
+            CustomObjectRouteProvider::ROUTE_FORM => [
                 'path'       => '/custom/object/edit/{objectId}',
                 'controller' => 'CustomObjectsBundle:CustomObject\Form:renderForm',
                 'method'     => 'GET',
             ],
-            CustomObjectRouteProvider::ROUTE_CLONE      => [
+            CustomObjectRouteProvider::ROUTE_CLONE => [
                 'path'       => '/custom/object/clone/{objectId}',
                 'controller' => 'CustomObjectsBundle:CustomObject\Clone:clone',
                 'method'     => 'GET',
             ],
-            CustomObjectRouteProvider::ROUTE_CANCEL     => [
+            CustomObjectRouteProvider::ROUTE_CANCEL => [
                 'path'       => '/custom/object/cancel/{objectId}',
                 'controller' => 'CustomObjectsBundle:CustomObject\Cancel:cancel',
                 'method'     => 'GET',
@@ -156,7 +156,7 @@ return [
                     'objectId' => null,
                 ],
             ],
-            CustomObjectRouteProvider::ROUTE_SAVE       => [
+            CustomObjectRouteProvider::ROUTE_SAVE => [
                 'path'       => '/custom/object/save/{objectId}',
                 'controller' => 'CustomObjectsBundle:CustomObject\Save:save',
                 'method'     => 'POST',
@@ -164,7 +164,7 @@ return [
                     'objectId' => null,
                 ],
             ],
-            CustomObjectRouteProvider::ROUTE_DELETE     => [
+            CustomObjectRouteProvider::ROUTE_DELETE => [
                 'path'       => '/custom/object/delete/{objectId}',
                 'controller' => 'CustomObjectsBundle:CustomObject\Delete:delete',
                 'method'     => 'GET',
@@ -188,13 +188,13 @@ return [
         ],
     ],
 
-    'services'   => [
-        'controllers'  => [
+    'services' => [
+        'controllers' => [
 
             // Custom Fields
-            'custom_field.form_controller'        => [
-                'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\FormController::class,
-                'arguments'   => [
+            'custom_field.form_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\FormController::class,
+                'arguments' => [
                     'form.factory',
                     'mautic.custom.model.field',
                     'custom_object.custom_field_factory',
@@ -205,13 +205,13 @@ return [
                 ],
                 'methodCalls' => [
                     'setContainer' => [
-                        '@service_container',
+                        '@service_container'
                     ],
                 ],
             ],
-            'custom_field.clone_controller'       => [
-                'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\CloneController::class,
-                'arguments'   => [
+            'custom_field.clone_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\CloneController::class,
+                'arguments' => [
                     'form.factory',
                     'mautic.custom.model.field',
                     'custom_field.permission.provider',
@@ -219,13 +219,13 @@ return [
                 ],
                 'methodCalls' => [
                     'setContainer' => [
-                        '@service_container',
+                        '@service_container'
                     ],
                 ],
             ],
-            'custom_field.save_controller'        => [
-                'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\SaveController::class,
-                'arguments'   => [
+            'custom_field.save_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\SaveController::class,
+                'arguments' => [
                     'session',
                     'form.factory',
                     'translator',
@@ -237,13 +237,13 @@ return [
                 ],
                 'methodCalls' => [
                     'setContainer' => [
-                        '@service_container',
+                        '@service_container'
                     ],
                 ],
             ],
-            'custom_field.delete_controller'      => [
-                'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\DeleteController::class,
-                'arguments'   => [
+            'custom_field.delete_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\DeleteController::class,
+                'arguments' => [
                     'mautic.custom.model.field',
                     'session',
                     'translator',
@@ -251,23 +251,23 @@ return [
                 ],
                 'methodCalls' => [
                     'setContainer' => [
-                        '@service_container',
+                        '@service_container'
                     ],
                 ],
             ],
-            'custom_field.cancel_controller'      => [
-                'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\CancelController::class,
+            'custom_field.cancel_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\CancelController::class,
                 'methodCalls' => [
                     'setContainer' => [
-                        '@service_container',
+                        '@service_container'
                     ],
                 ],
             ],
 
             // Custom Items
-            'custom_item.list_controller'         => [
-                'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ListController::class,
-                'arguments'   => [
+            'custom_item.list_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ListController::class,
+                'arguments' => [
                     'request_stack',
                     'session',
                     'mautic.helper.core_parameters',
@@ -278,13 +278,13 @@ return [
                 ],
                 'methodCalls' => [
                     'setContainer' => [
-                        '@service_container',
+                        '@service_container'
                     ],
                 ],
             ],
-            'custom_item.view_controller'         => [
-                'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ViewController::class,
-                'arguments'   => [
+            'custom_item.view_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ViewController::class,
+                'arguments' => [
                     'request_stack',
                     'session',
                     'mautic.helper.core_parameters',
@@ -294,13 +294,13 @@ return [
                 ],
                 'methodCalls' => [
                     'setContainer' => [
-                        '@service_container',
+                        '@service_container'
                     ],
                 ],
             ],
-            'custom_item.form_controller'         => [
-                'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\FormController::class,
-                'arguments'   => [
+            'custom_item.form_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\FormController::class,
+                'arguments' => [
                     'form.factory',
                     'mautic.custom.model.object',
                     'mautic.custom.model.item',
@@ -309,13 +309,13 @@ return [
                 ],
                 'methodCalls' => [
                     'setContainer' => [
-                        '@service_container',
+                        '@service_container'
                     ],
                 ],
             ],
-            'custom_item.clone_controller'        => [
-                'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\CloneController::class,
-                'arguments'   => [
+            'custom_item.clone_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\CloneController::class,
+                'arguments' => [
                     'form.factory',
                     'mautic.custom.model.item',
                     'custom_item.permission.provider',
@@ -323,13 +323,13 @@ return [
                 ],
                 'methodCalls' => [
                     'setContainer' => [
-                        '@service_container',
+                        '@service_container'
                     ],
                 ],
             ],
-            'custom_item.save_controller'         => [
-                'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\SaveController::class,
-                'arguments'   => [
+            'custom_item.save_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\SaveController::class,
+                'arguments' => [
                     'request_stack',
                     'session',
                     'form.factory',
@@ -341,13 +341,13 @@ return [
                 ],
                 'methodCalls' => [
                     'setContainer' => [
-                        '@service_container',
+                        '@service_container'
                     ],
                 ],
             ],
-            'custom_item.delete_controller'       => [
-                'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\DeleteController::class,
-                'arguments'   => [
+            'custom_item.delete_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\DeleteController::class,
+                'arguments' => [
                     'mautic.custom.model.item',
                     'session',
                     'translator',
@@ -355,13 +355,13 @@ return [
                 ],
                 'methodCalls' => [
                     'setContainer' => [
-                        '@service_container',
+                        '@service_container'
                     ],
                 ],
             ],
             'custom_item.batch_delete_controller' => [
-                'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\BatchDeleteController::class,
-                'arguments'   => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\BatchDeleteController::class,
+                'arguments' => [
                     'request_stack',
                     'mautic.custom.model.item',
                     'session',
@@ -370,54 +370,54 @@ return [
                 ],
                 'methodCalls' => [
                     'setContainer' => [
-                        '@service_container',
+                        '@service_container'
                     ],
                 ],
             ],
-            'custom_item.cancel_controller'       => [
-                'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\CancelController::class,
-                'arguments'   => [
+            'custom_item.cancel_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\CancelController::class,
+                'arguments' => [
                     'session',
                     'mautic.custom.model.item',
                     'custom_item.route.provider',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
-                        '@service_container',
+                        '@service_container'
                     ],
                 ],
             ],
-            'custom_item.lookup_controller'       => [
-                'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\LookupController::class,
-                'arguments'   => [
+            'custom_item.lookup_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\LookupController::class,
+                'arguments' => [
                     'request_stack',
                     'mautic.custom.model.item',
                     'custom_item.permission.provider',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
-                        '@service_container',
+                        '@service_container'
                     ],
                 ],
             ],
-            'custom_item.link_controller'         => [
-                'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\LinkController::class,
-                'arguments'   => [
+            'custom_item.link_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\LinkController::class,
+                'arguments' => [
                     'mautic.custom.model.item',
                     'custom_item.permission.provider',
                     'translator',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
-                        '@service_container',
+                        '@service_container'
                     ],
                 ],
             ],
 
             // Custom Objects
-            'custom_object.list_controller'       => [
-                'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\ListController::class,
-                'arguments'   => [
+            'custom_object.list_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\ListController::class,
+                'arguments' => [
                     'request_stack',
                     'session',
                     'mautic.helper.core_parameters',
@@ -427,13 +427,13 @@ return [
                 ],
                 'methodCalls' => [
                     'setContainer' => [
-                        '@service_container',
+                        '@service_container'
                     ],
                 ],
             ],
-            'custom_object.view_controller'       => [
-                'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\ViewController::class,
-                'arguments'   => [
+            'custom_object.view_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\ViewController::class,
+                'arguments' => [
                     'request_stack',
                     'session',
                     'mautic.helper.core_parameters',
@@ -443,13 +443,13 @@ return [
                 ],
                 'methodCalls' => [
                     'setContainer' => [
-                        '@service_container',
+                        '@service_container'
                     ],
                 ],
             ],
-            'custom_object.form_controller'       => [
-                'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\FormController::class,
-                'arguments'   => [
+            'custom_object.form_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\FormController::class,
+                'arguments' => [
                     'form.factory',
                     'mautic.custom.model.object',
                     'mautic.custom.model.field',
@@ -459,13 +459,13 @@ return [
                 ],
                 'methodCalls' => [
                     'setContainer' => [
-                        '@service_container',
+                        '@service_container'
                     ],
                 ],
             ],
-            'custom_object.clone_controller'      => [
-                'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\CloneController::class,
-                'arguments'   => [
+            'custom_object.clone_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\CloneController::class,
+                'arguments' => [
                     'form.factory',
                     'mautic.custom.model.object',
                     'custom_object.permission.provider',
@@ -473,30 +473,31 @@ return [
                 ],
                 'methodCalls' => [
                     'setContainer' => [
-                        '@service_container',
+                        '@service_container'
                     ],
                 ],
             ],
-            'custom_object.save_controller'       => [
-                'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\SaveController::class,
-                'arguments'   => [
+            'custom_object.save_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\SaveController::class,
+                'arguments' => [
                     'request_stack',
                     'session',
                     'form.factory',
                     'translator',
                     'mautic.custom.model.object',
+                    'mautic.custom.model.field',
                     'custom_object.permission.provider',
                     'custom_object.route.provider',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
-                        '@service_container',
+                        '@service_container'
                     ],
                 ],
             ],
-            'custom_object.delete_controller'     => [
-                'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\DeleteController::class,
-                'arguments'   => [
+            'custom_object.delete_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\DeleteController::class,
+                'arguments' => [
                     'mautic.custom.model.object',
                     'session',
                     'translator',
@@ -504,26 +505,26 @@ return [
                 ],
                 'methodCalls' => [
                     'setContainer' => [
-                        '@service_container',
+                        '@service_container'
                     ],
                 ],
             ],
-            'custom_object.cancel_controller'     => [
-                'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\CancelController::class,
-                'arguments'   => [
+            'custom_object.cancel_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\CancelController::class,
+                'arguments' => [
                     'session',
                     'mautic.custom.model.object',
                     'custom_object.route.provider',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
-                        '@service_container',
+                        '@service_container'
                     ],
                 ],
             ],
         ],
-        'models'       => [
-            'mautic.custom.model.field'       => [
+        'models' => [
+            'mautic.custom.model.field' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
@@ -539,7 +540,7 @@ return [
                     'custom_field.type.provider',
                 ],
             ],
-            'mautic.custom.model.item'        => [
+            'mautic.custom.model.item' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomItemModel::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
@@ -551,7 +552,16 @@ return [
                     'custom_field.type.provider',
                 ],
             ],
-            'mautic.custom.model.object'      => [
+            'mautic.custom.model.import.item' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomItemImportModel::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'custom_item.permission.provider',
+                    'mautic.custom.model.item',
+                    'mautic.helper.template.formatter',
+                ],
+            ],
+            'mautic.custom.model.object' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
@@ -562,14 +572,14 @@ return [
             ],
         ],
         'repositories' => [
-            'custom_field.repository'  => [
+            'custom_field.repository' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \MauticPlugin\CustomObjectsBundle\Entity\CustomField::class,
                 ],
             ],
-            'custom_item.repository'   => [
+            'custom_item.repository' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
@@ -584,115 +594,115 @@ return [
                 ],
             ],
         ],
-        'events'       => [
-            'custom_object.assets.subscriber'                      => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\AssetsSubscriber::class,
+        'events' => [
+            'custom_object.assets.subscriber' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\EventListener\AssetsSubscriber::class,
                 'arguments' => [
                     'templating.helper.assets',
                     'mautic.helper.core_parameters',
-                ],
+                ]
             ],
-            'custom_object.menu.subscriber'                        => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\MenuSubscriber::class,
+            'custom_object.menu.subscriber' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\EventListener\MenuSubscriber::class,
                 'arguments' => [
                     'mautic.custom.model.object',
                     'mautic.helper.core_parameters',
                 ],
             ],
-            'custom_object.tab.subscriber'                         => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\TabSubscriber::class,
+            'custom_object.tab.subscriber' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\EventListener\TabSubscriber::class,
                 'arguments' => [
                     'mautic.custom.model.object',
                     'mautic.custom.model.item',
                     'mautic.helper.core_parameters',
                 ],
             ],
-            'custom_field.type.subscriber'                         => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldTypeSubscriber::class,
+            'custom_field.type.subscriber' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldTypeSubscriber::class,
                 'arguments' => [
                     'translator',
                 ],
             ],
-            'custom_field.subscriber'                              => [
-                'class'        => \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldSubscriber::class,
-                'arguments'    => [
+            'custom_field.subscriber' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldSubscriber::class,
+                'arguments' => [
                     'custom_field.type.provider',
                 ],
-                'tag'          => 'doctrine.event_listener',
+                'tag' => 'doctrine.event_listener',
                 'tagArguments' => [
                     'event' => 'postLoad',
-                    'lazy'  => true,
-                ],
+                    'lazy' => true,
+                ]
             ],
-            'custom_item.button.subscriber'                        => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomItemButtonSubscriber::class,
+            'custom_item.button.subscriber' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CustomItemButtonSubscriber::class,
                 'arguments' => [
                     'custom_item.permission.provider',
                     'custom_item.route.provider',
                     'translator',
                 ],
             ],
-            'custom_object.button.subscriber'                      => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectButtonSubscriber::class,
+            'custom_item.import.subscriber' => [
+                'class'     => MauticPlugin\CustomObjectsBundle\EventListener\ImportSubscriber::class,
+                'arguments' => [
+                    'mautic.custom.model.object',
+                    'mautic.custom.model.import.item',
+                ],
+            ],
+            'custom_object.button.subscriber' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectButtonSubscriber::class,
                 'arguments' => [
                     'custom_object.permission.provider',
                     'custom_object.route.provider',
                 ],
             ],
-            'custom_item.campaign.subscriber'                      => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CampaignSubscriber::class,
+            'custom_item.campaign.subscriber' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CampaignSubscriber::class,
                 'arguments' => [
                     'mautic.custom.model.field',
                     'mautic.custom.model.object',
                     'mautic.custom.model.item',
                     'translator',
-                ],
+                ]
             ],
-            'custom_object.segments.filters_generate.subscriber'   => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\SegmentFiltersChoicesGenerateSubscriber::class,
-                'arguments' => [
+	   'custom_object.segments.filters_generate.subscriber' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\EventListener\SegmentFiltersChoicesGenerateSubscriber::class,
+                'arguments'=> [
                     'custom_object.repository',
                     'translator',
-                ],
+                ]
             ],
             'custom_object.segments.filters_dictionary.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\SegmentFiltersDictionarySubscriber::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-            'custom_object.dynamic_content.subscriber' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\DynamicContentSubscriber::class,
-                'arguments' => [
-                    'doctrine.orm.entity_manager',
-                    'mautic.lead.model.lead_segment_filter_factory'
+                    'mautic.helper.core_parameters'
                 ],
             ],
         ],
-        'forms'        => [
-            'custom_item.item.form'          => [
+        'forms' => [
+            'custom_item.item.form' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemType::class,
             ],
-            'custom_field.field.form'        => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType::class,
+            'custom_field.field.form' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType::class,
                 'arguments' => [
-                    'custom_object.repository',
+                    'custom_object.repository'
                 ],
-                'tag'       => 'form.type',
+                'tag' => 'form.type'
             ],
-            'custom_field.field.value.form'  => [
+            'custom_field.field.value.form' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldValueType::class,
             ],
             'custom_item.campaign.link.form' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Form\Type\CampaignActionLinkType::class,
+                'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CampaignActionLinkType::class,
                 'arguments' => [
                     'custom_item.route.provider',
                     'translator',
                 ],
             ],
             'custom_item.campaign.link.form' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Form\Type\CampaignConditionFieldValueType::class,
+                'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CampaignConditionFieldValueType::class,
                 'arguments' => [
                     'mautic.custom.model.field',
                     'custom_item.route.provider',
@@ -700,7 +710,7 @@ return [
                 ],
             ],
         ],
-        'commands'     => [
+        'commands' => [
             'custom_object.command.generate_sample_data' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Command\GenerateSampleDataCommand::class,
                 'arguments' => [
@@ -710,60 +720,60 @@ return [
                     'doctrine.orm.entity_manager',
                     'custom_object.random.helper',
                 ],
-                'tag'       => 'console.command',
+                'tag' => 'console.command',
             ],
         ],
-        'other'        => [
-            'custom_field.type.provider'                   => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider::class,
+        'other' => [
+            'custom_field.type.provider' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider::class,
                 'arguments' => [
                     'event_dispatcher',
                 ],
             ],
-            'custom_field.permission.provider'             => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider::class,
+            'custom_field.permission.provider' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider::class,
                 'arguments' => [
                     'mautic.security',
                 ],
             ],
-            'custom_field.route.provider'                  => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider::class,
+            'custom_field.route.provider' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider::class,
                 'arguments' => [
                     'router',
                 ],
             ],
-            'custom_item.route.provider'                   => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider::class,
+            'custom_item.route.provider' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider::class,
                 'arguments' => [
                     'router',
                 ],
             ],
-            'custom_item.permission.provider'              => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider::class,
+            'custom_item.permission.provider' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider::class,
                 'arguments' => [
                     'mautic.security',
                 ],
             ],
-            'custom_object.route.provider'                 => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider::class,
+            'custom_object.route.provider' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider::class,
                 'arguments' => [
                     'router',
                 ],
             ],
-            'custom_object.permission.provider'            => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider::class,
+            'custom_object.permission.provider' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider::class,
                 'arguments' => [
                     'mautic.security',
                 ],
             ],
-            'custom_object.random.helper'                  => [
+            'custom_object.random.helper' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Helper\RandomHelper::class,
             ],
             'custom_object.custom_field_factory'           => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory::class,
+                'class' =>\MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory::class,
                 'arguments' => [
-                    'custom_field.type.provider',
-                ],
+                    'custom_field.type.provider'
+                ]
             ],
             'mautic.lead.query.builder.custom_field.value' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder::class,

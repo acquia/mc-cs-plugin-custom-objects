@@ -201,6 +201,10 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     public function addCustomFieldValue(CustomFieldValueInterface $customFieldValue)
     {
+        if (null === $this->customFieldValues) {
+            $this->customFieldValues = new ArrayCollection();
+        }
+
         $this->customFieldValues->add($customFieldValue);
     }
 
@@ -222,6 +226,21 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         }
         
         return $this->customFieldValues;
+    }
+
+    /**
+     * @return CustomFieldValueInterface|null
+     */
+    public function findCustomFieldValueForFieldId($customFieldId)
+    {
+        $customFieldValue = $this->customFieldValues->get("{$customFieldId}_{$this->getId()}");
+
+        // In case the custom field value doesn't exist, find it with the key used for artificially created null values:
+        if (null === $customFieldValue) {
+            $customFieldValue = $this->customFieldValues->get($customFieldId);
+        }
+
+        return $customFieldValue;
     }
 
     /**

@@ -60,6 +60,11 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      */
     private $customObject;
 
+    /**
+     * @var int|null
+     */
+    private $order;
+
     public function __clone()
     {
         $this->id = null;
@@ -83,13 +88,18 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
         $builder->createManyToOne('customObject', CustomObject::class)
             ->addJoinColumn('custom_object_id', 'id', false, false, 'CASCADE')
-            ->inversedBy('fields')
+            ->inversedBy('customFields')
+            ->cascadePersist()
             ->fetchExtraLazy()
             ->build();
 
         $builder->addId();
         $builder->addField('label', Type::STRING);
         $builder->addField('type', Type::STRING);
+        $builder->createField('order', 'integer')
+            ->columnName('field_order')
+            ->nullable()
+            ->build();
     }
 
     /**
@@ -164,7 +174,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param CustomFieldTypeInterface|string $type
+     * @param CustomFieldTypeInterface $typeObject
      */
     public function setTypeObject(CustomFieldTypeInterface $typeObject): void
     {
@@ -190,9 +200,27 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @param CustomObject $customObject
      */
-    public function setCustomObject(CustomObject $customObject)
+    public function setCustomObject(CustomObject $customObject = null)
     {
         $this->customObject = $customObject;
-        $this->isChanged('customObject', $customObject->getId());
+        if ($customObject) {
+            $this->isChanged('customObject', $customObject->getId());
+        }
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getOrder(): ?int
+    {
+        return $this->order;
+    }
+
+    /**
+     * @param int|null $order
+     */
+    public function setOrder(?int $order): void
+    {
+        $this->order = $order;
     }
 }

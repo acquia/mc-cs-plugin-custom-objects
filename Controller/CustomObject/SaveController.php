@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
+use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
@@ -52,6 +53,11 @@ class SaveController extends CommonController
     private $customObjectModel;
 
     /**
+     * @var CustomFieldModel
+     */
+    private $customFieldModel;
+
+    /**
      * @var CustomObjectPermissionProvider
      */
     private $permissionProvider;
@@ -62,13 +68,14 @@ class SaveController extends CommonController
     private $routeProvider;
 
     /**
-     * @param RequestStack $requestStack
-     * @param Session $session
-     * @param FormFactory $formFactory
-     * @param TranslatorInterface $translator
-     * @param CustomObjectModel $customObjectModel
+     * @param RequestStack                   $requestStack
+     * @param Session                        $session
+     * @param FormFactory                    $formFactory
+     * @param TranslatorInterface            $translator
+     * @param CustomObjectModel              $customObjectModel
+     * @param CustomFieldModel               $customFieldModel
      * @param CustomObjectPermissionProvider $permissionProvider
-     * @param CustomObjectRouteProvider $routeProvider
+     * @param CustomObjectRouteProvider      $routeProvider
      */
     public function __construct(
         RequestStack $requestStack,
@@ -76,6 +83,7 @@ class SaveController extends CommonController
         FormFactory $formFactory,
         TranslatorInterface $translator,
         CustomObjectModel $customObjectModel,
+        CustomFieldModel $customFieldModel,
         CustomObjectPermissionProvider $permissionProvider,
         CustomObjectRouteProvider $routeProvider
     )
@@ -85,6 +93,7 @@ class SaveController extends CommonController
         $this->formFactory        = $formFactory;
         $this->translator         = $translator;
         $this->customObjectModel  = $customObjectModel;
+        $this->customFieldModel = $customFieldModel;
         $this->permissionProvider = $permissionProvider;
         $this->routeProvider      = $routeProvider;
     }
@@ -97,11 +106,11 @@ class SaveController extends CommonController
     public function saveAction(?int $objectId = null)
     {
         try {
-            $entity = $objectId ? $this->customObjectModel->fetchEntity($objectId): new CustomObject();
-            if ($entity->isNew()) {
+            $customObject = $objectId ? $this->customObjectModel->fetchEntity($objectId): new CustomObject();
+            if ($customObject->isNew()) {
                 $this->permissionProvider->canCreate();
             } else {
-                $this->permissionProvider->canEdit($entity);
+                $this->permissionProvider->canEdit($customObject);
             }
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
@@ -111,18 +120,25 @@ class SaveController extends CommonController
 
         $request = $this->requestStack->getCurrentRequest();
         $action  = $this->routeProvider->buildSaveRoute($objectId);
-        $form    = $this->formFactory->create(CustomObjectType::class, $entity, ['action' => $action]);
+        $form    = $this->formFactory->create(CustomObjectType::class, $customObject, ['action' => $action]);
         $form->handleRequest($request);
         
         if ($form->isValid()) {
-            $this->customObjectModel->save($entity);
+            $this->customObjectModel->save($customObject);
+
+            $rawCustomObject = $request->get('custom_object');
+            foreach ($rawCustomObject['customFields'] as $customField) {
+                if ($customField['deleted'] && $customField['id']) {
+                    $this->customFieldModel->deleteById((int) $customField['id']);
+                }
+            }
 
             $this->session->getFlashBag()->add(
                 'notice',
                 $this->translator->trans(
                     $objectId ? 'mautic.core.notice.updated' : 'mautic.core.notice.created',
                     [
-                        '%name%' => $entity->getName(),
+                        '%name%' => $customObject->getName(),
                         '%url%'  => $this->routeProvider->buildFormRoute($objectId),
                     ], 
                     'flashes'
@@ -130,29 +146,11 @@ class SaveController extends CommonController
             );
 
             if ($form->get('buttons')->get('save')->isClicked()) {
-                return $this->redirectToDetail($request, $entity);
-            } else {
-                return $this->redirectToEdit($request, $entity);
+                return $this->forwardToDetail($request, $customObject);
             }
         }
 
-        $route = $this->routeProvider->buildFormRoute($objectId);
-
-        return $this->delegateView(
-            [
-                'returnUrl'      => $route,
-                'viewParameters' => [
-                    'entity' => $entity,
-                    'form'   => $form->createView(),
-                    'tmpl'   => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
-                ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.php',
-                'passthroughVars' => [
-                    'mauticContent' => 'customObject',
-                    'route'         => $route,
-                ],
-            ]
-        );
+        return $this->forwardToEdit($request, $customObject);
     }
 
     /**
@@ -161,7 +159,7 @@ class SaveController extends CommonController
      * 
      * @return Response
      */
-    private function redirectToEdit(Request $request, CustomObject $entity): Response
+    private function forwardToEdit(Request $request, CustomObject $entity): Response
     {
         $request->setMethod('GET');
         $params = ['objectId' => $entity->getId()];
@@ -175,7 +173,7 @@ class SaveController extends CommonController
      * 
      * @return Response
      */
-    private function redirectToDetail(Request $request, CustomObject $entity): Response
+    private function forwardToDetail(Request $request, CustomObject $entity): Response
     {
         $request->setMethod('GET');
         $params = ['objectId' => $entity->getId()];
