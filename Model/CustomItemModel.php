@@ -263,7 +263,9 @@ class CustomItemModel extends FormModel
         
         foreach ($customFields as $customField) {
             // Create default value for field that does not exist yet.
-            if (null === $values->get("{$customField->getId()}_{$customItem->getId()}")) {
+            try {
+                $customItem->findCustomFieldValueForFieldId($customField->getId());
+            } catch (NotFoundException $e) {
                 $customFieldType = $this->customFieldTypeProvider->getType($customField->getType());
                 // @todo the default value should come form the custom field.
                 $values->set(

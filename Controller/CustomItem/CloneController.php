@@ -94,8 +94,9 @@ class CloneController extends CommonController
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute($objectId),
                 'viewParameters' => [
-                    'entity' => $entity,
-                    'form'   => $form->createView(),
+                    'entity'       => $entity,
+                    'form'         => $form->createView(),
+                    'customObject' => $entity->getCustomObject(),
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.php',
                 'passthroughVars' => [
