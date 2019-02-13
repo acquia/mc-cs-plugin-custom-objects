@@ -2,3 +2,7 @@
     line-height: 32px;
     right: 15px;
 }
+
+.panel .btn-group {
+    z-index: 1000;
+}
