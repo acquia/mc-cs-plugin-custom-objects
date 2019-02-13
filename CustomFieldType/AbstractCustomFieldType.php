@@ -18,6 +18,35 @@ use Symfony\Component\Translation\TranslatorInterface;
 abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
 {
     /**
+     * @var string
+     */
+    private $name;
+
+    /**
+     * @param string $name field type name translated to user's language
+     */
+    public function __construct(string $name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getKey(): string
+    {
+        return $this->key;
+    }
+
+    /**
      * @return string
      */
     public function __toString(): string

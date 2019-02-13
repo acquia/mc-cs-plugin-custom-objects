@@ -18,38 +18,9 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 
-class TextType extends AbstractCustomFieldType
+class TextType extends AbstractTextType
 {
-    const KEY = 'text';
-
-    /**
-     * @var string
-     */
-    private $name;
-
-    /**
-     * @param string $name field type name translated to user's language
-     */
-    public function __construct(string $name) 
-    {
-        $this->name = $name;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * @return string
-     */
-    public function getKey(): string
-    {
-        return self::KEY;
-    }
+    protected $key = 'text';
 
     /**
      * @return string
@@ -57,22 +28,6 @@ class TextType extends AbstractCustomFieldType
     public function getSymfonyFormFiledType(): string
     {
         return \Symfony\Component\Form\Extension\Core\Type\TextType::class;
-    }
-
-    /**
-     * @return string
-     */
-    public function getEntityClass(): string
-    {
-        return \MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText::class;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTableName(): string
-    {
-        return MAUTIC_TABLE_PREFIX.'custom_field_value_text';
     }
 
     /**
@@ -93,16 +48,5 @@ class TextType extends AbstractCustomFieldType
     public function createValueEntity(CustomField $customField, CustomItem $customItem, $value = null): CustomFieldValueInterface
     {
         return new CustomFieldValueText($customField, $customItem, (string) $value);
-    }
-
-    /**
-     * @return array
-     */
-    public function getOperators(): array
-    {
-        $allOperators = parent::getOperators();
-        $allowedOperators = array_flip(['=', '!=', 'empty', '!empty', 'like', '!like', 'in', '!in', 'startsWith', 'endsWith', 'contains']);
-        
-        return array_intersect_key($allOperators, $allowedOperators);
     }
 }
