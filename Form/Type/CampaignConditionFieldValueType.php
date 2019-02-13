@@ -13,15 +13,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
-use MauticPlugin\CustomObjectsBundle\Form\CustomObjectHiddenTransformer;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -56,8 +53,8 @@ class CampaignConditionFieldValueType extends AbstractType
     )
     {
         $this->customFieldModel = $customFieldModel;
-        $this->routeProvider = $routeProvider;
-        $this->translator = $translator;
+        $this->routeProvider    = $routeProvider;
+        $this->translator       = $translator;
     }
 
     /**

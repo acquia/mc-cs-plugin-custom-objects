@@ -106,9 +106,9 @@ class CampaignSubscriber extends CommonSubscriber
             $event->addCondition("custom_item.{$customObject->getId()}.fieldvalue", [
                 'label'           => $this->translator->trans('custom.item.events.field.value', ['%customObject%' => $customObject->getNameSingular()]),
                 'description'     => $this->translator->trans('custom.item.events.field.value_descr', ['%customObject%' => $customObject->getNameSingular()]),
+                'eventName'       => CustomItemEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
                 'formType'        => CampaignConditionFieldValueType::class,
                 'formTheme'       => 'CustomObjectsBundle:FormTheme\FieldValueCondition',
-                'eventName'       => CustomItemEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
                 'formTypeOptions' => ['customObject' => $customObject],
             ]);
         }
