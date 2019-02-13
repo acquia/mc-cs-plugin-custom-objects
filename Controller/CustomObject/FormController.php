@@ -115,7 +115,9 @@ class FormController extends CommonController
 
         if ($request->getMethod() === Request::METHOD_POST) {
             //We need to see validation messages if POST was sent
+            // Process all changes made with CFs to be visible
             $form->handleRequest($request);
+            $customObject = $form->getData();
         }
 
         return $this->delegateView(
