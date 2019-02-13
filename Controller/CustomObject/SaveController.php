@@ -165,7 +165,23 @@ class SaveController extends CommonController
             }
         }
 
-        return $this->forwardToEdit($request, $customObject);
+        return $this->delegateView(
+            [
+                'returnUrl'      => $this->routeProvider->buildListRoute(),
+                'viewParameters' => [
+                    'customObject' => $customObject,
+                    'availableFieldTypes' => $this->customFieldTypeProvider->getTypes(),
+                    'customFields' => $this->customFieldModel->fetchCustomFieldsForObject($customObject),
+                    'deletedFields' => [],
+                    'form'   => $form->createView(),
+                ],
+                'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.php',
+                'passthroughVars' => [
+                    'mauticContent' => 'customObject',
+                    'route'         => $this->routeProvider->buildFormRoute($customObject->getId()),
+                ],
+            ]
+        );
     }
 
     /**
@@ -180,19 +196,5 @@ class SaveController extends CommonController
         $params = ['objectId' => $entity->getId()];
 
         return $this->forward('CustomObjectsBundle:CustomObject\View:view', $params);
-    }
-
-    /**
-     * @param Request               $request
-     * @param CustomObject $entity
-     *
-     * @return Response
-     */
-    private function forwardToEdit(Request $request, CustomObject $entity): Response
-    {
-        $request->setMethod('GET');
-        $params = ['objectId' => $entity->getId()];
-
-        return $this->forward('custom_object.form_controller:renderFormAction', $params);
     }
 }
