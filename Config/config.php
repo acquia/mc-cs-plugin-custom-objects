@@ -123,6 +123,11 @@ return [
                 'controller' => 'CustomObjectsBundle:CustomItem\Link:save',
                 'method'     => 'POST',
             ],
+            CustomItemRouteProvider::ROUTE_UNLINK => [
+                'path'       => '/custom/item/{itemId}/unlink/{entityType}/{entityId}.json',
+                'controller' => 'CustomObjectsBundle:CustomItem\Unlink:save',
+                'method'     => 'POST',
+            ],
 
             // Custom Objects
             CustomObjectRouteProvider::ROUTE_LIST => [
@@ -402,6 +407,19 @@ return [
             ],
             'custom_item.link_controller' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\LinkController::class,
+                'arguments' => [
+                    'mautic.custom.model.item',
+                    'custom_item.permission.provider',
+                    'translator',
+                ],
+                'methodCalls' => [
+                    'setContainer' => [
+                        '@service_container'
+                    ],
+                ],
+            ],
+            'custom_item.unlink_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\UnlinkController::class,
                 'arguments' => [
                     'mautic.custom.model.item',
                     'custom_item.permission.provider',

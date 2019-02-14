@@ -169,6 +169,13 @@ CustomObjects = {
         });
     },
 
+    unlinkFromContact(elHtml, event, customObjectId, contactId) {
+        event.preventDefault();
+        mQuery.ajax({type: 'POST', url: mQuery(elHtml).attr('data-action'), success: function() {
+            CustomObjects.reloadItemsTable(customObjectId, contactId);
+        }});
+    },
+
     getItemsForObject(customObjectId, contactId, callback) {
         mQuery.ajax({
             type: 'GET',

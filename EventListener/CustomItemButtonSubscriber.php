@@ -71,29 +71,42 @@ class CustomItemButtonSubscriber extends CommonSubscriber
     {
         switch ($event->getRoute()) {
             case CustomItemRouteProvider::ROUTE_LIST:
-                $this->addEntityButtons($event, ButtonHelper::LOCATION_LIST_ACTIONS);
                 try {
-                    $customObjectId = $this->getCustomObjectIdFromEvent($event);
-                    $event->addButton(
-                        $this->defineNewButton($customObjectId),
-                        ButtonHelper::LOCATION_PAGE_ACTIONS,
-                        $event->getRoute()
-                    );
-                    $event->addButton(
-                        $this->defineImportNewButton($customObjectId),
-                        ButtonHelper::LOCATION_PAGE_ACTIONS,
-                        $event->getRoute()
-                    );
-                    $event->addButton(
-                        $this->defineImportListButton($customObjectId),
-                        ButtonHelper::LOCATION_PAGE_ACTIONS,
-                        $event->getRoute()
-                    );
-                    $event->addButton(
-                        $this->defineBatchDeleteButton($customObjectId),
-                        ButtonHelper::LOCATION_BULK_ACTIONS,
-                        $event->getRoute()
-                    );
+                    $customObjectId      = $this->getCustomObjectIdFromEvent($event);
+                    $contactId           = $event->getRequest()->query->get('contactId', false);
+                    $onContactDetailPage = (bool) $contactId;
+                    if ($onContactDetailPage) {
+                        $entity = $event->getItem();
+                        if ($entity && $entity instanceof CustomItem) {
+                            $event->addButton(
+                                $this->defineUnlinkContactButton($customObjectId, $entity->getId(), (int) $contactId),
+                                ButtonHelper::LOCATION_LIST_ACTIONS,
+                                $event->getRoute()
+                            );
+                        }
+                    } else {
+                        $this->addEntityButtons($event, ButtonHelper::LOCATION_LIST_ACTIONS);
+                        $event->addButton(
+                            $this->defineNewButton($customObjectId),
+                            ButtonHelper::LOCATION_PAGE_ACTIONS,
+                            $event->getRoute()
+                        );
+                        $event->addButton(
+                            $this->defineImportNewButton($customObjectId),
+                            ButtonHelper::LOCATION_PAGE_ACTIONS,
+                            $event->getRoute()
+                        );
+                        $event->addButton(
+                            $this->defineImportListButton($customObjectId),
+                            ButtonHelper::LOCATION_PAGE_ACTIONS,
+                            $event->getRoute()
+                        );
+                        $event->addButton(
+                            $this->defineBatchDeleteButton($customObjectId),
+                            ButtonHelper::LOCATION_BULK_ACTIONS,
+                            $event->getRoute()
+                        );
+                    }
                 } catch (ForbiddenException $e) {}
                 break;
 
@@ -233,6 +246,32 @@ class CustomItemButtonSubscriber extends CommonSubscriber
             ],
             'btnText'   => $this->translator->trans('mautic.core.form.new'),
             'iconClass' => 'fa fa-plus',
+            'priority'  => 500,
+        ];
+    }
+
+    /**
+     * @param int $customObjectId
+     * @param int $customItemId
+     * @param int $contactId
+     * 
+     * @return array
+     * 
+     * @throws ForbiddenException
+     */
+    private function defineUnlinkContactButton(int $customObjectId, int $customItemId, int $contactId): array
+    {
+        $this->permissionProvider->canCreate();        
+
+        return [
+            'attr' => [
+                'href'        => '#',
+                'onclick'     => "CustomObjects.unlinkFromContact(this, event, $customObjectId, $contactId);",
+                'data-action' => $this->routeProvider->buildUnlinkContactRoute($customItemId, $contactId),
+                'data-toggle' => '',
+            ],
+            'btnText'   => $this->translator->trans('custom.item.unlink'),
+            'iconClass' => 'fa fa-unlink',
             'priority'  => 500,
         ];
     }

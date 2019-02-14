@@ -27,7 +27,7 @@ $routeSelf = $view['router']->path(
 ?>
 <?php if (count($items)): ?>
     <div class="table-responsive">
-        <table class="table table-hover table-striped table-bordered" id="custom-items-table">
+        <table class="table table-hover table-striped table-bordered" id="custom-items-<?php echo $customObject->getId(); ?>-table">
             <thead>
             <tr>
                 <?php
@@ -35,7 +35,7 @@ $routeSelf = $view['router']->path(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
                         'checkall'  => 'true',
-                        'target'    => '#custom-items-table',
+                        'target'    => "#custom-items-{$customObject->getId()}-table",
                         'langVar'   => 'custom.item',
                         'routeBase' => 'custom_item',
                         'baseUrl'   => $routeSelf,
@@ -75,13 +75,13 @@ $routeSelf = $view['router']->path(
                     </td>
                     <td>
                         <div>
-                            <?php echo $view->render(
+                            <?php echo empty($contactId) ? $view->render(
                                 'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                                 [
                                     'item'  => $item,
                                     'model' => 'custom.item',
                                 ]
-                            ); ?>
+                            ): ''; ?>
                             <a href="<?php echo $view['router']->path(CustomItemRouteProvider::ROUTE_VIEW, ['objectId' => $customObject->getId(), 'itemId' => $item->getId()]); ?>" data-toggle="ajax">
                                 <?php echo $item->getName(); ?>
                             </a>
