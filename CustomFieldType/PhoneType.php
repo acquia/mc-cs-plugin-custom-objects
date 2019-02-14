@@ -15,15 +15,10 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class PhoneType extends AbstractTextType
 {
-    protected $key = 'phone';
-
     /**
-     * @return string
+     * @var string
      */
-    public function getSymfonyFormFiledType(): string
-    {
-        return TextType::class;
-    }
+    protected $key = 'phone';
 
     /**
      * @return string

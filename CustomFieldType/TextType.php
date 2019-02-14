@@ -13,22 +13,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-
 class TextType extends AbstractTextType
 {
-    protected $key = 'text';
-
     /**
-     * @return string
+     * @var string
      */
-    public function getSymfonyFormFiledType(): string
-    {
-        return \Symfony\Component\Form\Extension\Core\Type\TextType::class;
-    }
+    protected $key = 'text';
 
     /**
      * @return string

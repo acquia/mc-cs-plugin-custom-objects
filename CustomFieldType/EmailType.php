@@ -11,22 +11,13 @@
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 
 class EmailType extends AbstractTextType
 {
-    protected $key = 'email';
-
     /**
-     * @return string
+     * @var string
      */
-    public function getSymfonyFormFiledType(): string
-    {
-        \Symfony\Component\Form\Extension\Core\Type\EmailType::class;
-    }
+    protected $key = 'email';
 
     /**
      * @return string

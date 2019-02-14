@@ -13,15 +13,10 @@ namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
 class HiddenType extends AbstractTextType
 {
-    protected $key = 'hidden';
-
     /**
-     * @return string
+     * @var string
      */
-    public function getSymfonyFormFiledType(): string
-    {
-        return \Symfony\Component\Form\Extension\Core\Type\HiddenType::class;
-    }
+    protected $key = 'hidden';
 
     /**
      * @return string

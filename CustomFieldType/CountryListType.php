@@ -11,17 +11,12 @@
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
-class CountryListType extends AbstractTextType
+class CountryListType extends SelectType
 {
-    protected $key = 'countrylist';
-
     /**
-     * @return string
+     * @var string
      */
-    public function getSymfonyFormFiledType(): string
-    {
-        return \Symfony\Component\Form\Extension\Core\Type\ChoiceType::class;
-    }
+    protected $key = 'countrylist';
 
     /**
      * @return string

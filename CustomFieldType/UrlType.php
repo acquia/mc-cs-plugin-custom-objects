@@ -13,15 +13,10 @@ namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
 class UrlType extends AbstractTextType
 {
-    protected $key = 'url';
-
     /**
-     * @return string
+     * @var string
      */
-    public function getSymfonyFormFiledType(): string
-    {
-        return \Symfony\Component\Form\Extension\Core\Type\TextType::class;
-    }
+    protected $key = 'url';
 
     /**
      * @return string

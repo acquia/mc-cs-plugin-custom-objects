@@ -11,13 +11,13 @@
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use Symfony\Component\Form\FormBuilderInterface;
 
 class TextareaType extends AbstractTextType
 {
+    /**
+     * @var string
+     */
     protected $key = 'textarea';
 
     /**
@@ -26,6 +26,20 @@ class TextareaType extends AbstractTextType
     public function getSymfonyFormFiledType(): string
     {
         return \Symfony\Component\Form\Extension\Core\Type\TextareaType::class;
+    }
+
+    /**
+     * @param FormBuilderInterface $builder
+     * @param string               $name
+     *
+     * @return FormBuilderInterface
+     */
+    public function createSymfonyFormFiledType(FormBuilderInterface $builder, string $name): FormBuilderInterface
+    {
+        return $builder->add(
+            $name,
+            \Symfony\Component\Form\Extension\Core\Type\TextareaType::class
+        )->get($name);
     }
 
     /**

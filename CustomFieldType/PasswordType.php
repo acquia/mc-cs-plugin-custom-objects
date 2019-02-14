@@ -11,17 +11,29 @@
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
+use Symfony\Component\Form\FormBuilderInterface;
+
 class PasswordType extends AbstractTextType
 {
+    /**
+     * @var string
+     */
     protected $key = 'password';
 
     /**
-     * @return string
+     * @param FormBuilderInterface $builder
+     * @param string               $name
+     *
+     * @return FormBuilderInterface
      */
-    public function getSymfonyFormFiledType(): string
+    public function createSymfonyFormFiledType(FormBuilderInterface $builder, string $name): FormBuilderInterface
     {
-        return \Symfony\Component\Form\Extension\Core\Type\PasswordType::class;
+        return $builder->add(
+            $name,
+            \Symfony\Component\Form\Extension\Core\Type\PasswordType::class
+        )->get($name);
     }
+
 
     /**
      * @return string

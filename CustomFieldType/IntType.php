@@ -17,17 +17,27 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInt;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use Symfony\Component\Form\FormBuilderInterface;
 
 class IntType extends AbstractCustomFieldType
 {
+    /**
+     * @var string
+     */
     protected $key = 'int';
 
     /**
-     * @return string
+     * @param FormBuilderInterface $builder
+     * @param string               $name
+     *
+     * @return FormBuilderInterface
      */
-    public function getSymfonyFormFiledType(): string
+    public function createSymfonyFormFiledType(FormBuilderInterface $builder, string $name): FormBuilderInterface
     {
-        return \Symfony\Component\Form\Extension\Core\Type\NumberType::class;
+        return $builder->add(
+            $name,
+            \Symfony\Component\Form\Extension\Core\Type\NumberType::class
+        )->get($name);
     }
 
     /**

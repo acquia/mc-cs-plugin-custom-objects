@@ -11,17 +11,14 @@
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
+use Symfony\Component\Form\FormBuilderInterface;
+
 class DescriptionAreaType extends AbstractTextType
 {
-    protected $key = 'descriptionarea';
-
     /**
-     * @return string
+     * @var string
      */
-    public function getSymfonyFormFiledType(): string
-    {
-        \Symfony\Component\Form\Extension\Core\Type\TextareaType::class;
-    }
+    protected $key = 'descriptionarea';
 
     /**
      * @return string

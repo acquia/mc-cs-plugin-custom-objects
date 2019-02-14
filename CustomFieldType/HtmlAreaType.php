@@ -12,17 +12,27 @@
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
 use Mautic\FormBundle\Form\Type\FormFieldHTMLType;
+use Symfony\Component\Form\FormBuilderInterface;
 
 class HtmlAreaType extends AbstractTextType
 {
+    /**
+     * @var string
+     */
     protected $key = 'hidden';
 
     /**
-     * @return string
+     * @param FormBuilderInterface $builder
+     * @param string               $name
+     *
+     * @return FormBuilderInterface
      */
-    public function getSymfonyFormFiledType(): string
+    public function createSymfonyFormFiledType(FormBuilderInterface $builder, string $name): FormBuilderInterface
     {
-        return FormFieldHTMLType::class;
+        return $builder->add(
+            $name,
+            FormFieldHTMLType::class
+        )->get($name);
     }
 
     /**
