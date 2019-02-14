@@ -37,16 +37,4 @@ class TextType extends AbstractTextType
     {
         return 'cfvtext';
     }
-
-    /**
-     * @param CustomField $customField
-     * @param CustomItem  $customItem
-     * @param string|null $value
-     * 
-     * @return CustomFieldValueInterface
-     */
-    public function createValueEntity(CustomField $customField, CustomItem $customItem, $value = null): CustomFieldValueInterface
-    {
-        return new CustomFieldValueText($customField, $customItem, (string) $value);
-    }
 }

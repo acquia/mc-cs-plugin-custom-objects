@@ -11,21 +11,16 @@
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-
-class TextareaType extends AbstractTextType
+class DescriptionAreaType extends AbstractTextType
 {
-    protected $key = 'textarea';
+    protected $key = 'descriptionarea';
 
     /**
      * @return string
      */
     public function getSymfonyFormFiledType(): string
     {
-        return \Symfony\Component\Form\Extension\Core\Type\TextareaType::class;
+        \Symfony\Component\Form\Extension\Core\Type\TextareaType::class;
     }
 
     /**
@@ -33,6 +28,6 @@ class TextareaType extends AbstractTextType
      */
     public function getTableAlias(): string
     {
-        return 'cfvtextarea';
+        return 'cfvdescriptionarea';
     }
 }

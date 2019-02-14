@@ -11,10 +11,25 @@
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 
 abstract class AbstractTextType extends AbstractCustomFieldType
 {
+    /**
+     * @param CustomField $customField
+     * @param CustomItem  $customItem
+     * @param mixed|null  $value
+     *
+     * @return CustomFieldValueInterface
+     */
+    public function createValueEntity(CustomField $customField, CustomItem $customItem, $value = null): CustomFieldValueInterface
+    {
+        return new CustomFieldValueText($customField, $customItem, (string) $value);
+    }
+
     /**
      * @return string
      */

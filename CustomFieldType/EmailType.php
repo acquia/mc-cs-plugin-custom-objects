@@ -16,16 +16,16 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 
-class TextareaType extends AbstractTextType
+class EmailType extends AbstractTextType
 {
-    protected $key = 'textarea';
+    protected $key = 'email';
 
     /**
      * @return string
      */
     public function getSymfonyFormFiledType(): string
     {
-        return \Symfony\Component\Form\Extension\Core\Type\TextareaType::class;
+        \Symfony\Component\Form\Extension\Core\Type\EmailType::class;
     }
 
     /**
@@ -33,6 +33,6 @@ class TextareaType extends AbstractTextType
      */
     public function getTableAlias(): string
     {
-        return 'cfvtextarea';
+        return 'cfvemail';
     }
 }

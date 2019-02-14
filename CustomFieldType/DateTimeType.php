@@ -21,6 +21,18 @@ class DateTimeType extends AbstractCustomFieldType
     protected $key = 'datetime';
 
     /**
+     * @param CustomField $customField
+     * @param CustomItem  $customItem
+     * @param mixed|null  $value
+     *
+     * @return CustomFieldValueInterface
+     */
+    public function createValueEntity(CustomField $customField, CustomItem $customItem, $value = null): CustomFieldValueInterface
+    {
+        return new CustomFieldValueDateTime($customField, $customItem, new \DateTime($value));
+    }
+
+    /**
      * @return string
      */
     public function getSymfonyFormFiledType(): string
@@ -34,18 +46,6 @@ class DateTimeType extends AbstractCustomFieldType
     public function getEntityClass(): string
     {
         return CustomFieldValueDateTime::class;
-    }
-
-    /**
-     * @param CustomField $customField
-     * @param CustomItem  $customItem
-     * @param mixed|null  $value
-     *
-     * @return CustomFieldValueInterface
-     */
-    public function createValueEntity(CustomField $customField, CustomItem $customItem, $value = null): CustomFieldValueInterface
-    {
-        return new CustomFieldValueDateTime($customField, $customItem, new \DateTime($value));
     }
 
     /**
