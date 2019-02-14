@@ -24,6 +24,7 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldType\EmailType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\HiddenType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\HtmlAreaType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\PasswordType;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\RadioGroupType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\SelectType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\PhoneType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\UrlType;
@@ -71,6 +72,7 @@ class CustomFieldTypeSubscriber extends CommonSubscriber
         $event->addCustomFieldType(new IntType($this->translator->trans('custom.field.type.int')));
         $event->addCustomFieldType(new PasswordType($this->translator->trans('custom.field.type.password')));
         $event->addCustomFieldType(new PhoneType($this->translator->trans('custom.field.type.phone')));
+        $event->addCustomFieldType(new RadioGroupType($this->translator->trans('custom.field.type.radio_group')));
         $event->addCustomFieldType(new SelectType($this->translator->trans('custom.field.type.select')));
         $event->addCustomFieldType(new TextType($this->translator->trans('custom.field.type.text')));
         $event->addCustomFieldType(new TextareaType($this->translator->trans('custom.field.type.textarea')));
