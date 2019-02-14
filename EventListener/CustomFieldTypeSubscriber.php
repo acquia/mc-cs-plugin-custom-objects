@@ -18,6 +18,7 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldEvents;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateTimeType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DescriptionAreaType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\EmailType;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\HiddenType;
 use MauticPlugin\CustomObjectsBundle\Event\CustomFieldTypeEvent;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
@@ -54,6 +55,7 @@ class CustomFieldTypeSubscriber extends CommonSubscriber
         $event->addCustomFieldType(new DateTimeType($this->translator->trans('custom.field.type.datetime')));
         $event->addCustomFieldType(new DescriptionAreaType($this->translator->trans('custom.field.type.description_area')));
         $event->addCustomFieldType(new EmailType($this->translator->trans('custom.field.type.email')));
+        $event->addCustomFieldType(new HiddenType($this->translator->trans('custom.field.type.hidden')));
         $event->addCustomFieldType(new IntType($this->translator->trans('custom.field.type.int')));
         $event->addCustomFieldType(new TextType($this->translator->trans('custom.field.type.text')));
         $event->addCustomFieldType(new TextareaType($this->translator->trans('custom.field.type.textarea')));
