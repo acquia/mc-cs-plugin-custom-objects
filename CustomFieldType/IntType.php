@@ -57,14 +57,6 @@ class IntType extends AbstractCustomFieldType
     }
 
     /**
-     * @return string
-     */
-    public function getTableAlias(): string
-    {
-        return 'cfvint';
-    }
-
-    /**
      * @param CustomField $customField
      * @param CustomItem  $customItem
      * @param int|null    $value

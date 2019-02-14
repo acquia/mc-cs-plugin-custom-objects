@@ -17,12 +17,4 @@ class UrlType extends AbstractTextType
      * @var string
      */
     protected $key = 'url';
-
-    /**
-     * @return string
-     */
-    public function getTableAlias(): string
-    {
-        return 'cfvurl';
-    }
 }

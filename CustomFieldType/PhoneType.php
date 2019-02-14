@@ -19,12 +19,4 @@ class PhoneType extends AbstractTextType
      * @var string
      */
     protected $key = 'phone';
-
-    /**
-     * @return string
-     */
-    public function getTableAlias(): string
-    {
-        return 'cfvphone';
-    }
 }

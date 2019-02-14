@@ -38,12 +38,4 @@ class SelectType extends AbstractTextType
             ]
         )->get($name);
     }
-
-    /**
-     * @return string
-     */
-    public function getTableAlias(): string
-    {
-        return 'cfvselect';
-    }
 }

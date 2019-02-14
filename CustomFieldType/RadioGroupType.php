@@ -38,12 +38,4 @@ class RadioGroupType extends AbstractTextType
             ]
         )->get($name);
     }
-
-    /**
-     * @return string
-     */
-    public function getTableAlias(): string
-    {
-        return 'cfvradiogroup';
-    }
 }

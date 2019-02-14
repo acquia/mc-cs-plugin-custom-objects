@@ -18,13 +18,5 @@ class DescriptionAreaType extends AbstractTextType
     /**
      * @var string
      */
-    protected $key = 'descriptionarea';
-
-    /**
-     * @return string
-     */
-    public function getTableAlias(): string
-    {
-        return 'cfvdescriptionarea';
-    }
+    protected $key = 'description_area';
 }

@@ -22,14 +22,6 @@ class CheckboxGroupType extends AbstractTextType
     protected $key = 'checkbox_group';
 
     /**
-     * @return string
-     */
-    public function getTableAlias(): string
-    {
-        return 'cfvcheckboxgroup';
-    }
-
-    /**
      * @param FormBuilderInterface $builder
      * @param string               $name
      *

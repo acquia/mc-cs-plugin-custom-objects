@@ -16,13 +16,5 @@ class CountryListType extends SelectType
     /**
      * @var string
      */
-    protected $key = 'countrylist';
-
-    /**
-     * @return string
-     */
-    public function getTableAlias(): string
-    {
-        return 'cfvcountrylist';
-    }
+    protected $key = 'country_list';
 }

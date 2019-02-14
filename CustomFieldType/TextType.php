@@ -19,12 +19,4 @@ class TextType extends AbstractTextType
      * @var string
      */
     protected $key = 'text';
-
-    /**
-     * @return string
-     */
-    public function getTableAlias(): string
-    {
-        return 'cfvtext';
-    }
 }

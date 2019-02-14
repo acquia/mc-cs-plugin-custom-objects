@@ -19,7 +19,7 @@ class HtmlAreaType extends AbstractTextType
     /**
      * @var string
      */
-    protected $key = 'hidden';
+    protected $key = 'html_area';
 
     /**
      * @param FormBuilderInterface $builder
@@ -33,13 +33,5 @@ class HtmlAreaType extends AbstractTextType
             $name,
             FormFieldHTMLType::class
         )->get($name);
-    }
-
-    /**
-     * @return string
-     */
-    public function getTableAlias(): string
-    {
-        return 'cfvhtmlarea';
     }
 }

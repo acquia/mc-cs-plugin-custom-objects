@@ -17,12 +17,4 @@ class HiddenType extends AbstractTextType
      * @var string
      */
     protected $key = 'hidden';
-
-    /**
-     * @return string
-     */
-    public function getTableAlias(): string
-    {
-        return 'cfvhidden';
-    }
 }

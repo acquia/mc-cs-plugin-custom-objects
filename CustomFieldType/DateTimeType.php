@@ -68,14 +68,6 @@ class DateTimeType extends AbstractCustomFieldType
     }
 
     /**
-     * @return string
-     */
-    public function getTableAlias(): string
-    {
-        return 'cfvdatetime';
-    }
-
-    /**
      * @return array
      */
     public function getOperators(): array

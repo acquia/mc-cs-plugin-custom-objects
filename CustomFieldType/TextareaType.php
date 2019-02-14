@@ -41,12 +41,4 @@ class TextareaType extends AbstractTextType
             \Symfony\Component\Form\Extension\Core\Type\TextareaType::class
         )->get($name);
     }
-
-    /**
-     * @return string
-     */
-    public function getTableAlias(): string
-    {
-        return 'cfvtextarea';
-    }
 }

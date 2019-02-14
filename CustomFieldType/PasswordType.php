@@ -34,12 +34,4 @@ class PasswordType extends AbstractTextType
         )->get($name);
     }
 
-
-    /**
-     * @return string
-     */
-    public function getTableAlias(): string
-    {
-        return 'cfvpassword';
-    }
 }

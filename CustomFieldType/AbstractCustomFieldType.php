@@ -49,6 +49,14 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     /**
      * @return string
      */
+    public function getTableAlias(): string
+    {
+        return 'cfv_' . $this->getKey();
+    }
+
+    /**
+     * @return string
+     */
     public function __toString(): string
     {
         return $this->getKey();

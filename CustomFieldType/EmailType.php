@@ -18,12 +18,4 @@ class EmailType extends AbstractTextType
      * @var string
      */
     protected $key = 'email';
-
-    /**
-     * @return string
-     */
-    public function getTableAlias(): string
-    {
-        return 'cfvemail';
-    }
 }

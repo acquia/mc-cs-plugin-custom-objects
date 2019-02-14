@@ -41,7 +41,7 @@ abstract class AbstractTextType extends AbstractCustomFieldType
     {
         return $builder->add(
             $name,
-            \Symfony\Component\Form\Extension\Core\Type\TextareaType::class
+            \Symfony\Component\Form\Extension\Core\Type\TextType::class
         )->get($name);
     }
 
