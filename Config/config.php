@@ -667,6 +667,15 @@ return [
                     'mautic.custom.model.import.item',
                 ],
             ],
+            'custom_item.contact.subscriber' => [
+                'class'     => MauticPlugin\CustomObjectsBundle\EventListener\ContactSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'translator',
+                    'custom_item.route.provider',
+                    'mautic.custom.model.item',
+                ],
+            ],
             'custom_object.button.subscriber' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectButtonSubscriber::class,
                 'arguments' => [
@@ -683,7 +692,7 @@ return [
                     'translator',
                 ]
             ],
-	   'custom_object.segments.filters_generate.subscriber' => [
+	        'custom_object.segments.filters_generate.subscriber' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\SegmentFiltersChoicesGenerateSubscriber::class,
                 'arguments'=> [
                     'custom_object.repository',

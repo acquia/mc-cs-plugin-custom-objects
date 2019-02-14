@@ -33,6 +33,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\NoResultException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use Mautic\LeadBundle\Entity\LeadEventLog;
 
 class CustomItemModel extends FormModel
 {
@@ -138,12 +139,15 @@ class CustomItemModel extends FormModel
         try {
             $xRef = $this->getContactReference($customItemId, $contactId);
         } catch (NoResultException $e) {
-            $xRef = new CustomItemXrefContact(
+            $contact  = $this->entityManager->getReference(Lead::class, $contactId);
+            $eventLog = $this->createContactEventLog($contact, 'link', 'CustomItem', $customItemId);
+            $xRef     = new CustomItemXrefContact(
                 $this->entityManager->getReference(CustomItem::class, $customItemId),
                 $this->entityManager->getReference(Lead::class, $contactId)
             );
     
             $this->entityManager->persist($xRef);
+            $this->entityManager->persist($eventLog);
             $this->entityManager->flush();
         }
 
@@ -157,8 +161,11 @@ class CustomItemModel extends FormModel
     public function unlinkContact(int $customItemId, int $contactId): void
     {
         try {
-            $xRef = $this->getContactReference($customItemId, $contactId);
+            $xRef     = $this->getContactReference($customItemId, $contactId);
+            $contact  = $this->entityManager->getReference(Lead::class, $contactId);
+            $eventLog = $this->createContactEventLog($contact, 'unlink', 'CustomItem', $customItemId);
             $this->entityManager->remove($xRef);
+            $this->entityManager->persist($eventLog);
             $this->entityManager->flush();
         } catch (NoResultException $e) {
             // If not found then we are done here.
@@ -382,5 +389,29 @@ class CustomItemModel extends FormModel
         }
 
         return $args;
+    }
+
+    /**
+     * @param Lead $contact
+     * @param string $action
+     * @param string $object
+     * @param integer $objectId
+     * @param array $properties
+     * 
+     * @return LeadEventLog
+     */
+    private function createContactEventLog(Lead $contact, string $action, string $object, int $objectId, array $properties = []): LeadEventLog
+    {
+        $eventLog = new LeadEventLog();
+        $eventLog->setLead($contact);
+        $eventLog->setBundle('CustomObject');
+        $eventLog->setAction($action);
+        $eventLog->setObject($object);
+        $eventLog->setObjectId($objectId);
+        $eventLog->setUserId($this->userHelper->getUser()->getId());
+        $eventLog->setUserName($this->userHelper->getUser()->getName());
+        $eventLog->setProperties($properties);
+
+        return $eventLog;
     }
 }
