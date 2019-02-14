@@ -15,6 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use MauticPlugin\CustomObjectsBundle\CustomFieldEvents;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\CheckboxGroupType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CountryListType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateTimeType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateType;
@@ -59,6 +60,7 @@ class CustomFieldTypeSubscriber extends CommonSubscriber
      */
     public function makeFieldTypeList(CustomFieldTypeEvent $event): void
     {
+        $event->addCustomFieldType(new CheckboxGroupType($this->translator->trans('custom.field.type.checkbox_group')));
         $event->addCustomFieldType(new CountryListType($this->translator->trans('custom.field.type.country_list')));
         $event->addCustomFieldType(new DateType($this->translator->trans('custom.field.type.date')));
         $event->addCustomFieldType(new DateTimeType($this->translator->trans('custom.field.type.datetime')));
