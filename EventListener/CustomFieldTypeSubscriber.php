@@ -15,6 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use MauticPlugin\CustomObjectsBundle\CustomFieldEvents;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\CountryListType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateTimeType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DescriptionAreaType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\EmailType;
@@ -55,6 +56,7 @@ class CustomFieldTypeSubscriber extends CommonSubscriber
      */
     public function makeFieldTypeList(CustomFieldTypeEvent $event)
     {
+        $event->addCustomFieldType(new CountryListType($this->translator->trans('custom.field.type.countrylist')));
         $event->addCustomFieldType(new DateTimeType($this->translator->trans('custom.field.type.datetime')));
         $event->addCustomFieldType(new DescriptionAreaType($this->translator->trans('custom.field.type.description_area')));
         $event->addCustomFieldType(new EmailType($this->translator->trans('custom.field.type.email')));
