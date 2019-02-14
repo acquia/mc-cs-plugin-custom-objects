@@ -24,6 +24,7 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldType\HtmlAreaType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\PasswordType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\SelectType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\PhoneType;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\UrlType;
 use MauticPlugin\CustomObjectsBundle\Event\CustomFieldTypeEvent;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
@@ -69,5 +70,6 @@ class CustomFieldTypeSubscriber extends CommonSubscriber
         $event->addCustomFieldType(new SelectType($this->translator->trans('custom.field.type.select')));
         $event->addCustomFieldType(new TextType($this->translator->trans('custom.field.type.text')));
         $event->addCustomFieldType(new TextareaType($this->translator->trans('custom.field.type.textarea')));
+        $event->addCustomFieldType(new UrlType($this->translator->trans('custom.field.type.url')));
     }
 }
