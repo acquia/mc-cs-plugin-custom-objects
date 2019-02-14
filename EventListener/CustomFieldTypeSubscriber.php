@@ -17,6 +17,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use MauticPlugin\CustomObjectsBundle\CustomFieldEvents;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CountryListType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateTimeType;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DescriptionAreaType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\EmailType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\HiddenType;
@@ -44,7 +45,7 @@ class CustomFieldTypeSubscriber extends CommonSubscriber
     /**
      * @return array
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CustomFieldEvents::MAKE_FIELD_TYPE_LIST => ['makeFieldTypeList', 0],
@@ -56,9 +57,10 @@ class CustomFieldTypeSubscriber extends CommonSubscriber
      * 
      * @param CustomFieldTypeEvent $event
      */
-    public function makeFieldTypeList(CustomFieldTypeEvent $event)
+    public function makeFieldTypeList(CustomFieldTypeEvent $event): void
     {
-        $event->addCustomFieldType(new CountryListType($this->translator->trans('custom.field.type.countrylist')));
+        $event->addCustomFieldType(new CountryListType($this->translator->trans('custom.field.type.country_list')));
+        $event->addCustomFieldType(new DateType($this->translator->trans('custom.field.type.date')));
         $event->addCustomFieldType(new DateTimeType($this->translator->trans('custom.field.type.datetime')));
         $event->addCustomFieldType(new DescriptionAreaType($this->translator->trans('custom.field.type.description_area')));
         $event->addCustomFieldType(new EmailType($this->translator->trans('custom.field.type.email')));
