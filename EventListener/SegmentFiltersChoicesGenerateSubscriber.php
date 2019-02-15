@@ -20,6 +20,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 
 /**
  * SegmentFiltersChoicesGenerateSubscriber
@@ -41,19 +42,26 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
     private $translator;
 
     /**
+     * @var ConfigProvider
+     */
+    private $configProvider;
+
+    /**
      * SegmentFiltersChoicesGenerateSubscriber constructor.
      *
      * @param CustomObjectRepository $customObjectRepository
      * @param TranslatorInterface    $translator
+     * @param ConfigProvider         $configProvider
      */
     public function __construct(
         CustomObjectRepository $customObjectRepository,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        ConfigProvider $configProvider
     )
     {
-
         $this->customObjectRepository = $customObjectRepository;
         $this->translator             = $translator;
+        $this->configProvider         = $configProvider;
     }
 
     /**
@@ -69,7 +77,11 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
      */
     public function onGenerateSegmentFilters(LeadListFiltersChoicesEvent $event): void
     {
-        $criteria     = new Criteria(Criteria::expr()->eq('isPublished', 1));
+        if (!$this->configProvider->pluginIsEnabled()) {
+            return;
+        }
+
+        $criteria = new Criteria(Criteria::expr()->eq('isPublished', 1));
 
         $this->customObjectRepository->matching($criteria)->map(
             function (CustomObject $customObject) use ($event) {

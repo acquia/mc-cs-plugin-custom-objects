@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
 use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\CustomObjectsBundle\CustomObjectsBundle;
@@ -21,6 +20,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemFilterQueryBuilder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 
 /**
  * SegmentFiltersDictionarySubscriber
@@ -34,19 +34,20 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
      * @var EntityManager
      */
     private $entityManager;
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
 
     /**
-     * @param EntityManager        $entityManager
-     * @param CoreParametersHelper $coreParametersHelper
+     * @var ConfigProvider
      */
-    public function __construct(EntityManager $entityManager, CoreParametersHelper $coreParametersHelper)
+    private $configProvider;
+
+    /**
+     * @param EntityManager  $entityManager
+     * @param ConfigProvider $coreParametersHelper
+     */
+    public function __construct(EntityManager $entityManager, ConfigProvider $configProvider)
     {
-        $this->entityManager        = $entityManager;
-        $this->coreParametersHelper = $coreParametersHelper;
+        $this->entityManager  = $entityManager;
+        $this->configProvider = $configProvider;
     }
 
     /**
@@ -54,7 +55,7 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents(): array
     {
-        return [LeadEvents::SEGMENT_DICTIONARY_ON_GENERATE => 'onGenerateSegmentDictionary'];
+        return [/*LeadEvents::SEGMENT_DICTIONARY_ON_GENERATE => 'onGenerateSegmentDictionary'*/];
     }
 
     /**
@@ -64,7 +65,7 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
      */
     public function onGenerateSegmentDictionary(SegmentDictionaryGenerationEvent $event): void
     {
-        if (!$this->coreParametersHelper->getParameter(CustomObjectsBundle::CONFIG_PARAM_ENABLED)) {
+        if (!$this->configProvider->pluginIsEnabled()) {
             return;
         }
 

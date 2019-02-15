@@ -16,8 +16,8 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use MauticPlugin\CustomObjectsBundle\CustomObjectsBundle;
+use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 
 class MenuSubscriber extends CommonSubscriber
 {
@@ -27,18 +27,18 @@ class MenuSubscriber extends CommonSubscriber
     private $customObjectModel;
 
     /**
-     * @var CoreParametersHelper
+     * @var ConfigProvider
      */
-    private $coreParametersHelper;
+    private $configProvider;
 
     /**
      * @param CustomObjectModel $customObjectModel
-     * @param CoreParametersHelper $coreParametersHelper
+     * @param ConfigProvider $configProvider
      */
-    public function __construct(CustomObjectModel $customObjectModel, CoreParametersHelper $coreParametersHelper)
+    public function __construct(CustomObjectModel $customObjectModel, ConfigProvider $configProvider)
     {
-        $this->customObjectModel    = $customObjectModel;
-        $this->coreParametersHelper = $coreParametersHelper;
+        $this->customObjectModel = $customObjectModel;
+        $this->configProvider    = $configProvider;
     }
 
     /**
@@ -56,9 +56,7 @@ class MenuSubscriber extends CommonSubscriber
      */
     public function onBuildMenu(MenuEvent $event): void
     {
-        $isEnabled = $this->coreParametersHelper->getParameter(CustomObjectsBundle::CONFIG_PARAM_ENABLED);
-
-        if (!$isEnabled) {
+        if (!$this->configProvider->pluginIsEnabled()) {
             return;
         }
         
