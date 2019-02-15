@@ -506,6 +506,7 @@ return [
                     'mautic.custom.model.field',
                     'custom_object.permission.provider',
                     'custom_object.route.provider',
+                    'custom_field.type.provider',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -586,6 +587,7 @@ return [
                     'custom_object.repository',
                     'custom_object.permission.provider',
                     'mautic.helper.user',
+                    'mautic.custom.model.field',
                 ],
             ],
         ],
@@ -715,6 +717,13 @@ return [
                 'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType::class,
                 'arguments' => [
                     'custom_object.repository'
+                ],
+                'tag' => 'form.type'
+            ],
+            'custom_object.object.form' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType::class,
+                'arguments' => [
+                    'custom_field.type.provider'
                 ],
                 'tag' => 'form.type'
             ],

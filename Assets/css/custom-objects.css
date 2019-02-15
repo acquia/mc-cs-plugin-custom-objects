@@ -7,3 +7,7 @@
     top: 3px;
     right: 0px;
 }
+
+.panel .btn-group {
+    z-index: 1000;
+}
