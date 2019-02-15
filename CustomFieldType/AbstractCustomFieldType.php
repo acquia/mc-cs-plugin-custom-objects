@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -13,7 +15,6 @@ namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\Translation\TranslatorInterface;
-
 
 abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
 {
