@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -71,7 +73,7 @@ class ContactSubscriber extends CommonSubscriber
      *
      * @param LeadTimelineEvent $event
      */
-    public function onTimelineGenerate(LeadTimelineEvent $event)
+    public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
         $eventTypes = [
             'customitem.linked'   => 'custom.item.event.linked',
@@ -121,7 +123,7 @@ class ContactSubscriber extends CommonSubscriber
      * @param string            $eventTypeName
      * @param string            $action
      */
-    private function addLinkTimelineEntry(LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName, string $action)
+    private function addLinkTimelineEntry(LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName, string $action): void
     {
         $links = $this->getEvents($event, $action);
 

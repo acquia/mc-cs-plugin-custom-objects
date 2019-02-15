@@ -55,9 +55,9 @@ class UnlinkController extends JsonController
     }
 
     /**
-     * @param integer $objectId
-     * @param string  $entityType
-     * @param integer $entityId
+     * @param int    $objectId
+     * @param string $entityType
+     * @param int    $entityId
      * 
      * @return JsonResponse
      */
@@ -67,7 +67,7 @@ class UnlinkController extends JsonController
             $this->permissionProvider->canViewAtAll();
             $this->unlinkBasedOnEntityType($itemId, $entityType, $entityId);
         } catch (ForbiddenException $e) {
-            return new AccessDeniedException($e->getMessage(), $e);
+            $this->addFlash('error', $e->getMessage());
         }
 
         $this->addFlash('notice', $this->translator->trans(
@@ -80,9 +80,9 @@ class UnlinkController extends JsonController
     }
 
     /**
-     * @param integer $itemId
-     * @param string  $entityType
-     * @param integer $entityId
+     * @param int    $itemId
+     * @param string $entityType
+     * @param int    $entityId
      * 
      * @throws \UnexpectedValueException
      */

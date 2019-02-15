@@ -230,11 +230,13 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     }
 
     /**
+     * @param int $customFieldId
+     * 
      * @return CustomFieldValueInterface
      * 
      * @throws NotFoundException
      */
-    public function findCustomFieldValueForFieldId($customFieldId)
+    public function findCustomFieldValueForFieldId(int $customFieldId)
     {
         $customFieldValue = $this->customFieldValues->get($customFieldId);
 

@@ -43,7 +43,7 @@ class CampaignConditionFieldValueType extends AbstractType
 
     /**
      * @param CustomFieldModel $customFieldModel
-     * @param CustomItemRouteProvider $router
+     * @param CustomItemRouteProvider $routeProvider
      * @param TranslatorInterface $translator
      */
     public function __construct(
