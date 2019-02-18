@@ -29,6 +29,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCompany;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
 class CustomItem extends FormEntity implements UniqueEntityInterface
 {
@@ -229,15 +230,18 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @return CustomFieldValueInterface|null
+     * @param int $customFieldId
+     * 
+     * @return CustomFieldValueInterface
+     * 
+     * @throws NotFoundException
      */
-    public function findCustomFieldValueForFieldId($customFieldId)
+    public function findCustomFieldValueForFieldId(int $customFieldId)
     {
-        $customFieldValue = $this->customFieldValues->get("{$customFieldId}_{$this->getId()}");
+        $customFieldValue = $this->customFieldValues->get($customFieldId);
 
-        // In case the custom field value doesn't exist, find it with the key used for artificially created null values:
-        if (null === $customFieldValue) {
-            $customFieldValue = $this->customFieldValues->get($customFieldId);
+        if (!$customFieldValue) {
+            throw new NotFoundException("Custom Field Value for ID = {$customFieldId} was not found.");
         }
 
         return $customFieldValue;

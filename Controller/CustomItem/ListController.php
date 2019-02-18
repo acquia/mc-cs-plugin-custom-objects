@@ -115,7 +115,6 @@ class ListController extends CommonController
         $limit        = (int) $request->get('limit', $sessionLimit);
         $orderBy      = $this->session->get('mautic.custom.item.orderby', CustomItemRepository::TABLE_ALIAS.'.id');
         $orderByDir   = $this->session->get('mautic.custom.item.orderbydir', 'DESC');
-        $route        = $this->routeProvider->buildListRoute($objectId, $page);
         $contactId    = (int) $request->get('contactId');
         
         if ($request->query->has('orderby')) {
@@ -134,24 +133,31 @@ class ListController extends CommonController
         $this->session->set('mautic.custom.item.limit', $limit);
         $this->session->set('mautic.custom.item.filter', $search);
 
-        return $this->delegateView(
-            [
-                'returnUrl'      => $route,
-                'viewParameters' => [
-                    'searchValue'    => $search,
-                    'customObject'   => $customObject,
-                    'items'          => $this->customItemModel->getTableData($tableConfig),
-                    'itemCount'      => $this->customItemModel->getCountForTable($tableConfig),
-                    'page'           => $page,
-                    'limit'          => $limit,
-                    'tmpl'           => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
-                ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomItem:list.html.php',
-                'passthroughVars' => [
-                    'mauticContent' => 'customItem',
-                    'route'         => $route,
-                ],
-            ]
-        );
+        $response = [
+            'viewParameters' => [
+                'searchValue'    => $search,
+                'customObject'   => $customObject,
+                'contactId'      => $contactId,
+                'items'          => $this->customItemModel->getTableData($tableConfig),
+                'itemCount'      => $this->customItemModel->getCountForTable($tableConfig),
+                'page'           => $page,
+                'limit'          => $limit,
+                'tmpl'           => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+            ],
+            'contentTemplate' => 'CustomObjectsBundle:CustomItem:list.html.php',
+            'passthroughVars' => [
+                'mauticContent' => 'customItem',
+            ],
+        ];
+
+        if ($request->isXmlHttpRequest()) {
+            $response['viewParameters']['tmpl'] = $request->get('tmpl', 'index');
+        } else {
+            $route                                = $this->routeProvider->buildListRoute($objectId, $page);
+            $response['returnUrl']                = $route;
+            $response['passthroughVars']['route'] = $route;
+        }
+
+        return $this->delegateView($response);
     }
 }

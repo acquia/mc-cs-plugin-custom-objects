@@ -13,16 +13,11 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
-use MauticPlugin\CustomObjectsBundle\Form\CustomObjectHiddenTransformer;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Mautic\CoreBundle\Form\Type\FormButtonsType;
-use Symfony\Component\Validator\Constraints\NotBlank;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -45,7 +40,7 @@ class CampaignActionLinkType extends AbstractType
     public function __construct(CustomItemRouteProvider $routeProvider, TranslatorInterface $translator)
     {
         $this->routeProvider = $routeProvider;
-        $this->translator = $translator;
+        $this->translator    = $translator;
     }
 
     /**

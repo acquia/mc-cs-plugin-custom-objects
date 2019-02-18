@@ -29,6 +29,7 @@ class CustomItemRouteProvider
     public const ROUTE_SAVE          = 'mautic_custom_item_save';
     public const ROUTE_LOOKUP        = 'mautic_custom_item_lookup';
     public const ROUTE_LINK          = 'mautic_custom_item_link';
+    public const ROUTE_UNLINK        = 'mautic_custom_item_unlink';
     public const ROUTE_IMPORT_ACTION = 'mautic_import_action';
     public const ROUTE_IMPORT_LIST   = 'mautic_import_index';
 
@@ -54,6 +55,17 @@ class CustomItemRouteProvider
     public function buildListRoute(int $objectId, int $page = 1): string
     {
         return $this->router->generate(static::ROUTE_LIST, ['objectId' => $objectId, 'page' => $page]);
+    }
+
+    /**
+     * @param int $customItemId
+     * @param int $contactId
+     * 
+     * @return string
+     */
+    public function buildUnlinkContactRoute(int $customItemId, int $contactId): string
+    {
+        return $this->router->generate(static::ROUTE_UNLINK, ['itemId' => $customItemId, 'entityType' => 'contact', 'entityId' => $contactId]);
     }
 
     /**

@@ -72,13 +72,13 @@ CustomObjects = {
         })
     },
 
-    addIconToInput(input, icon) {
+    addIconToInput(input, icon, spinIt) {
         CustomObjects.removeIconFromInput(input);
         let id = input.attr('id')+'-input-icon';
         let formGroup = input.closest('.form-group');
         let iconEl = mQuery('<span/>').addClass('fa fa-'+icon+' form-control-feedback');
         let ariaEl = mQuery('<span/>').addClass('sr-only').text('('+icon+')').attr('id', id);
-        if (icon === 'spinner') {
+        if (spinIt) {
             iconEl.addClass('fa-spin');
         }
         formGroup.addClass('has-feedback');
@@ -129,9 +129,9 @@ CustomObjects = {
                 wildcard: '%QUERY',
                 ajax: {
                     beforeSend: function() {
-                        CustomObjects.addIconToInput(input, 'spinner');
+                        CustomObjects.addIconToInput(input, 'spinner', true);
                     },
-                    complete: function(){
+                    complete: function() {
                         CustomObjects.removeIconFromInput(input);
                     }
                 },
@@ -167,10 +167,17 @@ CustomObjects = {
         });
     },
 
+    unlinkFromContact(elHtml, event, customObjectId, contactId) {
+        event.preventDefault();
+        mQuery.ajax({type: 'POST', url: mQuery(elHtml).attr('data-action'), success: function() {
+            CustomObjects.reloadItemsTable(customObjectId, contactId);
+        }});
+    },
+
     getItemsForObject(customObjectId, contactId, callback) {
         mQuery.ajax({
             type: 'GET',
-            url: mauticBaseUrl+'s/custom/object/'+customObjectId+'/item',
+            url: mauticBaseUrl+'s/custom/object/'+customObjectId+'/item?tmpl=list',
             data: {contactId: contactId},
             success: function (response) {
                 callback(response);

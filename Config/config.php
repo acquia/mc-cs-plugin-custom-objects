@@ -123,6 +123,11 @@ return [
                 'controller' => 'CustomObjectsBundle:CustomItem\Link:save',
                 'method'     => 'POST',
             ],
+            CustomItemRouteProvider::ROUTE_UNLINK => [
+                'path'       => '/custom/item/{itemId}/unlink/{entityType}/{entityId}.json',
+                'controller' => 'CustomObjectsBundle:CustomItem\Unlink:save',
+                'method'     => 'POST',
+            ],
 
             // Custom Objects
             CustomObjectRouteProvider::ROUTE_LIST => [
@@ -413,6 +418,19 @@ return [
                     ],
                 ],
             ],
+            'custom_item.unlink_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\UnlinkController::class,
+                'arguments' => [
+                    'mautic.custom.model.item',
+                    'custom_item.permission.provider',
+                    'translator',
+                ],
+                'methodCalls' => [
+                    'setContainer' => [
+                        '@service_container'
+                    ],
+                ],
+            ],
 
             // Custom Objects
             'custom_object.list_controller' => [
@@ -651,6 +669,15 @@ return [
                     'mautic.custom.model.import.item',
                 ],
             ],
+            'custom_item.contact.subscriber' => [
+                'class'     => MauticPlugin\CustomObjectsBundle\EventListener\ContactSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'translator',
+                    'custom_item.route.provider',
+                    'mautic.custom.model.item',
+                ],
+            ],
             'custom_object.button.subscriber' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectButtonSubscriber::class,
                 'arguments' => [
@@ -667,7 +694,7 @@ return [
                     'translator',
                 ]
             ],
-	   'custom_object.segments.filters_generate.subscriber' => [
+	        'custom_object.segments.filters_generate.subscriber' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\SegmentFiltersChoicesGenerateSubscriber::class,
                 'arguments'=> [
                     'custom_object.repository',
@@ -710,7 +737,7 @@ return [
                     'translator',
                 ],
             ],
-            'custom_item.campaign.link.form' => [
+            'custom_item.campaign.field.value.form' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CampaignConditionFieldValueType::class,
                 'arguments' => [
                     'mautic.custom.model.field',

@@ -31,7 +31,7 @@ class CustomFieldValueType extends AbstractType
     {
         $customItem       = $options['customItem'];
         $customFieldId    = (int) $builder->getName();
-        $customFieldValue = $customItem->findCustomFieldValueForFieldId($customFieldId);
+        $customFieldValue = $customItem->findCustomFieldValueForFieldId((int) $customFieldId);
         $customField      = $customFieldValue->getCustomField();
 
         $builder->add(

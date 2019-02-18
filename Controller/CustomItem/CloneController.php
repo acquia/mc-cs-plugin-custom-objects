@@ -63,7 +63,7 @@ class CloneController extends CommonController
     )
     {
         $this->formFactory        = $formFactory;
-        $this->customItemModel  = $customItemModel;
+        $this->customItemModel    = $customItemModel;
         $this->permissionProvider = $permissionProvider;
         $this->routeProvider      = $routeProvider;
     }
@@ -77,25 +77,26 @@ class CloneController extends CommonController
     public function cloneAction(int $objectId, int $itemId)
     {
         try {
-            $entity = clone $this->customItemModel->fetchEntity($itemId);
-            $this->permissionProvider->canClone($entity);
+            $customItem = clone $this->customItemModel->fetchEntity($itemId);
+            $this->permissionProvider->canClone($customItem);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
             $this->accessDenied(false, $e->getMessage());
         }
 
-        $entity->setName($entity->getName().' '.$this->translator->trans('mautic.core.form.clone'));
+        $customItem->setName($customItem->getName().' '.$this->translator->trans('mautic.core.form.clone'));
 
         $action = $this->routeProvider->buildSaveRoute($objectId);
-        $form   = $this->formFactory->create(CustomItemType::class, $entity, ['action' => $action, 'objectId' => $objectId]);
+        $form   = $this->formFactory->create(CustomItemType::class, $customItem, ['action' => $action, 'objectId' => $objectId]);
 
         return $this->delegateView(
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute($objectId),
                 'viewParameters' => [
-                    'entity' => $entity,
-                    'form'   => $form->createView(),
+                    'entity'       => $customItem,
+                    'form'         => $form->createView(),
+                    'customObject' => $customItem->getCustomObject(),
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.php',
                 'passthroughVars' => [
