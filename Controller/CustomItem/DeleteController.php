@@ -15,13 +15,13 @@ namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
 use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Controller\CommonController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 
 class DeleteController extends CommonController
 {
@@ -41,29 +41,37 @@ class DeleteController extends CommonController
     private $permissionProvider;
 
     /**
+     * @var CustomItemRouteProvider
+     */
+    private $routeProvider;
+
+    /**
      * @param CustomItemModel $customItemModel
      * @param Session $session
      * @param TranslatorInterface $translator
      * @param CustomItemPermissionProvider $permissionProvider
+     * @param CustomItemRouteProvider $routeProvider
      */
     public function __construct(
         CustomItemModel $customItemModel,
         Session $session,
         TranslatorInterface $translator,
-        CustomItemPermissionProvider $permissionProvider
+        CustomItemPermissionProvider $permissionProvider,
+        CustomItemRouteProvider $routeProvider
     )
     {
         $this->customItemModel    = $customItemModel;
         $this->session            = $session;
         $this->translator         = $translator;
         $this->permissionProvider = $permissionProvider;
+        $this->routeProvider      = $routeProvider;
     }
 
     /**
      * @param int $objectId
      * @param int $itemId
      * 
-     * @return Response|JsonResponse
+     * @return Response
      */
     public function deleteAction(int $objectId, int $itemId)
     {
@@ -90,11 +98,16 @@ class DeleteController extends CommonController
             )
         );
 
-        return $this->forward(
-            'CustomObjectsBundle:CustomItem\List:list',
+        $page =  $this->session->get('custom.item.page', 1);
+
+        return $this->postActionRedirect(
             [
-                'objectId' => $objectId,
-                'page'     => $this->session->get('custom.item.page', 1),
+                'returnUrl'       => $this->routeProvider->buildListRoute($objectId, $page),
+                'viewParameters'  => ['objectId' => $objectId, 'page' => $page],
+                'contentTemplate' => 'CustomObjectsBundle:CustomItem\List:list',
+                'passthroughVars' => [
+                    'mauticContent' => 'customItem',
+                ],
             ]
         );
     }

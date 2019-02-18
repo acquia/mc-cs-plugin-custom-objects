@@ -357,6 +357,7 @@ return [
                     'session',
                     'translator',
                     'custom_item.permission.provider',
+                    'custom_item.route.provider',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
