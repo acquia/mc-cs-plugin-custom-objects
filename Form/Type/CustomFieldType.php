@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextareaType;
 use MauticPlugin\CustomObjectsBundle\Form\CustomObjectHiddenTransformer;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\Form\AbstractType;
@@ -98,7 +99,15 @@ class CustomFieldType extends AbstractType
         if ($customObjectForm) {
             // Possibility to mark field as deleted in POST data
             $builder->add('deleted',HiddenType::class,['mapped' => false]);
+
+            $builder->add('defaultValue', HiddenType::class);
+
         } else {
+
+            $builder->add(
+                'defaultValue',
+                \Symfony\Component\Form\Extension\Core\Type\TextareaType::class
+            );
 
             $builder->add(
                 'buttons',

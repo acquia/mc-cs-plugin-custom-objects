@@ -65,6 +65,11 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      */
     private $order;
 
+    /**
+     * @var mixed
+     */
+    private $defaultValue;
+
     public function __clone()
     {
         $this->id = null;
@@ -114,6 +119,10 @@ class CustomField extends FormEntity implements UniqueEntityInterface
             ->columnName('field_order')
             ->nullable()
             ->build();
+        $builder->createField('defaultValue', Type::STRING)
+            ->columnName('default_value')
+            ->nullable()
+            ->build();
     }
 
     /**
@@ -126,6 +135,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         $metadata->addPropertyConstraint('type', new Assert\NotBlank());
         $metadata->addPropertyConstraint('type', new Assert\Length(['max' => 255]));
         $metadata->addPropertyConstraint('customObject', new Assert\NotBlank());
+        $metadata->addPropertyConstraint('defaultValue', new Assert\Length(['max' => 255]));
     }
 
     /**
@@ -236,5 +246,21 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     public function setOrder(?int $order): void
     {
         $this->order = $order;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDefaultValue()
+    {
+        return $this->defaultValue;
+    }
+
+    /**
+     * @param mixed $defaultValue
+     */
+    public function setDefaultValue($defaultValue): void
+    {
+        $this->defaultValue = $defaultValue;
     }
 }
