@@ -13,9 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
-
-use Symfony\Component\Form\FormBuilderInterface;
-
 class EmailType extends AbstractTextType
 {
     /**
@@ -24,16 +21,10 @@ class EmailType extends AbstractTextType
     protected $key = 'email';
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param string               $name
-     *
-     * @return FormBuilderInterface
+     * @return string
      */
-    public function createSymfonyFormFiledType(FormBuilderInterface $builder, string $name): FormBuilderInterface
+    public function getSymfonyFormFiledType(): string
     {
-        return $builder->add(
-            $name,
-            \Symfony\Component\Form\Extension\Core\Type\EmailType::class
-        )->get($name);
+        return \Symfony\Component\Form\Extension\Core\Type\EmailType::class;
     }
 }

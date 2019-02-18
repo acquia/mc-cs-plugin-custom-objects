@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
-use Symfony\Component\Form\FormBuilderInterface;
-
 class HiddenType extends AbstractTextType
 {
     /**
@@ -23,16 +21,10 @@ class HiddenType extends AbstractTextType
     protected $key = 'hidden';
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param string               $name
-     *
-     * @return FormBuilderInterface
+     * @return string
      */
-    public function createSymfonyFormFiledType(FormBuilderInterface $builder, string $name): FormBuilderInterface
+    public function getSymfonyFormFiledType(): string
     {
-        return $builder->add(
-            $name,
-            \Symfony\Component\Form\Extension\Core\Type\HiddenType::class
-        )->get($name);
+        return \Symfony\Component\Form\Extension\Core\Type\HiddenType::class;
     }
 }

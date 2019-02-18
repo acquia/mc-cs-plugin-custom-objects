@@ -34,17 +34,11 @@ abstract class AbstractTextType extends AbstractCustomFieldType
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param string               $name
-     *
      * @return FormBuilderInterface
      */
-    public function createSymfonyFormFiledType(FormBuilderInterface $builder, string $name): FormBuilderInterface
+    public function getSymfonyFormFiledType(): string
     {
-        return $builder->add(
-            $name,
-            \Symfony\Component\Form\Extension\Core\Type\TextType::class
-        )->get($name);
+        return \Symfony\Component\Form\Extension\Core\Type\TextType::class;
     }
 
     /**

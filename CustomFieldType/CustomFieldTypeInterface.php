@@ -16,7 +16,6 @@ namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 interface CustomFieldTypeInterface
@@ -32,12 +31,9 @@ interface CustomFieldTypeInterface
     public function getKey(): string;
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param string               $name
-     *
-     * @return FormBuilderInterface
+     * @return string
      */
-    public function createSymfonyFormFiledType(FormBuilderInterface $builder, string $name): FormBuilderInterface;
+    public function getSymfonyFormFiledType(): string;
 
     /**
      * @return string

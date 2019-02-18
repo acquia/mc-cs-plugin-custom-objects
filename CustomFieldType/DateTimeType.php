@@ -40,17 +40,11 @@ class DateTimeType extends AbstractCustomFieldType
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param string               $name
-     *
-     * @return FormBuilderInterface
+     * @return string
      */
-    public function createSymfonyFormFiledType(FormBuilderInterface $builder, string $name): FormBuilderInterface
+    public function getSymfonyFormFiledType(): string
     {
-        return $builder->add(
-            $name,
-            \Symfony\Component\Form\Extension\Core\Type\DateTimeType::class
-        )->get($name);
+        return \Symfony\Component\Form\Extension\Core\Type\DateTimeType::class;
     }
 
     /**

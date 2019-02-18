@@ -13,9 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\FormBuilderInterface;
-
 class RadioGroupType extends AbstractTextType
 {
     /**
@@ -24,20 +21,10 @@ class RadioGroupType extends AbstractTextType
     protected $key = 'radio_group';
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param string               $name
-     *
-     * @return FormBuilderInterface
+     * @return string
      */
-    public function createSymfonyFormFiledType(FormBuilderInterface $builder, string $name): FormBuilderInterface
+    public function getSymfonyFormFiledType(): string
     {
-        return $builder->add(
-            $name,
-            ChoiceType::class,
-            [
-                'expanded' => true,
-                'multiple' => false,
-            ]
-        )->get($name);
+        return \MauticPlugin\CustomObjectsBundle\CustomFieldType\Form\Type\RadioGroupType::class;
     }
 }
