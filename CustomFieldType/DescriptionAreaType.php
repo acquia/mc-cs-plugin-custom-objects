@@ -13,10 +13,26 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
+use Symfony\Component\Form\FormBuilderInterface;
+
 class DescriptionAreaType extends AbstractTextType
 {
     /**
      * @var string
      */
     protected $key = 'description_area';
+
+    /**
+     * @param FormBuilderInterface $builder
+     * @param string               $name
+     *
+     * @return FormBuilderInterface
+     */
+    public function createSymfonyFormFiledType(FormBuilderInterface $builder, string $name): FormBuilderInterface
+    {
+        return $builder->add(
+            $name,
+            \Symfony\Component\Form\Extension\Core\Type\TextareaType::class
+        )->get($name);
+    }
 }
