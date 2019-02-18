@@ -15,18 +15,12 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
 use Mautic\LeadBundle\LeadEvents;
-use MauticPlugin\CustomObjectsBundle\CustomObjectsBundle;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemFilterQueryBuilder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 
-/**
- * SegmentFiltersDictionarySubscriber
- *
- * @package MauticPlugin\CustomObjectsBundle\EventListener
- */
 class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
 {
 
@@ -42,7 +36,7 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
 
     /**
      * @param EntityManager  $entityManager
-     * @param ConfigProvider $coreParametersHelper
+     * @param ConfigProvider $configProvider
      */
     public function __construct(EntityManager $entityManager, ConfigProvider $configProvider)
     {
@@ -55,13 +49,14 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents(): array
     {
-        return [/*LeadEvents::SEGMENT_DICTIONARY_ON_GENERATE => 'onGenerateSegmentDictionary'*/];
+        return [
+            // @todo enable once https://github.com/mautic-inc/mautic-cloud/pull/388 is in beta
+            //LeadEvents::SEGMENT_DICTIONARY_ON_GENERATE => 'onGenerateSegmentDictionary',
+        ];
     }
 
     /**
      * @param SegmentDictionaryGenerationEvent $event
-     *
-     * @throws InvalidArgumentException
      */
     public function onGenerateSegmentDictionary(SegmentDictionaryGenerationEvent $event): void
     {

@@ -16,7 +16,6 @@ use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use MauticPlugin\CustomObjectsBundle\CustomObjectsBundle;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 
 class MenuSubscriber extends CommonSubscriber

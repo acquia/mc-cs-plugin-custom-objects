@@ -28,7 +28,7 @@ class ConfigProvider
     private $coreParametersHelper;
 
     /**
-     * @param CoreParametersHelper $coreParameters
+     * @param CoreParametersHelper $coreParametersHelper
      */
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
@@ -42,6 +42,6 @@ class ConfigProvider
      */
     public function pluginIsEnabled(): bool
     {
-        return (bool) $this->coreParametersHelper->getParameter(ConfigProvider::CONFIG_PARAM_ENABLED, true);
+        return (bool) $this->coreParametersHelper->getParameter(self::CONFIG_PARAM_ENABLED, true);
     }
 }

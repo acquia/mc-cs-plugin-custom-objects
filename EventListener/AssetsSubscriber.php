@@ -15,7 +15,6 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use MauticPlugin\CustomObjectsBundle\CustomObjectsBundle;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 
 class AssetsSubscriber extends CommonSubscriber

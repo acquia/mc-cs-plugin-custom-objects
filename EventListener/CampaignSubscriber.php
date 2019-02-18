@@ -93,13 +93,11 @@ class CampaignSubscriber extends CommonSubscriber
     }
 
     /**
-     * @todo don't forget to disable these methods when the plugin is disabled
-     *
      * Add event triggers and actions.
      *
      * @param CampaignBuilderEvent $event
      */
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
         if (!$this->configProvider->pluginIsEnabled()) {
             return;
@@ -130,13 +128,13 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * @param CampaignExecutionEvent $event
      */
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    public function onCampaignTriggerAction(CampaignExecutionEvent $event): void
     {
         if (!$this->configProvider->pluginIsEnabled()) {
             return;
         }
 
-        if (!preg_match('/custom_item.(\d).linkcontact/', $event->getEvent()['type'])) {
+        if (!preg_match('/custom_item.(\d*).linkcontact/', $event->getEvent()['type'])) {
             return;
         }
 
@@ -156,43 +154,44 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * @param CampaignExecutionEvent $event
      */
-    public function onCampaignTriggerCondition(CampaignExecutionEvent $event)
+    public function onCampaignTriggerCondition(CampaignExecutionEvent $event): void
     {
         if (!$this->configProvider->pluginIsEnabled()) {
             return;
         }
         
-        if (!preg_match('/custom_item.(\d).fieldvalue/', $event->getEvent()['type'])) {
+        if (!preg_match('/custom_item.(\d*).fieldvalue/', $event->getEvent()['type'])) {
             return;
         }
 
         $contact = $event->getLead();
 
         if (!$contact || !$contact->getId()) {
-            return $event->setResult(false);
+            $event->setResult(false);
+
+            return;
         }
 
         try {
             $customField = $this->customFieldModel->fetchEntity($event->getConfig()['field']);
         } catch (NotFoundException $e) {
-            return $event->setResult(false);
-        }
+            $event->setResult(false);
 
-        $expr = $customField->getTypeObject()->getOperators()[$event->getConfig()['operator']]['expr'];
+            return;
+        }
 
         try {
             $customItemId = $this->customItemModel->findItemIdForValue(
                 $customField,
                 $contact,
-                $expr,
+                $customField->getTypeObject()->getOperators()[$event->getConfig()['operator']]['expr'],
                 $event->getConfig()['value']
             );
             
             $event->setChannel('customItem', $customItemId);
-    
-            return $event->setResult(true);
+            $event->setResult(true);
         } catch (NotFoundException $e) {
-            return $event->setResult(false);
+            $event->setResult(false);
         }
     }
 }

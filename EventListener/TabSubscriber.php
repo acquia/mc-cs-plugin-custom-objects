@@ -17,7 +17,6 @@ use Mautic\CoreBundle\Event\CustomContentEvent;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use MauticPlugin\CustomObjectsBundle\CustomObjectsBundle;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 
 class TabSubscriber extends CommonSubscriber
