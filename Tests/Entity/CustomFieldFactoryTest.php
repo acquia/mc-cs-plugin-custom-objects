@@ -48,7 +48,7 @@ class CustomFieldFactoryTest extends \PHPUnit_Framework_TestCase
             $factory = new CustomFieldFactory($typeProvider);
 
             $customField = $factory->create($type, $customObject);
-            $this->assertSame($type, $customField->getType()->getKey());
+            $this->assertSame($type, $customField->getTypeObject()->getKey());
             $this->assertSame($customObject, $customField->getCustomObject());
         }
 

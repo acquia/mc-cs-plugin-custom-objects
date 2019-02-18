@@ -17,8 +17,7 @@ use Mautic\CoreBundle\Event\CustomContentEvent;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use MauticPlugin\CustomObjectsBundle\CustomObjectsBundle;
+use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 
 class TabSubscriber extends CommonSubscriber
 {
@@ -33,9 +32,9 @@ class TabSubscriber extends CommonSubscriber
     private $customItemModel;
 
     /**
-     * @var CoreParametersHelper
+     * @var ConfigProvider
      */
-    private $coreParametersHelper;
+    private $configProvider;
 
     /**
      * @var CustomObject[]
@@ -43,19 +42,19 @@ class TabSubscriber extends CommonSubscriber
     private $customObjects = [];
 
     /**
-     * @param CustomObjectModel    $customObjectModel
-     * @param CustomItemModel      $customItemModel
-     * @param CoreParametersHelper $coreParametersHelper
+     * @param CustomObjectModel $customObjectModel
+     * @param CustomItemModel   $customItemModel
+     * @param ConfigProvider    $configProvider
      */
     public function __construct(
         CustomObjectModel $customObjectModel,
         CustomItemModel $customItemModel,
-        CoreParametersHelper $coreParametersHelper
+        ConfigProvider $configProvider
     )
     {
-        $this->customObjectModel    = $customObjectModel;
-        $this->customItemModel      = $customItemModel;
-        $this->coreParametersHelper = $coreParametersHelper;
+        $this->customObjectModel = $customObjectModel;
+        $this->customItemModel   = $customItemModel;
+        $this->configProvider    = $configProvider;
     }
 
     /**
@@ -73,9 +72,7 @@ class TabSubscriber extends CommonSubscriber
      */
     public function injectTabs(CustomContentEvent $event): void
     {
-        $isEnabled = $this->coreParametersHelper->getParameter(CustomObjectsBundle::CONFIG_PARAM_ENABLED);
-
-        if (!$isEnabled) {
+        if (!$this->configProvider->pluginIsEnabled()) {
             return;
         }
 

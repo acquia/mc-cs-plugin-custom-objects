@@ -14,7 +14,7 @@ declare(strict_types=1);
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use MauticPlugin\CustomObjectsBundle\CustomObjectsBundle;
+use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 
 return [
     'name'        => 'Custom Objects',
@@ -186,7 +186,7 @@ return [
                 'iconClass' => 'fa-list-alt',
                 'checks'    => [
                     'parameters' => [
-                        CustomObjectsBundle::CONFIG_PARAM_ENABLED => true,
+                        ConfigProvider::CONFIG_PARAM_ENABLED => true,
                     ],
                 ],
             ],
@@ -619,14 +619,14 @@ return [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\AssetsSubscriber::class,
                 'arguments' => [
                     'templating.helper.assets',
-                    'mautic.helper.core_parameters',
+                    'custom_object.config.provider',
                 ]
             ],
             'custom_object.menu.subscriber' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\MenuSubscriber::class,
                 'arguments' => [
                     'mautic.custom.model.object',
-                    'mautic.helper.core_parameters',
+                    'custom_object.config.provider',
                 ],
             ],
             'custom_object.tab.subscriber' => [
@@ -634,7 +634,7 @@ return [
                 'arguments' => [
                     'mautic.custom.model.object',
                     'mautic.custom.model.item',
-                    'mautic.helper.core_parameters',
+                    'custom_object.config.provider',
                 ],
             ],
             'custom_field.type.subscriber' => [
@@ -667,6 +667,7 @@ return [
                 'arguments' => [
                     'mautic.custom.model.object',
                     'mautic.custom.model.import.item',
+                    'custom_object.config.provider',
                 ],
             ],
             'custom_item.contact.subscriber' => [
@@ -692,6 +693,7 @@ return [
                     'mautic.custom.model.object',
                     'mautic.custom.model.item',
                     'translator',
+                    'custom_object.config.provider',
                 ]
             ],
 	        'custom_object.segments.filters_generate.subscriber' => [
@@ -699,13 +701,14 @@ return [
                 'arguments'=> [
                     'custom_object.repository',
                     'translator',
+                    'custom_object.config.provider',
                 ]
             ],
             'custom_object.segments.filters_dictionary.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\SegmentFiltersDictionarySubscriber::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
-                    'mautic.helper.core_parameters'
+                    'custom_object.config.provider',
                 ],
             ],
         ],
@@ -760,6 +763,12 @@ return [
             ],
         ],
         'other' => [
+            'custom_object.config.provider' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
+            ],
             'custom_field.type.provider' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider::class,
                 'arguments' => [
@@ -822,6 +831,6 @@ return [
         ],
     ],
     'parameters' => [
-        'custom_objects_enabled' => true,
+        ConfigProvider::CONFIG_PARAM_ENABLED => true,
     ],
 ];

@@ -20,6 +20,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemImportModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 
 class ImportSubscriber extends CommonSubscriber
 {
@@ -34,16 +35,24 @@ class ImportSubscriber extends CommonSubscriber
     private $customItemImportModel;
 
     /**
+     * @var ConfigProvider
+     */
+    private $configProvider;
+
+    /**
      * @param CustomObjectModel $customObjectModel
      * @param CustomItemImportModel $customItemImportModel
+     * @param ConfigProvider $configProvider
      */
     public function __construct(
         CustomObjectModel $customObjectModel,
-        CustomItemImportModel $customItemImportModel
+        CustomItemImportModel $customItemImportModel,
+        ConfigProvider $configProvider
     )
     {
         $this->customObjectModel     = $customObjectModel;
         $this->customItemImportModel = $customItemImportModel;
+        $this->configProvider        = $configProvider;
     }
 
     /**
@@ -63,6 +72,10 @@ class ImportSubscriber extends CommonSubscriber
      */
     public function onImportInit(ImportInitEvent $event): void
     {
+        if (!$this->configProvider->pluginIsEnabled()) {
+            return;
+        }
+
         try {
             $customObjectId = $this->getCustomObjectId($event->getRouteObjectName());
             $customObject   = $this->customObjectModel->fetchEntity($customObjectId);
@@ -80,6 +93,10 @@ class ImportSubscriber extends CommonSubscriber
      */
     public function onFieldMapping(ImportMappingEvent $event): void
     {
+        if (!$this->configProvider->pluginIsEnabled()) {
+            return;
+        }
+
         try {
             $customObjectId = $this->getCustomObjectId($event->getRouteObjectName());
             $customObject   = $this->customObjectModel->fetchEntity($customObjectId);
@@ -109,6 +126,10 @@ class ImportSubscriber extends CommonSubscriber
      */
     public function onImportProcess(ImportProcessEvent $event): void
     {
+        if (!$this->configProvider->pluginIsEnabled()) {
+            return;
+        }
+        
         try {
             $customObjectId = $this->getCustomObjectId($event->getImport()->getObject());
             $customObject   = $this->customObjectModel->fetchEntity($customObjectId);
@@ -127,7 +148,7 @@ class ImportSubscriber extends CommonSubscriber
      */
     private function getCustomObjectId(string $routeObjectName): int
     {
-        if (preg_match('/custom-object:(\d)/', $routeObjectName, $matches)) {
+        if (preg_match('/custom-object:(\d*)/', $routeObjectName, $matches)) {
             return (int) $matches[1];
         }
 

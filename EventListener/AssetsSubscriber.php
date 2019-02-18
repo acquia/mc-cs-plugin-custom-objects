@@ -15,8 +15,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use MauticPlugin\CustomObjectsBundle\CustomObjectsBundle;
+use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 
 class AssetsSubscriber extends CommonSubscriber
 {
@@ -26,19 +25,19 @@ class AssetsSubscriber extends CommonSubscriber
     private $assetHelper;
 
     /**
-     * @var CoreParametersHelper
+     * @var ConfigProvider
      */
-    private $coreParametersHelper;
+    private $configProvider;
 
     /**
      *
      * @param AssetsHelper $assetHelper
-     * @param CoreParametersHelper $coreParametersHelper
+     * @param ConfigProvider $configProvider
      */
-    public function __construct(AssetsHelper $assetHelper, CoreParametersHelper $coreParametersHelper)
+    public function __construct(AssetsHelper $assetHelper, ConfigProvider $configProvider)
     {
-        $this->assetHelper          = $assetHelper;
-        $this->coreParametersHelper = $coreParametersHelper;
+        $this->assetHelper    = $assetHelper;
+        $this->configProvider = $configProvider;
     }
 
     /**
@@ -56,8 +55,7 @@ class AssetsSubscriber extends CommonSubscriber
      */
     public function loadAssets(GetResponseEvent $event): void
     {
-        $isEnabled = $this->coreParametersHelper->getParameter(CustomObjectsBundle::CONFIG_PARAM_ENABLED);
-        if ($isEnabled && $event->isMasterRequest()) {
+        if ($this->configProvider->pluginIsEnabled() && $event->isMasterRequest()) {
             $this->assetHelper->addScript('plugins/CustomObjectsBundle/Assets/js/custom-objects.js');
             $this->assetHelper->addScript('plugins/CustomObjectsBundle/Assets/js/co-form.js');
             $this->assetHelper->addStylesheet('plugins/CustomObjectsBundle/Assets/css/custom-objects.css');
