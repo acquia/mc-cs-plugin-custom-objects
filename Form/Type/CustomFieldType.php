@@ -109,7 +109,6 @@ class CustomFieldType extends AbstractType
                 \Symfony\Component\Form\Extension\Core\Type\CheckboxType::class,
                 [
                     'label' => 'custom.field.label.required',
-                    'required' => false,
                 ]
             );
 
@@ -118,7 +117,6 @@ class CustomFieldType extends AbstractType
                 \Symfony\Component\Form\Extension\Core\Type\TextareaType::class,
                 [
                     'label' => 'custom.field.label.default_value',
-                    'required' => false,
                 ]
             );
 
