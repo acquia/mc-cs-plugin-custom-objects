@@ -15,8 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Symfony\Component\Form\FormFactory;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use Predis\Protocol\Text\RequestSerializer;
 use Mautic\CoreBundle\Controller\CommonController;
@@ -24,18 +23,16 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
+use Symfony\Component\HttpFoundation\Response;
 
 class ViewController extends CommonController
 {
+    
     /**
      * @var RequestStack
      */
     private $requestStack;
-
-    /**
-     * @var Session
-     */
-    private $session;
 
     /**
      * @var CustomItemModel
@@ -53,56 +50,81 @@ class ViewController extends CommonController
     private $routeProvider;
 
     /**
+     * @var FormFactory
+     */
+    private $formFactory;
+
+    /**
      * @param RequestStack $requestStack
-     * @param Session $session
-     * @param CoreParametersHelper $coreParametersHelper
+     * @param FormFactory $formFactory
      * @param CustomItemModel $customItemModel
      * @param CustomItemPermissionProvider $permissionProvider
      * @param CustomItemRouteProvider $routeProvider
      */
     public function __construct(
         RequestStack $requestStack,
-        Session $session,
-        CoreParametersHelper $coreParametersHelper,
+        FormFactory $formFactory,
         CustomItemModel $customItemModel,
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider
     )
     {
-        $this->requestStack         = $requestStack;
-        $this->session              = $session;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->customItemModel      = $customItemModel;
-        $this->permissionProvider   = $permissionProvider;
-        $this->routeProvider        = $routeProvider;
+        $this->requestStack       = $requestStack;
+        $this->formFactory        = $formFactory;
+        $this->customItemModel    = $customItemModel;
+        $this->permissionProvider = $permissionProvider;
+        $this->routeProvider      = $routeProvider;
     }
 
     /**
      * @param int $objectId
      * @param int $itemId
      * 
-     * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse
+     * @return Response
      */
     public function viewAction(int $objectId, int $itemId)
     {
         try {
-            $entity = $this->customItemModel->fetchEntity($itemId);
-            $this->permissionProvider->canView($entity);
+            $customItem = $this->customItemModel->fetchEntity($itemId);
+            $this->permissionProvider->canView($customItem);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
             $this->accessDenied(false, $e->getMessage());
         }
 
-        $route = $this->routeProvider->buildViewRoute($objectId, $itemId);
+        $route         = $this->routeProvider->buildViewRoute($objectId, $itemId);
+        $dateRangeForm = $this->formFactory->create(
+            DateRangeType::class,
+            $this->requestStack->getCurrentRequest()->get('daterange', []),
+            ['action' => $route]
+        );
+        $stats = $this->customItemModel->getLinksLineChartData(
+            new \DateTime($dateRangeForm->get('date_from')->getData()),
+            new \DateTime($dateRangeForm->get('date_to')->getData()),
+            $customItem
+        );
 
         return $this->delegateView(
             [
                 'returnUrl'      => $route,
-                'viewParameters' => ['item' => $entity],
+                'viewParameters' => [
+                    'item'          => $customItem,
+                    'dateRangeForm' => $dateRangeForm->createView(),
+                    'stats'         => $stats,
+                    'contacts'      => $this->forward(
+                        'CustomObjectsBundle:CustomItem\ContactList:list',
+                        [
+                            'objectId'   => $itemId,
+                            'page'       => 1,
+                            'ignoreAjax' => true,
+                        ]
+                    )->getContent(),
+                ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomItem:detail.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customItem',
+                    'activeLink'    => "#mautic_custom_object_{$objectId}",
                     'route'         => $route,
                 ],
             ]

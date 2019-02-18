@@ -32,6 +32,7 @@ class CustomItemRouteProvider
     public const ROUTE_UNLINK        = 'mautic_custom_item_unlink';
     public const ROUTE_IMPORT_ACTION = 'mautic_import_action';
     public const ROUTE_IMPORT_LIST   = 'mautic_import_index';
+    public const ROUTE_CONTACT_LIST  = 'mautic_custom_item_contacts';
 
     /**
      * @var RouterInterface
