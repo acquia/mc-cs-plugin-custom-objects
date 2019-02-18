@@ -19,7 +19,6 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldType\CheckboxGroupType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CountryListType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateTimeType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateType;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\DescriptionAreaType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\EmailType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\HiddenType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\HtmlAreaType;
@@ -54,8 +53,6 @@ class CustomFieldTypeSubscriber extends CommonSubscriber
     }
 
     /**
-     * @todo add more field types
-     * 
      * @param CustomFieldTypeEvent $event
      */
     public function makeFieldTypeList(CustomFieldTypeEvent $event): void
@@ -64,7 +61,6 @@ class CustomFieldTypeSubscriber extends CommonSubscriber
         $event->addCustomFieldType(new CountryListType($this->translator->trans('custom.field.type.country_list')));
         $event->addCustomFieldType(new DateType($this->translator->trans('custom.field.type.date')));
         $event->addCustomFieldType(new DateTimeType($this->translator->trans('custom.field.type.datetime')));
-        $event->addCustomFieldType(new DescriptionAreaType($this->translator->trans('custom.field.type.description_area')));
         $event->addCustomFieldType(new EmailType($this->translator->trans('custom.field.type.email')));
         $event->addCustomFieldType(new HiddenType($this->translator->trans('custom.field.type.hidden')));
         $event->addCustomFieldType(new HtmlAreaType($this->translator->trans('custom.field.type.html_area')));
