@@ -16,17 +16,12 @@ namespace MauticPlugin\CustomObjectsBundle\Entity;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
 use DateTimeInterface;
-use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\FormEntity;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
-use MauticPlugin\CustomObjectsBundle\Entity\UniqueEntityInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
-use Ramsey\Uuid\Uuid;
 
 class CustomField extends FormEntity implements UniqueEntityInterface
 {
@@ -64,6 +59,11 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      * @var int|null
      */
     private $order;
+
+    /**
+     * @var bool
+     */
+    private $required;
 
     /**
      * @var mixed
@@ -117,6 +117,10 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         $builder->addField('type', Type::STRING);
         $builder->createField('order', 'integer')
             ->columnName('field_order')
+            ->nullable()
+            ->build();
+        $builder->createField('required', Type::BOOLEAN)
+            ->columnName('required')
             ->nullable()
             ->build();
         $builder->createField('defaultValue', Type::STRING)
@@ -246,6 +250,22 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     public function setOrder(?int $order): void
     {
         $this->order = $order;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRequired(): bool
+    {
+        return $this->required;
+    }
+
+    /**
+     * @param bool $required
+     */
+    public function setRequired(?bool $required): void
+    {
+        $this->required = (bool) $required;
     }
 
     /**
