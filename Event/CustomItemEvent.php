@@ -24,11 +24,17 @@ class CustomItemEvent extends Event
     private $customItem = [];
 
     /**
+     * @var bool
+     */
+    private $isNew;
+
+    /**
      * @param CustomItem $customItem
      */
-    public function __construct(CustomItem $customItem)
+    public function __construct(CustomItem $customItem, bool $isNew = false)
     {
         $this->customItem = $customItem;
+        $this->isNew      = $isNew;
     }
 
     /**
@@ -37,5 +43,13 @@ class CustomItemEvent extends Event
     public function getCustomItem(): CustomItem
     {
         return $this->customItem;
+    }
+
+    /**
+     * @return bool
+     */
+    public function entityIsNew(): bool
+    {
+        return $this->isNew;
     }
 }

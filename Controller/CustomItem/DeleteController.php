@@ -84,7 +84,7 @@ class DeleteController extends CommonController
             $this->accessDenied(false, $e->getMessage());
         }
 
-        $this->customItemModel->deleteEntity($entity);
+        $this->customItemModel->delete($entity);
 
         $this->session->getFlashBag()->add(
             'notice',

@@ -39,6 +39,26 @@ final class CustomItemEvents
     const ON_CUSTOM_ITEM_POST_SAVE = 'custom.item.on_post_save';
 
     /**
+     * The custom.item.on_pre_delete event is fired when a custom item is about to be deleted.
+     *
+     * The event listener receives a
+     * MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent
+     *
+     * @var string
+     */
+    const ON_CUSTOM_ITEM_PRE_DELETE = 'custom.item.on_pre_delete';
+
+    /**
+     * The custom.item.on_post_delete event is fired when a custom item is deleted.
+     *
+     * The event listener receives a
+     * MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent
+     *
+     * @var string
+     */
+    const ON_CUSTOM_ITEM_POST_DELETE = 'custom.item.on_post_delete';
+
+    /**
      * The custom.item.on_campaign_trigger_action event is fired when the campaign action triggers.
      *
      * The event listener receives a

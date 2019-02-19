@@ -110,8 +110,9 @@ class CustomItemModel extends FormModel
      */
     public function save(CustomItem $customItem): CustomItem
     {
-        $user = $this->userHelper->getUser();
-        $now  = new DateTimeHelper();
+        $user  = $this->userHelper->getUser();
+        $now   = new DateTimeHelper();
+        $event = new CustomItemEvent($customItem, $customItem->isNew());
 
         if ($customItem->isNew()) {
             $customItem->setCreatedBy($user->getId());
@@ -135,13 +136,29 @@ class CustomItemModel extends FormModel
 
         $customItem->recordCustomFieldValueChanges();
 
-        $customItemEvent = new CustomItemEvent($customItem);
-
-        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, $customItemEvent);
+        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, $event);
         $this->entityManager->flush();
-        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $customItemEvent);
+        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $event);
 
         return $customItem;
+    }
+
+    /**
+     * @param CustomItem $customItem
+     */
+    public function delete(CustomItem $customItem)
+    {
+        //take note of ID before doctrine wipes it out
+        $id    = $customItem->getId();
+        $event = new CustomItemEvent($customItem);
+        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_PRE_DELETE, $event);
+
+        $this->entityManager->remove($customItem);
+        $this->entityManager->flush();
+
+        //set the id for use in events
+        $customItem->deletedId = $id;
+        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_POST_DELETE, $event);
     }
 
     /**

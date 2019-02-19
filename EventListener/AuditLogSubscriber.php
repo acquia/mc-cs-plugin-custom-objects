@@ -48,11 +48,12 @@ class AuditLogSubscriber extends CommonSubscriber
     {
         return [
             CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE => 'onCustomItemPostSave',
+            CustomItemEvents::ON_CUSTOM_ITEM_POST_DELETE => 'onCustomItemPostDelete',
         ];
     }
 
     /**
-     * Add an entry to the audit log.
+     * Add a create/update entry to the audit log.
      *
      * @param CustomItemEvent $event
      */
@@ -62,15 +63,32 @@ class AuditLogSubscriber extends CommonSubscriber
         $changes    = $customItem->getChanges();
 
         if (!empty($changes)) {
-            $log = [
+            $this->auditLogModel->writeToLog([
                 'bundle'    => 'customObjects',
                 'object'    => 'customItem',
                 'objectId'  => $customItem->getId(),
-                'action'    => ($customItem->getId()) ? 'create' : 'update',
+                'action'    => $event->entityIsNew() ? 'create' : 'update',
                 'details'   => $changes,
                 'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
-            ];
-            $this->auditLogModel->writeToLog($log);
+            ]);
         }
+    }
+
+    /**
+     * Add a delete entry to the audit log.
+     *
+     * @param CustomItemEvent $event
+     */
+    public function onCustomItemPostDelete(CustomItemEvent $event): void
+    {
+        $customItem = $event->getCustomItem();
+        $this->auditLogModel->writeToLog([
+            'bundle'    => 'customObjects',
+            'object'    => 'customItem',
+            'objectId'  => $customItem->deletedId,
+            'action'    => 'delete',
+            'details'   => ['name' => $customItem->getName()],
+            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+        ]);
     }
 }
