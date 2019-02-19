@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Mautic\CoreBundle\Controller\CommonController;
@@ -29,11 +28,6 @@ class ViewController extends CommonController
      * @var RequestStack
      */
     private $requestStack;
-
-    /**
-     * @var Session
-     */
-    private $session;
 
     /**
      * @var CustomObjectModel
@@ -52,7 +46,6 @@ class ViewController extends CommonController
 
     /**
      * @param RequestStack $requestStack
-     * @param Session $session
      * @param CoreParametersHelper $coreParametersHelper
      * @param CustomObjectModel $customObjectModel
      * @param CustomObjectPermissionProvider $permissionProvider
@@ -60,7 +53,6 @@ class ViewController extends CommonController
      */
     public function __construct(
         RequestStack $requestStack,
-        Session $session,
         CoreParametersHelper $coreParametersHelper,
         CustomObjectModel $customObjectModel,
         CustomObjectPermissionProvider $permissionProvider,
@@ -68,7 +60,6 @@ class ViewController extends CommonController
     )
     {
         $this->requestStack         = $requestStack;
-        $this->session              = $session;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->customObjectModel    = $customObjectModel;
         $this->permissionProvider   = $permissionProvider;
