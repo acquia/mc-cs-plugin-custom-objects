@@ -20,6 +20,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
@@ -148,13 +149,19 @@ class CustomFieldType extends AbstractType
             ]
         );
 
-        $builder->add(
-            'defaultValue',
-            \Symfony\Component\Form\Extension\Core\Type\TextareaType::class,
-            [
-                'label' => 'custom.field.label.default_value',
-            ]
-        );
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event){
+            /** @var CustomField $customField */
+            $customField = $event->getData();
+            $form = $event->getForm();
+
+            $form->add(
+                'defaultValue',
+                $customField->getTypeObject()->getSymfonyFormFiledType(),
+                [
+                    'label' => 'custom.field.label.default_value',
+                ]
+            );
+        });
 
         $builder->add(
             'buttons',
