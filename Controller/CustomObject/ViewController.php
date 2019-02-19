@@ -83,8 +83,8 @@ class ViewController extends CommonController
     public function viewAction(int $objectId)
     {
         try {
-            $entity = $this->customObjectModel->fetchEntity($objectId);
-            $this->permissionProvider->canView($entity);
+            $customObject = $this->customObjectModel->fetchEntity($objectId);
+            $this->permissionProvider->canView($customObject);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
@@ -97,7 +97,7 @@ class ViewController extends CommonController
             [
                 'returnUrl'      => $route,
                 'viewParameters' => [
-                    'item' => $entity,
+                    'item' => $customObject,
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomObject:detail.html.php',
                 'passthroughVars' => [
