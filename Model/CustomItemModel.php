@@ -338,18 +338,26 @@ class CustomItemModel extends FormModel
      * 
      * @return array
      */
-    public function getLinksLineChartData(\DateTimeInterface $from, \DateTimeInterface $to, CustomItem $customItem): array
+    public function getLinksLineChartData(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        CustomItem $customItem
+    ): array
     {
         $chart = new LineChart(null, $from, $to);
         $query = new ChartQuery($this->entityManager->getConnection(), $from, $to);
-        $links = $query->fetchTimeData('custom_item_xref_contact', 'date_added', ['custom_item_id' => $customItem->getId()]);
+        $links = $query->fetchTimeData(
+            'custom_item_xref_contact',
+            'date_added',
+            ['custom_item_id' => $customItem->getId()]
+        );
         $chart->setDataset($this->translator->trans('custom.item.linked.contacts'), $links);
 
         return $chart->render();
     }
 
     /**
-     * Used only by Mautic's generic methods. Use CustomFieldPermissionProvider instead.
+     * Used only by Mautic's generic methods. Use CustomItemPermissionProvider instead.
      * 
      * @return string
      */
