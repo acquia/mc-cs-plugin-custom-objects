@@ -466,7 +466,7 @@ return [
                 'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\ViewController::class,
                 'arguments' => [
                     'request_stack',
-                    'session',
+                    'form.factory',
                     'mautic.helper.core_parameters',
                     'mautic.custom.model.object',
                     'custom_object.permission.provider',

@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
+use Mautic\CoreBundle\Form\Type\DateRangeType;
+use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
@@ -30,6 +32,11 @@ class ViewController extends CommonController
     private $requestStack;
 
     /**
+     * @var FormFactory
+     */
+    private $formFactory;
+
+    /**
      * @var CustomObjectModel
      */
     private $customObjectModel;
@@ -45,14 +52,16 @@ class ViewController extends CommonController
     private $routeProvider;
 
     /**
-     * @param RequestStack $requestStack
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param CustomObjectModel $customObjectModel
+     * @param RequestStack                   $requestStack
+     * @param FormFactory                    $formFactory
+     * @param CoreParametersHelper           $coreParametersHelper
+     * @param CustomObjectModel              $customObjectModel
      * @param CustomObjectPermissionProvider $permissionProvider
-     * @param CustomObjectRouteProvider $routeProvider
+     * @param CustomObjectRouteProvider      $routeProvider
      */
     public function __construct(
         RequestStack $requestStack,
+        FormFactory $formFactory,
         CoreParametersHelper $coreParametersHelper,
         CustomObjectModel $customObjectModel,
         CustomObjectPermissionProvider $permissionProvider,
@@ -60,6 +69,7 @@ class ViewController extends CommonController
     )
     {
         $this->requestStack         = $requestStack;
+        $this->formFactory = $formFactory;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->customObjectModel    = $customObjectModel;
         $this->permissionProvider   = $permissionProvider;
@@ -83,16 +93,30 @@ class ViewController extends CommonController
         }
 
         $route = $this->routeProvider->buildViewRoute($objectId);
+        $dateRangeForm = $this->formFactory->create(
+            DateRangeType::class,
+            $this->requestStack->getCurrentRequest()->get('daterange', []),
+            ['action' => $route]
+        );
+
+        $stats = $this->customObjectModel->getItemsLineChartData(
+            new \DateTime($dateRangeForm->get('date_from')->getData()),
+            new \DateTime($dateRangeForm->get('date_to')->getData()),
+            $customObject
+        );
 
         return $this->delegateView(
             [
                 'returnUrl'      => $route,
                 'viewParameters' => [
                     'item' => $customObject,
+                    'dateRangeForm' => $dateRangeForm->createView(),
+                    'stats'         => $stats,
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomObject:detail.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
+                    'activeLink'    => "#mautic_custom_object_{$objectId}",
                     'route'         => $route,
                 ],
             ]
