@@ -146,7 +146,7 @@ class CustomItemModel extends FormModel
     /**
      * @param CustomItem $customItem
      */
-    public function delete(CustomItem $customItem)
+    public function delete(CustomItem $customItem): void
     {
         //take note of ID before doctrine wipes it out
         $id    = $customItem->getId();
