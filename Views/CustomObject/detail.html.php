@@ -10,17 +10,17 @@
  */
 $view->extend('MauticCoreBundle:Default:content.html.php');
 $view['slots']->set('mauticContent', 'customObject');
-$view['slots']->set('headerTitle', $item->getName());
+$view['slots']->set('headerTitle', $customObject->getName());
 $view['slots']->set(
     'actions',
     $view->render(
         'MauticCoreBundle:Helper:page_actions.html.php',
-        ['item' => $item]
+        ['item' => $customObject]
     )
 );
 $view['slots']->set(
     'publishStatus',
-    $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $item])
+    $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $customObject])
 );
 ?>
 
@@ -33,7 +33,7 @@ $view['slots']->set(
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
                     <div class="col-xs-10">
-                        <div class="text-muted"><?php echo $item->getDescription(); ?></div>
+                        <div class="text-muted"><?php echo $customObject->getNameSingular() ?></div>
                     </div>
                 </div>
             </div>
@@ -47,7 +47,7 @@ $view['slots']->set(
                             <tbody>
                             <?php echo $view->render(
                                 'MauticCoreBundle:Helper:details.html.php',
-                                ['entity' => $item]
+                                ['entity' => $customObject]
                             ); ?>
                             </tbody>
                         </table>

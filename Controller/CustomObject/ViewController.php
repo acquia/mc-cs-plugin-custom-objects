@@ -109,7 +109,7 @@ class ViewController extends CommonController
             [
                 'returnUrl'      => $route,
                 'viewParameters' => [
-                    'item' => $customObject,
+                    'customObject'  => $customObject,
                     'dateRangeForm' => $dateRangeForm->createView(),
                     'stats'         => $stats,
                 ],
