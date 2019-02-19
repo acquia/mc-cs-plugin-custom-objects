@@ -601,6 +601,7 @@ return [
                     'custom_object.permission.provider',
                     'mautic.helper.user',
                     'mautic.custom.model.field',
+                    'event_dispatcher',
                 ],
             ],
         ],

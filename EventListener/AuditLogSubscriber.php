@@ -18,6 +18,8 @@ use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
+use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
+use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
 
 class AuditLogSubscriber extends CommonSubscriber
 {
@@ -47,8 +49,10 @@ class AuditLogSubscriber extends CommonSubscriber
     public static function getSubscribedEvents(): array
     {
         return [
-            CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE => 'onCustomItemPostSave',
-            CustomItemEvents::ON_CUSTOM_ITEM_POST_DELETE => 'onCustomItemPostDelete',
+            CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE       => 'onCustomItemPostSave',
+            CustomItemEvents::ON_CUSTOM_ITEM_POST_DELETE     => 'onCustomItemPostDelete',
+            CustomObjectEvents::ON_CUSTOM_OBJECT_POST_SAVE   => 'onCustomObjectPostSave',
+            CustomObjectEvents::ON_CUSTOM_OBJECT_POST_DELETE => 'onCustomObjectPostDelete',
         ];
     }
 
@@ -88,6 +92,46 @@ class AuditLogSubscriber extends CommonSubscriber
             'objectId'  => $customItem->deletedId,
             'action'    => 'delete',
             'details'   => ['name' => $customItem->getName()],
+            'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+        ]);
+    }
+
+    /**
+     * Add a create/update entry to the audit log.
+     *
+     * @param CustomObjectEvent $event
+     */
+    public function onCustomObjectPostSave(CustomObjectEvent $event): void
+    {
+        $customObject = $event->getCustomObject();
+        $changes      = $customObject->getChanges();
+
+        if (!empty($changes)) {
+            $this->auditLogModel->writeToLog([
+                'bundle'    => 'customObjects',
+                'object'    => 'customObject',
+                'objectId'  => $customObject->getId(),
+                'action'    => $event->entityIsNew() ? 'create' : 'update',
+                'details'   => $changes,
+                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+            ]);
+        }
+    }
+
+    /**
+     * Add a delete entry to the audit log.
+     *
+     * @param CustomObjectEvent $event
+     */
+    public function onCustomObjectPostDelete(CustomObjectEvent $event): void
+    {
+        $customObject = $event->getCustomObject();
+        $this->auditLogModel->writeToLog([
+            'bundle'    => 'customObjects',
+            'object'    => 'customObject',
+            'objectId'  => $customObject->deletedId,
+            'action'    => 'delete',
+            'details'   => ['name' => $customObject->getName()],
             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ]);
     }

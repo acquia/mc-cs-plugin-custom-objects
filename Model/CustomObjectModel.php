@@ -24,6 +24,9 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
+use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
 
 class CustomObjectModel extends FormModel
 {
@@ -53,45 +56,73 @@ class CustomObjectModel extends FormModel
      * @param CustomObjectPermissionProvider $permissionProvider
      * @param UserHelper                     $userHelper
      * @param CustomFieldModel               $customFieldModel
+     * @param EventDispatcherInterface       $dispatcher
      */
     public function __construct(
         EntityManager $entityManager,
         CustomObjectRepository $customObjectRepository,
         CustomObjectPermissionProvider $permissionProvider,
         UserHelper $userHelper,
-        CustomFieldModel $customFieldModel
+        CustomFieldModel $customFieldModel,
+        EventDispatcherInterface $dispatcher
     ) {
         $this->entityManager          = $entityManager;
         $this->customObjectRepository = $customObjectRepository;
         $this->permissionProvider     = $permissionProvider;
         $this->userHelper             = $userHelper;
-        $this->customFieldModel = $customFieldModel;
+        $this->customFieldModel       = $customFieldModel;
+        $this->dispatcher             = $dispatcher;
     }
 
     /**
-     * @param CustomObject $entity
+     * @param CustomObject $customObject
      * 
      * @return CustomObject
      */
-    public function save(CustomObject $entity): CustomObject
+    public function save(CustomObject $customObject): CustomObject
     {
-        $user = $this->userHelper->getUser();
-        $now  = new DateTimeHelper();
+        $user  = $this->userHelper->getUser();
+        $now   = new DateTimeHelper();
+        $event = new CustomObjectEvent($customObject, $customObject->isNew());
 
-        if ($entity->isNew()) {
-            $entity->setCreatedBy($user->getId());
-            $entity->setCreatedByUser($user->getName());
-            $entity->setDateAdded($now->getUtcDateTime());
+        if ($customObject->isNew()) {
+            $customObject->setCreatedBy($user->getId());
+            $customObject->setCreatedByUser($user->getName());
+            $customObject->setDateAdded($now->getUtcDateTime());
         }
 
-        $entity->setModifiedBy($user->getId());
-        $entity->setModifiedByUser($user->getName());
-        $entity->setDateModified($now->getUtcDateTime());
+        $customObject->setModifiedBy($user->getId());
+        $customObject->setModifiedByUser($user->getName());
+        $customObject->setDateModified($now->getUtcDateTime());
 
-        $this->entityManager->persist($entity);
+        $customObject->recordCustomFieldChanges();
+
+        $this->dispatcher->dispatch(CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_SAVE, $event);
+
+        $this->entityManager->persist($customObject);
         $this->entityManager->flush();
 
-        return $entity;
+        $this->dispatcher->dispatch(CustomObjectEvents::ON_CUSTOM_OBJECT_POST_SAVE, $event);
+
+        return $customObject;
+    }
+
+    /**
+     * @param CustomObject $customObject
+     */
+    public function delete(CustomObject $customObject): void
+    {
+        //take note of ID before doctrine wipes it out
+        $id    = $customObject->getId();
+        $event = new CustomItemEvent($customObject);
+        $this->dispatcher->dispatch(CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_DELETE, $event);
+
+        $this->entityManager->remove($customObject);
+        $this->entityManager->flush();
+
+        //set the id for use in events
+        $customObject->deletedId = $id;
+        $this->dispatcher->dispatch(CustomObjectEvents::ON_CUSTOM_OBJECT_POST_DELETE, $event);
     }
 
     /**
@@ -103,13 +134,15 @@ class CustomObjectModel extends FormModel
      */
     public function fetchEntity(int $id): CustomObject
     {
-        $entity = parent::getEntity($id);
+        $customObject = parent::getEntity($id);
 
-        if (null === $entity) {
+        if (null === $customObject) {
             throw new NotFoundException("Custom Object with ID = {$id} was not found");
         }
 
-        return $entity;
+        $customObject->createFieldsSnapshot();
+
+        return $customObject;
     }
 
     /**
