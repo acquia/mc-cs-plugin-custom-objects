@@ -23,10 +23,10 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Symfony\Component\HttpFoundation\Response;
+use Mautic\CoreBundle\Model\AuditLogModel;
 
 class ViewController extends CommonController
 {
-    
     /**
      * @var RequestStack
      */
@@ -36,6 +36,11 @@ class ViewController extends CommonController
      * @var CustomItemModel
      */
     private $customItemModel;
+
+    /**
+     * @var AuditLogModel
+     */
+    private $auditLogModel;
 
     /**
      * @var CustomItemPermissionProvider
@@ -56,6 +61,7 @@ class ViewController extends CommonController
      * @param RequestStack $requestStack
      * @param FormFactory $formFactory
      * @param CustomItemModel $customItemModel
+     * @param AuditLogModel $auditLogModel
      * @param CustomItemPermissionProvider $permissionProvider
      * @param CustomItemRouteProvider $routeProvider
      */
@@ -63,6 +69,7 @@ class ViewController extends CommonController
         RequestStack $requestStack,
         FormFactory $formFactory,
         CustomItemModel $customItemModel,
+        AuditLogModel $auditLogModel,
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider
     )
@@ -70,6 +77,7 @@ class ViewController extends CommonController
         $this->requestStack       = $requestStack;
         $this->formFactory        = $formFactory;
         $this->customItemModel    = $customItemModel;
+        $this->auditLogModel      = $auditLogModel;
         $this->permissionProvider = $permissionProvider;
         $this->routeProvider      = $routeProvider;
     }
@@ -103,6 +111,8 @@ class ViewController extends CommonController
             $customItem
         );
 
+        $auditLogs = $this->auditLogModel->getLogForObject('customItem', $itemId, $customItem->getDateAdded(), 10, 'customObjects');
+
         return $this->delegateView(
             [
                 'returnUrl'      => $route,
@@ -110,6 +120,7 @@ class ViewController extends CommonController
                     'item'          => $customItem,
                     'dateRangeForm' => $dateRangeForm->createView(),
                     'stats'         => $stats,
+                    'logs'          => $auditLogs,
                     'contacts'      => $this->forward(
                         'CustomObjectsBundle:CustomItem\ContactList:list',
                         [
