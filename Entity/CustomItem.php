@@ -30,6 +30,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCompany;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use Mautic\CoreBundle\Helper\ArrayHelper;
 
 class CustomItem extends FormEntity implements UniqueEntityInterface
 {
@@ -62,6 +63,11 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      * @var ArrayCollection
      */
     private $customFieldValues;
+
+    /**
+     * @var array
+     */
+    private $initialCustomFieldValues = [];
 
     /**
      * @var ArrayCollection
@@ -175,8 +181,9 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @param Category|null $category
      */
-    public function setCategory($category)
+    public function setCategory(?Category $category)
     {
+        $this->isChanged('category', ($category) ? $category->getId() : null);
         $this->category = $category;
     }
 
@@ -191,7 +198,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $language
      */
-    public function setLanguage($language)
+    public function setLanguage(?string $language)
     {
         $this->isChanged('language', $language);
         $this->language = $language;
@@ -215,6 +222,31 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     public function setCustomFieldValues(ArrayCollection $customFieldValues)
     {
         $this->customFieldValues = $customFieldValues;
+    }
+
+    /**
+     * Called when the custom field values are loaded from the database.
+     */
+    public function createFieldValuesSnapshot()
+    {
+        foreach ($this->customFieldValues as $customFieldId => $customFieldValue) {
+            $this->initialCustomFieldValues[$customFieldId] = $customFieldValue->getValue();
+        }
+    }
+
+    /**
+     * Called before CustomItemSave. It will record changes that happened for custom field values.
+     */
+    public function recordCustomFieldValueChanges()
+    {
+        foreach ($this->customFieldValues as $customFieldId => $customFieldValue) {
+            $initialValue = ArrayHelper::getValue($customFieldId, $this->initialCustomFieldValues);
+            $newValue     = $customFieldValue->getValue();
+
+            if ($initialValue != $newValue) {
+                $this->addChange("customfieldvalue:{$customFieldId}", [$initialValue, $newValue]);
+            }
+        }
     }
 
     /**

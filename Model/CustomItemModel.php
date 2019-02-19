@@ -36,6 +36,9 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
 
 class CustomItemModel extends FormModel
 {
@@ -77,6 +80,7 @@ class CustomItemModel extends FormModel
      * @param CustomFieldModel $customFieldModel
      * @param CustomFieldValueModel $customFieldValueModel
      * @param CustomFieldTypeProvider $customFieldTypeProvider
+     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(
         EntityManager $entityManager,
@@ -85,7 +89,8 @@ class CustomItemModel extends FormModel
         UserHelper $userHelper,
         CustomFieldModel $customFieldModel,
         CustomFieldValueModel $customFieldValueModel,
-        CustomFieldTypeProvider $customFieldTypeProvider
+        CustomFieldTypeProvider $customFieldTypeProvider,
+        EventDispatcherInterface $dispatcher
     )
     {
         $this->entityManager           = $entityManager;
@@ -95,41 +100,48 @@ class CustomItemModel extends FormModel
         $this->customFieldModel        = $customFieldModel;
         $this->customFieldValueModel   = $customFieldValueModel;
         $this->customFieldTypeProvider = $customFieldTypeProvider;
+        $this->dispatcher              = $dispatcher;
     }
 
     /**
-     * @param CustomItem $entity
+     * @param CustomItem $customItem
      * 
      * @return CustomItem
      */
-    public function save(CustomItem $entity): CustomItem
+    public function save(CustomItem $customItem): CustomItem
     {
         $user = $this->userHelper->getUser();
         $now  = new DateTimeHelper();
 
-        if ($entity->isNew()) {
-            $entity->setCreatedBy($user->getId());
-            $entity->setCreatedByUser($user->getName());
-            $entity->setDateAdded($now->getUtcDateTime());
+        if ($customItem->isNew()) {
+            $customItem->setCreatedBy($user->getId());
+            $customItem->setCreatedByUser($user->getName());
+            $customItem->setDateAdded($now->getUtcDateTime());
         }
 
-        $entity->setModifiedBy($user->getId());
-        $entity->setModifiedByUser($user->getName());
-        $entity->setDateModified($now->getUtcDateTime());
+        $customItem->setModifiedBy($user->getId());
+        $customItem->setModifiedByUser($user->getName());
+        $customItem->setDateModified($now->getUtcDateTime());
 
-        $this->entityManager->persist($entity);
+        $this->entityManager->persist($customItem);
 
-        foreach ($entity->getCustomFieldValues() as $customFieldValue) {
+        foreach ($customItem->getCustomFieldValues() as $customFieldValue) {
             $this->customFieldValueModel->save($customFieldValue);
         }
 
-        foreach ($entity->getContactReferences() as $reference) {
+        foreach ($customItem->getContactReferences() as $reference) {
             $this->entityManager->persist($reference);
         }
 
-        $this->entityManager->flush();
+        $customItem->recordCustomFieldValueChanges();
 
-        return $entity;
+        $customItemEvent = new CustomItemEvent($customItem);
+
+        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, $customItemEvent);
+        $this->entityManager->flush();
+        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $customItemEvent);
+
+        return $customItem;
     }
 
     /**
@@ -264,7 +276,6 @@ class CustomItemModel extends FormModel
         $values            = $customItem->getCustomFieldValues();
         $customFields      = $this->customFieldModel->fetchCustomFieldsForObject($customItem->getCustomObject());
         $customFieldValues = $this->customFieldValueModel->getValuesForItem($customItem);
-        $customItem->setCustomFieldValues($values);
         
         foreach ($customFieldValues as $customFieldValue) {
             $values->set($customFieldValue->getId(), $customFieldValue);
@@ -283,6 +294,8 @@ class CustomItemModel extends FormModel
                 );
             }
         }
+
+        $customItem->createFieldValuesSnapshot();
 
         return $customItem;
     }

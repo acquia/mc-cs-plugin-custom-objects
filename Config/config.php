@@ -581,6 +581,7 @@ return [
                     'mautic.custom.model.field',
                     'mautic.custom.model.field.value',
                     'custom_field.type.provider',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.custom.model.import.item' => [
@@ -689,6 +690,13 @@ return [
                     'translator',
                     'custom_item.route.provider',
                     'mautic.custom.model.item',
+                ],
+            ],
+            'custom_object.audit.log.subscriber' => [
+                'class'     => MauticPlugin\CustomObjectsBundle\EventListener\AuditLogSubscriber::class,
+                'arguments' => [
+                    'mautic.core.model.auditlog',
+                    'mautic.helper.ip_lookup',
                 ],
             ],
             'custom_object.button.subscriber' => [

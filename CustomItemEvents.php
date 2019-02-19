@@ -19,6 +19,26 @@ namespace MauticPlugin\CustomObjectsBundle;
 final class CustomItemEvents
 {
     /**
+     * The custom.item.on_pre_save event is fired when a custom item is about to be saved.
+     *
+     * The event listener receives a
+     * MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent
+     *
+     * @var string
+     */
+    const ON_CUSTOM_ITEM_PRE_SAVE = 'custom.item.on_pre_save';
+
+    /**
+     * The custom.item.on_post_save event is fired when a custom item is saved.
+     *
+     * The event listener receives a
+     * MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent
+     *
+     * @var string
+     */
+    const ON_CUSTOM_ITEM_POST_SAVE = 'custom.item.on_post_save';
+
+    /**
      * The custom.item.on_campaign_trigger_action event is fired when the campaign action triggers.
      *
      * The event listener receives a
