@@ -229,8 +229,8 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     public function createFieldValuesSnapshot()
     {
-        foreach ($this->customFieldValues as $customFieldId => $customFieldValue) {
-            $this->initialCustomFieldValues[$customFieldId] = $customFieldValue->getValue();
+        foreach ($this->customFieldValues as $customFieldValue) {
+            $this->initialCustomFieldValues[$customFieldValue->getCustomField()->getId()] = $customFieldValue->getValue();
         }
     }
 
@@ -239,9 +239,10 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     public function recordCustomFieldValueChanges()
     {
-        foreach ($this->customFieldValues as $customFieldId => $customFieldValue) {
-            $initialValue = ArrayHelper::getValue($customFieldId, $this->initialCustomFieldValues);
-            $newValue     = $customFieldValue->getValue();
+        foreach ($this->customFieldValues as $customFieldValue) {
+            $customFieldId = $customFieldValue->getCustomField()->getId();
+            $initialValue  = ArrayHelper::getValue($customFieldId, $this->initialCustomFieldValues);
+            $newValue      = $customFieldValue->getValue();
 
             if ($initialValue != $newValue) {
                 $this->addChange("customfieldvalue:{$customFieldId}", [$initialValue, $newValue]);
