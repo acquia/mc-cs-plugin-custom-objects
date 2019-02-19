@@ -34,6 +34,8 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\NoResultException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Mautic\LeadBundle\Entity\LeadEventLog;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 
 class CustomItemModel extends FormModel
 {
@@ -330,7 +332,32 @@ class CustomItemModel extends FormModel
     }
 
     /**
-     * Used only by Mautic's generic methods. Use CustomFieldPermissionProvider instead.
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param CustomItem $customItem
+     * 
+     * @return array
+     */
+    public function getLinksLineChartData(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        CustomItem $customItem
+    ): array
+    {
+        $chart = new LineChart(null, $from, $to);
+        $query = new ChartQuery($this->entityManager->getConnection(), $from, $to);
+        $links = $query->fetchTimeData(
+            'custom_item_xref_contact',
+            'date_added',
+            ['custom_item_id' => $customItem->getId()]
+        );
+        $chart->setDataset($this->translator->trans('custom.item.linked.contacts'), $links);
+
+        return $chart->render();
+    }
+
+    /**
+     * Used only by Mautic's generic methods. Use CustomItemPermissionProvider instead.
      * 
      * @return string
      */

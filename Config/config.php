@@ -128,6 +128,10 @@ return [
                 'controller' => 'CustomObjectsBundle:CustomItem\Unlink:save',
                 'method'     => 'POST',
             ],
+            CustomItemRouteProvider::ROUTE_CONTACT_LIST => [
+                'path'       => '/custom/item/{objectId}/contact/{page}',
+                'controller' => 'CustomObjectsBundle:CustomItem\ContactList:list',
+            ],
 
             // Custom Objects
             CustomObjectRouteProvider::ROUTE_LIST => [
@@ -291,8 +295,7 @@ return [
                 'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ViewController::class,
                 'arguments' => [
                     'request_stack',
-                    'session',
-                    'mautic.helper.core_parameters',
+                    'form.factory',
                     'mautic.custom.model.item',
                     'custom_item.permission.provider',
                     'custom_item.route.provider',
@@ -357,6 +360,7 @@ return [
                     'session',
                     'translator',
                     'custom_item.permission.provider',
+                    'custom_item.route.provider',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -425,6 +429,14 @@ return [
                     'custom_item.permission.provider',
                     'translator',
                 ],
+                'methodCalls' => [
+                    'setContainer' => [
+                        '@service_container'
+                    ],
+                ],
+            ],
+            'custom_item.contact_list_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ContactListController::class,
                 'methodCalls' => [
                     'setContainer' => [
                         '@service_container'

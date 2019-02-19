@@ -132,7 +132,7 @@ class ContactSubscriber extends CommonSubscriber
         if (!$event->isEngagementCount()) {
             foreach ($links['results'] as $link) {
                 try {
-                    $customItem = $this->customItemModel->fetchEntity($link['object_id']);
+                    $customItem = $this->customItemModel->fetchEntity((int) $link['object_id']);
                     $eventLabel = [
                         'label' => $this->translator->trans("custom.item.{$action}.event", ['%customItemName%' => $customItem->getName()]),
                         'href'  => $this->routeProvider->buildViewRoute($customItem->getCustomObject()->getId(), $customItem->getId()),
