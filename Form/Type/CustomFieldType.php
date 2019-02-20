@@ -159,6 +159,7 @@ class CustomFieldType extends AbstractType
                 $customField->getTypeObject()->getSymfonyFormFiledType(),
                 [
                     'label' => 'custom.field.label.default_value',
+                    'required' => false,
                 ]
             );
         });
