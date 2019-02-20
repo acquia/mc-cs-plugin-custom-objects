@@ -135,18 +135,17 @@ class SaveController extends CommonController
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $this->customObjectModel->save($customObject);
-
             $rawCustomObject = $request->get('custom_object');
 
             if (!empty($rawCustomObject['customFields'])) {
-
                 foreach ($rawCustomObject['customFields'] as $customField) {
                     if ($customField['deleted'] && $customField['id']) {
                         $this->customObjectModel->removeCustomFieldById($customObject, (int) $customField['id']);
                     }
                 }
             }
+
+            $this->customObjectModel->save($customObject);
 
             $this->session->getFlashBag()->add(
                 'notice',
