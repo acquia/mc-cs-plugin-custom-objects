@@ -112,6 +112,7 @@ class ViewController extends CommonController
                     'customObject'  => $customObject,
                     'dateRangeForm' => $dateRangeForm->createView(),
                     'stats'         => $stats,
+                    'logs'          => [],
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomObject:detail.html.php',
                 'passthroughVars' => [
