@@ -17,7 +17,6 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use Symfony\Component\Form\FormBuilderInterface;
 
 abstract class AbstractTextType extends AbstractCustomFieldType
 {
@@ -34,7 +33,7 @@ abstract class AbstractTextType extends AbstractCustomFieldType
     }
 
     /**
-     * @return FormBuilderInterface
+     * @return string
      */
     public function getSymfonyFormFiledType(): string
     {

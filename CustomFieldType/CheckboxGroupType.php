@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
-use Symfony\Component\Form\FormBuilderInterface;
-
 class CheckboxGroupType extends AbstractTextType
 {
     /**
@@ -23,7 +21,7 @@ class CheckboxGroupType extends AbstractTextType
     protected $key = 'checkbox_group';
 
     /**
-     * @return FormBuilderInterface
+     * @return string
      */
     public function getSymfonyFormFiledType(): string
     {
