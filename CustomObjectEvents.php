@@ -1,0 +1,60 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * @copyright   2019 Mautic, Inc. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://mautic.com
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+namespace MauticPlugin\CustomObjectsBundle;
+
+/**
+ * Events available for Custom Objects.
+ */
+final class CustomObjectEvents
+{
+    /**
+     * The custom.object.on_pre_save event is fired when a custom object is about to be saved.
+     *
+     * The event listener receives a
+     * MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent
+     *
+     * @var string
+     */
+    public const ON_CUSTOM_OBJECT_PRE_SAVE = 'custom.object.on_pre_save';
+
+    /**
+     * The custom.object.on_post_save event is fired when a custom object is saved.
+     *
+     * The event listener receives a
+     * MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent
+     *
+     * @var string
+     */
+    public const ON_CUSTOM_OBJECT_POST_SAVE = 'custom.object.on_post_save';
+
+    /**
+     * The custom.object.on_pre_delete event is fired when a custom object is about to be deleted.
+     *
+     * The event listener receives a
+     * MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent
+     *
+     * @var string
+     */
+    public const ON_CUSTOM_OBJECT_PRE_DELETE = 'custom.object.on_pre_delete';
+
+    /**
+     * The custom.object.on_post_delete event is fired when a custom object is deleted.
+     *
+     * The event listener receives a
+     * MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent
+     *
+     * @var string
+     */
+    public const ON_CUSTOM_OBJECT_POST_DELETE = 'custom.object.on_post_delete';
+}

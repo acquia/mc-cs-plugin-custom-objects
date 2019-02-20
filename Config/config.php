@@ -297,6 +297,7 @@ return [
                     'request_stack',
                     'form.factory',
                     'mautic.custom.model.item',
+                    'mautic.core.model.auditlog',
                     'custom_item.permission.provider',
                     'custom_item.route.provider',
                 ],
@@ -581,6 +582,7 @@ return [
                     'mautic.custom.model.field',
                     'mautic.custom.model.field.value',
                     'custom_field.type.provider',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.custom.model.import.item' => [
@@ -600,6 +602,7 @@ return [
                     'custom_object.permission.provider',
                     'mautic.helper.user',
                     'mautic.custom.model.field',
+                    'event_dispatcher',
                 ],
             ],
         ],
@@ -689,6 +692,13 @@ return [
                     'translator',
                     'custom_item.route.provider',
                     'mautic.custom.model.item',
+                ],
+            ],
+            'custom_object.audit.log.subscriber' => [
+                'class'     => MauticPlugin\CustomObjectsBundle\EventListener\AuditLogSubscriber::class,
+                'arguments' => [
+                    'mautic.core.model.auditlog',
+                    'mautic.helper.ip_lookup',
                 ],
             ],
             'custom_object.button.subscriber' => [

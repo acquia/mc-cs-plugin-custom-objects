@@ -76,6 +76,20 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return [
+            'id'           => $this->id,
+            'label'        => $this->label,
+            'type'         => $this->type,
+            'customObject' => $this->customObject->getId(),
+            'order'        => $this->order,
+        ];
+    }
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
