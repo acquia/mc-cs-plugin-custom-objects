@@ -18,6 +18,7 @@ use Mautic\PluginBundle\Bundle\PluginBundleBase;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use Doctrine\DBAL\Connection;
+use MauticPlugin\CustomObjectsBundle\Migrations\Engine;
 
 class CustomObjectsBundle extends PluginBundleBase
 {
@@ -61,26 +62,8 @@ class CustomObjectsBundle extends PluginBundleBase
      */
     public static function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, Schema $installedSchema = null): void
     {
-        $queries = [self::createIndexQueryIfDoesNotExist($installedSchema)];
-        self::commit($factory->getDatabase(), $queries);
-    }
-
-    /**
-     * @param Schema $schema
-     * 
-     * @return string
-     */
-    private static function createIndexQueryIfDoesNotExist(Schema $schema): string
-    {
-        if (!$schema->hasTable(self::$tableName)) {
-            return '';
-        }
-        
-        if ($schema->getTable(self::$tableName)->hasIndex(self::$indexName)) {
-            return '';
-        }
-        
-        return self::createIndexQuery();
+        $migrationEngine = new Engine($factory);
+        $migrationEngine->up($plugin->getVersion());
     }
 
     /**
