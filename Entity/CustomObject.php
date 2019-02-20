@@ -262,6 +262,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
      */
     public function recordCustomFieldChanges()
     {
+        $existingFields = [];
         foreach ($this->customFields as $i => $customField) {
             $initialField = ArrayHelper::getValue($customField->getId(), $this->initialCustomFields, []);
             $newField     = $customField->toArray();
@@ -270,6 +271,8 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
             // Custom Field ID for new fields is not known yet in this point.
             if (empty($newField['id'])) {
                 $newField['id'] = "temp_{$i}";
+            } else {
+                $existingFields[$newField['id']] = $newField;
             }
 
             foreach ($newField as $key => $newValue) {
@@ -278,6 +281,12 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
                     $this->addChange("customfield:{$newField['id']}:{$key}", [$initialValue, $newValue]);
                 }
             }
+        }
+
+        $deletedFields = array_diff_key($this->initialCustomFields, $existingFields);
+
+        foreach ($deletedFields as $deletedField) {
+            $this->addChange("customfield:{$deletedField['id']}", [null, 'deleted']);
         }
     }
 }
