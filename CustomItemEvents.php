@@ -26,7 +26,7 @@ final class CustomItemEvents
      *
      * @var string
      */
-    const ON_CUSTOM_ITEM_PRE_SAVE = 'custom.item.on_pre_save';
+    public const ON_CUSTOM_ITEM_PRE_SAVE = 'custom.item.on_pre_save';
 
     /**
      * The custom.item.on_post_save event is fired when a custom item is saved.
@@ -36,7 +36,7 @@ final class CustomItemEvents
      *
      * @var string
      */
-    const ON_CUSTOM_ITEM_POST_SAVE = 'custom.item.on_post_save';
+    public const ON_CUSTOM_ITEM_POST_SAVE = 'custom.item.on_post_save';
 
     /**
      * The custom.item.on_pre_delete event is fired when a custom item is about to be deleted.
@@ -46,7 +46,7 @@ final class CustomItemEvents
      *
      * @var string
      */
-    const ON_CUSTOM_ITEM_PRE_DELETE = 'custom.item.on_pre_delete';
+    public const ON_CUSTOM_ITEM_PRE_DELETE = 'custom.item.on_pre_delete';
 
     /**
      * The custom.item.on_post_delete event is fired when a custom item is deleted.
@@ -56,7 +56,7 @@ final class CustomItemEvents
      *
      * @var string
      */
-    const ON_CUSTOM_ITEM_POST_DELETE = 'custom.item.on_post_delete';
+    public const ON_CUSTOM_ITEM_POST_DELETE = 'custom.item.on_post_delete';
 
     /**
      * The custom.item.on_campaign_trigger_action event is fired when the campaign action triggers.
@@ -66,7 +66,7 @@ final class CustomItemEvents
      *
      * @var string
      */
-    const ON_CAMPAIGN_TRIGGER_ACTION = 'custom.item.on_campaign_trigger_action';
+    public const ON_CAMPAIGN_TRIGGER_ACTION = 'custom.item.on_campaign_trigger_action';
 
     /**
      * The custom.item.on_campaign_trigger_condition event is fired when the campaign condition triggers.
@@ -76,5 +76,5 @@ final class CustomItemEvents
      *
      * @var string
      */
-    const ON_CAMPAIGN_TRIGGER_CONDITION = 'custom.item.on_campaign_trigger_notification';
+    public const ON_CAMPAIGN_TRIGGER_CONDITION = 'custom.item.on_campaign_trigger_notification';
 }

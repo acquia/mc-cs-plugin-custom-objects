@@ -26,7 +26,7 @@ final class CustomObjectEvents
      *
      * @var string
      */
-    const ON_CUSTOM_OBJECT_PRE_SAVE = 'custom.object.on_pre_save';
+    public const ON_CUSTOM_OBJECT_PRE_SAVE = 'custom.object.on_pre_save';
 
     /**
      * The custom.object.on_post_save event is fired when a custom object is saved.
@@ -36,7 +36,7 @@ final class CustomObjectEvents
      *
      * @var string
      */
-    const ON_CUSTOM_OBJECT_POST_SAVE = 'custom.object.on_post_save';
+    public const ON_CUSTOM_OBJECT_POST_SAVE = 'custom.object.on_post_save';
 
     /**
      * The custom.object.on_pre_delete event is fired when a custom object is about to be deleted.
@@ -46,7 +46,7 @@ final class CustomObjectEvents
      *
      * @var string
      */
-    const ON_CUSTOM_OBJECT_PRE_DELETE = 'custom.object.on_pre_delete';
+    public const ON_CUSTOM_OBJECT_PRE_DELETE = 'custom.object.on_pre_delete';
 
     /**
      * The custom.object.on_post_delete event is fired when a custom object is deleted.
@@ -56,5 +56,5 @@ final class CustomObjectEvents
      *
      * @var string
      */
-    const ON_CUSTOM_OBJECT_POST_DELETE = 'custom.object.on_post_delete';
+    public const ON_CUSTOM_OBJECT_POST_DELETE = 'custom.object.on_post_delete';
 }

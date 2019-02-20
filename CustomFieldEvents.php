@@ -26,5 +26,5 @@ final class CustomFieldEvents
      *
      * @var string
      */
-    const MAKE_FIELD_TYPE_LIST = 'custom_fields.make_type_list';
+    public const MAKE_FIELD_TYPE_LIST = 'custom_fields.make_type_list';
 }
