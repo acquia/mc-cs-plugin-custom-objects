@@ -25,6 +25,6 @@ class RadioGroupType extends AbstractTextType
      */
     public function getSymfonyFormFiledType(): string
     {
-        return \MauticPlugin\CustomObjectsBundle\CustomFieldType\Form\Type\RadioGroupType::class;
+        return Form\Type\RadioGroupType::class;
     }
 }

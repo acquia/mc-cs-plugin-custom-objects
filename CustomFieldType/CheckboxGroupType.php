@@ -25,6 +25,6 @@ class CheckboxGroupType extends AbstractTextType
      */
     public function getSymfonyFormFiledType(): string
     {
-        return MauticPlugin\CustomObjectsBundle\CustomFieldType\Form\Type\CheckboxGroupType::class;
+        return Form\Type\CheckboxGroupType::class;
     }
 }

@@ -25,6 +25,6 @@ class SelectType extends AbstractTextType
      */
     public function getSymfonyFormFiledType(): string
     {
-        return \MauticPlugin\CustomObjectsBundle\CustomFieldType\Form\Type\SelectType::class;
+        return Form\Type\SelectType::class;
     }
 }
