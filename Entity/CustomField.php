@@ -63,7 +63,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @var bool
      */
-    private $required;
+    private $required = false;
 
     /**
      * @var mixed
