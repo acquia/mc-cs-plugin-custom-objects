@@ -37,7 +37,7 @@ $view['slots']->set(
             <!--/ form detail header -->
 
             <!-- form detail collapseable -->
-            <div class="collapse" id="form-details">
+            <div class="collapse" id="custom-object-details">
                 <div class="pr-md pl-md pb-md">
                     <div class="panel shd-none mb-0">
                         <table class="table table-bordered table-striped mb-0">
