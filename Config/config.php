@@ -145,7 +145,7 @@ return [
             CustomObjectRouteProvider::ROUTE_VIEW => [
                 'path'       => '/custom/object/view/{objectId}',
                 'controller' => 'CustomObjectsBundle:CustomObject\View:view',
-                'method'     => 'GET',
+                'method'     => 'GET|POST',
             ],
             CustomObjectRouteProvider::ROUTE_FORM => [
                 'path'       => '/custom/object/edit/{objectId}',
@@ -469,6 +469,7 @@ return [
                     'form.factory',
                     'mautic.helper.core_parameters',
                     'mautic.custom.model.object',
+                    'mautic.core.model.auditlog',
                     'custom_object.permission.provider',
                     'custom_object.route.provider',
                 ],

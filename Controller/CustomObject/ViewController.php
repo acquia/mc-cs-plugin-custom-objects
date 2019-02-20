@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
 use Mautic\CoreBundle\Form\Type\DateRangeType;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -42,6 +43,11 @@ class ViewController extends CommonController
     private $customObjectModel;
 
     /**
+     * @var AuditLogModel
+     */
+    private $auditLogModel;
+
+    /**
      * @var CustomObjectPermissionProvider
      */
     private $permissionProvider;
@@ -56,6 +62,7 @@ class ViewController extends CommonController
      * @param FormFactory                    $formFactory
      * @param CoreParametersHelper           $coreParametersHelper
      * @param CustomObjectModel              $customObjectModel
+     * @param AuditLogModel                  $auditLogModel
      * @param CustomObjectPermissionProvider $permissionProvider
      * @param CustomObjectRouteProvider      $routeProvider
      */
@@ -64,6 +71,7 @@ class ViewController extends CommonController
         FormFactory $formFactory,
         CoreParametersHelper $coreParametersHelper,
         CustomObjectModel $customObjectModel,
+        AuditLogModel $auditLogModel,
         CustomObjectPermissionProvider $permissionProvider,
         CustomObjectRouteProvider $routeProvider
     )
@@ -72,6 +80,7 @@ class ViewController extends CommonController
         $this->formFactory = $formFactory;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->customObjectModel    = $customObjectModel;
+        $this->auditLogModel = $auditLogModel;
         $this->permissionProvider   = $permissionProvider;
         $this->routeProvider      = $routeProvider;
     }
@@ -105,6 +114,14 @@ class ViewController extends CommonController
             $customObject
         );
 
+        $logs = $this->auditLogModel->getLogForObject(
+            'customObject',
+            $customObject->getId(),
+            $customObject->getDateAdded(),
+            10,
+            'customObjects'
+        );
+
         return $this->delegateView(
             [
                 'returnUrl'      => $route,
@@ -112,7 +129,7 @@ class ViewController extends CommonController
                     'customObject'  => $customObject,
                     'dateRangeForm' => $dateRangeForm->createView(),
                     'stats'         => $stats,
-                    'logs'          => [],
+                    'logs'          => $logs,
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomObject:detail.html.php',
                 'passthroughVars' => [
