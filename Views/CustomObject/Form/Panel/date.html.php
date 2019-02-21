@@ -9,4 +9,4 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$view->extend("CustomObjectsBundle:CustomObject:FormFields\\field.html.php");
+$view->extend("CustomObjectsBundle:CustomObject:Form\\Panel\\_field.html.php");

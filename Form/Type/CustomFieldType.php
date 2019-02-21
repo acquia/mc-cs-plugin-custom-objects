@@ -20,6 +20,8 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 
@@ -96,20 +98,9 @@ class CustomFieldType extends AbstractType
         );
 
         if ($customObjectForm) {
-            // Possibility to mark field as deleted in POST data
-            $builder->add('deleted',HiddenType::class,['mapped' => false]);
+            $this->buildPanelFormFields($builder);
         } else {
-
-            $builder->add(
-                'buttons',
-                FormButtonsType::class,
-                [
-                    'apply_text' => '',
-                    'cancel_onclick' => "mQuery('form[name=custom_field]').attr('method', 'get').attr('action', mQuery('form[name=custom_field]').attr('action').replace('/save', '/cancel'));",
-                ]
-            );
-
-            $builder->setAction($options['action']);
+            $this->buildModalFormFields($builder, $options);
         }
     }
 
@@ -125,5 +116,63 @@ class CustomFieldType extends AbstractType
                 'csrf_protection'   => false,
             ]
         );
+    }
+
+    /**
+     * Build fields for panel - custom field list.
+     * All should be hidden.
+     *
+     * @param FormBuilderInterface $builder
+     */
+    private function buildPanelFormFields(FormBuilderInterface $builder): void
+    {
+        $builder->add('required', HiddenType::class);
+        $builder->add('defaultValue', HiddenType::class);
+
+        // Possibility to mark field as deleted in POST data
+        $builder->add('deleted',HiddenType::class,['mapped' => false]);
+    }
+
+    /**
+     * Build fields for form in modal. Full specification of custom field.
+     *
+     * @param FormBuilderInterface $builder
+     * @param array                $options
+     */
+    public function buildModalFormFields(FormBuilderInterface $builder, array $options): void
+    {
+        $builder->add(
+            'required',
+            \Symfony\Component\Form\Extension\Core\Type\CheckboxType::class,
+            [
+                'label' => 'custom.field.label.required',
+            ]
+        );
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event){
+            /** @var CustomField $customField */
+            $customField = $event->getData();
+            $form = $event->getForm();
+
+            $form->add(
+                'defaultValue',
+                $customField->getTypeObject()->getSymfonyFormFiledType(),
+                [
+                    'label' => 'custom.field.label.default_value',
+                    'required' => false,
+                ]
+            );
+        });
+
+        $builder->add(
+            'buttons',
+            FormButtonsType::class,
+            [
+                'apply_text' => '',
+                'cancel_onclick' => "mQuery('form[name=custom_field]').attr('method', 'get').attr('action', mQuery('form[name=custom_field]').attr('action').replace('/save', '/cancel'));",
+            ]
+        );
+
+        $builder->setAction($options['action']);
     }
 }

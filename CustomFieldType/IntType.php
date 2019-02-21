@@ -20,36 +20,10 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 
 class IntType extends AbstractCustomFieldType
 {
-    const KEY = 'int';
-
     /**
      * @var string
      */
-    private $name;
-
-    /**
-     * @param string $name field type name translated to user's language
-     */
-    public function __construct(string $name) 
-    {
-        $this->name = $name;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * @return string
-     */
-    public function getKey(): string
-    {
-        return self::KEY;
-    }
+    protected $key = 'int';
 
     /**
      * @return string
@@ -73,14 +47,6 @@ class IntType extends AbstractCustomFieldType
     public function getTableName(): string
     {
         return 'custom_field_value_int';
-    }
-
-    /**
-     * @return string
-     */
-    public function getTableAlias(): string
-    {
-        return 'cfvint';
     }
 
     /**

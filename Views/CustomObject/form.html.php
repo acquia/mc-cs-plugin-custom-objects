@@ -76,7 +76,7 @@ $view['slots']->set('headerTitle', $header);
                             $customFieldEntity = $customField->vars['data'];
                             if (!in_array($customFieldEntity->getId(), $deletedFields)) :
                                 echo $view->render(
-                                    "CustomObjectsBundle:CustomObject:FormFields\\field.{$customFieldEntity->getType()}.html.php",
+                                    "CustomObjectsBundle:CustomObject:Form\\Panel\\{$customFieldEntity->getType()}.html.php",
                                     ['customField' => $customField, 'customObject' => $customObject]
                                 );
                             endif;

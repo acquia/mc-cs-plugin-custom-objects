@@ -103,7 +103,6 @@ class SaveController extends CommonController
      * @param Request $request
      *
      * @return Response|JsonResponse
-     * @throws ForbiddenException
      */
     public function saveAction(Request $request)
     {
@@ -167,7 +166,7 @@ class SaveController extends CommonController
      *
      * @return JsonResponse
      */
-    private function buildCustomFieldFormPart(CustomObject $customObject, CustomField $customField)
+    private function buildCustomFieldFormPart(CustomObject $customObject, CustomField $customField): JsonResponse
     {
         $customFieldForm = $this->formFactory->create(
             CustomFieldType::class,
@@ -176,7 +175,7 @@ class SaveController extends CommonController
         );
 
          $template = $this->render(
-            "CustomObjectsBundle:CustomObject:FormFields\\field.{$customField->getType()}.html.php",
+            "CustomObjectsBundle:CustomObject:Form\\Panel\\{$customField->getType()}.html.php",
             [
                 'customObject' => $customObject,
                 'customFieldEntity' => $customField,
