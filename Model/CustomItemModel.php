@@ -33,6 +33,12 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\NoResultException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use Mautic\LeadBundle\Entity\LeadEventLog;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
 
 class CustomItemModel extends FormModel
 {
@@ -74,6 +80,7 @@ class CustomItemModel extends FormModel
      * @param CustomFieldModel $customFieldModel
      * @param CustomFieldValueModel $customFieldValueModel
      * @param CustomFieldTypeProvider $customFieldTypeProvider
+     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(
         EntityManager $entityManager,
@@ -82,7 +89,8 @@ class CustomItemModel extends FormModel
         UserHelper $userHelper,
         CustomFieldModel $customFieldModel,
         CustomFieldValueModel $customFieldValueModel,
-        CustomFieldTypeProvider $customFieldTypeProvider
+        CustomFieldTypeProvider $customFieldTypeProvider,
+        EventDispatcherInterface $dispatcher
     )
     {
         $this->entityManager           = $entityManager;
@@ -92,41 +100,65 @@ class CustomItemModel extends FormModel
         $this->customFieldModel        = $customFieldModel;
         $this->customFieldValueModel   = $customFieldValueModel;
         $this->customFieldTypeProvider = $customFieldTypeProvider;
+        $this->dispatcher              = $dispatcher;
     }
 
     /**
-     * @param CustomItem $entity
+     * @param CustomItem $customItem
      * 
      * @return CustomItem
      */
-    public function save(CustomItem $entity): CustomItem
+    public function save(CustomItem $customItem): CustomItem
     {
-        $user = $this->userHelper->getUser();
-        $now  = new DateTimeHelper();
+        $user  = $this->userHelper->getUser();
+        $now   = new DateTimeHelper();
+        $event = new CustomItemEvent($customItem, $customItem->isNew());
 
-        if ($entity->isNew()) {
-            $entity->setCreatedBy($user->getId());
-            $entity->setCreatedByUser($user->getName());
-            $entity->setDateAdded($now->getUtcDateTime());
+        if ($customItem->isNew()) {
+            $customItem->setCreatedBy($user->getId());
+            $customItem->setCreatedByUser($user->getName());
+            $customItem->setDateAdded($now->getUtcDateTime());
         }
 
-        $entity->setModifiedBy($user->getId());
-        $entity->setModifiedByUser($user->getName());
-        $entity->setDateModified($now->getUtcDateTime());
+        $customItem->setModifiedBy($user->getId());
+        $customItem->setModifiedByUser($user->getName());
+        $customItem->setDateModified($now->getUtcDateTime());
 
-        $this->entityManager->persist($entity);
+        $this->entityManager->persist($customItem);
 
-        foreach ($entity->getCustomFieldValues() as $customFieldValue) {
+        foreach ($customItem->getCustomFieldValues() as $customFieldValue) {
             $this->customFieldValueModel->save($customFieldValue);
         }
 
-        foreach ($entity->getContactReferences() as $reference) {
+        foreach ($customItem->getContactReferences() as $reference) {
             $this->entityManager->persist($reference);
         }
 
+        $customItem->recordCustomFieldValueChanges();
+
+        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, $event);
+        $this->entityManager->flush();
+        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $event);
+
+        return $customItem;
+    }
+
+    /**
+     * @param CustomItem $customItem
+     */
+    public function delete(CustomItem $customItem): void
+    {
+        //take note of ID before doctrine wipes it out
+        $id    = $customItem->getId();
+        $event = new CustomItemEvent($customItem);
+        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_PRE_DELETE, $event);
+
+        $this->entityManager->remove($customItem);
         $this->entityManager->flush();
 
-        return $entity;
+        //set the id for use in events
+        $customItem->deletedId = $id;
+        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_POST_DELETE, $event);
     }
 
     /**
@@ -138,12 +170,15 @@ class CustomItemModel extends FormModel
         try {
             $xRef = $this->getContactReference($customItemId, $contactId);
         } catch (NoResultException $e) {
-            $xRef = new CustomItemXrefContact(
+            $contact  = $this->entityManager->getReference(Lead::class, $contactId);
+            $eventLog = $this->createContactEventLog($contact, 'link', 'CustomItem', $customItemId);
+            $xRef     = new CustomItemXrefContact(
                 $this->entityManager->getReference(CustomItem::class, $customItemId),
                 $this->entityManager->getReference(Lead::class, $contactId)
             );
     
             $this->entityManager->persist($xRef);
+            $this->entityManager->persist($eventLog);
             $this->entityManager->flush();
         }
 
@@ -157,8 +192,11 @@ class CustomItemModel extends FormModel
     public function unlinkContact(int $customItemId, int $contactId): void
     {
         try {
-            $xRef = $this->getContactReference($customItemId, $contactId);
+            $xRef     = $this->getContactReference($customItemId, $contactId);
+            $contact  = $this->entityManager->getReference(Lead::class, $contactId);
+            $eventLog = $this->createContactEventLog($contact, 'unlink', 'CustomItem', $customItemId);
             $this->entityManager->remove($xRef);
+            $this->entityManager->persist($eventLog);
             $this->entityManager->flush();
         } catch (NoResultException $e) {
             // If not found then we are done here.
@@ -255,7 +293,6 @@ class CustomItemModel extends FormModel
         $values            = $customItem->getCustomFieldValues();
         $customFields      = $this->customFieldModel->fetchCustomFieldsForObject($customItem->getCustomObject());
         $customFieldValues = $this->customFieldValueModel->getValuesForItem($customItem);
-        $customItem->setCustomFieldValues($values);
         
         foreach ($customFieldValues as $customFieldValue) {
             $values->set($customFieldValue->getId(), $customFieldValue);
@@ -263,7 +300,9 @@ class CustomItemModel extends FormModel
         
         foreach ($customFields as $customField) {
             // Create default value for field that does not exist yet.
-            if (null === $values->get("{$customField->getId()}_{$customItem->getId()}")) {
+            try {
+                $customItem->findCustomFieldValueForFieldId($customField->getId());
+            } catch (NotFoundException $e) {
                 $customFieldType = $this->customFieldTypeProvider->getType($customField->getType());
                 // @todo the default value should come form the custom field.
                 $values->set(
@@ -272,6 +311,8 @@ class CustomItemModel extends FormModel
                 );
             }
         }
+
+        $customItem->createFieldValuesSnapshot();
 
         return $customItem;
     }
@@ -321,7 +362,32 @@ class CustomItemModel extends FormModel
     }
 
     /**
-     * Used only by Mautic's generic methods. Use CustomFieldPermissionProvider instead.
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param CustomItem $customItem
+     * 
+     * @return array
+     */
+    public function getLinksLineChartData(
+        \DateTimeInterface $from,
+        \DateTimeInterface $to,
+        CustomItem $customItem
+    ): array
+    {
+        $chart = new LineChart(null, $from, $to);
+        $query = new ChartQuery($this->entityManager->getConnection(), $from, $to);
+        $links = $query->fetchTimeData(
+            'custom_item_xref_contact',
+            'date_added',
+            ['custom_item_id' => $customItem->getId()]
+        );
+        $chart->setDataset($this->translator->trans('custom.item.linked.contacts'), $links);
+
+        return $chart->render();
+    }
+
+    /**
+     * Used only by Mautic's generic methods. Use CustomItemPermissionProvider instead.
      * 
      * @return string
      */
@@ -380,5 +446,29 @@ class CustomItemModel extends FormModel
         }
 
         return $args;
+    }
+
+    /**
+     * @param Lead $contact
+     * @param string $action
+     * @param string $object
+     * @param integer $objectId
+     * @param array $properties
+     * 
+     * @return LeadEventLog
+     */
+    private function createContactEventLog(Lead $contact, string $action, string $object, int $objectId, array $properties = []): LeadEventLog
+    {
+        $eventLog = new LeadEventLog();
+        $eventLog->setLead($contact);
+        $eventLog->setBundle('CustomObject');
+        $eventLog->setAction($action);
+        $eventLog->setObject($object);
+        $eventLog->setObjectId($objectId);
+        $eventLog->setUserId($this->userHelper->getUser()->getId());
+        $eventLog->setUserName($this->userHelper->getUser()->getName());
+        $eventLog->setProperties($properties);
+
+        return $eventLog;
     }
 }

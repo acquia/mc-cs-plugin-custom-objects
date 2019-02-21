@@ -13,13 +13,16 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -27,6 +30,21 @@ use Mautic\CategoryBundle\Form\Type\CategoryListType;
 
 class CustomObjectType extends AbstractType
 {
+    /**
+     * @var CustomFieldTypeProvider
+     */
+    private $customFieldTypeProvider;
+
+    /**
+     * CustomObjectType constructor.
+     *
+     * @param CustomFieldTypeProvider $customFieldTypeProvider
+     */
+    public function __construct(CustomFieldTypeProvider $customFieldTypeProvider)
+    {
+        $this->customFieldTypeProvider = $customFieldTypeProvider;
+    }
+
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
@@ -84,6 +102,7 @@ class CustomObjectType extends AbstractType
                 'allow_add' => true,
                 'allow_delete' => true,
                 'by_reference' => false,
+                'prototype' => false, // Do not use CF panel prototype in DOM
             ]
         );
 
@@ -96,6 +115,31 @@ class CustomObjectType extends AbstractType
         );
 
         $builder->setAction($options['action']);
+
+        $this->addEvents($builder);
+
+    }
+
+    /**
+     * @param FormBuilderInterface $builder
+     */
+    private function addEvents(FormBuilderInterface $builder): void
+    {
+        $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) {
+            /** @var CustomObject $customObject */
+            $customObject = $event->getData();
+            if (!$customFields = $customObject->getCustomFields()) {
+                return;
+            }
+
+            /** @var CustomField $customField */
+            foreach($customFields as $customField) {
+                if (!$customField->getTypeObject()) {
+                    // Should not happen. Every CF MUST HAVE type object.
+                    $customField->setTypeObject($this->customFieldTypeProvider->getType($customField->getType()));
+                }
+            }
+        });
     }
 
     /**

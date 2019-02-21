@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -28,6 +30,7 @@ use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CampaignConditionFieldValueType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 
 class CampaignSubscriber extends CommonSubscriber
 {
@@ -47,6 +50,11 @@ class CampaignSubscriber extends CommonSubscriber
     private $customItemModel;
 
     /**
+     * @var ConfigProvider
+     */
+    private $configProvider;
+
+    /**
      * @var TranslatorInterface
      */
     protected $translator;
@@ -57,18 +65,21 @@ class CampaignSubscriber extends CommonSubscriber
      * @param CustomObjectModel $customObjectModel
      * @param CustomItemModel $customItemModel
      * @param TranslatorInterface $translator
+     * @param ConfigProvider $configProvider
      */
     public function __construct(
         CustomFieldModel $customFieldModel,
         CustomObjectModel $customObjectModel,
         CustomItemModel $customItemModel,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        ConfigProvider $configProvider
     )
     {
         $this->customFieldModel  = $customFieldModel;
         $this->customObjectModel = $customObjectModel;
         $this->customItemModel   = $customItemModel;
         $this->translator        = $translator;
+        $this->configProvider    = $configProvider;
     }
 
     /**
@@ -84,14 +95,16 @@ class CampaignSubscriber extends CommonSubscriber
     }
 
     /**
-     * @todo don't forget to disable these methods when the plugin is disabled
-     *
      * Add event triggers and actions.
      *
      * @param CampaignBuilderEvent $event
      */
-    public function onCampaignBuild(CampaignBuilderEvent $event)
+    public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
+        if (!$this->configProvider->pluginIsEnabled()) {
+            return;
+        }
+
         $customObjects = $this->customObjectModel->fetchAllPublishedEntities();
 
         foreach ($customObjects as $customObject) {
@@ -106,9 +119,9 @@ class CampaignSubscriber extends CommonSubscriber
             $event->addCondition("custom_item.{$customObject->getId()}.fieldvalue", [
                 'label'           => $this->translator->trans('custom.item.events.field.value', ['%customObject%' => $customObject->getNameSingular()]),
                 'description'     => $this->translator->trans('custom.item.events.field.value_descr', ['%customObject%' => $customObject->getNameSingular()]),
+                'eventName'       => CustomItemEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
                 'formType'        => CampaignConditionFieldValueType::class,
                 'formTheme'       => 'CustomObjectsBundle:FormTheme\FieldValueCondition',
-                'eventName'       => CustomItemEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
                 'formTypeOptions' => ['customObject' => $customObject],
             ]);
         }
@@ -117,9 +130,13 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * @param CampaignExecutionEvent $event
      */
-    public function onCampaignTriggerAction(CampaignExecutionEvent $event)
+    public function onCampaignTriggerAction(CampaignExecutionEvent $event): void
     {
-        if (!preg_match('/custom_item.(\d).linkcontact/', $event->getEvent()['type'])) {
+        if (!$this->configProvider->pluginIsEnabled()) {
+            return;
+        }
+
+        if (!preg_match('/custom_item.(\d*).linkcontact/', $event->getEvent()['type'])) {
             return;
         }
 
@@ -139,39 +156,44 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * @param CampaignExecutionEvent $event
      */
-    public function onCampaignTriggerCondition(CampaignExecutionEvent $event)
+    public function onCampaignTriggerCondition(CampaignExecutionEvent $event): void
     {
-        if (!preg_match('/custom_item.(\d).fieldvalue/', $event->getEvent()['type'])) {
+        if (!$this->configProvider->pluginIsEnabled()) {
+            return;
+        }
+        
+        if (!preg_match('/custom_item.(\d*).fieldvalue/', $event->getEvent()['type'])) {
             return;
         }
 
         $contact = $event->getLead();
 
         if (!$contact || !$contact->getId()) {
-            return $event->setResult(false);
+            $event->setResult(false);
+
+            return;
         }
 
         try {
             $customField = $this->customFieldModel->fetchEntity($event->getConfig()['field']);
         } catch (NotFoundException $e) {
-            return $event->setResult(false);
-        }
+            $event->setResult(false);
 
-        $expr = $customField->getTypeObject()->getOperators()[$event->getConfig()['operator']]['expr'];
+            return;
+        }
 
         try {
             $customItemId = $this->customItemModel->findItemIdForValue(
                 $customField,
                 $contact,
-                $expr,
+                $customField->getTypeObject()->getOperators()[$event->getConfig()['operator']]['expr'],
                 $event->getConfig()['value']
             );
             
             $event->setChannel('customItem', $customItemId);
-    
-            return $event->setResult(true);
+            $event->setResult(true);
         } catch (NotFoundException $e) {
-            return $event->setResult(false);
+            $event->setResult(false);
         }
     }
 }

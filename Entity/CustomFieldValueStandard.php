@@ -82,7 +82,7 @@ abstract class CustomFieldValueStandard implements CustomFieldValueInterface
      */
     public function getId()
     {
-        return "{$this->customField->getId()}_{$this->customItem->getId()}";
+        return $this->customField->getId();
     }
 
     /**

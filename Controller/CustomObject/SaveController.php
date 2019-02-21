@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
@@ -66,6 +67,10 @@ class SaveController extends CommonController
      * @var CustomObjectRouteProvider
      */
     private $routeProvider;
+    /**
+     * @var CustomFieldTypeProvider
+     */
+    private $customFieldTypeProvider;
 
     /**
      * @param RequestStack                   $requestStack
@@ -76,6 +81,7 @@ class SaveController extends CommonController
      * @param CustomFieldModel               $customFieldModel
      * @param CustomObjectPermissionProvider $permissionProvider
      * @param CustomObjectRouteProvider      $routeProvider
+     * @param CustomFieldTypeProvider        $customFieldTypeProvider
      */
     public function __construct(
         RequestStack $requestStack,
@@ -85,9 +91,9 @@ class SaveController extends CommonController
         CustomObjectModel $customObjectModel,
         CustomFieldModel $customFieldModel,
         CustomObjectPermissionProvider $permissionProvider,
-        CustomObjectRouteProvider $routeProvider
-    )
-    {
+        CustomObjectRouteProvider $routeProvider,
+        CustomFieldTypeProvider $customFieldTypeProvider
+    ) {
         $this->requestStack       = $requestStack;
         $this->session            = $session;
         $this->formFactory        = $formFactory;
@@ -96,6 +102,7 @@ class SaveController extends CommonController
         $this->customFieldModel = $customFieldModel;
         $this->permissionProvider = $permissionProvider;
         $this->routeProvider      = $routeProvider;
+        $this->customFieldTypeProvider = $customFieldTypeProvider;
     }
 
     /**
@@ -106,7 +113,7 @@ class SaveController extends CommonController
     public function saveAction(?int $objectId = null)
     {
         try {
-            $customObject = $objectId ? $this->customObjectModel->fetchEntity($objectId): new CustomObject();
+            $customObject = $objectId ? $this->customObjectModel->fetchEntity($objectId) : new CustomObject();
             if ($customObject->isNew()) {
                 $this->permissionProvider->canCreate();
             } else {
@@ -119,19 +126,26 @@ class SaveController extends CommonController
         }
 
         $request = $this->requestStack->getCurrentRequest();
-        $action  = $this->routeProvider->buildSaveRoute($objectId);
-        $form    = $this->formFactory->create(CustomObjectType::class, $customObject, ['action' => $action]);
+        $action = $this->routeProvider->buildSaveRoute($objectId);
+        $form = $this->formFactory->create(
+            CustomObjectType::class,
+            $customObject,
+            ['action' => $action]
+        );
         $form->handleRequest($request);
-        
-        if ($form->isValid()) {
-            $this->customObjectModel->save($customObject);
 
+        if ($form->isValid()) {
             $rawCustomObject = $request->get('custom_object');
-            foreach ($rawCustomObject['customFields'] as $customField) {
-                if ($customField['deleted'] && $customField['id']) {
-                    $this->customFieldModel->deleteById((int) $customField['id']);
+
+            if (!empty($rawCustomObject['customFields'])) {
+                foreach ($rawCustomObject['customFields'] as $customField) {
+                    if ($customField['deleted'] && $customField['id']) {
+                        $this->customObjectModel->removeCustomFieldById($customObject, (int) $customField['id']);
+                    }
                 }
             }
+
+            $this->customObjectModel->save($customObject);
 
             $this->session->getFlashBag()->add(
                 'notice',
@@ -139,8 +153,8 @@ class SaveController extends CommonController
                     $objectId ? 'mautic.core.notice.updated' : 'mautic.core.notice.created',
                     [
                         '%name%' => $customObject->getName(),
-                        '%url%'  => $this->routeProvider->buildFormRoute($objectId),
-                    ], 
+                        '%url%' => $this->routeProvider->buildFormRoute($objectId),
+                    ],
                     'flashes'
                 )
             );
@@ -150,21 +164,23 @@ class SaveController extends CommonController
             }
         }
 
-        return $this->forwardToEdit($request, $customObject);
-    }
-
-    /**
-     * @param Request               $request
-     * @param CustomObject $entity
-     * 
-     * @return Response
-     */
-    private function forwardToEdit(Request $request, CustomObject $entity): Response
-    {
-        $request->setMethod('GET');
-        $params = ['objectId' => $entity->getId()];
-
-        return $this->forward('custom_object.form_controller:renderFormAction', $params);
+        return $this->delegateView(
+            [
+                'returnUrl'      => $this->routeProvider->buildListRoute(),
+                'viewParameters' => [
+                    'customObject' => $customObject,
+                    'availableFieldTypes' => $this->customFieldTypeProvider->getTypes(),
+                    'customFields' => $this->customFieldModel->fetchCustomFieldsForObject($customObject),
+                    'deletedFields' => [],
+                    'form'   => $form->createView(),
+                ],
+                'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.php',
+                'passthroughVars' => [
+                    'mauticContent' => 'customObject',
+                    'route'         => $this->routeProvider->buildFormRoute($customObject->getId()),
+                ],
+            ]
+        );
     }
 
     /**

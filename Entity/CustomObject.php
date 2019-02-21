@@ -23,6 +23,7 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\FormEntity;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Mautic\CoreBundle\Helper\ArrayHelper;
 
 class CustomObject extends FormEntity implements UniqueEntityInterface
 {
@@ -65,6 +66,11 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
      * @var ArrayCollection
      */
     private $customFields;
+
+    /**
+     * @var array
+     */
+    private $initialCustomFields = [];
 
     public function __construct()
     {
@@ -239,5 +245,48 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     public function getCustomFields()
     {
         return $this->customFields;
+    }
+
+    /**
+     * Called when the custom fields are loaded from the database.
+     */
+    public function createFieldsSnapshot()
+    {
+        foreach ($this->customFields as $customField) {
+            $this->initialCustomFields[$customField->getId()] = $customField->toArray();
+        }
+    }
+
+    /**
+     * Called before CustomObjectSave. It will record changes that happened for custom fields.
+     */
+    public function recordCustomFieldChanges()
+    {
+        $existingFields = [];
+        foreach ($this->customFields as $i => $customField) {
+            $initialField = ArrayHelper::getValue($customField->getId(), $this->initialCustomFields, []);
+            $newField     = $customField->toArray();
+
+            // In case the user added more than 1 new field, add it unique ID.
+            // Custom Field ID for new fields is not known yet in this point.
+            if (empty($newField['id'])) {
+                $newField['id'] = "temp_{$i}";
+            } else {
+                $existingFields[$newField['id']] = $newField;
+            }
+
+            foreach ($newField as $key => $newValue) {
+                $initialValue = ArrayHelper::getValue($key, $initialField);
+                if ($initialValue != $newValue) {
+                    $this->addChange("customfield:{$newField['id']}:{$key}", [$initialValue, $newValue]);
+                }
+            }
+        }
+
+        $deletedFields = array_diff_key($this->initialCustomFields, $existingFields);
+
+        foreach ($deletedFields as $deletedField) {
+            $this->addChange("customfield:{$deletedField['id']}", [null, 'deleted']);
+        }
     }
 }

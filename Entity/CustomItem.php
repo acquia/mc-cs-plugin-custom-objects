@@ -29,6 +29,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCompany;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use Mautic\CoreBundle\Helper\ArrayHelper;
 
 class CustomItem extends FormEntity implements UniqueEntityInterface
 {
@@ -61,6 +63,11 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      * @var ArrayCollection
      */
     private $customFieldValues;
+
+    /**
+     * @var array
+     */
+    private $initialCustomFieldValues = [];
 
     /**
      * @var ArrayCollection
@@ -174,8 +181,9 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @param Category|null $category
      */
-    public function setCategory($category)
+    public function setCategory(?Category $category)
     {
+        $this->isChanged('category', ($category) ? $category->getId() : null);
         $this->category = $category;
     }
 
@@ -190,7 +198,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $language
      */
-    public function setLanguage($language)
+    public function setLanguage(?string $language)
     {
         $this->isChanged('language', $language);
         $this->language = $language;
@@ -217,6 +225,32 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     }
 
     /**
+     * Called when the custom field values are loaded from the database.
+     */
+    public function createFieldValuesSnapshot()
+    {
+        foreach ($this->customFieldValues as $customFieldValue) {
+            $this->initialCustomFieldValues[$customFieldValue->getCustomField()->getId()] = $customFieldValue->getValue();
+        }
+    }
+
+    /**
+     * Called before CustomItemSave. It will record changes that happened for custom field values.
+     */
+    public function recordCustomFieldValueChanges()
+    {
+        foreach ($this->customFieldValues as $customFieldValue) {
+            $customFieldId = $customFieldValue->getCustomField()->getId();
+            $initialValue  = ArrayHelper::getValue($customFieldId, $this->initialCustomFieldValues);
+            $newValue      = $customFieldValue->getValue();
+
+            if ($initialValue != $newValue) {
+                $this->addChange("customfieldvalue:{$customFieldId}", [$initialValue, $newValue]);
+            }
+        }
+    }
+
+    /**
      * @return ArrayCollection
      */
     public function getCustomFieldValues()
@@ -229,15 +263,18 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @return CustomFieldValueInterface|null
+     * @param int $customFieldId
+     * 
+     * @return CustomFieldValueInterface
+     * 
+     * @throws NotFoundException
      */
-    public function findCustomFieldValueForFieldId($customFieldId)
+    public function findCustomFieldValueForFieldId(int $customFieldId)
     {
-        $customFieldValue = $this->customFieldValues->get("{$customFieldId}_{$this->getId()}");
+        $customFieldValue = $this->customFieldValues->get($customFieldId);
 
-        // In case the custom field value doesn't exist, find it with the key used for artificially created null values:
-        if (null === $customFieldValue) {
-            $customFieldValue = $this->customFieldValues->get($customFieldId);
+        if (!$customFieldValue) {
+            throw new NotFoundException("Custom Field Value for ID = {$customFieldId} was not found.");
         }
 
         return $customFieldValue;

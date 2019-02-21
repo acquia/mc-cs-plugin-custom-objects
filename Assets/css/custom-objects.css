@@ -1,4 +1,13 @@
-.form-control-feedback {
+.fa.form-control-feedback {
     line-height: 32px;
     right: 15px;
+}
+
+.custom-object-search .fa.form-control-feedback {
+    top: 3px;
+    right: 0px;
+}
+
+.panel .btn-group {
+    z-index: 1000;
 }

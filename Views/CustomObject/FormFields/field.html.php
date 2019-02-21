@@ -9,10 +9,16 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+/**
+ * Panels rendered in CO form
+ */
+
 $customFieldEntity = $customField->vars['data'];
 $customField->vars['index'] = $customField->vars['name'];
+$order = (int) $customField->vars['value']->getOrder();
+$deleted = (!empty($_POST['custom_object']['customFields'][$order]['deleted'])) ? 'style="display:none;"' : '';
 ?>
-<div class="panel form-field-wrapper ui-sortable-handle" id="customField_<?php echo (int) $customField->vars['value']->getOrder() ?>">
+<div class="panel form-field-wrapper ui-sortable-handle" id="customField_<?php echo (int) $customField->vars['value']->getOrder() ?>" <?php echo $deleted ?>>
 
     <div class="form-buttons btn-group" role="group" aria-label="Field options" style="width: 77px;">
 

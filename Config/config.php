@@ -14,7 +14,7 @@ declare(strict_types=1);
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use MauticPlugin\CustomObjectsBundle\CustomObjectsBundle;
+use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 
 return [
     'name'        => 'Custom Objects',
@@ -123,6 +123,15 @@ return [
                 'controller' => 'CustomObjectsBundle:CustomItem\Link:save',
                 'method'     => 'POST',
             ],
+            CustomItemRouteProvider::ROUTE_UNLINK => [
+                'path'       => '/custom/item/{itemId}/unlink/{entityType}/{entityId}.json',
+                'controller' => 'CustomObjectsBundle:CustomItem\Unlink:save',
+                'method'     => 'POST',
+            ],
+            CustomItemRouteProvider::ROUTE_CONTACT_LIST => [
+                'path'       => '/custom/item/{objectId}/contact/{page}',
+                'controller' => 'CustomObjectsBundle:CustomItem\ContactList:list',
+            ],
 
             // Custom Objects
             CustomObjectRouteProvider::ROUTE_LIST => [
@@ -181,7 +190,7 @@ return [
                 'iconClass' => 'fa-list-alt',
                 'checks'    => [
                     'parameters' => [
-                        CustomObjectsBundle::CONFIG_PARAM_ENABLED => true,
+                        ConfigProvider::CONFIG_PARAM_ENABLED => true,
                     ],
                 ],
             ],
@@ -286,9 +295,9 @@ return [
                 'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ViewController::class,
                 'arguments' => [
                     'request_stack',
-                    'session',
-                    'mautic.helper.core_parameters',
+                    'form.factory',
                     'mautic.custom.model.item',
+                    'mautic.core.model.auditlog',
                     'custom_item.permission.provider',
                     'custom_item.route.provider',
                 ],
@@ -352,6 +361,7 @@ return [
                     'session',
                     'translator',
                     'custom_item.permission.provider',
+                    'custom_item.route.provider',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -407,6 +417,27 @@ return [
                     'custom_item.permission.provider',
                     'translator',
                 ],
+                'methodCalls' => [
+                    'setContainer' => [
+                        '@service_container'
+                    ],
+                ],
+            ],
+            'custom_item.unlink_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\UnlinkController::class,
+                'arguments' => [
+                    'mautic.custom.model.item',
+                    'custom_item.permission.provider',
+                    'translator',
+                ],
+                'methodCalls' => [
+                    'setContainer' => [
+                        '@service_container'
+                    ],
+                ],
+            ],
+            'custom_item.contact_list_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ContactListController::class,
                 'methodCalls' => [
                     'setContainer' => [
                         '@service_container'
@@ -488,6 +519,7 @@ return [
                     'mautic.custom.model.field',
                     'custom_object.permission.provider',
                     'custom_object.route.provider',
+                    'custom_field.type.provider',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -550,6 +582,7 @@ return [
                     'mautic.custom.model.field',
                     'mautic.custom.model.field.value',
                     'custom_field.type.provider',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.custom.model.import.item' => [
@@ -568,6 +601,8 @@ return [
                     'custom_object.repository',
                     'custom_object.permission.provider',
                     'mautic.helper.user',
+                    'mautic.custom.model.field',
+                    'event_dispatcher',
                 ],
             ],
         ],
@@ -599,14 +634,14 @@ return [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\AssetsSubscriber::class,
                 'arguments' => [
                     'templating.helper.assets',
-                    'mautic.helper.core_parameters',
+                    'custom_object.config.provider',
                 ]
             ],
             'custom_object.menu.subscriber' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\MenuSubscriber::class,
                 'arguments' => [
                     'mautic.custom.model.object',
-                    'mautic.helper.core_parameters',
+                    'custom_object.config.provider',
                 ],
             ],
             'custom_object.tab.subscriber' => [
@@ -614,7 +649,7 @@ return [
                 'arguments' => [
                     'mautic.custom.model.object',
                     'mautic.custom.model.item',
-                    'mautic.helper.core_parameters',
+                    'custom_object.config.provider',
                 ],
             ],
             'custom_field.type.subscriber' => [
@@ -647,6 +682,23 @@ return [
                 'arguments' => [
                     'mautic.custom.model.object',
                     'mautic.custom.model.import.item',
+                    'custom_object.config.provider',
+                ],
+            ],
+            'custom_item.contact.subscriber' => [
+                'class'     => MauticPlugin\CustomObjectsBundle\EventListener\ContactSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'translator',
+                    'custom_item.route.provider',
+                    'mautic.custom.model.item',
+                ],
+            ],
+            'custom_object.audit.log.subscriber' => [
+                'class'     => MauticPlugin\CustomObjectsBundle\EventListener\AuditLogSubscriber::class,
+                'arguments' => [
+                    'mautic.core.model.auditlog',
+                    'mautic.helper.ip_lookup',
                 ],
             ],
             'custom_object.button.subscriber' => [
@@ -663,20 +715,22 @@ return [
                     'mautic.custom.model.object',
                     'mautic.custom.model.item',
                     'translator',
+                    'custom_object.config.provider',
                 ]
             ],
-	   'custom_object.segments.filters_generate.subscriber' => [
+	        'custom_object.segments.filters_generate.subscriber' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\SegmentFiltersChoicesGenerateSubscriber::class,
                 'arguments'=> [
                     'custom_object.repository',
                     'translator',
+                    'custom_object.config.provider',
                 ]
             ],
             'custom_object.segments.filters_dictionary.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\SegmentFiltersDictionarySubscriber::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
-                    'mautic.helper.core_parameters'
+                    'custom_object.config.provider',
                 ],
             ],
         ],
@@ -691,6 +745,13 @@ return [
                 ],
                 'tag' => 'form.type'
             ],
+            'custom_object.object.form' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType::class,
+                'arguments' => [
+                    'custom_field.type.provider'
+                ],
+                'tag' => 'form.type'
+            ],
             'custom_field.field.value.form' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldValueType::class,
             ],
@@ -701,7 +762,7 @@ return [
                     'translator',
                 ],
             ],
-            'custom_item.campaign.link.form' => [
+            'custom_item.campaign.field.value.form' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Form\Type\CampaignConditionFieldValueType::class,
                 'arguments' => [
                     'mautic.custom.model.field',
@@ -724,6 +785,12 @@ return [
             ],
         ],
         'other' => [
+            'custom_object.config.provider' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                ],
+            ],
             'custom_field.type.provider' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider::class,
                 'arguments' => [
@@ -786,6 +853,6 @@ return [
         ],
     ],
     'parameters' => [
-        'custom_objects_enabled' => true,
+        ConfigProvider::CONFIG_PARAM_ENABLED => true,
     ],
 ];

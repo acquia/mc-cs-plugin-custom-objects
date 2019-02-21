@@ -15,10 +15,19 @@ use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 if ($tmpl == 'index') {
     $view->extend('CustomObjectsBundle:CustomItem:index.html.php');
 }
+
+$routeSelf = $view['router']->path(
+    CustomItemRouteProvider::ROUTE_LIST,
+    [
+        'objectId'  => $customObject->getId(),
+        'contactId' => $contactId,
+        'tmpl'      => 'list',
+    ]
+);
 ?>
 <?php if (count($items)): ?>
     <div class="table-responsive">
-        <table class="table table-hover table-striped table-bordered" id="custom-items-table">
+        <table class="table table-hover table-striped table-bordered" id="custom-items-<?php echo $customObject->getId(); ?>-table">
             <thead>
             <tr>
                 <?php
@@ -26,9 +35,10 @@ if ($tmpl == 'index') {
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
                         'checkall'  => 'true',
-                        'target'    => '#custom-items-table',
+                        'target'    => "#custom-items-{$customObject->getId()}-table",
                         'langVar'   => 'custom.item',
                         'routeBase' => 'custom_item',
+                        'baseUrl'   => $routeSelf,
                     ]
                 );
 
@@ -39,6 +49,7 @@ if ($tmpl == 'index') {
                         'orderBy'    => CustomItemRepository::TABLE_ALIAS.'.name',
                         'text'       => 'mautic.core.name',
                         'class'      => 'col-custom_item_name',
+                        'baseUrl'    => $routeSelf,
                     ]
                 );
 
@@ -50,6 +61,7 @@ if ($tmpl == 'index') {
                         'text'       => 'mautic.core.id',
                         'class'      => 'visible-md visible-lg col-asset-id',
                         'default'    => true,
+                        'baseUrl'    => $routeSelf,
                     ]
                 );
                 ?>
@@ -63,14 +75,14 @@ if ($tmpl == 'index') {
                     </td>
                     <td>
                         <div>
-                            <?php echo $view->render(
+                            <?php echo empty($contactId) ? $view->render(
                                 'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                                 [
                                     'item'  => $item,
                                     'model' => 'custom.item',
                                 ]
-                            ); ?>
-                            <a href="<?php echo $view['router']->path(CustomItemRouteProvider::ROUTE_VIEW, ['objectId' => $item->getCustomObject()->getId(), 'itemId' => $item->getId()]); ?>" data-toggle="ajax">
+                            ): ''; ?>
+                            <a href="<?php echo $view['router']->path(CustomItemRouteProvider::ROUTE_VIEW, ['objectId' => $customObject->getId(), 'itemId' => $item->getId()]); ?>" data-toggle="ajax">
                                 <?php echo $item->getName(); ?>
                             </a>
                         </div>
@@ -85,12 +97,13 @@ if ($tmpl == 'index') {
         <?php echo $view->render(
             'MauticCoreBundle:Helper:pagination.html.php',
             [
-                'totalItems' => $itemCount,
-                'page'       => $page,
-                'limit'      => $limit,
-                'baseUrl'    => $view['router']->path(CustomItemRouteProvider::ROUTE_LIST),
-                'sessionVar' => 'custom.item',
-                'routeBase'  => CustomItemRouteProvider::ROUTE_LIST,
+                'totalItems'  => $itemCount,
+                'page'        => $page,
+                'limit'       => $limit,
+                'baseUrl'     => $routeSelf = $view['router']->path(CustomItemRouteProvider::ROUTE_LIST,['objectId'  => $customObject->getId(),]),
+                'queryString' => "&contactId={$contactId}",
+                'sessionVar'  => 'custom.item',
+                'routeBase'   => CustomItemRouteProvider::ROUTE_LIST,
             ]
         ); ?>
     </div>
