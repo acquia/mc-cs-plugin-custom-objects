@@ -159,6 +159,31 @@ $view['slots']->set(
 
     <!-- right section -->
     <div class="col-md-3 bg-white bdr-l height-auto">
+
+        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
+            <div class="panel-heading">
+                <div class="panel-title">Actions</div>
+            </div>
+            <div class="panel-body pt-xs">
+                <ul class="media-list media-list-feed">
+                    <li>
+                        <a href="<?php
+                        echo $view['router']->path(
+                            \MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider::ROUTE_LIST,
+                            ['objectId' => $customObject->getId()]
+                        ) ?>">View custom items</a>
+                    </li>
+                    <li>
+                        <a href="<?php
+                        echo $view['router']->path(
+                            \MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider::ROUTE_NEW,
+                            ['objectId' => $customObject->getId()]
+                        ) ?>">Create new custom item</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
         <!-- recent activity -->
         <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', ['logs' => $logs]); ?>
     </div>
