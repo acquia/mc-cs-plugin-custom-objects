@@ -16,12 +16,9 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\DebugBundle\Service\MauticDebugHelper;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
-use Mautic\EmailBundle\Event\ContactFiltersEvaluateEvent;
+use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
-use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
-use Mautic\LeadBundle\Segment\Decorator\DecoratorFactory;
-use Mautic\LeadBundle\Segment\OperatorOptions;
 
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 
@@ -34,6 +31,7 @@ class DynamicContentSubscriber extends CommonSubscriber
      * @var EntityManager
      */
     private $entityManager;
+
     /**
      * @var ContactSegmentFilterFactory
      */
@@ -95,8 +93,6 @@ class DynamicContentSubscriber extends CommonSubscriber
             }
 
             $this->addContactIdRestriction($filterQueryBuilder, $tableAlias, (int) $event->getContact()->getId());
-
-            MauticDebugHelper::dumpSQL($filterQueryBuilder);
 
             if ($filterQueryBuilder->execute()->rowCount()) {
                 $event->setIsEvaluated(true);

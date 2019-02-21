@@ -22,24 +22,24 @@ trait QueryFilterHelper
 {
     /**
      * @param Connection  $connection
-     * @param string      $queryBuilderAlias
-     * @param int         $customFieldId
-     * @param string|null $customFieldType
+     * @param string      $builderAlias
+     * @param int         $fieldId
+     * @param string|null $fieldType
      *
      * @return QueryBuilder
      */
     public function createValueQueryBuilder(
         Connection $connection,
-        string $queryBuilderAlias,
-        int $customFieldId,
-        ?string $customFieldType = null
+        string $builderAlias,
+        int $fieldId,
+        ?string $fieldType = null
     )
     {
         $queryBuilder      = new QueryBuilder($connection);
-        $customFieldType   = $customFieldType ?: $this->getCustomFieldType($queryBuilder, $customFieldId);
-        $valueQueryBuilder = $this->getBasicItemQueryBuilder($queryBuilder, $queryBuilderAlias);
-        $this->addCustomFieldValueJoin($valueQueryBuilder, $queryBuilderAlias, $customFieldType);
-        $this->addCustomFieldIdRestriction($valueQueryBuilder, $queryBuilderAlias, $customFieldId);
+        $fieldType         = $fieldType ?: $this->getCustomFieldType($queryBuilder, $fieldId);
+        $valueQueryBuilder = $this->getBasicItemQueryBuilder($queryBuilder, $builderAlias);
+        $this->addCustomFieldValueJoin($valueQueryBuilder, $builderAlias, $fieldType);
+        $this->addCustomFieldIdRestriction($valueQueryBuilder, $builderAlias, $fieldId);
 
         return $valueQueryBuilder;
     }
