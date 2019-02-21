@@ -16,9 +16,6 @@ namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 
 class CustomFieldValueType extends AbstractType
@@ -31,7 +28,7 @@ class CustomFieldValueType extends AbstractType
     {
         $customItem       = $options['customItem'];
         $customFieldId    = (int) $builder->getName();
-        $customFieldValue = $customItem->findCustomFieldValueForFieldId((int) $customFieldId);
+        $customFieldValue = $customItem->findCustomFieldValueForFieldId($customFieldId);
         $customField      = $customFieldValue->getCustomField();
 
         $builder->add(
@@ -39,7 +36,7 @@ class CustomFieldValueType extends AbstractType
             $customField->getTypeObject()->getSymfonyFormFiledType(),
             [
                 'label'      => $customFieldValue->getCustomField()->getLabel(),
-                'required'   => true, // make this dynamic
+                'required'   => $customFieldValue->getCustomField()->isRequired(),
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => ['class' => 'form-control'],
             ]

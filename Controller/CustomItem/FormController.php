@@ -87,12 +87,12 @@ class FormController extends CommonController
             $customObject = $this->customObjectModel->fetchEntity($objectId);
 
             if ($itemId) {
-                $entity = $this->customItemModel->fetchEntity($itemId);
+                $customItem = $this->customItemModel->fetchEntity($itemId);
                 $route  = $this->routeProvider->buildEditRoute($objectId, $itemId);
-                $this->permissionProvider->canEdit($entity);
+                $this->permissionProvider->canEdit($customItem);
             } else {
                 $this->permissionProvider->canCreate();
-                $entity = $this->customItemModel->populateCustomFields(new CustomItem($customObject));
+                $customItem = $this->customItemModel->populateCustomFields(new CustomItem($customObject));
                 $route  = $this->routeProvider->buildNewRoute($objectId);
             }
         } catch (NotFoundException $e) {
@@ -102,13 +102,13 @@ class FormController extends CommonController
         }
 
         $action = $this->routeProvider->buildSaveRoute($objectId, $itemId);
-        $form   = $this->formFactory->create(CustomItemType::class, $entity, ['action' => $action, 'objectId' => $objectId]);
+        $form   = $this->formFactory->create(CustomItemType::class, $customItem, ['action' => $action, 'objectId' => $objectId]);
 
         return $this->delegateView(
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute($objectId),
                 'viewParameters' => [
-                    'entity'       => $entity,
+                    'entity'       => $customItem,
                     'customObject' => $customObject,
                     'form'         => $form->createView(),
                 ],
