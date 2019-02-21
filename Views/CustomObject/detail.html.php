@@ -19,6 +19,11 @@ $view['slots']->set(
         ['item' => $customObject]
     )
 );
+
+$view['slots']->set(
+    'publishStatus',
+    $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $customObject])
+);
 ?>
 
 <!-- start: box layout -->
@@ -30,7 +35,6 @@ $view['slots']->set(
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
                     <div class="col-xs-2 text-right">
-                        <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $customObject]); ?>
                     </div>
                 </div>
             </div>
