@@ -97,6 +97,58 @@ $view['slots']->set(
             </div>
 
             <?php echo $view['content']->getCustomContent('details.stats.graph.below', $mauticTemplateVars); ?>
+
+            <!-- tabs controls -->
+            <ul class="nav nav-tabs pr-md pl-md">
+                <li class="active">
+                    <a href="#fields-container" role="tab" data-toggle="tab">
+                        <?php echo $view['translator']->trans('custom.object.tab.fields'); ?>
+                    </a>
+                </li>
+            </ul>
+            <!--/ tabs controls -->
+
+        </div>
+
+        <div class="tab-content pa-md">
+
+            <!-- #fields-container -->
+            <div class="tab-pane fade active in bdr-w-0" id="fields-container">
+                <h5 class="fw-sb mb-xs"><?php echo $view['translator']->trans('custom.field.title') ?></h5>
+                <ul class="list-group mb-xs">
+                    <?php /** @var MauticPlugin\CustomObjectsBundle\Entity\CustomField $field */
+                    foreach ($customObject->getCustomFields() as $field) : ?>
+                        <li class="list-group-item bg-auto bg-light-xs">
+                            <div class="box-layout">
+                                <div class="col-md-1 va-m">
+                                    <?php $requiredTitle = $field->isRequired() ? 'mautic.core.required'
+                                        : 'mautic.core.not_required'; ?>
+                                    <h3><span class="fa fa-<?php echo $field->isRequired() ? 'check'
+                                            : 'times'; ?> text-white dark-xs" data-toggle="tooltip"
+                                              data-placement="left"
+                                              title="<?php echo $view['translator']->trans($requiredTitle); ?>"></span>
+                                    </h3>
+                                </div>
+                                <div class="col-md-7 va-m">
+                                    <h5 class="fw-sb text-primary mb-xs"><?php echo $field->getLabel(); ?></h5>
+                                    <h6 class="text-white dark-md"><?php echo $view['translator']->trans(
+                                            'mautic.form.details.field_type',
+                                            ['%type%' => $field->getType()]
+                                        ); ?></h6>
+                                </div>
+                                <div class="col-md-4 va-m text-right">
+                                    <em class="text-white dark-sm"><?php echo $view['translator']->trans(
+                                            'mautic.form.details.field_order',
+                                            ['%order%' => $field->getOrder()]
+                                        ); ?></em>
+                                </div>
+                            </div>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+            <!--/ #fields-container -->
+
         </div>
 
     </div>
