@@ -66,7 +66,7 @@ class LookupController extends JsonController
     public function listAction(int $objectId)
     {
         try {
-            $this->permissionProvider->canViewAtAll();
+            $this->permissionProvider->canViewAtAll($objectId);
         } catch (ForbiddenException $e) {
             return new AccessDeniedException($e->getMessage(), $e);
         }

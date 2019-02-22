@@ -69,16 +69,17 @@ class LinkController extends JsonController
     public function saveAction(int $itemId, string $entityType, int $entityId): JsonResponse
     {
         try {
-            $this->permissionProvider->canViewAtAll();
+            $customItem = $this->customItemModel->fetchEntity($itemId);
+            $this->permissionProvider->canEdit($customItem);
             $this->makeLinkBasedOnEntityType($itemId, $entityType, $entityId);
-        } catch (ForbiddenException $e) {
-            return new AccessDeniedException($e->getMessage(), $e);
         } catch (UniqueConstraintViolationException $e) {
             $this->addFlash('error', $this->translator->trans(
                 'custom.item.error.link.exists.already',
                 ['%itemId%' => $itemId, '%entityType%' => $entityType, '%entityId%' => $entityId],
                 'flashes'
             ));
+        } catch (\Exception $e) {
+            $this->addFlash('error', $e->getMessage());
         }
 
         return $this->renderJson();

@@ -249,8 +249,9 @@ class CustomItemModel extends FormModel
      */
     public function getTableData(TableConfig $tableConfig): array
     {
+        $customObjectFilter = $tableConfig->getFilter(CustomItem::class, 'customObject');
         $queryBuilder = $this->customItemRepository->getTableDataQuery($tableConfig);
-        $queryBuilder = $this->applyOwnerFilter($queryBuilder);
+        $queryBuilder = $this->applyOwnerFilter($queryBuilder, $customObjectFilter->getValue());
 
         return $queryBuilder->getQuery()->getResult();
     }
@@ -262,8 +263,9 @@ class CustomItemModel extends FormModel
      */
     public function getCountForTable(TableConfig $tableConfig): int
     {
+        $customObjectFilter = $tableConfig->getFilter(CustomItem::class, 'customObject');
         $queryBuilder = $this->customItemRepository->getTableCountQuery($tableConfig);
-        $queryBuilder = $this->applyOwnerFilter($queryBuilder);
+        $queryBuilder = $this->applyOwnerFilter($queryBuilder, $customObjectFilter->getValue());
 
         return (int) $queryBuilder->getQuery()->getSingleScalarResult();
     }
@@ -403,10 +405,10 @@ class CustomItemModel extends FormModel
      * 
      * @return QueryBuilder
      */
-    private function applyOwnerFilter(QueryBuilder $queryBuilder): QueryBuilder
+    private function applyOwnerFilter(QueryBuilder $queryBuilder, int $customObjectId): QueryBuilder
     {
         try {
-            $this->permissionProvider->isGranted('viewother');
+            $this->permissionProvider->isGranted('viewother', $customObjectId);
         } catch (ForbiddenException $e) {
             $this->customItemRepository->applyOwnerFilter($queryBuilder, $this->userHelper->getUser()->getId());
         }

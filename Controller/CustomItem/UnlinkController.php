@@ -64,9 +64,10 @@ class UnlinkController extends JsonController
     public function saveAction(int $itemId, string $entityType, int $entityId): JsonResponse
     {
         try {
-            $this->permissionProvider->canViewAtAll();
+            $customItem = $this->customItemModel->fetchEntity($itemId);
+            $this->permissionProvider->canEdit($customItem);
             $this->unlinkBasedOnEntityType($itemId, $entityType, $entityId);
-        } catch (ForbiddenException $e) {
+        } catch (\Exception $e) {
             $this->addFlash('error', $e->getMessage());
         }
 

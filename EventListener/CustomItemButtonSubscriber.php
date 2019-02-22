@@ -78,10 +78,10 @@ class CustomItemButtonSubscriber extends CommonSubscriber
                     $contactId           = $event->getRequest()->query->get('contactId', false);
                     $onContactDetailPage = (bool) $contactId;
                     if ($onContactDetailPage) {
-                        $entity = $event->getItem();
-                        if ($entity && $entity instanceof CustomItem) {
+                        $customItem = $event->getItem();
+                        if ($customItem && $customItem instanceof CustomItem) {
                             $event->addButton(
-                                $this->defineUnlinkContactButton($customObjectId, $entity->getId(), (int) $contactId),
+                                $this->defineUnlinkContactButton($customObjectId, $customItem->getId(), (int) $contactId),
                                 ButtonHelper::LOCATION_LIST_ACTIONS,
                                 $event->getRoute()
                             );
@@ -103,6 +103,8 @@ class CustomItemButtonSubscriber extends CommonSubscriber
                             ButtonHelper::LOCATION_PAGE_ACTIONS,
                             $event->getRoute()
                         );
+                        $location = $event->getLocation();
+                        $route = $event->getRoute();
                         $event->addButton(
                             $this->defineBatchDeleteButton($customObjectId),
                             ButtonHelper::LOCATION_BULK_ACTIONS,
@@ -129,38 +131,38 @@ class CustomItemButtonSubscriber extends CommonSubscriber
      */
     private function addEntityButtons(CustomButtonEvent $event, $location): void
     {
-        $entity = $event->getItem();
-        if ($entity && $entity instanceof CustomItem) {
+        $customItem = $event->getItem();
+        if ($customItem && $customItem instanceof CustomItem) {
             $customObjectId = $this->getCustomObjectIdFromEvent($event);
             try {
-                $event->addButton($this->defineDeleteButton($customObjectId, $entity), $location, $event->getRoute());
+                $event->addButton($this->defineDeleteButton($customObjectId, $customItem), $location, $event->getRoute());
             } catch (ForbiddenException $e) {}
 
             try {
-                $event->addButton($this->defineCloneButton($customObjectId, $entity), $location, $event->getRoute());
+                $event->addButton($this->defineCloneButton($customObjectId, $customItem), $location, $event->getRoute());
             } catch (ForbiddenException $e) {}
 
             try {
-                $event->addButton($this->defineEditButton($customObjectId, $entity), $location, $event->getRoute());
+                $event->addButton($this->defineEditButton($customObjectId, $customItem), $location, $event->getRoute());
             } catch (ForbiddenException $e) {}
         }
     }
 
     /**
      * @param int        $customObjectId
-     * @param CustomItem $entity
+     * @param CustomItem $customItem
      * 
      * @return array
      * 
      * @throws ForbiddenException
      */
-    private function defineEditButton(int $customObjectId, CustomItem $entity): array
+    private function defineEditButton(int $customObjectId, CustomItem $customItem): array
     {
-        $this->permissionProvider->canEdit($entity);
+        $this->permissionProvider->canEdit($customItem);
 
         return [
             'attr' => [
-                'href' => $this->routeProvider->buildEditRoute($customObjectId, $entity->getId()),
+                'href' => $this->routeProvider->buildEditRoute($customObjectId, $customItem->getId()),
             ],
             'btnText'   => 'mautic.core.form.edit',
             'iconClass' => 'fa fa-pencil-square-o',
@@ -189,19 +191,19 @@ class CustomItemButtonSubscriber extends CommonSubscriber
 
     /**
      * @param int        $customObjectId
-     * @param CustomItem $entity
+     * @param CustomItem $customItem
      * 
      * @return array
      * 
      * @throws ForbiddenException
      */
-    private function defineCloneButton(int $customObjectId, CustomItem $entity): array
+    private function defineCloneButton(int $customObjectId, CustomItem $customItem): array
     {
-        $this->permissionProvider->canClone($entity);
+        $this->permissionProvider->canClone($customItem);
 
         return [
             'attr' => [
-                'href' => $this->routeProvider->buildCloneRoute($customObjectId, $entity->getId()),
+                'href' => $this->routeProvider->buildCloneRoute($customObjectId, $customItem->getId()),
             ],
             'btnText'   => 'mautic.core.form.clone',
             'iconClass' => 'fa fa-copy',
@@ -211,19 +213,19 @@ class CustomItemButtonSubscriber extends CommonSubscriber
 
     /**
      * @param int        $customObjectId
-     * @param CustomItem $entity
+     * @param CustomItem $customItem
      * 
      * @return array
      * 
      * @throws ForbiddenException
      */
-    private function defineDeleteButton(int $customObjectId, CustomItem $entity): array
+    private function defineDeleteButton(int $customObjectId, CustomItem $customItem): array
     {
-        $this->permissionProvider->canDelete($entity);        
+        $this->permissionProvider->canDelete($customItem);        
 
         return [
             'attr' => [
-                'href' => $this->routeProvider->buildDeleteRoute($customObjectId, $entity->getId()),
+                'href' => $this->routeProvider->buildDeleteRoute($customObjectId, $customItem->getId()),
             ],
             'btnText'   => 'mautic.core.form.delete',
             'iconClass' => 'fa fa-fw fa-trash-o text-danger',
@@ -240,7 +242,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
      */
     private function defineNewButton(int $customObjectId): array
     {
-        $this->permissionProvider->canCreate();        
+        $this->permissionProvider->canCreate($customObjectId);        
 
         return [
             'attr' => [
@@ -263,7 +265,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
      */
     private function defineUnlinkContactButton(int $customObjectId, int $customItemId, int $contactId): array
     {
-        $this->permissionProvider->canCreate();        
+        $this->permissionProvider->canCreate($customObjectId);        
 
         return [
             'attr' => [
@@ -287,7 +289,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
      */
     private function defineImportNewButton(int $customObjectId): array
     {
-        $this->permissionProvider->canCreate();        
+        $this->permissionProvider->canCreate($customObjectId);        
 
         return [
             'attr' => [
@@ -308,7 +310,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
      */
     private function defineImportListButton(int $customObjectId): array
     {
-        $this->permissionProvider->canCreate();        
+        $this->permissionProvider->canCreate($customObjectId);        
 
         return [
             'attr' => [
