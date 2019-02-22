@@ -52,7 +52,7 @@ class ImportSubscriber extends CommonSubscriber
      * @param CustomObjectModel $customObjectModel
      * @param CustomItemImportModel $customItemImportModel
      * @param ConfigProvider $configProvider
-     * @param ConfigProvider $permissionProvider
+     * @param CustomItemPermissionProvider $permissionProvider
      */
     public function __construct(
         CustomObjectModel $customObjectModel,
