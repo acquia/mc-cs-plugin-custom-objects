@@ -16,10 +16,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 class CustomObjectPermissions extends AbstractPermissions
 {
-    const NAME = 'custom_objects';
+    public const NAME = 'custom_objects';
 
     /**
      * @var CustomObjectModel
@@ -66,7 +67,7 @@ class CustomObjectPermissions extends AbstractPermissions
     /**
      * {@inheritdoc}
      */
-    public function definePermissions()
+    public function definePermissions(): void
     {
         $this->addExtendedPermissions('custom_fields');
         $this->addExtendedPermissions(self::NAME);
@@ -79,21 +80,16 @@ class CustomObjectPermissions extends AbstractPermissions
 
     /**
      * {@inheritdoc}
-     *
-     * @return string|void
      */
-    public function getName()
+    public function getName(): string
     {
         return self::NAME;
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @param FormBuilderInterface $builder
-     * @param array                $options
      */
-    public function buildForm(FormBuilderInterface &$builder, array $options, array $data)
+    public function buildForm(FormBuilderInterface &$builder, array $options, array $data): void
     {
         $this->addExtendedFormFields(self::NAME, 'custom_fields', $builder, $data);
         $this->addExtendedFormFields(self::NAME, self::NAME, $builder, $data);
@@ -107,18 +103,15 @@ class CustomObjectPermissions extends AbstractPermissions
     /**
      * {@inheritdoc}
      */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return $this->configProvider->pluginIsEnabled();
     }
 
     /**
-     * @param string $bundle
-     * @param string $level
-     * 
-     * @return string
+     * {@inheritdoc}
      */
-    protected function getLabel($bundle, $level)
+    protected function getLabel($bundle, $level): string
     {
         if (is_numeric($level)) {
             $customObject = $this->getCustomObjects()[$level];

@@ -15,8 +15,8 @@ namespace MauticPlugin\CustomObjectsBundle\Provider;
 
 use MauticPlugin\CustomObjectsBundle\Security\Permissions\CustomObjectPermissions;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use MauticPlugin\CustomObjectsBundle\Entity\UniqueEntityInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 
 class CustomItemPermissionProvider
 {
@@ -71,11 +71,11 @@ class CustomItemPermissionProvider
     }
 
     /**
-     * @param UniqueEntityInterface $entity
+     * @param CustomItem $entity
      * 
      * @throws ForbiddenException
      */
-    public function canView(UniqueEntityInterface $entity): void
+    public function canView(CustomItem $entity): void
     {
         $this->hasEntityAccess('view', $entity);
     }
@@ -91,11 +91,11 @@ class CustomItemPermissionProvider
     }
 
     /**
-     * @param UniqueEntityInterface $entity
+     * @param CustomItem $entity
      * 
      * @throws ForbiddenException
      */
-    public function canEdit(UniqueEntityInterface $entity): void
+    public function canEdit(CustomItem $entity): void
     {
         $this->hasEntityAccess('edit', $entity);
     }
@@ -115,11 +115,11 @@ class CustomItemPermissionProvider
     }
 
     /**
-     * @param UniqueEntityInterface $entity
+     * @param CustomItem $entity
      * 
      * @throws ForbiddenException
      */
-    public function canDelete(UniqueEntityInterface $entity): void
+    public function canDelete(CustomItem $entity): void
     {
         $this->hasEntityAccess('delete', $entity);
     }
