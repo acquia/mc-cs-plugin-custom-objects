@@ -97,7 +97,6 @@ class FormController extends CommonController
      * @param Request $request
      *
      * @return Response|JsonResponse
-     * @throws ForbiddenException
      */
     public function renderFormAction(Request $request)
     {

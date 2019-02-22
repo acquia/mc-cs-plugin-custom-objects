@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * @copyright   2018 Mautic, Inc. All rights reserved
+ * @copyright   2019 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
  *
  * @link        https://mautic.com
@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
-class TextType extends AbstractTextType
+class PhoneType extends AbstractTextType
 {
     /**
      * @var string
      */
-    protected $key = 'text';
+    protected $key = 'phone';
 }

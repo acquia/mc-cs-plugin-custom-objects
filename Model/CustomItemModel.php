@@ -30,7 +30,6 @@ use Doctrine\ORM\QueryBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
-use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\NoResultException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Mautic\LeadBundle\Entity\LeadEventLog;
@@ -299,17 +298,17 @@ class CustomItemModel extends FormModel
         foreach ($customFieldValues as $customFieldValue) {
             $values->set($customFieldValue->getId(), $customFieldValue);
         }
-        
+
+        /** @var CustomField $customField */
         foreach ($customFields as $customField) {
             // Create default value for field that does not exist yet.
             try {
                 $customItem->findCustomFieldValueForFieldId($customField->getId());
             } catch (NotFoundException $e) {
                 $customFieldType = $this->customFieldTypeProvider->getType($customField->getType());
-                // @todo the default value should come form the custom field.
                 $values->set(
                     $customField->getId(),
-                    $customFieldType->createValueEntity($customField, $customItem)
+                    $customFieldType->createValueEntity($customField, $customItem, $customField->getDefaultValue())
                 );
             }
         }
