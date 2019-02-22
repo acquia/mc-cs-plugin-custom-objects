@@ -44,6 +44,9 @@ class Engine
         $this->migrationsPath = $pluginPath . '/Migrations/';
     }
 
+    /**
+     * Run available migrations
+     */
     public function up(): void
     {
         $migrationClasses = $this->getMigrationClasses();
@@ -72,7 +75,7 @@ class Engine
      */
     private function getMigrationClasses(): array
     {
-        $migrationFileNames = $this->getMigrationFilNames();
+        $migrationFileNames = $this->getMigrationFileNames();
         $migrationClasses = [];
 
         foreach ($migrationFileNames as $fileName) {
@@ -90,7 +93,7 @@ class Engine
      *
      * @return array
      */
-    private function getMigrationFilNames(): array
+    private function getMigrationFileNames(): array
     {
         $fileNames = scandir($this->migrationsPath);
 

@@ -64,6 +64,6 @@ class CustomObjectsBundle extends PluginBundleBase
             dirname(__FILE__)
         );
 
-        $migrationEngine->up($plugin->getVersion());
+        $migrationEngine->up();
     }
 }
