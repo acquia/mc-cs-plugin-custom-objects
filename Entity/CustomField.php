@@ -64,6 +64,11 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      */
     private $defaultValue;
 
+    /**
+     * @var array
+     */
+    private $params;
+
     public function __clone()
     {
         $this->id = null;
@@ -118,6 +123,10 @@ class CustomField extends FormEntity implements UniqueEntityInterface
             ->build();
         $builder->createField('defaultValue', Type::STRING)
             ->columnName('default_value')
+            ->nullable()
+            ->build();
+        $builder->createField('params', Type::JSON_ARRAY)
+            ->columnName('params')
             ->nullable()
             ->build();
     }
@@ -275,5 +284,21 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     public function setDefaultValue($defaultValue): void
     {
         $this->defaultValue = $defaultValue;
+    }
+
+    /**
+     * @return array
+     */
+    public function getParams(): array
+    {
+        return $this->params;
+    }
+
+    /**
+     * @param array $params
+     */
+    public function setParams(array $params): void
+    {
+        $this->params = $params;
     }
 }
