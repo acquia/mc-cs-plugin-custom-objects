@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc., Jan Kozak <galvani78@gmail.com
+ * @author      Mautic, Inc.
  *
  * @link        https://mautic.org
  *
@@ -100,56 +100,5 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
         $queryBuilder->setParametersPairs($filterParametersHolder, $filterParameters);
 
         return $queryBuilder;
-    }
-
-    /**
-     * @param $filterParameters
-     *
-     * @return array|string
-     */
-    public function getParametersAliases($filterParameters)
-    {
-        if (is_array($filterParameters)) {
-            $parameters = [];
-            foreach ($filterParameters as $filterParameter) {
-                $parameters[] = $this->generateRandomParameterName();
-            }
-        } else {
-            $parameters = $this->generateRandomParameterName();
-        }
-
-        return $parameters;
-    }
-
-    /**
-     * @param QueryBuilder $queryBuilder
-     * @param string       $fieldType
-     * @param string|null  $alias
-     *
-     * @return \Doctrine\DBAL\Query\QueryBuilder
-     */
-    private function getCustomFieldJoin(QueryBuilder $queryBuilder, string $fieldType, string $alias)
-    {
-        $customFieldQueryBuilder = $queryBuilder->createQueryBuilder();
-
-        $customFieldQueryBuilder
-            ->select(null)
-            ->from(MAUTIC_TABLE_PREFIX . 'custom_item_xref_contact', $alias . '_contact')
-            ->leftJoin(
-                $alias . '_contact',
-                MAUTIC_TABLE_PREFIX . 'custom_item',
-                $alias . '_item',
-                $alias . '_item.id=' . $alias . '_contact.custom_item_id')
-            ->leftJoin(
-                $alias . '_item',
-                MAUTIC_TABLE_PREFIX . 'custom_field_value_' . $fieldType,
-                $alias . '_value',
-                $alias . '_value.custom_item_id = ' . $alias . '_item.id')
-            ->where('l.id = ' . $alias . "_contact.contact_id");
-        $customFieldQueryBuilder->andWhere(
-            $customFieldQueryBuilder->expr()->eq($alias . '_value.custom_field_id', ':customFieldId_' . $alias)
-        );
-
-        return $customFieldQueryBuilder;
     }
 }

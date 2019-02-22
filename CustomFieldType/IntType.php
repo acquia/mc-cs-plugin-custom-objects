@@ -46,7 +46,7 @@ class IntType extends AbstractCustomFieldType
      */
     public function getTableName(): string
     {
-        return MAUTIC_TABLE_PREFIX.'custom_field_value_int';
+        return 'custom_field_value_int';
     }
 
     /**

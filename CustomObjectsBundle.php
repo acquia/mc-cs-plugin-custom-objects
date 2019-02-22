@@ -17,10 +17,21 @@ use Doctrine\DBAL\Schema\Schema;
 use Mautic\PluginBundle\Bundle\PluginBundleBase;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\CoreBundle\Factory\MauticFactory;
-use MauticPlugin\CustomObjectsBundle\Migration\Engine;
+use Doctrine\DBAL\Connection;
+use MauticPlugin\CustomObjectsBundle\Migrations\Engine;
 
 class CustomObjectsBundle extends PluginBundleBase
 {
+    /**
+     * @var string
+     */
+    private static $tableName = MAUTIC_TABLE_PREFIX.'custom_field_value_text';
+
+    /**
+     * @var string
+     */
+    private static $indexName = MAUTIC_TABLE_PREFIX.'value_index';
+
     /**
      * @param Plugin           $plugin
      * @param MauticFactory    $factory
@@ -36,7 +47,9 @@ class CustomObjectsBundle extends PluginBundleBase
             return;
         }
 
-        self::runMigrations($plugin, $factory);
+        parent::onPluginInstall($plugin, $factory, $metadata, $installedSchema);
+        $queries[] = self::createIndexQuery();
+        self::commit($factory->getDatabase(), $queries);
     }
 
     /**
@@ -49,21 +62,41 @@ class CustomObjectsBundle extends PluginBundleBase
      */
     public static function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, Schema $installedSchema = null): void
     {
-        self::runMigrations($plugin, $factory);
+        $migrationEngine = new Engine($factory);
+        $migrationEngine->up($plugin->getVersion());
     }
 
     /**
-     * @param Plugin        $plugin
-     * @param MauticFactory $factory
+     * @return string
      */
-    private static function runMigrations(Plugin $plugin, MauticFactory $factory): void
+    private static function createIndexQuery(): string
     {
-        $migrationEngine = new Engine(
-            $factory->getEntityManager(),
-            $factory->getParameter('mautic.db_table_prefix'),
-            dirname(__FILE__)
-        );
+        return sprintf('CREATE INDEX %s ON %s (value(64))', self::$indexName, self::$tableName);
+    }
 
-        $migrationEngine->up();
+    /**
+     * @param Connection $connection
+     * @param array $queries
+     */
+    private static function commit(Connection $connection, array $queries): void
+    {
+        if (!empty($queries)) {
+
+            $connection->beginTransaction();
+            try {
+                foreach ($queries as $query) {
+                    if (!$query) {
+                        continue;
+                    }
+                    $connection->query($query);
+                }
+
+                $connection->commit();
+            } catch (\Exception $e) {
+                $connection->rollBack();
+
+                throw $e;
+            }
+        }
     }
 }

@@ -15,6 +15,8 @@ namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
 class TextType extends AbstractTextType
 {
+    const KEY = 'text';
+
     /**
      * @var string
      */
