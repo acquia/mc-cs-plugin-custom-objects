@@ -43,26 +43,25 @@ class AbstractMigration implements MigrationInterface
     }
 
     /**
-     * @return bool
+     * {@inheritdoc}
      */
     public function isApplicable(): bool
     {
         return false;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function up(): void
     {
         // Implement it in child class
     }
 
     /**
-     * @param string $sql
+     * {@inheritdoc}
+     * @throws \Doctrine\DBAL\DBALException
      */
-    protected function addSql(string $sql): void
-    {
-        $this->queries[] = $sql;
-    }
-
     public function execute(): void
     {
         if (!$this->queries) {
@@ -79,5 +78,13 @@ class AbstractMigration implements MigrationInterface
             $stmt = $connection->prepare($sql);
             $stmt->execute();
         }
+    }
+
+    /**
+     * @param string $sql
+     */
+    protected function addSql(string $sql): void
+    {
+        $this->queries[] = $sql;
     }
 }

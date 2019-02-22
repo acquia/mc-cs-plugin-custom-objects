@@ -16,11 +16,19 @@ namespace MauticPlugin\CustomObjectsBundle\Migration;
 interface MigrationInterface
 {
     /**
+     * Is defined migration applicable to current schema?
+     *
      * @return bool
      */
     public function isApplicable(): bool;
 
+    /**
+     * Define migration up
+     */
     public function up(): void;
 
+    /**
+     * Execute migration if applicable
+     */
     public function execute(): void;
 }
