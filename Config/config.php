@@ -695,6 +695,7 @@ return [
                     'mautic.custom.model.object',
                     'mautic.custom.model.import.item',
                     'custom_object.config.provider',
+                    'custom_item.permission.provider',
                 ],
             ],
             'custom_item.contact.subscriber' => [

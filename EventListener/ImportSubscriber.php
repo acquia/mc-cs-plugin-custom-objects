@@ -23,6 +23,8 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemImportModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 
 class ImportSubscriber extends CommonSubscriber
 {
@@ -42,19 +44,27 @@ class ImportSubscriber extends CommonSubscriber
     private $configProvider;
 
     /**
+     * @var CustomItemPermissionProvider
+     */
+    private $permissionProvider;
+
+    /**
      * @param CustomObjectModel $customObjectModel
      * @param CustomItemImportModel $customItemImportModel
      * @param ConfigProvider $configProvider
+     * @param CustomItemPermissionProvider $permissionProvider
      */
     public function __construct(
         CustomObjectModel $customObjectModel,
         CustomItemImportModel $customItemImportModel,
-        ConfigProvider $configProvider
+        ConfigProvider $configProvider,
+        CustomItemPermissionProvider $permissionProvider
     )
     {
         $this->customObjectModel     = $customObjectModel;
         $this->customItemImportModel = $customItemImportModel;
         $this->configProvider        = $configProvider;
+        $this->permissionProvider    = $permissionProvider;
     }
 
     /**
@@ -80,14 +90,15 @@ class ImportSubscriber extends CommonSubscriber
 
         try {
             $customObjectId = $this->getCustomObjectId($event->getRouteObjectName());
-            $customObject   = $this->customObjectModel->fetchEntity($customObjectId);
+            $this->permissionProvider->canCreate($customObjectId);
+            $customObject = $this->customObjectModel->fetchEntity($customObjectId);
             $event->setObjectIsSupported(true);
             $event->setObjectSingular($event->getRouteObjectName());
             $event->setObjectName($customObject->getNamePlural());
             $event->setActiveLink("#mautic_custom_object_{$customObjectId}");
             $event->setIndexRoute(CustomItemRouteProvider::ROUTE_LIST, ['objectId' => $customObjectId]);
             $event->stopPropagation();
-        } catch (NotFoundException $e) {}
+        } catch (NotFoundException | ForbiddenException $e) {}
     }
 
     /**
@@ -101,14 +112,15 @@ class ImportSubscriber extends CommonSubscriber
 
         try {
             $customObjectId = $this->getCustomObjectId($event->getRouteObjectName());
-            $customObject   = $this->customObjectModel->fetchEntity($customObjectId);
-            $customFields   = $customObject->getCustomFields();
-            $specialFields  = [
+            $this->permissionProvider->canCreate($customObjectId);
+            $customObject  = $this->customObjectModel->fetchEntity($customObjectId);
+            $customFields  = $customObject->getCustomFields();
+            $specialFields = [
                 'linkedContactIds' => 'custom.item.link.contact.ids',
             ];
 
             $fieldList = [
-                'customItemId' => 'mautic.core.id',
+                'customItemId'   => 'mautic.core.id',
                 'customItemName' => 'custom.item.name.label',
             ];
 
@@ -120,7 +132,7 @@ class ImportSubscriber extends CommonSubscriber
                 $customObject->getNamePlural() => $fieldList,
                 'mautic.lead.special_fields'   => $specialFields,
             ]);
-        } catch (NotFoundException $e) {}
+        } catch (NotFoundException | ForbiddenException $e) {}
     }
 
     /**
@@ -131,14 +143,12 @@ class ImportSubscriber extends CommonSubscriber
         if (!$this->configProvider->pluginIsEnabled()) {
             return;
         }
-        
-        try {
-            $customObjectId = $this->getCustomObjectId($event->getImport()->getObject());
-            $customObject   = $this->customObjectModel->fetchEntity($customObjectId);
-            $import         = $event->getImport();
-            $merged         = $this->customItemImportModel->import($import, $event->getRowData(), $customObject);
-            $event->setWasMerged($merged);
-        } catch (NotFoundException $e) {}
+
+        $customObjectId = $this->getCustomObjectId($event->getImport()->getObject());
+        $this->permissionProvider->canCreate($customObjectId);
+        $customObject = $this->customObjectModel->fetchEntity($customObjectId);
+        $merged       = $this->customItemImportModel->import($event->getImport(), $event->getRowData(), $customObject);
+        $event->setWasMerged($merged);
     }
 
     /**
@@ -150,6 +160,8 @@ class ImportSubscriber extends CommonSubscriber
      */
     private function getCustomObjectId(string $routeObjectName): int
     {
+        $matches = [];
+        
         if (preg_match('/custom-object:(\d*)/', $routeObjectName, $matches)) {
             return (int) $matches[1];
         }
