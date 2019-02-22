@@ -83,9 +83,9 @@ class BatchDeleteController extends CommonController
 
         foreach ($itemIds as $itemId) {
             try {
-                $entity = $this->customItemModel->fetchEntity((int) $itemId);
-                $this->permissionProvider->canDelete($entity);
-                $this->customItemModel->delete($entity);
+                $customItem = $this->customItemModel->fetchEntity((int) $itemId);
+                $this->permissionProvider->canDelete($customItem);
+                $this->customItemModel->delete($customItem);
                 $deleted[] = $itemId;
             } catch (NotFoundException $e) {
                 $notFound[] = $itemId;

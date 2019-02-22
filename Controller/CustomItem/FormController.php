@@ -88,12 +88,12 @@ class FormController extends CommonController
 
             if ($itemId) {
                 $customItem = $this->customItemModel->fetchEntity($itemId);
-                $route  = $this->routeProvider->buildEditRoute($objectId, $itemId);
+                $route      = $this->routeProvider->buildEditRoute($objectId, $itemId);
                 $this->permissionProvider->canEdit($customItem);
             } else {
-                $this->permissionProvider->canCreate();
+                $this->permissionProvider->canCreate($objectId);
                 $customItem = $this->customItemModel->populateCustomFields(new CustomItem($customObject));
-                $route  = $this->routeProvider->buildNewRoute($objectId);
+                $route      = $this->routeProvider->buildNewRoute($objectId);
             }
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());

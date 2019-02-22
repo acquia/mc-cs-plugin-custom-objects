@@ -76,29 +76,29 @@ class DeleteController extends CommonController
     public function deleteAction(int $objectId, int $itemId)
     {
         try {
-            $entity = $this->customItemModel->fetchEntity($itemId);
-            $this->permissionProvider->canDelete($entity);
+            $customItem = $this->customItemModel->fetchEntity($itemId);
+            $this->permissionProvider->canDelete($customItem);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
             $this->accessDenied(false, $e->getMessage());
         }
 
-        $this->customItemModel->delete($entity);
+        $this->customItemModel->delete($customItem);
 
         $this->session->getFlashBag()->add(
             'notice',
             $this->translator->trans(
                 'mautic.core.notice.deleted',
                 [
-                    '%name%' => $entity->getName(),
-                    '%id%'   => $entity->getId(),
+                    '%name%' => $customItem->getName(),
+                    '%id%'   => $customItem->getId(),
                 ], 
                 'flashes'
             )
         );
 
-        $page =  $this->session->get('custom.item.page', 1);
+        $page = $this->session->get('custom.item.page', 1);
 
         return $this->postActionRedirect(
             [
