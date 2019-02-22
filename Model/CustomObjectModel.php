@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Model\FormModel;
@@ -202,6 +204,23 @@ class CustomObjectModel extends FormModel
     public function getPermissionBase(): string
     {
         return 'custom_objects:custom_objects';
+    }
+
+    /**
+     * @param \DateTimeInterface $from
+     * @param \DateTimeInterface $to
+     * @param CustomObject       $customObject
+     *
+     * @return array
+     */
+    public function getItemsLineChartData(\DateTimeInterface $from, \DateTimeInterface $to, CustomObject $customObject): array
+    {
+        $chart = new LineChart(null, $from, $to);
+        $query = new ChartQuery($this->entityManager->getConnection(), $from, $to);
+        $items = $query->fetchTimeData('custom_item', 'date_added', ['custom_object_id' => $customObject->getId()]);
+        $chart->setDataset($this->translator->trans('custom.object.created.items'), $items);
+
+        return $chart->render();
     }
 
     /**

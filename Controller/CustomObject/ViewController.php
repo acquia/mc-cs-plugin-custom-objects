@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
-use Symfony\Component\HttpFoundation\Request;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
+use Mautic\CoreBundle\Model\AuditLogModel;
+use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use Predis\Protocol\Text\RequestSerializer;
 use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
@@ -33,14 +33,19 @@ class ViewController extends CommonController
     private $requestStack;
 
     /**
-     * @var Session
+     * @var FormFactory
      */
-    private $session;
+    private $formFactory;
 
     /**
      * @var CustomObjectModel
      */
     private $customObjectModel;
+
+    /**
+     * @var AuditLogModel
+     */
+    private $auditLogModel;
 
     /**
      * @var CustomObjectPermissionProvider
@@ -53,28 +58,30 @@ class ViewController extends CommonController
     private $routeProvider;
 
     /**
-     * @param RequestStack $requestStack
-     * @param Session $session
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param CustomObjectModel $customObjectModel
+     * @param RequestStack                   $requestStack
+     * @param FormFactory                    $formFactory
+     * @param CoreParametersHelper           $coreParametersHelper
+     * @param CustomObjectModel              $customObjectModel
+     * @param AuditLogModel                  $auditLogModel
      * @param CustomObjectPermissionProvider $permissionProvider
-     * @param CustomObjectRouteProvider $routeProvider
+     * @param CustomObjectRouteProvider      $routeProvider
      */
     public function __construct(
         RequestStack $requestStack,
-        Session $session,
+        FormFactory $formFactory,
         CoreParametersHelper $coreParametersHelper,
         CustomObjectModel $customObjectModel,
+        AuditLogModel $auditLogModel,
         CustomObjectPermissionProvider $permissionProvider,
         CustomObjectRouteProvider $routeProvider
-    )
-    {
+    ){
         $this->requestStack         = $requestStack;
-        $this->session              = $session;
+        $this->formFactory          = $formFactory;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->customObjectModel    = $customObjectModel;
+        $this->auditLogModel        = $auditLogModel;
         $this->permissionProvider   = $permissionProvider;
-        $this->routeProvider      = $routeProvider;
+        $this->routeProvider        = $routeProvider;
     }
 
     /**
@@ -85,8 +92,8 @@ class ViewController extends CommonController
     public function viewAction(int $objectId)
     {
         try {
-            $entity = $this->customObjectModel->fetchEntity($objectId);
-            $this->permissionProvider->canView($entity);
+            $customObject = $this->customObjectModel->fetchEntity($objectId);
+            $this->permissionProvider->canView($customObject);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
@@ -94,16 +101,34 @@ class ViewController extends CommonController
         }
 
         $route = $this->routeProvider->buildViewRoute($objectId);
+        $dateRangeForm = $this->formFactory->create(
+            DateRangeType::class,
+            $this->requestStack->getCurrentRequest()->get('daterange', []),
+            ['action' => $route]
+        );
+        $stats = $this->customObjectModel->getItemsLineChartData(
+            new \DateTime($dateRangeForm->get('date_from')->getData()),
+            new \DateTime($dateRangeForm->get('date_to')->getData()),
+            $customObject
+        );
+
+        $auditLogs = $this->auditLogModel->getLogForObject(
+            'customObject', $objectId, $customObject->getDateAdded(), 10, 'customObjects'
+        );
 
         return $this->delegateView(
             [
                 'returnUrl'      => $route,
                 'viewParameters' => [
-                    'item' => $entity,
+                    'customObject' => $customObject,
+                    'dateRangeForm' => $dateRangeForm->createView(),
+                    'stats'         => $stats,
+                    'logs'          => $auditLogs,
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomObject:detail.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
+                    'activeLink'    => "#mautic_custom_object_{$objectId}",
                     'route'         => $route,
                 ],
             ]
