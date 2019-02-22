@@ -19,7 +19,8 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use MauticPlugin\CustomObjectsBundle\Controller\JsonController;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use UnexpectedValueException;
 
 class UnlinkController extends JsonController
 {
@@ -67,7 +68,7 @@ class UnlinkController extends JsonController
             $customItem = $this->customItemModel->fetchEntity($itemId);
             $this->permissionProvider->canEdit($customItem);
             $this->unlinkBasedOnEntityType($itemId, $entityType, $entityId);
-        } catch (\Exception $e) {
+        } catch (ForbiddenException | NotFoundException | UnexpectedValueException $e) {
             $this->addFlash('error', $e->getMessage());
         }
 
@@ -85,7 +86,7 @@ class UnlinkController extends JsonController
      * @param string $entityType
      * @param int    $entityId
      * 
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      */
     private function unlinkBasedOnEntityType(int $itemId, string $entityType, int $entityId): void
     {
@@ -94,7 +95,7 @@ class UnlinkController extends JsonController
                 $this->customItemModel->unlinkContact($itemId, $entityId);
                 break;
             default:
-                throw new \UnexpectedValueException("Entity {$entityType} cannot be linked to a custom item");
+                throw new UnexpectedValueException("Entity {$entityType} cannot be linked to a custom item");
                 break;
         }
     }

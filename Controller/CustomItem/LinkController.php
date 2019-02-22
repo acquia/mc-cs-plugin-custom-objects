@@ -16,15 +16,12 @@ namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use Mautic\CoreBundle\Helper\InputHelper;
-use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use MauticPlugin\CustomObjectsBundle\DTO\TableFilterConfig;
 use MauticPlugin\CustomObjectsBundle\Controller\JsonController;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use UnexpectedValueException;
 
 class LinkController extends JsonController
 {
@@ -78,7 +75,7 @@ class LinkController extends JsonController
                 ['%itemId%' => $itemId, '%entityType%' => $entityType, '%entityId%' => $entityId],
                 'flashes'
             ));
-        } catch (\Exception $e) {
+        } catch (ForbiddenException | NotFoundException | UnexpectedValueException $e) {
             $this->addFlash('error', $e->getMessage());
         }
 
@@ -90,7 +87,7 @@ class LinkController extends JsonController
      * @param string  $entityType
      * @param integer $entityId
      * 
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      * @throws UniqueConstraintViolationException
      */
     private function makeLinkBasedOnEntityType(int $itemId, string $entityType, int $entityId): void
@@ -100,7 +97,7 @@ class LinkController extends JsonController
                 $this->customItemModel->linkContact($itemId, $entityId);
                 break;
             default:
-                throw new \UnexpectedValueException("Entity {$entityType} cannot be linked to a custom item");
+                throw new UnexpectedValueException("Entity {$entityType} cannot be linked to a custom item");
                 break;
         }
     }
