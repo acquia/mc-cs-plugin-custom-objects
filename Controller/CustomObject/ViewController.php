@@ -76,12 +76,12 @@ class ViewController extends CommonController
         CustomObjectRouteProvider $routeProvider
     ){
         $this->requestStack         = $requestStack;
-        $this->formFactory = $formFactory;
+        $this->formFactory          = $formFactory;
         $this->coreParametersHelper = $coreParametersHelper;
         $this->customObjectModel    = $customObjectModel;
-        $this->auditLogModel = $auditLogModel;
+        $this->auditLogModel        = $auditLogModel;
         $this->permissionProvider   = $permissionProvider;
-        $this->routeProvider      = $routeProvider;
+        $this->routeProvider        = $routeProvider;
     }
 
     /**
