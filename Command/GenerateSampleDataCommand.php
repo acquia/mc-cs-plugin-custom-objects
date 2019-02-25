@@ -30,7 +30,6 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInt;
-use Mautic\LeadBundle\Helper\Progress;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Doctrine\ORM\EntityManager;
 
