@@ -48,17 +48,17 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->customItem = $this->createMock(CustomItem::class);
-        $this->user = $this->createMock(User::class);
-        $this->entityManager = $this->createMock(EntityManager::class);
-        $this->customItemRepository = $this->createMock(CustomItemRepository::class);
+        $this->customItem                   = $this->createMock(CustomItem::class);
+        $this->user                         = $this->createMock(User::class);
+        $this->entityManager                = $this->createMock(EntityManager::class);
+        $this->customItemRepository         = $this->createMock(CustomItemRepository::class);
         $this->customItemPermissionProvider = $this->createMock(CustomItemPermissionProvider::class);
-        $this->userHelper = $this->createMock(UserHelper::class);
-        $this->customFieldModel = $this->createMock(CustomFieldModel::class);
-        $this->customFieldValueModel = $this->createMock(CustomFieldValueModel::class);
-        $this->customFieldTypeProvider = $this->createMock(CustomFieldTypeProvider::class);
-        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->customItemModel = new CustomItemModel(
+        $this->userHelper                   = $this->createMock(UserHelper::class);
+        $this->customFieldModel             = $this->createMock(CustomFieldModel::class);
+        $this->customFieldValueModel        = $this->createMock(CustomFieldValueModel::class);
+        $this->customFieldTypeProvider      = $this->createMock(CustomFieldTypeProvider::class);
+        $this->dispatcher                   = $this->createMock(EventDispatcherInterface::class);
+        $this->customItemModel              = new CustomItemModel(
             $this->entityManager,
             $this->customItemRepository,
             $this->customItemPermissionProvider,

@@ -17,7 +17,6 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use Doctrine\Common\Collections\ArrayCollection;
 
 class CustomItemTest extends \PHPUnit_Framework_TestCase
 {

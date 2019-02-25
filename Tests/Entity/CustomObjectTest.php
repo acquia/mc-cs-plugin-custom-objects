@@ -13,10 +13,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Entity;
 
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use Doctrine\Common\Collections\ArrayCollection;
 
 class CustomObjectTest extends \PHPUnit_Framework_TestCase
 {

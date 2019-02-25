@@ -1,12 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 /*
  * @copyright   2019 Mautic Inc. All rights reserved
- * @author      Mautic, Inc. Jan Kozak <galvani78@gmail.com>
+ * @author      Mautic, Inc.
  *
  * @link        http://mautic.com
- * @created     5.2.19
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
@@ -41,7 +41,7 @@ trait FixtureObjectsTrait
     {
         foreach ($objects as $key => $object) {
             $this->objects[get_class($object)][$key] = $object;
-            $this->entityMap[$key] = get_class($object);
+            $this->entityMap[$key]                   = get_class($object);
         }
     }
 
@@ -100,7 +100,7 @@ trait FixtureObjectsTrait
 
         $orderedKeys = $this->entityMap;
         array_reverse($orderedKeys, true);
-        foreach ($orderedKeys as $key=>$type) {
+        foreach ($orderedKeys as $key => $type) {
             $entities[$key] = $this->objects[$type][$key];
         }
         return $entities;
