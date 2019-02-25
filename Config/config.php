@@ -542,7 +542,6 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\CancelController::class,
                 'arguments' => [
                     'session',
-                    'mautic.custom.model.object',
                     'custom_object.route.provider',
                 ],
                 'methodCalls' => [
