@@ -15,7 +15,6 @@ namespace MauticPlugin\CustomObjectsBundle\Segment\Query\Filter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
-use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 
 class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
 {
@@ -103,22 +102,19 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
     }
 
     /**
-     * @param $filterParameters
+     * @param array|string $filterParameters
      *
      * @return array|string
      */
     public function getParametersAliases($filterParameters)
     {
         if (is_array($filterParameters)) {
-            $parameters = [];
-            foreach ($filterParameters as $filterParameter) {
-                $parameters[] = $this->generateRandomParameterName();
-            }
-        } else {
-            $parameters = $this->generateRandomParameterName();
+            return array_map(function() {
+                return $this->generateRandomParameterName();
+            }, $filterParameters);
         }
-
-        return $parameters;
+        
+        return $this->generateRandomParameterName();
     }
 
     /**
