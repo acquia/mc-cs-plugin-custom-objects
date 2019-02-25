@@ -55,7 +55,7 @@ if ($tmpl == 'index') {
             </tr>
             </thead>
             <tbody>
-            <?php foreach ($items as $k => $item): ?>
+            <?php foreach ($items as $item): ?>
                 <tr>
                     <td>
                         <?php echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', ['item' => $item]); ?>

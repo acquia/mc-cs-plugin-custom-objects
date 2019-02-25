@@ -18,7 +18,7 @@ if ($entity->getId()) {
         'custom.item.edit',
         [
             '%object%' => $view['translator']->trans($customObject->getNameSingular()),
-            '%item%' => $view['translator']->trans($entity->getName()),
+            '%item%'   => $view['translator']->trans($entity->getName()),
         ]
     );
 } else {

@@ -13,10 +13,10 @@
  * Panels rendered in CO form
  */
 
-$customFieldEntity = $customField->vars['data'];
+$customFieldEntity          = $customField->vars['data'];
 $customField->vars['index'] = $customField->vars['name'];
-$order = (int) $customField->vars['value']->getOrder();
-$deleted = (!empty($_POST['custom_object']['customFields'][$order]['deleted'])) ? 'style="display:none;"' : '';
+$order                      = (int) $customField->vars['value']->getOrder();
+$deleted                    = !empty($_POST['custom_object']['customFields'][$order]['deleted']) ? 'style="display:none;"' : '';
 ?>
 <div class="panel form-field-wrapper ui-sortable-handle" id="customField_<?php echo (int) $customField->vars['value']->getOrder() ?>" <?php echo $deleted ?>>
 
@@ -26,8 +26,8 @@ $deleted = (!empty($_POST['custom_object']['customFields'][$order]['deleted'])) 
         echo $view['router']->path(
             \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider::ROUTE_FORM,
             [
-                'fieldId' => $customFieldEntity->getId(),
-                'objectId' => $customObject->getId(),
+                'fieldId'   => $customFieldEntity->getId(),
+                'objectId'  => $customObject->getId(),
                 'fieldType' => $customFieldEntity->getTypeObject()->getKey(),
             ]
         );
