@@ -20,11 +20,13 @@ use Mautic\LeadBundle\Event\ImportMappingEvent;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 
 class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     private $customObjectModel;
     private $customItemImportModel;
+    private $permissionProvider;
     private $configProvider;
     private $importInitEvent;
     private $importMappingEvent;
@@ -37,6 +39,7 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->customObjectModel     = $this->createMock(CustomObjectModel::class);
         $this->customItemImportModel = $this->createMock(CustomItemImportModel::class);
+        $this->permissionProvider    = $this->createMock(CustomItemPermissionProvider::class);
         $this->configProvider        = $this->createMock(ConfigProvider::class);
         $this->importInitEvent       = $this->createMock(ImportInitEvent::class);
         $this->importMappingEvent    = $this->createMock(ImportMappingEvent::class);
@@ -44,7 +47,8 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->importSubscriber      = new ImportSubscriber(
             $this->customObjectModel,
             $this->customItemImportModel,
-            $this->configProvider
+            $this->configProvider,
+            $this->permissionProvider
         );
     }
 
