@@ -40,8 +40,8 @@ $title = $customField->getId() ? $customField->getLabel() : $customField->getTyp
 
         <div class="tab-content pa-lg">
             <div role="tabpanel" class="tab-pane active" id="general">
-                <div class="row">
 
+                <div class="row">
                     <div class="col-md-6">
                         <?php echo $view['form']->row($form['label']); ?>
                     </div>
@@ -49,7 +49,6 @@ $title = $customField->getId() ? $customField->getLabel() : $customField->getTyp
                     <div class="col-md-6">
                         <?php echo $view['form']->row($form['required']); ?>
                     </div>
-
                 </div>
 
                 <div class="row">
@@ -59,6 +58,10 @@ $title = $customField->getId() ? $customField->getLabel() : $customField->getTyp
                 </div>
 
             </div>
+
+            <div role="tabpanel" class="tab-pane" id="properties">
+            </div>
+
         </div>
 
     </div>
