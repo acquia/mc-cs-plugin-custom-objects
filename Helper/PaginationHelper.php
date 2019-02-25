@@ -24,7 +24,7 @@ class PaginationHelper
      */
     public static function countOffset(int $page, int $limit): int
     {
-        $offset = ($page === 1) ? 0 : (($page - 1) * $limit);
+        $offset = $page === 1 ? 0 : (($page - 1) * $limit);
 
         return $offset < 0 ? 0 : $offset;
     }
