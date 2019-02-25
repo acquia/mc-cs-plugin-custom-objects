@@ -24,6 +24,11 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     private $name;
 
     /**
+     * @var string
+     */
+    private $key;
+
+    /**
      * @param string $name field type name translated to user's language
      */
     public function __construct(string $name)

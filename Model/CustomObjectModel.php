@@ -29,6 +29,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
 
 class CustomObjectModel extends FormModel
 {

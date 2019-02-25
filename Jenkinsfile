@@ -79,5 +79,18 @@ pipeline {
         }
       }
     }
+    stage('Static Analysis') {
+      steps {
+        container('hosted-tester') {
+          ansiColor('xterm') {
+            dir('plugins/CustomObjectsBundle') {
+              sh """
+                vendor/bin/phpstan analyse --autoload-file=../../vendor/autoload.php --level=0 Command Config Controller CustomFieldType DTO Entity Event EventListener Exception Form Helper Migration Migrations Model Provider Repository Security Segment Tests
+              """
+            }
+          }
+        }
+      }
+    }
   }
 }

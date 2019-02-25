@@ -85,7 +85,6 @@ class CampaignActionLinkType extends AbstractType
                 'attr'     => [
                     'tooltip'                => 'custom.item.unlink.contact.descr',
                     'data-toggle'            => 'typeahead',
-                    'data-action'            => 'route provider here',
                     'data-id-input-selector' => '.unlink-custom-item-id',
                     'data-action'            => $this->routeProvider->buildLookupRoute($options['customObjectId']),
                     'data-selected-message'  => $this->translator->trans('custom.item.selected'),

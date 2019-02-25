@@ -276,9 +276,10 @@ class CustomItemModel extends FormModel
      */
     public function getLookupData(TableConfig $tableConfig): array
     {
-        $queryBuilder = $this->customItemRepository->getTableDataQuery($tableConfig);
-        $queryBuilder = $this->applyOwnerFilter($queryBuilder);
-        $rootAlias    = $queryBuilder->getRootAliases()[0];
+        $customObjectFilter = $tableConfig->getFilter(CustomItem::class, 'customObject');
+        $queryBuilder       = $this->customItemRepository->getTableDataQuery($tableConfig);
+        $queryBuilder       = $this->applyOwnerFilter($queryBuilder, $customObjectFilter->getValue());
+        $rootAlias          = $queryBuilder->getRootAliases()[0];
         $queryBuilder->select("{$rootAlias}.name as value, {$rootAlias}.id");
 
         return array_values($queryBuilder->getQuery()->getArrayResult());

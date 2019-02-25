@@ -20,10 +20,11 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Mautic\CoreBundle\Helper\InputHelper;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Controller\JsonController;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class LookupController extends JsonController
 {
@@ -59,7 +60,7 @@ class LookupController extends JsonController
     }
 
     /**
-     * @param integer $objectId
+     * @param int $objectId
      * 
      * @return JsonResponse
      */

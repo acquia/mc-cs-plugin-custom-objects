@@ -23,6 +23,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Mautic\CoreBundle\Helper\InputHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Helper\PaginationHelper;
+use Symfony\Component\HttpFoundation\Response;
 
 class ListController extends CommonController
 {
@@ -77,9 +78,9 @@ class ListController extends CommonController
     }
 
     /**
-     * @param integer $page
+     * @param int $page
      * 
-     * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse
+     * @return Response
      */
     public function listAction(int $page = 1)
     {

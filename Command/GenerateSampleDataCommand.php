@@ -186,11 +186,11 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
     private function generateCustomFieldValues(CustomItem $customItem, CustomObject $customObject): CustomItem
     {
         foreach ($customObject->getCustomFields() as $field) {
-            if ($field->getType() === TextType::KEY) {
+            if ($field->getType() === 'text') {
                 $customItem->addCustomFieldValue(new CustomFieldValueText($field, $customItem, $this->randomHelper->getSentence(rand(0, 100))));
             }
 
-            if ($field->getType() === IntType::KEY) {
+            if ($field->getType() === 'int') {
                 $customItem->addCustomFieldValue(new CustomFieldValueInt($field, $customItem, rand(0, 1000)));
             }
         }

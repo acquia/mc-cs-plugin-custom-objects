@@ -247,20 +247,6 @@ return [
                     ],
                 ],
             ],
-            'custom_field.delete_controller' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\DeleteController::class,
-                'arguments' => [
-                    'mautic.custom.model.field',
-                    'session',
-                    'translator',
-                    'custom_field.permission.provider',
-                ],
-                'methodCalls' => [
-                    'setContainer' => [
-                        '@service_container',
-                    ],
-                ],
-            ],
             'custom_field.cancel_controller' => [
                 'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\CancelController::class,
                 'methodCalls' => [

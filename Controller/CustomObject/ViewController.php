@@ -24,6 +24,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
+use Symfony\Component\HttpFoundation\Response;
 
 class ViewController extends CommonController
 {
@@ -87,7 +88,7 @@ class ViewController extends CommonController
     /**
      * @param int $objectId
      * 
-     * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse
+     * @return Response
      */
     public function viewAction(int $objectId)
     {
