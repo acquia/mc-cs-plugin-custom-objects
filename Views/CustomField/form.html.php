@@ -23,14 +23,44 @@ $title = $customField->getId() ? $customField->getLabel() : $customField->getTyp
 
     <?php echo $view['form']->start($form); ?>
 
-    <div class="col-md-9 bg-auto height-auto bdr-r">
-        <div class="pa-md">
-            <div class="row">
-                <div class="col-md-4">
-                    <?php echo $view['form']->row($form['label']); ?>
+    <div role="tabpanel">
+
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active">
+                <a href="#general" aria-controls="general" role="tab" data-toggle="tab">
+                    General
+                </a>
+            </li>
+            <li role="presentation">
+                <a href="#properties" aria-controls="properties" role="tab" data-toggle="tab">
+                    Properties
+                </a>
+            </li>
+        </ul>
+
+        <div class="tab-content pa-lg">
+            <div role="tabpanel" class="tab-pane active" id="general">
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <?php echo $view['form']->row($form['label']); ?>
+                    </div>
+
+                    <div class="col-md-6">
+                        <?php echo $view['form']->row($form['required']); ?>
+                    </div>
+
                 </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <?php echo $view['form']->row($form['defaultValue']); ?>
+                    </div>
+                </div>
+
             </div>
         </div>
+
     </div>
 
     <?php echo $view['form']->end($form); ?>
