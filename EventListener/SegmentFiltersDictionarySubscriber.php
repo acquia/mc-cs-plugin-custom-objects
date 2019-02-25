@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
 use Mautic\LeadBundle\LeadEvents;
-use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemFilterQueryBuilder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -28,7 +28,7 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
     /**
      * @var EntityManager
      */
-    private $entityManager;
+    private $doctrineRegistry;
 
     /**
      * @var ConfigProvider
@@ -36,13 +36,13 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
     private $configProvider;
 
     /**
-     * @param EntityManager  $entityManager
+     * @param EntityManager  $registry
      * @param ConfigProvider $configProvider
      */
-    public function __construct(EntityManager $entityManager, ConfigProvider $configProvider)
+    public function __construct(Registry $registry, ConfigProvider $configProvider)
     {
-        $this->entityManager  = $entityManager;
-        $this->configProvider = $configProvider;
+        $this->doctrineRegistry = $registry;
+        $this->configProvider   = $configProvider;
     }
 
     /**
@@ -51,8 +51,7 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            // @todo enable once https://github.com/mautic-inc/mautic-cloud/pull/388 is in beta
-            //LeadEvents::SEGMENT_DICTIONARY_ON_GENERATE => 'onGenerateSegmentDictionary',
+            LeadEvents::SEGMENT_DICTIONARY_ON_GENERATE => 'onGenerateSegmentDictionary',
         ];
     }
 
@@ -65,15 +64,19 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
             return;
         }
 
-        $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
+        $queryBuilder = $this->doctrineRegistry->getConnection()->createQueryBuilder();
         $queryBuilder
             ->select('f.id, f.label, f.type, o.id as custom_object_id')
             ->from(MAUTIC_TABLE_PREFIX . "custom_field", 'f')
-            ->innerJoin('f', MAUTIC_TABLE_PREFIX . "custom_object", 'o', 'f.custom_object_id = o.id and o.is_published = 1');
+            ->innerJoin('f', MAUTIC_TABLE_PREFIX . "custom_object", 'o', 'f.custom_object_id = o.id');
+
+        echo \SqlFormatter::format($queryBuilder->getSQL());
 
         $registeredObjects = [];
 
-        foreach ($queryBuilder->execute()->fetchAll() as $field) {
+        $fields = $queryBuilder->execute()->fetchAll();
+
+        foreach ($fields as $field) {
             if (!in_array($COId = $field['custom_object_id'], $registeredObjects)) {
                 $event->addTranslation('cmo_' . $COId, [
                     'type'  => CustomItemFilterQueryBuilder::getServiceId(),

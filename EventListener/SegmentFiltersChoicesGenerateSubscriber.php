@@ -99,7 +99,7 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
                 );
 
                 /** @var CustomField $customField */
-                foreach ($customObject->getFields()->getIterator() as $customField) {
+                foreach ($customObject->getCustomFields()->getIterator() as $customField) {
                     $availableOperator = $this->getOperatorsForFieldType($customField->getType());
                     $allowedOperators = $customField->getTypeObject()->getOperators();
                     $operators = array_intersect_key($availableOperator, $allowedOperators);

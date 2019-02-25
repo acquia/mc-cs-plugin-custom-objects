@@ -730,7 +730,7 @@ return [
             'custom_object.segments.filters_dictionary.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\SegmentFiltersDictionarySubscriber::class,
                 'arguments' => [
-                    'doctrine.orm.entity_manager',
+                    'doctrine',
                     'custom_object.config.provider',
                 ],
             ],
