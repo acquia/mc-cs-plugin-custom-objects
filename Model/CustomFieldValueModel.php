@@ -47,9 +47,9 @@ class CustomFieldValueModel
 
     /**
      * The values are joined from several tables. Each value type can have own table.
-     * 
+     *
      * @param CustomItem $customItem
-     * 
+     *
      * @return ArrayCollection
      */
     public function getValuesForItem(CustomItem $customItem): ArrayCollection

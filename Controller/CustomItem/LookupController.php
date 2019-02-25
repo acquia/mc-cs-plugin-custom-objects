@@ -61,7 +61,7 @@ class LookupController extends JsonController
 
     /**
      * @param int $objectId
-     * 
+     *
      * @return JsonResponse
      */
     public function listAction(int $objectId)
@@ -75,7 +75,7 @@ class LookupController extends JsonController
         $request     = $this->requestStack->getCurrentRequest();
         $nameFilter  = InputHelper::clean($request->get('filter'));
         $contactId   = (int) InputHelper::clean($request->get('contactId'));
-        $tableConfig = new TableConfig(10, 1, CustomItemRepository::TABLE_ALIAS.'.name', 'ASC');
+        $tableConfig = new TableConfig(10, 1, CustomItemRepository::TABLE_ALIAS . '.name', 'ASC');
         $tableConfig->addFilter(CustomItem::class, 'customObject', $objectId);
         $tableConfig->addFilterIfNotEmpty(CustomItem::class, 'name', "%{$nameFilter}%", 'like');
 

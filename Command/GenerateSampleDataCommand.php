@@ -53,7 +53,6 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
      */
     private $entityManager;
 
-
     /**
      * @var RandomHelper
      */
@@ -114,14 +113,14 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         $enquirer = $this->getHelper('question');
         $objectId = (int) $input->getOption('object-id');
         $limit    = (int) $input->getOption('limit');
-        
+
         if (!$limit) {
             $limit = 1000;
         }
-        
+
         if (!$objectId) {
-            $io->error("Provide a Custom Object ID for which you want to generate the custom items. Use --object-id=X");
-            
+            $io->error('Provide a Custom Object ID for which you want to generate the custom items. Use --object-id=X');
+
             return 1;
         }
 
@@ -153,7 +152,6 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
             $progress->advance();
         }
 
-
         $progress->finish();
         $runTime = gmdate('H:i:s', microtime(true) - $startTime);
 
@@ -164,7 +162,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
 
     /**
      * @param CustomObject $customObject
-     * 
+     *
      * @return CustomItem
      */
     private function generateCustomItem(CustomObject $customObject): CustomItem
@@ -178,7 +176,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
     /**
      * @param CustomItem $customItem
      * @param CustomObject $customObject
-     * 
+     *
      * @return CustomItem
      */
     private function generateCustomFieldValues(CustomItem $customItem, CustomObject $customObject): CustomItem
@@ -198,9 +196,9 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
 
     /**
      * Generates up to 10 custom item - contact references and adds them to the CustomItem entity.
-     * 
+     *
      * @param CustomItem $customItem
-     * 
+     *
      * @return CustomItem
      */
     private function generateContactReferences(CustomItem $customItem): CustomItem
@@ -210,9 +208,9 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
             $reference = new CustomItemXrefContact($customItem, $contact);
             $contact->setFirstname(ucfirst($this->randomHelper->getWord()));
             $contact->setLastname(ucfirst($this->randomHelper->getWord()));
-    
+
             $this->contactModel->saveEntity($contact);
-    
+
             $customItem->addContactReference($reference);
         }
 

@@ -91,9 +91,9 @@ class ContactSubscriber extends CommonSubscriber
                 continue;
             }
 
-            if ('customitem.linked' === $type) {
+            if ($type === 'customitem.linked') {
                 $this->addLinkTimelineEntry($event, $type, $name, 'link');
-            } elseif ('customitem.unlinked' === $type) {
+            } elseif ($type === 'customitem.unlinked') {
                 $this->addLinkTimelineEntry($event, $type, $name, 'unlink');
             }
         }
@@ -102,7 +102,7 @@ class ContactSubscriber extends CommonSubscriber
     /**
      * @param LeadTimelineEvent $event
      * @param string            $action
-     * 
+     *
      * @return array
      */
     private function getEvents(LeadTimelineEvent $event, string $action): array
@@ -142,15 +142,15 @@ class ContactSubscriber extends CommonSubscriber
                     $eventLabel = $this->translator->trans("custom.item.{$action}.event.not.found", ['%customItemId%' => $link['object_id']]);
                 }
                 $event->addEvent([
-                        'event'           => $eventTypeKey,
-                        'eventId'         => $eventTypeKey.$link['id'],
-                        'eventType'       => $eventTypeName,
-                        'eventLabel'      => $eventLabel,
-                        'timestamp'       => $link['date_added'],
-                        'icon'            => "fa-{$action}",
-                        'extra'           => $link,
-                        'contactId'       => $link['lead_id'],
-                        'contentTemplate' => 'CustomObjectsBundle:SubscribedEvents\Timeline:link.html.php',
+                    'event'           => $eventTypeKey,
+                    'eventId'         => $eventTypeKey . $link['id'],
+                    'eventType'       => $eventTypeName,
+                    'eventLabel'      => $eventLabel,
+                    'timestamp'       => $link['date_added'],
+                    'icon'            => "fa-{$action}",
+                    'extra'           => $link,
+                    'contactId'       => $link['lead_id'],
+                    'contentTemplate' => 'CustomObjectsBundle:SubscribedEvents\Timeline:link.html.php',
                 ]);
             }
         }

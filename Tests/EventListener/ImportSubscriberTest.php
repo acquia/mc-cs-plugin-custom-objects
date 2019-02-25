@@ -25,12 +25,19 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     private $customObjectModel;
+
     private $customItemImportModel;
+
     private $permissionProvider;
+
     private $configProvider;
+
     private $importInitEvent;
+
     private $importMappingEvent;
+
     private $importProcessEvent;
+
     private $importSubscriber;
 
     protected function setUp()
@@ -60,7 +67,7 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->importInitEvent->expects($this->never())
             ->method('getRouteObjectName');
-        
+
         $this->importSubscriber->onImportInit($this->importInitEvent);
     }
 
@@ -105,7 +112,7 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->importInitEvent->expects($this->once())
             ->method('stopPropagation');
-        
+
         $this->importSubscriber->onImportInit($this->importInitEvent);
     }
 
@@ -117,7 +124,7 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->importInitEvent->expects($this->never())
             ->method('getRouteObjectName');
-        
+
         $this->importSubscriber->onFieldMapping($this->importMappingEvent);
     }
 
@@ -129,7 +136,7 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->importProcessEvent->expects($this->never())
             ->method('getImport');
-        
+
         $this->importSubscriber->onImportProcess($this->importProcessEvent);
     }
 }

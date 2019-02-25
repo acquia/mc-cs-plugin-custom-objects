@@ -79,7 +79,7 @@ class ListController extends CommonController
 
     /**
      * @param int $page
-     * 
+     *
      * @return Response
      */
     public function listAction(int $page = 1)
@@ -101,12 +101,12 @@ class ListController extends CommonController
 
         if ($request->query->has('orderby')) {
             $orderBy    = InputHelper::clean($request->query->get('orderby'), true);
-            $orderByDir = $this->session->get("mautic.custom.object.orderbydir", 'ASC');
-            $orderByDir = $orderByDir == 'ASC' ? 'DESC' : 'ASC';
-            $this->session->set("mautic.custom.object.orderby", $orderBy);
-            $this->session->set("mautic.custom.object.orderbydir", $orderByDir);
+            $orderByDir = $this->session->get('mautic.custom.object.orderbydir', 'ASC');
+            $orderByDir = $orderByDir === 'ASC' ? 'DESC' : 'ASC';
+            $this->session->set('mautic.custom.object.orderby', $orderBy);
+            $this->session->set('mautic.custom.object.orderbydir', $orderByDir);
         }
-        
+
         $entities = $this->customObjectModel->fetchEntities(
             [
                 'start'      => PaginationHelper::countOffset($page, $limit),
@@ -116,7 +116,7 @@ class ListController extends CommonController
                 'orderByDir' => $orderByDir,
             ]
         );
-    
+
         $this->session->set('mautic.custom.object.page', $page);
         $this->session->set('mautic.custom.object.limit', $limit);
         $this->session->set('mautic.custom.object.filter', $search);

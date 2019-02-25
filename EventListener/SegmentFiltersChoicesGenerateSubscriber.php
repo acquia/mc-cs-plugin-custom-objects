@@ -91,7 +91,7 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
                     'custom_object',
                     'cmo_' . $customObject->getId(),
                     [
-                        'label'      => $customObject->getName() . " " . $this->translator->trans('custom.item.name.label'),
+                        'label'      => $customObject->getName() . ' ' . $this->translator->trans('custom.item.name.label'),
                         'properties' => ['type' => 'text'],
                         'operators'  => $this->getOperatorsForFieldType('text'),
                         'object'     => $customObject->getId(),
@@ -103,7 +103,7 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
                         'custom_object',
                         'cmf_' . $customField->getId(),
                         [
-                            'label'      => $customField->getCustomObject()->getName() . " : " . $customField->getLabel(),
+                            'label'      => $customField->getCustomObject()->getName() . ' : ' . $customField->getLabel(),
                             'properties' => ['type' => $customField->getType()],
                             'operators'  => $customField->getTypeObject()->getOperators(),
                             'object'     => $customField->getId(),

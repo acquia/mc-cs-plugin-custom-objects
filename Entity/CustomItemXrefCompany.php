@@ -76,7 +76,7 @@ class CustomItemXrefCompany
             ->columnName('date_added')
             ->build();
     }
-    
+
     /**
      * @return CustomItem
      */

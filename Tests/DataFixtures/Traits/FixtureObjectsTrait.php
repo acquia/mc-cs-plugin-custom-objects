@@ -73,7 +73,7 @@ trait FixtureObjectsTrait
         $fixtures = array_values($fixtures);
 
         if (!isset($fixtures[$index])) {
-            throw new FixtureNotFoundException('No index "' . $index. '" defined of ' . $type . '\'s');
+            throw new FixtureNotFoundException('No index "' . $index . '" defined of ' . $type . '\'s');
         }
 
         return $fixtures[$index];
@@ -87,12 +87,12 @@ trait FixtureObjectsTrait
      */
     public function getFixtureById($id): UniqueEntityInterface {
         if (!isset($this->entityMap[$id])) {
-            throw new FixtureNotFoundException('No fixture with id "' . $id. '"" defined');
+            throw new FixtureNotFoundException('No fixture with id "' . $id . '"" defined');
         }
-        
+
         return $this->objects[$this->entityMap[$id]][$id];
     }
-    
+
     /**
      * @return CommonEntity[]
      */

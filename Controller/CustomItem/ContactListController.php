@@ -24,7 +24,7 @@ class ContactListController extends CommonController
     /**
      * @param int $objectId
      * @param int $page
-     * 
+     *
      * @return Response
      */
     public function listAction(int $objectId, int $page = 1)

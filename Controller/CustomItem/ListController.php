@@ -91,10 +91,10 @@ class ListController extends CommonController
 
     /**
      * @todo make the search filter work.
-     * 
+     *
      * @param integer $objectId
      * @param integer $page
-     * 
+     *
      * @return \Symfony\Component\HttpFoundation\Response|\Symfony\Component\HttpFoundation\JsonResponse
      */
     public function listAction(int $objectId, int $page = 1)
@@ -113,18 +113,18 @@ class ListController extends CommonController
         $defaultlimit = (int) $this->coreParametersHelper->getParameter('default_pagelimit');
         $sessionLimit = (int) $this->session->get('mautic.custom.item.limit', $defaultlimit);
         $limit        = (int) $request->get('limit', $sessionLimit);
-        $orderBy      = $this->session->get('mautic.custom.item.orderby', CustomItemRepository::TABLE_ALIAS.'.id');
+        $orderBy      = $this->session->get('mautic.custom.item.orderby', CustomItemRepository::TABLE_ALIAS . '.id');
         $orderByDir   = $this->session->get('mautic.custom.item.orderbydir', 'DESC');
         $contactId    = (int) $request->get('contactId');
-        
+
         if ($request->query->has('orderby')) {
             $orderBy    = InputHelper::clean($request->query->get('orderby'), true);
-            $orderByDir = $this->session->get("mautic.custom.item.orderbydir", 'ASC');
-            $orderByDir = $orderByDir == 'ASC' ? 'DESC' : 'ASC';
-            $this->session->set("mautic.custom.item.orderby", $orderBy);
-            $this->session->set("mautic.custom.item.orderbydir", $orderByDir);
+            $orderByDir = $this->session->get('mautic.custom.item.orderbydir', 'ASC');
+            $orderByDir = $orderByDir === 'ASC' ? 'DESC' : 'ASC';
+            $this->session->set('mautic.custom.item.orderby', $orderBy);
+            $this->session->set('mautic.custom.item.orderbydir', $orderByDir);
         }
-        
+
         $tableConfig = new TableConfig($limit, $page, $orderBy, $orderByDir);
         $tableConfig->addFilter(CustomItem::class, 'customObject', $objectId);
         $tableConfig->addFilterIfNotEmpty(CustomItemXrefContact::class, 'contact', $contactId);

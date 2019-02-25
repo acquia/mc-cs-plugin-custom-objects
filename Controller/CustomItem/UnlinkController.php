@@ -59,7 +59,7 @@ class UnlinkController extends JsonController
      * @param int    $itemId
      * @param string $entityType
      * @param int    $entityId
-     * 
+     *
      * @return JsonResponse
      */
     public function saveAction(int $itemId, string $entityType, int $entityId): JsonResponse
@@ -85,7 +85,7 @@ class UnlinkController extends JsonController
      * @param int    $itemId
      * @param string $entityType
      * @param int    $entityId
-     * 
+     *
      * @throws UnexpectedValueException
      */
     private function unlinkBasedOnEntityType(int $itemId, string $entityType, int $entityId): void

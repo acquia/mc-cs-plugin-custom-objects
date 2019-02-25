@@ -21,7 +21,7 @@ class CancelController extends CommonController
 {
     /**
      * @param int|null $fieldId
-     * 
+     *
      * @return Response|JsonResponse
      */
     public function cancelAction(?int $fieldId)

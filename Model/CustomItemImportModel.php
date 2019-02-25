@@ -60,7 +60,7 @@ class CustomItemImportModel extends FormModel
      * @param Import $import
      * @param array $rowData
      * @param CustomObject $customObject
-     * 
+     *
      * @return boolean updated = true, inserted = false
      */
     public function import(Import $import, array $rowData, CustomObject $customObject): bool
@@ -102,17 +102,16 @@ class CustomItemImportModel extends FormModel
         $this->customItemModel->save($customItem);
 
         $this->linkContacts($customItem, $contactIds);
-        
+
         return $merged;
     }
 
     /**
-     *
      * @param CustomObject $customObject
      * @param CustomItem $customItem
      * @param int $customFieldId
      * @param int $csvValue
-     * 
+     *
      * @return CustomFieldValueInterface
      */
     private function createNewCustomFieldValue(CustomObject $customObject, CustomItem $customItem, int $customFieldId, $csvValue): CustomFieldValueInterface
@@ -122,7 +121,7 @@ class CustomItemImportModel extends FormModel
                 $fieldType        = $customField->getTypeObject();
                 $customFieldValue = $fieldType->createValueEntity($customField, $customItem, $csvValue);
                 $customItem->addCustomFieldValue($customFieldValue);
-                
+
                 return $customFieldValue;
             }
         }
@@ -133,7 +132,7 @@ class CustomItemImportModel extends FormModel
     /**
      * @param CustomItem $customItem
      * @param array $contactIds
-     * 
+     *
      * @return CustomItem
      */
     private function linkContacts(CustomItem $customItem, array $contactIds): CustomItem
@@ -148,7 +147,7 @@ class CustomItemImportModel extends FormModel
     /**
      * @param Import $import
      * @param CustomItem $customItem
-     * 
+     *
      * @return CustomItem
      */
     private function setOwner(Import $import, CustomItem $customItem): CustomItem
@@ -164,7 +163,7 @@ class CustomItemImportModel extends FormModel
      * @param Import $import
      * @param CustomObject $customObject
      * @param array $rowData
-     * 
+     *
      * @return CustomItem
      */
     private function getCustomItem(Import $import, CustomObject $customObject, array $rowData): CustomItem
@@ -173,10 +172,11 @@ class CustomItemImportModel extends FormModel
         $customItem    = new CustomItem($customObject);
         $idKey         = array_search(
             strtolower('customItemId'),
-            array_map('strtolower', $matchedFields)
+            array_map('strtolower', $matchedFields),
+            true
         );
 
-        if (false !== $idKey) {
+        if ($idKey !== false) {
             try {
                 $customItem = $this->customItemModel->fetchEntity((int) $rowData[$idKey]);
                 $customItem = $this->customItemModel->populateCustomFields($customItem);

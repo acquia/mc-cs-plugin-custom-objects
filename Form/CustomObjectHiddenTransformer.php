@@ -54,7 +54,7 @@ class CustomObjectHiddenTransformer implements DataTransformerInterface
 
         $entity = $this->customObjectRepository->findOneBy(['id' => $value]);
 
-        if (null === $entity) {
+        if ($entity === null) {
             throw new TransformationFailedException(sprintf(
                 'An entity with ID "%s" does not exist!',
                 $value

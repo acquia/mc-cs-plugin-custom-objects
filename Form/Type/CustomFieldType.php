@@ -119,21 +119,6 @@ class CustomFieldType extends AbstractType
     }
 
     /**
-     * Build fields for panel - custom field list.
-     * All should be hidden.
-     *
-     * @param FormBuilderInterface $builder
-     */
-    private function buildPanelFormFields(FormBuilderInterface $builder): void
-    {
-        $builder->add('required', HiddenType::class);
-        $builder->add('defaultValue', HiddenType::class);
-
-        // Possibility to mark field as deleted in POST data
-        $builder->add('deleted',HiddenType::class,['mapped' => false]);
-    }
-
-    /**
      * Build fields for form in modal. Full specification of custom field.
      *
      * @param FormBuilderInterface $builder
@@ -174,5 +159,20 @@ class CustomFieldType extends AbstractType
         );
 
         $builder->setAction($options['action']);
+    }
+
+    /**
+     * Build fields for panel - custom field list.
+     * All should be hidden.
+     *
+     * @param FormBuilderInterface $builder
+     */
+    private function buildPanelFormFields(FormBuilderInterface $builder): void
+    {
+        $builder->add('required', HiddenType::class);
+        $builder->add('defaultValue', HiddenType::class);
+
+        // Possibility to mark field as deleted in POST data
+        $builder->add('deleted', HiddenType::class, ['mapped' => false]);
     }
 }

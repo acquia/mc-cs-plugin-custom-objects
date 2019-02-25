@@ -36,12 +36,12 @@ abstract class StandardPermissionProvider
 
     /**
      * @param string $permission
-     * 
+     *
      * @throws ForbiddenException
      */
     public function isGranted(string $permission): void
     {
-        if (!$this->corePermissions->isGranted(static::BASE.$permission)) {
+        if (!$this->corePermissions->isGranted(static::BASE . $permission)) {
             throw new ForbiddenException($permission);
         }
     }
@@ -49,12 +49,12 @@ abstract class StandardPermissionProvider
     /**
      * @param string     $permission
      * @param FormEntity $entity
-     * 
+     *
      * @throws ForbiddenException
      */
     public function hasEntityAccess(string $permission, FormEntity $entity): void
     {
-        if (!$this->corePermissions->hasEntityAccess(static::BASE.$permission.'own', static::BASE.$permission.'other', $entity->getCreatedBy())) {
+        if (!$this->corePermissions->hasEntityAccess(static::BASE . $permission . 'own', static::BASE . $permission . 'other', $entity->getCreatedBy())) {
             throw new ForbiddenException($permission);
         }
     }
@@ -69,7 +69,7 @@ abstract class StandardPermissionProvider
 
     /**
      * @param FormEntity $entity
-     * 
+     *
      * @throws ForbiddenException
      */
     public function canView(FormEntity $entity): void
@@ -87,7 +87,7 @@ abstract class StandardPermissionProvider
 
     /**
      * @param FormEntity $entity
-     * 
+     *
      * @throws ForbiddenException
      */
     public function canEdit(FormEntity $entity): void
@@ -97,7 +97,7 @@ abstract class StandardPermissionProvider
 
     /**
      * @param FormEntity $entity
-     * 
+     *
      * @throws ForbiddenException
      */
     public function canClone(FormEntity $entity): void
@@ -111,7 +111,7 @@ abstract class StandardPermissionProvider
 
     /**
      * @param FormEntity $entity
-     * 
+     *
      * @throws ForbiddenException
      */
     public function canDelete(FormEntity $entity): void

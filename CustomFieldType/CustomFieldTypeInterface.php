@@ -44,7 +44,7 @@ interface CustomFieldTypeInterface
      * @param CustomField $customField
      * @param CustomItem  $customItem
      * @param mixed|null  $value
-     * 
+     *
      * @return CustomFieldValueInterface
      */
     public function createValueEntity(CustomField $customField, CustomItem $customItem, $value = null): CustomFieldValueInterface;
@@ -66,7 +66,7 @@ interface CustomFieldTypeInterface
 
     /**
      * @param TranslatorInterface $translator
-     * 
+     *
      * @return array
      */
     public function getOperatorOptions(TranslatorInterface $translator): array;

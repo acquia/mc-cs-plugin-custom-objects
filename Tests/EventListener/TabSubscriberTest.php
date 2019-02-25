@@ -22,9 +22,13 @@ use Mautic\LeadBundle\Entity\Lead;
 class TabSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     private $customObjectModel;
+
     private $customItemModel;
+
     private $configProvider;
+
     private $customContentEvent;
+
     private $tabSubscriber;
 
     protected function setUp()
@@ -50,7 +54,7 @@ class TabSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->customContentEvent->expects($this->never())
             ->method('checkContext');
-        
+
         $this->tabSubscriber->injectTabs($this->customContentEvent);
     }
 
@@ -78,7 +82,7 @@ class TabSubscriberTest extends \PHPUnit_Framework_TestCase
                 'CustomObjectsBundle:SubscribedEvents/Tab:link.html.php',
                 [
                     'customObject' => $customObject,
-                    'count'        => 13
+                    'count'        => 13,
                 ]
             );
 
@@ -95,7 +99,7 @@ class TabSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('countItemsLinkedToContact')
             ->with($customObject, $contact)
             ->willReturn(13);
-        
+
         $this->tabSubscriber->injectTabs($this->customContentEvent);
     }
 

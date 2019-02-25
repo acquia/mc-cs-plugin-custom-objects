@@ -124,7 +124,7 @@ class SaveController extends CommonController
         $form   = $this->formFactory->create(CustomFieldType::class, $customField, ['action' => $action]);
 
         $form->handleRequest($request);
-        
+
         if ($form->isValid()) {
             return $this->buildCustomFieldFormPart($customObject, $form->getData());
         }

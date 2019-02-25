@@ -19,6 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQuery
 class CustomFieldFilterQueryBuilderUnitTest extends \PHPUnit_Framework_TestCase
 {
     private $randomParameterName;
+
     private $customFieldFilterQueryBuilder;
 
     protected function setUp()

@@ -21,10 +21,10 @@ class CustomFieldFactoryTest extends \PHPUnit_Framework_TestCase
     /**
      * @var array
      */
-    var $definedTypes = [
-            'text',
-            'int',
-        ];
+    private $definedTypes = [
+        'text',
+        'int',
+    ];
 
     public function testCreate()
     {

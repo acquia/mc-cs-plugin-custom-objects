@@ -18,9 +18,13 @@ use Symfony\Component\Routing\RouterInterface;
 class CustomFieldRouteProvider
 {
     public const ROUTE_FORM   = 'mautic_custom_field_form';
+
     public const ROUTE_CLONE  = 'mautic_custom_field_clone';
+
     public const ROUTE_DELETE = 'mautic_custom_field_delete';
+
     public const ROUTE_CANCEL = 'mautic_custom_field_cancel';
+
     public const ROUTE_SAVE   = 'mautic_custom_field_save';
 
     /**

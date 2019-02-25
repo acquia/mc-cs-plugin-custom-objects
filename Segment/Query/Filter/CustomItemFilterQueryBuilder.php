@@ -92,7 +92,7 @@ class CustomItemFilterQueryBuilder extends BaseFilterQueryBuilder
                 $queryBuilder->addLogic($queryBuilder->expr()->notExists($customQuery->getSQL()), $filter->getGlue());
                 break;
             default:
-                $expression = $customQuery->expr()->$filterOperator(
+                $expression = $customQuery->expr()->{$filterOperator}(
                     $tableAlias . '_item.name',
                     $filterParametersHolder
                 );
@@ -118,7 +118,7 @@ class CustomItemFilterQueryBuilder extends BaseFilterQueryBuilder
                 return $this->generateRandomParameterName();
             }, $filterParameters);
         }
-        
+
         return $this->generateRandomParameterName();
     }
 
@@ -140,7 +140,7 @@ class CustomItemFilterQueryBuilder extends BaseFilterQueryBuilder
                 MAUTIC_TABLE_PREFIX . 'custom_item',
                 $alias . '_item',
                 $alias . '_item.id=' . $alias . '_contact.custom_item_id')
-            ->where('l.id = ' . $alias . "_contact.contact_id");
+            ->where('l.id = ' . $alias . '_contact.contact_id');
 
         $customFieldQueryBuilder->andWhere($customFieldQueryBuilder->expr()->eq($alias . '_item.custom_object_id', ':customObjectId_' . $alias));
 

@@ -103,7 +103,7 @@ class CustomItemModel extends FormModel
 
     /**
      * @param CustomItem $customItem
-     * 
+     *
      * @return CustomItem
      */
     public function save(CustomItem $customItem): CustomItem
@@ -174,7 +174,7 @@ class CustomItemModel extends FormModel
                 $this->entityManager->getReference(CustomItem::class, $customItemId),
                 $this->entityManager->getReference(Lead::class, $contactId)
             );
-    
+
             $this->entityManager->persist($xRef);
             $this->entityManager->persist($eventLog);
             $this->entityManager->flush();
@@ -204,9 +204,9 @@ class CustomItemModel extends FormModel
     /**
      * @param integer $customItemId
      * @param integer $contactId
-     * 
+     *
      * @return CustomItemXrefContact
-     * 
+     *
      * @throws NoResultException if the reference does not exist
      */
     public function getContactReference(int $customItemId, int $contactId): CustomItemXrefContact
@@ -224,16 +224,16 @@ class CustomItemModel extends FormModel
 
     /**
      * @param integer $id
-     * 
+     *
      * @return CustomItem
-     * 
+     *
      * @throws NotFoundException
      */
     public function fetchEntity(int $id): CustomItem
     {
         $entity = parent::getEntity($id);
 
-        if (null === $entity) {
+        if ($entity === null) {
             throw new NotFoundException("Custom Item with ID = {$id} was not found");
         }
 
@@ -242,7 +242,7 @@ class CustomItemModel extends FormModel
 
     /**
      * @param TableConfig $tableConfig
-     * 
+     *
      * @return CustomItem[]
      */
     public function getTableData(TableConfig $tableConfig): array
@@ -256,7 +256,7 @@ class CustomItemModel extends FormModel
 
     /**
      * @param TableConfig $tableConfig
-     * 
+     *
      * @return integer
      */
     public function getCountForTable(TableConfig $tableConfig): int
@@ -270,7 +270,7 @@ class CustomItemModel extends FormModel
 
     /**
      * @param TableConfig $tableConfig
-     * 
+     *
      * @return array
      */
     public function getLookupData(TableConfig $tableConfig): array
@@ -286,7 +286,7 @@ class CustomItemModel extends FormModel
 
     /**
      * @param CustomItem $customItem
-     * 
+     *
      * @return CustomItem
      */
     public function populateCustomFields(CustomItem $customItem): CustomItem
@@ -294,7 +294,7 @@ class CustomItemModel extends FormModel
         $values            = $customItem->getCustomFieldValues();
         $customFields      = $this->customFieldModel->fetchCustomFieldsForObject($customItem->getCustomObject());
         $customFieldValues = $this->customFieldValueModel->getValuesForItem($customItem);
-        
+
         foreach ($customFieldValues as $customFieldValue) {
             $values->set($customFieldValue->getId(), $customFieldValue);
         }
@@ -320,7 +320,7 @@ class CustomItemModel extends FormModel
 
     /**
      * Used only by Mautic's generic methods. Use DI instead.
-     * 
+     *
      * @return CommonRepository
      */
     public function getRepository(): CommonRepository
@@ -333,7 +333,7 @@ class CustomItemModel extends FormModel
      * @param Lead $contact
      * @param string $expr
      * @param mixed $value
-     * 
+     *
      * @return int
      */
     public function findItemIdForValue(CustomField $customField, Lead $contact, string $expr, $value): int
@@ -344,7 +344,7 @@ class CustomItemModel extends FormModel
     /**
      * @param Lead         $contact
      * @param CustomObject $customObject
-     * 
+     *
      * @return int
      */
     public function countItemsLinkedToContact(CustomObject $customObject, Lead $contact): int
@@ -356,7 +356,7 @@ class CustomItemModel extends FormModel
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
      * @param CustomItem $customItem
-     * 
+     *
      * @return array
      */
     public function getLinksLineChartData(
@@ -379,7 +379,7 @@ class CustomItemModel extends FormModel
 
     /**
      * Used only by Mautic's generic methods. Use CustomItemPermissionProvider instead.
-     * 
+     *
      * @return string
      */
     public function getPermissionBase(): string
@@ -391,7 +391,7 @@ class CustomItemModel extends FormModel
      * Adds condition for owner if the user doesn't have permissions to view other.
      *
      * @param QueryBuilder $queryBuilder
-     * 
+     *
      * @return QueryBuilder
      */
     private function applyOwnerFilter(QueryBuilder $queryBuilder, int $customObjectId): QueryBuilder
@@ -411,7 +411,7 @@ class CustomItemModel extends FormModel
      * @param string $object
      * @param integer $objectId
      * @param array $properties
-     * 
+     *
      * @return LeadEventLog
      */
     private function createContactEventLog(Lead $contact, string $action, string $object, int $objectId, array $properties = []): LeadEventLog

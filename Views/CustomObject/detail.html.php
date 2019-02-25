@@ -171,14 +171,14 @@ $view['slots']->set(
                         echo $view['router']->path(
                             \MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider::ROUTE_LIST,
                             ['objectId' => $customObject->getId()]
-                        ) ?>"><?php echo $view['translator']->trans("custom.items.view.link"); ?></a>
+                        ) ?>"><?php echo $view['translator']->trans('custom.items.view.link'); ?></a>
                     </li>
                     <li>
                         <a href="<?php
                         echo $view['router']->path(
                             \MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider::ROUTE_NEW,
                             ['objectId' => $customObject->getId()]
-                        ) ?>"><?php echo $view['translator']->trans("custom.item.create.link"); ?></a>
+                        ) ?>"><?php echo $view['translator']->trans('custom.item.create.link'); ?></a>
                     </li>
                 </ul>
             </div>

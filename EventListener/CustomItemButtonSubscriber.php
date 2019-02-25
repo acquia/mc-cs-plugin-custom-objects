@@ -26,6 +26,11 @@ use Symfony\Component\Translation\TranslatorInterface;
 class CustomItemButtonSubscriber extends CommonSubscriber
 {
     /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
      * @var CustomItemPermissionProvider
      */
     private $permissionProvider;
@@ -34,11 +39,6 @@ class CustomItemButtonSubscriber extends CommonSubscriber
      * @var CustomItemRouteProvider
      */
     private $routeProvider;
-
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
 
     /**
      * @param CustomItemPermissionProvider $permissionProvider
@@ -149,9 +149,9 @@ class CustomItemButtonSubscriber extends CommonSubscriber
     /**
      * @param int        $customObjectId
      * @param CustomItem $customItem
-     * 
+     *
      * @return array
-     * 
+     *
      * @throws ForbiddenException
      */
     private function defineEditButton(int $customObjectId, CustomItem $customItem): array
@@ -170,7 +170,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
 
     /**
      * @param int $customObjectId
-     * 
+     *
      * @return array
      */
     private function defineCloseButton(int $customObjectId): array
@@ -190,9 +190,9 @@ class CustomItemButtonSubscriber extends CommonSubscriber
     /**
      * @param int        $customObjectId
      * @param CustomItem $customItem
-     * 
+     *
      * @return array
-     * 
+     *
      * @throws ForbiddenException
      */
     private function defineCloneButton(int $customObjectId, CustomItem $customItem): array
@@ -212,14 +212,14 @@ class CustomItemButtonSubscriber extends CommonSubscriber
     /**
      * @param int        $customObjectId
      * @param CustomItem $customItem
-     * 
+     *
      * @return array
-     * 
+     *
      * @throws ForbiddenException
      */
     private function defineDeleteButton(int $customObjectId, CustomItem $customItem): array
     {
-        $this->permissionProvider->canDelete($customItem);        
+        $this->permissionProvider->canDelete($customItem);
 
         return [
             'attr' => [
@@ -233,14 +233,14 @@ class CustomItemButtonSubscriber extends CommonSubscriber
 
     /**
      * @param int $customObjectId
-     * 
+     *
      * @return array
-     * 
+     *
      * @throws ForbiddenException
      */
     private function defineNewButton(int $customObjectId): array
     {
-        $this->permissionProvider->canCreate($customObjectId);        
+        $this->permissionProvider->canCreate($customObjectId);
 
         return [
             'attr' => [
@@ -256,19 +256,19 @@ class CustomItemButtonSubscriber extends CommonSubscriber
      * @param int $customObjectId
      * @param int $customItemId
      * @param int $contactId
-     * 
+     *
      * @return array
-     * 
+     *
      * @throws ForbiddenException
      */
     private function defineUnlinkContactButton(int $customObjectId, int $customItemId, int $contactId): array
     {
-        $this->permissionProvider->canCreate($customObjectId);        
+        $this->permissionProvider->canCreate($customObjectId);
 
         return [
             'attr' => [
                 'href'        => '#',
-                'onclick'     => "CustomObjects.unlinkFromContact(this, event, $customObjectId, $contactId);",
+                'onclick'     => "CustomObjects.unlinkFromContact(this, event, ${customObjectId}, ${contactId});",
                 'data-action' => $this->routeProvider->buildUnlinkContactRoute($customItemId, $contactId),
                 'data-toggle' => '',
             ],
@@ -280,14 +280,14 @@ class CustomItemButtonSubscriber extends CommonSubscriber
 
     /**
      * @param int $customObjectId
-     * 
+     *
      * @return array
-     * 
+     *
      * @throws ForbiddenException
      */
     private function defineImportNewButton(int $customObjectId): array
     {
-        $this->permissionProvider->canCreate($customObjectId);        
+        $this->permissionProvider->canCreate($customObjectId);
 
         return [
             'attr' => [
@@ -301,14 +301,14 @@ class CustomItemButtonSubscriber extends CommonSubscriber
 
     /**
      * @param int $customObjectId
-     * 
+     *
      * @return array
-     * 
+     *
      * @throws ForbiddenException
      */
     private function defineImportListButton(int $customObjectId): array
     {
-        $this->permissionProvider->canCreate($customObjectId);        
+        $this->permissionProvider->canCreate($customObjectId);
 
         return [
             'attr' => [
@@ -322,9 +322,9 @@ class CustomItemButtonSubscriber extends CommonSubscriber
 
     /**
      * @param int $customObjectId
-     * 
+     *
      * @return array
-     * 
+     *
      * @throws ForbiddenException
      */
     private function defineBatchDeleteButton(int $customObjectId): array
@@ -343,7 +343,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
 
     /**
      * @param CustomButtonEvent $event
-     * 
+     *
      * @return int
      */
     private function getCustomObjectIdFromEvent(CustomButtonEvent $event): int

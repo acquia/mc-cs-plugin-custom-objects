@@ -19,8 +19,11 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 class AssetsSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     private $assetsHelper;
+
     private $configProvider;
+
     private $getResponseEvent;
+
     private $assetsSubscriber;
 
     protected function setUp()
@@ -41,7 +44,7 @@ class AssetsSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->getResponseEvent->expects($this->never())
             ->method('isMasterRequest');
-        
+
         $this->assetsHelper->expects($this->never())
             ->method('addStylesheet');
 
@@ -53,11 +56,11 @@ class AssetsSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
             ->willReturn(true);
-        
+
         $this->getResponseEvent->expects($this->once())
             ->method('isMasterRequest')
             ->willReturn(true);
-        
+
         $this->assetsHelper->expects($this->once())
             ->method('addStylesheet');
 

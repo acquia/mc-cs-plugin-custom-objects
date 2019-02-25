@@ -17,7 +17,7 @@ class CustomItemFilterQueryBuilderTest extends WebTestCase
     /** @var EntityManager */
     private $entityManager;
 
-    public function setUp()
+    protected function setUp()
     {
         $pluginDirectory   = $this->getContainer()->get('kernel')->locateResource('@CustomObjectsBundle');
         $fixturesDirectory = $pluginDirectory . '/Tests/DataFixtures/ORM/Data';
@@ -31,7 +31,7 @@ class CustomItemFilterQueryBuilderTest extends WebTestCase
             $fixturesDirectory . '/custom_items.yml',
             $fixturesDirectory . '/custom_xref.yml',
             $fixturesDirectory . '/custom_values.yml',
-        ], false, null,'doctrine'); //,ORMPurger::PURGE_MODE_DELETE);
+        ], false, null, 'doctrine'); //,ORMPurger::PURGE_MODE_DELETE);
 
         $this->setFixtureObjects($objects);
 
@@ -40,7 +40,7 @@ class CustomItemFilterQueryBuilderTest extends WebTestCase
         parent::setUp();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         foreach ($this->getFixturesInUnloadableOrder() as $entity) {
             $this->entityManager->remove($entity);
@@ -56,16 +56,16 @@ class CustomItemFilterQueryBuilderTest extends WebTestCase
         $filterMock = $this->createSegmentFilterMock('%emotion%');
 
         $queryBuilder = $this->getLeadsQueryBuilder();
-        $queryBuilderService->applyQuery($queryBuilder,$filterMock);
+        $queryBuilderService->applyQuery($queryBuilder, $filterMock);
 
-        $this->assertEquals(1, $queryBuilder->execute()->rowCount());
+        $this->assertSame(1, $queryBuilder->execute()->rowCount());
 
         $filterMock = $this->createSegmentFilterMock('%Object%');
 
         $queryBuilder = $this->getLeadsQueryBuilder();
-        $queryBuilderService->applyQuery($queryBuilder,$filterMock);
+        $queryBuilderService->applyQuery($queryBuilder, $filterMock);
 
-        $this->assertEquals(6, $queryBuilder->execute()->rowCount());
+        $this->assertSame(6, $queryBuilder->execute()->rowCount());
     }
 
     private function createSegmentFilterMock($value) {
@@ -87,7 +87,7 @@ class CustomItemFilterQueryBuilderTest extends WebTestCase
         $connection   = $this->entityManager->getConnection();
         $queryBuilder = new QueryBuilder($connection);
 
-        $queryBuilder->select('l.*')->from(MAUTIC_TABLE_PREFIX . "leads","l");
+        $queryBuilder->select('l.*')->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
 
         return $queryBuilder;
     }

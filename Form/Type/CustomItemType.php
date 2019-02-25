@@ -24,7 +24,7 @@ use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
 class CustomItemType extends AbstractType
-{   
+{
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options

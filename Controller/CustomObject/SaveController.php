@@ -67,6 +67,7 @@ class SaveController extends CommonController
      * @var CustomObjectRouteProvider
      */
     private $routeProvider;
+
     /**
      * @var CustomFieldTypeProvider
      */
@@ -107,7 +108,7 @@ class SaveController extends CommonController
 
     /**
      * @param int|null $objectId
-     * 
+     *
      * @return Response|JsonResponse
      */
     public function saveAction(?int $objectId = null)
@@ -186,7 +187,7 @@ class SaveController extends CommonController
     /**
      * @param Request               $request
      * @param CustomObject $entity
-     * 
+     *
      * @return Response
      */
     private function forwardToDetail(Request $request, CustomObject $entity): Response

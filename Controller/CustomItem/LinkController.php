@@ -60,7 +60,7 @@ class LinkController extends JsonController
      * @param integer $itemId
      * @param string  $entityType
      * @param integer $entityId
-     * 
+     *
      * @return JsonResponse
      */
     public function saveAction(int $itemId, string $entityType, int $entityId): JsonResponse
@@ -86,7 +86,7 @@ class LinkController extends JsonController
      * @param integer $itemId
      * @param string  $entityType
      * @param integer $entityId
-     * 
+     *
      * @throws UnexpectedValueException
      * @throws UniqueConstraintViolationException
      */

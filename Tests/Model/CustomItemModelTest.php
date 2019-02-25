@@ -33,15 +33,25 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 class CustomItemModelTest extends \PHPUnit_Framework_TestCase
 {
     private $customItem;
+
     private $user;
+
     private $entityManager;
+
     private $customItemRepository;
+
     private $customItemPermissionProvider;
+
     private $userHelper;
+
     private $customFieldModel;
+
     private $customFieldValueModel;
+
     private $customFieldTypeProvider;
+
     private $dispatcher;
+
     private $customItemModel;
 
     protected function setUp()

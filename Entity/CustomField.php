@@ -98,7 +98,6 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         $builder->setTable('custom_field')
             ->setCustomRepositoryClass(CustomFieldRepository::class);
 
-
         $builder->createManyToOne('customObject', CustomObject::class)
             ->addJoinColumn('custom_object_id', 'id', false, false, 'CASCADE')
             ->inversedBy('customFields')
@@ -171,7 +170,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
     /**
      * Alias for abstractions. Do not use.
-     * 
+     *
      * @return string|null
      */
     public function getName(): ?string

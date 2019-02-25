@@ -51,21 +51,21 @@ class CustomFieldTypeProvider
             $this->dispatcher->dispatch(CustomFieldEvents::MAKE_FIELD_TYPE_LIST, $event);
             $this->customFieldTypes = $event->getCustomFieldTypes();
         }
-        
+
         return $this->customFieldTypes;
     }
 
     /**
      * @param string $key
-     * 
+     *
      * @return CustomFieldTypeInterface
-     * 
+     *
      * @throws NotFoundException
      */
     public function getType(string $key): CustomFieldTypeInterface
     {
         $this->getTypes();
-        
+
         if (isset($this->customFieldTypes[$key])) {
             return $this->customFieldTypes[$key];
         }

@@ -121,6 +121,20 @@ class CustomObjectType extends AbstractType
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(
+            [
+                'data_class'         => CustomObject::class,
+                'allow_extra_fields' => true,
+                'csrf_protection'    => false,
+            ]
+        );
+    }
+
+    /**
      * @param FormBuilderInterface $builder
      */
     private function addEvents(FormBuilderInterface $builder): void
@@ -140,19 +154,5 @@ class CustomObjectType extends AbstractType
                 }
             }
         });
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(
-            [
-                'data_class'         => CustomObject::class,
-                'allow_extra_fields' => true,
-                'csrf_protection'    => false,
-            ]
-        );
     }
 }

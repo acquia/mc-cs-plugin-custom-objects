@@ -124,7 +124,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
 
     /**
      * This is alias method that is required by Mautic.
-     * 
+     *
      * @return string|null
      */
     public function getName()
@@ -272,7 +272,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
 
             foreach ($newField as $key => $newValue) {
                 $initialValue = ArrayHelper::getValue($key, $initialField);
-                if ($initialValue != $newValue) {
+                if ($initialValue !== $newValue) {
                     $this->addChange("customfield:{$newField['id']}:{$key}", [$initialValue, $newValue]);
                 }
             }

@@ -76,7 +76,7 @@ class CustomItemXrefContact
             ->columnName('date_added')
             ->build();
     }
-    
+
     /**
      * @return CustomItem
      */

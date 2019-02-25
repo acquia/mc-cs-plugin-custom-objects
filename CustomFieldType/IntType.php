@@ -46,14 +46,14 @@ class IntType extends AbstractCustomFieldType
      */
     public function getTableName(): string
     {
-        return MAUTIC_TABLE_PREFIX.'custom_field_value_int';
+        return MAUTIC_TABLE_PREFIX . 'custom_field_value_int';
     }
 
     /**
      * @param CustomField $customField
      * @param CustomItem  $customItem
      * @param int|null    $value
-     * 
+     *
      * @return CustomFieldValueInterface
      */
     public function createValueEntity(CustomField $customField, CustomItem $customItem, $value = null): CustomFieldValueInterface
@@ -68,7 +68,7 @@ class IntType extends AbstractCustomFieldType
     {
         $allOperators     = parent::getOperators();
         $allowedOperators = array_flip(['=', '!=', 'gt', 'gte', 'lt', 'lte', 'empty', '!empty', 'between', '!between', 'in', '!in']);
-        
+
         return array_intersect_key($allOperators, $allowedOperators);
     }
 }

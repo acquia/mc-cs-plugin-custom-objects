@@ -47,24 +47,6 @@ abstract class CustomFieldValueStandard implements CustomFieldValueInterface
     }
 
     /**
-     * @param ClassMetadataBuilder $builder
-     */
-    protected static function addReferenceColumns(ClassMetadataBuilder $builder): void
-    {
-        $builder->createManyToOne('customField', CustomField::class)
-            ->addJoinColumn('custom_field_id', 'id', false, false, 'CASCADE')
-            ->makePrimaryKey()
-            ->fetchExtraLazy()
-            ->build();
-
-        $builder->createManyToOne('customItem', CustomItem::class)
-            ->addJoinColumn('custom_item_id', 'id', false, false, 'CASCADE')
-            ->makePrimaryKey()
-            ->fetchExtraLazy()
-            ->build();
-    }
-
-    /**
      * @param ClassMetadata $metadata
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -97,9 +79,7 @@ abstract class CustomFieldValueStandard implements CustomFieldValueInterface
         return $this->customItem;
     }
 
-    /**
-     * @return void
-     */
+
     public function updateThisEntityManually()
     {
         $this->updateManually = true;
@@ -111,5 +91,23 @@ abstract class CustomFieldValueStandard implements CustomFieldValueInterface
     public function shouldBeUpdatedManually()
     {
         return $this->updateManually;
+    }
+
+    /**
+     * @param ClassMetadataBuilder $builder
+     */
+    protected static function addReferenceColumns(ClassMetadataBuilder $builder): void
+    {
+        $builder->createManyToOne('customField', CustomField::class)
+            ->addJoinColumn('custom_field_id', 'id', false, false, 'CASCADE')
+            ->makePrimaryKey()
+            ->fetchExtraLazy()
+            ->build();
+
+        $builder->createManyToOne('customItem', CustomItem::class)
+            ->addJoinColumn('custom_item_id', 'id', false, false, 'CASCADE')
+            ->makePrimaryKey()
+            ->fetchExtraLazy()
+            ->build();
     }
 }

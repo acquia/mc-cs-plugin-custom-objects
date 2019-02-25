@@ -33,11 +33,11 @@ class ForbiddenException extends Exception
         ?Throwable $throwable = null
     ) {
         $message = "You do not have permission to {$permission}";
-        
+
         if ($entity) {
             $message .= " item with ID {$entity->getId()}";
         }
-        
+
         parent::__construct($message, $code, $throwable);
     }
 }

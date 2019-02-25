@@ -23,7 +23,7 @@ class RandomHelper
 
     /**
      * @param integer $limit
-     * 
+     *
      * @return string
      */
     public function getSentence(int $limit): string
@@ -44,7 +44,7 @@ class RandomHelper
     {
         $randomWords = $this->getRandomWords();
         $randomKey   = array_rand($randomWords);
-        
+
         return $randomWords[$randomKey];
     }
 
@@ -56,7 +56,7 @@ class RandomHelper
     private function getRandomWords(): array
     {
         if (empty($this->randomWords)) {
-            $path              = __DIR__.'/../Assets/json/mnemonic-words.json';
+            $path              = __DIR__ . '/../Assets/json/mnemonic-words.json';
             $string            = \file_get_contents($path);
             $this->randomWords = \json_decode($string, true);
         }

@@ -81,7 +81,7 @@ class Engine
         foreach ($migrationFileNames as $fileName) {
             require_once $this->migrationsPath . $fileName;
             $className          = preg_replace('/\\.[^.\\s]{3,4}$/', '', $fileName);
-            $className          = "MauticPlugin\CustomObjectsBundle\Migrations\\$className";
+            $className          = "MauticPlugin\CustomObjectsBundle\Migrations\\${className}";
             $migrationClasses[] = $className;
         }
 

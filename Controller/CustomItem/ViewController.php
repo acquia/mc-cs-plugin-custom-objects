@@ -85,7 +85,7 @@ class ViewController extends CommonController
     /**
      * @param int $objectId
      * @param int $itemId
-     * 
+     *
      * @return Response
      */
     public function viewAction(int $objectId, int $itemId)

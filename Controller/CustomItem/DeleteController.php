@@ -70,7 +70,7 @@ class DeleteController extends CommonController
     /**
      * @param int $objectId
      * @param int $itemId
-     * 
+     *
      * @return Response
      */
     public function deleteAction(int $objectId, int $itemId)
@@ -93,7 +93,7 @@ class DeleteController extends CommonController
                 [
                     '%name%' => $customItem->getName(),
                     '%id%'   => $customItem->getId(),
-                ], 
+                ],
                 'flashes'
             )
         );

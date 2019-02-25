@@ -31,6 +31,11 @@ use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 class CampaignSubscriber extends CommonSubscriber
 {
     /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
      * @var CustomFieldModel
      */
     private $customFieldModel;
@@ -51,12 +56,6 @@ class CampaignSubscriber extends CommonSubscriber
     private $configProvider;
 
     /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     *
      * @param CustomFieldModel $customFieldModel
      * @param CustomObjectModel $customObjectModel
      * @param CustomItemModel $customItemModel
@@ -157,7 +156,7 @@ class CampaignSubscriber extends CommonSubscriber
         if (!$this->configProvider->pluginIsEnabled()) {
             return;
         }
-        
+
         if (!preg_match('/custom_item.(\d*).fieldvalue/', $event->getEvent()['type'])) {
             return;
         }
@@ -185,7 +184,7 @@ class CampaignSubscriber extends CommonSubscriber
                 $customField->getTypeObject()->getOperators()[$event->getConfig()['operator']]['expr'],
                 $event->getConfig()['value']
             );
-            
+
             $event->setChannel('customItem', $customItemId);
             $event->setResult(true);
         } catch (NotFoundException $e) {

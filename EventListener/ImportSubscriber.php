@@ -153,15 +153,15 @@ class ImportSubscriber extends CommonSubscriber
 
     /**
      * @param string $routeObjectName
-     * 
+     *
      * @return integer
-     * 
+     *
      * @throws NotFoundException
      */
     private function getCustomObjectId(string $routeObjectName): int
     {
         $matches = [];
-        
+
         if (preg_match('/custom-object:(\d*)/', $routeObjectName, $matches)) {
             return (int) $matches[1];
         }

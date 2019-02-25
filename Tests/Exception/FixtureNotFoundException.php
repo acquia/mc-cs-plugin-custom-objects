@@ -15,5 +15,4 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
 class FixtureNotFoundException extends NotFoundException
 {
-    
 }

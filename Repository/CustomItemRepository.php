@@ -27,24 +27,24 @@ class CustomItemRepository extends CommonRepository
 
     /**
      * @param TableConfig $tableConfig
-     * 
+     *
      * @return QueryBuilder
      */
     public function getTableDataQuery(TableConfig $tableConfig): QueryBuilder
     {
-        $queryBuilder = $this->createQueryBuilder(self::TABLE_ALIAS, self::TABLE_ALIAS.'.id');
+        $queryBuilder = $this->createQueryBuilder(self::TABLE_ALIAS, self::TABLE_ALIAS . '.id');
 
         return $tableConfig->configureSelectQueryBuilder($queryBuilder, $this->getClassMetadata());
     }
 
     /**
      * @param TableConfig $tableConfig
-     * 
+     *
      * @return QueryBuilder
      */
     public function getTableCountQuery(TableConfig $tableConfig): QueryBuilder
     {
-        $queryBuilder = $this->createQueryBuilder(self::TABLE_ALIAS, self::TABLE_ALIAS.'.id');
+        $queryBuilder = $this->createQueryBuilder(self::TABLE_ALIAS, self::TABLE_ALIAS . '.id');
 
         return $tableConfig->configureCountQueryBuilder($queryBuilder, $this->getClassMetadata());
     }
@@ -52,18 +52,18 @@ class CustomItemRepository extends CommonRepository
     /**
      * @param QueryBuilder $queryBuilder
      * @param integer $userId
-     * 
+     *
      * @return QueryBuilder
      */
     public function applyOwnerId(QueryBuilder $queryBuilder, int $userId): QueryBuilder
     {
-        return $queryBuilder->andWhere(self::TABLE_ALIAS.'.createdBy', $userId);
+        return $queryBuilder->andWhere(self::TABLE_ALIAS . '.createdBy', $userId);
     }
 
     /**
      * @param Lead         $contact
      * @param CustomObject $customObject
-     * 
+     *
      * @return int
      */
     public function countItemsLinkedToContact(CustomObject $customObject, Lead $contact): int
@@ -85,9 +85,9 @@ class CustomItemRepository extends CommonRepository
      * @param Lead $contact
      * @param string $expr
      * @param mixed $value
-     * 
+     *
      * @return integer
-     * 
+     *
      * @throws NotFoundException
      */
     public function findItemIdForValue(CustomField $customField, Lead $contact, string $expr, $value): int
@@ -95,8 +95,8 @@ class CustomItemRepository extends CommonRepository
         $fieldType    = $customField->getTypeObject();
         $queryBuilder = $this->_em->getConnection()->createQueryBuilder();
         $queryBuilder->select('ci.id');
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX.'custom_item', 'ci');
-        $queryBuilder->innerJoin('ci', MAUTIC_TABLE_PREFIX.'custom_item_xref_contact', 'cixcont', 'cixcont.custom_item_id = ci.id');
+        $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'custom_item', 'ci');
+        $queryBuilder->innerJoin('ci', MAUTIC_TABLE_PREFIX . 'custom_item_xref_contact', 'cixcont', 'cixcont.custom_item_id = ci.id');
         $queryBuilder->innerJoin('ci', $fieldType->getTableName(), $fieldType->getTableAlias(), "{$fieldType->getTableAlias()}.custom_item_id = ci.id");
         $queryBuilder->where('cixcont.contact_id = :contactId');
         $queryBuilder->setParameter('contactId', $contact->getId());
@@ -106,7 +106,7 @@ class CustomItemRepository extends CommonRepository
 
         $result = $queryBuilder->execute()->fetchColumn();
 
-        if (false === $result) {
+        if ($result === false) {
             $stringValue = print_r($value, true);
             $msg         = "Custom Item for contact {$contact->getId()}, custom field {$customField->getId()} and value {$expr} {$stringValue} was not found.";
             throw new NotFoundException($msg);

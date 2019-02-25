@@ -78,7 +78,7 @@ class FormController extends CommonController
     /**
      * @param int $objectId
      * @param int $itemId
-     * 
+     *
      * @return Response|JsonResponse
      */
     public function renderFormAction(int $objectId, ?int $itemId)

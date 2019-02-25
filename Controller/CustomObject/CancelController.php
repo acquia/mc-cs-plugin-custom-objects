@@ -46,9 +46,9 @@ class CancelController extends CommonController
 
     /**
      * @todo unlock entity?
-     * 
+     *
      * @param int|null $objectId
-     * 
+     *
      * @return Response|JsonResponse
      */
     public function cancelAction(?int $objectId)

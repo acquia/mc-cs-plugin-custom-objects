@@ -46,7 +46,7 @@ class CustomFieldValueDateTime extends CustomFieldValueStandard
         $builder->setTable('custom_field_value_datetime');
         $builder->addIndex(['value'], 'value_index');
         $builder->addNullableField('value', Type::DATETIME);
-        
+
         parent::addReferenceColumns($builder);
     }
 

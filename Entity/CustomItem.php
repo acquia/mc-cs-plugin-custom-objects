@@ -73,11 +73,6 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     private $companyReferences;
 
-    public function __clone()
-    {
-        $this->id = null;
-    }
-
     /**
      * @param CustomObject $customObject
      */
@@ -87,6 +82,11 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         $this->customFieldValues = new ArrayCollection();
         $this->contactReferences = new ArrayCollection();
         $this->companyReferences = new ArrayCollection();
+    }
+
+    public function __clone()
+    {
+        $this->id = null;
     }
 
     /**
@@ -203,7 +203,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     public function addCustomFieldValue(CustomFieldValueInterface $customFieldValue)
     {
-        if (null === $this->customFieldValues) {
+        if ($this->customFieldValues === null) {
             $this->customFieldValues = new ArrayCollection();
         }
 
@@ -238,7 +238,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
             $initialValue  = ArrayHelper::getValue($customFieldId, $this->initialCustomFieldValues);
             $newValue      = $customFieldValue->getValue();
 
-            if ($initialValue != $newValue) {
+            if ($initialValue !== $newValue) {
                 $this->addChange("customfieldvalue:{$customFieldId}", [$initialValue, $newValue]);
             }
         }
@@ -249,18 +249,18 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     public function getCustomFieldValues()
     {
-        if (null === $this->customFieldValues) {
+        if ($this->customFieldValues === null) {
             $this->customFieldValues = new ArrayCollection();
         }
-        
+
         return $this->customFieldValues;
     }
 
     /**
      * @param int $customFieldId
-     * 
+     *
      * @return CustomFieldValueInterface
-     * 
+     *
      * @throws NotFoundException
      */
     public function findCustomFieldValueForFieldId(int $customFieldId)

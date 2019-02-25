@@ -11,7 +11,7 @@
 
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 
-if ($tmpl == 'index') {
+if ($tmpl === 'index') {
     $view->extend('CustomObjectsBundle:CustomObject:index.html.php');
 }
 ?>
@@ -101,4 +101,3 @@ if ($tmpl == 'index') {
 <?php else: ?>
     <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php', ['tip' => 'custom.object.noresults.tip']); ?>
 <?php endif; ?>
-

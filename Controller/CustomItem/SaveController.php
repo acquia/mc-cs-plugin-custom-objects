@@ -101,7 +101,7 @@ class SaveController extends CommonController
     /**
      * @param int      $objectId
      * @param int|null $itemId
-     * 
+     *
      * @return Response|JsonResponse
      */
     public function saveAction(int $objectId, ?int $itemId = null)
@@ -126,7 +126,7 @@ class SaveController extends CommonController
         $action  = $this->routeProvider->buildSaveRoute($objectId, $itemId);
         $form    = $this->formFactory->create(CustomItemType::class, $customItem, ['action' => $action, 'objectId' => $objectId]);
         $form->handleRequest($request);
-        
+
         if ($form->isValid()) {
             $this->customItemModel->save($customItem);
 
@@ -137,7 +137,7 @@ class SaveController extends CommonController
                     [
                         '%name%' => $customItem->getName(),
                         '%url%'  => $this->routeProvider->buildEditRoute($objectId, $customItem->getId()),
-                    ], 
+                    ],
                     'flashes'
                 )
             );
@@ -174,7 +174,7 @@ class SaveController extends CommonController
      * @param string     $where
      * @param Request    $request
      * @param CustomItem $customItem
-     * 
+     *
      * @return Response
      */
     private function redirectTo(string $where, Request $request, CustomItem $customItem): Response

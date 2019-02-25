@@ -22,7 +22,7 @@ class CustomItemTest extends \PHPUnit_Framework_TestCase
 {
     public function testCustomFieldValueChanges()
     {
-        $item   = new CustomItem(new CustomObject);
+        $item   = new CustomItem(new CustomObject());
         $fieldA = $this->createMock(CustomField::class);
         $fieldB = $this->createMock(CustomField::class);
         $valueA = new CustomFieldValueText($fieldA, $item, 'a value A');

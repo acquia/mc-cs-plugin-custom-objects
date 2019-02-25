@@ -59,7 +59,7 @@ class DateTimeType extends AbstractCustomFieldType
      */
     public function getTableName(): string
     {
-        return MAUTIC_TABLE_PREFIX.'custom_field_value_datetime';
+        return MAUTIC_TABLE_PREFIX . 'custom_field_value_datetime';
     }
 
     /**

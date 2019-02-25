@@ -23,7 +23,6 @@ use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 
 class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
 {
-
     /**
      * @var EntityManager
      */
@@ -67,13 +66,13 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
         $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
         $queryBuilder
             ->select('f.id, f.label, f.type, o.id as custom_object_id')
-            ->from(MAUTIC_TABLE_PREFIX . "custom_field", 'f')
-            ->innerJoin('f', MAUTIC_TABLE_PREFIX . "custom_object", 'o', 'f.custom_object_id = o.id and o.is_published = 1');
+            ->from(MAUTIC_TABLE_PREFIX . 'custom_field', 'f')
+            ->innerJoin('f', MAUTIC_TABLE_PREFIX . 'custom_object', 'o', 'f.custom_object_id = o.id and o.is_published = 1');
 
         $registeredObjects = [];
 
         foreach ($queryBuilder->execute()->fetchAll() as $field) {
-            if (!in_array($COId = $field['custom_object_id'], $registeredObjects)) {
+            if (!in_array($COId = $field['custom_object_id'], $registeredObjects, true)) {
                 $event->addTranslation('cmo_' . $COId, [
                     'type'  => CustomItemFilterQueryBuilder::getServiceId(),
                     'field' => $COId,

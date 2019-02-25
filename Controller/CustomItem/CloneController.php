@@ -68,7 +68,7 @@ class CloneController extends CommonController
     /**
      * @param int $objectId
      * @param int $itemId
-     * 
+     *
      * @return Response|JsonResponse
      */
     public function cloneAction(int $objectId, int $itemId)
@@ -82,7 +82,7 @@ class CloneController extends CommonController
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        $customItem->setName($customItem->getName().' '.$this->translator->trans('mautic.core.form.clone'));
+        $customItem->setName($customItem->getName() . ' ' . $this->translator->trans('mautic.core.form.clone'));
 
         $action = $this->routeProvider->buildSaveRoute($objectId);
         $form   = $this->formFactory->create(CustomItemType::class, $customItem, ['action' => $action, 'objectId' => $objectId]);

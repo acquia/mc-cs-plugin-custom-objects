@@ -69,7 +69,7 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
                     $event->addButton($this->defineNewButton(), ButtonHelper::LOCATION_PAGE_ACTIONS, $event->getRoute());
                 } catch (ForbiddenException $e) {}
                 break;
-            
+
             case CustomObjectRouteProvider::ROUTE_VIEW:
                 $this->addEntityButtons($event, ButtonHelper::LOCATION_PAGE_ACTIONS);
                 $event->addButton($this->defineCloseButton(), ButtonHelper::LOCATION_PAGE_ACTIONS, $event->getRoute());
@@ -101,9 +101,9 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
 
     /**
      * @param CustomObject $entity
-     * 
+     *
      * @return array
-     * 
+     *
      * @throws ForbiddenException
      */
     private function defineEditButton(CustomObject $entity): array
@@ -139,9 +139,9 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
 
     /**
      * @param CustomObject $entity
-     * 
+     *
      * @return array
-     * 
+     *
      * @throws ForbiddenException
      */
     private function defineCloneButton(CustomObject $entity): array
@@ -160,14 +160,14 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
 
     /**
      * @param CustomObject $entity
-     * 
+     *
      * @return array
-     * 
+     *
      * @throws ForbiddenException
      */
     private function defineDeleteButton(CustomObject $entity): array
     {
-        $this->permissionProvider->canDelete($entity);        
+        $this->permissionProvider->canDelete($entity);
 
         return [
             'attr' => [
@@ -181,12 +181,12 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
 
     /**
      * @return array
-     * 
+     *
      * @throws ForbiddenException
      */
     private function defineNewButton(): array
     {
-        $this->permissionProvider->canCreate();        
+        $this->permissionProvider->canCreate();
 
         return [
             'attr' => [

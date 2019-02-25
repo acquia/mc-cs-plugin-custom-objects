@@ -45,7 +45,7 @@ class CustomFieldValueInt extends CustomFieldValueStandard
         $builder->setTable('custom_field_value_int');
         $builder->addIndex(['value'], 'value_index');
         $builder->addNullableField('value', Type::INTEGER);
-        
+
         parent::addReferenceColumns($builder);
     }
 

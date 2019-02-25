@@ -21,8 +21,11 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 class MenuSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     private $customObjectModel;
+
     private $configProvider;
+
     private $menuEvent;
+
     private $menuSubscriber;
 
     protected function setUp()
@@ -52,11 +55,11 @@ class MenuSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
             ->willReturn(true);
-        
+
         $this->menuEvent->expects($this->once())
             ->method('getType')
             ->willReturn('not-main');
-        
+
         $this->customObjectModel->expects($this->never())
             ->method('fetchAllPublishedEntities');
 
@@ -68,11 +71,11 @@ class MenuSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
             ->willReturn(true);
-        
+
         $this->menuEvent->expects($this->once())
             ->method('getType')
             ->willReturn('main');
-        
+
         $this->customObjectModel->expects($this->once())
             ->method('fetchAllPublishedEntities')
             ->willReturn([]);
@@ -92,11 +95,11 @@ class MenuSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
             ->willReturn(true);
-        
+
         $this->menuEvent->expects($this->once())
             ->method('getType')
             ->willReturn('main');
-        
+
         $this->customObjectModel->expects($this->once())
             ->method('fetchAllPublishedEntities')
             ->willReturn([$customObject]);

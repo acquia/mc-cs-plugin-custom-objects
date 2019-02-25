@@ -60,8 +60,8 @@ class MenuSubscriber extends CommonSubscriber
         if (!$this->configProvider->pluginIsEnabled()) {
             return;
         }
-        
-        if ('main' !== $event->getType()) {
+
+        if ($event->getType() !== 'main') {
             return;
         }
 
@@ -92,7 +92,7 @@ class MenuSubscriber extends CommonSubscriber
                             'route'           => CustomItemRouteProvider::ROUTE_LIST,
                             'routeParameters' => ['objectId' => $customObject->getId(), 'page' => 1],
                             'access'          => "custom_objects:{$customObject->getId()}:view",
-                            'id'              => 'mautic_custom_object_'.$customObject->getId(),
+                            'id'              => 'mautic_custom_object_' . $customObject->getId(),
                             'parent'          => 'custom.object.title',
                         ],
                     ],

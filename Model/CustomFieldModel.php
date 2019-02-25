@@ -64,7 +64,7 @@ class CustomFieldModel extends FormModel
 
     /**
      * @param CustomField $entity
-     * 
+     *
      * @return CustomField
      */
     public function save(CustomField $entity): CustomField
@@ -90,16 +90,16 @@ class CustomFieldModel extends FormModel
 
     /**
      * @param integer $id
-     * 
+     *
      * @return CustomField
-     * 
+     *
      * @throws NotFoundException
      */
     public function fetchEntity(int $id): CustomField
     {
         $entity = parent::getEntity($id);
 
-        if (null === $entity) {
+        if ($entity === null) {
             throw new NotFoundException("Custom Field with ID = {$id} was not found");
         }
 
@@ -108,7 +108,7 @@ class CustomFieldModel extends FormModel
 
     /**
      * @param CustomObject $customObject
-     * 
+     *
      * @return array
      */
     public function fetchCustomFieldsForObject(CustomObject $customObject): array
@@ -131,7 +131,7 @@ class CustomFieldModel extends FormModel
 
     /**
      * @param array $args
-     * 
+     *
      * @return Paginator|array
      */
     public function fetchEntities(array $args = [])
@@ -141,7 +141,7 @@ class CustomFieldModel extends FormModel
 
     /**
      * Used only by Mautic's generic methods. Use DI instead.
-     * 
+     *
      * @return CommonRepository
      */
     public function getRepository(): CommonRepository
@@ -151,7 +151,7 @@ class CustomFieldModel extends FormModel
 
     /**
      * Used only by Mautic's generic methods. Use CustomFieldPermissionProvider instead.
-     * 
+     *
      * @return string
      */
     public function getPermissionBase(): string
@@ -163,7 +163,7 @@ class CustomFieldModel extends FormModel
      * Adds condition for creator if the user doesn't have permissions to view other.
      *
      * @param array $args
-     * 
+     *
      * @return array
      */
     private function addCreatorLimit(array $args): array

@@ -61,7 +61,7 @@ class DeleteController extends CommonController
 
     /**
      * @param int $objectId
-     * 
+     *
      * @return Response|JsonResponse
      */
     public function deleteAction(int $objectId)
@@ -84,7 +84,7 @@ class DeleteController extends CommonController
                 [
                     '%name%' => $customObject->getName(),
                     '%id%'   => $customObject->getId(),
-                ], 
+                ],
                 'flashes'
             )
         );

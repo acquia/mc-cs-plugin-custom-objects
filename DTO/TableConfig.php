@@ -81,7 +81,7 @@ class TableConfig
     public function getOffset(): int
     {
         $offset = $this->page === 1 ? 0 : (($this->page - 1) * $this->limit);
-        
+
         return $offset < 0 ? 0 : $offset;
     }
 
@@ -121,7 +121,7 @@ class TableConfig
      * @param string $columnName
      * @param mixed  $value
      * @param string $expression
-     * 
+     *
      * @return TableFilterConfig
      */
     public function createFilter(string $entityName, string $columnName, $value, string $expression = 'eq'): TableFilterConfig
@@ -131,7 +131,7 @@ class TableConfig
 
     /**
      * Checks if the filter value is not empty before adding the filter.
-     * 
+     *
      * @param string $entityName
      * @param string $columnName
      * @param mixed  $value
@@ -140,7 +140,7 @@ class TableConfig
     public function addFilterIfNotEmpty(string $entityName, string $columnName, $value, string $expression = 'eq'): void
     {
         // Remove SQL wild cards for NOT/LIKE:
-        if (in_array($expression, ['like', 'notLike']) && is_string($value)) {
+        if (in_array($expression, ['like', 'notLike'], true) && is_string($value)) {
             $trimmedValue = trim($value, '%');
         } else {
             $trimmedValue = $value;
@@ -162,9 +162,9 @@ class TableConfig
     /**
      * @param string $entityName
      * @param string $columnName
-     * 
+     *
      * @return TableFilterConfig
-     * 
+     *
      * @throws NotFoundException
      */
     public function getFilter(string $entityName, string $columnName): TableFilterConfig
@@ -185,7 +185,7 @@ class TableConfig
     /**
      * @param string $entityName
      * @param string $columnName
-     * 
+     *
      * @return boolean
      */
     public function hasFilter(string $entityName, string $columnName): bool
@@ -203,7 +203,7 @@ class TableConfig
     /**
      * @param QueryBuilder $queryBuilder
      * @param ClassMetadata $metadata
-     * 
+     *
      * @return QueryBuilder
      */
     public function configureSelectQueryBuilder(QueryBuilder $queryBuilder, ClassMetadata $metadata): QueryBuilder
@@ -216,7 +216,7 @@ class TableConfig
     /**
      * @param QueryBuilder $queryBuilder
      * @param ClassMetadata $metadata
-     * 
+     *
      * @return QueryBuilder
      */
     public function configureCountQueryBuilder(QueryBuilder $queryBuilder, ClassMetadata $metadata): QueryBuilder

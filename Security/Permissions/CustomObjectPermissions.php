@@ -39,7 +39,7 @@ class CustomObjectPermissions extends AbstractPermissions
 
     /**
      * Cached custom objects.
-     * 
+     *
      * @var array
      */
     private $customObjects = [];
@@ -115,19 +115,19 @@ class CustomObjectPermissions extends AbstractPermissions
     {
         if (is_numeric($level)) {
             $customObject = $this->getCustomObjects()[$level];
-        
+
             return $this->translator->trans(
                 'custom.object.permissions',
                 ['%name%' => $customObject->getNamePlural()]
             );
         }
-        
+
         return parent::getLabel($bundle, $level);
     }
 
     /**
      * Fetches published custom objects once and returns the cached array if fetched already.
-     * 
+     *
      * @return CustomObject[]
      */
     private function getCustomObjects(): array
