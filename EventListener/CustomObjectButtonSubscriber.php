@@ -127,10 +127,10 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
     {
         return [
             'attr' => [
-                'href' => $this->routeProvider->buildListRoute(),
+                'href'  => $this->routeProvider->buildListRoute(),
                 'class' => 'btn btn-default',
             ],
-            'class' => 'btn btn-default',
+            'class'     => 'btn btn-default',
             'btnText'   => 'mautic.core.form.close',
             'iconClass' => 'fa fa-fw fa-remove',
             'priority'  => 400,

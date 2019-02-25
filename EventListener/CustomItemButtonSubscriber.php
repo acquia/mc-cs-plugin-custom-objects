@@ -103,8 +103,6 @@ class CustomItemButtonSubscriber extends CommonSubscriber
                             ButtonHelper::LOCATION_PAGE_ACTIONS,
                             $event->getRoute()
                         );
-                        $location = $event->getLocation();
-                        $route = $event->getRoute();
                         $event->addButton(
                             $this->defineBatchDeleteButton($customObjectId),
                             ButtonHelper::LOCATION_BULK_ACTIONS,
@@ -179,10 +177,10 @@ class CustomItemButtonSubscriber extends CommonSubscriber
     {
         return [
             'attr' => [
-                'href' => $this->routeProvider->buildListRoute($customObjectId),
+                'href'  => $this->routeProvider->buildListRoute($customObjectId),
                 'class' => 'btn btn-default',
             ],
-            'class' => 'btn btn-default',
+            'class'     => 'btn btn-default',
             'btnText'   => 'mautic.core.form.close',
             'iconClass' => 'fa fa-fw fa-remove',
             'priority'  => 400,
@@ -350,7 +348,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
      */
     private function getCustomObjectIdFromEvent(CustomButtonEvent $event): int
     {
-        list($route, $routeParams) = $event->getRoute(true);
+        list(, $routeParams) = $event->getRoute(true);
 
         return (int) $routeParams['objectId'];
     }

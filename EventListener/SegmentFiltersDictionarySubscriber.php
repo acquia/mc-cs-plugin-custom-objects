@@ -16,7 +16,6 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
 use Mautic\LeadBundle\LeadEvents;
-use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemFilterQueryBuilder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -94,12 +93,10 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
     {
         $segmentValueType = 'custom_field_value_' . $fieldAttributes['type'];
 
-        $translation = [
+        return [
             'type'  => CustomFieldFilterQueryBuilder::getServiceId(),
             'table' => $segmentValueType,
             'field' => $fieldAttributes['id'],
         ];
-
-        return $translation;
     }
 }

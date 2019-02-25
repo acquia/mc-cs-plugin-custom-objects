@@ -109,7 +109,7 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
                             'object'     => $customField->getId(),
                         ]
                     );
-                };
+                }
             }
         );
     }
