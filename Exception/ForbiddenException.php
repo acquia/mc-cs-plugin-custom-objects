@@ -24,7 +24,7 @@ class ForbiddenException extends Exception
      * @param string                     $permission
      * @param UniqueEntityInterface|null $entity
      * @param int                        $code
-     * @param Throwable|null             $previous
+     * @param Throwable|null             $throwable
      */
     public function __construct(
         string $permission,
