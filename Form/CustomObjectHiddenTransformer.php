@@ -52,7 +52,7 @@ class CustomObjectHiddenTransformer implements DataTransformerInterface
             return new CustomObject();
         }
 
-        $entity = $this->customObjectRepository->findOneById($value);
+        $entity = $this->customObjectRepository->findOneBy(['id' => $value]);
 
         if (null === $entity) {
             throw new TransformationFailedException(sprintf(

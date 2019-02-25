@@ -20,7 +20,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 class CustomFieldValueRepository extends CommonRepository
 {
     /**
-     * @param int $customItem
+     * @param CustomItem $customItem
      *
      * @return array
      */

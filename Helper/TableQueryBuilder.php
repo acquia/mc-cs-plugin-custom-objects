@@ -94,8 +94,6 @@ class TableQueryBuilder
 
     /**
      * @param TableFilterConfig $filter
-     * 
-     * @return QueryBuilder
      */
     private function applyTableFilter(TableFilterConfig $filter): void
     {

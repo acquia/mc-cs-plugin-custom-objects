@@ -30,11 +30,6 @@ return [
                 'controller' => 'CustomObjectsBundle:CustomField\Form:renderForm',
                 'method'     => 'GET',
             ],
-            CustomFieldRouteProvider::ROUTE_CLONE => [
-                'path'       => '/custom/field/clone/{fieldId}',
-                'controller' => 'CustomObjectsBundle:CustomField\Clone:clone',
-                'method'     => 'GET',
-            ],
             CustomFieldRouteProvider::ROUTE_CANCEL => [
                 'path'       => '/custom/field/cancel/{fieldId}/{fieldType}',
                 'controller' => 'CustomObjectsBundle:CustomField\Cancel:cancel',
@@ -50,11 +45,6 @@ return [
                 'defaults'   => [
                     'fieldId' => null,
                 ],
-            ],
-            CustomFieldRouteProvider::ROUTE_DELETE => [
-                'path'       => '/custom/field/delete/{fieldId}',
-                'controller' => 'CustomObjectsBundle:CustomField\Delete:delete',
-                'method'     => 'GET|POST',
             ],
 
             // Custom Items
@@ -209,20 +199,6 @@ return [
                     'custom_field.route.provider',
                     'mautic.custom.model.object',
                     'custom_object.route.provider',
-                ],
-                'methodCalls' => [
-                    'setContainer' => [
-                        '@service_container',
-                    ],
-                ],
-            ],
-            'custom_field.clone_controller' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\CloneController::class,
-                'arguments' => [
-                    'form.factory',
-                    'mautic.custom.model.field',
-                    'custom_field.permission.provider',
-                    'custom_field.route.provider',
                 ],
                 'methodCalls' => [
                     'setContainer' => [

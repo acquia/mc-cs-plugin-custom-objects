@@ -57,7 +57,7 @@ class ListController extends CommonController
      * @param Session $session
      * @param CoreParametersHelper $coreParametersHelper
      * @param CustomObjectModel $customObjectModel
-     * @param CorePermissions $permissionProvider
+     * @param CustomObjectPermissionProvider $permissionProvider
      * @param CustomObjectRouteProvider $routeProvider
      */
     public function __construct(

@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Provider;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use MauticPlugin\CustomObjectsBundle\Entity\UniqueEntityInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use Mautic\CoreBundle\Entity\FormEntity;
 
 abstract class StandardPermissionProvider
 {
@@ -47,11 +47,12 @@ abstract class StandardPermissionProvider
     }
 
     /**
-     * @param string $permission
+     * @param string     $permission
+     * @param FormEntity $entity
      * 
      * @throws ForbiddenException
      */
-    public function hasEntityAccess(string $permission, UniqueEntityInterface $entity): void
+    public function hasEntityAccess(string $permission, FormEntity $entity): void
     {
         if (!$this->corePermissions->hasEntityAccess(static::BASE.$permission.'own', static::BASE.$permission.'other', $entity->getCreatedBy())) {
             throw new ForbiddenException($permission);
@@ -67,11 +68,11 @@ abstract class StandardPermissionProvider
     }
 
     /**
-     * @param UniqueEntityInterface $entity
+     * @param FormEntity $entity
      * 
      * @throws ForbiddenException
      */
-    public function canView(UniqueEntityInterface $entity): void
+    public function canView(FormEntity $entity): void
     {
         $this->hasEntityAccess('view', $entity);
     }
@@ -85,21 +86,21 @@ abstract class StandardPermissionProvider
     }
 
     /**
-     * @param UniqueEntityInterface $entity
+     * @param FormEntity $entity
      * 
      * @throws ForbiddenException
      */
-    public function canEdit(UniqueEntityInterface $entity): void
+    public function canEdit(FormEntity $entity): void
     {
         $this->hasEntityAccess('edit', $entity);
     }
 
     /**
-     * @param UniqueEntityInterface $entity
+     * @param FormEntity $entity
      * 
      * @throws ForbiddenException
      */
-    public function canClone(UniqueEntityInterface $entity): void
+    public function canClone(FormEntity $entity): void
     {
         // Check the create permission as new entity will be created.
         $this->isGranted('create');
@@ -109,11 +110,11 @@ abstract class StandardPermissionProvider
     }
 
     /**
-     * @param UniqueEntityInterface $entity
+     * @param FormEntity $entity
      * 
      * @throws ForbiddenException
      */
-    public function canDelete(UniqueEntityInterface $entity): void
+    public function canDelete(FormEntity $entity): void
     {
         $this->hasEntityAccess('delete', $entity);
     }

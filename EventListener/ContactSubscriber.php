@@ -21,6 +21,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use Doctrine\ORM\EntityManager;
+use Mautic\LeadBundle\Entity\LeadEventLog;
 
 class ContactSubscriber extends CommonSubscriber
 {
@@ -106,7 +107,7 @@ class ContactSubscriber extends CommonSubscriber
      */
     private function getEvents(LeadTimelineEvent $event, string $action): array
     {
-        $eventLogRepo = $this->entityManager->getRepository('MauticLeadBundle:LeadEventLog');
+        $eventLogRepo = $this->entityManager->getRepository(LeadEventLog::class);
 
         return $eventLogRepo->getEvents(
             $event->getLead(),

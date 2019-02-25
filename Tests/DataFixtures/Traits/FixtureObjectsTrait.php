@@ -14,6 +14,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\DataFixtures\Traits;
 
 use Mautic\CoreBundle\Entity\CommonEntity;
 use MauticPlugin\CustomObjectsBundle\Tests\Exception\FixtureNotFoundException;
+use MauticPlugin\CustomObjectsBundle\Entity\UniqueEntityInterface;
 
 /**
  * Trait FixtureObjectsTrait implements Liip fixtures with Alice and offers helper methods for handling them
@@ -81,10 +82,10 @@ trait FixtureObjectsTrait
     /**
      * @param string $id key specified in fixtures
      *
-     * @return CommonEntity
+     * @return UniqueEntityInterface
      * @throws FixtureNotFoundException
      */
-    public function getFixtureById($id): CommonEntity {
+    public function getFixtureById($id): UniqueEntityInterface {
         if (!isset($this->entityMap[$id])) {
             throw new FixtureNotFoundException('No fixture with id "' . $id. '"" defined');
         }

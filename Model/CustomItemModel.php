@@ -320,16 +320,6 @@ class CustomItemModel extends FormModel
     }
 
     /**
-     * @param array $args
-     * 
-     * @return Paginator|array
-     */
-    public function fetchEntities(array $args = [])
-    {
-        return parent::getEntities($this->addCreatorLimit($args));
-    }
-
-    /**
      * Used only by Mautic's generic methods. Use DI instead.
      * 
      * @return CommonRepository
@@ -410,44 +400,10 @@ class CustomItemModel extends FormModel
         try {
             $this->permissionProvider->isGranted('viewother', $customObjectId);
         } catch (ForbiddenException $e) {
-            $this->customItemRepository->applyOwnerFilter($queryBuilder, $this->userHelper->getUser()->getId());
+            $this->customItemRepository->applyOwnerId($queryBuilder, $this->userHelper->getUser()->getId());
         }
 
         return $queryBuilder;
-    }
-
-    /**
-     * Adds condition for creator if the user doesn't have permissions to view other.
-     *
-     * @param array $args
-     * 
-     * @return array
-     */
-    private function addCreatorLimit(array $args): array
-    {
-        try {
-            $this->permissionProvider->isGranted('viewother');
-        } catch (ForbiddenException $e) {
-            if (!isset($args['filter'])) {
-                $args['filter'] = [];
-            }
-
-            if (!isset($args['filter']['force'])) {
-                $args['filter']['force'] = [];
-            }
-
-            $limitOwnerFilter = [
-                [
-                    'column' => 'e.createdBy',
-                    'expr'   => 'eq',
-                    'value'  => $this->userHelper->getUser()->getId(),
-                ],
-            ];
-
-            $args['filter']['force'] += $limitOwnerFilter;
-        }
-
-        return $args;
     }
 
     /**

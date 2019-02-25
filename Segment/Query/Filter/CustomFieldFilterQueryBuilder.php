@@ -120,7 +120,7 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
     /**
      * @param QueryBuilder $queryBuilder
      * @param string       $fieldType
-     * @param string|null  $alias
+     * @param string       $alias
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */

@@ -73,7 +73,8 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
 
     public function __clone()
     {
-        $this->id = null;
+        $this->id  = null;
+        $this->new = true;
     }
 
     /**
@@ -87,9 +88,9 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
             ->setCustomRepositoryClass(CustomObjectRepository::class);
 
         $builder->createOneToMany('customFields', CustomField::class)
+            ->setOrderBy(['order' => 'ASC'])
             ->addJoinColumn('custom_item_id', 'id', false, false, 'CASCADE')
             ->mappedBy('customObject')
-            ->setOrderBy(['order' => 'ASC'])
             ->cascadePersist()
             ->fetchExtraLazy()
             ->build();
