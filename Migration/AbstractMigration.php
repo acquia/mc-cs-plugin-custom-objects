@@ -39,7 +39,7 @@ class AbstractMigration implements MigrationInterface
     public function __construct(EntityManager $entityManager, string $tablePrefix)
     {
         $this->entityManager = $entityManager;
-        $this->tablePrefix = $tablePrefix;
+        $this->tablePrefix   = $tablePrefix;
     }
 
     /**

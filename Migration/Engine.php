@@ -39,8 +39,8 @@ class Engine
      */
     public function __construct(EntityManager $entityManager, string $tablePrefix, string $pluginPath)
     {
-        $this->entityManager = $entityManager;
-        $this->tablePrefix = $tablePrefix;
+        $this->entityManager  = $entityManager;
+        $this->tablePrefix    = $tablePrefix;
         $this->migrationsPath = $pluginPath . '/Migrations/';
     }
 
@@ -76,12 +76,12 @@ class Engine
     private function getMigrationClasses(): array
     {
         $migrationFileNames = $this->getMigrationFileNames();
-        $migrationClasses = [];
+        $migrationClasses   = [];
 
         foreach ($migrationFileNames as $fileName) {
             require_once $this->migrationsPath . $fileName;
-            $className = preg_replace('/\\.[^.\\s]{3,4}$/', '', $fileName);
-            $className = "MauticPlugin\CustomObjectsBundle\Migrations\\$className";
+            $className          = preg_replace('/\\.[^.\\s]{3,4}$/', '', $fileName);
+            $className          = "MauticPlugin\CustomObjectsBundle\Migrations\\$className";
             $migrationClasses[] = $className;
         }
 
@@ -103,8 +103,6 @@ class Engine
             );
         }
 
-        $fileNames = array_diff($fileNames, ['.', '..']);
-
-        return $fileNames;
+        return array_diff($fileNames, ['.', '..']);
     }
 }
