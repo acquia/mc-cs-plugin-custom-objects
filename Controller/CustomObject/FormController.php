@@ -76,11 +76,11 @@ class FormController extends CommonController
         CustomObjectRouteProvider $routeProvider,
         CustomFieldTypeProvider $customFieldTypeProvider
     ){
-        $this->formFactory        = $formFactory;
-        $this->customObjectModel  = $customObjectModel;
-        $this->customFieldModel = $customFieldModel;
-        $this->permissionProvider = $permissionProvider;
-        $this->routeProvider      = $routeProvider;
+        $this->formFactory             = $formFactory;
+        $this->customObjectModel       = $customObjectModel;
+        $this->customFieldModel        = $customFieldModel;
+        $this->permissionProvider      = $permissionProvider;
+        $this->routeProvider           = $routeProvider;
         $this->customFieldTypeProvider = $customFieldTypeProvider;
     }
 
@@ -125,11 +125,11 @@ class FormController extends CommonController
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute(),
                 'viewParameters' => [
-                    'customObject' => $customObject,
+                    'customObject'        => $customObject,
                     'availableFieldTypes' => $this->customFieldTypeProvider->getTypes(),
-                    'customFields' => $this->customFieldModel->fetchCustomFieldsForObject($customObject),
-                    'deletedFields' => [],
-                    'form'   => $form->createView(),
+                    'customFields'        => $this->customFieldModel->fetchCustomFieldsForObject($customObject),
+                    'deletedFields'       => [],
+                    'form'                => $form->createView(),
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.php',
                 'passthroughVars' => [

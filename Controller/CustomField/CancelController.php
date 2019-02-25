@@ -30,7 +30,7 @@ class CancelController extends CommonController
             [
                 'passthroughVars' => [
                     'mauticContent' => 'customField',
-                    'closeModal' => 1,
+                    'closeModal'    => 1,
                 ],
             ]
         );

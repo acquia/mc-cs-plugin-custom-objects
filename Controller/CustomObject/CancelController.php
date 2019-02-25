@@ -12,7 +12,6 @@ declare(strict_types=1);
  */
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
-;
 
 use Symfony\Component\HttpFoundation\Session\Session;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;

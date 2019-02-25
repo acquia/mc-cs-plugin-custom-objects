@@ -13,12 +13,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use Predis\Protocol\Text\RequestSerializer;
 use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
@@ -58,7 +56,7 @@ class ListController extends CommonController
      * @param Session $session
      * @param CoreParametersHelper $coreParametersHelper
      * @param CustomObjectModel $customObjectModel
-     * @param CorePermissions $corePermissions
+     * @param CorePermissions $permissionProvider
      * @param CustomObjectRouteProvider $routeProvider
      */
     public function __construct(
@@ -103,7 +101,7 @@ class ListController extends CommonController
         if ($request->query->has('orderby')) {
             $orderBy    = InputHelper::clean($request->query->get('orderby'), true);
             $orderByDir = $this->session->get("mautic.custom.object.orderbydir", 'ASC');
-            $orderByDir = ($orderByDir == 'ASC') ? 'DESC' : 'ASC';
+            $orderByDir = $orderByDir == 'ASC' ? 'DESC' : 'ASC';
             $this->session->set("mautic.custom.object.orderby", $orderBy);
             $this->session->set("mautic.custom.object.orderbydir", $orderByDir);
         }

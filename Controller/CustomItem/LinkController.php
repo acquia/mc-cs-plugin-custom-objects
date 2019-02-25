@@ -57,7 +57,7 @@ class LinkController extends JsonController
     }
 
     /**
-     * @param integer $objectId
+     * @param integer $itemId
      * @param string  $entityType
      * @param integer $entityId
      * 

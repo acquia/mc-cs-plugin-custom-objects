@@ -53,9 +53,9 @@ class DeleteController extends CommonController
         CustomObjectPermissionProvider $permissionProvider
     )
     {
-        $this->customObjectModel = $customObjectModel;
-        $this->session           = $session;
-        $this->translator        = $translator;
+        $this->customObjectModel  = $customObjectModel;
+        $this->session            = $session;
+        $this->translator         = $translator;
         $this->permissionProvider = $permissionProvider;
     }
 

@@ -84,13 +84,13 @@ class FormController extends CommonController
         CustomObjectModel $customObjectModel,
         CustomObjectRouteProvider $objectRouteProvider
     ){
-        $this->formFactory        = $formFactory;
-        $this->customFieldModel   = $customFieldModel;
-        $this->customFieldFactory = $customFieldFactory;
-        $this->permissionProvider = $permissionProvider;
+        $this->formFactory             = $formFactory;
+        $this->customFieldModel        = $customFieldModel;
+        $this->customFieldFactory      = $customFieldFactory;
+        $this->permissionProvider      = $permissionProvider;
         $this->fieldRouteProvider      = $fieldRouteProvider;
-        $this->customObjectModel = $customObjectModel;
-        $this->objectRouteProvider = $objectRouteProvider;
+        $this->customObjectModel       = $customObjectModel;
+        $this->objectRouteProvider     = $objectRouteProvider;
     }
 
     /**
@@ -100,8 +100,8 @@ class FormController extends CommonController
      */
     public function renderFormAction(Request $request)
     {
-        $objectId = (int) $request->get('objectId');
-        $fieldId = (int) $request->get('fieldId');
+        $objectId  = (int) $request->get('objectId');
+        $fieldId   = (int) $request->get('fieldId');
         $fieldType = $request->get('fieldType');
 
         if ($objectId) {
@@ -124,7 +124,7 @@ class FormController extends CommonController
             $this->accessDenied(false, $e->getMessage());
         }
 
-        $route = $this->fieldRouteProvider->buildFormRoute($customField->getId());
+        $route  = $this->fieldRouteProvider->buildFormRoute($customField->getId());
         $action = $this->fieldRouteProvider->buildSaveRoute($fieldType, $fieldId, $customObject->getId());
         $form   = $this->formFactory->create(CustomFieldType::class, $customField, ['action' => $action]);
 
@@ -133,8 +133,8 @@ class FormController extends CommonController
                 'returnUrl'      => $this->objectRouteProvider->buildFormRoute($customObject->getId()),
                 'viewParameters' => [
                     'customObject' => $customObject,
-                    'customField' => $customField,
-                    'form'   => $form->createView(),
+                    'customField'  => $customField,
+                    'form'         => $form->createView(),
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomField:form.html.php',
                 'passthroughVars' => [

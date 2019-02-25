@@ -16,8 +16,6 @@ namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
@@ -34,11 +32,6 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
 
 class SaveController extends CommonController
 {
-    /**
-     * @var Session
-     */
-    private $session;
-
     /**
      * @var FormFactory
      */
@@ -70,7 +63,6 @@ class SaveController extends CommonController
     private $customObjectModel;
 
     /**
-     * @param Session                       $session
      * @param FormFactory                   $formFactory
      * @param TranslatorInterface           $translator
      * @param CustomFieldModel              $customFieldModel
@@ -80,7 +72,6 @@ class SaveController extends CommonController
      * @param CustomObjectModel             $customObjectModel
      */
     public function __construct(
-        Session $session,
         FormFactory $formFactory,
         TranslatorInterface $translator,
         CustomFieldModel $customFieldModel,
@@ -89,14 +80,13 @@ class SaveController extends CommonController
         CustomFieldRouteProvider $routeProvider,
         CustomObjectModel $customObjectModel
     ){
-        $this->session            = $session;
-        $this->formFactory        = $formFactory;
-        $this->translator         = $translator;
-        $this->customFieldModel   = $customFieldModel;
-        $this->customFieldFactory = $customFieldFactory;
-        $this->permissionProvider = $permissionProvider;
+        $this->formFactory             = $formFactory;
+        $this->translator              = $translator;
+        $this->customFieldModel        = $customFieldModel;
+        $this->customFieldFactory      = $customFieldFactory;
+        $this->permissionProvider      = $permissionProvider;
         $this->fieldRouteProvider      = $routeProvider;
-        $this->customObjectModel = $customObjectModel;
+        $this->customObjectModel       = $customObjectModel;
     }
 
     /**
@@ -106,8 +96,8 @@ class SaveController extends CommonController
      */
     public function saveAction(Request $request)
     {
-        $objectId = (int) $request->get('objectId');
-        $fieldId = (int) $request->get('fieldId');
+        $objectId  = (int) $request->get('objectId');
+        $fieldId   = (int) $request->get('fieldId');
         $fieldType = $request->get('fieldType');
 
         if ($objectId) {
@@ -146,7 +136,7 @@ class SaveController extends CommonController
                 'returnUrl'      => $route,
                 'viewParameters' => [
                     'customField' => $customField,
-                    'form'   => $form->createView(),
+                    'form'        => $form->createView(),
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomField:form.html.php',
                 'passthroughVars' => [
@@ -177,9 +167,9 @@ class SaveController extends CommonController
          $template = $this->render(
             "CustomObjectsBundle:CustomObject:Form\\Panel\\{$customField->getType()}.html.php",
             [
-                'customObject' => $customObject,
+                'customObject'      => $customObject,
                 'customFieldEntity' => $customField,
-                'customField' => $customFieldForm->createView(),
+                'customField'       => $customFieldForm->createView(),
             ]
          );
 

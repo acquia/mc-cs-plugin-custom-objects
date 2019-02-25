@@ -120,7 +120,7 @@ class ListController extends CommonController
         if ($request->query->has('orderby')) {
             $orderBy    = InputHelper::clean($request->query->get('orderby'), true);
             $orderByDir = $this->session->get("mautic.custom.item.orderbydir", 'ASC');
-            $orderByDir = ($orderByDir == 'ASC') ? 'DESC' : 'ASC';
+            $orderByDir = $orderByDir == 'ASC' ? 'DESC' : 'ASC';
             $this->session->set("mautic.custom.item.orderby", $orderBy);
             $this->session->set("mautic.custom.item.orderbydir", $orderByDir);
         }

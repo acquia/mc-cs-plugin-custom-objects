@@ -1,9 +1,9 @@
 imports:
   - { resource: 'vendor/symplify/easy-coding-standard/config/clean-code.yml' }
-  - { resource: 'vendor/symplify/easy-coding-standard/config/common.yml' }
-  - { resource: 'vendor/symplify/easy-coding-standard/config/php71.yml' }
-  - { resource: 'vendor/symplify/easy-coding-standard/config/symfony.yml' }
-  - { resource: 'vendor/symplify/easy-coding-standard/config/symplify.yml' }
+#  - { resource: 'vendor/symplify/easy-coding-standard/config/common.yml' }
+#  - { resource: 'vendor/symplify/easy-coding-standard/config/php71.yml' }
+#  - { resource: 'vendor/symplify/easy-coding-standard/config/symfony.yml' }
+#  - { resource: 'vendor/symplify/easy-coding-standard/config/symplify.yml' }
 
 services:
   PhpCsFixer\Fixer\Operator\BinaryOperatorSpacesFixer:
@@ -14,6 +14,9 @@ parameters:
   exclude_checkers:
     - 'PhpCsFixer\Fixer\Operator\NotOperatorWithSuccessorSpaceFixer'
     - 'Symplify\CodingStandard\Fixer\Commenting\RemoveUselessDocBlockFixer'
+    - 'PhpCsFixer\Fixer\Import\OrderedImportsFixer'
   exclude_files:
     - 'vendor/*'
   skip:
+    PhpCsFixer\Fixer\ArrayNotation\TrailingCommaInMultilineArrayFixer:
+      - 'Config/config.php'

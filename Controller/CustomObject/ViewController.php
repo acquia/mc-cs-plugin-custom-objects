@@ -100,7 +100,7 @@ class ViewController extends CommonController
             $this->accessDenied(false, $e->getMessage());
         }
 
-        $route = $this->routeProvider->buildViewRoute($objectId);
+        $route         = $this->routeProvider->buildViewRoute($objectId);
         $dateRangeForm = $this->formFactory->create(
             DateRangeType::class,
             $this->requestStack->getCurrentRequest()->get('daterange', []),
@@ -120,7 +120,7 @@ class ViewController extends CommonController
             [
                 'returnUrl'      => $route,
                 'viewParameters' => [
-                    'customObject' => $customObject,
+                    'customObject'  => $customObject,
                     'dateRangeForm' => $dateRangeForm->createView(),
                     'stats'         => $stats,
                     'logs'          => $auditLogs,

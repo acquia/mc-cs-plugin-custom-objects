@@ -13,11 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
-use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
@@ -93,7 +91,7 @@ class CloneController extends CommonController
                 'returnUrl'      => $this->routeProvider->buildListRoute(),
                 'viewParameters' => [
                     'customField' => $customField,
-                    'form'   => $form->createView(),
+                    'form'        => $form->createView(),
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomField:form.html.php',
                 'passthroughVars' => [

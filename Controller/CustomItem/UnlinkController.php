@@ -56,7 +56,7 @@ class UnlinkController extends JsonController
     }
 
     /**
-     * @param int    $objectId
+     * @param int    $itemId
      * @param string $entityType
      * @param int    $entityId
      * 
