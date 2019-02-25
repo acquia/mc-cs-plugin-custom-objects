@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Provider;
 
-use MauticPlugin\CustomObjectsBundle\Provider\StandardPermissionProvider;
 
 class CustomFieldPermissionProvider extends StandardPermissionProvider
 {

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Provider;
 
-use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Symfony\Component\Routing\RouterInterface;
 
 class CustomFieldRouteProvider

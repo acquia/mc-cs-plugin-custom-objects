@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Provider;
 
 use Symfony\Component\Routing\RouterInterface;
-use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 
 class CustomItemRouteProvider
 {
@@ -129,7 +128,7 @@ class CustomItemRouteProvider
     }
 
     /**
-     * @param int $itemId
+     * @param int $objectId
      * 
      * @return string
      */
@@ -139,7 +138,7 @@ class CustomItemRouteProvider
     }
 
     /**
-     * @param int $itemId
+     * @param int $objectId
      * 
      * @return string
      */
