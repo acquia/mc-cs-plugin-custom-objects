@@ -107,22 +107,19 @@ class CustomItemFilterQueryBuilder extends BaseFilterQueryBuilder
     }
 
     /**
-     * @param $filterParameters
+     * @param array|string $filterParameters
      *
      * @return array|string
      */
     public function getParametersAliases($filterParameters)
     {
         if (is_array($filterParameters)) {
-            $parameters = [];
-            foreach ($filterParameters as $filterParameter) {
-                $parameters[] = $this->generateRandomParameterName();
-            }
-        } else {
-            $parameters = $this->generateRandomParameterName();
+            return array_map(function() {
+                return $this->generateRandomParameterName();
+            }, $filterParameters);
         }
-
-        return $parameters;
+        
+        return $this->generateRandomParameterName();
     }
 
     /**
