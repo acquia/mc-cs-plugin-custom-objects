@@ -9,27 +9,20 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$view->extend('MauticCoreBundle:Default:content.html.php');
+/** @var \MauticPlugin\CustomObjectsBundle\Entity\CustomField $customField */
+$customField;
 
-$view['slots']->set('mauticContent', 'customField');
-
-if ($customField->getId()) {
-    $header = $view['translator']->trans(
-        $customField->getId() ? 'custom.field.edit' : 'custom.field.new',
-        ['%name%' => $view['translator']->trans($customField->getName())]
-    );
-} else {
-    $header = $view['translator']->trans('custom.field.new');
-}
-
-$view['slots']->set('headerTitle', $header);
+$title = $customField->getId() ? $customField->getLabel() : $customField->getTypeObject()->getName();
 ?>
 
-<?php echo $view['form']->start($form); ?>
+<div class="bundle-form">
 
-<!-- start: box layout -->
-<div class="box-layout">
-    <!-- container -->
+    <div class="bundle-form-header">
+        <h3 class="mb-lg"><?php echo $title ?></h3>
+    </div>
+
+    <?php echo $view['form']->start($form); ?>
+
     <div class="col-md-9 bg-auto height-auto bdr-r">
         <div class="pa-md">
             <div class="row">
@@ -39,6 +32,7 @@ $view['slots']->set('headerTitle', $header);
             </div>
         </div>
     </div>
-</div>
 
-<?php echo $view['form']->end($form); ?>
+    <?php echo $view['form']->end($form); ?>
+
+</div>
