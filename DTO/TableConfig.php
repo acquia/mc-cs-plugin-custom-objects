@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\DTO;
 
-use MauticPlugin\CustomObjectsBundle\DTO\TableFilterConfig;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use Doctrine\ORM\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Helper\TableQueryBuilder;
@@ -81,7 +80,7 @@ class TableConfig
      */
     public function getOffset(): int
     {
-        $offset = ($this->page === 1) ? 0 : (($this->page - 1) * $this->limit);
+        $offset = $this->page === 1 ? 0 : (($this->page - 1) * $this->limit);
         
         return $offset < 0 ? 0 : $offset;
     }

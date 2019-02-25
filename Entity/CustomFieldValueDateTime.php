@@ -16,7 +16,6 @@ namespace MauticPlugin\CustomObjectsBundle\Entity;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemValue;
 use DateTimeInterface;
 
 class CustomFieldValueDateTime extends CustomFieldValueStandard

@@ -18,7 +18,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
-use DateTimeInterface;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\FormEntity;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
@@ -41,11 +40,6 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
      * @var string|null
      */
     private $nameSingular;
-
-    /**
-     * @var DateTimeInterface|null
-     */
-    private $dateAdded;
 
     /**
      * @var string|null

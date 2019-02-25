@@ -18,17 +18,11 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
-use DateTimeInterface;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\FormEntity;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
-use MauticPlugin\CustomObjectsBundle\Entity\UniqueEntityInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Iterator\CustomFieldValues;
 use Doctrine\Common\Collections\ArrayCollection;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCompany;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 
@@ -183,7 +177,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     public function setCategory(?Category $category)
     {
-        $this->isChanged('category', ($category) ? $category->getId() : null);
+        $this->isChanged('category', $category ? $category->getId() : null);
         $this->category = $category;
     }
 
@@ -294,5 +288,21 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     public function getContactReferences()
     {
         return $this->contactReferences;
+    }
+
+    /**
+     * @param CustomItemXrefCompany $reference
+     */
+    public function addCompanyReference(CustomItemXrefCompany $reference)
+    {
+        $this->companyReferences->add($reference);
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getCompanyReferences()
+    {
+        return $this->companyReferences;
     }
 }

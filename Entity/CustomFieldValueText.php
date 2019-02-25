@@ -16,9 +16,6 @@ namespace MauticPlugin\CustomObjectsBundle\Entity;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemValue;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueStandard;
 
 class CustomFieldValueText extends CustomFieldValueStandard
 {
