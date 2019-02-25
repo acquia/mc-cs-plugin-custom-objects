@@ -66,6 +66,7 @@ $title = $customField->getId() ? $customField->getLabel() : $customField->getTyp
 
     </div>
 
+    <?php echo $view['form']->rest($form); ?>
     <?php echo $view['form']->end($form); ?>
 
 </div>
