@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Repository;
 
-use Doctrine\DBAL\Types\Type;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
@@ -21,14 +20,14 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 class CustomFieldValueRepository extends CommonRepository
 {
     /**
-     * @param int $itemId
+     * @param int $customItem
      *
      * @return array
      */
     public function getValuesForItem(CustomItem $customItem)
     {
         $values = [];
-        $q = $this->createQueryBuilder('cfv', 'cfv.id');
+        $q      = $this->createQueryBuilder('cfv', 'cfv.id');
         $q->select('DISTINCT(cfvt.id) AS value_id, IDENTITY(cfv.customField) AS field_id, cfvt.value')
             ->innerJoin(CustomFieldValueText::class, 'cfvt')
             ->where(

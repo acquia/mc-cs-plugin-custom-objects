@@ -18,7 +18,6 @@ use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use Doctrine\ORM\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Mautic\LeadBundle\Entity\Lead;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
@@ -93,7 +92,7 @@ class CustomItemRepository extends CommonRepository
      */
     public function findItemIdForValue(CustomField $customField, Lead $contact, string $expr, $value): int
     {
-        $fieldType = $customField->getTypeObject();
+        $fieldType    = $customField->getTypeObject();
         $queryBuilder = $this->_em->getConnection()->createQueryBuilder();
         $queryBuilder->select('ci.id');
         $queryBuilder->from(MAUTIC_TABLE_PREFIX.'custom_item', 'ci');
