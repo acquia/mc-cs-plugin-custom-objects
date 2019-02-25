@@ -251,7 +251,7 @@ class CustomObjectModel extends FormModel
                 ],
             ];
 
-            $args['filter']['force'] = $args['filter']['force'] + $limitOwnerFilter;
+            $args['filter']['force'] += $limitOwnerFilter;
         }
 
         return $args;

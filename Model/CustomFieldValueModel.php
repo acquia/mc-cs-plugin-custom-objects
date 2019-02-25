@@ -15,11 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Model;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Entity\CommonRepository;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInt;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
@@ -75,7 +71,7 @@ class CustomFieldValueModel
             $queryBuilder->from($type->getTableName(), $type->getTableAlias());
             $queryBuilder->where("{$type->getTableAlias()}.custom_item_id = :customItemId");
             $params['customItemId'] = $customItem->getId();
-            $queries[] = $queryBuilder->getSQL();
+            $queries[]              = $queryBuilder->getSQL();
         }
 
         $statement = $this->entityManager->getConnection()->prepare(implode(' UNION ', $queries));
@@ -133,17 +129,5 @@ class CustomFieldValueModel
             ->setParameter('customItemId', (int) $customFieldValue->getCustomItem()->getId());
         $query = $queryBuilder->getQuery();
         $query->execute();
-    }
-
-    /**
-     * Create unique table alias for field type.
-     *
-     * @param CustomFieldTypeInterface $fieldType
-     * 
-     * @return string
-     */
-    private function getAlias(CustomFieldTypeInterface $fieldType): string
-    {
-        return "cfv{$fieldType->getKey()}";
     }
 }

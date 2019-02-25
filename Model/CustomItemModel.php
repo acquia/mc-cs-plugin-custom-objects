@@ -249,8 +249,8 @@ class CustomItemModel extends FormModel
     public function getTableData(TableConfig $tableConfig): array
     {
         $customObjectFilter = $tableConfig->getFilter(CustomItem::class, 'customObject');
-        $queryBuilder = $this->customItemRepository->getTableDataQuery($tableConfig);
-        $queryBuilder = $this->applyOwnerFilter($queryBuilder, $customObjectFilter->getValue());
+        $queryBuilder       = $this->customItemRepository->getTableDataQuery($tableConfig);
+        $queryBuilder       = $this->applyOwnerFilter($queryBuilder, $customObjectFilter->getValue());
 
         return $queryBuilder->getQuery()->getResult();
     }
@@ -263,8 +263,8 @@ class CustomItemModel extends FormModel
     public function getCountForTable(TableConfig $tableConfig): int
     {
         $customObjectFilter = $tableConfig->getFilter(CustomItem::class, 'customObject');
-        $queryBuilder = $this->customItemRepository->getTableCountQuery($tableConfig);
-        $queryBuilder = $this->applyOwnerFilter($queryBuilder, $customObjectFilter->getValue());
+        $queryBuilder       = $this->customItemRepository->getTableCountQuery($tableConfig);
+        $queryBuilder       = $this->applyOwnerFilter($queryBuilder, $customObjectFilter->getValue());
 
         return (int) $queryBuilder->getQuery()->getSingleScalarResult();
     }

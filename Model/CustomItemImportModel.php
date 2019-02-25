@@ -16,7 +16,6 @@ namespace MauticPlugin\CustomObjectsBundle\Model;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Model\FormModel;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Mautic\LeadBundle\Entity\Import;
@@ -129,13 +128,15 @@ class CustomItemImportModel extends FormModel
     {
         foreach ($customObject->getCustomFields() as $customField) {
             if ($customField->getId() === (int) $customFieldId) {
-                $fieldType  = $customField->getTypeObject();
+                $fieldType        = $customField->getTypeObject();
                 $customFieldValue = $fieldType->createValueEntity($customField, $customItem, $csvValue);
                 $customItem->addCustomFieldValue($customFieldValue);
+                
+                return $customFieldValue;
             }
         }
 
-        return $customFieldValue;
+        throw new NotFoundException("Custom field field {$customFieldId} was not found.");
     }
 
     /**

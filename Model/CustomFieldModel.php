@@ -24,7 +24,6 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 class CustomFieldModel extends FormModel
@@ -58,7 +57,7 @@ class CustomFieldModel extends FormModel
     )
     {
         $this->entityManager          = $entityManager;
-        $this->customFieldRepository = $customFieldRepository;
+        $this->customFieldRepository  = $customFieldRepository;
         $this->permissionProvider     = $permissionProvider;
         $this->userHelper             = $userHelper;
     }
@@ -124,8 +123,8 @@ class CustomFieldModel extends FormModel
                     ],
                 ],
             ],
-            'orderBy'        => 'e.order',
-            'orderByDir'     => 'ASC',
+            'orderBy'          => 'e.order',
+            'orderByDir'       => 'ASC',
             'ignore_paginator' => true,
         ]);
     }
@@ -188,7 +187,7 @@ class CustomFieldModel extends FormModel
                 ],
             ];
 
-            $args['filter']['force'] = $args['filter']['force'] + $limitOwnerFilter;
+            $args['filter']['force'] += $limitOwnerFilter;
         }
 
         return $args;
