@@ -16,7 +16,6 @@ namespace MauticPlugin\CustomObjectsBundle\Model;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Model\FormModel;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
@@ -32,11 +31,6 @@ class CustomItemImportModel extends FormModel
     private $entityManager;
 
     /**
-     * @var CustomItemPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
      * @var CustomItemModel
      */
     private $customItemModel;
@@ -48,19 +42,16 @@ class CustomItemImportModel extends FormModel
 
     /**
      * @param EntityManager $entityManager
-     * @param CustomItemPermissionProvider $permissionProvider
      * @param CustomItemModel $customItemModel
      * @param FormatterHelper $formatterHelper
      */
     public function __construct(
         EntityManager $entityManager,
-        CustomItemPermissionProvider $permissionProvider,
         CustomItemModel $customItemModel,
         FormatterHelper $formatterHelper
     )
     {
         $this->entityManager        = $entityManager;
-        $this->permissionProvider   = $permissionProvider;
         $this->customItemModel      = $customItemModel;
         $this->formatterHelper      = $formatterHelper;
     }

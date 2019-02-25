@@ -586,7 +586,6 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomItemImportModel::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
-                    'custom_item.permission.provider',
                     'mautic.custom.model.item',
                     'mautic.helper.template.formatter',
                 ],
