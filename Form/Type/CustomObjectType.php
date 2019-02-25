@@ -142,7 +142,9 @@ class CustomObjectType extends AbstractType
         $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) {
             /** @var CustomObject $customObject */
             $customObject = $event->getData();
-            if (!$customFields = $customObject->getCustomFields()) {
+            $customFields = $customObject->getCustomFields();
+
+            if (!$customFields) {
                 return;
             }
 

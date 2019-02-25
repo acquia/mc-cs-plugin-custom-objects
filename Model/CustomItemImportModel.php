@@ -152,7 +152,9 @@ class CustomItemImportModel extends FormModel
      */
     private function setOwner(Import $import, CustomItem $customItem): CustomItem
     {
-        if ($owner = $import->getDefault('owner')) {
+        $owner = $import->getDefault('owner');
+
+        if ($owner) {
             $customItem->setCreatedBy($this->entityManager->find(User::class, $owner));
         }
 

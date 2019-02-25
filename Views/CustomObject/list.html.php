@@ -73,9 +73,9 @@ if ($tmpl === 'index') {
                                 <?php echo $item->getName(); ?>
                             </a>
                         </div>
-                        <?php if ($description = $item->getDescription()): ?>
+                        <?php if ($item->getDescription()): ?>
                             <div class="text-muted mt-4">
-                                <small><?php echo $description; ?></small>
+                                <small><?php echo $item->getDescription(); ?></small>
                             </div>
                         <?php endif; ?>
                     </td>

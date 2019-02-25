@@ -79,7 +79,6 @@ abstract class CustomFieldValueStandard implements CustomFieldValueInterface
         return $this->customItem;
     }
 
-
     public function updateThisEntityManually()
     {
         $this->updateManually = true;

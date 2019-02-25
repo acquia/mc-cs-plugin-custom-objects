@@ -72,7 +72,8 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
         $registeredObjects = [];
 
         foreach ($queryBuilder->execute()->fetchAll() as $field) {
-            if (!in_array($COId = $field['custom_object_id'], $registeredObjects, true)) {
+            $COId = $field['custom_object_id'];
+            if (!in_array($COId, $registeredObjects, true)) {
                 $event->addTranslation('cmo_' . $COId, [
                     'type'  => CustomItemFilterQueryBuilder::getServiceId(),
                     'field' => $COId,
