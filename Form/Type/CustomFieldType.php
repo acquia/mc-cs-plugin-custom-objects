@@ -111,9 +111,9 @@ class CustomFieldType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => CustomField::class,
+                'data_class'         => CustomField::class,
                 'custom_object_form' => false, // Is form used as subform?
-                'csrf_protection'   => false,
+                'csrf_protection'    => false,
             ]
         );
     }
@@ -158,7 +158,7 @@ class CustomFieldType extends AbstractType
                 'defaultValue',
                 $customField->getTypeObject()->getSymfonyFormFiledType(),
                 [
-                    'label' => 'custom.field.label.default_value',
+                    'label'    => 'custom.field.label.default_value',
                     'required' => false,
                 ]
             );
@@ -168,7 +168,7 @@ class CustomFieldType extends AbstractType
             'buttons',
             FormButtonsType::class,
             [
-                'apply_text' => '',
+                'apply_text'     => '',
                 'cancel_onclick' => "mQuery('form[name=custom_field]').attr('method', 'get').attr('action', mQuery('form[name=custom_field]').attr('action').replace('/save', '/cancel'));",
             ]
         );

@@ -46,7 +46,7 @@ class CustomItemType extends AbstractType
             'custom_field_values',
             CollectionType::class,
             [
-                'entry_type' => CustomFieldValueType::class,
+                'entry_type'    => CustomFieldValueType::class,
                 'entry_options' => [
                     'label'      => false,
                     'customItem' => $builder->getData(),

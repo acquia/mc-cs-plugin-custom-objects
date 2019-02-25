@@ -96,13 +96,13 @@ class CustomObjectType extends AbstractType
         $builder->add('customFields',
             CollectionType::class,
             [
-                'entry_type' => CustomFieldType::class,
-                'entry_options' => ['custom_object_form' => true],
+                'entry_type'         => CustomFieldType::class,
+                'entry_options'      => ['custom_object_form' => true],
                 'allow_extra_fields' => true,
-                'allow_add' => true,
-                'allow_delete' => true,
-                'by_reference' => false,
-                'prototype' => false, // Do not use CF panel prototype in DOM
+                'allow_add'          => true,
+                'allow_delete'       => true,
+                'by_reference'       => false,
+                'prototype'          => false, // Do not use CF panel prototype in DOM
             ]
         );
 
@@ -149,9 +149,9 @@ class CustomObjectType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => CustomObject::class,
+                'data_class'         => CustomObject::class,
                 'allow_extra_fields' => true,
-                'csrf_protection'   => false,
+                'csrf_protection'    => false,
             ]
         );
     }

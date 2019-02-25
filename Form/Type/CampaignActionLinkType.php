@@ -34,7 +34,7 @@ class CampaignActionLinkType extends AbstractType
     protected $translator;
 
     /**
-     * @param CustomItemRouteProvider $router
+     * @param CustomItemRouteProvider $routeProvider
      * @param TranslatorInterface $translator
      */
     public function __construct(CustomItemRouteProvider $routeProvider, TranslatorInterface $translator)
