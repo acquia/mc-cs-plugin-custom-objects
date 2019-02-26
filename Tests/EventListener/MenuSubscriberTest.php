@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
@@ -28,7 +28,7 @@ class MenuSubscriberTest extends \PHPUnit_Framework_TestCase
 
     private $menuSubscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -38,7 +38,7 @@ class MenuSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->menuSubscriber    = new MenuSubscriber($this->customObjectModel, $this->configProvider);
     }
 
-    public function testPluginDisabled()
+    public function testPluginDisabled(): void
     {
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
@@ -50,7 +50,7 @@ class MenuSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->menuSubscriber->onBuildMenu($this->menuEvent);
     }
 
-    public function testTypeNotMain()
+    public function testTypeNotMain(): void
     {
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
@@ -66,7 +66,7 @@ class MenuSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->menuSubscriber->onBuildMenu($this->menuEvent);
     }
 
-    public function testNoCustomObjects()
+    public function testNoCustomObjects(): void
     {
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
@@ -86,7 +86,7 @@ class MenuSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->menuSubscriber->onBuildMenu($this->menuEvent);
     }
 
-    public function testSomeCustomObjects()
+    public function testSomeCustomObjects(): void
     {
         $customObject = $this->createMock(CustomObject::class);
         $customObject->method('getName')->willReturn('Test Object');

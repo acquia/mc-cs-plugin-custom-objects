@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
@@ -31,7 +31,7 @@ class TabSubscriberTest extends \PHPUnit_Framework_TestCase
 
     private $tabSubscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -46,7 +46,7 @@ class TabSubscriberTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testPluginDisabled()
+    public function testPluginDisabled(): void
     {
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
@@ -58,7 +58,7 @@ class TabSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->tabSubscriber->injectTabs($this->customContentEvent);
     }
 
-    public function testForTabsContext()
+    public function testForTabsContext(): void
     {
         $customObject = $this->createMock(CustomObject::class);
         $contact      = $this->createMock(Lead::class);
@@ -103,7 +103,7 @@ class TabSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->tabSubscriber->injectTabs($this->customContentEvent);
     }
 
-    public function testForTabContentsContext()
+    public function testForTabContentsContext(): void
     {
         $customObject = $this->createMock(CustomObject::class);
         $contact      = $this->createMock(Lead::class);

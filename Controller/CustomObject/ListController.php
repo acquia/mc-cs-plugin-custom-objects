@@ -82,7 +82,7 @@ class ListController extends CommonController
      *
      * @return Response
      */
-    public function listAction(int $page = 1)
+    public function listAction(int $page = 1): Response
     {
         try {
             $this->permissionProvider->canViewAtAll();

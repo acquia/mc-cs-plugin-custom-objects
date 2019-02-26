@@ -49,7 +49,7 @@ class CustomObjectType extends AbstractType
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'namePlural',
@@ -123,7 +123,7 @@ class CustomObjectType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function setDefaultOptions(OptionsResolverInterface $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -139,7 +139,7 @@ class CustomObjectType extends AbstractType
      */
     private function addEvents(FormBuilderInterface $builder): void
     {
-        $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) {
+        $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event): void {
             /** @var CustomObject $customObject */
             $customObject = $event->getData();
             $customFields = $customObject->getCustomFields();

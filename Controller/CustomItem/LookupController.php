@@ -64,7 +64,7 @@ class LookupController extends JsonController
      *
      * @return JsonResponse
      */
-    public function listAction(int $objectId)
+    public function listAction(int $objectId): JsonResponse
     {
         try {
             $this->permissionProvider->canViewAtAll($objectId);

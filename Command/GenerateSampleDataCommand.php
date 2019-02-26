@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
@@ -84,7 +84,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('mautic:customobjects:generatesampledata')
             ->setDescription('Creates specified amount of custom items with random links to contacts, random names and random custom field values.')
@@ -168,7 +168,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
     private function generateCustomItem(CustomObject $customObject): CustomItem
     {
         $customItem = new CustomItem($customObject);
-        $customItem->setName($this->randomHelper->getSentence(rand(2, 6)));
+        $customItem->setName($this->randomHelper->getSentence(random_int(2, 6)));
 
         return $customItem;
     }
@@ -183,11 +183,11 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
     {
         foreach ($customObject->getCustomFields() as $field) {
             if ($field->getType() === 'text') {
-                $customItem->addCustomFieldValue(new CustomFieldValueText($field, $customItem, $this->randomHelper->getSentence(rand(0, 100))));
+                $customItem->addCustomFieldValue(new CustomFieldValueText($field, $customItem, $this->randomHelper->getSentence(random_int(0, 100))));
             }
 
             if ($field->getType() === 'int') {
-                $customItem->addCustomFieldValue(new CustomFieldValueInt($field, $customItem, rand(0, 1000)));
+                $customItem->addCustomFieldValue(new CustomFieldValueInt($field, $customItem, random_int(0, 1000)));
             }
         }
 
@@ -203,7 +203,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
      */
     private function generateContactReferences(CustomItem $customItem): CustomItem
     {
-        for ($i = 1; $i <= rand(0, 10); $i++) {
+        for ($i = 1; $i <= random_int(0, 10); $i++) {
             $contact   = new Lead();
             $reference = new CustomItemXrefContact($customItem, $contact);
             $contact->setFirstname(ucfirst($this->randomHelper->getWord()));

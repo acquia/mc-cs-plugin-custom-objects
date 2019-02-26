@@ -86,7 +86,7 @@ class CustomFieldValueModel
             $fieldType      = $this->customFieldTypeProvider->getType($row['type']);
             $entityClass    = $fieldType->getEntityClass();
             $customFieldRef = $this->entityManager->getReference(CustomField::class, (int) $row['custom_field_id']);
-            $customFieldRef->setType($fieldType);
+            $customFieldRef->setTypeObject($fieldType);
             $customFieldValueRef = $this->entityManager->getReference($entityClass, ['customField' => $customFieldRef, 'customItem' => $customItem]);
             $customFieldValueRef->setValue($row['value']);
             $customFieldValueRef->updateThisEntityManually();
@@ -102,7 +102,7 @@ class CustomFieldValueModel
      *
      * @param CustomFieldValueInterface $customFieldValue
      */
-    public function save(CustomFieldValueInterface $customFieldValue)
+    public function save(CustomFieldValueInterface $customFieldValue): void
     {
         if ($customFieldValue->shouldBeUpdatedManually()) {
             $this->updateManually($customFieldValue);
@@ -115,7 +115,7 @@ class CustomFieldValueModel
     /**
      * @param CustomFieldValueInterface $customFieldValue
      */
-    public function updateManually(CustomFieldValueInterface $customFieldValue)
+    public function updateManually(CustomFieldValueInterface $customFieldValue): void
     {
         $fieldType    = $customFieldValue->getCustomField()->getTypeObject();
         $queryBuilder = $this->entityManager->createQueryBuilder();

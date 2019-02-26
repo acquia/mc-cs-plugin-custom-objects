@@ -52,7 +52,7 @@ class CancelController extends CommonController
      *
      * @return Response|JsonResponse
      */
-    public function cancelAction(int $objectId, int $itemId = null)
+    public function cancelAction(int $objectId, ?int $itemId = null)
     {
         $page = $this->session->get('custom.item.page', 1);
 

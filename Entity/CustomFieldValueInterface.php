@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
-
 interface CustomFieldValueInterface extends UniqueEntityInterface
 {
     /**

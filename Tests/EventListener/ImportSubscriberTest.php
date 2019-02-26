@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
@@ -40,7 +40,7 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
 
     private $importSubscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -59,7 +59,7 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testPluginDisabledForImportInit()
+    public function testPluginDisabledForImportInit(): void
     {
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
@@ -71,7 +71,7 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->importSubscriber->onImportInit($this->importInitEvent);
     }
 
-    public function testImportInit()
+    public function testImportInit(): void
     {
         $customObject = $this->createMock(CustomObject::class);
 
@@ -116,7 +116,7 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->importSubscriber->onImportInit($this->importInitEvent);
     }
 
-    public function testPluginDisabledForFieldMapping()
+    public function testPluginDisabledForFieldMapping(): void
     {
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
@@ -128,7 +128,7 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->importSubscriber->onFieldMapping($this->importMappingEvent);
     }
 
-    public function testPluginDisabledForImportProcess()
+    public function testPluginDisabledForImportProcess(): void
     {
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')

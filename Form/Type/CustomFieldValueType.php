@@ -24,7 +24,7 @@ class CustomFieldValueType extends AbstractType
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $customItem       = $options['customItem'];
         $customFieldId    = (int) $builder->getName();
@@ -46,7 +46,7 @@ class CustomFieldValueType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function setDefaultOptions(OptionsResolverInterface $resolver): void
     {
         $resolver->setDefaults(['data_class' => CustomFieldValueInterface::class]);
         $resolver->setRequired(['customItem']);

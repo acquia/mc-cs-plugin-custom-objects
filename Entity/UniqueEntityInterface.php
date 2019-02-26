@@ -16,7 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Entity;
 interface UniqueEntityInterface
 {
     /**
-     * @return int|null
+     * @return mixed
      */
     public function getId();
 }

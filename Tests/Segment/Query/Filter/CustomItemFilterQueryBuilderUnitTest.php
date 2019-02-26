@@ -22,7 +22,7 @@ class CustomItemFilterQueryBuilderUnitTest extends \PHPUnit_Framework_TestCase
 
     private $customItemFilterQueryBuilder;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -30,7 +30,7 @@ class CustomItemFilterQueryBuilderUnitTest extends \PHPUnit_Framework_TestCase
         $this->customItemFilterQueryBuilder = new CustomItemFilterQueryBuilder($this->randomParameterName);
     }
 
-    public function testGetParametersAliasesForArrays()
+    public function testGetParametersAliasesForArrays(): void
     {
         $this->randomParameterName->expects($this->exactly(2))
             ->method('generateRandomParameterName')
@@ -41,7 +41,7 @@ class CustomItemFilterQueryBuilderUnitTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testGetParametersAliasesForStrings()
+    public function testGetParametersAliasesForStrings(): void
     {
         $this->randomParameterName->expects($this->once())
             ->method('generateRandomParameterName')

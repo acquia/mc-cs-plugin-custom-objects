@@ -52,7 +52,7 @@ class IntType extends AbstractCustomFieldType
     /**
      * @param CustomField $customField
      * @param CustomItem  $customItem
-     * @param int|null    $value
+     * @param mixed|null  $value
      *
      * @return CustomFieldValueInterface
      */

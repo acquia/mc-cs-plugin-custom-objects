@@ -134,7 +134,7 @@ class CustomFieldType extends AbstractType
             ]
         );
 
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event){
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
             /** @var CustomField $customField */
             $customField = $event->getData();
             $form = $event->getForm();

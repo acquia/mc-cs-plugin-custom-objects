@@ -24,7 +24,7 @@ class CustomFieldValueRepository extends CommonRepository
      *
      * @return array
      */
-    public function getValuesForItem(CustomItem $customItem)
+    public function getValuesForItem(CustomItem $customItem): array
     {
         $values = [];
         $q      = $this->createQueryBuilder('cfv', 'cfv.id');

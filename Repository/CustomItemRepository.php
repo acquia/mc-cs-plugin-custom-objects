@@ -23,7 +23,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
 class CustomItemRepository extends CommonRepository
 {
-    const TABLE_ALIAS = 'CustomItem';
+    public const TABLE_ALIAS = 'CustomItem';
 
     /**
      * @param TableConfig $tableConfig
@@ -118,7 +118,7 @@ class CustomItemRepository extends CommonRepository
     /**
      * @return string
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return self::TABLE_ALIAS;
     }

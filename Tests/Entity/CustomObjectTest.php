@@ -18,7 +18,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 
 class CustomObjectTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCustomFieldChanges()
+    public function testCustomFieldChanges(): void
     {
         $object        = new CustomObject();
         $modifiedField = $this->createMock(CustomField::class);

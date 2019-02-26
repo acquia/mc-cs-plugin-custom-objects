@@ -80,7 +80,7 @@ class CustomObjectRouteProvider
      *
      * @return string
      */
-    public function buildFormRoute(int $id = null): string
+    public function buildFormRoute(?int $id = null): string
     {
         $params = $id ? ['objectId' => $id] : [];
         return $this->router->generate(static::ROUTE_FORM, $params);

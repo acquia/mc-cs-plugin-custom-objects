@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
@@ -26,7 +26,7 @@ class AssetsSubscriberTest extends \PHPUnit_Framework_TestCase
 
     private $assetsSubscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -36,7 +36,7 @@ class AssetsSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assetsSubscriber = new AssetsSubscriber($this->assetsHelper, $this->configProvider);
     }
 
-    public function testPluginDisabled()
+    public function testPluginDisabled(): void
     {
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
@@ -51,7 +51,7 @@ class AssetsSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assetsSubscriber->loadAssets($this->getResponseEvent);
     }
 
-    public function testPluginEnabled()
+    public function testPluginEnabled(): void
     {
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')

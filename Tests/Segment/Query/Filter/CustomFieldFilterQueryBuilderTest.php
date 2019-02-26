@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Segment\Query\Filter;
 
@@ -17,7 +17,7 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
     /** @var EntityManager */
     private $entityManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $pluginDirectory   = $this->getContainer()->get('kernel')->locateResource('@CustomObjectsBundle');
         $fixturesDirectory = $pluginDirectory . '/Tests/DataFixtures/ORM/Data';
@@ -50,7 +50,7 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
         return parent::tearDown();
     }
 
-    public function testApplyQuery() {
+    public function testApplyQuery(): void {
         $queryBuilderService = new CustomFieldFilterQueryBuilder(new RandomParameterName());
 
         $filterMock = $this->createSegmentFilterMock('hate');

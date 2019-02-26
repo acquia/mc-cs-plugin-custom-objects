@@ -27,7 +27,7 @@ class ContactListController extends CommonController
      *
      * @return Response
      */
-    public function listAction(int $objectId, int $page = 1)
+    public function listAction(int $objectId, int $page = 1): Response
     {
         return $this->generateContactsGrid(
             $objectId,

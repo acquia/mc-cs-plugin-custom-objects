@@ -54,7 +54,7 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
 
     private $customItemModel;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -80,7 +80,7 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testSaveNew()
+    public function testSaveNew(): void
     {
         $this->user->expects($this->exactly(2))->method('getId')->willReturn(55);
         $this->user->expects($this->exactly(2))->method('getName')->willReturn('John Doe');
@@ -103,7 +103,7 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->customItem, $this->customItemModel->save($this->customItem));
     }
 
-    public function testSaveEdit()
+    public function testSaveEdit(): void
     {
         $customFieldValue = $this->createMock(CustomFieldValueText::class);
         $contactXref      = $this->createMock(CustomItemXrefContact::class);
@@ -127,7 +127,7 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->customItem, $this->customItemModel->save($this->customItem));
     }
 
-    public function testDelete()
+    public function testDelete(): void
     {
         $this->customItem->expects($this->once())->method('getId')->willReturn(34);
         $this->dispatcher->expects($this->at(0))->method('dispatch')->with(CustomItemEvents::ON_CUSTOM_ITEM_PRE_DELETE, $this->isInstanceOf(CustomItemEvent::class));

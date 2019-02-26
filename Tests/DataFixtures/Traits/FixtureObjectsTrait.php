@@ -52,7 +52,8 @@ trait FixtureObjectsTrait
      * @return CommonEntity[]
      * @throws FixtureNotFoundException
      */
-    public function getFixturesByEntityClassName(string $type): array {
+    public function getFixturesByEntityClassName(string $type): array
+    {
         if (!isset($this->objects[$type])) {
             throw new FixtureNotFoundException('No fixtures of type ' . $type . ' defined');
         }
@@ -67,7 +68,8 @@ trait FixtureObjectsTrait
      * @return CommonEntity
      * @throws FixtureNotFoundException
      */
-    public function getFixtureByEntityClassNameAndIndex(string $type, int $index): CommonEntity {
+    public function getFixtureByEntityClassNameAndIndex(string $type, int $index): CommonEntity
+    {
         $fixtures = $this->getFixturesByEntityClassName($type);
 
         $fixtures = array_values($fixtures);
@@ -85,7 +87,8 @@ trait FixtureObjectsTrait
      * @return UniqueEntityInterface
      * @throws FixtureNotFoundException
      */
-    public function getFixtureById($id): UniqueEntityInterface {
+    public function getFixtureById(string $id): UniqueEntityInterface
+    {
         if (!isset($this->entityMap[$id])) {
             throw new FixtureNotFoundException('No fixture with id "' . $id . '"" defined');
         }
@@ -96,7 +99,8 @@ trait FixtureObjectsTrait
     /**
      * @return CommonEntity[]
      */
-    public function getFixturesInUnloadableOrder() {
+    public function getFixturesInUnloadableOrder()
+    {
         $entities = [];
 
         $orderedKeys = $this->entityMap;

@@ -90,7 +90,7 @@ class ViewController extends CommonController
      *
      * @return Response
      */
-    public function viewAction(int $objectId)
+    public function viewAction(int $objectId): Response
     {
         try {
             $customObject = $this->customObjectModel->fetchEntity($objectId);

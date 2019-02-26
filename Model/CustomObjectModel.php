@@ -177,7 +177,11 @@ class CustomObjectModel extends FormModel
         ]);
     }
 
-    public function removeCustomFieldById(CustomObject $customObject, int $customFieldId)
+    /**
+     * @param CustomObject $customObject
+     * @param int $customFieldId
+     */
+    public function removeCustomFieldById(CustomObject $customObject, int $customFieldId): void
     {
         foreach($customObject->getCustomFields() as $customField) {
             if ($customField->getId() === $customFieldId) {

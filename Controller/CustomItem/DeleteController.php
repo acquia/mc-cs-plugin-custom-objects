@@ -73,7 +73,7 @@ class DeleteController extends CommonController
      *
      * @return Response
      */
-    public function deleteAction(int $objectId, int $itemId)
+    public function deleteAction(int $objectId, int $itemId): Response
     {
         try {
             $customItem = $this->customItemModel->fetchEntity($itemId);

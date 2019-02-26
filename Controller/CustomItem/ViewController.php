@@ -88,7 +88,7 @@ class ViewController extends CommonController
      *
      * @return Response
      */
-    public function viewAction(int $objectId, int $itemId)
+    public function viewAction(int $objectId, int $itemId): Response
     {
         try {
             $customItem = $this->customItemModel->fetchEntity($itemId);

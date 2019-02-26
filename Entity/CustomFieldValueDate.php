@@ -51,17 +51,22 @@ class CustomFieldValueDate extends CustomFieldValueStandard
     }
 
     /**
-     * @param DateTimeInterface|null $value
+     * @param mixed $value
      */
     public function setValue($value = null): void
     {
+        if (!$value instanceof DateTimeInterface) {
+            $valueToString = print_r($value, true);
+            throw new \UnexpectedValueException("Value must be type of DateTimeInterface. {$valueToString} provided.");
+        }
+
         $this->value = $value;
     }
 
     /**
-     * @return DateTimeInterface|null
+     * @return mixed
      */
-    public function getValue(): ?DateTimeInterface
+    public function getValue()
     {
         return $this->value;
     }

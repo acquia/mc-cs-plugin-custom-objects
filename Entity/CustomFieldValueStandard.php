@@ -56,9 +56,9 @@ abstract class CustomFieldValueStandard implements CustomFieldValueInterface
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->customField->getId();
     }
@@ -66,7 +66,7 @@ abstract class CustomFieldValueStandard implements CustomFieldValueInterface
     /**
      * @return CustomField
      */
-    public function getCustomField()
+    public function getCustomField(): CustomField
     {
         return $this->customField;
     }
@@ -74,12 +74,12 @@ abstract class CustomFieldValueStandard implements CustomFieldValueInterface
     /**
      * @return CustomItem
      */
-    public function getCustomItem()
+    public function getCustomItem(): CustomItem
     {
         return $this->customItem;
     }
 
-    public function updateThisEntityManually()
+    public function updateThisEntityManually(): void
     {
         $this->updateManually = true;
     }
@@ -87,7 +87,7 @@ abstract class CustomFieldValueStandard implements CustomFieldValueInterface
     /**
      * @return bool
      */
-    public function shouldBeUpdatedManually()
+    public function shouldBeUpdatedManually(): bool
     {
         return $this->updateManually;
     }

@@ -39,7 +39,7 @@ class CustomFieldValueInt extends CustomFieldValueStandard
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('custom_field_value_int');
@@ -50,15 +50,15 @@ class CustomFieldValueInt extends CustomFieldValueStandard
     }
 
     /**
-     * @param int|null $value
+     * @param mixed $value
      */
-    public function setValue($value = null)
+    public function setValue($value = null): void
     {
-        $this->value = $value;
+        $this->value = (int) $value;
     }
 
     /**
-     * @return int|null
+     * @return mixed
      */
     public function getValue()
     {

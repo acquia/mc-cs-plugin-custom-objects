@@ -154,7 +154,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $label
      */
-    public function setLabel($label)
+    public function setLabel(?string $label): void
     {
         $this->isChanged('label', $label);
         $this->label = $label;
@@ -181,7 +181,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $type
      */
-    public function setType($type): void
+    public function setType(?string $type): void
     {
         $this->type = $type;
     }
@@ -189,7 +189,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @return string|null
      */
-    public function getType()
+    public function getType(): ?string
     {
         return $this->type;
     }
@@ -205,7 +205,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @return CustomFieldTypeInterface|null
      */
-    public function getTypeObject()
+    public function getTypeObject(): ?CustomFieldTypeInterface
     {
         return $this->typeObject;
     }
@@ -213,7 +213,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @return CustomObject|null
      */
-    public function getCustomObject()
+    public function getCustomObject(): ?CustomObject
     {
         return $this->customObject;
     }
@@ -221,7 +221,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @param CustomObject $customObject
      */
-    public function setCustomObject(CustomObject $customObject = null)
+    public function setCustomObject(?CustomObject $customObject = null): void
     {
         $this->customObject = $customObject;
         if ($customObject) {

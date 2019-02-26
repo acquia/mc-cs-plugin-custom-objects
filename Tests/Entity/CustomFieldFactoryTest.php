@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
@@ -26,7 +26,7 @@ class CustomFieldFactoryTest extends \PHPUnit_Framework_TestCase
         'int',
     ];
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $customObject = new CustomObject();
 

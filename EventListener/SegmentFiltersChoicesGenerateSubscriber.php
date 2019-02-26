@@ -86,7 +86,7 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
         $criteria = new Criteria(Criteria::expr()->eq('isPublished', 1));
 
         $this->customObjectRepository->matching($criteria)->map(
-            function (CustomObject $customObject) use ($event) {
+            function (CustomObject $customObject) use ($event): void {
                 $event->addChoice(
                     'custom_object',
                     'cmo_' . $customObject->getId(),

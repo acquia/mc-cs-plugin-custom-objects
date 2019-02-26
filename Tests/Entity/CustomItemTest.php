@@ -20,7 +20,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 
 class CustomItemTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCustomFieldValueChanges()
+    public function testCustomFieldValueChanges(): void
     {
         $item   = new CustomItem(new CustomObject());
         $fieldA = $this->createMock(CustomField::class);

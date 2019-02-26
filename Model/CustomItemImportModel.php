@@ -110,7 +110,7 @@ class CustomItemImportModel extends FormModel
      * @param CustomObject $customObject
      * @param CustomItem $customItem
      * @param int $customFieldId
-     * @param int $csvValue
+     * @param mixed $csvValue
      *
      * @return CustomFieldValueInterface
      */

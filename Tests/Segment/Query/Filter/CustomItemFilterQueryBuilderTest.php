@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Segment\Query\Filter;
 
@@ -17,7 +17,7 @@ class CustomItemFilterQueryBuilderTest extends WebTestCase
     /** @var EntityManager */
     private $entityManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $pluginDirectory   = $this->getContainer()->get('kernel')->locateResource('@CustomObjectsBundle');
         $fixturesDirectory = $pluginDirectory . '/Tests/DataFixtures/ORM/Data';
@@ -50,7 +50,7 @@ class CustomItemFilterQueryBuilderTest extends WebTestCase
         return parent::tearDown();
     }
 
-    public function testApplyQuery() {
+    public function testApplyQuery(): void {
         $queryBuilderService = new CustomItemFilterQueryBuilder(new RandomParameterName());
 
         $filterMock = $this->createSegmentFilterMock('%emotion%');

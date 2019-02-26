@@ -80,7 +80,7 @@ class CustomItemXrefCompany
     /**
      * @return CustomItem
      */
-    public function getCustomItem()
+    public function getCustomItem(): CustomItem
     {
         return $this->customItem;
     }
@@ -88,7 +88,7 @@ class CustomItemXrefCompany
     /**
      * @return Company
      */
-    public function getCompany()
+    public function getCompany(): Company
     {
         return $this->company;
     }
@@ -96,7 +96,7 @@ class CustomItemXrefCompany
     /**
      * @return DateTimeInterface
      */
-    public function getDateAdded()
+    public function getDateAdded(): DateTimeInterface
     {
         return $this->dateAdded;
     }

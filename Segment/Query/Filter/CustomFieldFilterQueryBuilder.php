@@ -124,7 +124,7 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    private function getCustomFieldJoin(QueryBuilder $queryBuilder, string $fieldType, string $alias)
+    private function getCustomFieldJoin(QueryBuilder $queryBuilder, string $fieldType, string $alias): \Doctrine\DBAL\Query\QueryBuilder
     {
         $customFieldQueryBuilder = $queryBuilder->createQueryBuilder();
 

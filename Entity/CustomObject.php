@@ -22,6 +22,7 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\FormEntity;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 
 class CustomObject extends FormEntity implements UniqueEntityInterface
@@ -235,7 +236,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @return ArrayCollection
+     * @return Collection
      */
     public function getCustomFields()
     {

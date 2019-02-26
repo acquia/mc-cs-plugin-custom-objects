@@ -59,7 +59,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
     /**
      * @return array
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS => ['injectViewButtons', 0],
@@ -69,7 +69,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
     /**
      * @param CustomButtonEvent $event
      */
-    public function injectViewButtons(CustomButtonEvent $event)
+    public function injectViewButtons(CustomButtonEvent $event): void
     {
         switch ($event->getRoute()) {
             case CustomItemRouteProvider::ROUTE_LIST:
@@ -127,7 +127,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
      * @param CustomButtonEvent $event
      * @param string            $location
      */
-    private function addEntityButtons(CustomButtonEvent $event, $location): void
+    private function addEntityButtons(CustomButtonEvent $event, string $location): void
     {
         $customItem = $event->getItem();
         if ($customItem && $customItem instanceof CustomItem) {
@@ -348,7 +348,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
      */
     private function getCustomObjectIdFromEvent(CustomButtonEvent $event): int
     {
-        list(, $routeParams) = $event->getRoute(true);
+        [, $routeParams] = $event->getRoute(true);
 
         return (int) $routeParams['objectId'];
     }

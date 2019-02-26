@@ -22,7 +22,7 @@ class CustomItemFilterQueryBuilder extends BaseFilterQueryBuilder
     /**
      * @return string
      */
-    public static function getServiceId()
+    public static function getServiceId(): string
     {
         return 'mautic.lead.query.builder.custom_item.value';
     }
