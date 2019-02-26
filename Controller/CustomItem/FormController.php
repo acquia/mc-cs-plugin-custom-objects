@@ -24,6 +24,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 class FormController extends CommonController
 {
@@ -88,7 +89,7 @@ class FormController extends CommonController
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        return $this->renderFormForItem($customItem, $this->routeProvider->buildNewRoute($objectId));
+        return $this->renderFormForItem($customItem, $customObject, $this->routeProvider->buildNewRoute($objectId));
     }
 
     /**
@@ -109,7 +110,7 @@ class FormController extends CommonController
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        return $this->renderFormForItem($customItem, $this->routeProvider->buildEditRoute($objectId, $itemId));
+        return $this->renderFormForItem($customItem, $customObject, $this->routeProvider->buildEditRoute($objectId, $itemId));
     }
 
     /**
@@ -131,24 +132,28 @@ class FormController extends CommonController
 
         $customItem->setName($customItem->getName().' '.$this->translator->trans('mautic.core.form.clone'));
 
-        return $this->renderFormForItem($customItem, $this->routeProvider->buildCloneRoute($objectId, $itemId));
+        return $this->renderFormForItem($customItem, $customItem->getCustomObject(), $this->routeProvider->buildCloneRoute($objectId, $itemId));
     }
 
     /**
-     * @param CustomItem $customItem
-     * @param string     $route
+     * @param CustomItem   $customItem
+     * @param CustomObject $customObject
+     * @param string       $route
      * 
      * @return Response
      */
-    private function renderFormForItem(CustomItem $customItem, string $route): Response
+    private function renderFormForItem(CustomItem $customItem, CustomObject $customObject, string $route): Response
     {
-        $objectId = $customItem->getCustomObject()->getId();
-        $action   = $this->routeProvider->buildSaveRoute($objectId, $customItem->getId());
-        $form     = $this->formFactory->create(CustomItemType::class, $customItem, ['action' => $action, 'objectId' => $objectId]);
+        $action = $this->routeProvider->buildSaveRoute($customObject->getId(), $customItem->getId());
+        $form   = $this->formFactory->create(
+            CustomItemType::class,
+            $customItem,
+            ['action' => $action, 'objectId' => $customObject->getId()]
+        );
 
         return $this->delegateView(
             [
-                'returnUrl'      => $this->routeProvider->buildListRoute($objectId),
+                'returnUrl'      => $this->routeProvider->buildListRoute($customObject->getId()),
                 'viewParameters' => [
                     'entity'       => $customItem,
                     'customObject' => $customItem->getCustomObject(),
