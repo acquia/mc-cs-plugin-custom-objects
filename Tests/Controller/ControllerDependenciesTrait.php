@@ -1,0 +1,65 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * @copyright   2019 Mautic Contributors. All rights reserved
+ * @author      Mautic, Inc
+ *
+ * @link        http://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+namespace MauticPlugin\CustomObjectsBundle\Tests\Controller;
+
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpKernel\HttpKernel;
+use Symfony\Component\HttpFoundation\Response;
+use Mautic\CoreBundle\Templating\Engine\PhpEngine;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Model\NotificationModel;
+use Symfony\Component\HttpFoundation\Session\Session;
+
+trait ControllerDependenciesTrait
+{
+    private function addSymfonyDependencies(Controller $controller)
+    {
+        $requestStack = empty($this->requestStack) ? $this->createMock(RequestStack::class) : $this->requestStack;
+        $request      = empty($this->request) ? $this->createMock(Request::class) : $this->request;
+        $session      = empty($this->session) ? $this->createMock(Session::class) : $this->session;
+
+        $container         = $this->createMock(ContainerInterface::class);
+        $httpKernel        = $this->createMock(HttpKernel::class);
+        $response          = $this->createMock(Response::class);
+        $phpEngine         = $this->createMock(PhpEngine::class);
+        $modelFactory      = $this->createMock(ModelFactory::class);
+        $notificationModel = $this->createMock(NotificationModel::class);
+
+        $container->method('get')->will($this->returnValueMap([
+            ['request_stack', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $requestStack],
+            ['http_kernel', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $httpKernel],
+            ['templating', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $phpEngine],
+            ['mautic.model.factory', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $modelFactory],
+            ['session', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $session],
+        ]));
+
+        $container->method('has')->will($this->returnValueMap([
+            ['templating', $phpEngine],
+        ]));
+
+        $modelFactory->method('getModel')->will($this->returnValueMap([
+            ['core.notification', $notificationModel],
+        ]));
+
+        $request->method('duplicate')->willReturnSelf();
+        $httpKernel->method('handle')->willReturn($response);
+        $notificationModel->method('getNotificationContent')->willReturn([[], '', '']);
+
+        $controller->setRequest($request);
+        $controller->setContainer($container);
+    }
+}
