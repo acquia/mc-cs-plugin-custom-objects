@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * @copyright   2018 Mautic, Inc. All rights reserved
@@ -11,7 +11,7 @@
 
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
 
-if ($tmpl == 'index') {
+if ('index' === $tmpl) {
     $view->extend('CustomObjectsBundle:CustomField:index.html.php');
 }
 ?>
@@ -55,7 +55,7 @@ if ($tmpl == 'index') {
             </tr>
             </thead>
             <tbody>
-            <?php foreach ($items as $k => $item): ?>
+            <?php foreach ($items as $item): ?>
                 <tr>
                     <td>
                         <?php echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', ['item' => $item]); ?>
@@ -73,9 +73,9 @@ if ($tmpl == 'index') {
                                 <?php echo $item->getName(); ?>
                             </a>
                         </div>
-                        <?php if ($type = $item->getType()): ?>
+                        <?php if ($item->getType()): ?>
                             <div class="text-muted mt-4">
-                                <small><?php echo $type; ?></small>
+                                <small><?php echo $item->getType(); ?></small>
                             </div>
                         <?php endif; ?>
                     </td>
@@ -101,4 +101,3 @@ if ($tmpl == 'index') {
 <?php else: ?>
     <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php', ['tip' => 'custom.field.noresults.tip']); ?>
 <?php endif; ?>
-

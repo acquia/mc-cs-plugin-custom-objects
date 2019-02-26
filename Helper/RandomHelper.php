@@ -13,24 +13,23 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Helper;
 
-
 class RandomHelper
 {
     /**
-     * @var array
+     * @var string[]
      */
     private $randomWords = [];
 
     /**
-     * @param integer $limit
-     * 
+     * @param int $limit
+     *
      * @return string
      */
     public function getSentence(int $limit): string
     {
         $words = [];
 
-        for ($i = 1; $i <= $limit; $i++) {
+        for ($i = 1; $i <= $limit; ++$i) {
             $words[] = $this->getWord();
         }
 
@@ -44,14 +43,14 @@ class RandomHelper
     {
         $randomWords = $this->getRandomWords();
         $randomKey   = array_rand($randomWords);
-        
+
         return $randomWords[$randomKey];
     }
 
     /**
      * Loads the database of random words from a JSON file or cache if loaded already.
      *
-     * @return array
+     * @return string[]
      */
     private function getRandomWords(): array
     {

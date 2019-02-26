@@ -13,18 +13,17 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use Predis\Protocol\Text\RequestSerializer;
 use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Mautic\CoreBundle\Helper\InputHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Helper\PaginationHelper;
+use Symfony\Component\HttpFoundation\Response;
 
 class ListController extends CommonController
 {
@@ -54,12 +53,12 @@ class ListController extends CommonController
     private $routeProvider;
 
     /**
-     * @param RequestStack $requestStack
-     * @param Session $session
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param CustomObjectModel $customObjectModel
-     * @param CorePermissions $corePermissions
-     * @param CustomObjectRouteProvider $routeProvider
+     * @param RequestStack                   $requestStack
+     * @param Session                        $session
+     * @param CoreParametersHelper           $coreParametersHelper
+     * @param CustomObjectModel              $customObjectModel
+     * @param CustomObjectPermissionProvider $permissionProvider
+     * @param CustomObjectRouteProvider      $routeProvider
      */
     public function __construct(
         RequestStack $requestStack,
@@ -68,8 +67,7 @@ class ListController extends CommonController
         CustomObjectModel $customObjectModel,
         CustomObjectPermissionProvider $permissionProvider,
         CustomObjectRouteProvider $routeProvider
-    )
-    {
+    ) {
         $this->requestStack         = $requestStack;
         $this->session              = $session;
         $this->coreParametersHelper = $coreParametersHelper;
@@ -79,11 +77,11 @@ class ListController extends CommonController
     }
 
     /**
-     * @param integer $page
-     * 
-     * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse
+     * @param int $page
+     *
+     * @return Response
      */
-    public function listAction(int $page = 1)
+    public function listAction(int $page = 1): Response
     {
         try {
             $this->permissionProvider->canViewAtAll();
@@ -102,12 +100,12 @@ class ListController extends CommonController
 
         if ($request->query->has('orderby')) {
             $orderBy    = InputHelper::clean($request->query->get('orderby'), true);
-            $orderByDir = $this->session->get("mautic.custom.object.orderbydir", 'ASC');
-            $orderByDir = ($orderByDir == 'ASC') ? 'DESC' : 'ASC';
-            $this->session->set("mautic.custom.object.orderby", $orderBy);
-            $this->session->set("mautic.custom.object.orderbydir", $orderByDir);
+            $orderByDir = $this->session->get('mautic.custom.object.orderbydir', 'ASC');
+            $orderByDir = 'ASC' === $orderByDir ? 'DESC' : 'ASC';
+            $this->session->set('mautic.custom.object.orderby', $orderBy);
+            $this->session->set('mautic.custom.object.orderbydir', $orderByDir);
         }
-        
+
         $entities = $this->customObjectModel->fetchEntities(
             [
                 'start'      => PaginationHelper::countOffset($page, $limit),
@@ -117,7 +115,7 @@ class ListController extends CommonController
                 'orderByDir' => $orderByDir,
             ]
         );
-    
+
         $this->session->set('mautic.custom.object.page', $page);
         $this->session->set('mautic.custom.object.limit', $limit);
         $this->session->set('mautic.custom.object.filter', $search);

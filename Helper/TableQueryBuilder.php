@@ -41,10 +41,10 @@ class TableQueryBuilder
     private $rootAlias;
 
     /**
-     * @param TableConfig $tableConfig
-     * @param QueryBuilder $queryBuilder
+     * @param TableConfig   $tableConfig
+     * @param QueryBuilder  $queryBuilder
      * @param ClassMetadata $metadata
-     * 
+     *
      * @return QueryBuilder
      */
     public function __construct(TableConfig $tableConfig, QueryBuilder $queryBuilder, ClassMetadata $metadata)
@@ -94,14 +94,12 @@ class TableQueryBuilder
 
     /**
      * @param TableFilterConfig $filter
-     * 
-     * @return QueryBuilder
      */
     private function applyTableFilter(TableFilterConfig $filter): void
     {
         $this->addJoinIfNecessary($filter);
-        
-        if ($filter->getExpression() === 'orX' && is_array($filter->getValue())) {
+
+        if ('orX' === $filter->getExpression() && is_array($filter->getValue())) {
             $expr = $this->queryBuilder->expr()->orX();
             foreach ($filter->getValue() as $orFilter) {
                 $exprOr = $this->queryBuilder->expr()->{$orFilter->getExpression()}($orFilter->getFullColumnName(), ':'.$orFilter->getColumnName());
@@ -121,7 +119,7 @@ class TableQueryBuilder
      */
     private function addJoinIfNecessary(TableFilterConfig $filter): void
     {
-        if (!in_array($filter->getTableAlias(), $this->queryBuilder->getAllAliases())) {
+        if (!in_array($filter->getTableAlias(), $this->queryBuilder->getAllAliases(), true)) {
             $cloumnNameArr = array_keys($this->metadata->getAssociationsByTargetClass($filter->getEntityName()));
             if (empty($cloumnNameArr[0])) {
                 throw new \UnexpectedValueException("Entity {$filter->getEntityName()} does not have association with {$filter->getEntityName()}");

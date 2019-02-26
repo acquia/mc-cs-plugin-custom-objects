@@ -18,7 +18,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
-use DateTimeInterface;
 use Mautic\CoreBundle\Entity\FormEntity;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
@@ -34,11 +33,6 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      * @var string|null
      */
     private $label;
-
-    /**
-     * @var DateTimeInterface|null
-     */
-    private $dateAdded;
 
     /**
      * @var string|null
@@ -81,7 +75,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public function toArray(): array
     {
@@ -103,7 +97,6 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
         $builder->setTable('custom_field')
             ->setCustomRepositoryClass(CustomFieldRepository::class);
-
 
         $builder->createManyToOne('customObject', CustomObject::class)
             ->addJoinColumn('custom_object_id', 'id', false, false, 'CASCADE')
@@ -161,7 +154,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $label
      */
-    public function setLabel($label)
+    public function setLabel(?string $label): void
     {
         $this->isChanged('label', $label);
         $this->label = $label;
@@ -177,7 +170,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
     /**
      * Alias for abstractions. Do not use.
-     * 
+     *
      * @return string|null
      */
     public function getName(): ?string
@@ -188,7 +181,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $type
      */
-    public function setType($type): void
+    public function setType(?string $type): void
     {
         $this->type = $type;
     }
@@ -196,7 +189,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @return string|null
      */
-    public function getType()
+    public function getType(): ?string
     {
         return $this->type;
     }
@@ -212,7 +205,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @return CustomFieldTypeInterface|null
      */
-    public function getTypeObject()
+    public function getTypeObject(): ?CustomFieldTypeInterface
     {
         return $this->typeObject;
     }
@@ -220,7 +213,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @return CustomObject|null
      */
-    public function getCustomObject()
+    public function getCustomObject(): ?CustomObject
     {
         return $this->customObject;
     }
@@ -228,7 +221,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @param CustomObject $customObject
      */
-    public function setCustomObject(CustomObject $customObject = null)
+    public function setCustomObject(?CustomObject $customObject = null): void
     {
         $this->customObject = $customObject;
         if ($customObject) {

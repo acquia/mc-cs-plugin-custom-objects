@@ -21,6 +21,11 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     /**
      * @var string
      */
+    protected $key = 'undefined';
+
+    /**
+     * @var string
+     */
     private $name;
 
     /**
@@ -29,6 +34,14 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     public function __construct(string $name)
     {
         $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString(): string
+    {
+        return $this->getKey();
     }
 
     /**
@@ -52,19 +65,11 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
      */
     public function getTableAlias(): string
     {
-        return 'cfv_' . $this->getKey();
+        return 'cfv_'.$this->getKey();
     }
 
     /**
-     * @return string
-     */
-    public function __toString(): string
-    {
-        return $this->getKey();
-    }
-
-    /**
-     * @return array
+     * @return mixed[]
      */
     public function getOperators(): array
     {
@@ -73,8 +78,8 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
 
     /**
      * @param TranslatorInterface $translator
-     * 
-     * @return array
+     *
+     * @return string[]
      */
     public function getOperatorOptions(TranslatorInterface $translator): array
     {

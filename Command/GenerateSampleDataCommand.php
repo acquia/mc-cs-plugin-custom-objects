@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc.
@@ -21,16 +23,13 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Helper\RandomHelper;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInt;
-use Mautic\LeadBundle\Helper\Progress;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Doctrine\ORM\EntityManager;
 
@@ -56,7 +55,6 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
      */
     private $entityManager;
 
-
     /**
      * @var RandomHelper
      */
@@ -64,10 +62,10 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
 
     /**
      * @param CustomObjectModel $customObjectModel
-     * @param CustomItemModel $customItemModel
-     * @param LeadModel $contactModel
-     * @param EntityManager $entityManager
-     * @param RandomHelper $randomHelper
+     * @param CustomItemModel   $customItemModel
+     * @param LeadModel         $contactModel
+     * @param EntityManager     $entityManager
+     * @param RandomHelper      $randomHelper
      */
     public function __construct(
         CustomObjectModel $customObjectModel,
@@ -88,7 +86,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('mautic:customobjects:generatesampledata')
             ->setDescription('Creates specified amount of custom items with random links to contacts, random names and random custom field values.')
@@ -117,14 +115,14 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         $enquirer = $this->getHelper('question');
         $objectId = (int) $input->getOption('object-id');
         $limit    = (int) $input->getOption('limit');
-        
+
         if (!$limit) {
             $limit = 1000;
         }
-        
+
         if (!$objectId) {
-            $io->error("Provide a Custom Object ID for which you want to generate the custom items. Use --object-id=X");
-            
+            $io->error('Provide a Custom Object ID for which you want to generate the custom items. Use --object-id=X');
+
             return 1;
         }
 
@@ -147,7 +145,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         $progress->setFormat(' %current%/%max% [%bar%] | %percent:3s%% | Elapsed: %elapsed:6s% | Estimated: %estimated:-6s% | Memory Usage: %memory:6s%');
         $progress->start();
 
-        for ($i = 1; $i <= $limit; $i++) {
+        for ($i = 1; $i <= $limit; ++$i) {
             $customItem = $this->generateCustomItem($customObject);
             $customItem = $this->generateCustomFieldValues($customItem, $customObject);
             $customItem = $this->generateContactReferences($customItem);
@@ -155,7 +153,6 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
             $this->clearMemory($customItem);
             $progress->advance();
         }
-
 
         $progress->finish();
         $runTime = gmdate('H:i:s', microtime(true) - $startTime);
@@ -167,32 +164,32 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
 
     /**
      * @param CustomObject $customObject
-     * 
+     *
      * @return CustomItem
      */
     private function generateCustomItem(CustomObject $customObject): CustomItem
     {
         $customItem = new CustomItem($customObject);
-        $customItem->setName($this->randomHelper->getSentence(rand(2, 6)));
+        $customItem->setName($this->randomHelper->getSentence(random_int(2, 6)));
 
         return $customItem;
     }
 
     /**
-     * @param CustomItem $customItem
+     * @param CustomItem   $customItem
      * @param CustomObject $customObject
-     * 
+     *
      * @return CustomItem
      */
     private function generateCustomFieldValues(CustomItem $customItem, CustomObject $customObject): CustomItem
     {
         foreach ($customObject->getCustomFields() as $field) {
-            if ($field->getType() === TextType::KEY) {
-                $customItem->addCustomFieldValue(new CustomFieldValueText($field, $customItem, $this->randomHelper->getSentence(rand(0, 100))));
+            if ('text' === $field->getType()) {
+                $customItem->addCustomFieldValue(new CustomFieldValueText($field, $customItem, $this->randomHelper->getSentence(random_int(0, 100))));
             }
 
-            if ($field->getType() === IntType::KEY) {
-                $customItem->addCustomFieldValue(new CustomFieldValueInt($field, $customItem, rand(0, 1000)));
+            if ('int' === $field->getType()) {
+                $customItem->addCustomFieldValue(new CustomFieldValueInt($field, $customItem, random_int(0, 1000)));
             }
         }
 
@@ -201,21 +198,21 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
 
     /**
      * Generates up to 10 custom item - contact references and adds them to the CustomItem entity.
-     * 
+     *
      * @param CustomItem $customItem
-     * 
+     *
      * @return CustomItem
      */
     private function generateContactReferences(CustomItem $customItem): CustomItem
     {
-        for ($i = 1; $i <= rand(0, 10); $i++) {
+        for ($i = 1; $i <= random_int(0, 10); ++$i) {
             $contact   = new Lead();
             $reference = new CustomItemXrefContact($customItem, $contact);
             $contact->setFirstname(ucfirst($this->randomHelper->getWord()));
             $contact->setLastname(ucfirst($this->randomHelper->getWord()));
-    
+
             $this->contactModel->saveEntity($contact);
-    
+
             $customItem->addContactReference($reference);
         }
 

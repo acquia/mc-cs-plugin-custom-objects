@@ -42,7 +42,7 @@ class CustomFieldType extends AbstractType
 
     /**
      * @param FormBuilderInterface $builder
-     * @param array                $options
+     * @param mixed[]              $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -111,11 +111,54 @@ class CustomFieldType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => CustomField::class,
+                'data_class'         => CustomField::class,
                 'custom_object_form' => false, // Is form used as subform?
-                'csrf_protection'   => false,
+                'csrf_protection'    => false,
             ]
         );
+    }
+
+    /**
+     * Build fields for form in modal. Full specification of custom field.
+     *
+     * @param FormBuilderInterface $builder
+     * @param mixed[]              $options
+     */
+    public function buildModalFormFields(FormBuilderInterface $builder, array $options): void
+    {
+        $builder->add(
+            'required',
+            \Symfony\Component\Form\Extension\Core\Type\CheckboxType::class,
+            [
+                'label' => 'custom.field.label.required',
+            ]
+        );
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
+            /** @var CustomField $customField */
+            $customField = $event->getData();
+            $form = $event->getForm();
+
+            $form->add(
+                'defaultValue',
+                $customField->getTypeObject()->getSymfonyFormFiledType(),
+                [
+                    'label'    => 'custom.field.label.default_value',
+                    'required' => false,
+                ]
+            );
+        });
+
+        $builder->add(
+            'buttons',
+            FormButtonsType::class,
+            [
+                'apply_text'     => '',
+                'cancel_onclick' => "mQuery('form[name=custom_field]').attr('method', 'get').attr('action', mQuery('form[name=custom_field]').attr('action').replace('/save', '/cancel'));",
+            ]
+        );
+
+        $builder->setAction($options['action']);
     }
 
     /**
@@ -130,49 +173,6 @@ class CustomFieldType extends AbstractType
         $builder->add('defaultValue', HiddenType::class);
 
         // Possibility to mark field as deleted in POST data
-        $builder->add('deleted',HiddenType::class,['mapped' => false]);
-    }
-
-    /**
-     * Build fields for form in modal. Full specification of custom field.
-     *
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildModalFormFields(FormBuilderInterface $builder, array $options): void
-    {
-        $builder->add(
-            'required',
-            \Symfony\Component\Form\Extension\Core\Type\CheckboxType::class,
-            [
-                'label' => 'custom.field.label.required',
-            ]
-        );
-
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event){
-            /** @var CustomField $customField */
-            $customField = $event->getData();
-            $form = $event->getForm();
-
-            $form->add(
-                'defaultValue',
-                $customField->getTypeObject()->getSymfonyFormFiledType(),
-                [
-                    'label' => 'custom.field.label.default_value',
-                    'required' => false,
-                ]
-            );
-        });
-
-        $builder->add(
-            'buttons',
-            FormButtonsType::class,
-            [
-                'apply_text' => '',
-                'cancel_onclick' => "mQuery('form[name=custom_field]').attr('method', 'get').attr('action', mQuery('form[name=custom_field]').attr('action').replace('/save', '/cancel'));",
-            ]
-        );
-
-        $builder->setAction($options['action']);
+        $builder->add('deleted', HiddenType::class, ['mapped' => false]);
     }
 }

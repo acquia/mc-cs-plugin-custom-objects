@@ -16,7 +16,6 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
 use Mautic\LeadBundle\LeadEvents;
-use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemFilterQueryBuilder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -24,7 +23,6 @@ use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 
 class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
 {
-
     /**
      * @var EntityManager
      */
@@ -46,13 +44,12 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public static function getSubscribedEvents(): array
     {
         return [
-            // @todo enable once https://github.com/mautic-inc/mautic-cloud/pull/388 is in beta
-            //LeadEvents::SEGMENT_DICTIONARY_ON_GENERATE => 'onGenerateSegmentDictionary',
+            LeadEvents::SEGMENT_DICTIONARY_ON_GENERATE => 'onGenerateSegmentDictionary',
         ];
     }
 
@@ -68,38 +65,37 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
         $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
         $queryBuilder
             ->select('f.id, f.label, f.type, o.id as custom_object_id')
-            ->from(MAUTIC_TABLE_PREFIX . "custom_field", 'f')
-            ->innerJoin('f', MAUTIC_TABLE_PREFIX . "custom_object", 'o', 'f.custom_object_id = o.id and o.is_published = 1');
+            ->from(MAUTIC_TABLE_PREFIX.'custom_field', 'f')
+            ->innerJoin('f', MAUTIC_TABLE_PREFIX.'custom_object', 'o', 'f.custom_object_id = o.id and o.is_published = 1');
 
         $registeredObjects = [];
 
         foreach ($queryBuilder->execute()->fetchAll() as $field) {
-            if (!in_array($COId = $field['custom_object_id'], $registeredObjects)) {
-                $event->addTranslation('cmo_' . $COId, [
+            $COId = $field['custom_object_id'];
+            if (!in_array($COId, $registeredObjects, true)) {
+                $event->addTranslation('cmo_'.$COId, [
                     'type'  => CustomItemFilterQueryBuilder::getServiceId(),
                     'field' => $COId,
                 ]);
                 $registeredObjects[] = $COId;
             }
-            $event->addTranslation('cmf_' . $field['id'], $this->createTranslation($field));
+            $event->addTranslation('cmf_'.$field['id'], $this->createTranslation($field));
         }
     }
 
     /**
-     * @param array $fieldAttributes
+     * @param mixed[] $fieldAttributes
      *
-     * @return array
+     * @return string[]
      */
     private function createTranslation(array $fieldAttributes): array
     {
-        $segmentValueType = 'custom_field_value_' . $fieldAttributes['type'];
+        $segmentValueType = 'custom_field_value_'.$fieldAttributes['type'];
 
-        $translation = [
+        return [
             'type'  => CustomFieldFilterQueryBuilder::getServiceId(),
             'table' => $segmentValueType,
             'field' => $fieldAttributes['id'],
         ];
-
-        return $translation;
     }
 }

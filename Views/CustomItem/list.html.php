@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
 * @copyright   2018 Mautic, Inc. All rights reserved
@@ -12,7 +12,7 @@
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 
-if ($tmpl == 'index') {
+if ('index' === $tmpl) {
     $view->extend('CustomObjectsBundle:CustomItem:index.html.php');
 }
 
@@ -68,7 +68,7 @@ $routeSelf = $view['router']->path(
             </tr>
             </thead>
             <tbody>
-            <?php foreach ($items as $k => $item): ?>
+            <?php foreach ($items as $item): ?>
                 <tr>
                     <td>
                         <?php echo $view->render('MauticCoreBundle:Helper:list_actions.html.php', ['item' => $item]); ?>
@@ -81,7 +81,7 @@ $routeSelf = $view['router']->path(
                                     'item'  => $item,
                                     'model' => 'custom.item',
                                 ]
-                            ): ''; ?>
+                            ) : ''; ?>
                             <a href="<?php echo $view['router']->path(CustomItemRouteProvider::ROUTE_VIEW, ['objectId' => $customObject->getId(), 'itemId' => $item->getId()]); ?>" data-toggle="ajax">
                                 <?php echo $item->getName(); ?>
                             </a>
@@ -100,7 +100,7 @@ $routeSelf = $view['router']->path(
                 'totalItems'  => $itemCount,
                 'page'        => $page,
                 'limit'       => $limit,
-                'baseUrl'     => $routeSelf = $view['router']->path(CustomItemRouteProvider::ROUTE_LIST,['objectId'  => $customObject->getId(),]),
+                'baseUrl'     => $routeSelf = $view['router']->path(CustomItemRouteProvider::ROUTE_LIST, ['objectId'  => $customObject->getId()]),
                 'queryString' => "&contactId={$contactId}",
                 'sessionVar'  => 'custom.item',
                 'routeBase'   => CustomItemRouteProvider::ROUTE_LIST,
@@ -110,4 +110,3 @@ $routeSelf = $view['router']->path(
 <?php else: ?>
     <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php', ['tip' => 'custom.object.noresults.tip']); ?>
 <?php endif; ?>
-

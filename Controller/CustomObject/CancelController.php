@@ -12,10 +12,8 @@ declare(strict_types=1);
  */
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
-;
 
 use Symfony\Component\HttpFoundation\Session\Session;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -29,36 +27,27 @@ class CancelController extends CommonController
     private $session;
 
     /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    /**
      * @var CustomObjectRouteProvider
      */
     private $routeProvider;
 
     /**
-     * @param Session $session
-     * @param CustomObjectModel $customObjectModel
+     * @param Session                   $session
      * @param CustomObjectRouteProvider $routeProvider
      */
     public function __construct(
         Session $session,
-        CustomObjectModel $customObjectModel,
         CustomObjectRouteProvider $routeProvider
-    )
-    {
-        $this->session           = $session;
-        $this->customObjectModel = $customObjectModel;
-        $this->routeProvider     = $routeProvider;
+    ) {
+        $this->session       = $session;
+        $this->routeProvider = $routeProvider;
     }
 
     /**
      * @todo unlock entity?
-     * 
+     *
      * @param int|null $objectId
-     * 
+     *
      * @return Response|JsonResponse
      */
     public function cancelAction(?int $objectId)

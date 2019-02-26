@@ -52,8 +52,8 @@ class IntType extends AbstractCustomFieldType
     /**
      * @param CustomField $customField
      * @param CustomItem  $customItem
-     * @param int|null    $value
-     * 
+     * @param mixed|null  $value
+     *
      * @return CustomFieldValueInterface
      */
     public function createValueEntity(CustomField $customField, CustomItem $customItem, $value = null): CustomFieldValueInterface
@@ -62,13 +62,13 @@ class IntType extends AbstractCustomFieldType
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public function getOperators(): array
     {
-        $allOperators = parent::getOperators();
+        $allOperators     = parent::getOperators();
         $allowedOperators = array_flip(['=', '!=', 'gt', 'gte', 'lt', 'lte', 'empty', '!empty', 'between', '!between', 'in', '!in']);
-        
+
         return array_intersect_key($allOperators, $allowedOperators);
     }
 }

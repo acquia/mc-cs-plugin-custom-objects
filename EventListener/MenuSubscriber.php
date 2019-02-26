@@ -34,7 +34,7 @@ class MenuSubscriber extends CommonSubscriber
 
     /**
      * @param CustomObjectModel $customObjectModel
-     * @param ConfigProvider $configProvider
+     * @param ConfigProvider    $configProvider
      */
     public function __construct(CustomObjectModel $customObjectModel, ConfigProvider $configProvider)
     {
@@ -43,7 +43,7 @@ class MenuSubscriber extends CommonSubscriber
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public static function getSubscribedEvents(): array
     {
@@ -60,7 +60,7 @@ class MenuSubscriber extends CommonSubscriber
         if (!$this->configProvider->pluginIsEnabled()) {
             return;
         }
-        
+
         if ('main' !== $event->getType()) {
             return;
         }

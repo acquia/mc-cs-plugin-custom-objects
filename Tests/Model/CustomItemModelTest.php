@@ -33,32 +33,42 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 class CustomItemModelTest extends \PHPUnit_Framework_TestCase
 {
     private $customItem;
+
     private $user;
+
     private $entityManager;
+
     private $customItemRepository;
+
     private $customItemPermissionProvider;
+
     private $userHelper;
+
     private $customFieldModel;
+
     private $customFieldValueModel;
+
     private $customFieldTypeProvider;
+
     private $dispatcher;
+
     private $customItemModel;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->customItem = $this->createMock(CustomItem::class);
-        $this->user = $this->createMock(User::class);
-        $this->entityManager = $this->createMock(EntityManager::class);
-        $this->customItemRepository = $this->createMock(CustomItemRepository::class);
+        $this->customItem                   = $this->createMock(CustomItem::class);
+        $this->user                         = $this->createMock(User::class);
+        $this->entityManager                = $this->createMock(EntityManager::class);
+        $this->customItemRepository         = $this->createMock(CustomItemRepository::class);
         $this->customItemPermissionProvider = $this->createMock(CustomItemPermissionProvider::class);
-        $this->userHelper = $this->createMock(UserHelper::class);
-        $this->customFieldModel = $this->createMock(CustomFieldModel::class);
-        $this->customFieldValueModel = $this->createMock(CustomFieldValueModel::class);
-        $this->customFieldTypeProvider = $this->createMock(CustomFieldTypeProvider::class);
-        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $this->customItemModel = new CustomItemModel(
+        $this->userHelper                   = $this->createMock(UserHelper::class);
+        $this->customFieldModel             = $this->createMock(CustomFieldModel::class);
+        $this->customFieldValueModel        = $this->createMock(CustomFieldValueModel::class);
+        $this->customFieldTypeProvider      = $this->createMock(CustomFieldTypeProvider::class);
+        $this->dispatcher                   = $this->createMock(EventDispatcherInterface::class);
+        $this->customItemModel              = new CustomItemModel(
             $this->entityManager,
             $this->customItemRepository,
             $this->customItemPermissionProvider,
@@ -70,7 +80,7 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testSaveNew()
+    public function testSaveNew(): void
     {
         $this->user->expects($this->exactly(2))->method('getId')->willReturn(55);
         $this->user->expects($this->exactly(2))->method('getName')->willReturn('John Doe');
@@ -93,7 +103,7 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->customItem, $this->customItemModel->save($this->customItem));
     }
 
-    public function testSaveEdit()
+    public function testSaveEdit(): void
     {
         $customFieldValue = $this->createMock(CustomFieldValueText::class);
         $contactXref      = $this->createMock(CustomItemXrefContact::class);
@@ -117,7 +127,7 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->customItem, $this->customItemModel->save($this->customItem));
     }
 
-    public function testDelete()
+    public function testDelete(): void
     {
         $this->customItem->expects($this->once())->method('getId')->willReturn(34);
         $this->dispatcher->expects($this->at(0))->method('dispatch')->with(CustomItemEvents::ON_CUSTOM_ITEM_PRE_DELETE, $this->isInstanceOf(CustomItemEvent::class));

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -34,6 +36,7 @@ class CustomFieldFactory
      * @param CustomObject $customObject
      *
      * @return CustomField
+     *
      * @throws NotFoundException
      */
     public function create(string $type, CustomObject $customObject): CustomField

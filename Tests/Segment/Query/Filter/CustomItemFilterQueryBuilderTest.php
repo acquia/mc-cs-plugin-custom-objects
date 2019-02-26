@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\CustomObjectsBundle\Tests\Segment\Query\Filter;
 
 use Doctrine\ORM\EntityManager;
@@ -17,21 +19,21 @@ class CustomItemFilterQueryBuilderTest extends WebTestCase
     /** @var EntityManager */
     private $entityManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
-        $pluginDirectory = $this->getContainer()->get('kernel')->locateResource('@CustomObjectsBundle');
-        $fixturesDirectory = $pluginDirectory . '/Tests/DataFixtures/ORM/Data';
+        $pluginDirectory   = $this->getContainer()->get('kernel')->locateResource('@CustomObjectsBundle');
+        $fixturesDirectory = $pluginDirectory.'/Tests/DataFixtures/ORM/Data';
 
         $objects = $this->loadFixtureFiles([
-            $fixturesDirectory . '/roles.yml',
-            $fixturesDirectory . '/users.yml',
-            $fixturesDirectory . '/leads.yml',
-            $fixturesDirectory . '/custom_objects.yml',
-            $fixturesDirectory . '/custom_fields.yml',
-            $fixturesDirectory . '/custom_items.yml',
-            $fixturesDirectory . '/custom_xref.yml',
-            $fixturesDirectory . '/custom_values.yml',
-        ], false, null,'doctrine'); //,ORMPurger::PURGE_MODE_DELETE);
+            $fixturesDirectory.'/roles.yml',
+            $fixturesDirectory.'/users.yml',
+            $fixturesDirectory.'/leads.yml',
+            $fixturesDirectory.'/custom_objects.yml',
+            $fixturesDirectory.'/custom_fields.yml',
+            $fixturesDirectory.'/custom_items.yml',
+            $fixturesDirectory.'/custom_xref.yml',
+            $fixturesDirectory.'/custom_values.yml',
+        ], false, null, 'doctrine'); //,ORMPurger::PURGE_MODE_DELETE);
 
         $this->setFixtureObjects($objects);
 
@@ -40,38 +42,44 @@ class CustomItemFilterQueryBuilderTest extends WebTestCase
         parent::setUp();
     }
 
-    public function tearDown()
+    protected function tearDown(): void
     {
         foreach ($this->getFixturesInUnloadableOrder() as $entity) {
             $this->entityManager->remove($entity);
         }
 
         $this->entityManager->flush();
-        return parent::tearDown();
+
+        parent::tearDown();
     }
 
-    public function testApplyQuery() {
+    public function testApplyQuery(): void
+    {
         $queryBuilderService = new CustomItemFilterQueryBuilder(new RandomParameterName());
 
         $filterMock = $this->createSegmentFilterMock('%emotion%');
 
         $queryBuilder = $this->getLeadsQueryBuilder();
-        $queryBuilderService->applyQuery($queryBuilder,$filterMock);
+        $queryBuilderService->applyQuery($queryBuilder, $filterMock);
 
-        $this->assertEquals(1, $queryBuilder->execute()->rowCount());
+        $this->assertSame(1, $queryBuilder->execute()->rowCount());
 
         $filterMock = $this->createSegmentFilterMock('%Object%');
 
         $queryBuilder = $this->getLeadsQueryBuilder();
-        $queryBuilderService->applyQuery($queryBuilder,$filterMock);
+        $queryBuilderService->applyQuery($queryBuilder, $filterMock);
 
-        $this->assertEquals(6, $queryBuilder->execute()->rowCount());
+        $this->assertSame(6, $queryBuilder->execute()->rowCount());
     }
 
-    private function createSegmentFilterMock($value) {
-        $filterMock = $this->getMockBuilder(ContactSegmentFilter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+    /**
+     * @param string $value
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    private function createSegmentFilterMock(string $value): \PHPUnit_Framework_MockObject_MockObject
+    {
+        $filterMock = $this->createMock(ContactSegmentFilter::class);
 
         $filterMock->method('getType')->willReturn('text');
         $filterMock->method('getOperator')->willReturn('like');
@@ -82,12 +90,12 @@ class CustomItemFilterQueryBuilderTest extends WebTestCase
         return $filterMock;
     }
 
-    private function getLeadsQueryBuilder()
+    private function getLeadsQueryBuilder(): QueryBuilder
     {
         $connection   = $this->entityManager->getConnection();
         $queryBuilder = new QueryBuilder($connection);
 
-        $queryBuilder->select('l.*')->from(MAUTIC_TABLE_PREFIX . "leads","l");
+        $queryBuilder->select('l.*')->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
         return $queryBuilder;
     }

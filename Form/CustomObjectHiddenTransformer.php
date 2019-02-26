@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -52,7 +54,7 @@ class CustomObjectHiddenTransformer implements DataTransformerInterface
             return new CustomObject();
         }
 
-        $entity = $this->customObjectRepository->findOneById($value);
+        $entity = $this->customObjectRepository->findOneBy(['id' => $value]);
 
         if (null === $entity) {
             throw new TransformationFailedException(sprintf(

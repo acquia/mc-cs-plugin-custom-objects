@@ -14,24 +14,37 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Provider;
 
 use Symfony\Component\Routing\RouterInterface;
-use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 
 class CustomItemRouteProvider
 {
     public const ROUTE_LIST          = 'mautic_custom_item_list';
+
     public const ROUTE_VIEW          = 'mautic_custom_item_view';
+
     public const ROUTE_EDIT          = 'mautic_custom_item_edit';
+
     public const ROUTE_CLONE         = 'mautic_custom_item_clone';
+
     public const ROUTE_DELETE        = 'mautic_custom_item_delete';
+
     public const ROUTE_BATCH_DELETE  = 'mautic_custom_item_batch_delete';
+
     public const ROUTE_NEW           = 'mautic_custom_item_new';
+
     public const ROUTE_CANCEL        = 'mautic_custom_item_cancel';
+
     public const ROUTE_SAVE          = 'mautic_custom_item_save';
+
     public const ROUTE_LOOKUP        = 'mautic_custom_item_lookup';
+
     public const ROUTE_LINK          = 'mautic_custom_item_link';
+
     public const ROUTE_UNLINK        = 'mautic_custom_item_unlink';
+
     public const ROUTE_IMPORT_ACTION = 'mautic_import_action';
+
     public const ROUTE_IMPORT_LIST   = 'mautic_import_index';
+
     public const ROUTE_CONTACT_LIST  = 'mautic_custom_item_contacts';
 
     /**
@@ -50,7 +63,7 @@ class CustomItemRouteProvider
     /**
      * @param int $objectId
      * @param int $page
-     * 
+     *
      * @return string
      */
     public function buildListRoute(int $objectId, int $page = 1): string
@@ -61,7 +74,7 @@ class CustomItemRouteProvider
     /**
      * @param int $customItemId
      * @param int $contactId
-     * 
+     *
      * @return string
      */
     public function buildUnlinkContactRoute(int $customItemId, int $contactId): string
@@ -71,7 +84,7 @@ class CustomItemRouteProvider
 
     /**
      * @param int $objectId
-     * 
+     *
      * @return string
      */
     public function buildNewRoute(int $objectId): string
@@ -82,7 +95,7 @@ class CustomItemRouteProvider
     /**
      * @param int      $objectId
      * @param int|null $itemId
-     * 
+     *
      * @return string
      */
     public function buildSaveRoute(int $objectId, ?int $itemId = null): string
@@ -92,7 +105,7 @@ class CustomItemRouteProvider
 
     /**
      * @param int $itemId
-     * 
+     *
      * @return string
      */
     public function buildViewRoute(int $objectId, int $itemId): string
@@ -102,7 +115,7 @@ class CustomItemRouteProvider
 
     /**
      * @param int $itemId
-     * 
+     *
      * @return string
      */
     public function buildEditRoute(int $objectId, int $itemId): string
@@ -120,7 +133,7 @@ class CustomItemRouteProvider
 
     /**
      * @param int $itemId
-     * 
+     *
      * @return string
      */
     public function buildDeleteRoute(int $objectId, int $itemId): string
@@ -129,8 +142,8 @@ class CustomItemRouteProvider
     }
 
     /**
-     * @param int $itemId
-     * 
+     * @param int $objectId
+     *
      * @return string
      */
     public function buildLookupRoute(int $objectId): string
@@ -139,8 +152,8 @@ class CustomItemRouteProvider
     }
 
     /**
-     * @param int $itemId
-     * 
+     * @param int $objectId
+     *
      * @return string
      */
     public function buildBatchDeleteRoute(int $objectId): string
@@ -150,7 +163,7 @@ class CustomItemRouteProvider
 
     /**
      * @param int $objectId
-     * 
+     *
      * @return string
      */
     public function buildNewImportRoute(int $objectId): string
@@ -160,7 +173,7 @@ class CustomItemRouteProvider
 
     /**
      * @param int $objectId
-     * 
+     *
      * @return string
      */
     public function buildListImportRoute(int $objectId): string
@@ -169,22 +182,22 @@ class CustomItemRouteProvider
     }
 
     /**
-     * @param int $objectId
+     * @param int    $objectId
      * @param string $objectAction
-     * 
+     *
      * @return string
      */
     private function buildImportRoute(int $objectId, string $objectAction): string
     {
         return $this->router->generate(static::ROUTE_IMPORT_ACTION, [
             'object'       => $this->buildImportRouteObject($objectId),
-            'objectAction' => $objectAction
+            'objectAction' => $objectAction,
         ]);
     }
 
     /**
      * @param int $objectId
-     * 
+     *
      * @return string
      */
     private function buildImportRouteObject(int $objectId): string

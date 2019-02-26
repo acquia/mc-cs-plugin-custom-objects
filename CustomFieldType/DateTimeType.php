@@ -18,7 +18,6 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueDateTime;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 
-
 class DateTimeType extends AbstractCustomFieldType
 {
     /**
@@ -63,11 +62,11 @@ class DateTimeType extends AbstractCustomFieldType
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public function getOperators(): array
     {
-        $allOperators = parent::getOperators();
+        $allOperators     = parent::getOperators();
         $allowedOperators = array_flip(['=', '!=', 'gt', 'gte', 'lt', 'lte', 'empty', '!empty', 'between', '!between', 'in', '!in']);
 
         return array_intersect_key($allOperators, $allowedOperators);

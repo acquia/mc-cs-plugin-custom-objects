@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc
@@ -39,15 +41,15 @@ class CustomObjectPermissions extends AbstractPermissions
 
     /**
      * Cached custom objects.
-     * 
-     * @var array
+     *
+     * @var CustomObject[]
      */
     private $customObjects = [];
 
     /**
-     * @param array $params
-     * @param CustomObjectModel $customObjectModel
-     * @param ConfigProvider $configProvider
+     * @param mixed[]             $params
+     * @param CustomObjectModel   $customObjectModel
+     * @param ConfigProvider      $configProvider
      * @param TranslatorInterface $translator
      */
     public function __construct(
@@ -55,8 +57,7 @@ class CustomObjectPermissions extends AbstractPermissions
         CustomObjectModel $customObjectModel,
         ConfigProvider $configProvider,
         TranslatorInterface $translator
-    )
-    {
+    ) {
         parent::__construct($params);
 
         $this->customObjectModel = $customObjectModel;
@@ -115,19 +116,19 @@ class CustomObjectPermissions extends AbstractPermissions
     {
         if (is_numeric($level)) {
             $customObject = $this->getCustomObjects()[$level];
-        
+
             return $this->translator->trans(
                 'custom.object.permissions',
                 ['%name%' => $customObject->getNamePlural()]
             );
         }
-        
+
         return parent::getLabel($bundle, $level);
     }
 
     /**
      * Fetches published custom objects once and returns the cached array if fetched already.
-     * 
+     *
      * @return CustomObject[]
      */
     private function getCustomObjects(): array

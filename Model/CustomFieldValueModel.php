@@ -15,13 +15,8 @@ namespace MauticPlugin\CustomObjectsBundle\Model;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Entity\CommonRepository;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInt;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Doctrine\Common\Collections\ArrayCollection;
 
@@ -44,17 +39,16 @@ class CustomFieldValueModel
     public function __construct(
         EntityManager $entityManager,
         CustomFieldTypeProvider $customFieldTypeProvider
-    )
-    {
+    ) {
         $this->entityManager           = $entityManager;
         $this->customFieldTypeProvider = $customFieldTypeProvider;
     }
 
     /**
      * The values are joined from several tables. Each value type can have own table.
-     * 
+     *
      * @param CustomItem $customItem
-     * 
+     *
      * @return ArrayCollection
      */
     public function getValuesForItem(CustomItem $customItem): ArrayCollection
@@ -75,7 +69,7 @@ class CustomFieldValueModel
             $queryBuilder->from($type->getTableName(), $type->getTableAlias());
             $queryBuilder->where("{$type->getTableAlias()}.custom_item_id = :customItemId");
             $params['customItemId'] = $customItem->getId();
-            $queries[] = $queryBuilder->getSQL();
+            $queries[]              = $queryBuilder->getSQL();
         }
 
         $statement = $this->entityManager->getConnection()->prepare(implode(' UNION ', $queries));
@@ -91,7 +85,7 @@ class CustomFieldValueModel
             $fieldType      = $this->customFieldTypeProvider->getType($row['type']);
             $entityClass    = $fieldType->getEntityClass();
             $customFieldRef = $this->entityManager->getReference(CustomField::class, (int) $row['custom_field_id']);
-            $customFieldRef->setType($fieldType);
+            $customFieldRef->setTypeObject($fieldType);
             $customFieldValueRef = $this->entityManager->getReference($entityClass, ['customField' => $customFieldRef, 'customItem' => $customItem]);
             $customFieldValueRef->setValue($row['value']);
             $customFieldValueRef->updateThisEntityManually();
@@ -107,7 +101,7 @@ class CustomFieldValueModel
      *
      * @param CustomFieldValueInterface $customFieldValue
      */
-    public function save(CustomFieldValueInterface $customFieldValue)
+    public function save(CustomFieldValueInterface $customFieldValue): void
     {
         if ($customFieldValue->shouldBeUpdatedManually()) {
             $this->updateManually($customFieldValue);
@@ -120,7 +114,7 @@ class CustomFieldValueModel
     /**
      * @param CustomFieldValueInterface $customFieldValue
      */
-    public function updateManually(CustomFieldValueInterface $customFieldValue)
+    public function updateManually(CustomFieldValueInterface $customFieldValue): void
     {
         $fieldType    = $customFieldValue->getCustomField()->getTypeObject();
         $queryBuilder = $this->entityManager->createQueryBuilder();
@@ -133,17 +127,5 @@ class CustomFieldValueModel
             ->setParameter('customItemId', (int) $customFieldValue->getCustomItem()->getId());
         $query = $queryBuilder->getQuery();
         $query->execute();
-    }
-
-    /**
-     * Create unique table alias for field type.
-     *
-     * @param CustomFieldTypeInterface $fieldType
-     * 
-     * @return string
-     */
-    private function getAlias(CustomFieldTypeInterface $fieldType): string
-    {
-        return "cfv{$fieldType->getKey()}";
     }
 }

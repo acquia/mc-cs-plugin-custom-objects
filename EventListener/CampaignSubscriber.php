@@ -14,9 +14,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use MauticPlugin\CustomObjectsBundle\CustomObjectsBundle;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
@@ -24,7 +21,6 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CampaignActionLinkType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CampaignConditionFieldValueType;
@@ -34,6 +30,11 @@ use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 
 class CampaignSubscriber extends CommonSubscriber
 {
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
     /**
      * @var CustomFieldModel
      */
@@ -55,17 +56,11 @@ class CampaignSubscriber extends CommonSubscriber
     private $configProvider;
 
     /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     *
-     * @param CustomFieldModel $customFieldModel
-     * @param CustomObjectModel $customObjectModel
-     * @param CustomItemModel $customItemModel
+     * @param CustomFieldModel    $customFieldModel
+     * @param CustomObjectModel   $customObjectModel
+     * @param CustomItemModel     $customItemModel
      * @param TranslatorInterface $translator
-     * @param ConfigProvider $configProvider
+     * @param ConfigProvider      $configProvider
      */
     public function __construct(
         CustomFieldModel $customFieldModel,
@@ -73,8 +68,7 @@ class CampaignSubscriber extends CommonSubscriber
         CustomItemModel $customItemModel,
         TranslatorInterface $translator,
         ConfigProvider $configProvider
-    )
-    {
+    ) {
         $this->customFieldModel  = $customFieldModel;
         $this->customObjectModel = $customObjectModel;
         $this->customItemModel   = $customItemModel;
@@ -83,7 +77,7 @@ class CampaignSubscriber extends CommonSubscriber
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public static function getSubscribedEvents(): array
     {
@@ -148,7 +142,7 @@ class CampaignSubscriber extends CommonSubscriber
             $this->customItemModel->linkContact($linkCustomItemId, $contactId);
         }
 
-        if ($unlinkCustomItemId ) {
+        if ($unlinkCustomItemId) {
             $this->customItemModel->unlinkContact($unlinkCustomItemId, $contactId);
         }
     }
@@ -161,7 +155,7 @@ class CampaignSubscriber extends CommonSubscriber
         if (!$this->configProvider->pluginIsEnabled()) {
             return;
         }
-        
+
         if (!preg_match('/custom_item.(\d*).fieldvalue/', $event->getEvent()['type'])) {
             return;
         }
@@ -189,7 +183,7 @@ class CampaignSubscriber extends CommonSubscriber
                 $customField->getTypeObject()->getOperators()[$event->getConfig()['operator']]['expr'],
                 $event->getConfig()['value']
             );
-            
+
             $event->setChannel('customItem', $customItemId);
             $event->setResult(true);
         } catch (NotFoundException $e) {

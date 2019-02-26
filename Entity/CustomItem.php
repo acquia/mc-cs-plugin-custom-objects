@@ -18,17 +18,11 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
-use DateTimeInterface;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\FormEntity;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
-use MauticPlugin\CustomObjectsBundle\Entity\UniqueEntityInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Iterator\CustomFieldValues;
 use Doctrine\Common\Collections\ArrayCollection;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCompany;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
+use Doctrine\Common\Collections\Collection;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 
@@ -65,7 +59,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     private $customFieldValues;
 
     /**
-     * @var array
+     * @var mixed[]
      */
     private $initialCustomFieldValues = [];
 
@@ -79,11 +73,6 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     private $companyReferences;
 
-    public function __clone()
-    {
-        $this->id = null;
-    }
-
     /**
      * @param CustomObject $customObject
      */
@@ -93,6 +82,11 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         $this->customFieldValues = new ArrayCollection();
         $this->contactReferences = new ArrayCollection();
         $this->companyReferences = new ArrayCollection();
+    }
+
+    public function __clone()
+    {
+        $this->id = null;
     }
 
     /**
@@ -140,7 +134,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @return int|null
      */
-    public function getId()
+    public function getId(): ?int
     {
         return (int) $this->id;
     }
@@ -148,7 +142,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $name
      */
-    public function setName($name)
+    public function setName(?string $name): void
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -157,7 +151,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @return string|null
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -165,7 +159,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @return CustomObject
      */
-    public function getCustomObject()
+    public function getCustomObject(): CustomObject
     {
         return $this->customObject;
     }
@@ -173,7 +167,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @return Category|null
      */
-    public function getCategory()
+    public function getCategory(): ?Category
     {
         return $this->category;
     }
@@ -181,16 +175,16 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @param Category|null $category
      */
-    public function setCategory(?Category $category)
+    public function setCategory(?Category $category): void
     {
-        $this->isChanged('category', ($category) ? $category->getId() : null);
+        $this->isChanged('category', $category ? $category->getId() : null);
         $this->category = $category;
     }
 
     /**
      * @return string
      */
-    public function getLanguage()
+    public function getLanguage(): string
     {
         return $this->language;
     }
@@ -198,7 +192,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $language
      */
-    public function setLanguage(?string $language)
+    public function setLanguage(?string $language): void
     {
         $this->isChanged('language', $language);
         $this->language = $language;
@@ -207,7 +201,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @param CustomFieldValueInterface $customFieldValue
      */
-    public function addCustomFieldValue(CustomFieldValueInterface $customFieldValue)
+    public function addCustomFieldValue(CustomFieldValueInterface $customFieldValue): void
     {
         if (null === $this->customFieldValues) {
             $this->customFieldValues = new ArrayCollection();
@@ -219,7 +213,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @param ArrayCollection $customFieldValues
      */
-    public function setCustomFieldValues(ArrayCollection $customFieldValues)
+    public function setCustomFieldValues(ArrayCollection $customFieldValues): void
     {
         $this->customFieldValues = $customFieldValues;
     }
@@ -227,7 +221,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * Called when the custom field values are loaded from the database.
      */
-    public function createFieldValuesSnapshot()
+    public function createFieldValuesSnapshot(): void
     {
         foreach ($this->customFieldValues as $customFieldValue) {
             $this->initialCustomFieldValues[$customFieldValue->getCustomField()->getId()] = $customFieldValue->getValue();
@@ -237,14 +231,14 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * Called before CustomItemSave. It will record changes that happened for custom field values.
      */
-    public function recordCustomFieldValueChanges()
+    public function recordCustomFieldValueChanges(): void
     {
         foreach ($this->customFieldValues as $customFieldValue) {
             $customFieldId = $customFieldValue->getCustomField()->getId();
             $initialValue  = ArrayHelper::getValue($customFieldId, $this->initialCustomFieldValues);
             $newValue      = $customFieldValue->getValue();
 
-            if ($initialValue != $newValue) {
+            if ($initialValue !== $newValue) {
                 $this->addChange("customfieldvalue:{$customFieldId}", [$initialValue, $newValue]);
             }
         }
@@ -253,23 +247,23 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @return ArrayCollection
      */
-    public function getCustomFieldValues()
+    public function getCustomFieldValues(): ArrayCollection
     {
         if (null === $this->customFieldValues) {
             $this->customFieldValues = new ArrayCollection();
         }
-        
+
         return $this->customFieldValues;
     }
 
     /**
      * @param int $customFieldId
-     * 
+     *
      * @return CustomFieldValueInterface
-     * 
+     *
      * @throws NotFoundException
      */
-    public function findCustomFieldValueForFieldId(int $customFieldId)
+    public function findCustomFieldValueForFieldId(int $customFieldId): CustomFieldValueInterface
     {
         $customFieldValue = $this->customFieldValues->get($customFieldId);
 
@@ -283,16 +277,32 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @param CustomItemXrefContact $reference
      */
-    public function addContactReference(CustomItemXrefContact $reference)
+    public function addContactReference(CustomItemXrefContact $reference): void
     {
         $this->contactReferences->add($reference);
     }
 
     /**
-     * @return ArrayCollection
+     * @return Collection
      */
-    public function getContactReferences()
+    public function getContactReferences(): Collection
     {
         return $this->contactReferences;
+    }
+
+    /**
+     * @param CustomItemXrefCompany $reference
+     */
+    public function addCompanyReference(CustomItemXrefCompany $reference): void
+    {
+        $this->companyReferences->add($reference);
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getCompanyReferences(): Collection
+    {
+        return $this->companyReferences;
     }
 }

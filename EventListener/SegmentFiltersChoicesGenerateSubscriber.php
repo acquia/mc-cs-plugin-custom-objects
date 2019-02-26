@@ -25,9 +25,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 
 /**
- * SegmentFiltersChoicesGenerateSubscriber
- *
- * @package MauticPlugin\CustomObjectsBundle\EventListener
+ * SegmentFiltersChoicesGenerateSubscriber.
  */
 class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterface
 {
@@ -49,8 +47,6 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
     private $configProvider;
 
     /**
-     * SegmentFiltersChoicesGenerateSubscriber constructor.
-     *
      * @param CustomObjectRepository $customObjectRepository
      * @param TranslatorInterface    $translator
      * @param ConfigProvider         $configProvider
@@ -59,15 +55,14 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
         CustomObjectRepository $customObjectRepository,
         TranslatorInterface $translator,
         ConfigProvider $configProvider
-    )
-    {
+    ) {
         $this->customObjectRepository = $customObjectRepository;
         $this->translator             = $translator;
         $this->configProvider         = $configProvider;
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public static function getSubscribedEvents(): array
     {
@@ -86,12 +81,12 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
         $criteria = new Criteria(Criteria::expr()->eq('isPublished', 1));
 
         $this->customObjectRepository->matching($criteria)->map(
-            function (CustomObject $customObject) use ($event) {
+            function (CustomObject $customObject) use ($event): void {
                 $event->addChoice(
                     'custom_object',
-                    'cmo_' . $customObject->getId(),
+                    'cmo_'.$customObject->getId(),
                     [
-                        'label'      => $customObject->getName() . " " . $this->translator->trans('custom.item.name.label'),
+                        'label'      => $customObject->getName().' '.$this->translator->trans('custom.item.name.label'),
                         'properties' => ['type' => 'text'],
                         'operators'  => $this->getOperatorsForFieldType('text'),
                         'object'     => $customObject->getId(),
@@ -101,15 +96,15 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
                 foreach ($customObject->getCustomFields()->getIterator() as $customField) {
                     $event->addChoice(
                         'custom_object',
-                        'cmf_' . $customField->getId(),
+                        'cmf_'.$customField->getId(),
                         [
-                            'label'      => $customField->getCustomObject()->getName() . " : " . $customField->getLabel(),
+                            'label'      => $customField->getCustomObject()->getName().' : '.$customField->getLabel(),
                             'properties' => ['type' => $customField->getType()],
                             'operators'  => $customField->getTypeObject()->getOperators(),
                             'object'     => $customField->getId(),
                         ]
                     );
-                };
+                }
             }
         );
     }

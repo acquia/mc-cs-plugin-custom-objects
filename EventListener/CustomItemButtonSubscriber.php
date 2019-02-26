@@ -26,6 +26,11 @@ use Symfony\Component\Translation\TranslatorInterface;
 class CustomItemButtonSubscriber extends CommonSubscriber
 {
     /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
      * @var CustomItemPermissionProvider
      */
     private $permissionProvider;
@@ -36,30 +41,24 @@ class CustomItemButtonSubscriber extends CommonSubscriber
     private $routeProvider;
 
     /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
      * @param CustomItemPermissionProvider $permissionProvider
-     * @param CustomItemRouteProvider $routeProvider
-     * @param TranslatorInterface $translator
+     * @param CustomItemRouteProvider      $routeProvider
+     * @param TranslatorInterface          $translator
      */
     public function __construct(
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider,
         TranslatorInterface $translator
-    )
-    {
+    ) {
         $this->permissionProvider = $permissionProvider;
         $this->routeProvider      = $routeProvider;
         $this->translator         = $translator;
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS => ['injectViewButtons', 0],
@@ -69,7 +68,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
     /**
      * @param CustomButtonEvent $event
      */
-    public function injectViewButtons(CustomButtonEvent $event)
+    public function injectViewButtons(CustomButtonEvent $event): void
     {
         switch ($event->getRoute()) {
             case CustomItemRouteProvider::ROUTE_LIST:
@@ -103,15 +102,15 @@ class CustomItemButtonSubscriber extends CommonSubscriber
                             ButtonHelper::LOCATION_PAGE_ACTIONS,
                             $event->getRoute()
                         );
-                        $location = $event->getLocation();
-                        $route = $event->getRoute();
                         $event->addButton(
                             $this->defineBatchDeleteButton($customObjectId),
                             ButtonHelper::LOCATION_BULK_ACTIONS,
                             $event->getRoute()
                         );
                     }
-                } catch (ForbiddenException $e) {}
+                } catch (ForbiddenException $e) {
+                }
+
                 break;
 
             case CustomItemRouteProvider::ROUTE_VIEW:
@@ -121,6 +120,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
                     ButtonHelper::LOCATION_PAGE_ACTIONS,
                     $event->getRoute()
                 );
+
                 break;
         }
     }
@@ -129,31 +129,35 @@ class CustomItemButtonSubscriber extends CommonSubscriber
      * @param CustomButtonEvent $event
      * @param string            $location
      */
-    private function addEntityButtons(CustomButtonEvent $event, $location): void
+    private function addEntityButtons(CustomButtonEvent $event, string $location): void
     {
         $customItem = $event->getItem();
         if ($customItem && $customItem instanceof CustomItem) {
             $customObjectId = $this->getCustomObjectIdFromEvent($event);
+
             try {
                 $event->addButton($this->defineDeleteButton($customObjectId, $customItem), $location, $event->getRoute());
-            } catch (ForbiddenException $e) {}
+            } catch (ForbiddenException $e) {
+            }
 
             try {
                 $event->addButton($this->defineCloneButton($customObjectId, $customItem), $location, $event->getRoute());
-            } catch (ForbiddenException $e) {}
+            } catch (ForbiddenException $e) {
+            }
 
             try {
                 $event->addButton($this->defineEditButton($customObjectId, $customItem), $location, $event->getRoute());
-            } catch (ForbiddenException $e) {}
+            } catch (ForbiddenException $e) {
+            }
         }
     }
 
     /**
      * @param int        $customObjectId
      * @param CustomItem $customItem
-     * 
-     * @return array
-     * 
+     *
+     * @return mixed[]
+     *
      * @throws ForbiddenException
      */
     private function defineEditButton(int $customObjectId, CustomItem $customItem): array
@@ -172,17 +176,17 @@ class CustomItemButtonSubscriber extends CommonSubscriber
 
     /**
      * @param int $customObjectId
-     * 
-     * @return array
+     *
+     * @return mixed[]
      */
     private function defineCloseButton(int $customObjectId): array
     {
         return [
             'attr' => [
-                'href' => $this->routeProvider->buildListRoute($customObjectId),
+                'href'  => $this->routeProvider->buildListRoute($customObjectId),
                 'class' => 'btn btn-default',
             ],
-            'class' => 'btn btn-default',
+            'class'     => 'btn btn-default',
             'btnText'   => 'mautic.core.form.close',
             'iconClass' => 'fa fa-fw fa-remove',
             'priority'  => 400,
@@ -192,9 +196,9 @@ class CustomItemButtonSubscriber extends CommonSubscriber
     /**
      * @param int        $customObjectId
      * @param CustomItem $customItem
-     * 
-     * @return array
-     * 
+     *
+     * @return mixed[]
+     *
      * @throws ForbiddenException
      */
     private function defineCloneButton(int $customObjectId, CustomItem $customItem): array
@@ -214,14 +218,14 @@ class CustomItemButtonSubscriber extends CommonSubscriber
     /**
      * @param int        $customObjectId
      * @param CustomItem $customItem
-     * 
-     * @return array
-     * 
+     *
+     * @return mixed[]
+     *
      * @throws ForbiddenException
      */
     private function defineDeleteButton(int $customObjectId, CustomItem $customItem): array
     {
-        $this->permissionProvider->canDelete($customItem);        
+        $this->permissionProvider->canDelete($customItem);
 
         return [
             'attr' => [
@@ -235,14 +239,14 @@ class CustomItemButtonSubscriber extends CommonSubscriber
 
     /**
      * @param int $customObjectId
-     * 
-     * @return array
-     * 
+     *
+     * @return mixed[]
+     *
      * @throws ForbiddenException
      */
     private function defineNewButton(int $customObjectId): array
     {
-        $this->permissionProvider->canCreate($customObjectId);        
+        $this->permissionProvider->canCreate($customObjectId);
 
         return [
             'attr' => [
@@ -258,19 +262,19 @@ class CustomItemButtonSubscriber extends CommonSubscriber
      * @param int $customObjectId
      * @param int $customItemId
      * @param int $contactId
-     * 
-     * @return array
-     * 
+     *
+     * @return mixed[]
+     *
      * @throws ForbiddenException
      */
     private function defineUnlinkContactButton(int $customObjectId, int $customItemId, int $contactId): array
     {
-        $this->permissionProvider->canCreate($customObjectId);        
+        $this->permissionProvider->canCreate($customObjectId);
 
         return [
             'attr' => [
                 'href'        => '#',
-                'onclick'     => "CustomObjects.unlinkFromContact(this, event, $customObjectId, $contactId);",
+                'onclick'     => "CustomObjects.unlinkFromContact(this, event, ${customObjectId}, ${contactId});",
                 'data-action' => $this->routeProvider->buildUnlinkContactRoute($customItemId, $contactId),
                 'data-toggle' => '',
             ],
@@ -282,14 +286,14 @@ class CustomItemButtonSubscriber extends CommonSubscriber
 
     /**
      * @param int $customObjectId
-     * 
-     * @return array
-     * 
+     *
+     * @return mixed[]
+     *
      * @throws ForbiddenException
      */
     private function defineImportNewButton(int $customObjectId): array
     {
-        $this->permissionProvider->canCreate($customObjectId);        
+        $this->permissionProvider->canCreate($customObjectId);
 
         return [
             'attr' => [
@@ -303,14 +307,14 @@ class CustomItemButtonSubscriber extends CommonSubscriber
 
     /**
      * @param int $customObjectId
-     * 
-     * @return array
-     * 
+     *
+     * @return mixed[]
+     *
      * @throws ForbiddenException
      */
     private function defineImportListButton(int $customObjectId): array
     {
-        $this->permissionProvider->canCreate($customObjectId);        
+        $this->permissionProvider->canCreate($customObjectId);
 
         return [
             'attr' => [
@@ -324,9 +328,9 @@ class CustomItemButtonSubscriber extends CommonSubscriber
 
     /**
      * @param int $customObjectId
-     * 
-     * @return array
-     * 
+     *
+     * @return mixed[]
+     *
      * @throws ForbiddenException
      */
     private function defineBatchDeleteButton(int $customObjectId): array
@@ -345,12 +349,12 @@ class CustomItemButtonSubscriber extends CommonSubscriber
 
     /**
      * @param CustomButtonEvent $event
-     * 
+     *
      * @return int
      */
     private function getCustomObjectIdFromEvent(CustomButtonEvent $event): int
     {
-        list($route, $routeParams) = $event->getRoute(true);
+        [, $routeParams] = $event->getRoute(true);
 
         return (int) $routeParams['objectId'];
     }

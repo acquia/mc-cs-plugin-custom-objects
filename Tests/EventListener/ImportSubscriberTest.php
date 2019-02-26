@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -20,23 +22,33 @@ use Mautic\LeadBundle\Event\ImportMappingEvent;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 
 class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     private $customObjectModel;
+
     private $customItemImportModel;
+
+    private $permissionProvider;
+
     private $configProvider;
+
     private $importInitEvent;
+
     private $importMappingEvent;
+
     private $importProcessEvent;
+
     private $importSubscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->customObjectModel     = $this->createMock(CustomObjectModel::class);
         $this->customItemImportModel = $this->createMock(CustomItemImportModel::class);
+        $this->permissionProvider    = $this->createMock(CustomItemPermissionProvider::class);
         $this->configProvider        = $this->createMock(ConfigProvider::class);
         $this->importInitEvent       = $this->createMock(ImportInitEvent::class);
         $this->importMappingEvent    = $this->createMock(ImportMappingEvent::class);
@@ -44,11 +56,12 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->importSubscriber      = new ImportSubscriber(
             $this->customObjectModel,
             $this->customItemImportModel,
-            $this->configProvider
+            $this->configProvider,
+            $this->permissionProvider
         );
     }
 
-    public function testPluginDisabledForImportInit()
+    public function testPluginDisabledForImportInit(): void
     {
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
@@ -56,11 +69,11 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->importInitEvent->expects($this->never())
             ->method('getRouteObjectName');
-        
+
         $this->importSubscriber->onImportInit($this->importInitEvent);
     }
 
-    public function testImportInit()
+    public function testImportInit(): void
     {
         $customObject = $this->createMock(CustomObject::class);
 
@@ -101,11 +114,11 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->importInitEvent->expects($this->once())
             ->method('stopPropagation');
-        
+
         $this->importSubscriber->onImportInit($this->importInitEvent);
     }
 
-    public function testPluginDisabledForFieldMapping()
+    public function testPluginDisabledForFieldMapping(): void
     {
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
@@ -113,11 +126,11 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->importInitEvent->expects($this->never())
             ->method('getRouteObjectName');
-        
+
         $this->importSubscriber->onFieldMapping($this->importMappingEvent);
     }
 
-    public function testPluginDisabledForImportProcess()
+    public function testPluginDisabledForImportProcess(): void
     {
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
@@ -125,7 +138,7 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->importProcessEvent->expects($this->never())
             ->method('getImport');
-        
+
         $this->importSubscriber->onImportProcess($this->importProcessEvent);
     }
 }

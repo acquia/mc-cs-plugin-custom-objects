@@ -36,8 +36,6 @@ class CustomObjectType extends AbstractType
     private $customFieldTypeProvider;
 
     /**
-     * CustomObjectType constructor.
-     *
      * @param CustomFieldTypeProvider $customFieldTypeProvider
      */
     public function __construct(CustomFieldTypeProvider $customFieldTypeProvider)
@@ -47,9 +45,9 @@ class CustomObjectType extends AbstractType
 
     /**
      * @param FormBuilderInterface $builder
-     * @param array                $options
+     * @param mixed[]              $options
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'namePlural',
@@ -96,13 +94,13 @@ class CustomObjectType extends AbstractType
         $builder->add('customFields',
             CollectionType::class,
             [
-                'entry_type' => CustomFieldType::class,
-                'entry_options' => ['custom_object_form' => true],
+                'entry_type'         => CustomFieldType::class,
+                'entry_options'      => ['custom_object_form' => true],
                 'allow_extra_fields' => true,
-                'allow_add' => true,
-                'allow_delete' => true,
-                'by_reference' => false,
-                'prototype' => false, // Do not use CF panel prototype in DOM
+                'allow_add'          => true,
+                'allow_delete'       => true,
+                'by_reference'       => false,
+                'prototype'          => false, // Do not use CF panel prototype in DOM
             ]
         );
 
@@ -117,7 +115,20 @@ class CustomObjectType extends AbstractType
         $builder->setAction($options['action']);
 
         $this->addEvents($builder);
+    }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function setDefaultOptions(OptionsResolverInterface $resolver): void
+    {
+        $resolver->setDefaults(
+            [
+                'data_class'         => CustomObject::class,
+                'allow_extra_fields' => true,
+                'csrf_protection'    => false,
+            ]
+        );
     }
 
     /**
@@ -125,34 +136,22 @@ class CustomObjectType extends AbstractType
      */
     private function addEvents(FormBuilderInterface $builder): void
     {
-        $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) {
+        $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event): void {
             /** @var CustomObject $customObject */
             $customObject = $event->getData();
-            if (!$customFields = $customObject->getCustomFields()) {
+            $customFields = $customObject->getCustomFields();
+
+            if (!$customFields) {
                 return;
             }
 
             /** @var CustomField $customField */
-            foreach($customFields as $customField) {
+            foreach ($customFields as $customField) {
                 if (!$customField->getTypeObject()) {
                     // Should not happen. Every CF MUST HAVE type object.
                     $customField->setTypeObject($this->customFieldTypeProvider->getType($customField->getType()));
                 }
             }
         });
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
-    {
-        $resolver->setDefaults(
-            [
-                'data_class' => CustomObject::class,
-                'allow_extra_fields' => true,
-                'csrf_protection'   => false,
-            ]
-        );
     }
 }

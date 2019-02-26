@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -19,11 +21,14 @@ use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 class AssetsSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     private $assetsHelper;
+
     private $configProvider;
+
     private $getResponseEvent;
+
     private $assetsSubscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -33,7 +38,7 @@ class AssetsSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assetsSubscriber = new AssetsSubscriber($this->assetsHelper, $this->configProvider);
     }
 
-    public function testPluginDisabled()
+    public function testPluginDisabled(): void
     {
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
@@ -41,23 +46,23 @@ class AssetsSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->getResponseEvent->expects($this->never())
             ->method('isMasterRequest');
-        
+
         $this->assetsHelper->expects($this->never())
             ->method('addStylesheet');
 
         $this->assetsSubscriber->loadAssets($this->getResponseEvent);
     }
 
-    public function testPluginEnabled()
+    public function testPluginEnabled(): void
     {
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
             ->willReturn(true);
-        
+
         $this->getResponseEvent->expects($this->once())
             ->method('isMasterRequest')
             ->willReturn(true);
-        
+
         $this->assetsHelper->expects($this->once())
             ->method('addStylesheet');
 

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\DTO;
 
-use MauticPlugin\CustomObjectsBundle\DTO\TableFilterConfig;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use Doctrine\ORM\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Helper\TableQueryBuilder;
@@ -42,15 +41,15 @@ class TableConfig
     private $orderDirection;
 
     /**
-     * @var array
+     * @var mixed[]
      */
     private $filters = [];
 
     /**
-     * @param integer $limit
-     * @param integer $page
-     * @param string  $orderBy
-     * @param string  $orderDirection
+     * @param int    $limit
+     * @param int    $page
+     * @param string $orderBy
+     * @param string $orderDirection
      */
     public function __construct(int $limit, int $page, string $orderBy, string $orderDirection = 'ASC')
     {
@@ -77,17 +76,17 @@ class TableConfig
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getOffset(): int
     {
-        $offset = ($this->page === 1) ? 0 : (($this->page - 1) * $this->limit);
-        
+        $offset = 1 === $this->page ? 0 : (($this->page - 1) * $this->limit);
+
         return $offset < 0 ? 0 : $offset;
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getLimit(): int
     {
@@ -122,7 +121,7 @@ class TableConfig
      * @param string $columnName
      * @param mixed  $value
      * @param string $expression
-     * 
+     *
      * @return TableFilterConfig
      */
     public function createFilter(string $entityName, string $columnName, $value, string $expression = 'eq'): TableFilterConfig
@@ -132,7 +131,7 @@ class TableConfig
 
     /**
      * Checks if the filter value is not empty before adding the filter.
-     * 
+     *
      * @param string $entityName
      * @param string $columnName
      * @param mixed  $value
@@ -141,7 +140,7 @@ class TableConfig
     public function addFilterIfNotEmpty(string $entityName, string $columnName, $value, string $expression = 'eq'): void
     {
         // Remove SQL wild cards for NOT/LIKE:
-        if (in_array($expression, ['like', 'notLike']) && is_string($value)) {
+        if (in_array($expression, ['like', 'notLike'], true) && is_string($value)) {
             $trimmedValue = trim($value, '%');
         } else {
             $trimmedValue = $value;
@@ -163,9 +162,9 @@ class TableConfig
     /**
      * @param string $entityName
      * @param string $columnName
-     * 
+     *
      * @return TableFilterConfig
-     * 
+     *
      * @throws NotFoundException
      */
     public function getFilter(string $entityName, string $columnName): TableFilterConfig
@@ -186,8 +185,8 @@ class TableConfig
     /**
      * @param string $entityName
      * @param string $columnName
-     * 
-     * @return boolean
+     *
+     * @return bool
      */
     public function hasFilter(string $entityName, string $columnName): bool
     {
@@ -196,15 +195,14 @@ class TableConfig
 
             return true;
         } catch (NotFoundException $e) {
-
             return false;
         }
     }
 
     /**
-     * @param QueryBuilder $queryBuilder
+     * @param QueryBuilder  $queryBuilder
      * @param ClassMetadata $metadata
-     * 
+     *
      * @return QueryBuilder
      */
     public function configureSelectQueryBuilder(QueryBuilder $queryBuilder, ClassMetadata $metadata): QueryBuilder
@@ -215,9 +213,9 @@ class TableConfig
     }
 
     /**
-     * @param QueryBuilder $queryBuilder
+     * @param QueryBuilder  $queryBuilder
      * @param ClassMetadata $metadata
-     * 
+     *
      * @return QueryBuilder
      */
     public function configureCountQueryBuilder(QueryBuilder $queryBuilder, ClassMetadata $metadata): QueryBuilder
