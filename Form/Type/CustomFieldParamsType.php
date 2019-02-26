@@ -26,6 +26,7 @@ class CustomFieldParamsType extends AbstractType
             TextType::class,
             [
                 'label' => 'custom.field.label.required_validation_message',
+                'required'   => false,
             ]
         );
     }

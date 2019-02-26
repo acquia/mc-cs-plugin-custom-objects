@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use MauticPlugin\CustomObjectsBundle\Form\CustomObjectHiddenTransformer;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -150,6 +151,13 @@ class CustomFieldType extends AbstractType
             );
         });
 
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event): void {
+            /** @var CustomField $customField */
+            $customField = $event->getData();
+            $customField->setParams((array) $customField->getParamsObject());
+            $event->setData($customField);
+        });
+
         $builder->add(
             'buttons',
             FormButtonsType::class,
@@ -194,6 +202,24 @@ class CustomFieldType extends AbstractType
         $builder->add('label', HiddenType::class);
         $builder->add('required', HiddenType::class);
         $builder->add('defaultValue', HiddenType::class);
+        $builder->add(
+            'params',
+            HiddenType::class
+        );
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
+            /** @var CustomField $customField */
+            $customField = $event->getData();
+            $builder = $event->getForm();
+
+            $builder->add(
+                'params',
+                HiddenType::class,
+                [
+                    'data' => json_encode((array) $customField->getParamsObject()),
+                ]
+            );
+        });
 
         // Possibility to mark field as deleted in POST data
         $builder->add('deleted', HiddenType::class, ['mapped' => false]);
