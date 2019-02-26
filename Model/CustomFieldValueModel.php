@@ -39,8 +39,7 @@ class CustomFieldValueModel
     public function __construct(
         EntityManager $entityManager,
         CustomFieldTypeProvider $customFieldTypeProvider
-    )
-    {
+    ) {
         $this->entityManager           = $entityManager;
         $this->customFieldTypeProvider = $customFieldTypeProvider;
     }

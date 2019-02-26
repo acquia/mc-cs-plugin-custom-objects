@@ -41,7 +41,7 @@ class CustomItemImportModel extends FormModel
     private $formatterHelper;
 
     /**
-     * @param EntityManager $entityManager
+     * @param EntityManager   $entityManager
      * @param CustomItemModel $customItemModel
      * @param FormatterHelper $formatterHelper
      */
@@ -49,19 +49,18 @@ class CustomItemImportModel extends FormModel
         EntityManager $entityManager,
         CustomItemModel $customItemModel,
         FormatterHelper $formatterHelper
-    )
-    {
+    ) {
         $this->entityManager        = $entityManager;
         $this->customItemModel      = $customItemModel;
         $this->formatterHelper      = $formatterHelper;
     }
 
     /**
-     * @param Import $import
-     * @param array $rowData
+     * @param Import       $import
+     * @param array        $rowData
      * @param CustomObject $customObject
      *
-     * @return boolean updated = true, inserted = false
+     * @return bool updated = true, inserted = false
      */
     public function import(Import $import, array $rowData, CustomObject $customObject): bool
     {
@@ -75,17 +74,19 @@ class CustomItemImportModel extends FormModel
         foreach ($matchedFields as $csvField => $customFieldId) {
             $csvValue = $rowData[$csvField];
 
-            if (strcasecmp('linkedContactIds', $customFieldId) === 0) {
+            if (0 === strcasecmp('linkedContactIds', $customFieldId)) {
                 $contactIds = $this->formatterHelper->simpleCsvToArray($csvValue, 'int');
+
                 continue;
             }
 
-            if (strcasecmp('customItemName', $customFieldId) === 0) {
+            if (0 === strcasecmp('customItemName', $customFieldId)) {
                 $customItem->setName($csvValue);
+
                 continue;
             }
 
-            if (strcasecmp('customItemId', $customFieldId) === 0) {
+            if (0 === strcasecmp('customItemId', $customFieldId)) {
                 continue;
             }
 
@@ -108,9 +109,9 @@ class CustomItemImportModel extends FormModel
 
     /**
      * @param CustomObject $customObject
-     * @param CustomItem $customItem
-     * @param int $customFieldId
-     * @param mixed $csvValue
+     * @param CustomItem   $customItem
+     * @param int          $customFieldId
+     * @param mixed        $csvValue
      *
      * @return CustomFieldValueInterface
      */
@@ -131,7 +132,7 @@ class CustomItemImportModel extends FormModel
 
     /**
      * @param CustomItem $customItem
-     * @param array $contactIds
+     * @param array      $contactIds
      *
      * @return CustomItem
      */
@@ -145,7 +146,7 @@ class CustomItemImportModel extends FormModel
     }
 
     /**
-     * @param Import $import
+     * @param Import     $import
      * @param CustomItem $customItem
      *
      * @return CustomItem
@@ -162,9 +163,9 @@ class CustomItemImportModel extends FormModel
     }
 
     /**
-     * @param Import $import
+     * @param Import       $import
      * @param CustomObject $customObject
-     * @param array $rowData
+     * @param array        $rowData
      *
      * @return CustomItem
      */
@@ -178,11 +179,12 @@ class CustomItemImportModel extends FormModel
             true
         );
 
-        if ($idKey !== false) {
+        if (false !== $idKey) {
             try {
                 $customItem = $this->customItemModel->fetchEntity((int) $rowData[$idKey]);
                 $customItem = $this->customItemModel->populateCustomFields($customItem);
-            } catch (NotFoundException $e) {}
+            } catch (NotFoundException $e) {
+            }
         }
 
         return $customItem;

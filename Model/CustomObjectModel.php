@@ -129,7 +129,7 @@ class CustomObjectModel extends FormModel
     }
 
     /**
-     * @param integer $id
+     * @param int $id
      *
      * @return CustomObject
      *
@@ -139,7 +139,7 @@ class CustomObjectModel extends FormModel
     {
         $customObject = parent::getEntity($id);
 
-        if ($customObject === null) {
+        if (null === $customObject) {
             throw new NotFoundException("Custom Object with ID = {$id} was not found");
         }
 
@@ -179,11 +179,11 @@ class CustomObjectModel extends FormModel
 
     /**
      * @param CustomObject $customObject
-     * @param int $customFieldId
+     * @param int          $customFieldId
      */
     public function removeCustomFieldById(CustomObject $customObject, int $customFieldId): void
     {
-        foreach($customObject->getCustomFields() as $customField) {
+        foreach ($customObject->getCustomFields() as $customField) {
             if ($customField->getId() === $customFieldId) {
                 $customObject->removeCustomField($customField);
                 $this->customFieldModel->deleteEntity($customField);

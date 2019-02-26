@@ -44,18 +44,17 @@ class CustomFieldModel extends FormModel
     private $permissionProvider;
 
     /**
-     * @param EntityManager $entityManager
-     * @param CustomFieldRepository $customFieldRepository
+     * @param EntityManager                 $entityManager
+     * @param CustomFieldRepository         $customFieldRepository
      * @param CustomFieldPermissionProvider $permissionProvider
-     * @param UserHelper $userHelper
+     * @param UserHelper                    $userHelper
      */
     public function __construct(
         EntityManager $entityManager,
         CustomFieldRepository $customFieldRepository,
         CustomFieldPermissionProvider $permissionProvider,
         UserHelper $userHelper
-    )
-    {
+    ) {
         $this->entityManager          = $entityManager;
         $this->customFieldRepository  = $customFieldRepository;
         $this->permissionProvider     = $permissionProvider;
@@ -89,7 +88,7 @@ class CustomFieldModel extends FormModel
     }
 
     /**
-     * @param integer $id
+     * @param int $id
      *
      * @return CustomField
      *
@@ -99,7 +98,7 @@ class CustomFieldModel extends FormModel
     {
         $entity = parent::getEntity($id);
 
-        if ($entity === null) {
+        if (null === $entity) {
             throw new NotFoundException("Custom Field with ID = {$id} was not found");
         }
 

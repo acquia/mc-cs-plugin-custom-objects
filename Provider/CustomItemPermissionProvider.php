@@ -35,7 +35,7 @@ class CustomItemPermissionProvider
 
     /**
      * @param string $permission
-     * @param int $customObjectId
+     * @param int    $customObjectId
      *
      * @throws ForbiddenException
      */
@@ -47,7 +47,7 @@ class CustomItemPermissionProvider
     }
 
     /**
-     * @param string $permission
+     * @param string     $permission
      * @param CustomItem $entity
      *
      * @throws ForbiddenException
@@ -125,7 +125,7 @@ class CustomItemPermissionProvider
     }
 
     /**
-     * @param int $customObjectId
+     * @param int    $customObjectId
      * @param string $permission
      *
      * @return string

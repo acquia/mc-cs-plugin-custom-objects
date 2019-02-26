@@ -136,7 +136,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $namePlural
      */
-    public function setNamePlural($namePlural)
+    public function setNamePlural(?string $namePlural): void
     {
         $this->isChanged('namePlural', $namePlural);
         $this->namePlural = $namePlural;
@@ -153,7 +153,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $nameSingular
      */
-    public function setNameSingular($nameSingular)
+    public function setNameSingular(?string $nameSingular): void
     {
         $this->isChanged('nameSingular', $nameSingular);
         $this->nameSingular = $nameSingular;
@@ -170,7 +170,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $description
      */
-    public function setDescription($description)
+    public function setDescription(?string $description): void
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -195,7 +195,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param Category|null $category
      */
-    public function setCategory($category)
+    public function setCategory(?Category $category): void
     {
         $this->category = $category;
     }
@@ -211,7 +211,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $language
      */
-    public function setLanguage($language)
+    public function setLanguage(?string $language): void
     {
         $this->isChanged('language', $language);
         $this->language = $language;
@@ -220,7 +220,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param \MauticPlugin\CustomObjectsBundle\Entity\CustomField $customField
      */
-    public function addCustomField(CustomField $customField)
+    public function addCustomField(CustomField $customField): void
     {
         $customField->setCustomObject($this);
         $this->customFields->add($customField);
@@ -229,7 +229,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param \MauticPlugin\CustomObjectsBundle\Entity\CustomField $customField
      */
-    public function removeCustomField(CustomField $customField)
+    public function removeCustomField(CustomField $customField): void
     {
         $this->customFields->removeElement($customField);
         $customField->setCustomObject();
@@ -246,7 +246,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * Called when the custom fields are loaded from the database.
      */
-    public function createFieldsSnapshot()
+    public function createFieldsSnapshot(): void
     {
         foreach ($this->customFields as $customField) {
             $this->initialCustomFields[$customField->getId()] = $customField->toArray();
@@ -256,7 +256,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * Called before CustomObjectSave. It will record changes that happened for custom fields.
      */
-    public function recordCustomFieldChanges()
+    public function recordCustomFieldChanges(): void
     {
         $existingFields = [];
         foreach ($this->customFields as $i => $customField) {

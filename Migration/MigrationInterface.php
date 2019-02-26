@@ -23,12 +23,12 @@ interface MigrationInterface
     public function isApplicable(): bool;
 
     /**
-     * Define migration up
+     * Define migration up.
      */
     public function up(): void;
 
     /**
-     * Execute migration if applicable
+     * Execute migration if applicable.
      */
     public function execute(): void;
 }

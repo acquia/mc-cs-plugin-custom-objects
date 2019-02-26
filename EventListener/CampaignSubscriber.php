@@ -56,11 +56,11 @@ class CampaignSubscriber extends CommonSubscriber
     private $configProvider;
 
     /**
-     * @param CustomFieldModel $customFieldModel
-     * @param CustomObjectModel $customObjectModel
-     * @param CustomItemModel $customItemModel
+     * @param CustomFieldModel    $customFieldModel
+     * @param CustomObjectModel   $customObjectModel
+     * @param CustomItemModel     $customItemModel
      * @param TranslatorInterface $translator
-     * @param ConfigProvider $configProvider
+     * @param ConfigProvider      $configProvider
      */
     public function __construct(
         CustomFieldModel $customFieldModel,
@@ -68,8 +68,7 @@ class CampaignSubscriber extends CommonSubscriber
         CustomItemModel $customItemModel,
         TranslatorInterface $translator,
         ConfigProvider $configProvider
-    )
-    {
+    ) {
         $this->customFieldModel  = $customFieldModel;
         $this->customObjectModel = $customObjectModel;
         $this->customItemModel   = $customItemModel;
@@ -143,7 +142,7 @@ class CampaignSubscriber extends CommonSubscriber
             $this->customItemModel->linkContact($linkCustomItemId, $contactId);
         }
 
-        if ($unlinkCustomItemId ) {
+        if ($unlinkCustomItemId) {
             $this->customItemModel->unlinkContact($unlinkCustomItemId, $contactId);
         }
     }

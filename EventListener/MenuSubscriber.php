@@ -34,7 +34,7 @@ class MenuSubscriber extends CommonSubscriber
 
     /**
      * @param CustomObjectModel $customObjectModel
-     * @param ConfigProvider $configProvider
+     * @param ConfigProvider    $configProvider
      */
     public function __construct(CustomObjectModel $customObjectModel, ConfigProvider $configProvider)
     {
@@ -61,7 +61,7 @@ class MenuSubscriber extends CommonSubscriber
             return;
         }
 
-        if ($event->getType() !== 'main') {
+        if ('main' !== $event->getType()) {
             return;
         }
 
@@ -92,7 +92,7 @@ class MenuSubscriber extends CommonSubscriber
                             'route'           => CustomItemRouteProvider::ROUTE_LIST,
                             'routeParameters' => ['objectId' => $customObject->getId(), 'page' => 1],
                             'access'          => "custom_objects:{$customObject->getId()}:view",
-                            'id'              => 'mautic_custom_object_' . $customObject->getId(),
+                            'id'              => 'mautic_custom_object_'.$customObject->getId(),
                             'parent'          => 'custom.object.title',
                         ],
                     ],

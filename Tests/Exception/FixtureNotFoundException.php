@@ -1,7 +1,9 @@
 <?php
+
 declare(strict_types=1);
 
 namespace  MauticPlugin\CustomObjectsBundle\Tests\Exception;
+
 /*
  * @copyright   2018 Mautic Inc. All rights reserved
  * @author      Mautic, Inc. Jan Kozak <galvani78@gmail.com>

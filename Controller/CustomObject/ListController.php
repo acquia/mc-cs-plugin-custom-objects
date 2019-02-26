@@ -53,12 +53,12 @@ class ListController extends CommonController
     private $routeProvider;
 
     /**
-     * @param RequestStack $requestStack
-     * @param Session $session
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param CustomObjectModel $customObjectModel
+     * @param RequestStack                   $requestStack
+     * @param Session                        $session
+     * @param CoreParametersHelper           $coreParametersHelper
+     * @param CustomObjectModel              $customObjectModel
      * @param CustomObjectPermissionProvider $permissionProvider
-     * @param CustomObjectRouteProvider $routeProvider
+     * @param CustomObjectRouteProvider      $routeProvider
      */
     public function __construct(
         RequestStack $requestStack,
@@ -67,8 +67,7 @@ class ListController extends CommonController
         CustomObjectModel $customObjectModel,
         CustomObjectPermissionProvider $permissionProvider,
         CustomObjectRouteProvider $routeProvider
-    )
-    {
+    ) {
         $this->requestStack         = $requestStack;
         $this->session              = $session;
         $this->coreParametersHelper = $coreParametersHelper;
@@ -102,7 +101,7 @@ class ListController extends CommonController
         if ($request->query->has('orderby')) {
             $orderBy    = InputHelper::clean($request->query->get('orderby'), true);
             $orderByDir = $this->session->get('mautic.custom.object.orderbydir', 'ASC');
-            $orderByDir = $orderByDir === 'ASC' ? 'DESC' : 'ASC';
+            $orderByDir = 'ASC' === $orderByDir ? 'DESC' : 'ASC';
             $this->session->set('mautic.custom.object.orderby', $orderBy);
             $this->session->set('mautic.custom.object.orderbydir', $orderByDir);
         }

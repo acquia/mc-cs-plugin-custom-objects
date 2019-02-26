@@ -32,7 +32,7 @@ class AssetsSubscriber extends CommonSubscriber
     private $configProvider;
 
     /**
-     * @param AssetsHelper $assetHelper
+     * @param AssetsHelper   $assetHelper
      * @param ConfigProvider $configProvider
      */
     public function __construct(AssetsHelper $assetHelper, ConfigProvider $configProvider)

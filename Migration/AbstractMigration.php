@@ -60,6 +60,7 @@ class AbstractMigration implements MigrationInterface
 
     /**
      * {@inheritdoc}
+     *
      * @throws \Doctrine\DBAL\DBALException
      */
     public function execute(): void
@@ -74,7 +75,7 @@ class AbstractMigration implements MigrationInterface
 
         $connection = $this->entityManager->getConnection();
 
-        foreach($this->queries as $sql) {
+        foreach ($this->queries as $sql) {
             $stmt = $connection->prepare($sql);
             $stmt->execute();
         }

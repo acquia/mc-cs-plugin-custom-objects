@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Helper;
 
-
 class RandomHelper
 {
     /**
@@ -22,7 +21,7 @@ class RandomHelper
     private $randomWords = [];
 
     /**
-     * @param integer $limit
+     * @param int $limit
      *
      * @return string
      */
@@ -30,7 +29,7 @@ class RandomHelper
     {
         $words = [];
 
-        for ($i = 1; $i <= $limit; $i++) {
+        for ($i = 1; $i <= $limit; ++$i) {
             $words[] = $this->getWord();
         }
 
@@ -56,7 +55,7 @@ class RandomHelper
     private function getRandomWords(): array
     {
         if (empty($this->randomWords)) {
-            $path              = __DIR__ . '/../Assets/json/mnemonic-words.json';
+            $path              = __DIR__.'/../Assets/json/mnemonic-words.json';
             $string            = \file_get_contents($path);
             $this->randomWords = \json_decode($string, true);
         }

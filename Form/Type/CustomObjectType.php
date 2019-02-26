@@ -117,7 +117,6 @@ class CustomObjectType extends AbstractType
         $builder->setAction($options['action']);
 
         $this->addEvents($builder);
-
     }
 
     /**
@@ -149,7 +148,7 @@ class CustomObjectType extends AbstractType
             }
 
             /** @var CustomField $customField */
-            foreach($customFields as $customField) {
+            foreach ($customFields as $customField) {
                 if (!$customField->getTypeObject()) {
                     // Should not happen. Every CF MUST HAVE type object.
                     $customField->setTypeObject($this->customFieldTypeProvider->getType($customField->getType()));

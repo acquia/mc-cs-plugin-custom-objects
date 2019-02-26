@@ -42,15 +42,14 @@ class CustomItemButtonSubscriber extends CommonSubscriber
 
     /**
      * @param CustomItemPermissionProvider $permissionProvider
-     * @param CustomItemRouteProvider $routeProvider
-     * @param TranslatorInterface $translator
+     * @param CustomItemRouteProvider      $routeProvider
+     * @param TranslatorInterface          $translator
      */
     public function __construct(
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider,
         TranslatorInterface $translator
-    )
-    {
+    ) {
         $this->permissionProvider = $permissionProvider;
         $this->routeProvider      = $routeProvider;
         $this->translator         = $translator;
@@ -109,7 +108,9 @@ class CustomItemButtonSubscriber extends CommonSubscriber
                             $event->getRoute()
                         );
                     }
-                } catch (ForbiddenException $e) {}
+                } catch (ForbiddenException $e) {
+                }
+
                 break;
 
             case CustomItemRouteProvider::ROUTE_VIEW:
@@ -119,6 +120,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
                     ButtonHelper::LOCATION_PAGE_ACTIONS,
                     $event->getRoute()
                 );
+
                 break;
         }
     }
@@ -132,17 +134,21 @@ class CustomItemButtonSubscriber extends CommonSubscriber
         $customItem = $event->getItem();
         if ($customItem && $customItem instanceof CustomItem) {
             $customObjectId = $this->getCustomObjectIdFromEvent($event);
+
             try {
                 $event->addButton($this->defineDeleteButton($customObjectId, $customItem), $location, $event->getRoute());
-            } catch (ForbiddenException $e) {}
+            } catch (ForbiddenException $e) {
+            }
 
             try {
                 $event->addButton($this->defineCloneButton($customObjectId, $customItem), $location, $event->getRoute());
-            } catch (ForbiddenException $e) {}
+            } catch (ForbiddenException $e) {
+            }
 
             try {
                 $event->addButton($this->defineEditButton($customObjectId, $customItem), $location, $event->getRoute());
-            } catch (ForbiddenException $e) {}
+            } catch (ForbiddenException $e) {
+            }
         }
     }
 

@@ -75,7 +75,7 @@ class FormController extends CommonController
         CustomObjectPermissionProvider $permissionProvider,
         CustomObjectRouteProvider $routeProvider,
         CustomFieldTypeProvider $customFieldTypeProvider
-    ){
+    ) {
         $this->formFactory             = $formFactory;
         $this->customObjectModel       = $customObjectModel;
         $this->customFieldModel        = $customFieldModel;
@@ -113,7 +113,7 @@ class FormController extends CommonController
             ['action' => $this->routeProvider->buildSaveRoute($objectId)]
         );
 
-        if ($request->getMethod() === Request::METHOD_POST) {
+        if (Request::METHOD_POST === $request->getMethod()) {
             //We need to see validation messages if POST was sent
             // Process all changes made with CFs to be visible
             $form->handleRequest($request);

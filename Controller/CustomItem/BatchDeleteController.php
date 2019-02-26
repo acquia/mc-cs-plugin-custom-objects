@@ -47,10 +47,10 @@ class BatchDeleteController extends CommonController
     private $permissionProvider;
 
     /**
-     * @param RequestStack $requestStack
-     * @param CustomItemModel $customItemModel
-     * @param Session $session
-     * @param TranslatorInterface $translator
+     * @param RequestStack                 $requestStack
+     * @param CustomItemModel              $customItemModel
+     * @param Session                      $session
+     * @param TranslatorInterface          $translator
      * @param CustomItemPermissionProvider $permissionProvider
      */
     public function __construct(
@@ -59,8 +59,7 @@ class BatchDeleteController extends CommonController
         Session $session,
         TranslatorInterface $translator,
         CustomItemPermissionProvider $permissionProvider
-    )
-    {
+    ) {
         $this->requestStack       = $requestStack;
         $this->customItemModel    = $customItemModel;
         $this->session            = $session;

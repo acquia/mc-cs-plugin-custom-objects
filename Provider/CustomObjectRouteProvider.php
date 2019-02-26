@@ -62,6 +62,7 @@ class CustomObjectRouteProvider
     public function buildSaveRoute(?int $id = null): string
     {
         $params = $id ? ['objectId' => $id] : [];
+
         return $this->router->generate(static::ROUTE_SAVE, $params);
     }
 
@@ -83,6 +84,7 @@ class CustomObjectRouteProvider
     public function buildFormRoute(?int $id = null): string
     {
         $params = $id ? ['objectId' => $id] : [];
+
         return $this->router->generate(static::ROUTE_FORM, $params);
     }
 

@@ -17,9 +17,7 @@ use MauticPlugin\CustomObjectsBundle\Tests\Exception\FixtureNotFoundException;
 use MauticPlugin\CustomObjectsBundle\Entity\UniqueEntityInterface;
 
 /**
- * Trait FixtureObjectsTrait implements Liip fixtures with Alice and offers helper methods for handling them
- *
- * @package MauticPlugin\CustomObjectsBundle\Tests\Segment\Query\Filter
+ * Trait FixtureObjectsTrait implements Liip fixtures with Alice and offers helper methods for handling them.
  */
 trait FixtureObjectsTrait
 {
@@ -34,7 +32,7 @@ trait FixtureObjectsTrait
     private $entityMap = [];
 
     /**
-     * The result of loadFixtureFiles should be passed here to initialize the thread
+     * The result of loadFixtureFiles should be passed here to initialize the thread.
      *
      * @param array $objects
      */
@@ -50,12 +48,13 @@ trait FixtureObjectsTrait
      * @param string $type
      *
      * @return CommonEntity[]
+     *
      * @throws FixtureNotFoundException
      */
     public function getFixturesByEntityClassName(string $type): array
     {
         if (!isset($this->objects[$type])) {
-            throw new FixtureNotFoundException('No fixtures of type ' . $type . ' defined');
+            throw new FixtureNotFoundException('No fixtures of type '.$type.' defined');
         }
 
         return $this->objects[$type];
@@ -66,6 +65,7 @@ trait FixtureObjectsTrait
      * @param int    $index
      *
      * @return CommonEntity
+     *
      * @throws FixtureNotFoundException
      */
     public function getFixtureByEntityClassNameAndIndex(string $type, int $index): CommonEntity
@@ -75,7 +75,7 @@ trait FixtureObjectsTrait
         $fixtures = array_values($fixtures);
 
         if (!isset($fixtures[$index])) {
-            throw new FixtureNotFoundException('No index "' . $index . '" defined of ' . $type . '\'s');
+            throw new FixtureNotFoundException('No index "'.$index.'" defined of '.$type.'\'s');
         }
 
         return $fixtures[$index];
@@ -85,12 +85,13 @@ trait FixtureObjectsTrait
      * @param string $id key specified in fixtures
      *
      * @return UniqueEntityInterface
+     *
      * @throws FixtureNotFoundException
      */
     public function getFixtureById(string $id): UniqueEntityInterface
     {
         if (!isset($this->entityMap[$id])) {
-            throw new FixtureNotFoundException('No fixture with id "' . $id . '"" defined');
+            throw new FixtureNotFoundException('No fixture with id "'.$id.'"" defined');
         }
 
         return $this->objects[$this->entityMap[$id]][$id];
@@ -108,6 +109,7 @@ trait FixtureObjectsTrait
         foreach ($orderedKeys as $key => $type) {
             $entities[$key] = $this->objects[$type][$key];
         }
+
         return $entities;
     }
 }

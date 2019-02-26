@@ -83,7 +83,7 @@ class FormController extends CommonController
         CustomFieldRouteProvider $fieldRouteProvider,
         CustomObjectModel $customObjectModel,
         CustomObjectRouteProvider $objectRouteProvider
-    ){
+    ) {
         $this->formFactory             = $formFactory;
         $this->customFieldModel        = $customFieldModel;
         $this->customFieldFactory      = $customFieldFactory;

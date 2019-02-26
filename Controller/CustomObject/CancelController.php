@@ -32,14 +32,13 @@ class CancelController extends CommonController
     private $routeProvider;
 
     /**
-     * @param Session $session
+     * @param Session                   $session
      * @param CustomObjectRouteProvider $routeProvider
      */
     public function __construct(
         Session $session,
         CustomObjectRouteProvider $routeProvider
-    )
-    {
+    ) {
         $this->session       = $session;
         $this->routeProvider = $routeProvider;
     }

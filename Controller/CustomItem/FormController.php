@@ -54,11 +54,11 @@ class FormController extends CommonController
     private $routeProvider;
 
     /**
-     * @param FormFactory $formFactory
-     * @param CustomObjectModel $customObjectModel
-     * @param CustomItemModel $customItemModel
+     * @param FormFactory                  $formFactory
+     * @param CustomObjectModel            $customObjectModel
+     * @param CustomItemModel              $customItemModel
      * @param CustomItemPermissionProvider $permissionProvider
-     * @param CustomItemRouteProvider $routeProvider
+     * @param CustomItemRouteProvider      $routeProvider
      */
     public function __construct(
         FormFactory $formFactory,
@@ -66,8 +66,7 @@ class FormController extends CommonController
         CustomItemModel $customItemModel,
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider
-    )
-    {
+    ) {
         $this->formFactory        = $formFactory;
         $this->customObjectModel  = $customObjectModel;
         $this->customItemModel    = $customItemModel;

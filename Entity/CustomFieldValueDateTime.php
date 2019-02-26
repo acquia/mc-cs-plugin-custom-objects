@@ -57,6 +57,7 @@ class CustomFieldValueDateTime extends CustomFieldValueStandard
     {
         if (!$value instanceof DateTimeInterface) {
             $valueToString = print_r($value, true);
+
             throw new \UnexpectedValueException("Value must be type of DateTimeInterface. {$valueToString} provided.");
         }
 

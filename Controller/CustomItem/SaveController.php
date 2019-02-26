@@ -68,14 +68,14 @@ class SaveController extends CommonController
     private $routeProvider;
 
     /**
-     * @param RequestStack $requestStack
-     * @param Session $session
-     * @param FormFactory $formFactory
-     * @param TranslatorInterface $translator
-     * @param CustomItemModel $customItemModel
-     * @param CustomObjectModel $customObjectModel
+     * @param RequestStack                 $requestStack
+     * @param Session                      $session
+     * @param FormFactory                  $formFactory
+     * @param TranslatorInterface          $translator
+     * @param CustomItemModel              $customItemModel
+     * @param CustomObjectModel            $customObjectModel
      * @param CustomItemPermissionProvider $permissionProvider
-     * @param CustomItemRouteProvider $routeProvider
+     * @param CustomItemRouteProvider      $routeProvider
      */
     public function __construct(
         RequestStack $requestStack,
@@ -86,8 +86,7 @@ class SaveController extends CommonController
         CustomObjectModel $customObjectModel,
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider
-    )
-    {
+    ) {
         $this->requestStack       = $requestStack;
         $this->session            = $session;
         $this->formFactory        = $formFactory;

@@ -46,11 +46,11 @@ class DeleteController extends CommonController
     private $routeProvider;
 
     /**
-     * @param CustomItemModel $customItemModel
-     * @param Session $session
-     * @param TranslatorInterface $translator
+     * @param CustomItemModel              $customItemModel
+     * @param Session                      $session
+     * @param TranslatorInterface          $translator
      * @param CustomItemPermissionProvider $permissionProvider
-     * @param CustomItemRouteProvider $routeProvider
+     * @param CustomItemRouteProvider      $routeProvider
      */
     public function __construct(
         CustomItemModel $customItemModel,
@@ -58,8 +58,7 @@ class DeleteController extends CommonController
         TranslatorInterface $translator,
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider
-    )
-    {
+    ) {
         $this->customItemModel    = $customItemModel;
         $this->session            = $session;
         $this->translator         = $translator;

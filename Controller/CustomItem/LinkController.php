@@ -41,25 +41,24 @@ class LinkController extends JsonController
     private $translator;
 
     /**
-     * @param CustomItemModel $customItemModel
+     * @param CustomItemModel              $customItemModel
      * @param CustomItemPermissionProvider $permissionProvider
-     * @param TranslatorInterface $translator
+     * @param TranslatorInterface          $translator
      */
     public function __construct(
         CustomItemModel $customItemModel,
         CustomItemPermissionProvider $permissionProvider,
         TranslatorInterface $translator
-    )
-    {
+    ) {
         $this->customItemModel    = $customItemModel;
         $this->permissionProvider = $permissionProvider;
         $this->translator         = $translator;
     }
 
     /**
-     * @param integer $itemId
-     * @param string  $entityType
-     * @param integer $entityId
+     * @param int    $itemId
+     * @param string $entityType
+     * @param int    $entityId
      *
      * @return JsonResponse
      */
@@ -83,9 +82,9 @@ class LinkController extends JsonController
     }
 
     /**
-     * @param integer $itemId
-     * @param string  $entityType
-     * @param integer $entityId
+     * @param int    $itemId
+     * @param string $entityType
+     * @param int    $entityId
      *
      * @throws UnexpectedValueException
      * @throws UniqueConstraintViolationException
@@ -95,9 +94,11 @@ class LinkController extends JsonController
         switch ($entityType) {
             case 'contact':
                 $this->customItemModel->linkContact($itemId, $entityId);
+
                 break;
             default:
                 throw new UnexpectedValueException("Entity {$entityType} cannot be linked to a custom item");
+
                 break;
         }
     }

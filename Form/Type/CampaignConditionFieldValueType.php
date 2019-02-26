@@ -41,16 +41,15 @@ class CampaignConditionFieldValueType extends AbstractType
     protected $translator;
 
     /**
-     * @param CustomFieldModel $customFieldModel
+     * @param CustomFieldModel        $customFieldModel
      * @param CustomItemRouteProvider $routeProvider
-     * @param TranslatorInterface $translator
+     * @param TranslatorInterface     $translator
      */
     public function __construct(
         CustomFieldModel $customFieldModel,
         CustomItemRouteProvider $routeProvider,
         TranslatorInterface $translator
-    )
-    {
+    ) {
         $this->customFieldModel = $customFieldModel;
         $this->routeProvider    = $routeProvider;
         $this->translator       = $translator;
@@ -75,8 +74,9 @@ class CampaignConditionFieldValueType extends AbstractType
                     'class'    => 'form-control',
                     'onchange' => 'CustomObjects.updateFormFieldOptions(this)',
                 ],
-                'choice_attr' => function($fieldId) use ($fields) {
+                'choice_attr' => function ($fieldId) use ($fields) {
                     $field = $fields[$fieldId];
+
                     return [
                         'data-operators' => json_encode($field->getTypeObject()->getOperatorOptions($this->translator)),
                     ];

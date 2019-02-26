@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * @copyright   2019 Mautic, Inc. All rights reserved
@@ -45,9 +47,9 @@ class CustomObjectPermissions extends AbstractPermissions
     private $customObjects = [];
 
     /**
-     * @param array $params
-     * @param CustomObjectModel $customObjectModel
-     * @param ConfigProvider $configProvider
+     * @param array               $params
+     * @param CustomObjectModel   $customObjectModel
+     * @param ConfigProvider      $configProvider
      * @param TranslatorInterface $translator
      */
     public function __construct(
@@ -55,8 +57,7 @@ class CustomObjectPermissions extends AbstractPermissions
         CustomObjectModel $customObjectModel,
         ConfigProvider $configProvider,
         TranslatorInterface $translator
-    )
-    {
+    ) {
         parent::__construct($params);
 
         $this->customObjectModel = $customObjectModel;

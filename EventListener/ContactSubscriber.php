@@ -41,18 +41,17 @@ class ContactSubscriber extends CommonSubscriber
     private $customItemModel;
 
     /**
-     * @param EntityManager $entityManager
-     * @param TranslatorInterface $translator
+     * @param EntityManager           $entityManager
+     * @param TranslatorInterface     $translator
      * @param CustomItemRouteProvider $routeProvider
-     * @param CustomItemModel $customItemModel
+     * @param CustomItemModel         $customItemModel
      */
     public function __construct(
         EntityManager $entityManager,
         TranslatorInterface $translator,
         CustomItemRouteProvider $routeProvider,
         CustomItemModel $customItemModel
-    )
-    {
+    ) {
         $this->entityManager   = $entityManager;
         $this->translator      = $translator;
         $this->routeProvider   = $routeProvider;
@@ -91,9 +90,9 @@ class ContactSubscriber extends CommonSubscriber
                 continue;
             }
 
-            if ($type === 'customitem.linked') {
+            if ('customitem.linked' === $type) {
                 $this->addLinkTimelineEntry($event, $type, $name, 'link');
-            } elseif ($type === 'customitem.unlinked') {
+            } elseif ('customitem.unlinked' === $type) {
                 $this->addLinkTimelineEntry($event, $type, $name, 'unlink');
             }
         }
@@ -143,7 +142,7 @@ class ContactSubscriber extends CommonSubscriber
                 }
                 $event->addEvent([
                     'event'           => $eventTypeKey,
-                    'eventId'         => $eventTypeKey . $link['id'],
+                    'eventId'         => $eventTypeKey.$link['id'],
                     'eventType'       => $eventTypeName,
                     'eventLabel'      => $eventLabel,
                     'timestamp'       => $link['date_added'],

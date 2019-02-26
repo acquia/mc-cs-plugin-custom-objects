@@ -46,10 +46,10 @@ class TableConfig
     private $filters = [];
 
     /**
-     * @param integer $limit
-     * @param integer $page
-     * @param string  $orderBy
-     * @param string  $orderDirection
+     * @param int    $limit
+     * @param int    $page
+     * @param string $orderBy
+     * @param string $orderDirection
      */
     public function __construct(int $limit, int $page, string $orderBy, string $orderDirection = 'ASC')
     {
@@ -76,17 +76,17 @@ class TableConfig
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getOffset(): int
     {
-        $offset = $this->page === 1 ? 0 : (($this->page - 1) * $this->limit);
+        $offset = 1 === $this->page ? 0 : (($this->page - 1) * $this->limit);
 
         return $offset < 0 ? 0 : $offset;
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getLimit(): int
     {
@@ -186,7 +186,7 @@ class TableConfig
      * @param string $entityName
      * @param string $columnName
      *
-     * @return boolean
+     * @return bool
      */
     public function hasFilter(string $entityName, string $columnName): bool
     {
@@ -195,13 +195,12 @@ class TableConfig
 
             return true;
         } catch (NotFoundException $e) {
-
             return false;
         }
     }
 
     /**
-     * @param QueryBuilder $queryBuilder
+     * @param QueryBuilder  $queryBuilder
      * @param ClassMetadata $metadata
      *
      * @return QueryBuilder
@@ -214,7 +213,7 @@ class TableConfig
     }
 
     /**
-     * @param QueryBuilder $queryBuilder
+     * @param QueryBuilder  $queryBuilder
      * @param ClassMetadata $metadata
      *
      * @return QueryBuilder

@@ -41,8 +41,8 @@ class TableQueryBuilder
     private $rootAlias;
 
     /**
-     * @param TableConfig $tableConfig
-     * @param QueryBuilder $queryBuilder
+     * @param TableConfig   $tableConfig
+     * @param QueryBuilder  $queryBuilder
      * @param ClassMetadata $metadata
      *
      * @return QueryBuilder
@@ -99,15 +99,15 @@ class TableQueryBuilder
     {
         $this->addJoinIfNecessary($filter);
 
-        if ($filter->getExpression() === 'orX' && is_array($filter->getValue())) {
+        if ('orX' === $filter->getExpression() && is_array($filter->getValue())) {
             $expr = $this->queryBuilder->expr()->orX();
             foreach ($filter->getValue() as $orFilter) {
-                $exprOr = $this->queryBuilder->expr()->{$orFilter->getExpression()}($orFilter->getFullColumnName(), ':' . $orFilter->getColumnName());
+                $exprOr = $this->queryBuilder->expr()->{$orFilter->getExpression()}($orFilter->getFullColumnName(), ':'.$orFilter->getColumnName());
                 $this->queryBuilder->setParameter($orFilter->getColumnName(), $orFilter->getValue());
                 $expr->add($exprOr);
             }
         } else {
-            $expr = $this->queryBuilder->expr()->{$filter->getExpression()}($filter->getFullColumnName(), ':' . $filter->getColumnName());
+            $expr = $this->queryBuilder->expr()->{$filter->getExpression()}($filter->getFullColumnName(), ':'.$filter->getColumnName());
             $this->queryBuilder->setParameter($filter->getColumnName(), $filter->getValue());
         }
 
@@ -124,7 +124,7 @@ class TableQueryBuilder
             if (empty($cloumnNameArr[0])) {
                 throw new \UnexpectedValueException("Entity {$filter->getEntityName()} does not have association with {$filter->getEntityName()}");
             }
-            $this->queryBuilder->leftJoin($this->rootAlias . '.' . $cloumnNameArr[0], $filter->getTableAlias());
+            $this->queryBuilder->leftJoin($this->rootAlias.'.'.$cloumnNameArr[0], $filter->getTableAlias());
         }
     }
 }

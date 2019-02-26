@@ -79,7 +79,7 @@ class SaveController extends CommonController
         CustomFieldPermissionProvider $permissionProvider,
         CustomFieldRouteProvider $routeProvider,
         CustomObjectModel $customObjectModel
-    ){
+    ) {
         $this->formFactory             = $formFactory;
         $this->translator              = $translator;
         $this->customFieldModel        = $customFieldModel;
@@ -149,7 +149,7 @@ class SaveController extends CommonController
     }
 
     /**
-     * Build custom field form to be used in custom object form
+     * Build custom field form to be used in custom object form.
      *
      * @param CustomObject $customObject
      * @param CustomField  $customField
@@ -164,7 +164,7 @@ class SaveController extends CommonController
             ['custom_object_form' => true]
         );
 
-         $template = $this->render(
+        $template = $this->render(
             "CustomObjectsBundle:CustomObject:Form\\Panel\\{$customField->getType()}.html.php",
             [
                 'customObject'      => $customObject,

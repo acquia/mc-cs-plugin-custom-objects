@@ -32,7 +32,7 @@ abstract class CustomFieldValueStandard implements CustomFieldValueInterface
     /**
      * Flag to know whether to update this entity manually or let EntityManager to handle it.
      *
-     * @var boolean
+     * @var bool
      */
     protected $updateManually = false;
 

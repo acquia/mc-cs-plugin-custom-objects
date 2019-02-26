@@ -18,13 +18,14 @@ class PaginationHelper
     /**
      * @deprecated Use TableConfig instead
      *
-     * @param integer $page
-     * @param integer $limit
-     * @return integer
+     * @param int $page
+     * @param int $limit
+     *
+     * @return int
      */
     public static function countOffset(int $page, int $limit): int
     {
-        $offset = $page === 1 ? 0 : (($page - 1) * $limit);
+        $offset = 1 === $page ? 0 : (($page - 1) * $limit);
 
         return $offset < 0 ? 0 : $offset;
     }

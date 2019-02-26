@@ -32,7 +32,7 @@ class CustomItemRepository extends CommonRepository
      */
     public function getTableDataQuery(TableConfig $tableConfig): QueryBuilder
     {
-        $queryBuilder = $this->createQueryBuilder(self::TABLE_ALIAS, self::TABLE_ALIAS . '.id');
+        $queryBuilder = $this->createQueryBuilder(self::TABLE_ALIAS, self::TABLE_ALIAS.'.id');
 
         return $tableConfig->configureSelectQueryBuilder($queryBuilder, $this->getClassMetadata());
     }
@@ -44,20 +44,20 @@ class CustomItemRepository extends CommonRepository
      */
     public function getTableCountQuery(TableConfig $tableConfig): QueryBuilder
     {
-        $queryBuilder = $this->createQueryBuilder(self::TABLE_ALIAS, self::TABLE_ALIAS . '.id');
+        $queryBuilder = $this->createQueryBuilder(self::TABLE_ALIAS, self::TABLE_ALIAS.'.id');
 
         return $tableConfig->configureCountQueryBuilder($queryBuilder, $this->getClassMetadata());
     }
 
     /**
      * @param QueryBuilder $queryBuilder
-     * @param integer $userId
+     * @param int          $userId
      *
      * @return QueryBuilder
      */
     public function applyOwnerId(QueryBuilder $queryBuilder, int $userId): QueryBuilder
     {
-        return $queryBuilder->andWhere(self::TABLE_ALIAS . '.createdBy', $userId);
+        return $queryBuilder->andWhere(self::TABLE_ALIAS.'.createdBy', $userId);
     }
 
     /**
@@ -82,11 +82,11 @@ class CustomItemRepository extends CommonRepository
 
     /**
      * @param CustomField $customField
-     * @param Lead $contact
-     * @param string $expr
-     * @param mixed $value
+     * @param Lead        $contact
+     * @param string      $expr
+     * @param mixed       $value
      *
-     * @return integer
+     * @return int
      *
      * @throws NotFoundException
      */
@@ -95,8 +95,8 @@ class CustomItemRepository extends CommonRepository
         $fieldType    = $customField->getTypeObject();
         $queryBuilder = $this->_em->getConnection()->createQueryBuilder();
         $queryBuilder->select('ci.id');
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX . 'custom_item', 'ci');
-        $queryBuilder->innerJoin('ci', MAUTIC_TABLE_PREFIX . 'custom_item_xref_contact', 'cixcont', 'cixcont.custom_item_id = ci.id');
+        $queryBuilder->from(MAUTIC_TABLE_PREFIX.'custom_item', 'ci');
+        $queryBuilder->innerJoin('ci', MAUTIC_TABLE_PREFIX.'custom_item_xref_contact', 'cixcont', 'cixcont.custom_item_id = ci.id');
         $queryBuilder->innerJoin('ci', $fieldType->getTableName(), $fieldType->getTableAlias(), "{$fieldType->getTableAlias()}.custom_item_id = ci.id");
         $queryBuilder->where('cixcont.contact_id = :contactId');
         $queryBuilder->setParameter('contactId', $contact->getId());
@@ -106,9 +106,10 @@ class CustomItemRepository extends CommonRepository
 
         $result = $queryBuilder->execute()->fetchColumn();
 
-        if ($result === false) {
+        if (false === $result) {
             $stringValue = print_r($value, true);
             $msg         = "Custom Item for contact {$contact->getId()}, custom field {$customField->getId()} and value {$expr} {$stringValue} was not found.";
+
             throw new NotFoundException($msg);
         }
 

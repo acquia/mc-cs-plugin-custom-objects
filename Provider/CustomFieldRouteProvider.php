@@ -70,6 +70,7 @@ class CustomFieldRouteProvider
     public function buildFormRoute(?int $id = null): string
     {
         $params = $id ? ['fieldId' => $id] : [];
+
         return $this->router->generate(static::ROUTE_FORM, $params);
     }
 

@@ -38,7 +38,7 @@ class CustomFieldValueText extends CustomFieldValueStandard
 
     /**
      * Doctrine doesn't support prefix indexes. It's being added in the updatePluginSchema method.
-     * $builder->addIndex(['value(64)'], 'value_index');
+     * $builder->addIndex(['value(64)'], 'value_index');.
      *
      * @param ORM\ClassMetadata $metadata
      */

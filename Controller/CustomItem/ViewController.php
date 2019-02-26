@@ -58,12 +58,12 @@ class ViewController extends CommonController
     private $formFactory;
 
     /**
-     * @param RequestStack $requestStack
-     * @param FormFactory $formFactory
-     * @param CustomItemModel $customItemModel
-     * @param AuditLogModel $auditLogModel
+     * @param RequestStack                 $requestStack
+     * @param FormFactory                  $formFactory
+     * @param CustomItemModel              $customItemModel
+     * @param AuditLogModel                $auditLogModel
      * @param CustomItemPermissionProvider $permissionProvider
-     * @param CustomItemRouteProvider $routeProvider
+     * @param CustomItemRouteProvider      $routeProvider
      */
     public function __construct(
         RequestStack $requestStack,
@@ -72,8 +72,7 @@ class ViewController extends CommonController
         AuditLogModel $auditLogModel,
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider
-    )
-    {
+    ) {
         $this->requestStack       = $requestStack;
         $this->formFactory        = $formFactory;
         $this->customItemModel    = $customItemModel;

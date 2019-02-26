@@ -18,7 +18,6 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueDateTime;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 
-
 class DateTimeType extends AbstractCustomFieldType
 {
     /**
@@ -59,7 +58,7 @@ class DateTimeType extends AbstractCustomFieldType
      */
     public function getTableName(): string
     {
-        return MAUTIC_TABLE_PREFIX . 'custom_field_value_datetime';
+        return MAUTIC_TABLE_PREFIX.'custom_field_value_datetime';
     }
 
     /**

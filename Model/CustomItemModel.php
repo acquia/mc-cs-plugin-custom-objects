@@ -71,14 +71,14 @@ class CustomItemModel extends FormModel
     private $customFieldTypeProvider;
 
     /**
-     * @param EntityManager $entityManager
-     * @param CustomItemRepository $customItemRepository
+     * @param EntityManager                $entityManager
+     * @param CustomItemRepository         $customItemRepository
      * @param CustomItemPermissionProvider $permissionProvider
-     * @param UserHelper $userHelper
-     * @param CustomFieldModel $customFieldModel
-     * @param CustomFieldValueModel $customFieldValueModel
-     * @param CustomFieldTypeProvider $customFieldTypeProvider
-     * @param EventDispatcherInterface $dispatcher
+     * @param UserHelper                   $userHelper
+     * @param CustomFieldModel             $customFieldModel
+     * @param CustomFieldValueModel        $customFieldValueModel
+     * @param CustomFieldTypeProvider      $customFieldTypeProvider
+     * @param EventDispatcherInterface     $dispatcher
      */
     public function __construct(
         EntityManager $entityManager,
@@ -89,8 +89,7 @@ class CustomItemModel extends FormModel
         CustomFieldValueModel $customFieldValueModel,
         CustomFieldTypeProvider $customFieldTypeProvider,
         EventDispatcherInterface $dispatcher
-    )
-    {
+    ) {
         $this->entityManager           = $entityManager;
         $this->customItemRepository    = $customItemRepository;
         $this->permissionProvider      = $permissionProvider;
@@ -160,8 +159,8 @@ class CustomItemModel extends FormModel
     }
 
     /**
-     * @param integer $customItemId
-     * @param integer $contactId
+     * @param int $customItemId
+     * @param int $contactId
      */
     public function linkContact(int $customItemId, int $contactId): CustomItemXrefContact
     {
@@ -184,8 +183,8 @@ class CustomItemModel extends FormModel
     }
 
     /**
-     * @param integer $customItemId
-     * @param integer $contactId
+     * @param int $customItemId
+     * @param int $contactId
      */
     public function unlinkContact(int $customItemId, int $contactId): void
     {
@@ -202,8 +201,8 @@ class CustomItemModel extends FormModel
     }
 
     /**
-     * @param integer $customItemId
-     * @param integer $contactId
+     * @param int $customItemId
+     * @param int $contactId
      *
      * @return CustomItemXrefContact
      *
@@ -223,7 +222,7 @@ class CustomItemModel extends FormModel
     }
 
     /**
-     * @param integer $id
+     * @param int $id
      *
      * @return CustomItem
      *
@@ -233,7 +232,7 @@ class CustomItemModel extends FormModel
     {
         $entity = parent::getEntity($id);
 
-        if ($entity === null) {
+        if (null === $entity) {
             throw new NotFoundException("Custom Item with ID = {$id} was not found");
         }
 
@@ -257,7 +256,7 @@ class CustomItemModel extends FormModel
     /**
      * @param TableConfig $tableConfig
      *
-     * @return integer
+     * @return int
      */
     public function getCountForTable(TableConfig $tableConfig): int
     {
@@ -330,9 +329,9 @@ class CustomItemModel extends FormModel
 
     /**
      * @param CustomField $customField
-     * @param Lead $contact
-     * @param string $expr
-     * @param mixed $value
+     * @param Lead        $contact
+     * @param string      $expr
+     * @param mixed       $value
      *
      * @return int
      */
@@ -355,7 +354,7 @@ class CustomItemModel extends FormModel
     /**
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @param CustomItem $customItem
+     * @param CustomItem         $customItem
      *
      * @return array
      */
@@ -363,8 +362,7 @@ class CustomItemModel extends FormModel
         \DateTimeInterface $from,
         \DateTimeInterface $to,
         CustomItem $customItem
-    ): array
-    {
+    ): array {
         $chart = new LineChart(null, $from, $to);
         $query = new ChartQuery($this->entityManager->getConnection(), $from, $to);
         $links = $query->fetchTimeData(
@@ -406,11 +404,11 @@ class CustomItemModel extends FormModel
     }
 
     /**
-     * @param Lead $contact
+     * @param Lead   $contact
      * @param string $action
      * @param string $object
-     * @param integer $objectId
-     * @param array $properties
+     * @param int    $objectId
+     * @param array  $properties
      *
      * @return LeadEventLog
      */

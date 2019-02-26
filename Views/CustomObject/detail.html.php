@@ -118,7 +118,7 @@ $view['slots']->set(
 
             <!-- #fields-container -->
             <div class="tab-pane fade active in bdr-w-0" id="fields-container">
-                <h5 class="fw-sb mb-xs"><?php echo $view['translator']->trans('custom.field.title') ?></h5>
+                <h5 class="fw-sb mb-xs"><?php echo $view['translator']->trans('custom.field.title'); ?></h5>
                 <ul class="list-group mb-xs">
                     <?php /** @var MauticPlugin\CustomObjectsBundle\Entity\CustomField $field */
                     foreach ($customObject->getCustomFields() as $field) : ?>
@@ -171,14 +171,14 @@ $view['slots']->set(
                         echo $view['router']->path(
                             \MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider::ROUTE_LIST,
                             ['objectId' => $customObject->getId()]
-                        ) ?>"><?php echo $view['translator']->trans('custom.items.view.link'); ?></a>
+                        ); ?>"><?php echo $view['translator']->trans('custom.items.view.link'); ?></a>
                     </li>
                     <li>
                         <a href="<?php
                         echo $view['router']->path(
                             \MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider::ROUTE_NEW,
                             ['objectId' => $customObject->getId()]
-                        ) ?>"><?php echo $view['translator']->trans('custom.item.create.link'); ?></a>
+                        ); ?>"><?php echo $view['translator']->trans('custom.item.create.link'); ?></a>
                     </li>
                 </ul>
             </div>

@@ -52,8 +52,7 @@ class TabSubscriber extends CommonSubscriber
         CustomObjectModel $customObjectModel,
         CustomItemModel $customItemModel,
         ConfigProvider $configProvider
-    )
-    {
+    ) {
         $this->customObjectModel = $customObjectModel;
         $this->customItemModel   = $customItemModel;
         $this->configProvider    = $configProvider;

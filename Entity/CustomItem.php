@@ -203,7 +203,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     public function addCustomFieldValue(CustomFieldValueInterface $customFieldValue): void
     {
-        if ($this->customFieldValues === null) {
+        if (null === $this->customFieldValues) {
             $this->customFieldValues = new ArrayCollection();
         }
 
@@ -249,7 +249,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     public function getCustomFieldValues(): ArrayCollection
     {
-        if ($this->customFieldValues === null) {
+        if (null === $this->customFieldValues) {
             $this->customFieldValues = new ArrayCollection();
         }
 

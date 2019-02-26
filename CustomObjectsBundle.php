@@ -31,7 +31,7 @@ class CustomObjectsBundle extends PluginBundleBase
      */
     public static function onPluginInstall(Plugin $plugin, MauticFactory $factory, $metadata = null, $installedSchema = null): void
     {
-        if ($installedSchema === true) {
+        if (true === $installedSchema) {
             // Schema exists
             return;
         }

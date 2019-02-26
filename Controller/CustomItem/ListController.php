@@ -62,13 +62,13 @@ class ListController extends CommonController
     private $routeProvider;
 
     /**
-     * @param RequestStack $requestStack
-     * @param Session $session
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param CustomItemModel $customItemModel
-     * @param CustomObjectModel $customObjectModel
+     * @param RequestStack                 $requestStack
+     * @param Session                      $session
+     * @param CoreParametersHelper         $coreParametersHelper
+     * @param CustomItemModel              $customItemModel
+     * @param CustomObjectModel            $customObjectModel
      * @param CustomItemPermissionProvider $permissionProvider
-     * @param CustomItemRouteProvider $routeProvider
+     * @param CustomItemRouteProvider      $routeProvider
      */
     public function __construct(
         RequestStack $requestStack,
@@ -78,8 +78,7 @@ class ListController extends CommonController
         CustomObjectModel $customObjectModel,
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider
-    )
-    {
+    ) {
         $this->requestStack         = $requestStack;
         $this->session              = $session;
         $this->coreParametersHelper = $coreParametersHelper;
@@ -92,8 +91,8 @@ class ListController extends CommonController
     /**
      * @todo make the search filter work.
      *
-     * @param integer $objectId
-     * @param integer $page
+     * @param int $objectId
+     * @param int $page
      *
      * @return \Symfony\Component\HttpFoundation\Response|\Symfony\Component\HttpFoundation\JsonResponse
      */
@@ -113,14 +112,14 @@ class ListController extends CommonController
         $defaultlimit = (int) $this->coreParametersHelper->getParameter('default_pagelimit');
         $sessionLimit = (int) $this->session->get('mautic.custom.item.limit', $defaultlimit);
         $limit        = (int) $request->get('limit', $sessionLimit);
-        $orderBy      = $this->session->get('mautic.custom.item.orderby', CustomItemRepository::TABLE_ALIAS . '.id');
+        $orderBy      = $this->session->get('mautic.custom.item.orderby', CustomItemRepository::TABLE_ALIAS.'.id');
         $orderByDir   = $this->session->get('mautic.custom.item.orderbydir', 'DESC');
         $contactId    = (int) $request->get('contactId');
 
         if ($request->query->has('orderby')) {
             $orderBy    = InputHelper::clean($request->query->get('orderby'), true);
             $orderByDir = $this->session->get('mautic.custom.item.orderbydir', 'ASC');
-            $orderByDir = $orderByDir === 'ASC' ? 'DESC' : 'ASC';
+            $orderByDir = 'ASC' === $orderByDir ? 'DESC' : 'ASC';
             $this->session->set('mautic.custom.item.orderby', $orderBy);
             $this->session->set('mautic.custom.item.orderbydir', $orderByDir);
         }

@@ -41,9 +41,9 @@ class DeleteController extends CommonController
     private $permissionProvider;
 
     /**
-     * @param CustomObjectModel $customObjectModel
-     * @param Session $session
-     * @param TranslatorInterface $translator
+     * @param CustomObjectModel              $customObjectModel
+     * @param Session                        $session
+     * @param TranslatorInterface            $translator
      * @param CustomObjectPermissionProvider $permissionProvider
      */
     public function __construct(
@@ -51,8 +51,7 @@ class DeleteController extends CommonController
         Session $session,
         TranslatorInterface $translator,
         CustomObjectPermissionProvider $permissionProvider
-    )
-    {
+    ) {
         $this->customObjectModel  = $customObjectModel;
         $this->session            = $session;
         $this->translator         = $translator;

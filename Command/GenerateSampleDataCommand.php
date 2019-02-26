@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
@@ -60,10 +62,10 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
 
     /**
      * @param CustomObjectModel $customObjectModel
-     * @param CustomItemModel $customItemModel
-     * @param LeadModel $contactModel
-     * @param EntityManager $entityManager
-     * @param RandomHelper $randomHelper
+     * @param CustomItemModel   $customItemModel
+     * @param LeadModel         $contactModel
+     * @param EntityManager     $entityManager
+     * @param RandomHelper      $randomHelper
      */
     public function __construct(
         CustomObjectModel $customObjectModel,
@@ -143,7 +145,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         $progress->setFormat(' %current%/%max% [%bar%] | %percent:3s%% | Elapsed: %elapsed:6s% | Estimated: %estimated:-6s% | Memory Usage: %memory:6s%');
         $progress->start();
 
-        for ($i = 1; $i <= $limit; $i++) {
+        for ($i = 1; $i <= $limit; ++$i) {
             $customItem = $this->generateCustomItem($customObject);
             $customItem = $this->generateCustomFieldValues($customItem, $customObject);
             $customItem = $this->generateContactReferences($customItem);
@@ -174,7 +176,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param CustomItem $customItem
+     * @param CustomItem   $customItem
      * @param CustomObject $customObject
      *
      * @return CustomItem
@@ -182,11 +184,11 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
     private function generateCustomFieldValues(CustomItem $customItem, CustomObject $customObject): CustomItem
     {
         foreach ($customObject->getCustomFields() as $field) {
-            if ($field->getType() === 'text') {
+            if ('text' === $field->getType()) {
                 $customItem->addCustomFieldValue(new CustomFieldValueText($field, $customItem, $this->randomHelper->getSentence(random_int(0, 100))));
             }
 
-            if ($field->getType() === 'int') {
+            if ('int' === $field->getType()) {
                 $customItem->addCustomFieldValue(new CustomFieldValueInt($field, $customItem, random_int(0, 1000)));
             }
         }
@@ -203,7 +205,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
      */
     private function generateContactReferences(CustomItem $customItem): CustomItem
     {
-        for ($i = 1; $i <= random_int(0, 10); $i++) {
+        for ($i = 1; $i <= random_int(0, 10); ++$i) {
             $contact   = new Lead();
             $reference = new CustomItemXrefContact($customItem, $contact);
             $contact->setFirstname(ucfirst($this->randomHelper->getWord()));

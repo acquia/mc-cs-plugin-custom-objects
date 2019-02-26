@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
@@ -54,7 +56,7 @@ class CustomObjectHiddenTransformer implements DataTransformerInterface
 
         $entity = $this->customObjectRepository->findOneBy(['id' => $value]);
 
-        if ($entity === null) {
+        if (null === $entity) {
             throw new TransformationFailedException(sprintf(
                 'An entity with ID "%s" does not exist!',
                 $value

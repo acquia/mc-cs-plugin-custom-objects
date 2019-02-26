@@ -44,16 +44,15 @@ class LookupController extends JsonController
     private $permissionProvider;
 
     /**
-     * @param RequestStack $requestStack
-     * @param CustomItemModel $customItemModel
+     * @param RequestStack                 $requestStack
+     * @param CustomItemModel              $customItemModel
      * @param CustomItemPermissionProvider $permissionProvider
      */
     public function __construct(
         RequestStack $requestStack,
         CustomItemModel $customItemModel,
         CustomItemPermissionProvider $permissionProvider
-    )
-    {
+    ) {
         $this->requestStack       = $requestStack;
         $this->customItemModel    = $customItemModel;
         $this->permissionProvider = $permissionProvider;
@@ -75,7 +74,7 @@ class LookupController extends JsonController
         $request     = $this->requestStack->getCurrentRequest();
         $nameFilter  = InputHelper::clean($request->get('filter'));
         $contactId   = (int) InputHelper::clean($request->get('contactId'));
-        $tableConfig = new TableConfig(10, 1, CustomItemRepository::TABLE_ALIAS . '.name', 'ASC');
+        $tableConfig = new TableConfig(10, 1, CustomItemRepository::TABLE_ALIAS.'.name', 'ASC');
         $tableConfig->addFilter(CustomItem::class, 'customObject', $objectId);
         $tableConfig->addFilterIfNotEmpty(CustomItem::class, 'name', "%{$nameFilter}%", 'like');
 

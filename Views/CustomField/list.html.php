@@ -11,7 +11,7 @@
 
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
 
-if ($tmpl === 'index') {
+if ('index' === $tmpl) {
     $view->extend('CustomObjectsBundle:CustomField:index.html.php');
 }
 ?>

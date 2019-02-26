@@ -182,7 +182,7 @@ class CustomItemRouteProvider
     }
 
     /**
-     * @param int $objectId
+     * @param int    $objectId
      * @param string $objectAction
      *
      * @return string

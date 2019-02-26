@@ -40,16 +40,15 @@ class UnlinkController extends JsonController
     private $translator;
 
     /**
-     * @param CustomItemModel $customItemModel
+     * @param CustomItemModel              $customItemModel
      * @param CustomItemPermissionProvider $permissionProvider
-     * @param TranslatorInterface $translator
+     * @param TranslatorInterface          $translator
      */
     public function __construct(
         CustomItemModel $customItemModel,
         CustomItemPermissionProvider $permissionProvider,
         TranslatorInterface $translator
-    )
-    {
+    ) {
         $this->customItemModel    = $customItemModel;
         $this->permissionProvider = $permissionProvider;
         $this->translator         = $translator;
@@ -93,9 +92,11 @@ class UnlinkController extends JsonController
         switch ($entityType) {
             case 'contact':
                 $this->customItemModel->unlinkContact($itemId, $entityId);
+
                 break;
             default:
                 throw new UnexpectedValueException("Entity {$entityType} cannot be linked to a custom item");
+
                 break;
         }
     }

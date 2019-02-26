@@ -41,7 +41,7 @@ abstract class StandardPermissionProvider
      */
     public function isGranted(string $permission): void
     {
-        if (!$this->corePermissions->isGranted(static::BASE . $permission)) {
+        if (!$this->corePermissions->isGranted(static::BASE.$permission)) {
             throw new ForbiddenException($permission);
         }
     }
@@ -54,7 +54,7 @@ abstract class StandardPermissionProvider
      */
     public function hasEntityAccess(string $permission, FormEntity $entity): void
     {
-        if (!$this->corePermissions->hasEntityAccess(static::BASE . $permission . 'own', static::BASE . $permission . 'other', $entity->getCreatedBy())) {
+        if (!$this->corePermissions->hasEntityAccess(static::BASE.$permission.'own', static::BASE.$permission.'other', $entity->getCreatedBy())) {
             throw new ForbiddenException($permission);
         }
     }

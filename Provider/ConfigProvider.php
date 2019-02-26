@@ -36,9 +36,9 @@ class ConfigProvider
     }
 
     /**
-     * Returns true if the Custom Objects plugin is enabled
+     * Returns true if the Custom Objects plugin is enabled.
      *
-     * @return boolean
+     * @return bool
      */
     public function pluginIsEnabled(): bool
     {

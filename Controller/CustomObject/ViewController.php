@@ -75,7 +75,7 @@ class ViewController extends CommonController
         AuditLogModel $auditLogModel,
         CustomObjectPermissionProvider $permissionProvider,
         CustomObjectRouteProvider $routeProvider
-    ){
+    ) {
         $this->requestStack         = $requestStack;
         $this->formFactory          = $formFactory;
         $this->coreParametersHelper = $coreParametersHelper;
