@@ -333,9 +333,10 @@ return [
                 'arguments' => [
                     'request_stack',
                     'mautic.custom.model.item',
-                    'session',
+                    'custom_item.session.provider',
                     'translator',
                     'custom_item.permission.provider',
+                    'custom_item.route.provider',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -789,6 +790,12 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider::class,
                 'arguments' => [
                     'mautic.security',
+                ],
+            ],
+            'custom_item.session.provider' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Provider\CustomItemSessionProvider::class,
+                'arguments' => [
+                    'session',
                 ],
             ],
             'custom_object.route.provider' => [
