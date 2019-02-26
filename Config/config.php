@@ -347,7 +347,7 @@ return [
             'custom_item.cancel_controller' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\CancelController::class,
                 'arguments' => [
-                    'session',
+                    'custom_item.session.provider',
                     'custom_item.route.provider',
                 ],
                 'methodCalls' => [
