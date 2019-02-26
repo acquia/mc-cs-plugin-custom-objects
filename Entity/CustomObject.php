@@ -24,6 +24,7 @@ use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CoreBundle\Helper\ArrayHelper;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 
 class CustomObject extends FormEntity implements UniqueEntityInterface
 {
@@ -136,7 +137,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $namePlural
      */
-    public function setNamePlural(?string $namePlural): void
+    public function setNamePlural($namePlural)
     {
         $this->isChanged('namePlural', $namePlural);
         $this->namePlural = $namePlural;
@@ -153,7 +154,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $nameSingular
      */
-    public function setNameSingular(?string $nameSingular): void
+    public function setNameSingular($nameSingular)
     {
         $this->isChanged('nameSingular', $nameSingular);
         $this->nameSingular = $nameSingular;
@@ -170,7 +171,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $description
      */
-    public function setDescription(?string $description): void
+    public function setDescription($description)
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -195,7 +196,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param Category|null $category
      */
-    public function setCategory(?Category $category): void
+    public function setCategory($category)
     {
         $this->category = $category;
     }
@@ -211,25 +212,25 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $language
      */
-    public function setLanguage(?string $language): void
+    public function setLanguage($language)
     {
         $this->isChanged('language', $language);
         $this->language = $language;
     }
 
     /**
-     * @param \MauticPlugin\CustomObjectsBundle\Entity\CustomField $customField
+     * @param CustomField $customField
      */
-    public function addCustomField(CustomField $customField): void
+    public function addCustomField(CustomField $customField)
     {
         $customField->setCustomObject($this);
         $this->customFields->add($customField);
     }
 
     /**
-     * @param \MauticPlugin\CustomObjectsBundle\Entity\CustomField $customField
+     * @param CustomField $customField
      */
-    public function removeCustomField(CustomField $customField): void
+    public function removeCustomField(CustomField $customField)
     {
         $this->customFields->removeElement($customField);
         $customField->setCustomObject();
@@ -246,7 +247,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * Called when the custom fields are loaded from the database.
      */
-    public function createFieldsSnapshot(): void
+    public function createFieldsSnapshot()
     {
         foreach ($this->customFields as $customField) {
             $this->initialCustomFields[$customField->getId()] = $customField->toArray();
@@ -256,7 +257,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * Called before CustomObjectSave. It will record changes that happened for custom fields.
      */
-    public function recordCustomFieldChanges(): void
+    public function recordCustomFieldChanges()
     {
         $existingFields = [];
         foreach ($this->customFields as $i => $customField) {
