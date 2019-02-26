@@ -156,7 +156,7 @@ class FormController extends CommonController
                 'returnUrl'      => $this->routeProvider->buildListRoute($customObject->getId()),
                 'viewParameters' => [
                     'entity'       => $customItem,
-                    'customObject' => $customItem->getCustomObject(),
+                    'customObject' => $customObject,
                     'form'         => $form->createView(),
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.php',
