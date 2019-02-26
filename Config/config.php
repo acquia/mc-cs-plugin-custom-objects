@@ -63,17 +63,17 @@ return [
             ],
             CustomItemRouteProvider::ROUTE_NEW => [
                 'path'       => '/custom/object/{objectId}/item/new',
-                'controller' => 'CustomObjectsBundle:CustomItem\Form:renderForm',
+                'controller' => 'CustomObjectsBundle:CustomItem\Form:new',
                 'method'     => 'GET',
             ],
             CustomItemRouteProvider::ROUTE_EDIT => [
                 'path'       => '/custom/object/{objectId}/item/edit/{itemId}',
-                'controller' => 'CustomObjectsBundle:CustomItem\Form:renderForm',
+                'controller' => 'CustomObjectsBundle:CustomItem\Form:edit',
                 'method'     => 'GET',
             ],
             CustomItemRouteProvider::ROUTE_CLONE => [
                 'path'       => '/custom/object/{objectId}/item/clone/{itemId}',
-                'controller' => 'CustomObjectsBundle:CustomItem\Clone:clone',
+                'controller' => 'CustomObjectsBundle:CustomItem\Form:clone',
                 'method'     => 'GET',
             ],
             CustomItemRouteProvider::ROUTE_CANCEL => [
@@ -271,20 +271,6 @@ return [
                 'arguments' => [
                     'form.factory',
                     'mautic.custom.model.object',
-                    'mautic.custom.model.item',
-                    'custom_item.permission.provider',
-                    'custom_item.route.provider',
-                ],
-                'methodCalls' => [
-                    'setContainer' => [
-                        '@service_container',
-                    ],
-                ],
-            ],
-            'custom_item.clone_controller' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\CloneController::class,
-                'arguments' => [
-                    'form.factory',
                     'mautic.custom.model.item',
                     'custom_item.permission.provider',
                     'custom_item.route.provider',
