@@ -42,7 +42,7 @@ class AssetsSubscriber extends CommonSubscriber
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public static function getSubscribedEvents(): array
     {

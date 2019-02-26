@@ -47,7 +47,7 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public static function getSubscribedEvents(): array
     {
@@ -108,7 +108,7 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
     /**
      * @param CustomObject $entity
      *
-     * @return array
+     * @return mixed[]
      *
      * @throws ForbiddenException
      */
@@ -127,7 +127,7 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     private function defineCloseButton(): array
     {
@@ -146,7 +146,7 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
     /**
      * @param CustomObject $entity
      *
-     * @return array
+     * @return mixed[]
      *
      * @throws ForbiddenException
      */
@@ -167,7 +167,7 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
     /**
      * @param CustomObject $entity
      *
-     * @return array
+     * @return mixed[]
      *
      * @throws ForbiddenException
      */
@@ -186,7 +186,7 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
     }
 
     /**
-     * @return array
+     * @return mixed[]
      *
      * @throws ForbiddenException
      */

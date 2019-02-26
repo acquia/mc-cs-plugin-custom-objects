@@ -108,9 +108,9 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
     }
 
     /**
-     * @param array|string $filterParameters
+     * @param string[]|string $filterParameters
      *
-     * @return array|string
+     * @return string[]|string
      */
     public function getParametersAliases($filterParameters)
     {

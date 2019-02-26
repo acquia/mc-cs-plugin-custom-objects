@@ -62,7 +62,7 @@ class DateTimeType extends AbstractCustomFieldType
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public function getOperators(): array
     {

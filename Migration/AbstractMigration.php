@@ -28,7 +28,7 @@ class AbstractMigration implements MigrationInterface
     protected $tablePrefix;
 
     /**
-     * @var array
+     * @var string[]
      */
     private $queries = [];
 

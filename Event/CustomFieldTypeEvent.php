@@ -19,7 +19,7 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
 class CustomFieldTypeEvent extends Event
 {
     /**
-     * @var array
+     * @var CustomFieldTypeInterface[]
      */
     private $customFieldTypes = [];
 

@@ -22,7 +22,7 @@ class CustomFieldValueRepository extends CommonRepository
     /**
      * @param CustomItem $customItem
      *
-     * @return array
+     * @return mixed[]
      */
     public function getValuesForItem(CustomItem $customItem): array
     {

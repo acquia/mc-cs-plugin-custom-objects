@@ -56,7 +56,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public static function getSubscribedEvents(): array
     {
@@ -156,7 +156,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
      * @param int        $customObjectId
      * @param CustomItem $customItem
      *
-     * @return array
+     * @return mixed[]
      *
      * @throws ForbiddenException
      */
@@ -177,7 +177,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
     /**
      * @param int $customObjectId
      *
-     * @return array
+     * @return mixed[]
      */
     private function defineCloseButton(int $customObjectId): array
     {
@@ -197,7 +197,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
      * @param int        $customObjectId
      * @param CustomItem $customItem
      *
-     * @return array
+     * @return mixed[]
      *
      * @throws ForbiddenException
      */
@@ -219,7 +219,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
      * @param int        $customObjectId
      * @param CustomItem $customItem
      *
-     * @return array
+     * @return mixed[]
      *
      * @throws ForbiddenException
      */
@@ -240,7 +240,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
     /**
      * @param int $customObjectId
      *
-     * @return array
+     * @return mixed[]
      *
      * @throws ForbiddenException
      */
@@ -263,7 +263,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
      * @param int $customItemId
      * @param int $contactId
      *
-     * @return array
+     * @return mixed[]
      *
      * @throws ForbiddenException
      */
@@ -287,7 +287,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
     /**
      * @param int $customObjectId
      *
-     * @return array
+     * @return mixed[]
      *
      * @throws ForbiddenException
      */
@@ -308,7 +308,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
     /**
      * @param int $customObjectId
      *
-     * @return array
+     * @return mixed[]
      *
      * @throws ForbiddenException
      */
@@ -329,7 +329,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
     /**
      * @param int $customObjectId
      *
-     * @return array
+     * @return mixed[]
      *
      * @throws ForbiddenException
      */

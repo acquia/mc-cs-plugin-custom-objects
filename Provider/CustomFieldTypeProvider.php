@@ -27,7 +27,7 @@ class CustomFieldTypeProvider
     private $dispatcher;
 
     /**
-     * @var array
+     * @var CustomFieldTypeInterface[]
      */
     private $customFieldTypes = [];
 
@@ -42,7 +42,7 @@ class CustomFieldTypeProvider
     /**
      * Builds the list of custom field type objects.
      *
-     * @return array
+     * @return CustomFieldTypeInterface[]
      */
     public function getTypes(): array
     {

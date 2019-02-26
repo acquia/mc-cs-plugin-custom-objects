@@ -42,12 +42,12 @@ class CustomObjectPermissions extends AbstractPermissions
     /**
      * Cached custom objects.
      *
-     * @var array
+     * @var CustomObject[]
      */
     private $customObjects = [];
 
     /**
-     * @param array               $params
+     * @param mixed[]             $params
      * @param CustomObjectModel   $customObjectModel
      * @param ConfigProvider      $configProvider
      * @param TranslatorInterface $translator

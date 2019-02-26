@@ -42,7 +42,7 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
         parent::setUp();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         foreach ($this->getFixturesInUnloadableOrder() as $entity) {
             $this->entityManager->remove($entity);
@@ -50,7 +50,7 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
 
         $this->entityManager->flush();
 
-        return parent::tearDown();
+        parent::tearDown();
     }
 
     public function testApplyQuery(): void
@@ -72,11 +72,9 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
         $this->assertSame(3, $queryBuilder->execute()->rowCount());
     }
 
-    private function createSegmentFilterMock($value)
+    private function createSegmentFilterMock(string $value): \PHPUnit_Framework_MockObject_MockObject
     {
-        $filterMock = $this->getMockBuilder(ContactSegmentFilter::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $filterMock = $this->createMock(ContactSegmentFilter::class);
 
         $filterMock->method('getType')->willReturn('text');
         $filterMock->method('getOperator')->willReturn('eq');
@@ -87,7 +85,7 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
         return $filterMock;
     }
 
-    private function getLeadsQueryBuilder()
+    private function getLeadsQueryBuilder(): QueryBuilder
     {
         $connection   = $this->entityManager->getConnection();
         $queryBuilder = new QueryBuilder($connection);

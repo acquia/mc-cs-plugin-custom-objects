@@ -75,7 +75,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public function toArray(): array
     {

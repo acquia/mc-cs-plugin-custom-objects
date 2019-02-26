@@ -47,8 +47,6 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
     private $configProvider;
 
     /**
-     * SegmentFiltersChoicesGenerateSubscriber constructor.
-     *
      * @param CustomObjectRepository $customObjectRepository
      * @param TranslatorInterface    $translator
      * @param ConfigProvider         $configProvider
@@ -64,7 +62,7 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public static function getSubscribedEvents(): array
     {

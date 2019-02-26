@@ -69,7 +69,7 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public function getOperators(): array
     {
@@ -79,7 +79,7 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     /**
      * @param TranslatorInterface $translator
      *
-     * @return array
+     * @return string[]
      */
     public function getOperatorOptions(TranslatorInterface $translator): array
     {

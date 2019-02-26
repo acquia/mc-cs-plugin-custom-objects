@@ -59,7 +59,7 @@ class ContactSubscriber extends CommonSubscriber
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public static function getSubscribedEvents(): array
     {
@@ -102,7 +102,7 @@ class ContactSubscriber extends CommonSubscriber
      * @param LeadTimelineEvent $event
      * @param string            $action
      *
-     * @return array
+     * @return mixed[]
      */
     private function getEvents(LeadTimelineEvent $event, string $action): array
     {

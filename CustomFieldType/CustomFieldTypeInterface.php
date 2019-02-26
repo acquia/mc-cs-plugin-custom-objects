@@ -60,14 +60,14 @@ interface CustomFieldTypeInterface
     public function getTableAlias(): string;
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public function getOperators(): array;
 
     /**
      * @param TranslatorInterface $translator
      *
-     * @return array
+     * @return mixed[]
      */
     public function getOperatorOptions(TranslatorInterface $translator): array;
 }

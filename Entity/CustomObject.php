@@ -63,7 +63,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     private $customFields;
 
     /**
-     * @var array
+     * @var mixed[]
      */
     private $initialCustomFields = [];
 

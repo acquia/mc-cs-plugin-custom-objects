@@ -62,7 +62,7 @@ class IntType extends AbstractCustomFieldType
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public function getOperators(): array
     {

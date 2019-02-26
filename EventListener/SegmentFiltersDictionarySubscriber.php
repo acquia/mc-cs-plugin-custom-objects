@@ -44,13 +44,12 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public static function getSubscribedEvents(): array
     {
         return [
-            // @todo enable once https://github.com/mautic-inc/mautic-cloud/pull/388 is in beta
-            //LeadEvents::SEGMENT_DICTIONARY_ON_GENERATE => 'onGenerateSegmentDictionary',
+            LeadEvents::SEGMENT_DICTIONARY_ON_GENERATE => 'onGenerateSegmentDictionary',
         ];
     }
 
@@ -85,9 +84,9 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param array $fieldAttributes
+     * @param mixed[] $fieldAttributes
      *
-     * @return array
+     * @return string[]
      */
     private function createTranslation(array $fieldAttributes): array
     {

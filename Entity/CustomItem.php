@@ -59,7 +59,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     private $customFieldValues;
 
     /**
-     * @var array
+     * @var mixed[]
      */
     private $initialCustomFieldValues = [];
 

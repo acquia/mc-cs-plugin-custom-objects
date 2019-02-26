@@ -108,7 +108,7 @@ class CustomFieldModel extends FormModel
     /**
      * @param CustomObject $customObject
      *
-     * @return array
+     * @return CustomField[]
      */
     public function fetchCustomFieldsForObject(CustomObject $customObject): array
     {
@@ -129,9 +129,9 @@ class CustomFieldModel extends FormModel
     }
 
     /**
-     * @param array $args
+     * @param mixed[] $args
      *
-     * @return Paginator|array
+     * @return Paginator|CustomField[]
      */
     public function fetchEntities(array $args = [])
     {
@@ -161,9 +161,9 @@ class CustomFieldModel extends FormModel
     /**
      * Adds condition for creator if the user doesn't have permissions to view other.
      *
-     * @param array $args
+     * @param mixed[] $args
      *
-     * @return array
+     * @return mixed[]
      */
     private function addCreatorLimit(array $args): array
     {

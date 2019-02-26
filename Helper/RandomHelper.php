@@ -16,7 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Helper;
 class RandomHelper
 {
     /**
-     * @var array
+     * @var string[]
      */
     private $randomWords = [];
 
@@ -50,7 +50,7 @@ class RandomHelper
     /**
      * Loads the database of random words from a JSON file or cache if loaded already.
      *
-     * @return array
+     * @return string[]
      */
     private function getRandomWords(): array
     {

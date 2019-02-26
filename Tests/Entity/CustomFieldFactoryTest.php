@@ -21,7 +21,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 class CustomFieldFactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var array
+     * @var string[]
      */
     private $definedTypes = [
         'text',

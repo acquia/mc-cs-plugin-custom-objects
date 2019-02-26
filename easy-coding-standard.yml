@@ -28,3 +28,9 @@ parameters:
       - 'CustomObjectsBundle.php'
     SlevomatCodingStandard\Sniffs\TypeHints\TypeHintDeclarationSniff.MissingReturnTypeHint:
       - Entity/* # Proxy classes doesn't have return types and so entities cannot have them either.
+    SlevomatCodingStandard\Sniffs\TypeHints\TypeHintDeclarationSniff.MissingPropertyTypeHint:
+      - Tests/*
+    SlevomatCodingStandard\Sniffs\TypeHints\TypeHintDeclarationSniff.MissingParameterTypeHint:
+      - Tests/*
+    SlevomatCodingStandard\Sniffs\TypeHints\TypeHintDeclarationSniff.MissingTraversableReturnTypeHintSpecification:
+      - Segment/Query/Filter/CustomItemFilterQueryBuilder.php

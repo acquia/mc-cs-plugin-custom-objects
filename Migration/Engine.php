@@ -71,7 +71,7 @@ class Engine
     /**
      * Get migration classes to proceed.
      *
-     * @return array
+     * @return string[]
      */
     private function getMigrationClasses(): array
     {
@@ -91,7 +91,7 @@ class Engine
     /**
      * Get migration file names.
      *
-     * @return array
+     * @return string[]
      */
     private function getMigrationFileNames(): array
     {

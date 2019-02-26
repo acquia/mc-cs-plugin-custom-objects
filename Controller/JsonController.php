@@ -21,7 +21,7 @@ class JsonController extends Controller
     /**
      * Adds flashes stored in session (by addFlash() method) to the JsonResponse.
      *
-     * @param array $responseData
+     * @param mixed[] $responseData
      *
      * @return JsonResponse
      */

@@ -34,7 +34,7 @@ class CustomFieldSubscriber implements EventSubscriber
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public function getSubscribedEvents(): array
     {

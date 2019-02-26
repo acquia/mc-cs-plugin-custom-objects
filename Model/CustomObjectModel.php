@@ -149,9 +149,9 @@ class CustomObjectModel extends FormModel
     }
 
     /**
-     * @param array $args
+     * @param mixed[] $args
      *
-     * @return Paginator|array
+     * @return Paginator|CustomObject[]
      */
     public function fetchEntities(array $args = [])
     {
@@ -159,7 +159,7 @@ class CustomObjectModel extends FormModel
     }
 
     /**
-     * @return array
+     * @return CustomObject[]
      */
     public function fetchAllPublishedEntities(): array
     {
@@ -216,7 +216,7 @@ class CustomObjectModel extends FormModel
      * @param \DateTimeInterface $to
      * @param CustomObject       $customObject
      *
-     * @return array
+     * @return mixed[]
      */
     public function getItemsLineChartData(\DateTimeInterface $from, \DateTimeInterface $to, CustomObject $customObject): array
     {
@@ -231,9 +231,9 @@ class CustomObjectModel extends FormModel
     /**
      * Adds condition for creator if the user doesn't have permissions to view other.
      *
-     * @param array $args
+     * @param mixed[] $args
      *
-     * @return array
+     * @return mixed[]
      */
     private function addCreatorLimit(array $args): array
     {

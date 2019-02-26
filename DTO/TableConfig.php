@@ -41,7 +41,7 @@ class TableConfig
     private $orderDirection;
 
     /**
-     * @var array
+     * @var mixed[]
      */
     private $filters = [];
 

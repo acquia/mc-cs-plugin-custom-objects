@@ -270,7 +270,7 @@ class CustomItemModel extends FormModel
     /**
      * @param TableConfig $tableConfig
      *
-     * @return array
+     * @return mixed[]
      */
     public function getLookupData(TableConfig $tableConfig): array
     {
@@ -356,7 +356,7 @@ class CustomItemModel extends FormModel
      * @param \DateTimeInterface $to
      * @param CustomItem         $customItem
      *
-     * @return array
+     * @return mixed[]
      */
     public function getLinksLineChartData(
         \DateTimeInterface $from,
@@ -404,11 +404,11 @@ class CustomItemModel extends FormModel
     }
 
     /**
-     * @param Lead   $contact
-     * @param string $action
-     * @param string $object
-     * @param int    $objectId
-     * @param array  $properties
+     * @param Lead    $contact
+     * @param string  $action
+     * @param string  $object
+     * @param int     $objectId
+     * @param mixed[] $properties
      *
      * @return LeadEventLog
      */

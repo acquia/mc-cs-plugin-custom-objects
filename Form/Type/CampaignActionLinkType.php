@@ -45,7 +45,7 @@ class CampaignActionLinkType extends AbstractType
 
     /**
      * @param FormBuilderInterface $builder
-     * @param array                $options
+     * @param mixed[]              $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

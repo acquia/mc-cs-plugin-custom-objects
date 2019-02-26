@@ -42,7 +42,7 @@ class CustomFieldType extends AbstractType
 
     /**
      * @param FormBuilderInterface $builder
-     * @param array                $options
+     * @param mixed[]              $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -122,7 +122,7 @@ class CustomFieldType extends AbstractType
      * Build fields for form in modal. Full specification of custom field.
      *
      * @param FormBuilderInterface $builder
-     * @param array                $options
+     * @param mixedp[]             $options
      */
     public function buildModalFormFields(FormBuilderInterface $builder, array $options): void
     {

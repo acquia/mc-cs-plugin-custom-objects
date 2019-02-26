@@ -50,14 +50,14 @@ class CustomItemImportModel extends FormModel
         CustomItemModel $customItemModel,
         FormatterHelper $formatterHelper
     ) {
-        $this->entityManager        = $entityManager;
-        $this->customItemModel      = $customItemModel;
-        $this->formatterHelper      = $formatterHelper;
+        $this->entityManager   = $entityManager;
+        $this->customItemModel = $customItemModel;
+        $this->formatterHelper = $formatterHelper;
     }
 
     /**
      * @param Import       $import
-     * @param array        $rowData
+     * @param mixed[]      $rowData
      * @param CustomObject $customObject
      *
      * @return bool updated = true, inserted = false
@@ -132,7 +132,7 @@ class CustomItemImportModel extends FormModel
 
     /**
      * @param CustomItem $customItem
-     * @param array      $contactIds
+     * @param int[]      $contactIds
      *
      * @return CustomItem
      */
@@ -165,7 +165,7 @@ class CustomItemImportModel extends FormModel
     /**
      * @param Import       $import
      * @param CustomObject $customObject
-     * @param array        $rowData
+     * @param mixed[]      $rowData
      *
      * @return CustomItem
      */
