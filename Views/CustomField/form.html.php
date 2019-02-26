@@ -32,6 +32,11 @@ $title = $customField->getId() ? $customField->getLabel() : $customField->getTyp
                 </a>
             </li>
             <li role="presentation">
+                <a href="#validation" aria-controls="validation" role="tab" data-toggle="tab">
+                    Validation
+                </a>
+            </li>
+            <li role="presentation">
                 <a href="#properties" aria-controls="properties" role="tab" data-toggle="tab">
                     Properties
                 </a>
@@ -45,10 +50,6 @@ $title = $customField->getId() ? $customField->getLabel() : $customField->getTyp
                     <div class="col-md-6">
                         <?php echo $view['form']->row($form['label']); ?>
                     </div>
-
-                    <div class="col-md-6">
-                        <?php echo $view['form']->row($form['required']); ?>
-                    </div>
                 </div>
 
                 <div class="row">
@@ -59,7 +60,20 @@ $title = $customField->getId() ? $customField->getLabel() : $customField->getTyp
 
             </div>
 
+            <div role="tabpanel" class="tab-pane" id="validation">
+                <div class="row">
+                    <div class="col-md-6">
+                        <?php echo $view['form']->row($form['paramsObject']['requiredValidationMessage']); ?>
+                    </div>
+                    <div class="col-md-6">
+                        <?php echo $view['form']->row($form['required']); ?>
+                    </div>
+                </div>
+            </div>
+
             <div role="tabpanel" class="tab-pane" id="properties">
+                <div class="row">
+                </div>
             </div>
 
         </div>

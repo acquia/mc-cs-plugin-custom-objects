@@ -16,6 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Entity;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
 use Mautic\CoreBundle\Entity\FormEntity;
@@ -67,7 +68,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @var array
      */
-    private $params;
+    private $params = [];
 
     public function __clone()
     {
@@ -284,6 +285,22 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     public function setDefaultValue($defaultValue): void
     {
         $this->defaultValue = $defaultValue;
+    }
+
+    /**
+     * @return Params
+     */
+    public function getParamsObject(): Params
+    {
+        return $this->paramsObject;
+    }
+
+    /**
+     * @param Params $params
+     */
+    public function setParamsObject(Params $params): void
+    {
+        $this->paramsObject = $params;
     }
 
     /**

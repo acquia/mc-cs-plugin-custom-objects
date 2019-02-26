@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 
@@ -48,6 +49,8 @@ class CustomFieldFactory
         $customField->setType($type);
         $customField->setTypeObject($typeObject);
         $customField->setCustomObject($customObject);
+        $customField->setParams([]);
+        $customField->setParamsObject(new Params());
 
         return $customField;
     }
