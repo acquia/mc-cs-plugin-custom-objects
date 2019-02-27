@@ -52,19 +52,6 @@ class CustomFieldType extends AbstractType
         $builder->add('id', HiddenType::class);
 
         $builder->add(
-            'label',
-            TextType::class,
-            [
-                'label'      => 'custom.field.label.label',
-                'required'   => true,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class' => 'form-control',
-                ],
-            ]
-        );
-
-        $builder->add(
             'customObject',
             HiddenType::class,
             [
@@ -127,6 +114,19 @@ class CustomFieldType extends AbstractType
     public function buildModalFormFields(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
+            'label',
+            TextType::class,
+            [
+                'label'      => 'custom.field.label.label',
+                'required'   => true,
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class' => 'form-control',
+                ],
+            ]
+        );
+
+        $builder->add(
             'required',
             \Symfony\Component\Form\Extension\Core\Type\CheckboxType::class,
             [
@@ -169,6 +169,28 @@ class CustomFieldType extends AbstractType
      */
     private function buildPanelFormFields(FormBuilderInterface $builder): void
     {
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
+            /** @var CustomField $customField */
+            $customField = $event->getData();
+            $builder = $event->getForm();
+
+            $builder->add(
+                'field',
+                $customField->getTypeObject()->getSymfonyFormFiledType(),
+                [
+                    'mapped'     => false,
+                    'label'      => $customField->getLabel(),
+                    'required'   => false,
+                    'data'       => $customField->getDefaultValue(),
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class' => 'form-control',
+                    ],
+                ]
+            );
+        });
+
+        $builder->add('label', HiddenType::class);
         $builder->add('required', HiddenType::class);
         $builder->add('defaultValue', HiddenType::class);
 

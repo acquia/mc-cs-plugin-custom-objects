@@ -221,12 +221,10 @@ CustomObjectsForm = {
         if (fieldOrderNo !== "") {
             // Custom field has order defined, this was edit
             fieldOrderNo = mQuery(content).find('[id*=order]').val();
-            content = CustomObjectsForm.convertDataFromModal(content, fieldOrderNo);
-            mQuery('form[name="custom_object"] [id*=order][value="' + fieldOrderNo +'"]').parent().replaceWith(content);
+            mQuery('#customField_' + fieldOrderNo +'').replaceWith(content);
         } else {
             // New custom field without id
             fieldOrderNo = mQuery('.panel').length - 2;
-            content = CustomObjectsForm.convertDataFromModal(content, fieldOrderNo);
             mQuery('.drop-here').prepend(content);
             CustomObjectsForm.recalculateOrder();
             fieldOrderNo = 0;
@@ -284,25 +282,5 @@ CustomObjectsForm = {
             mQuery('#objectFieldModal').find(target).val(value);
 
         });
-    },
-
-    /**
-     * Transfer modal data to CO form
-     * @param panel CF panel content
-     * @param fieldIndex numeric index of CF in form
-     * @returns html content of panel
-     */
-    convertDataFromModal: function (panel, fieldIndex) {
-
-        mQuery(panel).find('input').each(function(i, input) {
-
-            let id = mQuery(input).attr('id');
-            id = id.slice(id.lastIndexOf('_') + 1, id.length);
-            let name = 'custom_object[customFields][' + fieldIndex + '][' + id + ']';
-            mQuery(input).attr('name', name);
-            id = 'custom_object_custom_fields_' + fieldIndex + '_' + id;
-            mQuery(input).attr('id', id);
-        });
-        return panel;
     },
 };
