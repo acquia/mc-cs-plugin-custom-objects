@@ -16,15 +16,12 @@ namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use Mautic\CoreBundle\Helper\InputHelper;
-use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use MauticPlugin\CustomObjectsBundle\DTO\TableFilterConfig;
 use MauticPlugin\CustomObjectsBundle\Controller\JsonController;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use UnexpectedValueException;
 
 class LinkController extends JsonController
 {
@@ -69,16 +66,17 @@ class LinkController extends JsonController
     public function saveAction(int $itemId, string $entityType, int $entityId): JsonResponse
     {
         try {
-            $this->permissionProvider->canViewAtAll();
+            $customItem = $this->customItemModel->fetchEntity($itemId);
+            $this->permissionProvider->canEdit($customItem);
             $this->makeLinkBasedOnEntityType($itemId, $entityType, $entityId);
-        } catch (ForbiddenException $e) {
-            return new AccessDeniedException($e->getMessage(), $e);
         } catch (UniqueConstraintViolationException $e) {
             $this->addFlash('error', $this->translator->trans(
                 'custom.item.error.link.exists.already',
                 ['%itemId%' => $itemId, '%entityType%' => $entityType, '%entityId%' => $entityId],
                 'flashes'
             ));
+        } catch (ForbiddenException | NotFoundException | UnexpectedValueException $e) {
+            $this->addFlash('error', $e->getMessage());
         }
 
         return $this->renderJson();
@@ -89,7 +87,7 @@ class LinkController extends JsonController
      * @param string  $entityType
      * @param integer $entityId
      * 
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      * @throws UniqueConstraintViolationException
      */
     private function makeLinkBasedOnEntityType(int $itemId, string $entityType, int $entityId): void
@@ -99,7 +97,7 @@ class LinkController extends JsonController
                 $this->customItemModel->linkContact($itemId, $entityId);
                 break;
             default:
-                throw new \UnexpectedValueException("Entity {$entityType} cannot be linked to a custom item");
+                throw new UnexpectedValueException("Entity {$entityType} cannot be linked to a custom item");
                 break;
         }
     }

@@ -607,6 +607,17 @@ return [
                 ],
             ],
         ],
+        'permissions' => [
+            'custom_object.permissions' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Security\Permissions\CustomObjectPermissions::class,
+                'arguments' => [
+                    '%mautic.parameters%',
+                    'mautic.custom.model.object',
+                    'custom_object.config.provider',
+                    'translator',
+                ],
+            ],
+        ],
         'repositories' => [
             'custom_field.repository' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository::class,
@@ -684,6 +695,7 @@ return [
                     'mautic.custom.model.object',
                     'mautic.custom.model.import.item',
                     'custom_object.config.provider',
+                    'custom_item.permission.provider',
                 ],
             ],
             'custom_item.contact.subscriber' => [

@@ -79,7 +79,7 @@ class CustomItemImportModel extends FormModel
         $customItem    = $this->getCustomItem($import, $customObject, $rowData);
         $merged        = (bool) $customItem->getId();
         $contactIds    = [];
-        
+
         $this->setOwner($import, $customItem);
 
         foreach ($matchedFields as $csvField => $customFieldId) {
@@ -99,12 +99,11 @@ class CustomItemImportModel extends FormModel
                 continue;
             }
 
-            $customFieldValue = $customItem->findCustomFieldValueForFieldId((int) $customFieldId);
-
-            if (!$customFieldValue) {
-                $customFieldValue = $this->createNewCustomFieldValue($customObject, $customItem, (int) $customFieldId, $csvValue);
-            } else {
+            try {
+                $customFieldValue = $customItem->findCustomFieldValueForFieldId((int) $customFieldId);
                 $customFieldValue->updateThisEntityManually();
+            } catch (NotFoundException $e) {
+                $customFieldValue = $this->createNewCustomFieldValue($customObject, $customItem, (int) $customFieldId, $csvValue);
             }
 
             $customFieldValue->setValue($csvValue);
@@ -113,7 +112,7 @@ class CustomItemImportModel extends FormModel
         $this->customItemModel->save($customItem);
 
         $this->linkContacts($customItem, $contactIds);
-
+        
         return $merged;
     }
 

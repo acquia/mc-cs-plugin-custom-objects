@@ -110,11 +110,11 @@ class SaveController extends CommonController
             $customObject = $this->customObjectModel->fetchEntity($objectId);
 
             if ($itemId) {
-                $entity = $this->customItemModel->fetchEntity($itemId);
-                $this->permissionProvider->canEdit($entity);
+                $customItem = $this->customItemModel->fetchEntity($itemId);
+                $this->permissionProvider->canEdit($customItem);
             } else {
-                $this->permissionProvider->canCreate();
-                $entity = $this->customItemModel->populateCustomFields(new CustomItem($customObject));
+                $this->permissionProvider->canCreate($objectId);
+                $customItem = $this->customItemModel->populateCustomFields(new CustomItem($customObject));
             }
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
@@ -124,19 +124,19 @@ class SaveController extends CommonController
 
         $request = $this->requestStack->getCurrentRequest();
         $action  = $this->routeProvider->buildSaveRoute($objectId, $itemId);
-        $form    = $this->formFactory->create(CustomItemType::class, $entity, ['action' => $action, 'objectId' => $objectId]);
+        $form    = $this->formFactory->create(CustomItemType::class, $customItem, ['action' => $action, 'objectId' => $objectId]);
         $form->handleRequest($request);
         
         if ($form->isValid()) {
-            $this->customItemModel->save($entity);
+            $this->customItemModel->save($customItem);
 
             $this->session->getFlashBag()->add(
                 'notice',
                 $this->translator->trans(
                     $itemId ? 'mautic.core.notice.updated' : 'mautic.core.notice.created',
                     [
-                        '%name%' => $entity->getName(),
-                        '%url%'  => $this->routeProvider->buildEditRoute($objectId, $entity->getId()),
+                        '%name%' => $customItem->getName(),
+                        '%url%'  => $this->routeProvider->buildEditRoute($objectId, $customItem->getId()),
                     ], 
                     'flashes'
                 )
@@ -148,7 +148,7 @@ class SaveController extends CommonController
                 $where = 'CustomObjectsBundle:CustomItem\Form:renderForm';
             }
 
-            return $this->redirectTo($where, $request, $entity);
+            return $this->redirectTo($where, $request, $customItem);
         }
 
         $route = $itemId ? $this->routeProvider->buildEditRoute($objectId, $itemId) : $this->routeProvider->buildNewRoute($objectId);
@@ -157,7 +157,7 @@ class SaveController extends CommonController
             [
                 'returnUrl'      => $route,
                 'viewParameters' => [
-                    'entity' => $entity,
+                    'entity' => $customItem,
                     'form'   => $form->createView(),
                     'tmpl'   => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                 ],
@@ -173,7 +173,7 @@ class SaveController extends CommonController
     /**
      * @param string     $where
      * @param Request    $request
-     * @param CustomItem $entity
+     * @param CustomItem $customItem
      * 
      * @return Response
      */

@@ -91,7 +91,7 @@ class MenuSubscriber extends CommonSubscriber
                         $customObject->getName() => [
                             'route'           => CustomItemRouteProvider::ROUTE_LIST,
                             'routeParameters' => ['objectId' => $customObject->getId(), 'page' => 1],
-                            'access'          => 'custom_fields:custom_fields:view',
+                            'access'          => "custom_objects:{$customObject->getId()}:view",
                             'id'              => 'mautic_custom_object_'.$customObject->getId(),
                             'parent'          => 'custom.object.title',
                         ],

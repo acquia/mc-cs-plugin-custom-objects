@@ -105,6 +105,9 @@ class TableConfig
         $this->addFilterDTO($this->createFilter($entityName, $columnName, $value, $expression));
     }
 
+    /**
+     * @param TableFilterConfig $tableFilterConfig
+     */
     public function addFilterDTO(TableFilterConfig $tableFilterConfig): void
     {
         if (!isset($this->filters[$tableFilterConfig->getEntityName()])) {
