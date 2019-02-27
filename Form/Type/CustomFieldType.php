@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use MauticPlugin\CustomObjectsBundle\Form\CustomObjectHiddenTransformer;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\Form\AbstractType;
@@ -128,7 +129,7 @@ class CustomFieldType extends AbstractType
 
         $builder->add(
             'required',
-            \Symfony\Component\Form\Extension\Core\Type\CheckboxType::class,
+            YesNoButtonGroupType::class,
             [
                 'label' => 'custom.field.label.required',
             ]
