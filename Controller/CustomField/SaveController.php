@@ -159,7 +159,9 @@ class SaveController extends CommonController
      */
     private function buildSuccessForm(CustomObject $customObject, CustomField $customField): JsonResponse
     {
-        $customObject->addCustomField($customField);
+        if (!$customField->getId()) {
+            $customObject->addCustomField($customField);
+        }
 
         $form = $this->formFactory->create(
             CustomObjectType::class,
