@@ -18,9 +18,7 @@ pipeline {
     stage('Download and combine') {
       steps {
         container('hosted-tester') {
-          checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: 'deployed']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '1a066462-6d24-4247-bef6-1da084c8f484', url: 'git@github.com:mautic-inc/mautic-cloud.git']]]
-          sh('rm -rf plugins/IntegrationsBundle')
-          checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: 'master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'plugins/IntegrationsBundle']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '1a066462-6d24-4247-bef6-1da084c8f484', url: 'git@github.com:mautic-inc/plugin-mautic-integrations.git']]]
+          checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: 'beta']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '1a066462-6d24-4247-bef6-1da084c8f484', url: 'git@github.com:mautic-inc/mautic-cloud.git']]]
           sh('mkdir -p plugins/CustomObjectsBundle && chmod 777 plugins/CustomObjectsBundle')
           dir('plugins/CustomObjectsBundle') {
             checkout scm
