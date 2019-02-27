@@ -127,7 +127,7 @@ class SaveController extends CommonController
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            return $this->buildCustomFieldFormPart($customObject, $form->getData());
+            return $this->buildSuccesForm($customObject, $form->getData());
         }
 
         $route = $fieldId ? $this->fieldRouteProvider->buildFormRoute($fieldId) : '';
@@ -157,7 +157,7 @@ class SaveController extends CommonController
      *
      * @return JsonResponse
      */
-    private function buildCustomFieldFormPart(CustomObject $customObject, CustomField $customField): JsonResponse
+    private function buildSuccesForm(CustomObject $customObject, CustomField $customField): JsonResponse
     {
         $customObject->addCustomField($customField);
 
