@@ -19,9 +19,9 @@ class Params
     private $requiredValidationMessage;
 
     /**
-     * @param array $params
+     * @param array $params|null
      */
-    public function __construct(array $params)
+    public function __construct(array $params = [])
     {
         foreach ($params as $key => $value) {
             $this->{$key} = $value;
