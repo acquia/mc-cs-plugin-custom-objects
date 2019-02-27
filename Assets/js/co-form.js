@@ -214,7 +214,7 @@ CustomObjectsForm = {
      * \MauticPlugin\CustomObjectsFormBundle\Controller\CustomField\SaveController::saveAction
      */
     saveToPanel: function(response, target) {
-        let content = mQuery(response.content);
+        let content = mQuery(response.content).find('#customField_0');
 
         fieldOrderNo = mQuery(content).find('[id*=order]').val();
 

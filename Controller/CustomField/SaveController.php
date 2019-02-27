@@ -15,6 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
@@ -158,18 +159,21 @@ class SaveController extends CommonController
      */
     private function buildCustomFieldFormPart(CustomObject $customObject, CustomField $customField): JsonResponse
     {
-        $customFieldForm = $this->formFactory->create(
-            CustomFieldType::class,
-            $customField,
-            ['custom_object_form' => true]
+        $customObject->addCustomField($customField);
+
+        $form = $this->formFactory->create(
+            CustomObjectType::class,
+            $customObject
         );
 
         $template = $this->render(
-            "CustomObjectsBundle:CustomObject:Form\\Panel\\{$customField->getType()}.html.php",
+            "CustomObjectsBundle:CustomObject:form.html.php",
             [
-                'customObject'      => $customObject,
-                'customFieldEntity' => $customField,
-                'customField'       => $customFieldForm->createView(),
+                'customObject'        => $customObject,
+                'availableFieldTypes' => [],
+                'customFields'        => [$customField],
+                'deletedFields'       => [],
+                'form'                => $form->createView(),
             ]
          );
 
