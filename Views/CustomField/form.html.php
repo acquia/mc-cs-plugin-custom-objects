@@ -63,7 +63,9 @@ $title = $customField->getId() ? $customField->getLabel() : $customField->getTyp
             <div role="tabpanel" class="tab-pane" id="validation">
                 <div class="row">
                     <div class="col-md-6">
-                        <?php echo $view['form']->row($form['paramsObject']['requiredValidationMessage']); ?>
+                        <?php
+//                            echo $view['form']->row($form['paramsObject']['requiredValidationMessage']);
+                        ?>
                     </div>
                     <div class="col-md-6">
                         <?php echo $view['form']->row($form['required']); ?>
