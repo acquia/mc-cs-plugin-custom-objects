@@ -24,6 +24,11 @@ use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Symfony\Component\HttpFoundation\Session\Session;
 
+/**
+ * Even though we use nice controllers with defined dependencies, when we call some method like
+ * `forward` or `postActionRedirect` it use container and all that nasty stuff. This trait should
+ * take care of it.
+ */
 trait ControllerDependenciesTrait
 {
     private function addSymfonyDependencies(Controller $controller)
@@ -48,7 +53,7 @@ trait ControllerDependenciesTrait
         ]));
 
         $container->method('has')->will($this->returnValueMap([
-            ['templating', $phpEngine],
+            ['templating', true],
         ]));
 
         $modelFactory->method('getModel')->will($this->returnValueMap([
