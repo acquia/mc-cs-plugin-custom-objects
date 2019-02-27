@@ -36,7 +36,6 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
         $filterOperator   = $filter->getOperator();
-        $filterParameters = $filter->getParameterValue();
         $filterFieldId    = $filter->getField();
 
         $tableAlias        = 'cfwq_' . (int) $filter->getField();
@@ -50,31 +49,23 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
 
 
         $filterQueryBuilder->select($tableAlias . '_contact.contact_id as lead_id');
+        $filterQueryBuilder->andWhere('l.id = ' . $tableAlias . '_contact.contact_id');
+
         $queryBuilder->setParameter('customFieldId_' . $tableAlias, (int) $filterFieldId);
 
         switch ($filterOperator) {
             case 'empty':
-                $queryBuilder->addLogic($queryBuilder->expr()->notExists($filterQueryBuilder->getSQL()), $filter->getGlue());
-                break;
-            case 'notEmpty':
-                $queryBuilder->addLogic($queryBuilder->expr()->exists($filterQueryBuilder->getSQL()), $filter->getGlue());
-                break;
-            case 'notIn':
-                $queryBuilder->addLogic($queryBuilder->expr()->exists($filterQueryBuilder->getSQL()), $filter->getGlue());
-                break;
             case 'neq':
-                $queryBuilder->addLogic($queryBuilder->expr()->notExists($filterQueryBuilder->getSQL()), $filter->getGlue());
-                break;
             case 'notLike':
                 $queryBuilder->addLogic($queryBuilder->expr()->notExists($filterQueryBuilder->getSQL()), $filter->getGlue());
                 break;
             default:
-                $filterQueryBuilder->andWhere($filterQueryBuilder->getSQL());
-
                 $queryBuilder->addLogic($queryBuilder->expr()->exists($filterQueryBuilder->getSQL()), $filter->getGlue());
         }
 
-        $queryBuilder->setParametersPairs($filterQueryBuilder->getParameters());
+        foreach ($filterQueryBuilder->getParameters() as $paraName => $paraValue) {
+            $queryBuilder->setParameter($paraName, $paraValue);
+        }
 
         return $queryBuilder;
     }

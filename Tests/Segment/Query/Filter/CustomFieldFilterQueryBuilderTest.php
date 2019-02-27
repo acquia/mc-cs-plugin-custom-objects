@@ -3,6 +3,7 @@
 namespace MauticPlugin\CustomObjectsBundle\Tests\Segment\Query\Filter;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Tools\SchemaTool;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -19,6 +20,19 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
 
     public function setUp()
     {
+        parent::setUp();
+
+        $em = $this->getContainer()->get('doctrine')->getManager();
+        if (!isset($metadatas)) {
+            $metadatas = $em->getMetadataFactory()->getAllMetadata();
+        }
+        $schemaTool = new SchemaTool($em);
+        $schemaTool->dropDatabase();
+        if (!empty($metadatas)) {
+            $schemaTool->createSchema($metadatas);
+        }
+        $this->postFixtureSetup();
+
         $pluginDirectory = $this->getContainer()->get('kernel')->locateResource('@CustomObjectsBundle');
         $fixturesDirectory = $pluginDirectory . '/Tests/DataFixtures/ORM/Data';
 
@@ -37,7 +51,6 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
 
         $this->entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
 
-        parent::setUp();
     }
 
     public function tearDown()

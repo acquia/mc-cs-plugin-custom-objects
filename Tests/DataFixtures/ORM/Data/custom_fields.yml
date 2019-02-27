@@ -15,6 +15,60 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomField:
     custom_object: '@custom_object1'
     is_published: true
     date_added: '<date()>'
+    label: '<word()> Date'
+    type: 'date'
+  custom_field4:
+    custom_object: '@custom_object1'
+    is_published: true
+    date_added: '<datetime()>'
     label: '<word()> DateTime'
-    type: 'DateTime'
+    type: 'datetime'
+  custom_field5:
+    custom_object: '@custom_object1'
+    is_published: true
+    date_added: '<datetime()>'
+    label: '<word()> Link'
+    type: 'link'
+  custom_field6:
+    custom_object: '@custom_object1'
+    is_published: true
+    date_added: '<datetime()>'
+    label: '<word()> Select'
+    type: 'select'
+  custom_field7:
+    custom_object: '@custom_object1'
+    is_published: true
+    date_added: '<datetime()>'
+    label: '<word()> Radio'
+    type: 'radio_group'
+  custom_field8:
+    custom_object: '@custom_object1'
+    is_published: true
+    date_added: '<datetime()>'
+    label: '<word()> Phone'
+    type: 'phone'
+  custom_field9:
+    custom_object: '@custom_object1'
+    is_published: true
+    date_added: '<datetime()>'
+    label: '<word()> Hidden'
+    type: 'hidden'
+  custom_field10:
+    custom_object: '@custom_object1'
+    is_published: true
+    date_added: '<datetime()>'
+    label: '<word()> Email'
+    type: 'email'
+  custom_field11:
+    custom_object: '@custom_object1'
+    is_published: true
+    date_added: '<datetime()>'
+    label: '<word()> Country'
+    type: 'country_list'
+  custom_field12:
+    custom_object: '@custom_object1'
+    is_published: true
+    date_added: '<datetime()>'
+    label: '<word()> CheckBox'
+    type: 'checkbox_group'
 
