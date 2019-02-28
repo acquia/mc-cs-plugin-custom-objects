@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Controller\CustomItem;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\DeleteController;
@@ -26,6 +25,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Mautic\CoreBundle\Service\FlashBag;
 
 class DeleteControllerTest extends \PHPUnit_Framework_TestCase
 {
@@ -37,7 +37,7 @@ class DeleteControllerTest extends \PHPUnit_Framework_TestCase
     
     private $customItemModel;
     private $sessionprovider;
-    private $translator;
+    private $flashBag;
     private $permissionProvider;
     private $routeProvider;
     private $request;
@@ -53,14 +53,14 @@ class DeleteControllerTest extends \PHPUnit_Framework_TestCase
 
         $this->customItemModel    = $this->createMock(CustomItemModel::class);
         $this->sessionprovider    = $this->createMock(CustomItemSessionProvider::class);
-        $this->translator         = $this->createMock(TranslatorInterface::class);
+        $this->flashBag           = $this->createMock(FlashBag::class);
         $this->permissionProvider = $this->createMock(CustomItemPermissionProvider::class);
         $this->routeProvider      = $this->createMock(CustomItemRouteProvider::class);
         $this->request            = $this->createMock(Request::class);
         $this->deleteController   = new DeleteController(
             $this->customItemModel,
             $this->sessionprovider,
-            $this->translator,
+            $this->flashBag,
             $this->permissionProvider,
             $this->routeProvider 
         );
@@ -81,13 +81,8 @@ class DeleteControllerTest extends \PHPUnit_Framework_TestCase
         $this->customItemModel->expects($this->never())
             ->method('delete');
 
-        $this->translator->expects($this->once())
-            ->method('trans')
-            ->with('Item not found message', ['%url%' => 'https://a.b'])
-            ->willReturn('some translation');
-        
-        $this->sessionprovider->expects($this->never())
-            ->method('addFlash');
+        $this->flashBag->expects($this->never())
+            ->method('add');
 
         $this->deleteController->deleteAction(self::OBJECT_ID, self::ITEM_ID);
     }
@@ -105,13 +100,8 @@ class DeleteControllerTest extends \PHPUnit_Framework_TestCase
         $this->customItemModel->expects($this->never())
             ->method('delete');
 
-        $this->translator->expects($this->once())
-            ->method('trans')
-            ->with('You do not have permission to delete', ['%url%' => 'https://a.b'])
-            ->willReturn('some translation');
-        
-        $this->sessionprovider->expects($this->never())
-            ->method('addFlash');
+        $this->flashBag->expects($this->never())
+            ->method('add');
 
         $this->expectException(AccessDeniedHttpException::class);
 
@@ -123,7 +113,6 @@ class DeleteControllerTest extends \PHPUnit_Framework_TestCase
         $customItem = $this->createMock(CustomItem::class);
 
         $customItem->method('getId')->willReturn(self::ITEM_ID);
-        $customItem->method('getName')->willReturn('Apple');
 
         $this->customItemModel->expects($this->once())
             ->method('fetchEntity')
@@ -134,14 +123,9 @@ class DeleteControllerTest extends \PHPUnit_Framework_TestCase
             ->method('delete')
             ->with($customItem);
             
-        $this->translator->expects($this->once())
-            ->method('trans')
-            ->with('mautic.core.notice.deleted', ['%name%' => 'Apple', '%id%' => self::ITEM_ID], 'flashes')
-            ->willReturn('some translation');
-        
-        $this->sessionprovider->expects($this->once())
-            ->method('addFlash')
-            ->with('some translation', 'notice');
+        $this->flashBag->expects($this->once())
+            ->method('add')
+            ->with('mautic.core.notice.deleted');
 
         $this->sessionprovider->expects($this->once())
             ->method('getPage')

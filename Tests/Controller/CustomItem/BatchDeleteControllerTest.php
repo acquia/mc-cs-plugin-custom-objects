@@ -20,11 +20,12 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\BatchDeleteController;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemSessionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerDependenciesTrait;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use Mautic\CoreBundle\Service\FlashBag;
 
 class BatchDeleteControllerTest extends \PHPUnit_Framework_TestCase
 {
@@ -33,7 +34,7 @@ class BatchDeleteControllerTest extends \PHPUnit_Framework_TestCase
     private $requestStack;
     private $customItemModel;
     private $sessionprovider;
-    private $translator;
+    private $flashBag;
     private $permissionProvider;
     private $routeProvider;
     private $request;
@@ -49,8 +50,8 @@ class BatchDeleteControllerTest extends \PHPUnit_Framework_TestCase
 
         $this->requestStack          = $this->createMock(RequestStack::class);
         $this->customItemModel       = $this->createMock(CustomItemModel::class);
-        $this->sessionprovider       = $this->createMock(CustomItemSessionProvider::class);
-        $this->translator            = $this->createMock(TranslatorInterface::class);
+        $this->sessionprovider       = $this->createMock(SessionProviderInterface::class);
+        $this->flashBag              = $this->createMock(FlashBag::class);
         $this->permissionProvider    = $this->createMock(CustomItemPermissionProvider::class);
         $this->routeProvider         = $this->createMock(CustomItemRouteProvider::class);
         $this->request               = $this->createMock(Request::class);
@@ -58,9 +59,9 @@ class BatchDeleteControllerTest extends \PHPUnit_Framework_TestCase
             $this->requestStack,
             $this->customItemModel,
             $this->sessionprovider,
-            $this->translator,
             $this->permissionProvider,
-            $this->routeProvider 
+            $this->routeProvider,
+            $this->flashBag
         );
 
         $this->addSymfonyDependencies($this->batchDeleteController);
@@ -82,15 +83,10 @@ class BatchDeleteControllerTest extends \PHPUnit_Framework_TestCase
         $this->customItemModel->expects($this->never())
             ->method('delete');
 
-        $this->translator->expects($this->once())
-            ->method('trans')
-            ->with('custom.item.error.items.not.found', ['%ids%' => '13,14'], 'flashes')
-            ->willReturn('some translation');
+        $this->flashBag->expects($this->once())
+            ->method('add')
+            ->with('custom.item.error.items.not.found', ['%ids%' => '13,14'], FlashBag::LEVEL_ERROR);
         
-        $this->sessionprovider->expects($this->once())
-            ->method('addFlash')
-            ->with('some translation', 'error');
-
         $this->batchDeleteController->deleteAction(33);
     }
 
@@ -112,15 +108,10 @@ class BatchDeleteControllerTest extends \PHPUnit_Framework_TestCase
         $this->customItemModel->expects($this->never())
             ->method('delete');
 
-        $this->translator->expects($this->once())
-            ->method('trans')
-            ->with('custom.item.error.items.denied', ['%ids%' => '13,14'], 'flashes')
-            ->willReturn('some translation');
+        $this->flashBag->expects($this->once())
+            ->method('add')
+            ->with('custom.item.error.items.denied', ['%ids%' => '13,14'], FlashBag::LEVEL_ERROR);
         
-        $this->sessionprovider->expects($this->once())
-            ->method('addFlash')
-            ->with('some translation', 'error');
-
         $this->batchDeleteController->deleteAction(33);
     }
 
@@ -152,15 +143,10 @@ class BatchDeleteControllerTest extends \PHPUnit_Framework_TestCase
             ->method('delete')
             ->with($customItem14);
 
-        $this->translator->expects($this->once())
-            ->method('trans')
-            ->with('mautic.core.notice.batch_deleted', ['%count%' => 2], 'flashes')
-            ->willReturn('some translation');
+        $this->flashBag->expects($this->once())
+            ->method('add')
+            ->with('mautic.core.notice.batch_deleted', ['%count%' => 2]);
         
-        $this->sessionprovider->expects($this->once())
-            ->method('addFlash')
-            ->with('some translation', 'notice');
-
         $this->sessionprovider->expects($this->once())
             ->method('getPage')
             ->willReturn(3);
