@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * @copyright   2018 Mautic, Inc. All rights reserved
@@ -18,7 +18,7 @@ if ($entity->getId()) {
         'custom.item.edit',
         [
             '%object%' => $view['translator']->trans($customObject->getNameSingular()),
-            '%item%' => $view['translator']->trans($entity->getName()),
+            '%item%'   => $view['translator']->trans($entity->getName()),
         ]
     );
 } else {

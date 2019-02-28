@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 /*
  * @copyright   2018 Mautic, Inc. All rights reserved
@@ -10,15 +10,14 @@
  */
 
 /**
- * Panels rendered in CO form
+ * Panels rendered in CO form.
  */
-
-$customFieldEntity = $customField->vars['data'];
+$customFieldEntity          = $customField->vars['data'];
 $customField->vars['index'] = $customField->vars['name'];
-$order = (int) $customField->vars['value']->getOrder();
-$deleted = (!empty($_POST['custom_object']['customFields'][$order]['deleted'])) ? 'style="display:none;"' : '';
+$order                      = (int) $customField->vars['value']->getOrder();
+$deleted                    = !empty($_POST['custom_object']['customFields'][$order]['deleted']) ? 'style="display:none;"' : '';
 ?>
-<div class="panel form-field-wrapper ui-sortable-handle" id="customField_<?php echo (int) $customField->vars['value']->getOrder() ?>" <?php echo $deleted ?>>
+<div class="panel form-field-wrapper ui-sortable-handle" id="customField_<?php echo (int) $customField->vars['value']->getOrder(); ?>" <?php echo $deleted; ?>>
 
     <div class="form-buttons btn-group" role="group" aria-label="Field options" style="width: 77px;">
 
@@ -26,8 +25,8 @@ $deleted = (!empty($_POST['custom_object']['customFields'][$order]['deleted'])) 
         echo $view['router']->path(
             \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider::ROUTE_FORM,
             [
-                'fieldId' => $customFieldEntity->getId(),
-                'objectId' => $customObject->getId(),
+                'fieldId'   => $customFieldEntity->getId(),
+                'objectId'  => $customObject->getId(),
                 'fieldType' => $customFieldEntity->getTypeObject()->getKey(),
             ]
         );
@@ -43,8 +42,8 @@ $deleted = (!empty($_POST['custom_object']['customFields'][$order]['deleted'])) 
 
     <div class="row ml-0 mr-0">
         <div id="mauticform_1" data-validate="name" data-validation-type="text" class="mauticform-row mauticform-text mauticform-field-1 mauticform-required">
-            <?php echo $view['form']->row($customField['label']) ?>
+            <?php echo $view['form']->row($customField['field']); ?>
         </div>
     </div>
-    <?php echo $view['form']->rest($customField) ?>
+    <?php echo $view['form']->rest($customField); ?>
 </div>

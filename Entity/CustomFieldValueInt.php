@@ -16,9 +16,6 @@ namespace MauticPlugin\CustomObjectsBundle\Entity;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemValue;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueStandard;
 
 class CustomFieldValueInt extends CustomFieldValueStandard
 {
@@ -42,26 +39,26 @@ class CustomFieldValueInt extends CustomFieldValueStandard
     /**
      * @param ORM\ClassMetadata $metadata
      */
-    public static function loadMetadata(ORM\ClassMetadata $metadata)
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('custom_field_value_int');
         $builder->addIndex(['value'], 'value_index');
         $builder->addNullableField('value', Type::INTEGER);
-        
+
         parent::addReferenceColumns($builder);
     }
 
     /**
-     * @param int|null $value
+     * @param mixed $value
      */
-    public function setValue($value = null)
+    public function setValue($value = null): void
     {
-        $this->value = $value;
+        $this->value = (int) $value;
     }
 
     /**
-     * @return int|null
+     * @return mixed
      */
     public function getValue()
     {

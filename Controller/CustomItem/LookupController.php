@@ -20,10 +20,11 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Mautic\CoreBundle\Helper\InputHelper;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Controller\JsonController;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class LookupController extends JsonController
 {
@@ -43,27 +44,26 @@ class LookupController extends JsonController
     private $permissionProvider;
 
     /**
-     * @param RequestStack $requestStack
-     * @param CustomItemModel $customItemModel
+     * @param RequestStack                 $requestStack
+     * @param CustomItemModel              $customItemModel
      * @param CustomItemPermissionProvider $permissionProvider
      */
     public function __construct(
         RequestStack $requestStack,
         CustomItemModel $customItemModel,
         CustomItemPermissionProvider $permissionProvider
-    )
-    {
+    ) {
         $this->requestStack       = $requestStack;
         $this->customItemModel    = $customItemModel;
         $this->permissionProvider = $permissionProvider;
     }
 
     /**
-     * @param integer $objectId
-     * 
+     * @param int $objectId
+     *
      * @return JsonResponse
      */
-    public function listAction(int $objectId)
+    public function listAction(int $objectId): JsonResponse
     {
         try {
             $this->permissionProvider->canViewAtAll($objectId);

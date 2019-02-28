@@ -15,9 +15,8 @@ namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
@@ -34,11 +33,6 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
 
 class SaveController extends CommonController
 {
-    /**
-     * @var Session
-     */
-    private $session;
-
     /**
      * @var FormFactory
      */
@@ -70,7 +64,6 @@ class SaveController extends CommonController
     private $customObjectModel;
 
     /**
-     * @param Session                       $session
      * @param FormFactory                   $formFactory
      * @param TranslatorInterface           $translator
      * @param CustomFieldModel              $customFieldModel
@@ -80,7 +73,6 @@ class SaveController extends CommonController
      * @param CustomObjectModel             $customObjectModel
      */
     public function __construct(
-        Session $session,
         FormFactory $formFactory,
         TranslatorInterface $translator,
         CustomFieldModel $customFieldModel,
@@ -88,15 +80,14 @@ class SaveController extends CommonController
         CustomFieldPermissionProvider $permissionProvider,
         CustomFieldRouteProvider $routeProvider,
         CustomObjectModel $customObjectModel
-    ){
-        $this->session            = $session;
-        $this->formFactory        = $formFactory;
-        $this->translator         = $translator;
-        $this->customFieldModel   = $customFieldModel;
-        $this->customFieldFactory = $customFieldFactory;
-        $this->permissionProvider = $permissionProvider;
+    ) {
+        $this->formFactory             = $formFactory;
+        $this->translator              = $translator;
+        $this->customFieldModel        = $customFieldModel;
+        $this->customFieldFactory      = $customFieldFactory;
+        $this->permissionProvider      = $permissionProvider;
         $this->fieldRouteProvider      = $routeProvider;
-        $this->customObjectModel = $customObjectModel;
+        $this->customObjectModel       = $customObjectModel;
     }
 
     /**
@@ -106,8 +97,8 @@ class SaveController extends CommonController
      */
     public function saveAction(Request $request)
     {
-        $objectId = (int) $request->get('objectId');
-        $fieldId = (int) $request->get('fieldId');
+        $objectId  = (int) $request->get('objectId');
+        $fieldId   = (int) $request->get('fieldId');
         $fieldType = $request->get('fieldType');
 
         if ($objectId) {
@@ -127,16 +118,16 @@ class SaveController extends CommonController
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
-            $this->accessDenied(false, $e->getMessage());
+            return $this->accessDenied(false, $e->getMessage());
         }
 
         $action = $this->fieldRouteProvider->buildSaveRoute($fieldType, $fieldId, $customObject->getId());
         $form   = $this->formFactory->create(CustomFieldType::class, $customField, ['action' => $action]);
 
         $form->handleRequest($request);
-        
+
         if ($form->isValid()) {
-            return $this->buildCustomFieldFormPart($customObject, $form->getData());
+            return $this->buildSuccessForm($customObject, $form->getData());
         }
 
         $route = $fieldId ? $this->fieldRouteProvider->buildFormRoute($fieldId) : '';
@@ -146,7 +137,7 @@ class SaveController extends CommonController
                 'returnUrl'      => $route,
                 'viewParameters' => [
                     'customField' => $customField,
-                    'form'   => $form->createView(),
+                    'form'        => $form->createView(),
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomField:form.html.php',
                 'passthroughVars' => [
@@ -159,14 +150,14 @@ class SaveController extends CommonController
     }
 
     /**
-     * Build custom field form to be used in custom object form
+     * Build custom field form to be used in custom object form.
      *
      * @param CustomObject $customObject
      * @param CustomField  $customField
      *
      * @return JsonResponse
      */
-    private function buildCustomFieldFormPart(CustomObject $customObject, CustomField $customField): JsonResponse
+    private function buildSuccessForm(CustomObject $customObject, CustomField $customField): JsonResponse
     {
         $customFieldForm = $this->formFactory->create(
             CustomFieldType::class,
@@ -174,14 +165,14 @@ class SaveController extends CommonController
             ['custom_object_form' => true]
         );
 
-         $template = $this->render(
+        $template = $this->render(
             "CustomObjectsBundle:CustomObject:Form\\Panel\\{$customField->getType()}.html.php",
             [
-                'customObject' => $customObject,
+                'customObject'      => $customObject,
                 'customFieldEntity' => $customField,
-                'customField' => $customFieldForm->createView(),
+                'customField'       => $customFieldForm->createView(),
             ]
-         );
+        );
 
         return new JsonResponse([
             'content'    => $template->getContent(),

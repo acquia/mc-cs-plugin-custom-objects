@@ -13,14 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
-use Doctrine\DBAL\Types\Type;
-use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Entity\UniqueEntityInterface;
-
 interface CustomFieldValueInterface extends UniqueEntityInterface
 {
     /**

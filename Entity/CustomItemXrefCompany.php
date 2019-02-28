@@ -16,9 +16,6 @@ namespace MauticPlugin\CustomObjectsBundle\Entity;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Constraints as Assert;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use DateTimeInterface;
 use DateTimeImmutable;
 use DateTimeZone;
@@ -79,11 +76,11 @@ class CustomItemXrefCompany
             ->columnName('date_added')
             ->build();
     }
-    
+
     /**
      * @return CustomItem
      */
-    public function getCustomItem()
+    public function getCustomItem(): CustomItem
     {
         return $this->customItem;
     }
@@ -91,7 +88,7 @@ class CustomItemXrefCompany
     /**
      * @return Company
      */
-    public function getCompany()
+    public function getCompany(): Company
     {
         return $this->company;
     }
@@ -99,7 +96,7 @@ class CustomItemXrefCompany
     /**
      * @return DateTimeInterface
      */
-    public function getDateAdded()
+    public function getDateAdded(): DateTimeInterface
     {
         return $this->dateAdded;
     }

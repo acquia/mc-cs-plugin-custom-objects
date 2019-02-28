@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -19,14 +21,14 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 class CustomFieldFactoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var array
+     * @var string[]
      */
-    var $definedTypes = [
-            'text',
-            'int',
-        ];
+    private $definedTypes = [
+        'text',
+        'int',
+    ];
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $customObject = new CustomObject();
 

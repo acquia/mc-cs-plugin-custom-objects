@@ -24,12 +24,12 @@ use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
 class CustomItemType extends AbstractType
-{   
+{
     /**
      * @param FormBuilderInterface $builder
-     * @param array                $options
+     * @param mixed[]              $options
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'name',
@@ -46,7 +46,7 @@ class CustomItemType extends AbstractType
             'custom_field_values',
             CollectionType::class,
             [
-                'entry_type' => CustomFieldValueType::class,
+                'entry_type'    => CustomFieldValueType::class,
                 'entry_options' => [
                     'label'      => false,
                     'customItem' => $builder->getData(),
@@ -73,7 +73,7 @@ class CustomItemType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function setDefaultOptions(OptionsResolverInterface $resolver): void
     {
         $resolver->setDefaults(['data_class' => CustomItem::class]);
         $resolver->setRequired(['objectId']);

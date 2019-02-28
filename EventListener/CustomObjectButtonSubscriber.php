@@ -36,21 +36,20 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
 
     /**
      * @param CustomObjectPermissionProvider $permissionProvider
-     * @param CustomObjectRouteProvider $routeProvider
+     * @param CustomObjectRouteProvider      $routeProvider
      */
     public function __construct(
         CustomObjectPermissionProvider $permissionProvider,
         CustomObjectRouteProvider $routeProvider
-    )
-    {
+    ) {
         $this->permissionProvider = $permissionProvider;
         $this->routeProvider      = $routeProvider;
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             CoreEvents::VIEW_INJECT_CUSTOM_BUTTONS => ['injectViewButtons', 0],
@@ -60,19 +59,23 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
     /**
      * @param CustomButtonEvent $event
      */
-    public function injectViewButtons(CustomButtonEvent $event)
+    public function injectViewButtons(CustomButtonEvent $event): void
     {
         switch ($event->getRoute()) {
             case CustomObjectRouteProvider::ROUTE_LIST:
                 $this->addEntityButtons($event, ButtonHelper::LOCATION_LIST_ACTIONS);
+
                 try {
                     $event->addButton($this->defineNewButton(), ButtonHelper::LOCATION_PAGE_ACTIONS, $event->getRoute());
-                } catch (ForbiddenException $e) {}
+                } catch (ForbiddenException $e) {
+                }
+
                 break;
-            
+
             case CustomObjectRouteProvider::ROUTE_VIEW:
                 $this->addEntityButtons($event, ButtonHelper::LOCATION_PAGE_ACTIONS);
                 $event->addButton($this->defineCloseButton(), ButtonHelper::LOCATION_PAGE_ACTIONS, $event->getRoute());
+
                 break;
         }
     }
@@ -81,29 +84,32 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
      * @param CustomButtonEvent $event
      * @param string            $location
      */
-    private function addEntityButtons(CustomButtonEvent $event, $location): void
+    private function addEntityButtons(CustomButtonEvent $event, string $location): void
     {
         $entity = $event->getItem();
         if ($entity && $entity instanceof CustomObject) {
             try {
                 $event->addButton($this->defineDeleteButton($entity), $location, $event->getRoute());
-            } catch (ForbiddenException $e) {}
+            } catch (ForbiddenException $e) {
+            }
 
             try {
                 $event->addButton($this->defineCloneButton($entity), $location, $event->getRoute());
-            } catch (ForbiddenException $e) {}
+            } catch (ForbiddenException $e) {
+            }
 
             try {
                 $event->addButton($this->defineEditButton($entity), $location, $event->getRoute());
-            } catch (ForbiddenException $e) {}
+            } catch (ForbiddenException $e) {
+            }
         }
     }
 
     /**
      * @param CustomObject $entity
-     * 
-     * @return array
-     * 
+     *
+     * @return mixed[]
+     *
      * @throws ForbiddenException
      */
     private function defineEditButton(CustomObject $entity): array
@@ -121,16 +127,16 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     private function defineCloseButton(): array
     {
         return [
             'attr' => [
-                'href' => $this->routeProvider->buildListRoute(),
+                'href'  => $this->routeProvider->buildListRoute(),
                 'class' => 'btn btn-default',
             ],
-            'class' => 'btn btn-default',
+            'class'     => 'btn btn-default',
             'btnText'   => 'mautic.core.form.close',
             'iconClass' => 'fa fa-fw fa-remove',
             'priority'  => 400,
@@ -139,9 +145,9 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
 
     /**
      * @param CustomObject $entity
-     * 
-     * @return array
-     * 
+     *
+     * @return mixed[]
+     *
      * @throws ForbiddenException
      */
     private function defineCloneButton(CustomObject $entity): array
@@ -160,14 +166,14 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
 
     /**
      * @param CustomObject $entity
-     * 
-     * @return array
-     * 
+     *
+     * @return mixed[]
+     *
      * @throws ForbiddenException
      */
     private function defineDeleteButton(CustomObject $entity): array
     {
-        $this->permissionProvider->canDelete($entity);        
+        $this->permissionProvider->canDelete($entity);
 
         return [
             'attr' => [
@@ -180,13 +186,13 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
     }
 
     /**
-     * @return array
-     * 
+     * @return mixed[]
+     *
      * @throws ForbiddenException
      */
     private function defineNewButton(): array
     {
-        $this->permissionProvider->canCreate();        
+        $this->permissionProvider->canCreate();
 
         return [
             'attr' => [

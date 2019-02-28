@@ -13,12 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemType;
-use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
-use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
@@ -50,18 +47,17 @@ class CloneController extends CommonController
     private $routeProvider;
 
     /**
-     * @param FormFactory $formFactory
-     * @param CustomItemModel $customItemModel
+     * @param FormFactory                  $formFactory
+     * @param CustomItemModel              $customItemModel
      * @param CustomItemPermissionProvider $permissionProvider
-     * @param CustomItemRouteProvider $routeProvider
+     * @param CustomItemRouteProvider      $routeProvider
      */
     public function __construct(
         FormFactory $formFactory,
         CustomItemModel $customItemModel,
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider
-    )
-    {
+    ) {
         $this->formFactory        = $formFactory;
         $this->customItemModel    = $customItemModel;
         $this->permissionProvider = $permissionProvider;
@@ -71,7 +67,7 @@ class CloneController extends CommonController
     /**
      * @param int $objectId
      * @param int $itemId
-     * 
+     *
      * @return Response|JsonResponse
      */
     public function cloneAction(int $objectId, int $itemId)
@@ -82,7 +78,7 @@ class CloneController extends CommonController
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
-            $this->accessDenied(false, $e->getMessage());
+            return $this->accessDenied(false, $e->getMessage());
         }
 
         $customItem->setName($customItem->getName().' '.$this->translator->trans('mautic.core.form.clone'));

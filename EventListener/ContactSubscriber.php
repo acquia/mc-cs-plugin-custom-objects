@@ -21,6 +21,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use Doctrine\ORM\EntityManager;
+use Mautic\LeadBundle\Entity\LeadEventLog;
 
 class ContactSubscriber extends CommonSubscriber
 {
@@ -40,18 +41,17 @@ class ContactSubscriber extends CommonSubscriber
     private $customItemModel;
 
     /**
-     * @param EntityManager $entityManager
-     * @param TranslatorInterface $translator
+     * @param EntityManager           $entityManager
+     * @param TranslatorInterface     $translator
      * @param CustomItemRouteProvider $routeProvider
-     * @param CustomItemModel $customItemModel
+     * @param CustomItemModel         $customItemModel
      */
     public function __construct(
         EntityManager $entityManager,
         TranslatorInterface $translator,
         CustomItemRouteProvider $routeProvider,
         CustomItemModel $customItemModel
-    )
-    {
+    ) {
         $this->entityManager   = $entityManager;
         $this->translator      = $translator;
         $this->routeProvider   = $routeProvider;
@@ -59,7 +59,7 @@ class ContactSubscriber extends CommonSubscriber
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public static function getSubscribedEvents(): array
     {
@@ -101,12 +101,12 @@ class ContactSubscriber extends CommonSubscriber
     /**
      * @param LeadTimelineEvent $event
      * @param string            $action
-     * 
-     * @return array
+     *
+     * @return mixed[]
      */
     private function getEvents(LeadTimelineEvent $event, string $action): array
     {
-        $eventLogRepo = $this->entityManager->getRepository('MauticLeadBundle:LeadEventLog');
+        $eventLogRepo = $this->entityManager->getRepository(LeadEventLog::class);
 
         return $eventLogRepo->getEvents(
             $event->getLead(),
@@ -141,15 +141,15 @@ class ContactSubscriber extends CommonSubscriber
                     $eventLabel = $this->translator->trans("custom.item.{$action}.event.not.found", ['%customItemId%' => $link['object_id']]);
                 }
                 $event->addEvent([
-                        'event'           => $eventTypeKey,
-                        'eventId'         => $eventTypeKey.$link['id'],
-                        'eventType'       => $eventTypeName,
-                        'eventLabel'      => $eventLabel,
-                        'timestamp'       => $link['date_added'],
-                        'icon'            => "fa-{$action}",
-                        'extra'           => $link,
-                        'contactId'       => $link['lead_id'],
-                        'contentTemplate' => 'CustomObjectsBundle:SubscribedEvents\Timeline:link.html.php',
+                    'event'           => $eventTypeKey,
+                    'eventId'         => $eventTypeKey.$link['id'],
+                    'eventType'       => $eventTypeName,
+                    'eventLabel'      => $eventLabel,
+                    'timestamp'       => $link['date_added'],
+                    'icon'            => "fa-{$action}",
+                    'extra'           => $link,
+                    'contactId'       => $link['lead_id'],
+                    'contentTemplate' => 'CustomObjectsBundle:SubscribedEvents\Timeline:link.html.php',
                 ]);
             }
         }

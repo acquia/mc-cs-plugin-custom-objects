@@ -41,9 +41,9 @@ class DeleteController extends CommonController
     private $permissionProvider;
 
     /**
-     * @param CustomObjectModel $customObjectModel
-     * @param Session $session
-     * @param TranslatorInterface $translator
+     * @param CustomObjectModel              $customObjectModel
+     * @param Session                        $session
+     * @param TranslatorInterface            $translator
      * @param CustomObjectPermissionProvider $permissionProvider
      */
     public function __construct(
@@ -51,17 +51,16 @@ class DeleteController extends CommonController
         Session $session,
         TranslatorInterface $translator,
         CustomObjectPermissionProvider $permissionProvider
-    )
-    {
-        $this->customObjectModel = $customObjectModel;
-        $this->session           = $session;
-        $this->translator        = $translator;
+    ) {
+        $this->customObjectModel  = $customObjectModel;
+        $this->session            = $session;
+        $this->translator         = $translator;
         $this->permissionProvider = $permissionProvider;
     }
 
     /**
      * @param int $objectId
-     * 
+     *
      * @return Response|JsonResponse
      */
     public function deleteAction(int $objectId)
@@ -72,7 +71,7 @@ class DeleteController extends CommonController
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
-            $this->accessDenied(false, $e->getMessage());
+            return $this->accessDenied(false, $e->getMessage());
         }
 
         $this->customObjectModel->delete($customObject);
@@ -84,7 +83,7 @@ class DeleteController extends CommonController
                 [
                     '%name%' => $customObject->getName(),
                     '%id%'   => $customObject->getId(),
-                ], 
+                ],
                 'flashes'
             )
         );

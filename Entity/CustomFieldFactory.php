@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -11,6 +13,7 @@
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 
@@ -34,6 +37,7 @@ class CustomFieldFactory
      * @param CustomObject $customObject
      *
      * @return CustomField
+     *
      * @throws NotFoundException
      */
     public function create(string $type, CustomObject $customObject): CustomField
@@ -45,6 +49,8 @@ class CustomFieldFactory
         $customField->setType($type);
         $customField->setTypeObject($typeObject);
         $customField->setCustomObject($customObject);
+        $customField->setParams([]);
+        $customField->setParamsObject(new Params());
 
         return $customField;
     }

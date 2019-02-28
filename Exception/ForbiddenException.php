@@ -24,7 +24,7 @@ class ForbiddenException extends Exception
      * @param string                     $permission
      * @param UniqueEntityInterface|null $entity
      * @param int                        $code
-     * @param Throwable|null             $previous
+     * @param Throwable|null             $throwable
      */
     public function __construct(
         string $permission,
@@ -33,11 +33,11 @@ class ForbiddenException extends Exception
         ?Throwable $throwable = null
     ) {
         $message = "You do not have permission to {$permission}";
-        
+
         if ($entity) {
             $message .= " item with ID {$entity->getId()}";
         }
-        
+
         parent::__construct($message, $code, $throwable);
     }
 }

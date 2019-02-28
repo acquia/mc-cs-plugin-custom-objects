@@ -24,7 +24,6 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 class CustomFieldModel extends FormModel
@@ -45,27 +44,26 @@ class CustomFieldModel extends FormModel
     private $permissionProvider;
 
     /**
-     * @param EntityManager $entityManager
-     * @param CustomFieldRepository $customFieldRepository
+     * @param EntityManager                 $entityManager
+     * @param CustomFieldRepository         $customFieldRepository
      * @param CustomFieldPermissionProvider $permissionProvider
-     * @param UserHelper $userHelper
+     * @param UserHelper                    $userHelper
      */
     public function __construct(
         EntityManager $entityManager,
         CustomFieldRepository $customFieldRepository,
         CustomFieldPermissionProvider $permissionProvider,
         UserHelper $userHelper
-    )
-    {
+    ) {
         $this->entityManager          = $entityManager;
-        $this->customFieldRepository = $customFieldRepository;
+        $this->customFieldRepository  = $customFieldRepository;
         $this->permissionProvider     = $permissionProvider;
         $this->userHelper             = $userHelper;
     }
 
     /**
      * @param CustomField $entity
-     * 
+     *
      * @return CustomField
      */
     public function save(CustomField $entity): CustomField
@@ -90,10 +88,10 @@ class CustomFieldModel extends FormModel
     }
 
     /**
-     * @param integer $id
-     * 
+     * @param int $id
+     *
      * @return CustomField
-     * 
+     *
      * @throws NotFoundException
      */
     public function fetchEntity(int $id): CustomField
@@ -109,8 +107,8 @@ class CustomFieldModel extends FormModel
 
     /**
      * @param CustomObject $customObject
-     * 
-     * @return array
+     *
+     * @return CustomField[]
      */
     public function fetchCustomFieldsForObject(CustomObject $customObject): array
     {
@@ -124,16 +122,16 @@ class CustomFieldModel extends FormModel
                     ],
                 ],
             ],
-            'orderBy'        => 'e.order',
-            'orderByDir'     => 'ASC',
+            'orderBy'          => 'e.order',
+            'orderByDir'       => 'ASC',
             'ignore_paginator' => true,
         ]);
     }
 
     /**
-     * @param array $args
-     * 
-     * @return Paginator|array
+     * @param mixed[] $args
+     *
+     * @return Paginator|CustomField[]
      */
     public function fetchEntities(array $args = [])
     {
@@ -142,7 +140,7 @@ class CustomFieldModel extends FormModel
 
     /**
      * Used only by Mautic's generic methods. Use DI instead.
-     * 
+     *
      * @return CommonRepository
      */
     public function getRepository(): CommonRepository
@@ -152,7 +150,7 @@ class CustomFieldModel extends FormModel
 
     /**
      * Used only by Mautic's generic methods. Use CustomFieldPermissionProvider instead.
-     * 
+     *
      * @return string
      */
     public function getPermissionBase(): string
@@ -163,9 +161,9 @@ class CustomFieldModel extends FormModel
     /**
      * Adds condition for creator if the user doesn't have permissions to view other.
      *
-     * @param array $args
-     * 
-     * @return array
+     * @param mixed[] $args
+     *
+     * @return mixed[]
      */
     private function addCreatorLimit(array $args): array
     {
@@ -188,7 +186,7 @@ class CustomFieldModel extends FormModel
                 ],
             ];
 
-            $args['filter']['force'] = $args['filter']['force'] + $limitOwnerFilter;
+            $args['filter']['force'] += $limitOwnerFilter;
         }
 
         return $args;

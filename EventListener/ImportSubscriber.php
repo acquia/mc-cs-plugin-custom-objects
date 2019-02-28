@@ -49,9 +49,9 @@ class ImportSubscriber extends CommonSubscriber
     private $permissionProvider;
 
     /**
-     * @param CustomObjectModel $customObjectModel
-     * @param CustomItemImportModel $customItemImportModel
-     * @param ConfigProvider $configProvider
+     * @param CustomObjectModel            $customObjectModel
+     * @param CustomItemImportModel        $customItemImportModel
+     * @param ConfigProvider               $configProvider
      * @param CustomItemPermissionProvider $permissionProvider
      */
     public function __construct(
@@ -59,8 +59,7 @@ class ImportSubscriber extends CommonSubscriber
         CustomItemImportModel $customItemImportModel,
         ConfigProvider $configProvider,
         CustomItemPermissionProvider $permissionProvider
-    )
-    {
+    ) {
         $this->customObjectModel     = $customObjectModel;
         $this->customItemImportModel = $customItemImportModel;
         $this->configProvider        = $configProvider;
@@ -68,7 +67,7 @@ class ImportSubscriber extends CommonSubscriber
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public static function getSubscribedEvents(): array
     {
@@ -98,7 +97,8 @@ class ImportSubscriber extends CommonSubscriber
             $event->setActiveLink("#mautic_custom_object_{$customObjectId}");
             $event->setIndexRoute(CustomItemRouteProvider::ROUTE_LIST, ['objectId' => $customObjectId]);
             $event->stopPropagation();
-        } catch (NotFoundException | ForbiddenException $e) {}
+        } catch (NotFoundException | ForbiddenException $e) {
+        }
     }
 
     /**
@@ -132,7 +132,8 @@ class ImportSubscriber extends CommonSubscriber
                 $customObject->getNamePlural() => $fieldList,
                 'mautic.lead.special_fields'   => $specialFields,
             ]);
-        } catch (NotFoundException | ForbiddenException $e) {}
+        } catch (NotFoundException | ForbiddenException $e) {
+        }
     }
 
     /**
@@ -153,15 +154,15 @@ class ImportSubscriber extends CommonSubscriber
 
     /**
      * @param string $routeObjectName
-     * 
-     * @return integer
-     * 
+     *
+     * @return int
+     *
      * @throws NotFoundException
      */
     private function getCustomObjectId(string $routeObjectName): int
     {
         $matches = [];
-        
+
         if (preg_match('/custom-object:(\d*)/', $routeObjectName, $matches)) {
             return (int) $matches[1];
         }

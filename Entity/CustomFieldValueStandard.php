@@ -13,13 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
-use Doctrine\DBAL\Types\Type;
-use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 abstract class CustomFieldValueStandard implements CustomFieldValueInterface
 {
@@ -36,7 +32,7 @@ abstract class CustomFieldValueStandard implements CustomFieldValueInterface
     /**
      * Flag to know whether to update this entity manually or let EntityManager to handle it.
      *
-     * @var boolean
+     * @var bool
      */
     protected $updateManually = false;
 
@@ -48,6 +44,52 @@ abstract class CustomFieldValueStandard implements CustomFieldValueInterface
     {
         $this->customField = $customField;
         $this->customItem  = $customItem;
+    }
+
+    /**
+     * @param ClassMetadata $metadata
+     */
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
+    {
+        $metadata->addPropertyConstraint('customField', new Assert\NotBlank());
+        $metadata->addPropertyConstraint('customItem', new Assert\NotBlank());
+    }
+
+    /**
+     * @return int
+     */
+    public function getId(): int
+    {
+        return $this->customField->getId();
+    }
+
+    /**
+     * @return CustomField
+     */
+    public function getCustomField(): CustomField
+    {
+        return $this->customField;
+    }
+
+    /**
+     * @return CustomItem
+     */
+    public function getCustomItem(): CustomItem
+    {
+        return $this->customItem;
+    }
+
+    public function updateThisEntityManually(): void
+    {
+        $this->updateManually = true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function shouldBeUpdatedManually(): bool
+    {
+        return $this->updateManually;
     }
 
     /**
@@ -66,54 +108,5 @@ abstract class CustomFieldValueStandard implements CustomFieldValueInterface
             ->makePrimaryKey()
             ->fetchExtraLazy()
             ->build();
-    }
-
-    /**
-     * @param ClassMetadata $metadata
-     */
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addPropertyConstraint('customField', new Assert\NotBlank());
-        $metadata->addPropertyConstraint('customItem', new Assert\NotBlank());
-    }
-
-    /**
-     * @return string
-     */
-    public function getId()
-    {
-        return $this->customField->getId();
-    }
-
-    /**
-     * @return CustomField
-     */
-    public function getCustomField()
-    {
-        return $this->customField;
-    }
-
-    /**
-     * @return CustomItem
-     */
-    public function getCustomItem()
-    {
-        return $this->customItem;
-    }
-
-    /**
-     * @return void
-     */
-    public function updateThisEntityManually()
-    {
-        $this->updateManually = true;
-    }
-
-    /**
-     * @return bool
-     */
-    public function shouldBeUpdatedManually()
-    {
-        return $this->updateManually;
     }
 }

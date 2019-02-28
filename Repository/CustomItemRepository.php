@@ -18,17 +18,16 @@ use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use Doctrine\ORM\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Mautic\LeadBundle\Entity\Lead;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
 class CustomItemRepository extends CommonRepository
 {
-    const TABLE_ALIAS = 'CustomItem';
+    public const TABLE_ALIAS = 'CustomItem';
 
     /**
      * @param TableConfig $tableConfig
-     * 
+     *
      * @return QueryBuilder
      */
     public function getTableDataQuery(TableConfig $tableConfig): QueryBuilder
@@ -40,7 +39,7 @@ class CustomItemRepository extends CommonRepository
 
     /**
      * @param TableConfig $tableConfig
-     * 
+     *
      * @return QueryBuilder
      */
     public function getTableCountQuery(TableConfig $tableConfig): QueryBuilder
@@ -52,8 +51,8 @@ class CustomItemRepository extends CommonRepository
 
     /**
      * @param QueryBuilder $queryBuilder
-     * @param integer $userId
-     * 
+     * @param int          $userId
+     *
      * @return QueryBuilder
      */
     public function applyOwnerId(QueryBuilder $queryBuilder, int $userId): QueryBuilder
@@ -64,7 +63,7 @@ class CustomItemRepository extends CommonRepository
     /**
      * @param Lead         $contact
      * @param CustomObject $customObject
-     * 
+     *
      * @return int
      */
     public function countItemsLinkedToContact(CustomObject $customObject, Lead $contact): int
@@ -83,17 +82,17 @@ class CustomItemRepository extends CommonRepository
 
     /**
      * @param CustomField $customField
-     * @param Lead $contact
-     * @param string $expr
-     * @param mixed $value
-     * 
-     * @return integer
-     * 
+     * @param Lead        $contact
+     * @param string      $expr
+     * @param mixed       $value
+     *
+     * @return int
+     *
      * @throws NotFoundException
      */
     public function findItemIdForValue(CustomField $customField, Lead $contact, string $expr, $value): int
     {
-        $fieldType = $customField->getTypeObject();
+        $fieldType    = $customField->getTypeObject();
         $queryBuilder = $this->_em->getConnection()->createQueryBuilder();
         $queryBuilder->select('ci.id');
         $queryBuilder->from(MAUTIC_TABLE_PREFIX.'custom_item', 'ci');
@@ -110,6 +109,7 @@ class CustomItemRepository extends CommonRepository
         if (false === $result) {
             $stringValue = print_r($value, true);
             $msg         = "Custom Item for contact {$contact->getId()}, custom field {$customField->getId()} and value {$expr} {$stringValue} was not found.";
+
             throw new NotFoundException($msg);
         }
 
@@ -119,7 +119,7 @@ class CustomItemRepository extends CommonRepository
     /**
      * @return string
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return self::TABLE_ALIAS;
     }

@@ -295,12 +295,14 @@ CustomObjectsForm = {
     convertDataFromModal: function (panel, fieldIndex) {
 
         mQuery(panel).find('input').each(function(i, input) {
-
-            let id = mQuery(input).attr('id');
-            id = id.slice(id.lastIndexOf('_') + 1, id.length);
-            let name = 'custom_object[customFields][' + fieldIndex + '][' + id + ']';
+            // Property name of hidden field represented as string
+            let propertyName = mQuery(input).attr('id');
+            propertyName = propertyName.slice(propertyName.lastIndexOf('_') + 1, propertyName.length);
+            // Full array path to the value represented as string
+            let name = 'custom_object[customFields][' + fieldIndex + '][' + propertyName + ']';
             mQuery(input).attr('name', name);
-            id = 'custom_object_custom_fields_' + fieldIndex + '_' + id;
+            // Property ID
+            let id = 'custom_object_custom_fields_' + fieldIndex + '_' + propertyName;
             mQuery(input).attr('id', id);
         });
         return panel;

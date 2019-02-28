@@ -18,10 +18,8 @@ pipeline {
     stage('Download and combine') {
       steps {
         container('hosted-tester') {
-          checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: 'deployed']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '1a066462-6d24-4247-bef6-1da084c8f484', url: 'git@github.com:mautic-inc/mautic-cloud.git']]]
-          sh('rm -rf plugins/IntegrationsBundle')
-          checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: 'master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'plugins/IntegrationsBundle']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '1a066462-6d24-4247-bef6-1da084c8f484', url: 'git@github.com:mautic-inc/plugin-mautic-integrations.git']]]
-          sh('mkdir -p plugins/CustomObjectsBundle && chmod 777 plugins/CustomObjectsBundle')
+          checkout changelog: false, poll: false, scm: [$class: 'GitSCM', branches: [[name: 'beta']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'SubmoduleOption', disableSubmodules: false, parentCredentials: true, recursiveSubmodules: true]], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '1a066462-6d24-4247-bef6-1da084c8f484', url: 'git@github.com:mautic-inc/mautic-cloud.git']]]
+          sh('rm -r plugins/CustomObjectsBundle || true; mkdir -p plugins/CustomObjectsBundle && chmod 777 plugins/CustomObjectsBundle')
           dir('plugins/CustomObjectsBundle') {
             checkout scm
           }
@@ -75,6 +73,19 @@ pipeline {
               export SYMFONY_ENV="test"
               bin/phpunit -d memory_limit=2048M --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --fail-on-warning --filter CustomObjectsBundle
             """
+          }
+        }
+      }
+    }
+    stage('Static Analysis') {
+      steps {
+        container('hosted-tester') {
+          ansiColor('xterm') {
+            dir('plugins/CustomObjectsBundle') {
+              sh """
+                vendor/bin/phpstan analyse --autoload-file=../../vendor/autoload.php --level=0 Command Config Controller CustomFieldType DTO Entity Event EventListener Exception Form Helper Migration Migrations Model Provider Repository Security Segment Tests
+              """
+            }
           }
         }
       }

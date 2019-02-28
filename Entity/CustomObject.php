@@ -18,11 +18,11 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
-use DateTimeInterface;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Entity\FormEntity;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 
 class CustomObject extends FormEntity implements UniqueEntityInterface
@@ -41,11 +41,6 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
      * @var string|null
      */
     private $nameSingular;
-
-    /**
-     * @var DateTimeInterface|null
-     */
-    private $dateAdded;
 
     /**
      * @var string|null
@@ -68,7 +63,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     private $customFields;
 
     /**
-     * @var array
+     * @var mixed[]
      */
     private $initialCustomFields = [];
 
@@ -79,7 +74,8 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
 
     public function __clone()
     {
-        $this->id = null;
+        $this->id  = null;
+        $this->new = true;
     }
 
     /**
@@ -93,9 +89,9 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
             ->setCustomRepositoryClass(CustomObjectRepository::class);
 
         $builder->createOneToMany('customFields', CustomField::class)
+            ->setOrderBy(['order' => 'ASC'])
             ->addJoinColumn('custom_item_id', 'id', false, false, 'CASCADE')
             ->mappedBy('customObject')
-            ->setOrderBy(['order' => 'ASC'])
             ->cascadePersist()
             ->fetchExtraLazy()
             ->build();
@@ -129,7 +125,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
 
     /**
      * This is alias method that is required by Mautic.
-     * 
+     *
      * @return string|null
      */
     public function getName()
@@ -140,7 +136,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $namePlural
      */
-    public function setNamePlural($namePlural)
+    public function setNamePlural(?string $namePlural): void
     {
         $this->isChanged('namePlural', $namePlural);
         $this->namePlural = $namePlural;
@@ -157,7 +153,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $nameSingular
      */
-    public function setNameSingular($nameSingular)
+    public function setNameSingular(?string $nameSingular): void
     {
         $this->isChanged('nameSingular', $nameSingular);
         $this->nameSingular = $nameSingular;
@@ -174,7 +170,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $description
      */
-    public function setDescription($description)
+    public function setDescription(?string $description): void
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -199,7 +195,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param Category|null $category
      */
-    public function setCategory($category)
+    public function setCategory(?Category $category): void
     {
         $this->category = $category;
     }
@@ -215,7 +211,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $language
      */
-    public function setLanguage($language)
+    public function setLanguage(?string $language): void
     {
         $this->isChanged('language', $language);
         $this->language = $language;
@@ -224,7 +220,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param \MauticPlugin\CustomObjectsBundle\Entity\CustomField $customField
      */
-    public function addCustomField(CustomField $customField)
+    public function addCustomField(CustomField $customField): void
     {
         $customField->setCustomObject($this);
         $this->customFields->add($customField);
@@ -233,14 +229,14 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param \MauticPlugin\CustomObjectsBundle\Entity\CustomField $customField
      */
-    public function removeCustomField(CustomField $customField)
+    public function removeCustomField(CustomField $customField): void
     {
         $this->customFields->removeElement($customField);
         $customField->setCustomObject();
     }
 
     /**
-     * @return ArrayCollection
+     * @return Collection
      */
     public function getCustomFields()
     {
@@ -250,7 +246,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * Called when the custom fields are loaded from the database.
      */
-    public function createFieldsSnapshot()
+    public function createFieldsSnapshot(): void
     {
         foreach ($this->customFields as $customField) {
             $this->initialCustomFields[$customField->getId()] = $customField->toArray();
@@ -260,7 +256,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * Called before CustomObjectSave. It will record changes that happened for custom fields.
      */
-    public function recordCustomFieldChanges()
+    public function recordCustomFieldChanges(): void
     {
         $existingFields = [];
         foreach ($this->customFields as $i => $customField) {
@@ -277,7 +273,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
 
             foreach ($newField as $key => $newValue) {
                 $initialValue = ArrayHelper::getValue($key, $initialField);
-                if ($initialValue != $newValue) {
+                if ($initialValue !== $newValue) {
                     $this->addChange("customfield:{$newField['id']}:{$key}", [$initialValue, $newValue]);
                 }
             }

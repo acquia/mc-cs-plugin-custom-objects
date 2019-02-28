@@ -27,7 +27,7 @@ class CustomFieldTypeProvider
     private $dispatcher;
 
     /**
-     * @var array
+     * @var CustomFieldTypeInterface[]
      */
     private $customFieldTypes = [];
 
@@ -42,7 +42,7 @@ class CustomFieldTypeProvider
     /**
      * Builds the list of custom field type objects.
      *
-     * @return array
+     * @return CustomFieldTypeInterface[]
      */
     public function getTypes(): array
     {
@@ -51,21 +51,21 @@ class CustomFieldTypeProvider
             $this->dispatcher->dispatch(CustomFieldEvents::MAKE_FIELD_TYPE_LIST, $event);
             $this->customFieldTypes = $event->getCustomFieldTypes();
         }
-        
+
         return $this->customFieldTypes;
     }
 
     /**
      * @param string $key
-     * 
+     *
      * @return CustomFieldTypeInterface
-     * 
+     *
      * @throws NotFoundException
      */
     public function getType(string $key): CustomFieldTypeInterface
     {
         $this->getTypes();
-        
+
         if (isset($this->customFieldTypes[$key])) {
             return $this->customFieldTypes[$key];
         }

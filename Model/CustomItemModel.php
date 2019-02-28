@@ -20,7 +20,6 @@ use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use Mautic\CoreBundle\Helper\UserHelper;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
@@ -72,14 +71,14 @@ class CustomItemModel extends FormModel
     private $customFieldTypeProvider;
 
     /**
-     * @param EntityManager $entityManager
-     * @param CustomItemRepository $customItemRepository
+     * @param EntityManager                $entityManager
+     * @param CustomItemRepository         $customItemRepository
      * @param CustomItemPermissionProvider $permissionProvider
-     * @param UserHelper $userHelper
-     * @param CustomFieldModel $customFieldModel
-     * @param CustomFieldValueModel $customFieldValueModel
-     * @param CustomFieldTypeProvider $customFieldTypeProvider
-     * @param EventDispatcherInterface $dispatcher
+     * @param UserHelper                   $userHelper
+     * @param CustomFieldModel             $customFieldModel
+     * @param CustomFieldValueModel        $customFieldValueModel
+     * @param CustomFieldTypeProvider      $customFieldTypeProvider
+     * @param EventDispatcherInterface     $dispatcher
      */
     public function __construct(
         EntityManager $entityManager,
@@ -90,8 +89,7 @@ class CustomItemModel extends FormModel
         CustomFieldValueModel $customFieldValueModel,
         CustomFieldTypeProvider $customFieldTypeProvider,
         EventDispatcherInterface $dispatcher
-    )
-    {
+    ) {
         $this->entityManager           = $entityManager;
         $this->customItemRepository    = $customItemRepository;
         $this->permissionProvider      = $permissionProvider;
@@ -104,7 +102,7 @@ class CustomItemModel extends FormModel
 
     /**
      * @param CustomItem $customItem
-     * 
+     *
      * @return CustomItem
      */
     public function save(CustomItem $customItem): CustomItem
@@ -161,8 +159,8 @@ class CustomItemModel extends FormModel
     }
 
     /**
-     * @param integer $customItemId
-     * @param integer $contactId
+     * @param int $customItemId
+     * @param int $contactId
      */
     public function linkContact(int $customItemId, int $contactId): CustomItemXrefContact
     {
@@ -175,7 +173,7 @@ class CustomItemModel extends FormModel
                 $this->entityManager->getReference(CustomItem::class, $customItemId),
                 $this->entityManager->getReference(Lead::class, $contactId)
             );
-    
+
             $this->entityManager->persist($xRef);
             $this->entityManager->persist($eventLog);
             $this->entityManager->flush();
@@ -185,8 +183,8 @@ class CustomItemModel extends FormModel
     }
 
     /**
-     * @param integer $customItemId
-     * @param integer $contactId
+     * @param int $customItemId
+     * @param int $contactId
      */
     public function unlinkContact(int $customItemId, int $contactId): void
     {
@@ -203,11 +201,11 @@ class CustomItemModel extends FormModel
     }
 
     /**
-     * @param integer $customItemId
-     * @param integer $contactId
-     * 
+     * @param int $customItemId
+     * @param int $contactId
+     *
      * @return CustomItemXrefContact
-     * 
+     *
      * @throws NoResultException if the reference does not exist
      */
     public function getContactReference(int $customItemId, int $contactId): CustomItemXrefContact
@@ -224,10 +222,10 @@ class CustomItemModel extends FormModel
     }
 
     /**
-     * @param integer $id
-     * 
+     * @param int $id
+     *
      * @return CustomItem
-     * 
+     *
      * @throws NotFoundException
      */
     public function fetchEntity(int $id): CustomItem
@@ -243,42 +241,43 @@ class CustomItemModel extends FormModel
 
     /**
      * @param TableConfig $tableConfig
-     * 
+     *
      * @return CustomItem[]
      */
     public function getTableData(TableConfig $tableConfig): array
     {
         $customObjectFilter = $tableConfig->getFilter(CustomItem::class, 'customObject');
-        $queryBuilder = $this->customItemRepository->getTableDataQuery($tableConfig);
-        $queryBuilder = $this->applyOwnerFilter($queryBuilder, $customObjectFilter->getValue());
+        $queryBuilder       = $this->customItemRepository->getTableDataQuery($tableConfig);
+        $queryBuilder       = $this->applyOwnerFilter($queryBuilder, $customObjectFilter->getValue());
 
         return $queryBuilder->getQuery()->getResult();
     }
 
     /**
      * @param TableConfig $tableConfig
-     * 
-     * @return integer
+     *
+     * @return int
      */
     public function getCountForTable(TableConfig $tableConfig): int
     {
         $customObjectFilter = $tableConfig->getFilter(CustomItem::class, 'customObject');
-        $queryBuilder = $this->customItemRepository->getTableCountQuery($tableConfig);
-        $queryBuilder = $this->applyOwnerFilter($queryBuilder, $customObjectFilter->getValue());
+        $queryBuilder       = $this->customItemRepository->getTableCountQuery($tableConfig);
+        $queryBuilder       = $this->applyOwnerFilter($queryBuilder, $customObjectFilter->getValue());
 
         return (int) $queryBuilder->getQuery()->getSingleScalarResult();
     }
 
     /**
      * @param TableConfig $tableConfig
-     * 
-     * @return array
+     *
+     * @return mixed[]
      */
     public function getLookupData(TableConfig $tableConfig): array
     {
-        $queryBuilder = $this->customItemRepository->getTableDataQuery($tableConfig);
-        $queryBuilder = $this->applyOwnerFilter($queryBuilder);
-        $rootAlias    = $queryBuilder->getRootAliases()[0];
+        $customObjectFilter = $tableConfig->getFilter(CustomItem::class, 'customObject');
+        $queryBuilder       = $this->customItemRepository->getTableDataQuery($tableConfig);
+        $queryBuilder       = $this->applyOwnerFilter($queryBuilder, $customObjectFilter->getValue());
+        $rootAlias          = $queryBuilder->getRootAliases()[0];
         $queryBuilder->select("{$rootAlias}.name as value, {$rootAlias}.id");
 
         return array_values($queryBuilder->getQuery()->getArrayResult());
@@ -286,7 +285,7 @@ class CustomItemModel extends FormModel
 
     /**
      * @param CustomItem $customItem
-     * 
+     *
      * @return CustomItem
      */
     public function populateCustomFields(CustomItem $customItem): CustomItem
@@ -294,7 +293,7 @@ class CustomItemModel extends FormModel
         $values            = $customItem->getCustomFieldValues();
         $customFields      = $this->customFieldModel->fetchCustomFieldsForObject($customItem->getCustomObject());
         $customFieldValues = $this->customFieldValueModel->getValuesForItem($customItem);
-        
+
         foreach ($customFieldValues as $customFieldValue) {
             $values->set($customFieldValue->getId(), $customFieldValue);
         }
@@ -319,18 +318,8 @@ class CustomItemModel extends FormModel
     }
 
     /**
-     * @param array $args
-     * 
-     * @return Paginator|array
-     */
-    public function fetchEntities(array $args = [])
-    {
-        return parent::getEntities($this->addCreatorLimit($args));
-    }
-
-    /**
      * Used only by Mautic's generic methods. Use DI instead.
-     * 
+     *
      * @return CommonRepository
      */
     public function getRepository(): CommonRepository
@@ -340,10 +329,10 @@ class CustomItemModel extends FormModel
 
     /**
      * @param CustomField $customField
-     * @param Lead $contact
-     * @param string $expr
-     * @param mixed $value
-     * 
+     * @param Lead        $contact
+     * @param string      $expr
+     * @param mixed       $value
+     *
      * @return int
      */
     public function findItemIdForValue(CustomField $customField, Lead $contact, string $expr, $value): int
@@ -354,7 +343,7 @@ class CustomItemModel extends FormModel
     /**
      * @param Lead         $contact
      * @param CustomObject $customObject
-     * 
+     *
      * @return int
      */
     public function countItemsLinkedToContact(CustomObject $customObject, Lead $contact): int
@@ -365,16 +354,15 @@ class CustomItemModel extends FormModel
     /**
      * @param \DateTimeInterface $from
      * @param \DateTimeInterface $to
-     * @param CustomItem $customItem
-     * 
-     * @return array
+     * @param CustomItem         $customItem
+     *
+     * @return mixed[]
      */
     public function getLinksLineChartData(
         \DateTimeInterface $from,
         \DateTimeInterface $to,
         CustomItem $customItem
-    ): array
-    {
+    ): array {
         $chart = new LineChart(null, $from, $to);
         $query = new ChartQuery($this->entityManager->getConnection(), $from, $to);
         $links = $query->fetchTimeData(
@@ -389,7 +377,7 @@ class CustomItemModel extends FormModel
 
     /**
      * Used only by Mautic's generic methods. Use CustomItemPermissionProvider instead.
-     * 
+     *
      * @return string
      */
     public function getPermissionBase(): string
@@ -401,7 +389,7 @@ class CustomItemModel extends FormModel
      * Adds condition for owner if the user doesn't have permissions to view other.
      *
      * @param QueryBuilder $queryBuilder
-     * 
+     *
      * @return QueryBuilder
      */
     private function applyOwnerFilter(QueryBuilder $queryBuilder, int $customObjectId): QueryBuilder
@@ -409,53 +397,19 @@ class CustomItemModel extends FormModel
         try {
             $this->permissionProvider->isGranted('viewother', $customObjectId);
         } catch (ForbiddenException $e) {
-            $this->customItemRepository->applyOwnerFilter($queryBuilder, $this->userHelper->getUser()->getId());
+            $this->customItemRepository->applyOwnerId($queryBuilder, $this->userHelper->getUser()->getId());
         }
 
         return $queryBuilder;
     }
 
     /**
-     * Adds condition for creator if the user doesn't have permissions to view other.
+     * @param Lead    $contact
+     * @param string  $action
+     * @param string  $object
+     * @param int     $objectId
+     * @param mixed[] $properties
      *
-     * @param array $args
-     * 
-     * @return array
-     */
-    private function addCreatorLimit(array $args): array
-    {
-        try {
-            $this->permissionProvider->isGranted('viewother');
-        } catch (ForbiddenException $e) {
-            if (!isset($args['filter'])) {
-                $args['filter'] = [];
-            }
-
-            if (!isset($args['filter']['force'])) {
-                $args['filter']['force'] = [];
-            }
-
-            $limitOwnerFilter = [
-                [
-                    'column' => 'e.createdBy',
-                    'expr'   => 'eq',
-                    'value'  => $this->userHelper->getUser()->getId(),
-                ],
-            ];
-
-            $args['filter']['force'] += $limitOwnerFilter;
-        }
-
-        return $args;
-    }
-
-    /**
-     * @param Lead $contact
-     * @param string $action
-     * @param string $object
-     * @param integer $objectId
-     * @param array $properties
-     * 
      * @return LeadEventLog
      */
     private function createContactEventLog(Lead $contact, string $action, string $object, int $objectId, array $properties = []): LeadEventLog

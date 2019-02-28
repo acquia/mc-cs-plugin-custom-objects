@@ -16,8 +16,6 @@ namespace MauticPlugin\CustomObjectsBundle\Model;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Model\FormModel;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
@@ -33,11 +31,6 @@ class CustomItemImportModel extends FormModel
     private $entityManager;
 
     /**
-     * @var CustomItemPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
      * @var CustomItemModel
      */
     private $customItemModel;
@@ -48,30 +41,26 @@ class CustomItemImportModel extends FormModel
     private $formatterHelper;
 
     /**
-     * @param EntityManager $entityManager
-     * @param CustomItemPermissionProvider $permissionProvider
+     * @param EntityManager   $entityManager
      * @param CustomItemModel $customItemModel
      * @param FormatterHelper $formatterHelper
      */
     public function __construct(
         EntityManager $entityManager,
-        CustomItemPermissionProvider $permissionProvider,
         CustomItemModel $customItemModel,
         FormatterHelper $formatterHelper
-    )
-    {
-        $this->entityManager        = $entityManager;
-        $this->permissionProvider   = $permissionProvider;
-        $this->customItemModel      = $customItemModel;
-        $this->formatterHelper      = $formatterHelper;
+    ) {
+        $this->entityManager   = $entityManager;
+        $this->customItemModel = $customItemModel;
+        $this->formatterHelper = $formatterHelper;
     }
 
     /**
-     * @param Import $import
-     * @param array $rowData
+     * @param Import       $import
+     * @param mixed[]      $rowData
      * @param CustomObject $customObject
-     * 
-     * @return boolean updated = true, inserted = false
+     *
+     * @return bool updated = true, inserted = false
      */
     public function import(Import $import, array $rowData, CustomObject $customObject): bool
     {
@@ -85,17 +74,19 @@ class CustomItemImportModel extends FormModel
         foreach ($matchedFields as $csvField => $customFieldId) {
             $csvValue = $rowData[$csvField];
 
-            if (strcasecmp('linkedContactIds', $customFieldId) === 0) {
+            if (0 === strcasecmp('linkedContactIds', $customFieldId)) {
                 $contactIds = $this->formatterHelper->simpleCsvToArray($csvValue, 'int');
+
                 continue;
             }
 
-            if (strcasecmp('customItemName', $customFieldId) === 0) {
+            if (0 === strcasecmp('customItemName', $customFieldId)) {
                 $customItem->setName($csvValue);
+
                 continue;
             }
 
-            if (strcasecmp('customItemId', $customFieldId) === 0) {
+            if (0 === strcasecmp('customItemId', $customFieldId)) {
                 continue;
             }
 
@@ -112,36 +103,37 @@ class CustomItemImportModel extends FormModel
         $this->customItemModel->save($customItem);
 
         $this->linkContacts($customItem, $contactIds);
-        
+
         return $merged;
     }
 
     /**
-     *
      * @param CustomObject $customObject
-     * @param CustomItem $customItem
-     * @param int $customFieldId
-     * @param int $csvValue
-     * 
+     * @param CustomItem   $customItem
+     * @param int          $customFieldId
+     * @param mixed        $csvValue
+     *
      * @return CustomFieldValueInterface
      */
     private function createNewCustomFieldValue(CustomObject $customObject, CustomItem $customItem, int $customFieldId, $csvValue): CustomFieldValueInterface
     {
         foreach ($customObject->getCustomFields() as $customField) {
             if ($customField->getId() === (int) $customFieldId) {
-                $fieldType  = $customField->getTypeObject();
+                $fieldType        = $customField->getTypeObject();
                 $customFieldValue = $fieldType->createValueEntity($customField, $customItem, $csvValue);
                 $customItem->addCustomFieldValue($customFieldValue);
+
+                return $customFieldValue;
             }
         }
 
-        return $customFieldValue;
+        throw new NotFoundException("Custom field field {$customFieldId} was not found.");
     }
 
     /**
      * @param CustomItem $customItem
-     * @param array $contactIds
-     * 
+     * @param int[]      $contactIds
+     *
      * @return CustomItem
      */
     private function linkContacts(CustomItem $customItem, array $contactIds): CustomItem
@@ -154,14 +146,16 @@ class CustomItemImportModel extends FormModel
     }
 
     /**
-     * @param Import $import
+     * @param Import     $import
      * @param CustomItem $customItem
-     * 
+     *
      * @return CustomItem
      */
     private function setOwner(Import $import, CustomItem $customItem): CustomItem
     {
-        if ($owner = $import->getDefault('owner')) {
+        $owner = $import->getDefault('owner');
+
+        if ($owner) {
             $customItem->setCreatedBy($this->entityManager->find(User::class, $owner));
         }
 
@@ -169,10 +163,10 @@ class CustomItemImportModel extends FormModel
     }
 
     /**
-     * @param Import $import
+     * @param Import       $import
      * @param CustomObject $customObject
-     * @param array $rowData
-     * 
+     * @param mixed[]      $rowData
+     *
      * @return CustomItem
      */
     private function getCustomItem(Import $import, CustomObject $customObject, array $rowData): CustomItem
@@ -181,14 +175,16 @@ class CustomItemImportModel extends FormModel
         $customItem    = new CustomItem($customObject);
         $idKey         = array_search(
             strtolower('customItemId'),
-            array_map('strtolower', $matchedFields)
+            array_map('strtolower', $matchedFields),
+            true
         );
 
         if (false !== $idKey) {
             try {
                 $customItem = $this->customItemModel->fetchEntity((int) $rowData[$idKey]);
                 $customItem = $this->customItemModel->populateCustomFields($customItem);
-            } catch (NotFoundException $e) {}
+            } catch (NotFoundException $e) {
+            }
         }
 
         return $customItem;

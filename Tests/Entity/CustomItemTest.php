@@ -17,13 +17,12 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use Doctrine\Common\Collections\ArrayCollection;
 
 class CustomItemTest extends \PHPUnit_Framework_TestCase
 {
-    public function testCustomFieldValueChanges()
+    public function testCustomFieldValueChanges(): void
     {
-        $item   = new CustomItem(new CustomObject);
+        $item   = new CustomItem(new CustomObject());
         $fieldA = $this->createMock(CustomField::class);
         $fieldB = $this->createMock(CustomField::class);
         $valueA = new CustomFieldValueText($fieldA, $item, 'a value A');

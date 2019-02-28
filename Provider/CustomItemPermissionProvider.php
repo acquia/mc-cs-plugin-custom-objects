@@ -35,8 +35,8 @@ class CustomItemPermissionProvider
 
     /**
      * @param string $permission
-     * @param int $customObjectId
-     * 
+     * @param int    $customObjectId
+     *
      * @throws ForbiddenException
      */
     public function isGranted(string $permission, int $customObjectId): void
@@ -47,9 +47,9 @@ class CustomItemPermissionProvider
     }
 
     /**
-     * @param string $permission
+     * @param string     $permission
      * @param CustomItem $entity
-     * 
+     *
      * @throws ForbiddenException
      */
     public function hasEntityAccess(string $permission, CustomItem $entity): void
@@ -62,7 +62,7 @@ class CustomItemPermissionProvider
 
     /**
      * @param int $customObjectId
-     * 
+     *
      * @throws ForbiddenException
      */
     public function canCreate(int $customObjectId): void
@@ -72,7 +72,7 @@ class CustomItemPermissionProvider
 
     /**
      * @param CustomItem $entity
-     * 
+     *
      * @throws ForbiddenException
      */
     public function canView(CustomItem $entity): void
@@ -82,7 +82,7 @@ class CustomItemPermissionProvider
 
     /**
      * @param int $customObjectId
-     * 
+     *
      * @throws ForbiddenException
      */
     public function canViewAtAll(int $customObjectId): void
@@ -92,7 +92,7 @@ class CustomItemPermissionProvider
 
     /**
      * @param CustomItem $entity
-     * 
+     *
      * @throws ForbiddenException
      */
     public function canEdit(CustomItem $entity): void
@@ -102,7 +102,7 @@ class CustomItemPermissionProvider
 
     /**
      * @param CustomItem $entity
-     * 
+     *
      * @throws ForbiddenException
      */
     public function canClone(CustomItem $entity): void
@@ -116,7 +116,7 @@ class CustomItemPermissionProvider
 
     /**
      * @param CustomItem $entity
-     * 
+     *
      * @throws ForbiddenException
      */
     public function canDelete(CustomItem $entity): void
@@ -125,9 +125,9 @@ class CustomItemPermissionProvider
     }
 
     /**
-     * @param int $customObjectId
+     * @param int    $customObjectId
      * @param string $permission
-     * 
+     *
      * @return string
      */
     private function getPermissionName(int $customObjectId, string $permission): string

@@ -28,7 +28,7 @@ class AbstractMigration implements MigrationInterface
     protected $tablePrefix;
 
     /**
-     * @var array
+     * @var string[]
      */
     private $queries = [];
 
@@ -39,7 +39,7 @@ class AbstractMigration implements MigrationInterface
     public function __construct(EntityManager $entityManager, string $tablePrefix)
     {
         $this->entityManager = $entityManager;
-        $this->tablePrefix = $tablePrefix;
+        $this->tablePrefix   = $tablePrefix;
     }
 
     /**
@@ -60,6 +60,7 @@ class AbstractMigration implements MigrationInterface
 
     /**
      * {@inheritdoc}
+     *
      * @throws \Doctrine\DBAL\DBALException
      */
     public function execute(): void
@@ -74,7 +75,7 @@ class AbstractMigration implements MigrationInterface
 
         $connection = $this->entityManager->getConnection();
 
-        foreach($this->queries as $sql) {
+        foreach ($this->queries as $sql) {
             $stmt = $connection->prepare($sql);
             $stmt->execute();
         }

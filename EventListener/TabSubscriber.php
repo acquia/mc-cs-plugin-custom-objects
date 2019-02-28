@@ -52,15 +52,14 @@ class TabSubscriber extends CommonSubscriber
         CustomObjectModel $customObjectModel,
         CustomItemModel $customItemModel,
         ConfigProvider $configProvider
-    )
-    {
+    ) {
         $this->customObjectModel = $customObjectModel;
         $this->customItemModel   = $customItemModel;
         $this->configProvider    = $configProvider;
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public static function getSubscribedEvents(): array
     {
@@ -88,7 +87,7 @@ class TabSubscriber extends CommonSubscriber
                     'customObject' => $object,
                     'count'        => $this->customItemModel->countItemsLinkedToContact($object, $contact),
                 ];
-    
+
                 $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:link.html.php', $data);
             }
         }
@@ -105,7 +104,7 @@ class TabSubscriber extends CommonSubscriber
                     'search'       => '',
                     'contactId'    => $contact->getId(),
                 ];
-    
+
                 $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:content.html.php', $data);
             }
         }
@@ -114,7 +113,7 @@ class TabSubscriber extends CommonSubscriber
     /**
      * Apart from fetching the custom object list this method also caches them to the memory and
      * use the list from memory if called multiple times.
-     * 
+     *
      * @return CustomObject[]
      */
     private function getCustomObjects(): array
@@ -122,7 +121,7 @@ class TabSubscriber extends CommonSubscriber
         if (!$this->customObjects) {
             $this->customObjects = $this->customObjectModel->fetchAllPublishedEntities();
         }
-        
+
         return $this->customObjects;
     }
 }

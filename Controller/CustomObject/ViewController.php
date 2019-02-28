@@ -24,6 +24,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
+use Symfony\Component\HttpFoundation\Response;
 
 class ViewController extends CommonController
 {
@@ -74,7 +75,7 @@ class ViewController extends CommonController
         AuditLogModel $auditLogModel,
         CustomObjectPermissionProvider $permissionProvider,
         CustomObjectRouteProvider $routeProvider
-    ){
+    ) {
         $this->requestStack         = $requestStack;
         $this->formFactory          = $formFactory;
         $this->coreParametersHelper = $coreParametersHelper;
@@ -86,10 +87,10 @@ class ViewController extends CommonController
 
     /**
      * @param int $objectId
-     * 
-     * @return \Mautic\CoreBundle\Controller\Response|\Symfony\Component\HttpFoundation\JsonResponse
+     *
+     * @return Response
      */
-    public function viewAction(int $objectId)
+    public function viewAction(int $objectId): Response
     {
         try {
             $customObject = $this->customObjectModel->fetchEntity($objectId);
@@ -97,10 +98,10 @@ class ViewController extends CommonController
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
-            $this->accessDenied(false, $e->getMessage());
+            return $this->accessDenied(false, $e->getMessage());
         }
 
-        $route = $this->routeProvider->buildViewRoute($objectId);
+        $route         = $this->routeProvider->buildViewRoute($objectId);
         $dateRangeForm = $this->formFactory->create(
             DateRangeType::class,
             $this->requestStack->getCurrentRequest()->get('daterange', []),
@@ -120,7 +121,7 @@ class ViewController extends CommonController
             [
                 'returnUrl'      => $route,
                 'viewParameters' => [
-                    'customObject' => $customObject,
+                    'customObject'  => $customObject,
                     'dateRangeForm' => $dateRangeForm->createView(),
                     'stats'         => $stats,
                     'logs'          => $auditLogs,

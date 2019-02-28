@@ -39,13 +39,13 @@ class Engine
      */
     public function __construct(EntityManager $entityManager, string $tablePrefix, string $pluginPath)
     {
-        $this->entityManager = $entityManager;
-        $this->tablePrefix = $tablePrefix;
-        $this->migrationsPath = $pluginPath . '/Migrations/';
+        $this->entityManager  = $entityManager;
+        $this->tablePrefix    = $tablePrefix;
+        $this->migrationsPath = $pluginPath.'/Migrations/';
     }
 
     /**
-     * Run available migrations
+     * Run available migrations.
      */
     public function up(): void
     {
@@ -57,7 +57,7 @@ class Engine
 
         $this->entityManager->beginTransaction();
 
-        foreach($migrationClasses as $migrationClass) {
+        foreach ($migrationClasses as $migrationClass) {
             /** @var AbstractMigration $migration */
             $migration = new $migrationClass($this->entityManager, $this->tablePrefix);
 
@@ -69,19 +69,19 @@ class Engine
     }
 
     /**
-     * Get migration classes to proceed
+     * Get migration classes to proceed.
      *
-     * @return array
+     * @return string[]
      */
     private function getMigrationClasses(): array
     {
         $migrationFileNames = $this->getMigrationFileNames();
-        $migrationClasses = [];
+        $migrationClasses   = [];
 
         foreach ($migrationFileNames as $fileName) {
-            require_once $this->migrationsPath . $fileName;
-            $className = preg_replace('/\\.[^.\\s]{3,4}$/', '', $fileName);
-            $className = "MauticPlugin\CustomObjectsBundle\Migrations\\$className";
+            require_once $this->migrationsPath.$fileName;
+            $className          = preg_replace('/\\.[^.\\s]{3,4}$/', '', $fileName);
+            $className          = "MauticPlugin\CustomObjectsBundle\Migrations\\${className}";
             $migrationClasses[] = $className;
         }
 
@@ -89,22 +89,20 @@ class Engine
     }
 
     /**
-     * Get migration file names
+     * Get migration file names.
      *
-     * @return array
+     * @return string[]
      */
     private function getMigrationFileNames(): array
     {
         $fileNames = scandir($this->migrationsPath);
 
-        if ($fileNames === false) {
+        if (false === $fileNames) {
             throw new \InvalidArgumentException(
                 sprintf("'%s' directory not found", $this->migrationsPath)
             );
         }
 
-        $fileNames = array_diff($fileNames, ['.', '..']);
-
-        return $fileNames;
+        return array_diff($fileNames, ['.', '..']);
     }
 }

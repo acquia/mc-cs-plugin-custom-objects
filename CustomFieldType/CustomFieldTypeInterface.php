@@ -44,7 +44,7 @@ interface CustomFieldTypeInterface
      * @param CustomField $customField
      * @param CustomItem  $customItem
      * @param mixed|null  $value
-     * 
+     *
      * @return CustomFieldValueInterface
      */
     public function createValueEntity(CustomField $customField, CustomItem $customItem, $value = null): CustomFieldValueInterface;
@@ -60,14 +60,14 @@ interface CustomFieldTypeInterface
     public function getTableAlias(): string;
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public function getOperators(): array;
 
     /**
      * @param TranslatorInterface $translator
-     * 
-     * @return array
+     *
+     * @return mixed[]
      */
     public function getOperatorOptions(TranslatorInterface $translator): array;
 }

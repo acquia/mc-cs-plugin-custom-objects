@@ -67,6 +67,7 @@ class SaveController extends CommonController
      * @var CustomObjectRouteProvider
      */
     private $routeProvider;
+
     /**
      * @var CustomFieldTypeProvider
      */
@@ -94,20 +95,20 @@ class SaveController extends CommonController
         CustomObjectRouteProvider $routeProvider,
         CustomFieldTypeProvider $customFieldTypeProvider
     ) {
-        $this->requestStack       = $requestStack;
-        $this->session            = $session;
-        $this->formFactory        = $formFactory;
-        $this->translator         = $translator;
-        $this->customObjectModel  = $customObjectModel;
-        $this->customFieldModel = $customFieldModel;
-        $this->permissionProvider = $permissionProvider;
-        $this->routeProvider      = $routeProvider;
+        $this->requestStack            = $requestStack;
+        $this->session                 = $session;
+        $this->formFactory             = $formFactory;
+        $this->translator              = $translator;
+        $this->customObjectModel       = $customObjectModel;
+        $this->customFieldModel        = $customFieldModel;
+        $this->permissionProvider      = $permissionProvider;
+        $this->routeProvider           = $routeProvider;
         $this->customFieldTypeProvider = $customFieldTypeProvider;
     }
 
     /**
      * @param int|null $objectId
-     * 
+     *
      * @return Response|JsonResponse
      */
     public function saveAction(?int $objectId = null)
@@ -122,12 +123,12 @@ class SaveController extends CommonController
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
-            $this->accessDenied(false, $e->getMessage());
+            return $this->accessDenied(false, $e->getMessage());
         }
 
         $request = $this->requestStack->getCurrentRequest();
-        $action = $this->routeProvider->buildSaveRoute($objectId);
-        $form = $this->formFactory->create(
+        $action  = $this->routeProvider->buildSaveRoute($objectId);
+        $form    = $this->formFactory->create(
             CustomObjectType::class,
             $customObject,
             ['action' => $action]
@@ -153,7 +154,7 @@ class SaveController extends CommonController
                     $objectId ? 'mautic.core.notice.updated' : 'mautic.core.notice.created',
                     [
                         '%name%' => $customObject->getName(),
-                        '%url%' => $this->routeProvider->buildFormRoute($objectId),
+                        '%url%'  => $this->routeProvider->buildFormRoute($objectId),
                     ],
                     'flashes'
                 )
@@ -168,11 +169,11 @@ class SaveController extends CommonController
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute(),
                 'viewParameters' => [
-                    'customObject' => $customObject,
+                    'customObject'        => $customObject,
                     'availableFieldTypes' => $this->customFieldTypeProvider->getTypes(),
-                    'customFields' => $this->customFieldModel->fetchCustomFieldsForObject($customObject),
-                    'deletedFields' => [],
-                    'form'   => $form->createView(),
+                    'customFields'        => $this->customFieldModel->fetchCustomFieldsForObject($customObject),
+                    'deletedFields'       => [],
+                    'form'                => $form->createView(),
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.php',
                 'passthroughVars' => [
@@ -184,9 +185,9 @@ class SaveController extends CommonController
     }
 
     /**
-     * @param Request               $request
+     * @param Request      $request
      * @param CustomObject $entity
-     * 
+     *
      * @return Response
      */
     private function forwardToDetail(Request $request, CustomObject $entity): Response

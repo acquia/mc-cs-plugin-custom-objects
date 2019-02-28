@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use MauticPlugin\CustomObjectsBundle\Form\CustomObjectHiddenTransformer;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\Form\AbstractType;
@@ -42,7 +43,7 @@ class CustomFieldType extends AbstractType
 
     /**
      * @param FormBuilderInterface $builder
-     * @param array                $options
+     * @param mixed[]              $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -50,19 +51,6 @@ class CustomFieldType extends AbstractType
         $customObjectForm = !empty($options['custom_object_form']);
 
         $builder->add('id', HiddenType::class);
-
-        $builder->add(
-            'label',
-            TextType::class,
-            [
-                'label'      => 'custom.field.label.label',
-                'required'   => true,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class' => 'form-control',
-                ],
-            ]
-        );
 
         $builder->add(
             'customObject',
@@ -111,11 +99,77 @@ class CustomFieldType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class' => CustomField::class,
+                'data_class'         => CustomField::class,
                 'custom_object_form' => false, // Is form used as subform?
-                'csrf_protection'   => false,
+                'csrf_protection'    => false,
             ]
         );
+    }
+
+    /**
+     * Build fields for form in modal. Full specification of custom field.
+     *
+     * @param FormBuilderInterface $builder
+     * @param mixed[]              $options
+     */
+    public function buildModalFormFields(FormBuilderInterface $builder, array $options): void
+    {
+        $builder->add(
+            'label',
+            TextType::class,
+            [
+                'label'      => 'custom.field.label.label',
+                'required'   => true,
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class' => 'form-control',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'required',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'custom.field.label.required',
+            ]
+        );
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
+            /** @var CustomField $customField */
+            $customField = $event->getData();
+            $form = $event->getForm();
+
+            $form->add(
+                'defaultValue',
+                $customField->getTypeObject()->getSymfonyFormFiledType(),
+                [
+                    'label'    => 'custom.field.label.default_value',
+                    'required' => false,
+                    'attr'       => [
+                        'class' => 'form-control',
+                    ],
+                ]
+            );
+        });
+
+//        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event): void {
+//            /** @var CustomField $customField */
+//            $customField = $event->getData();
+//            $customField->setParams((array) $customField->getParamsObject());
+//            $event->setData($customField);
+//        });
+
+        $builder->add(
+            'buttons',
+            FormButtonsType::class,
+            [
+                'apply_text'     => '',
+                'cancel_onclick' => "mQuery('form[name=custom_field]').attr('method', 'get').attr('action', mQuery('form[name=custom_field]').attr('action').replace('/save', '/cancel'));",
+            ]
+        );
+
+        $builder->setAction($options['action']);
     }
 
     /**
@@ -126,53 +180,51 @@ class CustomFieldType extends AbstractType
      */
     private function buildPanelFormFields(FormBuilderInterface $builder): void
     {
-        $builder->add('required', HiddenType::class);
-        $builder->add('defaultValue', HiddenType::class);
-
-        // Possibility to mark field as deleted in POST data
-        $builder->add('deleted',HiddenType::class,['mapped' => false]);
-    }
-
-    /**
-     * Build fields for form in modal. Full specification of custom field.
-     *
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildModalFormFields(FormBuilderInterface $builder, array $options): void
-    {
-        $builder->add(
-            'required',
-            \Symfony\Component\Form\Extension\Core\Type\CheckboxType::class,
-            [
-                'label' => 'custom.field.label.required',
-            ]
-        );
-
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event){
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
             /** @var CustomField $customField */
             $customField = $event->getData();
-            $form = $event->getForm();
+            $builder = $event->getForm();
 
-            $form->add(
-                'defaultValue',
+            if (!$customField) {
+                return;
+            }
+
+            $builder->add(
+                'field',
                 $customField->getTypeObject()->getSymfonyFormFiledType(),
                 [
-                    'label' => 'custom.field.label.default_value',
-                    'required' => false,
+                    'mapped'     => false,
+                    'label'      => $customField->getLabel(),
+                    'required'   => false,
+                    'data'       => $customField->getDefaultValue(),
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class' => 'form-control',
+                        'readonly' => true,
+                    ],
                 ]
             );
         });
 
-        $builder->add(
-            'buttons',
-            FormButtonsType::class,
-            [
-                'apply_text' => '',
-                'cancel_onclick' => "mQuery('form[name=custom_field]').attr('method', 'get').attr('action', mQuery('form[name=custom_field]').attr('action').replace('/save', '/cancel'));",
-            ]
-        );
+        $builder->add('label', HiddenType::class);
+        $builder->add('required', HiddenType::class);
+        $builder->add('defaultValue', HiddenType::class);
 
-        $builder->setAction($options['action']);
+//        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
+//            /** @var CustomField $customField */
+//            $customField = $event->getData();
+//            $builder = $event->getForm();
+//
+//            $builder->add(
+//                'params',
+//                HiddenType::class,
+//                [
+//                    'data' => json_encode((array) $customField->getParamsObject()),
+//                ]
+//            );
+//        });
+
+        // Possibility to mark field as deleted in POST data
+        $builder->add('deleted', HiddenType::class, ['mapped' => false]);
     }
 }

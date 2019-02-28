@@ -47,10 +47,10 @@ class BatchDeleteController extends CommonController
     private $permissionProvider;
 
     /**
-     * @param RequestStack $requestStack
-     * @param CustomItemModel $customItemModel
-     * @param Session $session
-     * @param TranslatorInterface $translator
+     * @param RequestStack                 $requestStack
+     * @param CustomItemModel              $customItemModel
+     * @param Session                      $session
+     * @param TranslatorInterface          $translator
      * @param CustomItemPermissionProvider $permissionProvider
      */
     public function __construct(
@@ -59,8 +59,7 @@ class BatchDeleteController extends CommonController
         Session $session,
         TranslatorInterface $translator,
         CustomItemPermissionProvider $permissionProvider
-    )
-    {
+    ) {
         $this->requestStack       = $requestStack;
         $this->customItemModel    = $customItemModel;
         $this->session            = $session;
@@ -70,7 +69,7 @@ class BatchDeleteController extends CommonController
 
     /**
      * @param int $objectId
-     * 
+     *
      * @return Response|JsonResponse
      */
     public function deleteAction(int $objectId)
@@ -99,7 +98,7 @@ class BatchDeleteController extends CommonController
                 'notice',
                 $this->translator->trans(
                     'mautic.core.notice.batch_deleted',
-                    ['%count%' => count($deleted)], 
+                    ['%count%' => count($deleted)],
                     'flashes'
                 )
             );
@@ -110,7 +109,7 @@ class BatchDeleteController extends CommonController
                 'error',
                 $this->translator->trans(
                     'custom.item.error.items.not.found',
-                    ['%ids%' => implode(',', $notFound)], 
+                    ['%ids%' => implode(',', $notFound)],
                     'flashes'
                 )
             );
@@ -121,7 +120,7 @@ class BatchDeleteController extends CommonController
                 'error',
                 $this->translator->trans(
                     'custom.item.error.items.denied',
-                    ['%ids%' => implode(',', $denied)], 
+                    ['%ids%' => implode(',', $denied)],
                     'flashes'
                 )
             );

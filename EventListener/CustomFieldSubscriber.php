@@ -18,6 +18,9 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 
+/**
+ * CustomField entity lifecycle
+ */
 class CustomFieldSubscriber implements EventSubscriber
 {
     /**
@@ -34,11 +37,14 @@ class CustomFieldSubscriber implements EventSubscriber
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public function getSubscribedEvents(): array
     {
-        return ['postLoad'];
+        return [
+            'postLoad',
+            'prePersist'
+        ];
     }
 
     /**
@@ -50,8 +56,34 @@ class CustomFieldSubscriber implements EventSubscriber
     {
         $customField = $args->getObject();
 
-        if ($customField instanceof CustomField) {
-            $customField->setTypeObject($this->customFieldTypeProvider->getType($customField->getType()));
+        if (!$customField instanceof CustomField) {
+            return;
         }
+
+        $customField->setTypeObject($this->customFieldTypeProvider->getType($customField->getType()));
+
+        $params = $customField->getParams();
+        $params = new CustomField\Params($params);
+
+        if ($params instanceof CustomField\Params) {
+            $customField->setParamsObject($params);
+        } else {
+            $customField->setParamsObject(new CustomField\Params());
+        }
+
+    }
+
+    /**
+     * @param LifecycleEventArgs $args
+     */
+    public function prePersist(LifecycleEventArgs $args): void
+    {
+        $customField = $args->getObject();
+
+        if (!$customField instanceof CustomField) {
+            return;
+        }
+
+        $customField->setParams((array) $customField->getParamsObject());
     }
 }

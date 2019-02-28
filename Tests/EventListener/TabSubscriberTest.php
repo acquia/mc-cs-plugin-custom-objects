@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -22,12 +24,16 @@ use Mautic\LeadBundle\Entity\Lead;
 class TabSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     private $customObjectModel;
+
     private $customItemModel;
+
     private $configProvider;
+
     private $customContentEvent;
+
     private $tabSubscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -42,7 +48,7 @@ class TabSubscriberTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testPluginDisabled()
+    public function testPluginDisabled(): void
     {
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
@@ -50,11 +56,11 @@ class TabSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->customContentEvent->expects($this->never())
             ->method('checkContext');
-        
+
         $this->tabSubscriber->injectTabs($this->customContentEvent);
     }
 
-    public function testForTabsContext()
+    public function testForTabsContext(): void
     {
         $customObject = $this->createMock(CustomObject::class);
         $contact      = $this->createMock(Lead::class);
@@ -78,7 +84,7 @@ class TabSubscriberTest extends \PHPUnit_Framework_TestCase
                 'CustomObjectsBundle:SubscribedEvents/Tab:link.html.php',
                 [
                     'customObject' => $customObject,
-                    'count'        => 13
+                    'count'        => 13,
                 ]
             );
 
@@ -95,11 +101,11 @@ class TabSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('countItemsLinkedToContact')
             ->with($customObject, $contact)
             ->willReturn(13);
-        
+
         $this->tabSubscriber->injectTabs($this->customContentEvent);
     }
 
-    public function testForTabContentsContext()
+    public function testForTabContentsContext(): void
     {
         $customObject = $this->createMock(CustomObject::class);
         $contact      = $this->createMock(Lead::class);

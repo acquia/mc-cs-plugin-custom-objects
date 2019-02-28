@@ -75,12 +75,12 @@ class FormController extends CommonController
         CustomObjectPermissionProvider $permissionProvider,
         CustomObjectRouteProvider $routeProvider,
         CustomFieldTypeProvider $customFieldTypeProvider
-    ){
-        $this->formFactory        = $formFactory;
-        $this->customObjectModel  = $customObjectModel;
-        $this->customFieldModel = $customFieldModel;
-        $this->permissionProvider = $permissionProvider;
-        $this->routeProvider      = $routeProvider;
+    ) {
+        $this->formFactory             = $formFactory;
+        $this->customObjectModel       = $customObjectModel;
+        $this->customFieldModel        = $customFieldModel;
+        $this->permissionProvider      = $permissionProvider;
+        $this->routeProvider           = $routeProvider;
         $this->customFieldTypeProvider = $customFieldTypeProvider;
     }
 
@@ -104,7 +104,7 @@ class FormController extends CommonController
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
-            $this->accessDenied(false, $e->getMessage());
+            return $this->accessDenied(false, $e->getMessage());
         }
 
         $form = $this->formFactory->create(
@@ -113,7 +113,7 @@ class FormController extends CommonController
             ['action' => $this->routeProvider->buildSaveRoute($objectId)]
         );
 
-        if ($request->getMethod() === Request::METHOD_POST) {
+        if (Request::METHOD_POST === $request->getMethod()) {
             //We need to see validation messages if POST was sent
             // Process all changes made with CFs to be visible
             $form->handleRequest($request);
@@ -125,11 +125,11 @@ class FormController extends CommonController
             [
                 'returnUrl'      => $this->routeProvider->buildListRoute(),
                 'viewParameters' => [
-                    'customObject' => $customObject,
+                    'customObject'        => $customObject,
                     'availableFieldTypes' => $this->customFieldTypeProvider->getTypes(),
-                    'customFields' => $this->customFieldModel->fetchCustomFieldsForObject($customObject),
-                    'deletedFields' => [],
-                    'form'   => $form->createView(),
+                    'customFields'        => $this->customFieldModel->fetchCustomFieldsForObject($customObject),
+                    'deletedFields'       => [],
+                    'form'                => $form->createView(),
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.php',
                 'passthroughVars' => [

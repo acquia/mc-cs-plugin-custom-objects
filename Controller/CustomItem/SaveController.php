@@ -68,14 +68,14 @@ class SaveController extends CommonController
     private $routeProvider;
 
     /**
-     * @param RequestStack $requestStack
-     * @param Session $session
-     * @param FormFactory $formFactory
-     * @param TranslatorInterface $translator
-     * @param CustomItemModel $customItemModel
-     * @param CustomObjectModel $customObjectModel
+     * @param RequestStack                 $requestStack
+     * @param Session                      $session
+     * @param FormFactory                  $formFactory
+     * @param TranslatorInterface          $translator
+     * @param CustomItemModel              $customItemModel
+     * @param CustomObjectModel            $customObjectModel
      * @param CustomItemPermissionProvider $permissionProvider
-     * @param CustomItemRouteProvider $routeProvider
+     * @param CustomItemRouteProvider      $routeProvider
      */
     public function __construct(
         RequestStack $requestStack,
@@ -86,8 +86,7 @@ class SaveController extends CommonController
         CustomObjectModel $customObjectModel,
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider
-    )
-    {
+    ) {
         $this->requestStack       = $requestStack;
         $this->session            = $session;
         $this->formFactory        = $formFactory;
@@ -101,7 +100,7 @@ class SaveController extends CommonController
     /**
      * @param int      $objectId
      * @param int|null $itemId
-     * 
+     *
      * @return Response|JsonResponse
      */
     public function saveAction(int $objectId, ?int $itemId = null)
@@ -119,14 +118,14 @@ class SaveController extends CommonController
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
-            $this->accessDenied(false, $e->getMessage());
+            return $this->accessDenied(false, $e->getMessage());
         }
 
         $request = $this->requestStack->getCurrentRequest();
         $action  = $this->routeProvider->buildSaveRoute($objectId, $itemId);
         $form    = $this->formFactory->create(CustomItemType::class, $customItem, ['action' => $action, 'objectId' => $objectId]);
         $form->handleRequest($request);
-        
+
         if ($form->isValid()) {
             $this->customItemModel->save($customItem);
 
@@ -137,7 +136,7 @@ class SaveController extends CommonController
                     [
                         '%name%' => $customItem->getName(),
                         '%url%'  => $this->routeProvider->buildEditRoute($objectId, $customItem->getId()),
-                    ], 
+                    ],
                     'flashes'
                 )
             );
@@ -174,7 +173,7 @@ class SaveController extends CommonController
      * @param string     $where
      * @param Request    $request
      * @param CustomItem $customItem
-     * 
+     *
      * @return Response
      */
     private function redirectTo(string $where, Request $request, CustomItem $customItem): Response

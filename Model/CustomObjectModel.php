@@ -29,6 +29,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
 
 class CustomObjectModel extends FormModel
 {
@@ -78,7 +79,7 @@ class CustomObjectModel extends FormModel
 
     /**
      * @param CustomObject $customObject
-     * 
+     *
      * @return CustomObject
      */
     public function save(CustomObject $customObject): CustomObject
@@ -128,10 +129,10 @@ class CustomObjectModel extends FormModel
     }
 
     /**
-     * @param integer $id
-     * 
+     * @param int $id
+     *
      * @return CustomObject
-     * 
+     *
      * @throws NotFoundException
      */
     public function fetchEntity(int $id): CustomObject
@@ -148,9 +149,9 @@ class CustomObjectModel extends FormModel
     }
 
     /**
-     * @param array $args
-     * 
-     * @return Paginator|array
+     * @param mixed[] $args
+     *
+     * @return Paginator|CustomObject[]
      */
     public function fetchEntities(array $args = [])
     {
@@ -158,7 +159,7 @@ class CustomObjectModel extends FormModel
     }
 
     /**
-     * @return array
+     * @return CustomObject[]
      */
     public function fetchAllPublishedEntities(): array
     {
@@ -176,9 +177,13 @@ class CustomObjectModel extends FormModel
         ]);
     }
 
-    public function removeCustomFieldById(CustomObject $customObject, int $customFieldId)
+    /**
+     * @param CustomObject $customObject
+     * @param int          $customFieldId
+     */
+    public function removeCustomFieldById(CustomObject $customObject, int $customFieldId): void
     {
-        foreach($customObject->getCustomFields() as $customField) {
+        foreach ($customObject->getCustomFields() as $customField) {
             if ($customField->getId() === $customFieldId) {
                 $customObject->removeCustomField($customField);
                 $this->customFieldModel->deleteEntity($customField);
@@ -188,7 +193,7 @@ class CustomObjectModel extends FormModel
 
     /**
      * Used only by Mautic's generic methods. Use DI instead.
-     * 
+     *
      * @return CommonRepository
      */
     public function getRepository(): CommonRepository
@@ -198,7 +203,7 @@ class CustomObjectModel extends FormModel
 
     /**
      * Used only by Mautic's generic methods. Use CustomFieldPermissionProvider instead.
-     * 
+     *
      * @return string
      */
     public function getPermissionBase(): string
@@ -211,7 +216,7 @@ class CustomObjectModel extends FormModel
      * @param \DateTimeInterface $to
      * @param CustomObject       $customObject
      *
-     * @return array
+     * @return mixed[]
      */
     public function getItemsLineChartData(\DateTimeInterface $from, \DateTimeInterface $to, CustomObject $customObject): array
     {
@@ -226,9 +231,9 @@ class CustomObjectModel extends FormModel
     /**
      * Adds condition for creator if the user doesn't have permissions to view other.
      *
-     * @param array $args
-     * 
-     * @return array
+     * @param mixed[] $args
+     *
+     * @return mixed[]
      */
     private function addCreatorLimit(array $args): array
     {
@@ -251,7 +256,7 @@ class CustomObjectModel extends FormModel
                 ],
             ];
 
-            $args['filter']['force'] = $args['filter']['force'] + $limitOwnerFilter;
+            $args['filter']['force'] += $limitOwnerFilter;
         }
 
         return $args;

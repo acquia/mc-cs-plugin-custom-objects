@@ -62,13 +62,13 @@ class ListController extends CommonController
     private $routeProvider;
 
     /**
-     * @param RequestStack $requestStack
-     * @param Session $session
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param CustomItemModel $customItemModel
-     * @param CustomObjectModel $customObjectModel
+     * @param RequestStack                 $requestStack
+     * @param Session                      $session
+     * @param CoreParametersHelper         $coreParametersHelper
+     * @param CustomItemModel              $customItemModel
+     * @param CustomObjectModel            $customObjectModel
      * @param CustomItemPermissionProvider $permissionProvider
-     * @param CustomItemRouteProvider $routeProvider
+     * @param CustomItemRouteProvider      $routeProvider
      */
     public function __construct(
         RequestStack $requestStack,
@@ -78,8 +78,7 @@ class ListController extends CommonController
         CustomObjectModel $customObjectModel,
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider
-    )
-    {
+    ) {
         $this->requestStack         = $requestStack;
         $this->session              = $session;
         $this->coreParametersHelper = $coreParametersHelper;
@@ -91,10 +90,10 @@ class ListController extends CommonController
 
     /**
      * @todo make the search filter work.
-     * 
-     * @param integer $objectId
-     * @param integer $page
-     * 
+     *
+     * @param int $objectId
+     * @param int $page
+     *
      * @return \Symfony\Component\HttpFoundation\Response|\Symfony\Component\HttpFoundation\JsonResponse
      */
     public function listAction(int $objectId, int $page = 1)
@@ -105,7 +104,7 @@ class ListController extends CommonController
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
-            $this->accessDenied(false, $e->getMessage());
+            return $this->accessDenied(false, $e->getMessage());
         }
 
         $request      = $this->requestStack->getCurrentRequest();
@@ -116,15 +115,15 @@ class ListController extends CommonController
         $orderBy      = $this->session->get('mautic.custom.item.orderby', CustomItemRepository::TABLE_ALIAS.'.id');
         $orderByDir   = $this->session->get('mautic.custom.item.orderbydir', 'DESC');
         $contactId    = (int) $request->get('contactId');
-        
+
         if ($request->query->has('orderby')) {
             $orderBy    = InputHelper::clean($request->query->get('orderby'), true);
-            $orderByDir = $this->session->get("mautic.custom.item.orderbydir", 'ASC');
-            $orderByDir = ($orderByDir == 'ASC') ? 'DESC' : 'ASC';
-            $this->session->set("mautic.custom.item.orderby", $orderBy);
-            $this->session->set("mautic.custom.item.orderbydir", $orderByDir);
+            $orderByDir = $this->session->get('mautic.custom.item.orderbydir', 'ASC');
+            $orderByDir = 'ASC' === $orderByDir ? 'DESC' : 'ASC';
+            $this->session->set('mautic.custom.item.orderby', $orderBy);
+            $this->session->set('mautic.custom.item.orderbydir', $orderByDir);
         }
-        
+
         $tableConfig = new TableConfig($limit, $page, $orderBy, $orderByDir);
         $tableConfig->addFilter(CustomItem::class, 'customObject', $objectId);
         $tableConfig->addFilterIfNotEmpty(CustomItemXrefContact::class, 'contact', $contactId);

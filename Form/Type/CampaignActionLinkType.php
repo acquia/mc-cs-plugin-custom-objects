@@ -34,8 +34,8 @@ class CampaignActionLinkType extends AbstractType
     protected $translator;
 
     /**
-     * @param CustomItemRouteProvider $router
-     * @param TranslatorInterface $translator
+     * @param CustomItemRouteProvider $routeProvider
+     * @param TranslatorInterface     $translator
      */
     public function __construct(CustomItemRouteProvider $routeProvider, TranslatorInterface $translator)
     {
@@ -45,9 +45,9 @@ class CampaignActionLinkType extends AbstractType
 
     /**
      * @param FormBuilderInterface $builder
-     * @param array                $options
+     * @param mixed[]              $options
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'linkCustomItemName',
@@ -85,7 +85,6 @@ class CampaignActionLinkType extends AbstractType
                 'attr'     => [
                     'tooltip'                => 'custom.item.unlink.contact.descr',
                     'data-toggle'            => 'typeahead',
-                    'data-action'            => 'route provider here',
                     'data-id-input-selector' => '.unlink-custom-item-id',
                     'data-action'            => $this->routeProvider->buildLookupRoute($options['customObjectId']),
                     'data-selected-message'  => $this->translator->trans('custom.item.selected'),

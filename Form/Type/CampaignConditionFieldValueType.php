@@ -17,7 +17,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -42,16 +41,15 @@ class CampaignConditionFieldValueType extends AbstractType
     protected $translator;
 
     /**
-     * @param CustomFieldModel $customFieldModel
+     * @param CustomFieldModel        $customFieldModel
      * @param CustomItemRouteProvider $routeProvider
-     * @param TranslatorInterface $translator
+     * @param TranslatorInterface     $translator
      */
     public function __construct(
         CustomFieldModel $customFieldModel,
         CustomItemRouteProvider $routeProvider,
         TranslatorInterface $translator
-    )
-    {
+    ) {
         $this->customFieldModel = $customFieldModel;
         $this->routeProvider    = $routeProvider;
         $this->translator       = $translator;
@@ -59,9 +57,9 @@ class CampaignConditionFieldValueType extends AbstractType
 
     /**
      * @param FormBuilderInterface $builder
-     * @param array                $options
+     * @param mixed[]              $options
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $fields = $this->customFieldModel->fetchCustomFieldsForObject($options['customObject']);
 
@@ -76,15 +74,16 @@ class CampaignConditionFieldValueType extends AbstractType
                     'class'    => 'form-control',
                     'onchange' => 'CustomObjects.updateFormFieldOptions(this)',
                 ],
-                'choice_attr' => function($fieldId) use ($fields) {
+                'choice_attr' => function ($fieldId) use ($fields) {
                     $field = $fields[$fieldId];
+
                     return [
                         'data-operators' => json_encode($field->getTypeObject()->getOperatorOptions($this->translator)),
                     ];
                 },
             ]
         );
-        
+
         if (isset($options['data']['field'])) {
             $selectedField = $fields[$options['data']['field']];
         } else {

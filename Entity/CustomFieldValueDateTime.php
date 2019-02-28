@@ -16,7 +16,6 @@ namespace MauticPlugin\CustomObjectsBundle\Entity;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemValue;
 use DateTimeInterface;
 
 class CustomFieldValueDateTime extends CustomFieldValueStandard
@@ -47,22 +46,28 @@ class CustomFieldValueDateTime extends CustomFieldValueStandard
         $builder->setTable('custom_field_value_datetime');
         $builder->addIndex(['value'], 'value_index');
         $builder->addNullableField('value', Type::DATETIME);
-        
+
         parent::addReferenceColumns($builder);
     }
 
     /**
-     * @param DateTimeInterface|null $value
+     * @param mixed $value
      */
     public function setValue($value = null): void
     {
+        if (!$value instanceof DateTimeInterface) {
+            $valueToString = print_r($value, true);
+
+            throw new \UnexpectedValueException("Value must be type of DateTimeInterface. {$valueToString} provided.");
+        }
+
         $this->value = $value;
     }
 
     /**
-     * @return DateTimeInterface|null
+     * @return mixed
      */
-    public function getValue(): ?DateTimeInterface
+    public function getValue()
     {
         return $this->value;
     }

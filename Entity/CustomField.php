@@ -16,9 +16,9 @@ namespace MauticPlugin\CustomObjectsBundle\Entity;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
-use DateTimeInterface;
 use Mautic\CoreBundle\Entity\FormEntity;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
@@ -34,11 +34,6 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      * @var string|null
      */
     private $label;
-
-    /**
-     * @var DateTimeInterface|null
-     */
-    private $dateAdded;
 
     /**
      * @var string|null
@@ -70,6 +65,11 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      */
     private $defaultValue;
 
+    /**
+     * @var array
+     */
+    private $params = [];
+
     public function __clone()
     {
         $this->id = null;
@@ -81,7 +81,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public function toArray(): array
     {
@@ -103,7 +103,6 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
         $builder->setTable('custom_field')
             ->setCustomRepositoryClass(CustomFieldRepository::class);
-
 
         $builder->createManyToOne('customObject', CustomObject::class)
             ->addJoinColumn('custom_object_id', 'id', false, false, 'CASCADE')
@@ -127,6 +126,10 @@ class CustomField extends FormEntity implements UniqueEntityInterface
             ->columnName('default_value')
             ->nullable()
             ->build();
+        $builder->createField('params', Type::JSON_ARRAY)
+            ->columnName('params')
+            ->nullable()
+            ->build();
     }
 
     /**
@@ -143,15 +146,15 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param int $id
+     * @param int|null $id
      */
-    public function setId(int $id): void
+    public function setId(?int $id): void
     {
         $this->id = $id;
     }
 
     /**
-     * @return int|null
+     * @return int|null Null when it is filled as new entity with PropertyAccessor
      */
     public function getId(): ?int
     {
@@ -161,7 +164,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $label
      */
-    public function setLabel($label)
+    public function setLabel(?string $label): void
     {
         $this->isChanged('label', $label);
         $this->label = $label;
@@ -177,7 +180,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
     /**
      * Alias for abstractions. Do not use.
-     * 
+     *
      * @return string|null
      */
     public function getName(): ?string
@@ -188,7 +191,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $type
      */
-    public function setType($type): void
+    public function setType(?string $type): void
     {
         $this->type = $type;
     }
@@ -196,7 +199,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @return string|null
      */
-    public function getType()
+    public function getType(): ?string
     {
         return $this->type;
     }
@@ -212,7 +215,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @return CustomFieldTypeInterface|null
      */
-    public function getTypeObject()
+    public function getTypeObject(): ?CustomFieldTypeInterface
     {
         return $this->typeObject;
     }
@@ -220,7 +223,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @return CustomObject|null
      */
-    public function getCustomObject()
+    public function getCustomObject(): ?CustomObject
     {
         return $this->customObject;
     }
@@ -228,7 +231,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @param CustomObject $customObject
      */
-    public function setCustomObject(CustomObject $customObject = null)
+    public function setCustomObject(?CustomObject $customObject = null): void
     {
         $this->customObject = $customObject;
         if ($customObject) {
@@ -282,5 +285,37 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     public function setDefaultValue($defaultValue): void
     {
         $this->defaultValue = $defaultValue;
+    }
+
+    /**
+     * @return Params
+     */
+    public function getParamsObject(): Params
+    {
+        return $this->paramsObject;
+    }
+
+    /**
+     * @param Params $params
+     */
+    public function setParamsObject(Params $params): void
+    {
+        $this->paramsObject = $params;
+    }
+
+    /**
+     * @return array
+     */
+    public function getParams(): array
+    {
+        return $this->params;
+    }
+
+    /**
+     * @param array $params
+     */
+    public function setParams(array $params): void
+    {
+        $this->params = $params;
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -21,11 +23,14 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 class MenuSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     private $customObjectModel;
+
     private $configProvider;
+
     private $menuEvent;
+
     private $menuSubscriber;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -35,7 +40,7 @@ class MenuSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->menuSubscriber    = new MenuSubscriber($this->customObjectModel, $this->configProvider);
     }
 
-    public function testPluginDisabled()
+    public function testPluginDisabled(): void
     {
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
@@ -47,32 +52,32 @@ class MenuSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->menuSubscriber->onBuildMenu($this->menuEvent);
     }
 
-    public function testTypeNotMain()
+    public function testTypeNotMain(): void
     {
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
             ->willReturn(true);
-        
+
         $this->menuEvent->expects($this->once())
             ->method('getType')
             ->willReturn('not-main');
-        
+
         $this->customObjectModel->expects($this->never())
             ->method('fetchAllPublishedEntities');
 
         $this->menuSubscriber->onBuildMenu($this->menuEvent);
     }
 
-    public function testNoCustomObjects()
+    public function testNoCustomObjects(): void
     {
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
             ->willReturn(true);
-        
+
         $this->menuEvent->expects($this->once())
             ->method('getType')
             ->willReturn('main');
-        
+
         $this->customObjectModel->expects($this->once())
             ->method('fetchAllPublishedEntities')
             ->willReturn([]);
@@ -83,7 +88,7 @@ class MenuSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->menuSubscriber->onBuildMenu($this->menuEvent);
     }
 
-    public function testSomeCustomObjects()
+    public function testSomeCustomObjects(): void
     {
         $customObject = $this->createMock(CustomObject::class);
         $customObject->method('getName')->willReturn('Test Object');
@@ -92,11 +97,11 @@ class MenuSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
             ->willReturn(true);
-        
+
         $this->menuEvent->expects($this->once())
             ->method('getType')
             ->willReturn('main');
-        
+
         $this->customObjectModel->expects($this->once())
             ->method('fetchAllPublishedEntities')
             ->willReturn([$customObject]);

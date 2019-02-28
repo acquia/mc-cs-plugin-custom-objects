@@ -34,7 +34,7 @@ class AuditLogSubscriber extends CommonSubscriber
     private $ipLookupHelper;
 
     /**
-     * @param AuditLogModel $auditLogModel
+     * @param AuditLogModel  $auditLogModel
      * @param IpLookupHelper $ipLookupHelper
      */
     public function __construct(AuditLogModel $auditLogModel, IpLookupHelper $ipLookupHelper)
@@ -44,7 +44,7 @@ class AuditLogSubscriber extends CommonSubscriber
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public static function getSubscribedEvents(): array
     {

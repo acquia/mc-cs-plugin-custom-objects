@@ -58,12 +58,12 @@ class ViewController extends CommonController
     private $formFactory;
 
     /**
-     * @param RequestStack $requestStack
-     * @param FormFactory $formFactory
-     * @param CustomItemModel $customItemModel
-     * @param AuditLogModel $auditLogModel
+     * @param RequestStack                 $requestStack
+     * @param FormFactory                  $formFactory
+     * @param CustomItemModel              $customItemModel
+     * @param AuditLogModel                $auditLogModel
      * @param CustomItemPermissionProvider $permissionProvider
-     * @param CustomItemRouteProvider $routeProvider
+     * @param CustomItemRouteProvider      $routeProvider
      */
     public function __construct(
         RequestStack $requestStack,
@@ -72,8 +72,7 @@ class ViewController extends CommonController
         AuditLogModel $auditLogModel,
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider
-    )
-    {
+    ) {
         $this->requestStack       = $requestStack;
         $this->formFactory        = $formFactory;
         $this->customItemModel    = $customItemModel;
@@ -85,10 +84,10 @@ class ViewController extends CommonController
     /**
      * @param int $objectId
      * @param int $itemId
-     * 
+     *
      * @return Response
      */
-    public function viewAction(int $objectId, int $itemId)
+    public function viewAction(int $objectId, int $itemId): Response
     {
         try {
             $customItem = $this->customItemModel->fetchEntity($itemId);
@@ -96,7 +95,7 @@ class ViewController extends CommonController
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
-            $this->accessDenied(false, $e->getMessage());
+            return $this->accessDenied(false, $e->getMessage());
         }
 
         $route         = $this->routeProvider->buildViewRoute($objectId, $itemId);

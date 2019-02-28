@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2018 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -9,4 +11,4 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-$view->extend("CustomObjectsBundle:CustomObject:Form\\Panel\\_field.html.php");
+$view->extend('CustomObjectsBundle:CustomObject:Form\\Panel\\_field.html.php');

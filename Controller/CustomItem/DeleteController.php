@@ -46,11 +46,11 @@ class DeleteController extends CommonController
     private $routeProvider;
 
     /**
-     * @param CustomItemModel $customItemModel
-     * @param Session $session
-     * @param TranslatorInterface $translator
+     * @param CustomItemModel              $customItemModel
+     * @param Session                      $session
+     * @param TranslatorInterface          $translator
      * @param CustomItemPermissionProvider $permissionProvider
-     * @param CustomItemRouteProvider $routeProvider
+     * @param CustomItemRouteProvider      $routeProvider
      */
     public function __construct(
         CustomItemModel $customItemModel,
@@ -58,8 +58,7 @@ class DeleteController extends CommonController
         TranslatorInterface $translator,
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider
-    )
-    {
+    ) {
         $this->customItemModel    = $customItemModel;
         $this->session            = $session;
         $this->translator         = $translator;
@@ -70,10 +69,10 @@ class DeleteController extends CommonController
     /**
      * @param int $objectId
      * @param int $itemId
-     * 
+     *
      * @return Response
      */
-    public function deleteAction(int $objectId, int $itemId)
+    public function deleteAction(int $objectId, int $itemId): Response
     {
         try {
             $customItem = $this->customItemModel->fetchEntity($itemId);
@@ -81,7 +80,7 @@ class DeleteController extends CommonController
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
-            $this->accessDenied(false, $e->getMessage());
+            return $this->accessDenied(false, $e->getMessage());
         }
 
         $this->customItemModel->delete($customItem);
@@ -93,7 +92,7 @@ class DeleteController extends CommonController
                 [
                     '%name%' => $customItem->getName(),
                     '%id%'   => $customItem->getId(),
-                ], 
+                ],
                 'flashes'
             )
         );
