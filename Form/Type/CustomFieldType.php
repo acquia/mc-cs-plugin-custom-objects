@@ -198,7 +198,7 @@ class CustomFieldType extends AbstractType
                     'required'   => false,
                     'data'       => $customField->getDefaultValue(),
                     'label_attr' => ['class' => 'control-label'],
-                    'attr'       => [
+                    'attr'       => [ // @todo this overrides configureOptions() method content
                         'class' => 'form-control',
                         'readonly' => true,
                     ],

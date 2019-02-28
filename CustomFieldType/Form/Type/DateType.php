@@ -11,28 +11,31 @@
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType\Form\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DateType extends \Symfony\Component\Form\Extension\Core\Type\DateTimeType
 {
     /**
-     * @param OptionsResolverInterface $resolver
+     * Configures the options for this type.
+     *
+     * @param OptionsResolver $resolver The resolver for the options
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver): void
+    public function configureOptions(OptionsResolver $resolver): void
     {
+        parent::configureOptions($resolver);
+
         $resolver->setDefaults(
             [
+                'widget'     => 'single_text',
                 'attr'       => [
-                    'class'       => 'form-control',
-                    // @todo does not work
-                    // @see 1a.content.js:305
+                    'class' => 'form-control',
+                    // @todo does not work, overwriten by definition
+                    // @see 1a.content.js:301
                     'data-toggle' => 'date',
                 ],
                 'format'   => 'yyyy-MM-dd',
                 'required' => false,
             ]
         );
-
-        parent::setDefaultOptions($resolver);
     }
 }

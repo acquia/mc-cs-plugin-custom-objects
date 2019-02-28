@@ -11,17 +11,22 @@
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType\Form\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DateTimeType extends \Symfony\Component\Form\Extension\Core\Type\DateTimeType
 {
     /**
-     * @param OptionsResolverInterface $resolver
+     * Configures the options for this type.
+     *
+     * @param OptionsResolver $resolver The resolver for the options
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver): void
+    public function configureOptions(OptionsResolver $resolver): void
     {
+        parent::configureOptions($resolver);
+
         $resolver->setDefaults(
             [
+                'widget'     => 'single_text',
                 'attr'       => [
                     'class'       => 'form-control',
                     // @todo does not work
@@ -32,7 +37,5 @@ class DateTimeType extends \Symfony\Component\Form\Extension\Core\Type\DateTimeT
                 'required' => false,
             ]
         );
-
-        parent::setDefaultOptions($resolver);
     }
 }
