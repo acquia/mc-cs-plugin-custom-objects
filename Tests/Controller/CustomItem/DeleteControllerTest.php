@@ -31,7 +31,7 @@ class DeleteControllerTest extends \PHPUnit_Framework_TestCase
 {
     use ControllerDependenciesTrait;
 
-    private const OBJECT_ID = 22;
+    private const OBJECT_ID = 33;
 
     private const ITEM_ID = 22;
     

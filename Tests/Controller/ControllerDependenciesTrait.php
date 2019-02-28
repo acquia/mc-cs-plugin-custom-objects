@@ -16,7 +16,6 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Templating\Engine\PhpEngine;
@@ -24,6 +23,8 @@ use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Controller\MauticController;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Even though we use nice controllers with defined dependencies, when we call some method like
@@ -32,7 +33,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
  */
 trait ControllerDependenciesTrait
 {
-    private function addSymfonyDependencies(Controller $controller)
+    private function addSymfonyDependencies(MauticController $controller)
     {
         $requestStack = empty($this->requestStack) ? $this->createMock(RequestStack::class) : $this->requestStack;
         $request      = empty($this->request) ? $this->createMock(Request::class) : $this->request;
@@ -45,6 +46,7 @@ trait ControllerDependenciesTrait
         $modelFactory      = $this->createMock(ModelFactory::class);
         $notificationModel = $this->createMock(NotificationModel::class);
         $security          = $this->createMock(CorePermissions::class);
+        $translator        = $this->createMock(TranslatorInterface::class);
 
         $container->method('get')->will($this->returnValueMap([
             ['request_stack', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $requestStack],
@@ -70,5 +72,6 @@ trait ControllerDependenciesTrait
 
         $controller->setRequest($request);
         $controller->setContainer($container);
+        $controller->setTranslator($translator);
     }
 }
