@@ -13,9 +13,14 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Provider;
 
-use Symfony\Component\HttpFoundation\Session\Session;
-
-class CustomItemSessionProvider extends CommonSessionProvider
+interface SessionProviderInterface
 {
-    public const KEY_PAGE = 'custom.item.page';
+    public const KEY_PAGE = 'undefined';
+
+    /**
+     * @param int $default
+     * 
+     * @return int
+     */
+    public function getPage(int $default = 1): int;
 }
