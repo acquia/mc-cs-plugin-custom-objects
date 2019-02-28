@@ -214,17 +214,19 @@ CustomObjectsForm = {
      * \MauticPlugin\CustomObjectsFormBundle\Controller\CustomField\SaveController::saveAction
      */
     saveToPanel: function(response, target) {
-        let content = mQuery(response.content).find('#customField_0');
+        let content = mQuery(response.content);
 
         fieldOrderNo = mQuery(content).find('[id*=order]').val();
 
         if (fieldOrderNo !== "") {
             // Custom field has order defined, this was edit
             fieldOrderNo = mQuery(content).find('[id*=order]').val();
-            mQuery('#customField_' + fieldOrderNo +'').replaceWith(content);
+            content = CustomObjectsForm.convertDataFromModal(content, fieldOrderNo);
+            mQuery('form[name="custom_object"] [id*=order][value="' + fieldOrderNo +'"]').parent().replaceWith(content);
         } else {
             // New custom field without id
             fieldOrderNo = mQuery('.panel').length - 2;
+            content = CustomObjectsForm.convertDataFromModal(content, fieldOrderNo);
             mQuery('.drop-here').prepend(content);
             CustomObjectsForm.recalculateOrder();
             fieldOrderNo = 0;
@@ -282,5 +284,27 @@ CustomObjectsForm = {
             mQuery('#objectFieldModal').find(target).val(value);
 
         });
+    },
+
+    /**
+     * Transfer modal data to CO form
+     * @param panel CF panel content
+     * @param fieldIndex numeric index of CF in form
+     * @returns html content of panel
+     */
+    convertDataFromModal: function (panel, fieldIndex) {
+
+        mQuery(panel).find('input').each(function(i, input) {
+            // Property name of hidden field represented as string
+            let propertyName = mQuery(input).attr('id');
+            propertyName = propertyName.slice(propertyName.lastIndexOf('_') + 1, propertyName.length);
+            // Full array path to the value represented as string
+            let name = 'custom_object[customFields][' + fieldIndex + '][' + propertyName + ']';
+            mQuery(input).attr('name', name);
+            // Property ID
+            let id = 'custom_object_custom_fields_' + fieldIndex + '_' + propertyName;
+            mQuery(input).attr('id', id);
+        });
+        return panel;
     },
 };

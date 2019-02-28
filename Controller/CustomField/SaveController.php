@@ -159,25 +159,20 @@ class SaveController extends CommonController
      */
     private function buildSuccessForm(CustomObject $customObject, CustomField $customField): JsonResponse
     {
-        if (!$customField->getId()) {
-            $customObject->addCustomField($customField);
-        }
-
-        $form = $this->formFactory->create(
-            CustomObjectType::class,
-            $customObject
+        $customFieldForm = $this->formFactory->create(
+            CustomFieldType::class,
+            $customField,
+            ['custom_object_form' => true]
         );
 
         $template = $this->render(
-            "CustomObjectsBundle:CustomObject:form.html.php",
+            "CustomObjectsBundle:CustomObject:Form\\Panel\\{$customField->getType()}.html.php",
             [
-                'customObject'        => $customObject,
-                'availableFieldTypes' => [],
-                'customFields'        => [$customField],
-                'deletedFields'       => [],
-                'form'                => $form->createView(),
+                'customObject'      => $customObject,
+                'customFieldEntity' => $customField,
+                'customField'       => $customFieldForm->createView(),
             ]
-         );
+        );
 
         return new JsonResponse([
             'content'    => $template->getContent(),
