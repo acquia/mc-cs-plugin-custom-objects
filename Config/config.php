@@ -303,7 +303,7 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\DeleteController::class,
                 'arguments' => [
                     'mautic.custom.model.item',
-                    'session',
+                    'custom_item.session.provider',
                     'translator',
                     'custom_item.permission.provider',
                     'custom_item.route.provider',

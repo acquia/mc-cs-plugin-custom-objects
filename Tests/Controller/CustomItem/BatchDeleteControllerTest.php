@@ -16,7 +16,6 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Controller\CustomItem;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\BatchDeleteController;
@@ -38,7 +37,6 @@ class BatchDeleteControllerTest extends \PHPUnit_Framework_TestCase
     private $permissionProvider;
     private $routeProvider;
     private $request;
-    private $flashBag;
 
     /**
      * @var BatchDeleteController
@@ -56,7 +54,6 @@ class BatchDeleteControllerTest extends \PHPUnit_Framework_TestCase
         $this->permissionProvider    = $this->createMock(CustomItemPermissionProvider::class);
         $this->routeProvider         = $this->createMock(CustomItemRouteProvider::class);
         $this->request               = $this->createMock(Request::class);
-        $this->flashBag              = $this->createMock(FlashBagInterface::class);
         $this->batchDeleteController = new BatchDeleteController(
             $this->requestStack,
             $this->customItemModel,
@@ -68,8 +65,6 @@ class BatchDeleteControllerTest extends \PHPUnit_Framework_TestCase
 
         $this->addSymfonyDependencies($this->batchDeleteController);
         
-        $this->request->method('isXmlHttpRequest')->willReturn(true);
-        $this->requestStack->method('getCurrentRequest')->willReturn($this->request);
         $this->request->method('isXmlHttpRequest')->willReturn(true);
     }
 
@@ -108,6 +103,10 @@ class BatchDeleteControllerTest extends \PHPUnit_Framework_TestCase
 
         $this->customItemModel->expects($this->exactly(2))
             ->method('fetchEntity')
+            ->willReturn($this->createMock(CustomItem::class));
+
+        $this->permissionProvider->expects($this->exactly(2))
+            ->method('canDelete')
             ->will($this->throwException(new ForbiddenException('delete')));
 
         $this->customItemModel->expects($this->never())
@@ -162,7 +161,14 @@ class BatchDeleteControllerTest extends \PHPUnit_Framework_TestCase
             ->method('addFlash')
             ->with('some translation', 'notice');
 
+        $this->sessionprovider->expects($this->once())
+            ->method('getPage')
+            ->willReturn(3);
+
+        $this->routeProvider->expects($this->once())
+            ->method('buildListRoute')
+            ->with(33, 3);
+
         $this->batchDeleteController->deleteAction(33);
     }
 }
-

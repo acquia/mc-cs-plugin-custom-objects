@@ -16,12 +16,12 @@ namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemSessionProvider;
 
 class DeleteController extends CommonController
 {
@@ -31,9 +31,9 @@ class DeleteController extends CommonController
     private $customItemModel;
 
     /**
-     * @var Session
+     * @var CustomItemSessionProvider
      */
-    private $session;
+    private $sessionProvider;
 
     /**
      * @var CustomItemPermissionProvider
@@ -47,20 +47,20 @@ class DeleteController extends CommonController
 
     /**
      * @param CustomItemModel              $customItemModel
-     * @param Session                      $session
+     * @param CustomItemSessionProvider    $sessionProvider
      * @param TranslatorInterface          $translator
      * @param CustomItemPermissionProvider $permissionProvider
      * @param CustomItemRouteProvider      $routeProvider
      */
     public function __construct(
         CustomItemModel $customItemModel,
-        Session $session,
+        CustomItemSessionProvider $sessionProvider,
         TranslatorInterface $translator,
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider
     ) {
         $this->customItemModel    = $customItemModel;
-        $this->session            = $session;
+        $this->sessionProvider    = $sessionProvider;
         $this->translator         = $translator;
         $this->permissionProvider = $permissionProvider;
         $this->routeProvider      = $routeProvider;
@@ -85,8 +85,7 @@ class DeleteController extends CommonController
 
         $this->customItemModel->delete($customItem);
 
-        $this->session->getFlashBag()->add(
-            'notice',
+        $this->sessionProvider->addFlash(
             $this->translator->trans(
                 'mautic.core.notice.deleted',
                 [
@@ -97,7 +96,7 @@ class DeleteController extends CommonController
             )
         );
 
-        $page = $this->session->get('custom.item.page', 1);
+        $page = $this->sessionProvider->getPage();
 
         return $this->postActionRedirect(
             [

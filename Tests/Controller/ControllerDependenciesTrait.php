@@ -23,6 +23,7 @@ use Mautic\CoreBundle\Templating\Engine\PhpEngine;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 
 /**
  * Even though we use nice controllers with defined dependencies, when we call some method like
@@ -43,6 +44,7 @@ trait ControllerDependenciesTrait
         $phpEngine         = $this->createMock(PhpEngine::class);
         $modelFactory      = $this->createMock(ModelFactory::class);
         $notificationModel = $this->createMock(NotificationModel::class);
+        $security          = $this->createMock(CorePermissions::class);
 
         $container->method('get')->will($this->returnValueMap([
             ['request_stack', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $requestStack],
@@ -50,6 +52,7 @@ trait ControllerDependenciesTrait
             ['templating', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $phpEngine],
             ['mautic.model.factory', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $modelFactory],
             ['session', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $session],
+            ['mautic.security', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $security],
         ]));
 
         $container->method('has')->will($this->returnValueMap([
@@ -63,6 +66,7 @@ trait ControllerDependenciesTrait
         $request->method('duplicate')->willReturnSelf();
         $httpKernel->method('handle')->willReturn($response);
         $notificationModel->method('getNotificationContent')->willReturn([[], '', '']);
+        $requestStack->method('getCurrentRequest')->willReturn($request);
 
         $controller->setRequest($request);
         $controller->setContainer($container);
