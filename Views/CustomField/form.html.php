@@ -10,7 +10,6 @@
  */
 
 /** @var \MauticPlugin\CustomObjectsBundle\Entity\CustomField $customField */
-$customField;
 
 $title = $customField->getId() ? $customField->getLabel() : $customField->getTypeObject()->getName();
 ?>
