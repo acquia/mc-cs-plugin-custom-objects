@@ -14,15 +14,15 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use Symfony\Component\HttpFoundation\RequestStack;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemSessionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderInterface;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 
 class BatchDeleteController extends CommonController
 {
@@ -37,7 +37,7 @@ class BatchDeleteController extends CommonController
     private $customItemModel;
 
     /**
-     * @var CustomItemSessionProvider
+     * @var SessionProviderInterface
      */
     private $sessionProvider;
 
@@ -52,27 +52,32 @@ class BatchDeleteController extends CommonController
     private $routeProvider;
 
     /**
+     * @var FlashBag
+     */
+    private $flashBag;
+
+    /**
      * @param RequestStack                 $requestStack
      * @param CustomItemModel              $customItemModel
-     * @param CustomItemSessionProvider    $sessionProvider
-     * @param TranslatorInterface          $translator
+     * @param SessionProviderInterface     $sessionProvider
      * @param CustomItemPermissionProvider $permissionProvider
      * @param CustomItemRouteProvider      $routeProvider
+     * @param FlashBag                     $flashBag
      */
     public function __construct(
         RequestStack $requestStack,
         CustomItemModel $customItemModel,
-        CustomItemSessionProvider $sessionProvider,
-        TranslatorInterface $translator,
+        SessionProviderInterface $sessionProvider,
         CustomItemPermissionProvider $permissionProvider,
-        CustomItemRouteProvider $routeProvider
+        CustomItemRouteProvider $routeProvider,
+        FlashBag $flashBag
     ) {
         $this->requestStack       = $requestStack;
         $this->customItemModel    = $customItemModel;
         $this->sessionProvider    = $sessionProvider;
-        $this->translator         = $translator;
         $this->permissionProvider = $permissionProvider;
         $this->routeProvider      = $routeProvider;
+        $this->flashBag           = $flashBag;
     }
 
     /**
@@ -84,6 +89,7 @@ class BatchDeleteController extends CommonController
     {
         $request  = $this->requestStack->getCurrentRequest();
         $itemIds  = json_decode($request->get('ids', '[]'), true);
+        $page     = $this->sessionProvider->getPage();
         $notFound = [];
         $denied   = [];
         $deleted  = [];
@@ -102,38 +108,27 @@ class BatchDeleteController extends CommonController
         }
 
         if ($deleted) {
-            $this->sessionProvider->addFlash(
-                $this->translator->trans(
-                    'mautic.core.notice.batch_deleted',
-                    ['%count%' => count($deleted)],
-                    'flashes'
-                )
+            $this->flashBag->add(
+                'mautic.core.notice.batch_deleted',
+                ['%count%' => count($deleted)]
             );
         }
 
         if ($notFound) {
-            $this->sessionProvider->addFlash(
-                $this->translator->trans(
-                    'custom.item.error.items.not.found',
-                    ['%ids%' => implode(',', $notFound)],
-                    'flashes'
-                ),
-                'error'
+            $this->flashBag->add(
+                'custom.item.error.items.not.found',
+                ['%ids%' => implode(',', $notFound)],
+                FlashBag::LEVEL_ERROR
             );
         }
 
         if ($denied) {
-            $this->sessionProvider->addFlash(
-                $this->translator->trans(
-                    'custom.item.error.items.denied',
-                    ['%ids%' => implode(',', $denied)],
-                    'flashes'
-                ),
-                'error'
+            $this->flashBag->add(
+                'custom.item.error.items.denied',
+                ['%ids%' => implode(',', $denied)],
+                FlashBag::LEVEL_ERROR
             );
         }
-
-        $page = $this->sessionProvider->getPage();
 
         return $this->postActionRedirect(
             [

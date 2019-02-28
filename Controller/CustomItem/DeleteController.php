@@ -16,12 +16,12 @@ namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemSessionProvider;
+use Mautic\CoreBundle\Service\FlashBag;
 
 class DeleteController extends CommonController
 {
@@ -46,22 +46,27 @@ class DeleteController extends CommonController
     private $routeProvider;
 
     /**
+     * @var FlashBag
+     */
+    private $flashBag;
+
+    /**
      * @param CustomItemModel              $customItemModel
      * @param CustomItemSessionProvider    $sessionProvider
-     * @param TranslatorInterface          $translator
+     * @param FlashBag                     $flashBag
      * @param CustomItemPermissionProvider $permissionProvider
      * @param CustomItemRouteProvider      $routeProvider
      */
     public function __construct(
         CustomItemModel $customItemModel,
         CustomItemSessionProvider $sessionProvider,
-        TranslatorInterface $translator,
+        FlashBag $flashBag,
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider
     ) {
         $this->customItemModel    = $customItemModel;
         $this->sessionProvider    = $sessionProvider;
-        $this->translator         = $translator;
+        $this->flashBag           = $flashBag;
         $this->permissionProvider = $permissionProvider;
         $this->routeProvider      = $routeProvider;
     }
@@ -85,15 +90,12 @@ class DeleteController extends CommonController
 
         $this->customItemModel->delete($customItem);
 
-        $this->sessionProvider->addFlash(
-            $this->translator->trans(
-                'mautic.core.notice.deleted',
-                [
-                    '%name%' => $customItem->getName(),
-                    '%id%'   => $customItem->getId(),
-                ],
-                'flashes'
-            )
+        $this->flashBag->add(
+            'mautic.core.notice.deleted',
+            [
+                '%name%' => $customItem->getName(),
+                '%id%'   => $customItem->getId(),
+            ]
         );
 
         $page = $this->sessionProvider->getPage();

@@ -304,7 +304,7 @@ return [
                 'arguments' => [
                     'mautic.custom.model.item',
                     'custom_item.session.provider',
-                    'translator',
+                    'mautic.core.service.flashbag',
                     'custom_item.permission.provider',
                     'custom_item.route.provider',
                 ],
@@ -320,9 +320,9 @@ return [
                     'request_stack',
                     'mautic.custom.model.item',
                     'custom_item.session.provider',
-                    'translator',
                     'custom_item.permission.provider',
                     'custom_item.route.provider',
+                    'mautic.core.service.flashbag',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
