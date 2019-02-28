@@ -22,6 +22,7 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use UnexpectedValueException;
+use Mautic\CoreBundle\Service\FlashBag;
 
 class LinkController extends JsonController
 {
@@ -36,23 +37,23 @@ class LinkController extends JsonController
     private $permissionProvider;
 
     /**
-     * @var TranslatorInterface
+     * @var FlashBag
      */
-    private $translator;
+    private $flashBag;
 
     /**
      * @param CustomItemModel              $customItemModel
      * @param CustomItemPermissionProvider $permissionProvider
-     * @param TranslatorInterface          $translator
+     * @param FlashBag                     $flashBag
      */
     public function __construct(
         CustomItemModel $customItemModel,
         CustomItemPermissionProvider $permissionProvider,
-        TranslatorInterface $translator
+        FlashBag $flashBag
     ) {
         $this->customItemModel    = $customItemModel;
         $this->permissionProvider = $permissionProvider;
-        $this->translator         = $translator;
+        $this->flashBag           = $flashBag;
     }
 
     /**
@@ -69,13 +70,13 @@ class LinkController extends JsonController
             $this->permissionProvider->canEdit($customItem);
             $this->makeLinkBasedOnEntityType($itemId, $entityType, $entityId);
         } catch (UniqueConstraintViolationException $e) {
-            $this->addFlash('error', $this->translator->trans(
+            $this->flashBag->add(
                 'custom.item.error.link.exists.already',
                 ['%itemId%' => $itemId, '%entityType%' => $entityType, '%entityId%' => $entityId],
-                'flashes'
-            ));
+                FlashBag::LEVEL_ERROR
+            );
         } catch (ForbiddenException | NotFoundException | UnexpectedValueException $e) {
-            $this->addFlash('error', $e->getMessage());
+            $this->flashBag->add($e->getMessage(), [], FlashBag::LEVEL_ERROR);
         }
 
         return $this->renderJson();

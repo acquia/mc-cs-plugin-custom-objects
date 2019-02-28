@@ -23,8 +23,9 @@ use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Mautic\CoreBundle\Controller\MauticController;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Mautic\CoreBundle\Controller\MauticController;
 
 /**
  * Even though we use nice controllers with defined dependencies, when we call some method like
@@ -33,7 +34,7 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 trait ControllerDependenciesTrait
 {
-    private function addSymfonyDependencies(MauticController $controller)
+    private function addSymfonyDependencies(Controller $controller)
     {
         $requestStack = empty($this->requestStack) ? $this->createMock(RequestStack::class) : $this->requestStack;
         $request      = empty($this->request) ? $this->createMock(Request::class) : $this->request;
@@ -70,8 +71,11 @@ trait ControllerDependenciesTrait
         $notificationModel->method('getNotificationContent')->willReturn([[], '', '']);
         $requestStack->method('getCurrentRequest')->willReturn($request);
 
-        $controller->setRequest($request);
         $controller->setContainer($container);
-        $controller->setTranslator($translator);
+        
+        if ($controller instanceof MauticController) {
+            $controller->setRequest($request);
+            $controller->setTranslator($translator);
+        }
     }
 }

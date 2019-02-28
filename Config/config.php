@@ -360,7 +360,7 @@ return [
                 'arguments' => [
                     'mautic.custom.model.item',
                     'custom_item.permission.provider',
-                    'translator',
+                    'mautic.core.service.flashbag',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
