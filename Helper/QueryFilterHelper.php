@@ -46,11 +46,11 @@ trait QueryFilterHelper
 
     /**
      * @param Connection $connection
-     * @param null       $queryBuilderAlias
+     * @param string     $queryBuilderAlias
      *
      * @return QueryBuilder
      */
-    public function createItemNameQueryBuilder(Connection $connection, $queryBuilderAlias)
+    public function createItemNameQueryBuilder(Connection $connection, string $queryBuilderAlias): QueryBuilder
     {
         $queryBuilder      = new QueryBuilder($connection);
         $valueQueryBuilder = $this->getBasicItemQueryBuilder($queryBuilder, $queryBuilderAlias);
@@ -65,7 +65,7 @@ trait QueryFilterHelper
      * @param string       $queryBuilderAlias
      * @param              $customFieldId
      */
-    public function addCustomFieldIdRestriction(QueryBuilder $queryBuilder, string $queryBuilderAlias, $customFieldId)
+    public function addCustomFieldIdRestriction(QueryBuilder $queryBuilder, string $queryBuilderAlias, $customFieldId): void
     {
         $queryBuilder->andWhere($queryBuilder->expr()->eq($queryBuilderAlias . "_value.custom_field_id", ":{$queryBuilderAlias}_custom_field_id"));
         $queryBuilder->setParameter("{$queryBuilderAlias}_custom_field_id", $customFieldId);
@@ -234,6 +234,7 @@ trait QueryFilterHelper
      */
     private function getCustomValueValueExpression(QueryBuilder $customQuery, $tableAlias, $operator)
     {
+        var_dump($operator);
         switch ($operator) {
             case 'empty':
             case 'notEmpty':
@@ -352,7 +353,7 @@ trait QueryFilterHelper
      *
      * @return QueryBuilder
      */
-    private function addCustomFieldValueJoin(QueryBuilder $customFieldQueryBuilder, string $alias, string $fieldType)
+    private function addCustomFieldValueJoin(QueryBuilder $customFieldQueryBuilder, string $alias, string $fieldType): QueryBuilder
     {
         $customFieldQueryBuilder->leftJoin(
             $alias . '_item',

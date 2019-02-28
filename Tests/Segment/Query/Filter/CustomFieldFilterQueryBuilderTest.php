@@ -33,7 +33,7 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
         }
         $this->postFixtureSetup();
 
-        $pluginDirectory = $this->getContainer()->get('kernel')->locateResource('@CustomObjectsBundle');
+        $pluginDirectory   = $this->getContainer()->get('kernel')->locateResource('@CustomObjectsBundle');
         $fixturesDirectory = $pluginDirectory . '/Tests/DataFixtures/ORM/Data';
 
         $objects = $this->loadFixtureFiles([
@@ -45,7 +45,7 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
             $fixturesDirectory . '/custom_items.yml',
             $fixturesDirectory . '/custom_xref.yml',
             $fixturesDirectory . '/custom_values.yml',
-        ], false, null,'doctrine'); //,ORMPurger::PURGE_MODE_DELETE);
+        ], false, null, 'doctrine'); //,ORMPurger::PURGE_MODE_DELETE);
 
         $this->setFixtureObjects($objects);
 
@@ -60,35 +60,38 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
         }
 
         $this->entityManager->flush();
+
         return parent::tearDown();
     }
 
-    public function testApplyQuery() {
+    public function testApplyQuery()
+    {
         $queryBuilderService = new CustomFieldFilterQueryBuilder(new RandomParameterName());
 
         $filterMock = $this->createSegmentFilterMock('hate');
 
         $queryBuilder = $this->getLeadsQueryBuilder();
-        $queryBuilderService->applyQuery($queryBuilder,$filterMock);
+        $queryBuilderService->applyQuery($queryBuilder, $filterMock);
 
         $this->assertEquals(2, $queryBuilder->execute()->rowCount());
 
         $filterMock = $this->createSegmentFilterMock('love');
 
         $queryBuilder = $this->getLeadsQueryBuilder();
-        $queryBuilderService->applyQuery($queryBuilder,$filterMock);
+        $queryBuilderService->applyQuery($queryBuilder, $filterMock);
 
         $this->assertEquals(3, $queryBuilder->execute()->rowCount());
     }
 
-    private function createSegmentFilterMock($value) {
+    private function createSegmentFilterMock($value, $type = 'text', $operator = 'eq', $fixtureField = 'custom_field1')
+    {
         $filterMock = $this->getMockBuilder(ContactSegmentFilter::class)
             ->disableOriginalConstructor()
             ->getMock();
 
-        $filterMock->method('getType')->willReturn('text');
-        $filterMock->method('getOperator')->willReturn('eq');
-        $filterMock->method('getField')->willReturn((string) $this->getFixtureById('custom_field1')->getId());
+        $filterMock->method('getType')->willReturn($type);
+        $filterMock->method('getOperator')->willReturn($operator);
+        $filterMock->method('getField')->willReturn((string) $this->getFixtureById($fixtureField)->getId());
         $filterMock->method('getParameterValue')->willReturn($value);
         $filterMock->method('getParameterHolder')->willReturn((string) ':needle');
 
@@ -100,7 +103,7 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
         $connection   = $this->entityManager->getConnection();
         $queryBuilder = new QueryBuilder($connection);
 
-        $queryBuilder->select('l.*')->from(MAUTIC_TABLE_PREFIX . "leads","l");
+        $queryBuilder->select('l.*')->from(MAUTIC_TABLE_PREFIX . "leads", "l");
 
         return $queryBuilder;
     }

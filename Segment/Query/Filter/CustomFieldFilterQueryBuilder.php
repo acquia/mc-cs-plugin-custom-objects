@@ -39,6 +39,10 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
         $filterFieldId    = $filter->getField();
 
         $tableAlias        = 'cfwq_' . (int) $filter->getField();
+
+
+        custom_field.type.provider
+
         $filterQueryBuilder = $this->createValueQueryBuilder(
             $queryBuilder->getConnection(),
             $tableAlias,

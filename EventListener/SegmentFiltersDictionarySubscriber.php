@@ -70,8 +70,6 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
             ->from(MAUTIC_TABLE_PREFIX . "custom_field", 'f')
             ->innerJoin('f', MAUTIC_TABLE_PREFIX . "custom_object", 'o', 'f.custom_object_id = o.id');
 
-        echo \SqlFormatter::format($queryBuilder->getSQL());
-
         $registeredObjects = [];
 
         $fields = $queryBuilder->execute()->fetchAll();
