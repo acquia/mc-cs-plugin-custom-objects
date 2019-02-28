@@ -15,6 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
@@ -126,7 +127,7 @@ class SaveController extends CommonController
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            return $this->buildCustomFieldFormPart($customObject, $form->getData());
+            return $this->buildSuccessForm($customObject, $form->getData());
         }
 
         $route = $fieldId ? $this->fieldRouteProvider->buildFormRoute($fieldId) : '';
@@ -156,7 +157,7 @@ class SaveController extends CommonController
      *
      * @return JsonResponse
      */
-    private function buildCustomFieldFormPart(CustomObject $customObject, CustomField $customField): JsonResponse
+    private function buildSuccessForm(CustomObject $customObject, CustomField $customField): JsonResponse
     {
         $customFieldForm = $this->formFactory->create(
             CustomFieldType::class,
@@ -171,7 +172,7 @@ class SaveController extends CommonController
                 'customFieldEntity' => $customField,
                 'customField'       => $customFieldForm->createView(),
             ]
-         );
+        );
 
         return new JsonResponse([
             'content'    => $template->getContent(),

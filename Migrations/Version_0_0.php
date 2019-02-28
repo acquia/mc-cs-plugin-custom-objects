@@ -66,6 +66,7 @@ class Version_0_0 extends AbstractMigration
                 `field_order` int(10) unsigned DEFAULT NULL,
                 `default_value` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
                 `required` tinyint(1) unsigned DEFAULT 0,
+                `params` json CHARACTER SET COLLATE utf8_unicode_ci DEFAULT NULL,
                 PRIMARY KEY (`id`),
                 KEY `IDX_98F8BD316917218D` (`custom_object_id`),
                 CONSTRAINT `FK_98F8BD316917218D` FOREIGN KEY (`custom_object_id`) REFERENCES `{$this->tablePrefix}custom_object` (`id`) ON DELETE CASCADE

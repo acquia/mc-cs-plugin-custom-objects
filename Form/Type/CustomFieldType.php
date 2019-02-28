@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use MauticPlugin\CustomObjectsBundle\Form\CustomObjectHiddenTransformer;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\Form\AbstractType;
@@ -50,19 +51,6 @@ class CustomFieldType extends AbstractType
         $customObjectForm = !empty($options['custom_object_form']);
 
         $builder->add('id', HiddenType::class);
-
-        $builder->add(
-            'label',
-            TextType::class,
-            [
-                'label'      => 'custom.field.label.label',
-                'required'   => true,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class' => 'form-control',
-                ],
-            ]
-        );
 
         $builder->add(
             'customObject',
@@ -127,8 +115,21 @@ class CustomFieldType extends AbstractType
     public function buildModalFormFields(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
+            'label',
+            TextType::class,
+            [
+                'label'      => 'custom.field.label.label',
+                'required'   => true,
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class' => 'form-control',
+                ],
+            ]
+        );
+
+        $builder->add(
             'required',
-            \Symfony\Component\Form\Extension\Core\Type\CheckboxType::class,
+            YesNoButtonGroupType::class,
             [
                 'label' => 'custom.field.label.required',
             ]
@@ -145,9 +146,19 @@ class CustomFieldType extends AbstractType
                 [
                     'label'    => 'custom.field.label.default_value',
                     'required' => false,
+                    'attr'       => [
+                        'class' => 'form-control',
+                    ],
                 ]
             );
         });
+
+//        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event): void {
+//            /** @var CustomField $customField */
+//            $customField = $event->getData();
+//            $customField->setParams((array) $customField->getParamsObject());
+//            $event->setData($customField);
+//        });
 
         $builder->add(
             'buttons',
@@ -169,8 +180,49 @@ class CustomFieldType extends AbstractType
      */
     private function buildPanelFormFields(FormBuilderInterface $builder): void
     {
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
+            /** @var CustomField $customField */
+            $customField = $event->getData();
+            $builder = $event->getForm();
+
+            if (!$customField) {
+                return;
+            }
+
+            $builder->add(
+                'field',
+                $customField->getTypeObject()->getSymfonyFormFiledType(),
+                [
+                    'mapped'     => false,
+                    'label'      => $customField->getLabel(),
+                    'required'   => false,
+                    'data'       => $customField->getDefaultValue(),
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class' => 'form-control',
+                        'readonly' => true,
+                    ],
+                ]
+            );
+        });
+
+        $builder->add('label', HiddenType::class);
         $builder->add('required', HiddenType::class);
         $builder->add('defaultValue', HiddenType::class);
+
+//        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
+//            /** @var CustomField $customField */
+//            $customField = $event->getData();
+//            $builder = $event->getForm();
+//
+//            $builder->add(
+//                'params',
+//                HiddenType::class,
+//                [
+//                    'data' => json_encode((array) $customField->getParamsObject()),
+//                ]
+//            );
+//        });
 
         // Possibility to mark field as deleted in POST data
         $builder->add('deleted', HiddenType::class, ['mapped' => false]);

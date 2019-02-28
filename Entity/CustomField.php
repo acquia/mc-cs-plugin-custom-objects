@@ -16,6 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Entity;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
 use Mautic\CoreBundle\Entity\FormEntity;
@@ -63,6 +64,11 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      * @var mixed
      */
     private $defaultValue;
+
+    /**
+     * @var array
+     */
+    private $params = [];
 
     public function __clone()
     {
@@ -120,6 +126,10 @@ class CustomField extends FormEntity implements UniqueEntityInterface
             ->columnName('default_value')
             ->nullable()
             ->build();
+        $builder->createField('params', Type::JSON_ARRAY)
+            ->columnName('params')
+            ->nullable()
+            ->build();
     }
 
     /**
@@ -136,15 +146,15 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param int $id
+     * @param int|null $id
      */
-    public function setId(int $id): void
+    public function setId(?int $id): void
     {
         $this->id = $id;
     }
 
     /**
-     * @return int|null
+     * @return int|null Null when it is filled as new entity with PropertyAccessor
      */
     public function getId(): ?int
     {
@@ -275,5 +285,37 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     public function setDefaultValue($defaultValue): void
     {
         $this->defaultValue = $defaultValue;
+    }
+
+    /**
+     * @return Params
+     */
+    public function getParamsObject(): Params
+    {
+        return $this->paramsObject;
+    }
+
+    /**
+     * @param Params $params
+     */
+    public function setParamsObject(Params $params): void
+    {
+        $this->paramsObject = $params;
+    }
+
+    /**
+     * @return array
+     */
+    public function getParams(): array
+    {
+        return $this->params;
+    }
+
+    /**
+     * @param array $params
+     */
+    public function setParams(array $params): void
+    {
+        $this->params = $params;
     }
 }
