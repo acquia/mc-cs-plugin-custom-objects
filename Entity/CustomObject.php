@@ -24,7 +24,6 @@ use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Mautic\CoreBundle\Helper\ArrayHelper;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 
 class CustomObject extends FormEntity implements UniqueEntityInterface
 {

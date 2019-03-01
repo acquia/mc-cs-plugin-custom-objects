@@ -18,18 +18,20 @@ parameters:
     - 'vendor/*'
   skip:
     PhpCsFixer\Fixer\ArrayNotation\TrailingCommaInMultilineArrayFixer:
-      - 'Config/config.php'
+      - 'Config/config.php' # Forces us to do not use full path class names
     SlevomatCodingStandard\Sniffs\TypeHints\NullableTypeForNullDefaultValueSniff.NullabilitySymbolRequired:
-      - 'CustomObjectsBundle.php'
+      - 'CustomObjectsBundle.php' # Breaks parent's method signature
     SlevomatCodingStandard\Sniffs\TypeHints\TypeHintDeclarationSniff.MissingParameterTypeHint:
-      - 'CustomObjectsBundle.php'
+      - 'CustomObjectsBundle.php' # Breaks parent's method signature
+      - '*Entity/*' # Proxy classes don't have parameter types and so entities cannot have them either.
+      - 'Tests/*'
     SlevomatCodingStandard\Sniffs\TypeHints\TypeHintDeclarationSniff.MissingTraversableParameterTypeHintSpecification:
       - 'CustomObjectsBundle.php'
     SlevomatCodingStandard\Sniffs\TypeHints\TypeHintDeclarationSniff.MissingReturnTypeHint:
-      - Entity/* # Proxy classes doesn't have return types and so entities cannot have them either.
+      - '*Entity/*' # Proxy classes don't have return types and so entities cannot have them either.
+    PhpCsFixer\Fixer\FunctionNotation\VoidReturnFixer:
+      - '*Entity/*' # Proxy classes don't have return types and so entities cannot have them either.
     SlevomatCodingStandard\Sniffs\TypeHints\TypeHintDeclarationSniff.MissingPropertyTypeHint:
-      - Tests/*
-    SlevomatCodingStandard\Sniffs\TypeHints\TypeHintDeclarationSniff.MissingParameterTypeHint:
-      - Tests/*
+      - 'Tests/*'
     SlevomatCodingStandard\Sniffs\TypeHints\TypeHintDeclarationSniff.MissingTraversableReturnTypeHintSpecification:
-      - Segment/Query/Filter/CustomItemFilterQueryBuilder.php
+      - 'Segment/Query/Filter/CustomItemFilterQueryBuilder.php'
