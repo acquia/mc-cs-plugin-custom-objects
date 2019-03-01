@@ -10,14 +10,13 @@
  */
 
 /** @var \MauticPlugin\CustomObjectsBundle\Entity\CustomField $customField */
-
 $title = $customField->getId() ? $customField->getLabel() : $customField->getTypeObject()->getName();
 ?>
 
 <div class="bundle-form">
 
     <div class="bundle-form-header">
-        <h3 class="mb-lg"><?php echo $title ?></h3>
+        <h3 class="mb-lg"><?php echo $title; ?></h3>
     </div>
 
     <?php echo $view['form']->start($form); ?>

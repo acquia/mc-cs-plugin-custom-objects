@@ -19,7 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 
 /**
- * CustomField entity lifecycle
+ * CustomField entity lifecycle.
  */
 class CustomFieldSubscriber implements EventSubscriber
 {
@@ -43,7 +43,7 @@ class CustomFieldSubscriber implements EventSubscriber
     {
         return [
             'postLoad',
-            'prePersist'
+            'prePersist',
         ];
     }
 
@@ -70,7 +70,6 @@ class CustomFieldSubscriber implements EventSubscriber
         } else {
             $customField->setParamsObject(new CustomField\Params());
         }
-
     }
 
     /**

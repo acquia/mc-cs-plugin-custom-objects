@@ -162,9 +162,9 @@ class SaveController extends CommonController
 
             if ($form->get('buttons')->get('save')->isClicked()) {
                 return $this->forwardToDetail($request, $customObject);
-            } else {
-                return $this->redirect($this->routeProvider->buildFormRoute($customObject->getId()));
             }
+
+            return $this->redirect($this->routeProvider->buildFormRoute($customObject->getId()));
         }
 
         return $this->delegateView(
