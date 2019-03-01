@@ -57,14 +57,6 @@ class DateTimeType extends AbstractCustomFieldType
     }
 
     /**
-     * @return string
-     */
-    public function getTableName(): string
-    {
-        return MAUTIC_TABLE_PREFIX.static::TABLE_NAME;
-    }
-
-    /**
      * @return mixed[]
      */
     public function getOperators(): array

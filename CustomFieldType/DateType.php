@@ -55,12 +55,4 @@ class DateType extends AbstractCustomFieldType
     {
         return CustomFieldValueDate::class;
     }
-
-    /**
-     * @return string
-     */
-    public function getTableName(): string
-    {
-        return MAUTIC_TABLE_PREFIX.static::TABLE_NAME;
-    }
 }

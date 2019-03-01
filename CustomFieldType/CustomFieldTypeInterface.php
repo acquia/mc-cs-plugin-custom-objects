@@ -52,11 +52,6 @@ interface CustomFieldTypeInterface
     /**
      * @return string
      */
-    public function getTableName(): string;
-
-    /**
-     * @return string
-     */
     public function getTableAlias(): string;
 
     /**

@@ -44,15 +44,6 @@ class IntType extends AbstractCustomFieldType
     }
 
     /**
-     * @return string
-     */
-    public function getTableName(): string
-    {
-        return MAUTIC_TABLE_PREFIX.static::TABLE_NAME;
-
-    }
-
-    /**
      * @param CustomField $customField
      * @param CustomItem  $customItem
      * @param mixed|null  $value
