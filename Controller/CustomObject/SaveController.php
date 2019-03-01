@@ -162,6 +162,8 @@ class SaveController extends CommonController
 
             if ($form->get('buttons')->get('save')->isClicked()) {
                 return $this->forwardToDetail($request, $customObject);
+            } else {
+                return $this->forwardToEdit($request, $customObject);
             }
         }
 
@@ -196,5 +198,19 @@ class SaveController extends CommonController
         $params = ['objectId' => $entity->getId()];
 
         return $this->forward('CustomObjectsBundle:CustomObject\View:view', $params);
+    }
+
+    /**
+     * @param Request      $request
+     * @param CustomObject $entity
+     *
+     * @return Response
+     */
+    private function forwardToEdit(Request $request, CustomObject $entity): Response
+    {
+        $request->setMethod('GET');
+        $params = ['objectId' => $entity->getId()];
+
+        return $this->forward('CustomObjectsBundle:CustomObject\Form:renderForm', $params);
     }
 }
