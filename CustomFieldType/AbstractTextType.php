@@ -37,7 +37,7 @@ abstract class AbstractTextType extends AbstractCustomFieldType
     /**
      * @return string
      */
-    public function getSymfonyFormFiledType(): string
+    public function getSymfonyFormFieldType(): string
     {
         return \Symfony\Component\Form\Extension\Core\Type\TextType::class;
     }

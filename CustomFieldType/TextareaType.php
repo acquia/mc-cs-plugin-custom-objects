@@ -23,7 +23,7 @@ class TextareaType extends AbstractTextType
     /**
      * @return string
      */
-    public function getSymfonyFormFiledType(): string
+    public function getSymfonyFormFieldType(): string
     {
         return \Symfony\Component\Form\Extension\Core\Type\TextareaType::class;
     }
