@@ -64,12 +64,12 @@ interface SessionProviderInterface
      *
      * @return string
      */
-    public function getOrderByDir(string $default): string;
+    public function getOrderByDir(string $default = 'DESC'): string;
 
     /**
      * @param string $orderByDir
      */
-    public function setOrderByDir(string $orderByDir = 'DESC'): void;
+    public function setOrderByDir(string $orderByDir): void;
 
     /**
      * @param string $default
