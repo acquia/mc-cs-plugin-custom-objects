@@ -21,6 +21,8 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 
 class DateType extends AbstractCustomFieldType
 {
+    const TABLE_NAME = 'custom_field_value_date';
+
     /**
      * @var string
      */
@@ -52,13 +54,5 @@ class DateType extends AbstractCustomFieldType
     public function getEntityClass(): string
     {
         return CustomFieldValueDate::class;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTableName(): string
-    {
-        return MAUTIC_TABLE_PREFIX.'custom_field_value_date';
     }
 }

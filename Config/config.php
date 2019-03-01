@@ -811,12 +811,16 @@ return [
             ],
             'mautic.lead.query.builder.custom_field.value' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder::class,
-                'arguments' => ['mautic.lead.model.random_parameter_name'],
+                'arguments' => ['mautic.lead.model.random_parameter_name','custom_object.query.filter.helper'],
             ],
             'mautic.lead.query.builder.custom_item.value'  => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemFilterQueryBuilder::class,
                 'arguments' => ['mautic.lead.model.random_parameter_name'],
             ],
+            'custom_object.query.filter.helper' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper::class,
+                'arguments' => ['custom_field.type.provider'],
+            ]
         ],
     ],
     'parameters' => [

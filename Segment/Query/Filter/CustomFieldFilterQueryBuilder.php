@@ -15,11 +15,25 @@ namespace MauticPlugin\CustomObjectsBundle\Segment\Query\Filter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use Mautic\LeadBundle\Segment\RandomParameterName;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 
 class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
 {
-    use QueryFilterHelper;
+    /**
+     * @var QueryFilterHelper
+     */
+    private $filterHelper;
+
+    /**
+     * @param RandomParameterName $randomParameterNameService
+     * @param QueryFilterHelper   $filterHelper
+     */
+    public function __construct(RandomParameterName $randomParameterNameService, QueryFilterHelper $filterHelper)
+    {
+        parent::__construct($randomParameterNameService);
+        $this->filterHelper = $filterHelper;
+    }
 
     /** {@inheritdoc} */
     public static function getServiceId()
@@ -32,6 +46,7 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
      * @param ContactSegmentFilter $filter
      *
      * @return QueryBuilder
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
@@ -41,15 +56,13 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
         $tableAlias        = 'cfwq_' . (int) $filter->getField();
 
 
-        custom_field.type.provider
-
-        $filterQueryBuilder = $this->createValueQueryBuilder(
+        $filterQueryBuilder = $this->filterHelper->createValueQueryBuilder(
             $queryBuilder->getConnection(),
             $tableAlias,
             (int) $filter->getField(),
             $filter->getType()
         );
-        $this->addCustomFieldValueExpressionFromSegmentFilter($filterQueryBuilder, $tableAlias, $filter);
+        $this->filterHelper->addCustomFieldValueExpressionFromSegmentFilter($filterQueryBuilder, $tableAlias, $filter);
 
 
         $filterQueryBuilder->select($tableAlias . '_contact.contact_id as lead_id');

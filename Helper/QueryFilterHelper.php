@@ -12,14 +12,32 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Helper;
 
-
 use Doctrine\DBAL\Connection;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 
-trait QueryFilterHelper
+final class QueryFilterHelper
 {
+    /**
+     * @var CustomFieldTypeProvider
+     */
+    private $fieldTypeProvider;
+
+    /**
+     * @var array
+     */
+    private $fieldTypes = [];
+
+    /**
+     * @param CustomFieldTypeProvider $fieldTypeProvider
+     */
+    public function __construct(CustomFieldTypeProvider $fieldTypeProvider)
+    {
+        $this->fieldTypeProvider = $fieldTypeProvider;
+    }
+
     /**
      * @param Connection  $connection
      * @param string      $builderAlias
@@ -344,24 +362,29 @@ trait QueryFilterHelper
         return $expression;
     }
 
-    /**
-     * Join CustomFieldValue to CustomItem
-     *
-     * @param QueryBuilder $customFieldQueryBuilder
-     * @param string       $alias
-     * @param string       $fieldType
-     *
-     * @return QueryBuilder
-     */
     private function addCustomFieldValueJoin(QueryBuilder $customFieldQueryBuilder, string $alias, string $fieldType): QueryBuilder
     {
+        $dataTable = $this->getTableNameFromFieldType($fieldType);
+
         $customFieldQueryBuilder->leftJoin(
             $alias . '_item',
-            MAUTIC_TABLE_PREFIX . 'custom_field_value_' . $fieldType,
+            MAUTIC_TABLE_PREFIX . $dataTable,
             $alias . '_value',
             $alias . '_value.custom_item_id = ' . $alias . '_item.id');
 
         return $customFieldQueryBuilder;
+    }
+
+    private function getTableNameFromFieldType(string $fieldType): string {
+        if (!isset($this->fieldTypes[$fieldType])) {
+            $types = $this->fieldTypeProvider->getTypes();
+            if (!in_array($fieldType, $types)) {
+                throw new InvalidArgumentException('Invalid custom field type requested: ' . $fieldType . ', Available: ' . join(', ', array_keys($types)));
+            }
+            $this->fieldTypes[$fieldType] = get_class($types[$fieldType]);
+
+        }
+        return $this->fieldTypes[$fieldType]::TABLE_NAME;
     }
 
     /**

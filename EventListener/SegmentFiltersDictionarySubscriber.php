@@ -17,7 +17,6 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
 use Mautic\LeadBundle\LeadEvents;
-use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemFilterQueryBuilder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -37,7 +36,7 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
     private $configProvider;
 
     /**
-     * @param EntityManager  $registry
+     * @param Registry       $registry
      * @param ConfigProvider $configProvider
      */
     public function __construct(Registry $registry, ConfigProvider $configProvider)
@@ -65,7 +64,12 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
             return;
         }
 
-        $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
+        // This avoids exceptions if no connection is available as in cache:clear
+        if (!$this->doctrineRegistry->getConnection()->isConnected()) {
+            return;
+        }
+
+        $queryBuilder = $this->doctrineRegistry->getConnection()->createQueryBuilder();
         $queryBuilder
             ->select('f.id, f.label, f.type, o.id as custom_object_id')
             ->from(MAUTIC_TABLE_PREFIX . "custom_field", 'f')
@@ -78,9 +82,9 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
         foreach ($fields as $field) {
             if (!in_array($COId = $field['custom_object_id'], $registeredObjects)) {
                 $event->addTranslation('cmo_' . $COId, [
-                    'type'  => CustomItemFilterQueryBuilder::getServiceId(),
-                    'field' => $COId,
-                    'foreign_table' => 'custom_objects'
+                    'type'          => CustomItemFilterQueryBuilder::getServiceId(),
+                    'field'         => $COId,
+                    'foreign_table' => 'custom_objects',
                 ]);
                 $registeredObjects[] = $COId;
             }
@@ -98,10 +102,10 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
         $segmentValueType = 'custom_field_value_' . $fieldAttributes['type'];
 
         $translation = [
-            'type'  => CustomFieldFilterQueryBuilder::getServiceId(),
-            'table' => $segmentValueType,
-            'field' => $fieldAttributes['id'],
-            'foreign_table' => 'custom_objects'
+            'type'          => CustomFieldFilterQueryBuilder::getServiceId(),
+            'table'         => $segmentValueType,
+            'field'         => $fieldAttributes['id'],
+            'foreign_table' => 'custom_objects',
         ];
 
         return $translation;

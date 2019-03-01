@@ -59,8 +59,8 @@ class QueryFilterHelperTest extends WebTestCase
 
     public function testGetCustomValueValueExpression()
     {
-        /** @var QueryFilterHelper|MockObject $mockTrait */
-        $mockTrait = $this->getMockForTrait(QueryFilterHelper::class);
+        $fieldTypeProvider = $this->getContainer()->get('custom_field.type.provider');
+        $filterHelper = new QueryFilterHelper($fieldTypeProvider);
 
         $queryBuilder = new QueryBuilder($this->entityManager->getConnection());
 
@@ -80,7 +80,7 @@ class QueryFilterHelperTest extends WebTestCase
         ];
 
         foreach ($filters as $filter) {
-            $mockTrait->addCustomFieldValueExpressionFromSegmentFilter(
+            $filterHelper->addCustomFieldValueExpressionFromSegmentFilter(
                 $queryBuilder, 'test', $this->filterFactory->factorSegmentFilter($filter['filter'])
             );
 

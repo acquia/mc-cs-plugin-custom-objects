@@ -68,6 +68,7 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
 
     public function testApplyQuery()
     {
+
         $queryBuilderService = new CustomFieldFilterQueryBuilder(new RandomParameterName());
 
         $filterMock = $this->createSegmentFilterMock('hate');
