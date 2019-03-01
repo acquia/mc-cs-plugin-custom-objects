@@ -19,7 +19,6 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use MauticPlugin\CustomObjectsBundle\Controller\JsonController;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use UnexpectedValueException;
 use Mautic\CoreBundle\Service\FlashBag;

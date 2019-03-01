@@ -37,7 +37,7 @@ class FormControllerTest extends \PHPUnit_Framework_TestCase
     private const OBJECT_ID = 33;
 
     private const ITEM_ID = 22;
-    
+
     private $customItemModel;
     private $customObjectModel;
     private $formFactory;
@@ -53,7 +53,7 @@ class FormControllerTest extends \PHPUnit_Framework_TestCase
      */
     private $formController;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -71,7 +71,7 @@ class FormControllerTest extends \PHPUnit_Framework_TestCase
             $this->customObjectModel,
             $this->customItemModel,
             $this->permissionProvider,
-            $this->routeProvider 
+            $this->routeProvider
         );
 
         $this->addSymfonyDependencies($this->formController);
@@ -83,12 +83,12 @@ class FormControllerTest extends \PHPUnit_Framework_TestCase
         $this->request->headers = new HeaderBag();
     }
 
-    public function testNewActionIfForbidden()
+    public function testNewActionIfForbidden(): void
     {
         $this->permissionProvider->expects($this->once())
             ->method('canCreate')
             ->will($this->throwException(new ForbiddenException('create')));
-        
+
         $this->customObjectModel->expects($this->never())
             ->method('fetchEntity');
 
@@ -103,11 +103,11 @@ class FormControllerTest extends \PHPUnit_Framework_TestCase
         $this->formController->newAction(self::OBJECT_ID, self::ITEM_ID);
     }
 
-    public function testNewAction()
+    public function testNewAction(): void
     {
         $this->permissionProvider->expects($this->once())
             ->method('canCreate');
-        
+
         $this->customObjectModel->expects($this->once())
             ->method('fetchEntity')
             ->with(self::OBJECT_ID)
@@ -121,12 +121,12 @@ class FormControllerTest extends \PHPUnit_Framework_TestCase
             ->method('buildNewRoute')
             ->with(self::OBJECT_ID);
 
-        $this->assertRenderFormForItem();        
+        $this->assertRenderFormForItem();
 
         $this->formController->newAction(self::OBJECT_ID, self::ITEM_ID);
     }
 
-    public function testEditActionIfCustomObjectNotFound()
+    public function testEditActionIfCustomObjectNotFound(): void
     {
         $this->customObjectModel->expects($this->once())
             ->method('fetchEntity')
@@ -142,7 +142,7 @@ class FormControllerTest extends \PHPUnit_Framework_TestCase
         $this->formController->editAction(self::OBJECT_ID, self::ITEM_ID);
     }
 
-    public function testEditActionIfCustomItemNotFound()
+    public function testEditActionIfCustomItemNotFound(): void
     {
         $this->customObjectModel->expects($this->once())
             ->method('fetchEntity')
@@ -159,7 +159,7 @@ class FormControllerTest extends \PHPUnit_Framework_TestCase
         $this->formController->editAction(self::OBJECT_ID, self::ITEM_ID);
     }
 
-    public function testEditActionIfCustomItemForbidden()
+    public function testEditActionIfCustomItemForbidden(): void
     {
         $this->customObjectModel->expects($this->once())
             ->method('fetchEntity')
@@ -177,12 +177,12 @@ class FormControllerTest extends \PHPUnit_Framework_TestCase
         $this->routeProvider->expects($this->never())
             ->method('buildEditRoute');
 
-        $this->expectException(AccessDeniedHttpException::class);        
+        $this->expectException(AccessDeniedHttpException::class);
 
         $this->formController->editAction(self::OBJECT_ID, self::ITEM_ID);
     }
 
-    public function testEditAction()
+    public function testEditAction(): void
     {
         $this->customObjectModel->expects($this->once())
             ->method('fetchEntity')
@@ -206,7 +206,7 @@ class FormControllerTest extends \PHPUnit_Framework_TestCase
         $this->formController->editAction(self::OBJECT_ID, self::ITEM_ID);
     }
 
-    public function testCloneAction()
+    public function testCloneAction(): void
     {
         $this->customItem->expects($this->once())
             ->method('getCustomObject')
@@ -228,12 +228,12 @@ class FormControllerTest extends \PHPUnit_Framework_TestCase
         $this->formController->cloneAction(self::OBJECT_ID, self::ITEM_ID);
     }
 
-    private function assertRenderFormForItem()
+    private function assertRenderFormForItem(): void
     {
         $this->routeProvider->expects($this->once())
-        ->method('buildSaveRoute')
-        ->with(self::OBJECT_ID, self::ITEM_ID)
-        ->willReturn('https://list.items');
+            ->method('buildSaveRoute')
+            ->with(self::OBJECT_ID, self::ITEM_ID)
+            ->willReturn('https://list.items');
 
         $this->routeProvider->expects($this->once())
             ->method('buildListRoute')
@@ -249,4 +249,3 @@ class FormControllerTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->form);
     }
 }
-

@@ -13,16 +13,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Controller\CustomItem;
 
-use Symfony\Component\HttpFoundation\Request;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\LinkController;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerDependenciesTrait;
-use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use Symfony\Component\HttpFoundation\HeaderBag;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Mautic\CoreBundle\Service\FlashBag;
 
 class LinkControllerTest extends \PHPUnit_Framework_TestCase
@@ -30,29 +26,27 @@ class LinkControllerTest extends \PHPUnit_Framework_TestCase
     use ControllerDependenciesTrait;
 
     private const ITEM_ID = 22;
-    
+
     private const ENTITY_ID = 33;
 
     private const ENTITY_TYPE = 'contact';
-    
+
     private $customItemModel;
     private $flashBag;
     private $permissionProvider;
-    private $request;
 
     /**
      * @var LinkController
      */
     private $linkController;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->customItemModel    = $this->createMock(CustomItemModel::class);
         $this->flashBag           = $this->createMock(FlashBag::class);
         $this->permissionProvider = $this->createMock(CustomItemPermissionProvider::class);
-        $this->request            = $this->createMock(Request::class);
         $this->linkController     = new LinkController(
             $this->customItemModel,
             $this->permissionProvider,
@@ -62,7 +56,7 @@ class LinkControllerTest extends \PHPUnit_Framework_TestCase
         $this->addSymfonyDependencies($this->linkController);
     }
 
-    public function testSaveActionIfCustomItemNotFound()
+    public function testSaveActionIfCustomItemNotFound(): void
     {
         $this->customItemModel->expects($this->once())
             ->method('fetchEntity')
@@ -78,7 +72,7 @@ class LinkControllerTest extends \PHPUnit_Framework_TestCase
         $this->linkController->saveAction(self::ITEM_ID, self::ENTITY_TYPE, self::ENTITY_ID);
     }
 
-    public function testSaveAction()
+    public function testSaveAction(): void
     {
         $this->customItemModel->expects($this->once())
             ->method('fetchEntity')
@@ -94,4 +88,3 @@ class LinkControllerTest extends \PHPUnit_Framework_TestCase
         $this->linkController->saveAction(self::ITEM_ID, self::ENTITY_TYPE, self::ENTITY_ID);
     }
 }
-

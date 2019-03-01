@@ -34,7 +34,7 @@ class DeleteControllerTest extends \PHPUnit_Framework_TestCase
     private const OBJECT_ID = 33;
 
     private const ITEM_ID = 22;
-    
+
     private $customItemModel;
     private $sessionprovider;
     private $flashBag;
@@ -47,7 +47,7 @@ class DeleteControllerTest extends \PHPUnit_Framework_TestCase
      */
     private $deleteController;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -62,17 +62,17 @@ class DeleteControllerTest extends \PHPUnit_Framework_TestCase
             $this->sessionprovider,
             $this->flashBag,
             $this->permissionProvider,
-            $this->routeProvider 
+            $this->routeProvider
         );
 
         $this->addSymfonyDependencies($this->deleteController);
-        
+
         $this->request->method('isXmlHttpRequest')->willReturn(true);
         $this->request->method('getRequestUri')->willReturn('https://a.b');
         $this->request->headers = new HeaderBag();
     }
 
-    public function testDeleteActionIfCustomItemNotFound()
+    public function testDeleteActionIfCustomItemNotFound(): void
     {
         $this->customItemModel->expects($this->once())
             ->method('fetchEntity')
@@ -87,7 +87,7 @@ class DeleteControllerTest extends \PHPUnit_Framework_TestCase
         $this->deleteController->deleteAction(self::OBJECT_ID, self::ITEM_ID);
     }
 
-    public function testDeleteActionIfCustomItemForbidden()
+    public function testDeleteActionIfCustomItemForbidden(): void
     {
         $this->customItemModel->expects($this->once())
             ->method('fetchEntity')
@@ -108,7 +108,7 @@ class DeleteControllerTest extends \PHPUnit_Framework_TestCase
         $this->deleteController->deleteAction(self::OBJECT_ID, self::ITEM_ID);
     }
 
-    public function testDeleteAction()
+    public function testDeleteAction(): void
     {
         $customItem = $this->createMock(CustomItem::class);
 
@@ -122,7 +122,7 @@ class DeleteControllerTest extends \PHPUnit_Framework_TestCase
         $this->customItemModel->expects($this->once())
             ->method('delete')
             ->with($customItem);
-            
+
         $this->flashBag->expects($this->once())
             ->method('add')
             ->with('mautic.core.notice.deleted');
@@ -138,4 +138,3 @@ class DeleteControllerTest extends \PHPUnit_Framework_TestCase
         $this->deleteController->deleteAction(self::OBJECT_ID, self::ITEM_ID);
     }
 }
-

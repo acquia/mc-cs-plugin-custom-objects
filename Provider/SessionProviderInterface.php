@@ -22,12 +22,12 @@ interface SessionProviderInterface
     public const KEY_ORDER_BY = 'undefined';
 
     public const KEY_ORDER_BY_DIR = 'undefined';
-    
+
     public const KEY_FILTER = 'undefined';
 
     /**
      * @param int $default
-     * 
+     *
      * @return int
      */
     public function getPage(int $default = 1): int;
@@ -49,7 +49,7 @@ interface SessionProviderInterface
 
     /**
      * @param string $default
-     * 
+     *
      * @return string
      */
     public function getOrderBy(string $default): string;
@@ -61,7 +61,7 @@ interface SessionProviderInterface
 
     /**
      * @param string $default
-     * 
+     *
      * @return string
      */
     public function getOrderByDir(string $default): string;
@@ -69,14 +69,14 @@ interface SessionProviderInterface
     /**
      * @param string $orderByDir
      */
-    public function setOrderByDir(string $orderByDir): void;
+    public function setOrderByDir(string $orderByDir = 'DESC'): void;
 
     /**
      * @param string $default
-     * 
+     *
      * @return string
      */
-    public function getFilter(string $default): string;
+    public function getFilter(string $default = ''): string;
 
     /**
      * @param string $filter

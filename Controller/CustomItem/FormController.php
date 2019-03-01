@@ -76,7 +76,7 @@ class FormController extends CommonController
 
     /**
      * @param int $objectId
-     * 
+     *
      * @return Response
      */
     public function newAction(int $objectId): Response
@@ -116,7 +116,7 @@ class FormController extends CommonController
     /**
      * @param int $objectId
      * @param int $itemId
-     * 
+     *
      * @return Response
      */
     public function cloneAction(int $objectId, int $itemId): Response
@@ -139,7 +139,7 @@ class FormController extends CommonController
      * @param CustomItem   $customItem
      * @param CustomObject $customObject
      * @param string       $route
-     * 
+     *
      * @return Response
      */
     private function renderFormForItem(CustomItem $customItem, CustomObject $customObject, string $route): Response

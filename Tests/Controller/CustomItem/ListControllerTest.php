@@ -38,12 +38,13 @@ class ListControllerTest extends \PHPUnit_Framework_TestCase
     private const OBJECT_ID = 33;
 
     private const PAGE = 3;
-    
+
     private $customItemModel;
     private $customObjectModel;
     private $sessionProvider;
     private $permissionProvider;
     private $routeProvider;
+    private $requestStack;
     private $request;
 
     /**
@@ -51,7 +52,7 @@ class ListControllerTest extends \PHPUnit_Framework_TestCase
      */
     private $listController;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -68,18 +69,18 @@ class ListControllerTest extends \PHPUnit_Framework_TestCase
             $this->customItemModel,
             $this->customObjectModel,
             $this->permissionProvider,
-            $this->routeProvider 
+            $this->routeProvider
         );
 
         $this->addSymfonyDependencies($this->listController);
 
         $this->requestStack->method('getCurrentRequest')->willReturn($this->request);
-        
+
         $this->request->headers = new HeaderBag();
         $this->request->query   = new ParameterBag();
     }
 
-    public function testDeleteActionIfCustomObjectNotFound()
+    public function testDeleteActionIfCustomObjectNotFound(): void
     {
         $this->customObjectModel->expects($this->once())
             ->method('fetchEntity')
@@ -91,7 +92,7 @@ class ListControllerTest extends \PHPUnit_Framework_TestCase
         $this->listController->listAction(self::OBJECT_ID, self::PAGE);
     }
 
-    public function testDeleteActionIfForbidden()
+    public function testDeleteActionIfForbidden(): void
     {
         $this->permissionProvider->expects($this->once())
             ->method('canViewAtAll')
@@ -105,7 +106,7 @@ class ListControllerTest extends \PHPUnit_Framework_TestCase
         $this->listController->listAction(self::OBJECT_ID, self::PAGE);
     }
 
-    public function testDeleteAction()
+    public function testDeleteAction(): void
     {
         $pageLimit    = 10;
         $customObject = $this->createMock(CustomObject::class);
@@ -133,7 +134,7 @@ class ListControllerTest extends \PHPUnit_Framework_TestCase
             ->method('getOrderByDir')
             ->willReturn('DESC');
 
-        $assertTableConfig = function(TableConfig $tableConfig) {
+        $assertTableConfig = function (TableConfig $tableConfig) {
             $this->assertSame(10, $tableConfig->getLimit());
             $this->assertSame(20, $tableConfig->getOffset());
             $this->assertSame('e.id', $tableConfig->getOrderBy());
@@ -166,4 +167,3 @@ class ListControllerTest extends \PHPUnit_Framework_TestCase
         $this->listController->listAction(self::OBJECT_ID, self::PAGE);
     }
 }
-

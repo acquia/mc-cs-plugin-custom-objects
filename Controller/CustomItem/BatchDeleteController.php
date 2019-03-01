@@ -85,7 +85,7 @@ class BatchDeleteController extends CommonController
      *
      * @return Response
      */
-    public function deleteAction(int $objectId)
+    public function deleteAction(int $objectId): Response
     {
         $request  = $this->requestStack->getCurrentRequest();
         $itemIds  = json_decode($request->get('ids', '[]'), true);

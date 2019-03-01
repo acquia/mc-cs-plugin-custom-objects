@@ -50,7 +50,7 @@ class CancelController extends CommonController
      *
      * @return Response
      */
-    public function cancelAction(int $objectId, ?int $itemId = null)
+    public function cancelAction(int $objectId, ?int $itemId = null): Response
     {
         $page = $this->sessionProvider->getPage();
 

@@ -34,7 +34,7 @@ use Mautic\CoreBundle\Controller\MauticController;
  */
 trait ControllerDependenciesTrait
 {
-    private function addSymfonyDependencies(Controller $controller)
+    private function addSymfonyDependencies(Controller $controller): void
     {
         $requestStack = empty($this->requestStack) ? $this->createMock(RequestStack::class) : $this->requestStack;
         $request      = empty($this->request) ? $this->createMock(Request::class) : $this->request;
@@ -72,7 +72,7 @@ trait ControllerDependenciesTrait
         $requestStack->method('getCurrentRequest')->willReturn($request);
 
         $controller->setContainer($container);
-        
+
         if ($controller instanceof MauticController) {
             $controller->setRequest($request);
             $controller->setTranslator($translator);

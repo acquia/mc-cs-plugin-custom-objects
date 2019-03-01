@@ -40,12 +40,12 @@ abstract class CommonSessionProvider implements SessionProviderInterface
 
     /**
      * @param int $default
-     * 
+     *
      * @return int
      */
     public function getPage(int $default = 1): int
     {
-        return (int) $this->session->get(get_called_class()::KEY_PAGE, $default);
+        return (int) $this->session->get(static::KEY_PAGE, $default);
     }
 
     /**
@@ -55,37 +55,37 @@ abstract class CommonSessionProvider implements SessionProviderInterface
     {
         $defaultlimit = (int) $this->coreParametersHelper->getParameter('default_pagelimit');
 
-        return (int) $this->session->get(get_called_class()::KEY_LIMIT, $defaultlimit);
+        return (int) $this->session->get(static::KEY_LIMIT, $defaultlimit);
     }
 
     /**
      * @param string $default
-     * 
+     *
      * @return string
      */
     public function getOrderBy(string $default): string
     {
-        return $this->session->get(get_called_class()::KEY_ORDER_BY, $default);
+        return $this->session->get(static::KEY_ORDER_BY, $default);
     }
 
     /**
      * @param string $default
-     * 
+     *
      * @return string
      */
     public function getOrderByDir(string $default = 'DESC'): string
     {
-        return $this->session->get(get_called_class()::KEY_ORDER_BY_DIR, $default);
+        return $this->session->get(static::KEY_ORDER_BY_DIR, $default);
     }
 
     /**
      * @param string $default
-     * 
+     *
      * @return string
      */
     public function getFilter(string $default = ''): string
     {
-        return $this->session->get(get_called_class()::KEY_FILTER, $default);
+        return $this->session->get(static::KEY_FILTER, $default);
     }
 
     /**
@@ -93,7 +93,7 @@ abstract class CommonSessionProvider implements SessionProviderInterface
      */
     public function setPage(int $page): void
     {
-        $this->session->set(get_called_class()::KEY_PAGE, $page);
+        $this->session->set(static::KEY_PAGE, $page);
     }
 
     /**
@@ -101,7 +101,7 @@ abstract class CommonSessionProvider implements SessionProviderInterface
      */
     public function setPageLimit(int $pageLimit): void
     {
-        $this->session->set(get_called_class()::KEY_LIMIT, $pageLimit);
+        $this->session->set(static::KEY_LIMIT, $pageLimit);
     }
 
     /**
@@ -109,7 +109,7 @@ abstract class CommonSessionProvider implements SessionProviderInterface
      */
     public function setOrderBy(string $orderBy): void
     {
-        $this->session->set(get_called_class()::KEY_ORDER_BY, $orderBy);
+        $this->session->set(static::KEY_ORDER_BY, $orderBy);
     }
 
     /**
@@ -117,7 +117,7 @@ abstract class CommonSessionProvider implements SessionProviderInterface
      */
     public function setOrderByDir(string $orderByDir): void
     {
-        $this->session->set(get_called_class()::KEY_ORDER_BY_DIR, $orderByDir);
+        $this->session->set(static::KEY_ORDER_BY_DIR, $orderByDir);
     }
 
     /**
@@ -125,6 +125,6 @@ abstract class CommonSessionProvider implements SessionProviderInterface
      */
     public function setFilter(string $filter): void
     {
-        $this->session->set(get_called_class()::KEY_FILTER, $filter);
+        $this->session->set(static::KEY_FILTER, $filter);
     }
 }
