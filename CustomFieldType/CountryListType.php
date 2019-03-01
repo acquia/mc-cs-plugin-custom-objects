@@ -25,7 +25,7 @@ class CountryListType extends SelectType
     /**
      * @return string
      */
-    public function getSymfonyFormFiledType(): string
+    public function getSymfonyFormFieldType(): string
     {
         return CountryType::class;
     }

@@ -20,7 +20,8 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 
 class IntType extends AbstractCustomFieldType
 {
-    const TABLE_NAME = 'custom_field_value_int';
+    public const TABLE_NAME = 'custom_field_value_int';
+
     /**
      * @var string
      */
@@ -29,7 +30,7 @@ class IntType extends AbstractCustomFieldType
     /**
      * @return string
      */
-    public function getSymfonyFormFiledType(): string
+    public function getSymfonyFormFieldType(): string
     {
         return \Symfony\Component\Form\Extension\Core\Type\NumberType::class;
     }

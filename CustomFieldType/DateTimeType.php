@@ -20,7 +20,8 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 
 class DateTimeType extends AbstractCustomFieldType
 {
-    const TABLE_NAME = 'custom_field_value_datetime';
+    public const TABLE_NAME = 'custom_field_value_datetime';
+
     /**
      * @var string
      */
@@ -32,6 +33,7 @@ class DateTimeType extends AbstractCustomFieldType
      * @param mixed|null  $value
      *
      * @return CustomFieldValueInterface
+     *
      * @throws \Exception
      */
     public function createValueEntity(CustomField $customField, CustomItem $customItem, $value = null): CustomFieldValueInterface
@@ -42,7 +44,7 @@ class DateTimeType extends AbstractCustomFieldType
     /**
      * @return string
      */
-    public function getSymfonyFormFiledType(): string
+    public function getSymfonyFormFieldType(): string
     {
         return Form\Type\DateTimeType::class;
     }

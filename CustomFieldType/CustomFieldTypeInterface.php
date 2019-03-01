@@ -33,7 +33,7 @@ interface CustomFieldTypeInterface
     /**
      * @return string
      */
-    public function getSymfonyFormFiledType(): string;
+    public function getSymfonyFormFieldType(): string;
 
     /**
      * @return string

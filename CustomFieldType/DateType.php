@@ -21,7 +21,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 
 class DateType extends AbstractCustomFieldType
 {
-    const TABLE_NAME = 'custom_field_value_date';
+    public const TABLE_NAME = 'custom_field_value_date';
 
     /**
      * @var string
@@ -43,7 +43,7 @@ class DateType extends AbstractCustomFieldType
     /**
      * @return string
      */
-    public function getSymfonyFormFiledType(): string
+    public function getSymfonyFormFieldType(): string
     {
         return Form\Type\DateType::class;
     }

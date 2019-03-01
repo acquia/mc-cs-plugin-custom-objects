@@ -153,7 +153,7 @@ class CustomFieldType extends AbstractType
 
             $form->add(
                 'defaultValue',
-                $customField->getTypeObject()->getSymfonyFormFiledType(),
+                $customField->getTypeObject()->getSymfonyFormFieldType(),
                 [
                     'label'      => 'custom.field.label.default_value',
                     'required'   => false,
@@ -203,7 +203,7 @@ class CustomFieldType extends AbstractType
 
             $builder->add(
                 'field',
-                $customField->getTypeObject()->getSymfonyFormFiledType(),
+                $customField->getTypeObject()->getSymfonyFormFieldType(),
                 [
                     'mapped'     => false,
                     'label'      => $customField->getLabel(),
