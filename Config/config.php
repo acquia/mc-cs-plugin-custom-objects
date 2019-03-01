@@ -237,8 +237,7 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ListController::class,
                 'arguments' => [
                     'request_stack',
-                    'session',
-                    'mautic.helper.core_parameters',
+                    'custom_item.session.provider',
                     'mautic.custom.model.item',
                     'mautic.custom.model.object',
                     'custom_item.permission.provider',
@@ -782,6 +781,7 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Provider\CustomItemSessionProvider::class,
                 'arguments' => [
                     'session',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'custom_object.route.provider' => [

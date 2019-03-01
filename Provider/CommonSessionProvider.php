@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Provider;
 
 use Symfony\Component\HttpFoundation\Session\Session;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 abstract class CommonSessionProvider implements SessionProviderInterface
 {
@@ -23,11 +24,18 @@ abstract class CommonSessionProvider implements SessionProviderInterface
     private $session;
 
     /**
-     * @param Session $session
+     * @var CoreParametersHelper
      */
-    public function __construct(Session $session)
+    private $coreParametersHelper;
+
+    /**
+     * @param Session              $session
+     * @param CoreParametersHelper $coreParametersHelper
+     */
+    public function __construct(Session $session, CoreParametersHelper $coreParametersHelper)
     {
-        $this->session = $session;
+        $this->session              = $session;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -37,6 +45,86 @@ abstract class CommonSessionProvider implements SessionProviderInterface
      */
     public function getPage(int $default = 1): int
     {
-        return (int) $this->session->get(self::KEY_PAGE, $default);
+        return (int) $this->session->get(get_called_class()::KEY_PAGE, $default);
+    }
+
+    /**
+     * @return int
+     */
+    public function getPageLimit(): int
+    {
+        $defaultlimit = (int) $this->coreParametersHelper->getParameter('default_pagelimit');
+
+        return (int) $this->session->get(get_called_class()::KEY_LIMIT, $defaultlimit);
+    }
+
+    /**
+     * @param string $default
+     * 
+     * @return string
+     */
+    public function getOrderBy(string $default): string
+    {
+        return $this->session->get(get_called_class()::KEY_ORDER_BY, $default);
+    }
+
+    /**
+     * @param string $default
+     * 
+     * @return string
+     */
+    public function getOrderByDir(string $default = 'DESC'): string
+    {
+        return $this->session->get(get_called_class()::KEY_ORDER_BY_DIR, $default);
+    }
+
+    /**
+     * @param string $default
+     * 
+     * @return string
+     */
+    public function getFilter(string $default = ''): string
+    {
+        return $this->session->get(get_called_class()::KEY_FILTER, $default);
+    }
+
+    /**
+     * @param int $page
+     */
+    public function setPage(int $page): void
+    {
+        $this->session->set(get_called_class()::KEY_PAGE, $page);
+    }
+
+    /**
+     * @param int $pageLimit
+     */
+    public function setPageLimit(int $pageLimit): void
+    {
+        $this->session->set(get_called_class()::KEY_LIMIT, $pageLimit);
+    }
+
+    /**
+     * @param string $orderBy
+     */
+    public function setOrderBy(string $orderBy): void
+    {
+        $this->session->set(get_called_class()::KEY_ORDER_BY, $orderBy);
+    }
+
+    /**
+     * @param string $orderByDir
+     */
+    public function setOrderByDir(string $orderByDir): void
+    {
+        $this->session->set(get_called_class()::KEY_ORDER_BY_DIR, $orderByDir);
+    }
+
+    /**
+     * @param string $filter
+     */
+    public function setFilter(string $filter): void
+    {
+        $this->session->set(get_called_class()::KEY_FILTER, $filter);
     }
 }

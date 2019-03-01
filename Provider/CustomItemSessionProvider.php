@@ -18,4 +18,12 @@ use Symfony\Component\HttpFoundation\Session\Session;
 class CustomItemSessionProvider extends CommonSessionProvider
 {
     public const KEY_PAGE = 'custom.item.page';
+
+    public const KEY_LIMIT = 'mautic.custom.item.limit';
+
+    public const KEY_ORDER_BY = 'mautic.custom.item.orderby';
+
+    public const KEY_ORDER_BY_DIR = 'mautic.custom.item.orderbydir';
+    
+    public const KEY_FILTER = 'mautic.custom.item.filter';
 }
