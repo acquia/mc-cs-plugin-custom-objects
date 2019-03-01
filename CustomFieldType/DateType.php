@@ -45,7 +45,7 @@ class DateType extends AbstractCustomFieldType
      */
     public function getSymfonyFormFiledType(): string
     {
-        return \Symfony\Component\Form\Extension\Core\Type\DateTimeType::class;
+        return Form\Type\DateType::class;
     }
 
     /**

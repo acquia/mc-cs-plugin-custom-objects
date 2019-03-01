@@ -15,6 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use MauticPlugin\CustomObjectsBundle\Form\CustomObjectHiddenTransformer;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -34,11 +35,20 @@ class CustomFieldType extends AbstractType
     private $customObjectRepository;
 
     /**
-     * @param CustomObjectRepository $customObjectRepository
+     * @var CustomFieldTypeProvider
      */
-    public function __construct(CustomObjectRepository $customObjectRepository)
-    {
-        $this->customObjectRepository = $customObjectRepository;
+    private $customFieldTypeProvider;
+
+    /**
+     * @param CustomObjectRepository  $customObjectRepository
+     * @param CustomFieldTypeProvider $customFieldTypeProvider
+     */
+    public function __construct(
+        CustomObjectRepository $customObjectRepository,
+        CustomFieldTypeProvider $customFieldTypeProvider
+    ) {
+        $this->customObjectRepository  = $customObjectRepository;
+        $this->customFieldTypeProvider = $customFieldTypeProvider;
     }
 
     /**
@@ -102,6 +112,7 @@ class CustomFieldType extends AbstractType
                 'data_class'         => CustomField::class,
                 'custom_object_form' => false, // Is form used as subform?
                 'csrf_protection'    => false,
+                'allow_extra_fields' => true,
             ]
         );
     }
@@ -144,8 +155,8 @@ class CustomFieldType extends AbstractType
                 'defaultValue',
                 $customField->getTypeObject()->getSymfonyFormFiledType(),
                 [
-                    'label'    => 'custom.field.label.default_value',
-                    'required' => false,
+                    'label'      => 'custom.field.label.default_value',
+                    'required'   => false,
                     'attr'       => [
                         'class' => 'form-control',
                     ],
@@ -154,7 +165,7 @@ class CustomFieldType extends AbstractType
         });
 
 //        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event): void {
-//            /** @var CustomField $customField */
+        // /** @var CustomField $customField */
 //            $customField = $event->getData();
 //            $customField->setParams((array) $customField->getParamsObject());
 //            $event->setData($customField);
@@ -186,6 +197,7 @@ class CustomFieldType extends AbstractType
             $builder = $event->getForm();
 
             if (!$customField) {
+                // Custom field is new without data fetched from DB
                 return;
             }
 
@@ -198,12 +210,22 @@ class CustomFieldType extends AbstractType
                     'required'   => false,
                     'data'       => $customField->getDefaultValue(),
                     'label_attr' => ['class' => 'control-label'],
-                    'attr'       => [
-                        'class' => 'form-control',
+                    'attr'       => [ // @todo this overrides configureOptions() method content
+                        'class'    => 'form-control',
                         'readonly' => true,
                     ],
                 ]
             );
+        });
+
+        $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event): void {
+            // Set proper type object when creating new custom field
+            /** @var CustomField $customField */
+            $customField = $event->getData();
+
+            if (!$customField->getTypeObject() && $customField->getType()) {
+                $customField->setTypeObject($this->customFieldTypeProvider->getType($customField->getType()));
+            }
         });
 
         $builder->add('label', HiddenType::class);
@@ -211,7 +233,7 @@ class CustomFieldType extends AbstractType
         $builder->add('defaultValue', HiddenType::class);
 
 //        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
-//            /** @var CustomField $customField */
+        // /** @var CustomField $customField */
 //            $customField = $event->getData();
 //            $builder = $event->getForm();
 //
