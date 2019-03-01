@@ -77,6 +77,14 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     }
 
     /**
+     * @return string
+     */
+    public function getTableName(): string
+    {
+        return MAUTIC_TABLE_PREFIX . static::TABLE_NAME;
+    }
+
+    /**
      * @param TranslatorInterface $translator
      *
      * @return string[]
