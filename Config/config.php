@@ -347,6 +347,7 @@ return [
                     'request_stack',
                     'mautic.custom.model.item',
                     'custom_item.permission.provider',
+                    'mautic.core.service.flashbag',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
