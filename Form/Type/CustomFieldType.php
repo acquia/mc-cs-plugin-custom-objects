@@ -15,6 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use MauticPlugin\CustomObjectsBundle\Form\CustomObjectHiddenTransformer;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -34,11 +35,20 @@ class CustomFieldType extends AbstractType
     private $customObjectRepository;
 
     /**
-     * @param CustomObjectRepository $customObjectRepository
+     * @var CustomFieldTypeProvider
      */
-    public function __construct(CustomObjectRepository $customObjectRepository)
-    {
+    private $customFieldTypeProvider;
+
+    /**
+     * @param CustomObjectRepository  $customObjectRepository
+     * @param CustomFieldTypeProvider $customFieldTypeProvider
+     */
+    public function __construct(
+        CustomObjectRepository $customObjectRepository,
+        CustomFieldTypeProvider $customFieldTypeProvider
+    ){
         $this->customObjectRepository = $customObjectRepository;
+        $this->customFieldTypeProvider = $customFieldTypeProvider;
     }
 
     /**
@@ -186,6 +196,7 @@ class CustomFieldType extends AbstractType
             $builder = $event->getForm();
 
             if (!$customField) {
+                // Custom field is new without data fetched from DB
                 return;
             }
 
@@ -204,6 +215,17 @@ class CustomFieldType extends AbstractType
                     ],
                 ]
             );
+        });
+
+        $builder->addEventListener(FormEvents::SUBMIT, function(FormEvent $event): void {
+            // Set proper type object when creating new custom field
+            /** @var CustomField $customField */
+            $customField = $event->getData();
+
+            if (!$customField->getTypeObject() && $customField->getType()) {
+                $customField->setTypeObject($this->customFieldTypeProvider->getType($customField->getType()));
+            }
+
         });
 
         $builder->add('label', HiddenType::class);
