@@ -21,6 +21,9 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class CustomFieldParamsType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(

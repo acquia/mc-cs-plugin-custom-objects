@@ -66,7 +66,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     private $defaultValue;
 
     /**
-     * @var array
+     * @var mixed[]
      */
     private $params = [];
 
@@ -304,7 +304,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public function getParams(): array
     {
@@ -312,7 +312,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param array $params
+     * @param mixed[] $params
      */
     public function setParams(array $params): void
     {
