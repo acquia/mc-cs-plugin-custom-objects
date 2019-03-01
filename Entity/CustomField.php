@@ -70,6 +70,11 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      */
     private $params = [];
 
+    /**
+     * @var Params
+     */
+    private $paramsObject;
+
     public function __clone()
     {
         $this->id = null;
