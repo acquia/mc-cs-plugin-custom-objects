@@ -20,6 +20,8 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 
 abstract class AbstractTextType extends AbstractCustomFieldType
 {
+    const TABLE_NAME = 'custom_field_value_text';
+
     /**
      * @param CustomField $customField
      * @param CustomItem  $customItem
@@ -46,14 +48,6 @@ abstract class AbstractTextType extends AbstractCustomFieldType
     public function getEntityClass(): string
     {
         return CustomFieldValueText::class;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTableName(): string
-    {
-        return MAUTIC_TABLE_PREFIX.'custom_field_value_text';
     }
 
     /**
