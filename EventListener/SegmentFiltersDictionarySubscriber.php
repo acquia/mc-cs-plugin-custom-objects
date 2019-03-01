@@ -26,7 +26,7 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
 {
 
     /**
-     * @var EntityManager
+     * @var Registry
      */
     private $doctrineRegistry;
 
