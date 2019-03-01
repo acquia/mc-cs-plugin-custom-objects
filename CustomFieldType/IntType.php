@@ -20,7 +20,8 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 
 class IntType extends AbstractCustomFieldType
 {
-    const TABLE_NAME = 'custom_field_value_int';
+    public const TABLE_NAME = 'custom_field_value_int';
+
     /**
      * @var string
      */
@@ -40,6 +41,15 @@ class IntType extends AbstractCustomFieldType
     public function getEntityClass(): string
     {
         return CustomFieldValueInt::class;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTableName(): string
+    {
+        return MAUTIC_TABLE_PREFIX.static::TABLE_NAME;
+
     }
 
     /**
