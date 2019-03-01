@@ -112,6 +112,7 @@ class CustomFieldType extends AbstractType
                 'data_class'         => CustomField::class,
                 'custom_object_form' => false, // Is form used as subform?
                 'csrf_protection'    => false,
+                'allow_extra_fields' => true,
             ]
         );
     }
