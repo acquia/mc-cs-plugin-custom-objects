@@ -284,9 +284,8 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\SaveController::class,
                 'arguments' => [
                     'request_stack',
-                    'session',
                     'form.factory',
-                    'translator',
+                    'mautic.core.service.flashbag',
                     'mautic.custom.model.item',
                     'mautic.custom.model.object',
                     'custom_item.permission.provider',

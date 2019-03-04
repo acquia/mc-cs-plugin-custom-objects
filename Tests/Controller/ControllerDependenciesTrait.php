@@ -58,6 +58,8 @@ trait ControllerDependenciesTrait
             ['mautic.security', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $security],
         ]));
 
+        $phpEngine->method('renderResponse')->willReturn($response);
+
         $container->method('has')->will($this->returnValueMap([
             ['templating', true],
         ]));
