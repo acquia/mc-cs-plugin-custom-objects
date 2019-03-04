@@ -16,7 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Provider;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
-abstract class CommonSessionProvider implements SessionProviderInterface
+abstract class StandardSessionProvider implements SessionProviderInterface
 {
     /**
      * @var Session
