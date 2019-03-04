@@ -16,7 +16,6 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Controller\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\LookupController;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerDependenciesTrait;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -88,7 +87,7 @@ class LookupControllerTest extends \PHPUnit_Framework_TestCase
 
         $this->customItemModel->expects($this->once())
             ->method('getLookupData')
-            ->with($this->callback(function(TableConfig $tableConfig) {
+            ->with($this->callback(function (TableConfig $tableConfig) {
                 $this->assertSame(10, $tableConfig->getLimit());
                 $this->assertSame(0, $tableConfig->getOffset());
                 $this->assertSame('CustomItem.name', $tableConfig->getOrderBy());
@@ -119,7 +118,7 @@ class LookupControllerTest extends \PHPUnit_Framework_TestCase
 
         $this->customItemModel->expects($this->once())
             ->method('getLookupData')
-            ->with($this->callback(function(TableConfig $tableConfig) {
+            ->with($this->callback(function (TableConfig $tableConfig) {
                 $this->assertSame(10, $tableConfig->getLimit());
                 $this->assertSame(0, $tableConfig->getOffset());
                 $this->assertSame('CustomItem.name', $tableConfig->getOrderBy());
