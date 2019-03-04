@@ -14,8 +14,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
@@ -28,6 +26,7 @@ use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
+use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderInterface;
 
 class ListController extends CommonController
 {
@@ -37,9 +36,9 @@ class ListController extends CommonController
     private $requestStack;
 
     /**
-     * @var Session
+     * @var SessionProviderInterface
      */
-    private $session;
+    private $sessionProvider;
 
     /**
      * @var CustomItemModel
@@ -63,8 +62,7 @@ class ListController extends CommonController
 
     /**
      * @param RequestStack                 $requestStack
-     * @param Session                      $session
-     * @param CoreParametersHelper         $coreParametersHelper
+     * @param SessionProviderInterface     $sessionProvider
      * @param CustomItemModel              $customItemModel
      * @param CustomObjectModel            $customObjectModel
      * @param CustomItemPermissionProvider $permissionProvider
@@ -72,20 +70,18 @@ class ListController extends CommonController
      */
     public function __construct(
         RequestStack $requestStack,
-        Session $session,
-        CoreParametersHelper $coreParametersHelper,
+        SessionProviderInterface $sessionProvider,
         CustomItemModel $customItemModel,
         CustomObjectModel $customObjectModel,
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider
     ) {
-        $this->requestStack         = $requestStack;
-        $this->session              = $session;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->customItemModel      = $customItemModel;
-        $this->customObjectModel    = $customObjectModel;
-        $this->permissionProvider   = $permissionProvider;
-        $this->routeProvider        = $routeProvider;
+        $this->requestStack       = $requestStack;
+        $this->sessionProvider    = $sessionProvider;
+        $this->customItemModel    = $customItemModel;
+        $this->customObjectModel  = $customObjectModel;
+        $this->permissionProvider = $permissionProvider;
+        $this->routeProvider      = $routeProvider;
     }
 
     /**
@@ -108,29 +104,27 @@ class ListController extends CommonController
         }
 
         $request      = $this->requestStack->getCurrentRequest();
-        $search       = InputHelper::clean($request->get('search', $this->session->get('mautic.custom.item.filter', '')));
-        $defaultlimit = (int) $this->coreParametersHelper->getParameter('default_pagelimit');
-        $sessionLimit = (int) $this->session->get('mautic.custom.item.limit', $defaultlimit);
-        $limit        = (int) $request->get('limit', $sessionLimit);
-        $orderBy      = $this->session->get('mautic.custom.item.orderby', CustomItemRepository::TABLE_ALIAS.'.id');
-        $orderByDir   = $this->session->get('mautic.custom.item.orderbydir', 'DESC');
+        $search       = InputHelper::clean($request->get('search', $this->sessionProvider->getFilter()));
+        $limit        = (int) $request->get('limit', $this->sessionProvider->getPageLimit());
         $contactId    = (int) $request->get('contactId');
+        $orderBy      = $this->sessionProvider->getOrderBy(CustomItemRepository::TABLE_ALIAS.'.id');
+        $orderByDir   = $this->sessionProvider->getOrderByDir();
 
         if ($request->query->has('orderby')) {
             $orderBy    = InputHelper::clean($request->query->get('orderby'), true);
-            $orderByDir = $this->session->get('mautic.custom.item.orderbydir', 'ASC');
+            $orderByDir = $this->sessionProvider->getOrderByDir('ASC');
             $orderByDir = 'ASC' === $orderByDir ? 'DESC' : 'ASC';
-            $this->session->set('mautic.custom.item.orderby', $orderBy);
-            $this->session->set('mautic.custom.item.orderbydir', $orderByDir);
+            $this->sessionProvider->setOrderBy($orderBy);
+            $this->sessionProvider->setOrderByDir($orderByDir);
         }
 
         $tableConfig = new TableConfig($limit, $page, $orderBy, $orderByDir);
         $tableConfig->addFilter(CustomItem::class, 'customObject', $objectId);
         $tableConfig->addFilterIfNotEmpty(CustomItemXrefContact::class, 'contact', $contactId);
 
-        $this->session->set('mautic.custom.item.page', $page);
-        $this->session->set('mautic.custom.item.limit', $limit);
-        $this->session->set('mautic.custom.item.filter', $search);
+        $this->sessionProvider->setPage($page);
+        $this->sessionProvider->setPageLimit($limit);
+        $this->sessionProvider->setFilter($search);
 
         $response = [
             'viewParameters' => [

@@ -18,13 +18,13 @@ use MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemType;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
 use Mautic\CoreBundle\Controller\CommonController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 class FormController extends CommonController
 {
@@ -76,36 +76,84 @@ class FormController extends CommonController
 
     /**
      * @param int $objectId
+     *
+     * @return Response
+     */
+    public function newAction(int $objectId): Response
+    {
+        try {
+            $this->permissionProvider->canCreate($objectId);
+            $customObject = $this->customObjectModel->fetchEntity($objectId);
+            $customItem   = $this->customItemModel->populateCustomFields(new CustomItem($customObject));
+        } catch (ForbiddenException $e) {
+            return $this->accessDenied(false, $e->getMessage());
+        }
+
+        return $this->renderFormForItem($customItem, $customObject, $this->routeProvider->buildNewRoute($objectId));
+    }
+
+    /**
+     * @param int $objectId
      * @param int $itemId
      *
-     * @return Response|JsonResponse
+     * @return Response
      */
-    public function renderFormAction(int $objectId, ?int $itemId)
+    public function editAction(int $objectId, int $itemId): Response
     {
         try {
             $customObject = $this->customObjectModel->fetchEntity($objectId);
-
-            if ($itemId) {
-                $customItem = $this->customItemModel->fetchEntity($itemId);
-                $route      = $this->routeProvider->buildEditRoute($objectId, $itemId);
-                $this->permissionProvider->canEdit($customItem);
-            } else {
-                $this->permissionProvider->canCreate($objectId);
-                $customItem = $this->customItemModel->populateCustomFields(new CustomItem($customObject));
-                $route      = $this->routeProvider->buildNewRoute($objectId);
-            }
+            $customItem   = $this->customItemModel->fetchEntity($itemId);
+            $this->permissionProvider->canEdit($customItem);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        $action = $this->routeProvider->buildSaveRoute($objectId, $itemId);
-        $form   = $this->formFactory->create(CustomItemType::class, $customItem, ['action' => $action, 'objectId' => $objectId]);
+        return $this->renderFormForItem($customItem, $customObject, $this->routeProvider->buildEditRoute($objectId, $itemId));
+    }
+
+    /**
+     * @param int $objectId
+     * @param int $itemId
+     *
+     * @return Response
+     */
+    public function cloneAction(int $objectId, int $itemId): Response
+    {
+        try {
+            $customItem = clone $this->customItemModel->fetchEntity($itemId);
+            $this->permissionProvider->canClone($customItem);
+        } catch (NotFoundException $e) {
+            return $this->notFound($e->getMessage());
+        } catch (ForbiddenException $e) {
+            return $this->accessDenied(false, $e->getMessage());
+        }
+
+        $customItem->setName($customItem->getName().' '.$this->translator->trans('mautic.core.form.clone'));
+
+        return $this->renderFormForItem($customItem, $customItem->getCustomObject(), $this->routeProvider->buildCloneRoute($objectId, $itemId));
+    }
+
+    /**
+     * @param CustomItem   $customItem
+     * @param CustomObject $customObject
+     * @param string       $route
+     *
+     * @return Response
+     */
+    private function renderFormForItem(CustomItem $customItem, CustomObject $customObject, string $route): Response
+    {
+        $action = $this->routeProvider->buildSaveRoute($customObject->getId(), $customItem->getId());
+        $form   = $this->formFactory->create(
+            CustomItemType::class,
+            $customItem,
+            ['action' => $action, 'objectId' => $customObject->getId()]
+        );
 
         return $this->delegateView(
             [
-                'returnUrl'      => $this->routeProvider->buildListRoute($objectId),
+                'returnUrl'      => $this->routeProvider->buildListRoute($customObject->getId()),
                 'viewParameters' => [
                     'entity'       => $customItem,
                     'customObject' => $customObject,

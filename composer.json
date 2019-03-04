@@ -19,5 +19,16 @@
         "symplify/easy-coding-standard": "^5.5@dev",
         "psr/simple-cache": "^1.0@dev",
         "phpstan/phpstan": "^0.11.0@dev"
+    },
+    "scripts": {
+        "test": [
+            "@phpunit",
+            "@phpstan",
+            "@csfixer"
+        ],
+        "phpunit": "../../bin/phpunit -d memory_limit=2048M --bootstrap ../../vendor/autoload.php --configuration ../../app/phpunit.xml.dist --fail-on-warning --filter CustomObjectsBundle",
+        "phpstan": "vendor/bin/phpstan analyse --autoload-file=../../vendor/autoload.php --level=1 Command Config Controller CustomFieldType DTO Entity Event EventListener Exception Form Helper Migration Migrations Model Provider Repository Security Segment Tests",
+        "csfixer": "vendor/bin/ecs check .",
+        "fixcs": "vendor/bin/ecs check . --fix"
     }
 }

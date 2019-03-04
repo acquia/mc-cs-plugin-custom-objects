@@ -24,7 +24,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Controller\JsonController;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Mautic\CoreBundle\Service\FlashBag;
 
 class LookupController extends JsonController
 {
@@ -44,18 +44,26 @@ class LookupController extends JsonController
     private $permissionProvider;
 
     /**
+     * @var FlashBag
+     */
+    private $flashBag;
+
+    /**
      * @param RequestStack                 $requestStack
      * @param CustomItemModel              $customItemModel
      * @param CustomItemPermissionProvider $permissionProvider
+     * @param FlashBag                     $flashBag
      */
     public function __construct(
         RequestStack $requestStack,
         CustomItemModel $customItemModel,
-        CustomItemPermissionProvider $permissionProvider
+        CustomItemPermissionProvider $permissionProvider,
+        FlashBag $flashBag
     ) {
         $this->requestStack       = $requestStack;
         $this->customItemModel    = $customItemModel;
         $this->permissionProvider = $permissionProvider;
+        $this->flashBag           = $flashBag;
     }
 
     /**
@@ -68,7 +76,9 @@ class LookupController extends JsonController
         try {
             $this->permissionProvider->canViewAtAll($objectId);
         } catch (ForbiddenException $e) {
-            return new AccessDeniedException($e->getMessage(), $e);
+            $this->flashBag->add($e->getMessage(), [], FlashBag::LEVEL_ERROR);
+
+            return $this->renderJson([]);
         }
 
         $request     = $this->requestStack->getCurrentRequest();

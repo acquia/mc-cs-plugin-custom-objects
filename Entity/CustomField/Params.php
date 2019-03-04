@@ -21,7 +21,7 @@ class Params
     private $requiredValidationMessage;
 
     /**
-     * @param array $params|null
+     * @param mixed[] $params
      */
     public function __construct(array $params = [])
     {

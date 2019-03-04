@@ -29,7 +29,6 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
 
 class CustomObjectModel extends FormModel
 {
@@ -117,7 +116,7 @@ class CustomObjectModel extends FormModel
     {
         //take note of ID before doctrine wipes it out
         $id    = $customObject->getId();
-        $event = new CustomItemEvent($customObject);
+        $event = new CustomObjectEvent($customObject);
         $this->dispatcher->dispatch(CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_DELETE, $event);
 
         $this->entityManager->remove($customObject);

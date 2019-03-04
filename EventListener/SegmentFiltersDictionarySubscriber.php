@@ -44,7 +44,7 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
     public static function getSubscribedEvents(): array
     {
@@ -78,7 +78,8 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
         $fields = $queryBuilder->execute()->fetchAll();
 
         foreach ($fields as $field) {
-            if (!in_array($COId = $field['custom_object_id'], $registeredObjects, true)) {
+            $COId = $field['custom_object_id'];
+            if (!in_array($COId, $registeredObjects, true)) {
                 $event->addTranslation('cmo_'.$COId, [
                     'type'          => CustomItemFilterQueryBuilder::getServiceId(),
                     'field'         => $COId,
@@ -91,9 +92,9 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param array $fieldAttributes
+     * @param mixed[] $fieldAttributes
      *
-     * @return array
+     * @return mixed[]
      */
     private function createTranslation(array $fieldAttributes): array
     {
