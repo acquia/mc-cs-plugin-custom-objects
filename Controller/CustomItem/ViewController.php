@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Form\FormFactory;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
@@ -24,6 +23,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class ViewController extends CommonController
 {
@@ -53,13 +53,13 @@ class ViewController extends CommonController
     private $routeProvider;
 
     /**
-     * @var FormFactory
+     * @var FormFactoryInterface
      */
     private $formFactory;
 
     /**
      * @param RequestStack                 $requestStack
-     * @param FormFactory                  $formFactory
+     * @param FormFactoryInterface         $formFactory
      * @param CustomItemModel              $customItemModel
      * @param AuditLogModel                $auditLogModel
      * @param CustomItemPermissionProvider $permissionProvider
@@ -67,7 +67,7 @@ class ViewController extends CommonController
      */
     public function __construct(
         RequestStack $requestStack,
-        FormFactory $formFactory,
+        FormFactoryInterface $formFactory,
         CustomItemModel $customItemModel,
         AuditLogModel $auditLogModel,
         CustomItemPermissionProvider $permissionProvider,
