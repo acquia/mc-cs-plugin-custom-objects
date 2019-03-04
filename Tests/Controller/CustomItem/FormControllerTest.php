@@ -21,7 +21,6 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerDependenciesTrait;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\FormController;
 use Symfony\Component\Form\FormFactory;
@@ -80,7 +79,6 @@ class FormControllerTest extends \PHPUnit_Framework_TestCase
         $this->customItem->method('getId')->willReturn(self::ITEM_ID);
         $this->request->method('isXmlHttpRequest')->willReturn(true);
         $this->request->method('getRequestUri')->willReturn('https://a.b');
-        $this->request->headers = new HeaderBag();
     }
 
     public function testNewActionIfForbidden(): void

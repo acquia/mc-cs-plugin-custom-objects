@@ -23,7 +23,6 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerDependenciesTrait;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Mautic\CoreBundle\Service\FlashBag;
 
@@ -69,7 +68,6 @@ class DeleteControllerTest extends \PHPUnit_Framework_TestCase
 
         $this->request->method('isXmlHttpRequest')->willReturn(true);
         $this->request->method('getRequestUri')->willReturn('https://a.b');
-        $this->request->headers = new HeaderBag();
     }
 
     public function testDeleteActionIfCustomItemNotFound(): void

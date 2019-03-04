@@ -22,7 +22,6 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerDependenciesTrait;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Mautic\CoreBundle\Service\FlashBag;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -81,7 +80,6 @@ class SaveControllerTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->addSymfonyDependencies($this->saveController);
-        $this->request->headers = new HeaderBag();
     }
 
     public function testSaveActionIfExistingCustomItemNotFound(): void

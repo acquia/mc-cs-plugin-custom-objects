@@ -23,11 +23,9 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerDependenciesTrait;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 
@@ -75,9 +73,6 @@ class ListControllerTest extends \PHPUnit_Framework_TestCase
         $this->addSymfonyDependencies($this->listController);
 
         $this->requestStack->method('getCurrentRequest')->willReturn($this->request);
-
-        $this->request->headers = new HeaderBag();
-        $this->request->query   = new ParameterBag();
     }
 
     public function testDeleteActionIfCustomObjectNotFound(): void

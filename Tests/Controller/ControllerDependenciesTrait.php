@@ -26,6 +26,8 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Mautic\CoreBundle\Controller\MauticController;
+use Symfony\Component\HttpFoundation\HeaderBag;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
  * Even though we use nice controllers with defined dependencies, when we call some method like
@@ -67,6 +69,9 @@ trait ControllerDependenciesTrait
         $modelFactory->method('getModel')->will($this->returnValueMap([
             ['core.notification', $notificationModel],
         ]));
+
+        $request->query   = new ParameterBag();
+        $request->headers = new HeaderBag();
 
         $request->method('duplicate')->willReturnSelf();
         $httpKernel->method('handle')->willReturn($response);
