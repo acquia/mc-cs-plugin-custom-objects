@@ -489,7 +489,7 @@ return [
             'custom_object.cancel_controller' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\CancelController::class,
                 'arguments' => [
-                    'session',
+                    'custom_object.session.provider',
                     'custom_object.route.provider',
                 ],
                 'methodCalls' => [
