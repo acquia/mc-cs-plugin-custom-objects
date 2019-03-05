@@ -7,8 +7,6 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\EventListener;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
-use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
-use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\EventListener\DynamicContentSubscriber;
 use MauticPlugin\CustomObjectsBundle\Tests\DataFixtures\Traits\FixtureObjectsTrait;
 
@@ -46,19 +44,10 @@ class DynamicContentSubscriberTest extends \Liip\FunctionalTestBundle\Test\WebTe
 
     public function testSubscribesToEvent(): void
     {
-        $testValue = md5(random_int(0, 10000));
-
-        $dcSubscriberMockBuilder = $this->getMockBuilder(DynamicContentSubscriber::class)->disableOriginalConstructor();
-        $dcSubscriberMock        = $dcSubscriberMockBuilder->setMethods([])->getMock();
-
-        $this->assertArrayHasKey(DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE, $eventSubscriptions = DynamicContentSubscriber::getSubscribedEvents());
-
-        $dcSubscriberMock->expects($this->once())->method('evaluateFilters')->willReturn($testValue);
+        $eventSubscriptions = DynamicContentSubscriber::getSubscribedEvents();
 
         $methodName = $eventSubscriptions[DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE][0];
 
-        $event = new ContactFiltersEvaluateEvent([], new Lead());
-
-        $this->assertSame($testValue, $dcSubscriberMock->{$methodName}($event));
+        $this->assertSame('evaluateFilters', $methodName);
     }
 }

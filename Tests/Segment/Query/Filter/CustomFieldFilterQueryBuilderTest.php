@@ -26,14 +26,12 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
     {
         parent::setUp();
 
-        $em = $this->getContainer()->get('doctrine')->getManager();
-        if (!isset($metadatas)) {
-            $metadatas = $em->getMetadataFactory()->getAllMetadata();
-        }
+        $em         = $this->getContainer()->get('doctrine')->getManager();
+        $metadata   = $em->getMetadataFactory()->getAllMetadata();
         $schemaTool = new SchemaTool($em);
         $schemaTool->dropDatabase();
-        if (!empty($metadatas)) {
-            $schemaTool->createSchema($metadatas);
+        if (!empty($metadata)) {
+            $schemaTool->createSchema($metadata);
         }
         $this->postFixtureSetup();
 

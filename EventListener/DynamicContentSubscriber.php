@@ -38,6 +38,11 @@ class DynamicContentSubscriber extends CommonSubscriber
     /** @var QueryFilterHelper */
     private $queryHelper;
 
+    /**
+     * @param EntityManager               $entityManager
+     * @param ContactSegmentFilterFactory $filterFactory
+     * @param QueryFilterHelper           $queryHelper
+     */
     public function __construct(
         EntityManager $entityManager,
         ContactSegmentFilterFactory $filterFactory,
@@ -61,6 +66,7 @@ class DynamicContentSubscriber extends CommonSubscriber
     /**
      * @param ContactFiltersEvaluateEvent $event
      *
+     * @throws \Doctrine\DBAL\DBALException
      * @throws \MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException
      */
     public function evaluateFilters(ContactFiltersEvaluateEvent $event): void

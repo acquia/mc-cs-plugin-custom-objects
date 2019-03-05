@@ -432,7 +432,7 @@ final class QueryFilterHelper
     {
         if (!isset($this->fieldTypes[$fieldType])) {
             $types = $this->fieldTypeProvider->getTypes();
-            if (!in_array($fieldType, $types, true)) {
+            if (!isset($types[$fieldType])) {
                 throw new InvalidArgumentException('Invalid custom field type requested: ' . $fieldType . ', Available: ' . join(', ', array_keys($types)));
             }
             $this->fieldTypes[$fieldType] = get_class($types[$fieldType]);

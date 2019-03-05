@@ -9,6 +9,8 @@ use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
+use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Tests\DataFixtures\Traits\FixtureObjectsTrait;
 
@@ -21,9 +23,6 @@ class CustomItemFilterQueryBuilderTest extends WebTestCase
 
     protected function setUp(): void
     {
-        $this->markTestIncomplete();
-
-        return;
         $pluginDirectory   = $this->getContainer()->get('kernel')->locateResource('@CustomObjectsBundle');
         $fixturesDirectory = $pluginDirectory.'/Tests/DataFixtures/ORM/Data';
 
@@ -58,16 +57,20 @@ class CustomItemFilterQueryBuilderTest extends WebTestCase
 
     public function testApplyQuery(): void
     {
-        $queryBuilderService = new CustomItemFilterQueryBuilder(new RandomParameterName());
+        $dispatcher        = $this->getContainer()->get('event_dispatcher');
+        $fieldTypeProvider = new CustomFieldTypeProvider($dispatcher);
+        $filterHelper      = new QueryFilterHelper($fieldTypeProvider);
 
-        $filterMock = $this->createSegmentFilterMock('%emotion%');
+        $queryBuilderService = new CustomItemFilterQueryBuilder(new RandomParameterName(), $filterHelper);
+
+        $filterMock = $this->createSegmentFilterMock('%emotion%', 'text', 'like');
 
         $queryBuilder = $this->getLeadsQueryBuilder();
         $queryBuilderService->applyQuery($queryBuilder, $filterMock);
 
         $this->assertSame(1, $queryBuilder->execute()->rowCount());
 
-        $filterMock = $this->createSegmentFilterMock('%Object%');
+        $filterMock = $this->createSegmentFilterMock('%Object%', 'text', 'like');
 
         $queryBuilder = $this->getLeadsQueryBuilder();
         $queryBuilderService->applyQuery($queryBuilder, $filterMock);
@@ -75,18 +78,15 @@ class CustomItemFilterQueryBuilderTest extends WebTestCase
         $this->assertSame(6, $queryBuilder->execute()->rowCount());
     }
 
-    /**
-     * @param string $value
-     *
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    private function createSegmentFilterMock(string $value): \PHPUnit_Framework_MockObject_MockObject
+    private function createSegmentFilterMock($value, $type = 'text', $operator = 'eq', $fixtureField = 'custom_field1')
     {
-        $filterMock = $this->createMock(ContactSegmentFilter::class);
+        $filterMock = $this->getMockBuilder(ContactSegmentFilter::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $filterMock->method('getType')->willReturn('text');
-        $filterMock->method('getOperator')->willReturn('like');
-        $filterMock->method('getField')->willReturn((string) $this->getFixtureById('custom_object1')->getId());
+        $filterMock->method('getType')->willReturn($type);
+        $filterMock->method('getOperator')->willReturn($operator);
+        $filterMock->method('getField')->willReturn((string) $this->getFixtureById($fixtureField)->getId());
         $filterMock->method('getParameterValue')->willReturn($value);
         $filterMock->method('getParameterHolder')->willReturn((string) ':needle');
 
