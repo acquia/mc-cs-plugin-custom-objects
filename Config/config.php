@@ -714,8 +714,12 @@ return [
                 'arguments' => [
                     'custom_object.repository',
                     'custom_field.type.provider',
+                    'custom_field.field.params.transformer',
                 ],
                 'tag' => 'form.type',
+            ],
+            'custom_field.field.params.transformer' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToJsonTransformer::class
             ],
             'custom_object.object.form' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType::class,

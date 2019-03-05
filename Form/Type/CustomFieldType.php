@@ -15,6 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use MauticPlugin\CustomObjectsBundle\Form\CustomObjectHiddenTransformer;
+use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToJsonTransformer;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\Form\AbstractType;
@@ -40,15 +41,23 @@ class CustomFieldType extends AbstractType
     private $customFieldTypeProvider;
 
     /**
+     * @var ParamsToJsonTransformer
+     */
+    private $paramsToJsonTransformer;
+
+    /**
      * @param CustomObjectRepository  $customObjectRepository
      * @param CustomFieldTypeProvider $customFieldTypeProvider
+     * @param ParamsToJsonTransformer $paramsToJsonTransformer
      */
     public function __construct(
         CustomObjectRepository $customObjectRepository,
-        CustomFieldTypeProvider $customFieldTypeProvider
+        CustomFieldTypeProvider $customFieldTypeProvider,
+        ParamsToJsonTransformer $paramsToJsonTransformer
     ) {
         $this->customObjectRepository  = $customObjectRepository;
         $this->customFieldTypeProvider = $customFieldTypeProvider;
+        $this->paramsToJsonTransformer = $paramsToJsonTransformer;
     }
 
     /**
@@ -139,6 +148,13 @@ class CustomFieldType extends AbstractType
         );
 
         $builder->add(
+            $builder->create(
+                'params',
+                CustomFieldParamsType::class
+            )
+        );
+
+        $builder->add(
             'required',
             YesNoButtonGroupType::class,
             [
@@ -163,13 +179,6 @@ class CustomFieldType extends AbstractType
                 ]
             );
         });
-
-//        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event): void {
-        // /** @var CustomField $customField */
-//            $customField = $event->getData();
-//            $customField->setParams((array) $customField->getParamsObject());
-//            $event->setData($customField);
-//        });
 
         $builder->add(
             'buttons',
@@ -232,19 +241,15 @@ class CustomFieldType extends AbstractType
         $builder->add('required', HiddenType::class);
         $builder->add('defaultValue', HiddenType::class);
 
-//        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
-        // /** @var CustomField $customField */
-//            $customField = $event->getData();
-//            $builder = $event->getForm();
-//
-//            $builder->add(
-//                'params',
-//                HiddenType::class,
-//                [
-//                    'data' => json_encode((array) $customField->getParamsObject()),
-//                ]
-//            );
-//        });
+        $builder->add(
+            $builder->create(
+                'params',
+                HiddenType::class,
+                [
+                ]
+            )
+            ->addModelTransformer($this->paramsToJsonTransformer)
+        );
 
         // Possibility to mark field as deleted in POST data
         $builder->add('deleted', HiddenType::class, ['mapped' => false]);

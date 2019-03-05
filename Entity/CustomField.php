@@ -66,14 +66,9 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     private $defaultValue;
 
     /**
-     * @var mixed[]
+     * @var Params|array
      */
-    private $params = [];
-
-    /**
-     * @var Params
-     */
-    private $paramsObject;
+    private $params;
 
     public function __clone()
     {
@@ -293,33 +288,21 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @return Params
+     * @return Params|array
      */
-    public function getParamsObject(): Params
+    public function getParams(): Params
     {
-        return $this->paramsObject;
+        if ($this->params) {
+            return $this->params;
+        }
+
+        return new Params();
     }
 
     /**
-     * @param Params $params
+     * @param Params|array $params
      */
-    public function setParamsObject(Params $params): void
-    {
-        $this->paramsObject = $params;
-    }
-
-    /**
-     * @return mixed[]
-     */
-    public function getParams(): array
-    {
-        return $this->params;
-    }
-
-    /**
-     * @param mixed[] $params
-     */
-    public function setParams(array $params): void
+    public function setParams(Params $params): void
     {
         $this->params = $params;
     }

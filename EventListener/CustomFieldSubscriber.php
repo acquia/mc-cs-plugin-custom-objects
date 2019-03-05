@@ -61,15 +61,6 @@ class CustomFieldSubscriber implements EventSubscriber
         }
 
         $customField->setTypeObject($this->customFieldTypeProvider->getType($customField->getType()));
-
-        $params = $customField->getParams();
-        $params = new CustomField\Params($params);
-
-        if ($params instanceof CustomField\Params) {
-            $customField->setParamsObject($params);
-        } else {
-            $customField->setParamsObject(new CustomField\Params());
-        }
     }
 
     /**
