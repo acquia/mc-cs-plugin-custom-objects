@@ -25,7 +25,7 @@ use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 
 class DynamicContentSubscriber extends CommonSubscriber
 {
-    use MatchFilterForLeadTrait, QueryFilterHelper;
+    use MatchFilterForLeadTrait;
 
     /**
      * @var EntityManager
@@ -37,11 +37,17 @@ class DynamicContentSubscriber extends CommonSubscriber
      */
     private $filterFactory;
 
+    /** @var QueryFilterHelper */
+    private $queryHelper;
 
-    public function __construct(EntityManager $entityManager, ContactSegmentFilterFactory $filterFactory)
+    public function __construct(
+        EntityManager $entityManager,
+        ContactSegmentFilterFactory $filterFactory,
+        QueryFilterHelper $queryHelper)
     {
         $this->entityManager = $entityManager;
         $this->filterFactory = $filterFactory;
+        $this->queryHelper   = $queryHelper;
     }
 
     /**
@@ -71,18 +77,18 @@ class DynamicContentSubscriber extends CommonSubscriber
             }
 
             if ($segmentFilter->getQueryType()=='mautic.lead.query.builder.custom_field.value') {
-                $tableAlias        = 'cfwq_' . (int) $segmentFilter->getField();
-                $filterQueryBuilder = $this->createValueQueryBuilder(
+                $tableAlias         = 'cfwq_' . (int) $segmentFilter->getField();
+                $filterQueryBuilder = $this->queryHelper->createValueQueryBuilder(
                     $connection,
                     $tableAlias,
                     (int) $segmentFilter->getField(),
                     $segmentFilter->getType()
                 );
-                $this->addCustomFieldValueExpressionFromSegmentFilter($filterQueryBuilder, $tableAlias, $segmentFilter);
+                $this->queryHelper->addCustomFieldValueExpressionFromSegmentFilter($filterQueryBuilder, $tableAlias, $segmentFilter);
             } elseif ($segmentFilter->getQueryType()=='mautic.lead.query.builder.custom_item.value') {
-                $tableAlias       = 'cowq_' . (int) $segmentFilter->getField();
-                $filterQueryBuilder = $this->createItemNameQueryBuilder($connection, $tableAlias);
-                $this->addCustomObjectNameExpression(
+                $tableAlias         = 'cowq_' . (int) $segmentFilter->getField();
+                $filterQueryBuilder = $this->queryHelper->createItemNameQueryBuilder($connection, $tableAlias);
+                $this->queryHelper->addCustomObjectNameExpression(
                     $filterQueryBuilder,
                     $tableAlias,
                     $segmentFilter->getOperator(),
@@ -92,14 +98,20 @@ class DynamicContentSubscriber extends CommonSubscriber
                 throw new \Exception('Not implemented');
             }
 
-            $this->addContactIdRestriction($filterQueryBuilder, $tableAlias, (int) $event->getContact()->getId());
+            $this->queryHelper->addContactIdRestriction($filterQueryBuilder, $tableAlias, (int) $event->getContact()->getId());
 
-            if ($filterQueryBuilder->execute()->rowCount()) {
-                $event->setIsEvaluated(true);
-                $event->setIsMatched(true);
-            } else {
-                $event->setIsEvaluated(true);
+            try {
+                if ($filterQueryBuilder->execute()->rowCount()) {
+                    $event->setIsEvaluated(true);
+                    $event->setIsMatched(true);
+                } else {
+                    $event->setIsEvaluated(true);
+                }
             }
+            catch (\Exception $e) {
+
+            }
+
             $event->stopPropagation();  // The filter is ours, we won't allow no more processing
         }
     }

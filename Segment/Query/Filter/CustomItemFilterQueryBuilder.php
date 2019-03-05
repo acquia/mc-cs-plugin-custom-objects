@@ -39,6 +39,8 @@ class CustomItemFilterQueryBuilder extends BaseFilterQueryBuilder
      */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
+
+
         $filterOperator   = $filter->getOperator();
         $filterParameters = $filter->getParameterValue();
         $filterFieldId    = $filter->getField();

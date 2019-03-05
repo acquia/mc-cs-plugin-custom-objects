@@ -362,6 +362,14 @@ final class QueryFilterHelper
         return $expression;
     }
 
+    /**
+     * @param QueryBuilder $customFieldQueryBuilder
+     * @param string       $alias
+     * @param string       $fieldType
+     *
+     * @return QueryBuilder
+     * @throws InvalidArgumentException
+     */
     private function addCustomFieldValueJoin(QueryBuilder $customFieldQueryBuilder, string $alias, string $fieldType): QueryBuilder
     {
         $dataTable = $this->getTableNameFromFieldType($fieldType);
@@ -375,6 +383,12 @@ final class QueryFilterHelper
         return $customFieldQueryBuilder;
     }
 
+    /**
+     * @param string $fieldType
+     *
+     * @return string
+     * @throws InvalidArgumentException
+     */
     private function getTableNameFromFieldType(string $fieldType): string {
         if (!isset($this->fieldTypes[$fieldType])) {
             $types = $this->fieldTypeProvider->getTypes();
