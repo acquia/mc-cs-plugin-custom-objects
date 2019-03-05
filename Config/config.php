@@ -411,7 +411,6 @@ return [
                 'arguments' => [
                     'request_stack',
                     'form.factory',
-                    'mautic.helper.core_parameters',
                     'mautic.custom.model.object',
                     'mautic.core.model.auditlog',
                     'custom_object.permission.provider',
