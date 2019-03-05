@@ -26,6 +26,11 @@ use Mautic\LeadBundle\Entity\LeadEventLog;
 class ContactSubscriber extends CommonSubscriber
 {
     /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
      * @var EntityManager
      */
     private $entityManager;

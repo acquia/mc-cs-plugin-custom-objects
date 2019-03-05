@@ -17,11 +17,9 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
 use Mautic\CoreBundle\Controller\CommonController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
@@ -85,41 +83,73 @@ class FormController extends CommonController
     }
 
     /**
-     * @param Request $request
-     *
-     * @return Response|JsonResponse
+     * @return Response
      */
-    public function renderFormAction(Request $request)
+    public function newAction(): Response
     {
-        $objectId = (int) $request->get('objectId');
-
         try {
-            if ($objectId) {
-                $customObject = $this->customObjectModel->fetchEntity($objectId);
-                $this->permissionProvider->canEdit($customObject);
-            } else {
-                $this->permissionProvider->canCreate();
-                $customObject = new CustomObject();
-            }
+            $this->permissionProvider->canCreate();
+            $customObject = new CustomObject();
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
             return $this->accessDenied(false, $e->getMessage());
         }
 
+        return $this->renderForm($customObject, $this->routeProvider->buildNewRoute());
+    }
+
+    /**
+     * @param int $objectId
+     *
+     * @return Response
+     */
+    public function editAction(int $objectId): Response
+    {
+        try {
+            $customObject = $this->customObjectModel->fetchEntity($objectId);
+            $this->permissionProvider->canEdit($customObject);
+        } catch (NotFoundException $e) {
+            return $this->notFound($e->getMessage());
+        } catch (ForbiddenException $e) {
+            return $this->accessDenied(false, $e->getMessage());
+        }
+
+        return $this->renderForm($customObject, $this->routeProvider->buildEditRoute($objectId));
+    }
+
+    /**
+     * @param int $objectId
+     *
+     * @return Response
+     */
+    public function cloneAction(int $objectId): Response
+    {
+        try {
+            $customObject = clone $this->customObjectModel->fetchEntity($objectId);
+            $this->permissionProvider->canClone($customObject);
+        } catch (NotFoundException $e) {
+            return $this->notFound($e->getMessage());
+        } catch (ForbiddenException $e) {
+            return $this->accessDenied(false, $e->getMessage());
+        }
+
+        return $this->renderForm($customObject, $this->routeProvider->buildCloneRoute($objectId));
+    }
+
+    /**
+     * @param CustomObject $customObject
+     * @param string       $route
+     *
+     * @return Response
+     */
+    private function renderForm(CustomObject $customObject, string $route): Response
+    {
         $form = $this->formFactory->create(
             CustomObjectType::class,
             $customObject,
-            ['action' => $this->routeProvider->buildSaveRoute($objectId)]
+            ['action' => $this->routeProvider->buildSaveRoute($customObject->getId())]
         );
-
-        if (Request::METHOD_POST === $request->getMethod()) {
-            //We need to see validation messages if POST was sent
-            // Process all changes made with CFs to be visible
-            $form->handleRequest($request);
-            $form->isValid(); // Validate POST to have errors visible
-            $customObject = $form->getData();
-        }
 
         return $this->delegateView(
             [
@@ -134,7 +164,7 @@ class FormController extends CommonController
                 'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
-                    'route'         => $this->routeProvider->buildFormRoute($customObject->getId()),
+                    'route'         => $route,
                 ],
             ]
         );

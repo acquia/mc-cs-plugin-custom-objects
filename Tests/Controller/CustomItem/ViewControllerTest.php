@@ -1,0 +1,169 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * @copyright   2019 Mautic Contributors. All rights reserved
+ * @author      Mautic, Inc
+ *
+ * @link        http://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+namespace MauticPlugin\CustomObjectsBundle\Tests\Controller\CustomItem;
+
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ViewController;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerTestCase;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Mautic\CoreBundle\Model\AuditLogModel;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Mautic\CoreBundle\Form\Type\DateRangeType;
+
+class ViewControllerTest extends ControllerTestCase
+{
+    private const OBJECT_ID = 33;
+
+    private const ITEM_ID = 22;
+
+    private $customItemModel;
+    private $auditLog;
+    private $permissionProvider;
+    private $routeProvider;
+    private $formFactory;
+    private $form;
+    private $customItem;
+
+    /**
+     * @var ViewController
+     */
+    private $viewController;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->customItemModel    = $this->createMock(CustomItemModel::class);
+        $this->auditLog           = $this->createMock(AuditLogModel::class);
+        $this->permissionProvider = $this->createMock(CustomItemPermissionProvider::class);
+        $this->routeProvider      = $this->createMock(CustomItemRouteProvider::class);
+        $this->requestStack       = $this->createMock(RequestStack::class);
+        $this->formFactory        = $this->createMock(FormFactoryInterface::class);
+        $this->form               = $this->createMock(FormInterface::class);
+        $this->customItem         = $this->createMock(CustomItem::class);
+        $this->viewController     = new ViewController(
+            $this->requestStack,
+            $this->formFactory,
+            $this->customItemModel,
+            $this->auditLog,
+            $this->permissionProvider,
+            $this->routeProvider
+        );
+
+        $this->addSymfonyDependencies($this->viewController);
+    }
+
+    public function testViewActionIfCustomItemNotFound(): void
+    {
+        $this->customItemModel->expects($this->once())
+            ->method('fetchEntity')
+            ->will($this->throwException(new NotFoundException('Item not found message')));
+
+        $this->permissionProvider->expects($this->never())
+            ->method('canView');
+
+        $this->routeProvider->expects($this->never())
+            ->method('buildViewRoute');
+
+        $this->viewController->viewAction(self::OBJECT_ID, self::ITEM_ID);
+    }
+
+    public function testViewActionIfCustomItemForbidden(): void
+    {
+        $this->customItemModel->expects($this->once())
+            ->method('fetchEntity')
+            ->willReturn($this->customItem);
+
+        $this->permissionProvider->expects($this->once())
+            ->method('canView')
+            ->will($this->throwException(new ForbiddenException('view')));
+
+        $this->routeProvider->expects($this->never())
+            ->method('buildViewRoute');
+
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $this->viewController->viewAction(self::OBJECT_ID, self::ITEM_ID);
+    }
+
+    public function testViewAction(): void
+    {
+        $this->customItem->expects($this->once())
+            ->method('getDateAdded')
+            ->willReturn('2019-01-04 10:20:30');
+
+        $this->customItemModel->expects($this->once())
+            ->method('fetchEntity')
+            ->willReturn($this->customItem);
+
+        $this->permissionProvider->expects($this->once())
+            ->method('canView');
+
+        $this->routeProvider->expects($this->once())
+            ->method('buildViewRoute')
+            ->with(self::OBJECT_ID, self::ITEM_ID);
+
+        $this->formFactory->expects($this->once())
+            ->method('create')
+            ->with(DateRangeType::class)
+            ->willReturn($this->form);
+
+        $this->form->expects($this->at(0))
+            ->method('get')
+            ->with('date_from')
+            ->willReturnSelf();
+
+        $this->form->expects($this->at(1))
+            ->method('getData')
+            ->willReturn('2019-02-04');
+
+        $this->form->expects($this->at(2))
+            ->method('get')
+            ->with('date_to')
+            ->willReturnSelf();
+
+        $this->form->expects($this->at(3))
+            ->method('getData')
+            ->willReturn('2019-03-04');
+
+        $this->customItemModel->expects($this->once())
+            ->method('getLinksLineChartData')
+            ->with(
+                $this->callback(function ($dateFrom) {
+                    $this->assertSame('2019-02-04', $dateFrom->format('Y-m-d'));
+
+                    return true;
+                }),
+                $this->callback(function ($dateTo) {
+                    $this->assertSame('2019-03-04', $dateTo->format('Y-m-d'));
+
+                    return true;
+                }),
+                $this->customItem
+            );
+
+        $this->auditLog->expects($this->once())
+            ->method('getLogForObject')
+            ->with('customItem', self::ITEM_ID, '2019-01-04 10:20:30', 10, 'customObjects');
+
+        $this->viewController->viewAction(self::OBJECT_ID, self::ITEM_ID);
+    }
+}

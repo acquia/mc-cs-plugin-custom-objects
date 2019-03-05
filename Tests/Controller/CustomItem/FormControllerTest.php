@@ -18,10 +18,9 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerDependenciesTrait;
+use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerTestCase;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\FormController;
 use Symfony\Component\Form\FormFactory;
@@ -30,10 +29,8 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Symfony\Component\Form\FormInterface;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemType;
 
-class FormControllerTest extends \PHPUnit_Framework_TestCase
+class FormControllerTest extends ControllerTestCase
 {
-    use ControllerDependenciesTrait;
-
     private const OBJECT_ID = 33;
 
     private const ITEM_ID = 22;
@@ -43,7 +40,6 @@ class FormControllerTest extends \PHPUnit_Framework_TestCase
     private $formFactory;
     private $permissionProvider;
     private $routeProvider;
-    private $request;
     private $customObject;
     private $customItem;
     private $form;
@@ -80,7 +76,6 @@ class FormControllerTest extends \PHPUnit_Framework_TestCase
         $this->customItem->method('getId')->willReturn(self::ITEM_ID);
         $this->request->method('isXmlHttpRequest')->willReturn(true);
         $this->request->method('getRequestUri')->willReturn('https://a.b');
-        $this->request->headers = new HeaderBag();
     }
 
     public function testNewActionIfForbidden(): void
@@ -100,7 +95,7 @@ class FormControllerTest extends \PHPUnit_Framework_TestCase
 
         $this->expectException(AccessDeniedHttpException::class);
 
-        $this->formController->newAction(self::OBJECT_ID, self::ITEM_ID);
+        $this->formController->newAction(self::OBJECT_ID);
     }
 
     public function testNewAction(): void
@@ -123,7 +118,7 @@ class FormControllerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertRenderFormForItem();
 
-        $this->formController->newAction(self::OBJECT_ID, self::ITEM_ID);
+        $this->formController->newAction(self::OBJECT_ID);
     }
 
     public function testEditActionIfCustomObjectNotFound(): void

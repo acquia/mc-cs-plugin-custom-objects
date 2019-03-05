@@ -141,7 +141,7 @@ class CustomObjectType extends AbstractType
             $customObject = $event->getData();
             $customFields = $customObject->getCustomFields();
 
-            if (!$customFields) {
+            if (empty($customFields)) {
                 return;
             }
 

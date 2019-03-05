@@ -26,15 +26,21 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Mautic\CoreBundle\Controller\MauticController;
+use Symfony\Component\HttpFoundation\HeaderBag;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
  * Even though we use nice controllers with defined dependencies, when we call some method like
  * `forward` or `postActionRedirect` it use container and all that nasty stuff. This trait should
  * take care of it.
  */
-trait ControllerDependenciesTrait
+class ControllerTestCase extends \PHPUnit_Framework_TestCase
 {
-    private function addSymfonyDependencies(Controller $controller): void
+    protected $requestStack;
+    protected $request;
+    protected $session;
+
+    protected function addSymfonyDependencies(Controller $controller): void
     {
         $requestStack = empty($this->requestStack) ? $this->createMock(RequestStack::class) : $this->requestStack;
         $request      = empty($this->request) ? $this->createMock(Request::class) : $this->request;
@@ -67,6 +73,9 @@ trait ControllerDependenciesTrait
         $modelFactory->method('getModel')->will($this->returnValueMap([
             ['core.notification', $notificationModel],
         ]));
+
+        $request->query   = new ParameterBag();
+        $request->headers = new HeaderBag();
 
         $request->method('duplicate')->willReturnSelf();
         $httpKernel->method('handle')->willReturn($response);

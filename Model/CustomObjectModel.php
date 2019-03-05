@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Model\FormModel;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -29,6 +30,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
+use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 
 class CustomObjectModel extends FormModel
 {
@@ -167,13 +169,39 @@ class CustomObjectModel extends FormModel
             'filter'           => [
                 'force' => [
                     [
-                        'column' => 'e.isPublished',
+                        'column' => CustomObjectRepository::TABLE_ALIAS.'.isPublished',
                         'value'  => true,
                         'expr'   => 'eq',
                     ],
                 ],
             ],
         ]);
+    }
+
+    /**
+     * @param TableConfig $tableConfig
+     *
+     * @return CustomObject[]
+     */
+    public function getTableData(TableConfig $tableConfig): array
+    {
+        $queryBuilder = $this->customObjectRepository->getTableDataQuery($tableConfig);
+        $queryBuilder = $this->applyOwnerFilter($queryBuilder);
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
+    /**
+     * @param TableConfig $tableConfig
+     *
+     * @return int
+     */
+    public function getCountForTable(TableConfig $tableConfig): int
+    {
+        $queryBuilder = $this->customObjectRepository->getTableCountQuery($tableConfig);
+        $queryBuilder = $this->applyOwnerFilter($queryBuilder);
+
+        return (int) $queryBuilder->getQuery()->getSingleScalarResult();
     }
 
     /**
@@ -249,7 +277,7 @@ class CustomObjectModel extends FormModel
 
             $limitOwnerFilter = [
                 [
-                    'column' => 'e.createdBy',
+                    'column' => CustomObjectRepository::TABLE_ALIAS.'.createdBy',
                     'expr'   => 'eq',
                     'value'  => $this->userHelper->getUser()->getId(),
                 ],
@@ -259,5 +287,26 @@ class CustomObjectModel extends FormModel
         }
 
         return $args;
+    }
+
+    /**
+     * Adds condition for owner if the user doesn't have permissions to view other.
+     *
+     * @param QueryBuilder $queryBuilder
+     *
+     * @return QueryBuilder
+     */
+    private function applyOwnerFilter(QueryBuilder $queryBuilder): QueryBuilder
+    {
+        try {
+            $this->permissionProvider->isGranted('viewother');
+        } catch (ForbiddenException $e) {
+            $this->customObjectRepository->applyOwnerId(
+                $queryBuilder,
+                $this->userHelper->getUser()->getId()
+            );
+        }
+
+        return $queryBuilder;
     }
 }

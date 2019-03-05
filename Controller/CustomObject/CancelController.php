@@ -13,18 +13,17 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Controller\CommonController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectSessionProvider;
 
 class CancelController extends CommonController
 {
     /**
-     * @var Session
+     * @var CustomObjectSessionProvider
      */
-    private $session;
+    private $sessionProvider;
 
     /**
      * @var CustomObjectRouteProvider
@@ -32,15 +31,15 @@ class CancelController extends CommonController
     private $routeProvider;
 
     /**
-     * @param Session                   $session
-     * @param CustomObjectRouteProvider $routeProvider
+     * @param CustomObjectSessionProvider $sessionProvider
+     * @param CustomObjectRouteProvider   $routeProvider
      */
     public function __construct(
-        Session $session,
+        CustomObjectSessionProvider $sessionProvider,
         CustomObjectRouteProvider $routeProvider
     ) {
-        $this->session       = $session;
-        $this->routeProvider = $routeProvider;
+        $this->sessionProvider = $sessionProvider;
+        $this->routeProvider   = $routeProvider;
     }
 
     /**
@@ -48,11 +47,11 @@ class CancelController extends CommonController
      *
      * @param int|null $objectId
      *
-     * @return Response|JsonResponse
+     * @return Response
      */
-    public function cancelAction(?int $objectId)
+    public function cancelAction(?int $objectId): Response
     {
-        $page = $this->session->get('custom.object.page', 1);
+        $page = $this->sessionProvider->getPage();
 
         return $this->postActionRedirect(
             [

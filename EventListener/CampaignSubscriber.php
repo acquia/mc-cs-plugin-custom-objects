@@ -162,7 +162,7 @@ class CampaignSubscriber extends CommonSubscriber
 
         $contact = $event->getLead();
 
-        if (!$contact || !$contact->getId()) {
+        if (empty($contact) || !$contact->getId()) {
             $event->setResult(false);
 
             return;

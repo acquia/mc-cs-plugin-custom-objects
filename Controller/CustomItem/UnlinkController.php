@@ -18,9 +18,9 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use MauticPlugin\CustomObjectsBundle\Controller\JsonController;
-use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use UnexpectedValueException;
+use Mautic\CoreBundle\Service\FlashBag;
 
 class UnlinkController extends JsonController
 {
@@ -35,23 +35,23 @@ class UnlinkController extends JsonController
     private $permissionProvider;
 
     /**
-     * @var TranslatorInterface
+     * @var FlashBag
      */
-    private $translator;
+    private $flashBag;
 
     /**
      * @param CustomItemModel              $customItemModel
      * @param CustomItemPermissionProvider $permissionProvider
-     * @param TranslatorInterface          $translator
+     * @param FlashBag                     $flashBag
      */
     public function __construct(
         CustomItemModel $customItemModel,
         CustomItemPermissionProvider $permissionProvider,
-        TranslatorInterface $translator
+        FlashBag $flashBag
     ) {
         $this->customItemModel    = $customItemModel;
         $this->permissionProvider = $permissionProvider;
-        $this->translator         = $translator;
+        $this->flashBag           = $flashBag;
     }
 
     /**
@@ -67,15 +67,13 @@ class UnlinkController extends JsonController
             $customItem = $this->customItemModel->fetchEntity($itemId);
             $this->permissionProvider->canEdit($customItem);
             $this->unlinkBasedOnEntityType($itemId, $entityType, $entityId);
+            $this->flashBag->add(
+                'custom.item.unlinked',
+                ['%itemId%' => $itemId, '%entityType%' => $entityType, '%entityId%' => $entityId]
+            );
         } catch (ForbiddenException | NotFoundException | UnexpectedValueException $e) {
-            $this->addFlash('error', $e->getMessage());
+            $this->flashBag->add($e->getMessage(), [], FlashBag::LEVEL_ERROR);
         }
-
-        $this->addFlash('notice', $this->translator->trans(
-            'custom.item.unlinked',
-            ['%itemId%' => $itemId, '%entityType%' => $entityType, '%entityId%' => $entityId],
-            'flashes'
-        ));
 
         return $this->renderJson();
     }
