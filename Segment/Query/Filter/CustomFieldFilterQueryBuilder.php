@@ -47,6 +47,7 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
      * @param ContactSegmentFilter $filter
      *
      * @return QueryBuilder
+     *
      * @throws \Doctrine\DBAL\DBALException
      * @throws \MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException
      */
@@ -55,7 +56,7 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
         $filterOperator   = $filter->getOperator();
         $filterFieldId    = $filter->getField();
 
-        $tableAlias = 'cfwq_' . (int) $filter->getField();
+        $tableAlias = 'cfwq_'.(int) $filter->getField();
 
         $filterQueryBuilder = $this->filterHelper->createValueQueryBuilder(
             $queryBuilder->getConnection(),
@@ -65,10 +66,10 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
         );
         $this->filterHelper->addCustomFieldValueExpressionFromSegmentFilter($filterQueryBuilder, $tableAlias, $filter);
 
-        $filterQueryBuilder->select($tableAlias . '_contact.contact_id as lead_id');
-        $filterQueryBuilder->andWhere('l.id = ' . $tableAlias . '_contact.contact_id');
+        $filterQueryBuilder->select($tableAlias.'_contact.contact_id as lead_id');
+        $filterQueryBuilder->andWhere('l.id = '.$tableAlias.'_contact.contact_id');
 
-        $queryBuilder->setParameter('customFieldId_' . $tableAlias, (int) $filterFieldId);
+        $queryBuilder->setParameter('customFieldId_'.$tableAlias, (int) $filterFieldId);
 
         switch ($filterOperator) {
             case 'empty':

@@ -78,7 +78,17 @@ class CustomItemFilterQueryBuilderTest extends WebTestCase
         $this->assertSame(6, $queryBuilder->execute()->rowCount());
     }
 
-    private function createSegmentFilterMock($value, $type = 'text', $operator = 'eq', $fixtureField = 'custom_field1')
+    /**
+     * @param        $value
+     * @param string $type
+     * @param string $operator
+     * @param string $fixtureField
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     *
+     * @throws \MauticPlugin\CustomObjectsBundle\Tests\Exception\FixtureNotFoundException
+     */
+    private function createSegmentFilterMock($value, $type = 'text', $operator = 'eq', $fixtureField = 'custom_field1'): \PHPUnit_Framework_MockObject_MockObject
     {
         $filterMock = $this->getMockBuilder(ContactSegmentFilter::class)
             ->disableOriginalConstructor()

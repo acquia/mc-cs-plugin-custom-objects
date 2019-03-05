@@ -38,17 +38,17 @@ class QueryFilterHelperTest extends WebTestCase
         $this->postFixtureSetup();
 
         $pluginDirectory   = $this->getContainer()->get('kernel')->locateResource('@CustomObjectsBundle');
-        $fixturesDirectory = $pluginDirectory . '/Tests/DataFixtures/ORM/Data';
+        $fixturesDirectory = $pluginDirectory.'/Tests/DataFixtures/ORM/Data';
 
         $objects = $this->loadFixtureFiles([
-            $fixturesDirectory . '/roles.yml',
-            $fixturesDirectory . '/users.yml',
-            $fixturesDirectory . '/leads.yml',
-            $fixturesDirectory . '/custom_objects.yml',
-            $fixturesDirectory . '/custom_fields.yml',
-            $fixturesDirectory . '/custom_items.yml',
-            $fixturesDirectory . '/custom_xref.yml',
-            $fixturesDirectory . '/custom_values.yml',
+            $fixturesDirectory.'/roles.yml',
+            $fixturesDirectory.'/users.yml',
+            $fixturesDirectory.'/leads.yml',
+            $fixturesDirectory.'/custom_objects.yml',
+            $fixturesDirectory.'/custom_fields.yml',
+            $fixturesDirectory.'/custom_items.yml',
+            $fixturesDirectory.'/custom_xref.yml',
+            $fixturesDirectory.'/custom_values.yml',
         ], false, null, 'doctrine'); //,ORMPurger::PURGE_MODE_DELETE);
 
         $this->setFixtureObjects($objects);
@@ -65,15 +65,15 @@ class QueryFilterHelperTest extends WebTestCase
 
         $filters = [
             [
-                'filter' => ['glue' => 'and', 'field' => 'cmf_' . $this->getFixtureById('custom_field1')->getId(), 'type' => 'custom_object', 'operator' => 'eq', 'value' => 'love'],
+                'filter' => ['glue' => 'and', 'field' => 'cmf_'.$this->getFixtureById('custom_field1')->getId(), 'type' => 'custom_object', 'operator' => 'eq', 'value' => 'love'],
                 'match'  => 'test_value.value = :test_value_value',
             ],
             [
-                'filter' => ['glue' => 'and', 'field' => 'cmf_' . $this->getFixtureById('custom_field1')->getId(), 'type' => 'custom_object', 'operator' => 'like', 'value' => 'love'],
+                'filter' => ['glue' => 'and', 'field' => 'cmf_'.$this->getFixtureById('custom_field1')->getId(), 'type' => 'custom_object', 'operator' => 'like', 'value' => 'love'],
                 'match'  => 'test_value.value LIKE :test_value_value',
             ],
             [
-                'filter' => ['glue' => 'and', 'field' => 'cmf_' . $this->getFixtureById('custom_field1')->getId(), 'type' => 'custom_object', 'operator' => 'neq', 'value' => 'love'],
+                'filter' => ['glue' => 'and', 'field' => 'cmf_'.$this->getFixtureById('custom_field1')->getId(), 'type' => 'custom_object', 'operator' => 'neq', 'value' => 'love'],
                 'match'  => '(test_value.value = :test_value_value) OR (test_value.value IS NULL)',
             ],
         ];

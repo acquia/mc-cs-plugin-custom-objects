@@ -81,12 +81,12 @@ class DynamicContentSubscriber extends CommonSubscriber
         foreach ($eventFilters as $eventFilter) {
             $segmentFilter = $this->filterFactory->factorSegmentFilter($eventFilter);
 
-            if ($segmentFilter->getTable() !== MAUTIC_TABLE_PREFIX . 'custom_objects') {
+            if ($segmentFilter->getTable() !== MAUTIC_TABLE_PREFIX.'custom_objects') {
                 continue;
             }
 
             if ('mautic.lead.query.builder.custom_field.value' === $segmentFilter->getQueryType()) {
-                $tableAlias         = 'cfwq_' . (int) $segmentFilter->getField();
+                $tableAlias         = 'cfwq_'.(int) $segmentFilter->getField();
                 $filterQueryBuilder = $this->queryHelper->createValueQueryBuilder(
                     $connection,
                     $tableAlias,
@@ -95,7 +95,7 @@ class DynamicContentSubscriber extends CommonSubscriber
                 );
                 $this->queryHelper->addCustomFieldValueExpressionFromSegmentFilter($filterQueryBuilder, $tableAlias, $segmentFilter);
             } elseif ('mautic.lead.query.builder.custom_item.value' === $segmentFilter->getQueryType()) {
-                $tableAlias         = 'cowq_' . (int) $segmentFilter->getField();
+                $tableAlias         = 'cowq_'.(int) $segmentFilter->getField();
                 $filterQueryBuilder = $this->queryHelper->createItemNameQueryBuilder($connection, $tableAlias);
                 $this->queryHelper->addCustomObjectNameExpression(
                     $filterQueryBuilder,
@@ -116,9 +116,9 @@ class DynamicContentSubscriber extends CommonSubscriber
                 } else {
                     $event->setIsEvaluated(true);
                 }
-            }
-            catch (\PDOException $e) {  // just to be a little more descriptive
-                $this->logger->addError('Failed to evaluate dynamic content for custom object ' . $e->getMessage());
+            } catch (\PDOException $e) {  // just to be a little more descriptive
+                $this->logger->addError('Failed to evaluate dynamic content for custom object '.$e->getMessage());
+
                 throw $e;
             }
 

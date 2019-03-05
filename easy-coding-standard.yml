@@ -27,6 +27,7 @@ parameters:
       - 'Tests/*'
     SlevomatCodingStandard\Sniffs\TypeHints\TypeHintDeclarationSniff.MissingTraversableParameterTypeHintSpecification:
       - 'CustomObjectsBundle.php'
+      - 'Helper/QueryFilterHelper.php'
     SlevomatCodingStandard\Sniffs\TypeHints\TypeHintDeclarationSniff.MissingReturnTypeHint:
       - '*Entity/*' # Proxy classes don't have return types and so entities cannot have them either.
     PhpCsFixer\Fixer\FunctionNotation\VoidReturnFixer:

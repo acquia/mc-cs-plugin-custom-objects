@@ -54,7 +54,7 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
         $this->entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         foreach ($this->getFixturesInUnloadableOrder() as $entity) {
             $this->entityManager->remove($entity);
@@ -62,7 +62,7 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
 
         $this->entityManager->flush();
 
-        return parent::tearDown();
+        parent::tearDown();
     }
 
     public function testApplyQuery(): void
@@ -88,8 +88,22 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
         $this->assertSame(3, $queryBuilder->execute()->rowCount());
     }
 
-    private function createSegmentFilterMock($value, $type = 'text', $operator = 'eq', $fixtureField = 'custom_field1')
-    {
+    /**
+     * @param        $value
+     * @param string $type
+     * @param string $operator
+     * @param string $fixtureField
+     *
+     * @return ContactSegmentFilter
+     *
+     * @throws \MauticPlugin\CustomObjectsBundle\Tests\Exception\FixtureNotFoundException
+     */
+    private function createSegmentFilterMock(
+        $value,
+        string $type = 'text',
+        string $operator = 'eq',
+        string $fixtureField = 'custom_field1'
+    ): ContactSegmentFilter {
         $filterMock = $this->getMockBuilder(ContactSegmentFilter::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -108,7 +122,7 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
         $connection   = $this->entityManager->getConnection();
         $queryBuilder = new QueryBuilder($connection);
 
-        $queryBuilder->select('l.*')->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
+        $queryBuilder->select('l.*')->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
         return $queryBuilder;
     }

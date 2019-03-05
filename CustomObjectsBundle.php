@@ -92,8 +92,7 @@ class CustomObjectsBundle extends PluginBundleBase
                 }
 
                 $connection->commit();
-            }
-            catch (\Throwable $e) {
+            } catch (\Throwable $e) {
                 $connection->rollBack();
 
                 throw $e;

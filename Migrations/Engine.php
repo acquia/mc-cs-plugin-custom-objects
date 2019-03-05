@@ -34,7 +34,7 @@ class Engine
     {
         $version        = str_replace('.', '_', $version);
         $migrationClass = "Version_{$version}";
-        $phpFile        = __DIR__ . '/' . $migrationClass . '.php';
+        $phpFile        = __DIR__.'/'.$migrationClass.'.php';
         $migrationClass = "MauticPlugin\CustomObjectsBundle\Migrations\\${migrationClass}";
 
         if (!file_exists($phpFile)) {

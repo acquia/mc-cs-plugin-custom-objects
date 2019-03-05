@@ -27,7 +27,7 @@ class AbstractMigration implements MigrationInterface
     private $entityManager;
 
     /**
-     * @var array
+     * @var string[]
      */
     private $queries = [];
 
