@@ -22,7 +22,6 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Controller\CommonController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
@@ -105,9 +104,9 @@ class SaveController extends CommonController
     /**
      * @param int|null $objectId
      *
-     * @return Response|JsonResponse
+     * @return Response
      */
-    public function saveAction(?int $objectId = null)
+    public function saveAction(?int $objectId = null): Response
     {
         try {
             $customObject = $objectId ? $this->customObjectModel->fetchEntity($objectId) : new CustomObject();
