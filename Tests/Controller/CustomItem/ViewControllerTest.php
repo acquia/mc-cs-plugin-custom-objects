@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Controller\CustomItem;
 
-use Symfony\Component\HttpFoundation\Request;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ViewController;
@@ -41,7 +40,6 @@ class ViewControllerTest extends \PHPUnit_Framework_TestCase
     private $auditLog;
     private $permissionProvider;
     private $routeProvider;
-    private $request;
     private $requestStack;
     private $formFactory;
     private $form;
@@ -60,7 +58,6 @@ class ViewControllerTest extends \PHPUnit_Framework_TestCase
         $this->auditLog           = $this->createMock(AuditLogModel::class);
         $this->permissionProvider = $this->createMock(CustomItemPermissionProvider::class);
         $this->routeProvider      = $this->createMock(CustomItemRouteProvider::class);
-        $this->request            = $this->createMock(Request::class);
         $this->requestStack       = $this->createMock(RequestStack::class);
         $this->formFactory        = $this->createMock(FormFactoryInterface::class);
         $this->form               = $this->createMock(FormInterface::class);
@@ -153,12 +150,12 @@ class ViewControllerTest extends \PHPUnit_Framework_TestCase
         $this->customItemModel->expects($this->once())
             ->method('getLinksLineChartData')
             ->with(
-                $this->callback(function($dateFrom) {
+                $this->callback(function ($dateFrom) {
                     $this->assertSame('2019-02-04', $dateFrom->format('Y-m-d'));
 
                     return true;
                 }),
-                $this->callback(function($dateTo) {
+                $this->callback(function ($dateTo) {
                     $this->assertSame('2019-03-04', $dateTo->format('Y-m-d'));
 
                     return true;

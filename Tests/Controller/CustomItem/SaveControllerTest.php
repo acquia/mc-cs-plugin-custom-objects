@@ -191,7 +191,7 @@ class SaveControllerTest extends \PHPUnit_Framework_TestCase
 
         $this->request->expects($this->once())
             ->method('setMethod')
-            ->with('GET');
+            ->with(Request::METHOD_GET);
 
         $this->saveController->saveAction(self::OBJECT_ID, self::ITEM_ID);
     }
