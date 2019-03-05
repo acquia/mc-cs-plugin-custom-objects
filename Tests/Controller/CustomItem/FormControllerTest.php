@@ -98,7 +98,7 @@ class FormControllerTest extends \PHPUnit_Framework_TestCase
 
         $this->expectException(AccessDeniedHttpException::class);
 
-        $this->formController->newAction(self::OBJECT_ID, self::ITEM_ID);
+        $this->formController->newAction(self::OBJECT_ID);
     }
 
     public function testNewAction(): void
@@ -121,7 +121,7 @@ class FormControllerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertRenderFormForItem();
 
-        $this->formController->newAction(self::OBJECT_ID, self::ITEM_ID);
+        $this->formController->newAction(self::OBJECT_ID);
     }
 
     public function testEditActionIfCustomObjectNotFound(): void
