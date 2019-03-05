@@ -86,7 +86,7 @@ class DynamicContentSubscriber extends CommonSubscriber
             }
 
             if ('mautic.lead.query.builder.custom_field.value' === $segmentFilter->getQueryType()) {
-                $tableAlias         = 'cfwq_'.(int) $segmentFilter->getField();
+                $tableAlias         = 'cfwq_'.$segmentFilter->getField();
                 $filterQueryBuilder = $this->queryHelper->createValueQueryBuilder(
                     $connection,
                     $tableAlias,
