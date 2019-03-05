@@ -34,9 +34,13 @@ use Symfony\Component\HttpFoundation\ParameterBag;
  * `forward` or `postActionRedirect` it use container and all that nasty stuff. This trait should
  * take care of it.
  */
-trait ControllerDependenciesTrait
+class ControllerTestCase extends \PHPUnit_Framework_TestCase
 {
-    private function addSymfonyDependencies(Controller $controller): void
+    protected $requestStack;
+    protected $request;
+    protected $session;
+
+    protected function addSymfonyDependencies(Controller $controller): void
     {
         $requestStack = empty($this->requestStack) ? $this->createMock(RequestStack::class) : $this->requestStack;
         $request      = empty($this->request) ? $this->createMock(Request::class) : $this->request;

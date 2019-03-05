@@ -19,25 +19,21 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomObject\ListController;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectSessionProvider;
-use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerDependenciesTrait;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
+use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerTestCase;
 
-class ListControllerTest extends \PHPUnit_Framework_TestCase
+class ListControllerTest extends ControllerTestCase
 {
-    use ControllerDependenciesTrait;
-
     private const PAGE = 3;
 
     private $customObjectModel;
     private $sessionProvider;
     private $permissionProvider;
     private $routeProvider;
-    private $requestStack;
-    private $request;
 
     /**
      * @var ListController

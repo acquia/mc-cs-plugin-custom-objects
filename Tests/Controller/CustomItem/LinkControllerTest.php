@@ -17,14 +17,12 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\LinkController;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerDependenciesTrait;
+use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerTestCase;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Mautic\CoreBundle\Service\FlashBag;
 
-class LinkControllerTest extends \PHPUnit_Framework_TestCase
+class LinkControllerTest extends ControllerTestCase
 {
-    use ControllerDependenciesTrait;
-
     private const ITEM_ID = 22;
 
     private const ENTITY_ID = 33;

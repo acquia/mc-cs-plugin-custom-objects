@@ -18,7 +18,7 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerDependenciesTrait;
+use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerTestCase;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -29,10 +29,8 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Symfony\Component\Form\FormInterface;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemType;
 
-class FormControllerTest extends \PHPUnit_Framework_TestCase
+class FormControllerTest extends ControllerTestCase
 {
-    use ControllerDependenciesTrait;
-
     private const OBJECT_ID = 33;
 
     private const ITEM_ID = 22;
@@ -42,7 +40,6 @@ class FormControllerTest extends \PHPUnit_Framework_TestCase
     private $formFactory;
     private $permissionProvider;
     private $routeProvider;
-    private $request;
     private $customObject;
     private $customItem;
     private $form;

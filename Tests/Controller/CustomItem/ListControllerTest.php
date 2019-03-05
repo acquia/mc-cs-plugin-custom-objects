@@ -20,7 +20,7 @@ use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ListController;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemSessionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerDependenciesTrait;
+use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerTestCase;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -29,10 +29,8 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 
-class ListControllerTest extends \PHPUnit_Framework_TestCase
+class ListControllerTest extends ControllerTestCase
 {
-    use ControllerDependenciesTrait;
-
     private const OBJECT_ID = 33;
 
     private const PAGE = 3;
@@ -42,8 +40,6 @@ class ListControllerTest extends \PHPUnit_Framework_TestCase
     private $sessionProvider;
     private $permissionProvider;
     private $routeProvider;
-    private $requestStack;
-    private $request;
 
     /**
      * @var ListController

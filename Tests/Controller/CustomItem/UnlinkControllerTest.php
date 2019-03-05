@@ -17,14 +17,12 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\UnlinkController;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerDependenciesTrait;
+use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerTestCase;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Mautic\CoreBundle\Service\FlashBag;
 
-class UnlinkControllerTest extends \PHPUnit_Framework_TestCase
+class UnlinkControllerTest extends ControllerTestCase
 {
-    use ControllerDependenciesTrait;
-
     private const ITEM_ID = 22;
 
     private const ENTITY_ID = 33;

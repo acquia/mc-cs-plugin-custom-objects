@@ -18,24 +18,21 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomObject\DeleteController;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerDependenciesTrait;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Mautic\CoreBundle\Service\FlashBag;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectSessionProvider;
+use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerTestCase;
 
-class DeleteControllerTest extends \PHPUnit_Framework_TestCase
+class DeleteControllerTest extends ControllerTestCase
 {
-    use ControllerDependenciesTrait;
-
     private const OBJECT_ID = 33;
 
     private $customObjectModel;
     private $sessionprovider;
     private $flashBag;
     private $permissionProvider;
-    private $request;
 
     /**
      * @var DeleteController

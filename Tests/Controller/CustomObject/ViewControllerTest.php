@@ -18,7 +18,6 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomObject\ViewController;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerDependenciesTrait;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -27,18 +26,16 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
+use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerTestCase;
 
-class ViewControllerTest extends \PHPUnit_Framework_TestCase
+class ViewControllerTest extends ControllerTestCase
 {
-    use ControllerDependenciesTrait;
-
     private const OBJECT_ID = 33;
 
     private $customObjectModel;
     private $auditLog;
     private $permissionProvider;
     private $routeProvider;
-    private $requestStack;
     private $formFactory;
     private $form;
     private $customObject;

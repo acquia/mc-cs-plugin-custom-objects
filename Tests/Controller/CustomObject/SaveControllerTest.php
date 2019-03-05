@@ -19,7 +19,6 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomObject\SaveController;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerDependenciesTrait;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -31,22 +30,19 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\ClickableInterface;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
+use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerTestCase;
 
-class SaveControllerTest extends \PHPUnit_Framework_TestCase
+class SaveControllerTest extends ControllerTestCase
 {
-    use ControllerDependenciesTrait;
-
     private const OBJECT_ID = 33;
 
     private $formFactory;
     private $customObjectModel;
     private $customFieldModel;
-    private $requestStack;
     private $customFieldTypeProvider;
     private $flashBag;
     private $permissionProvider;
     private $routeProvider;
-    private $request;
     private $customObject;
     private $form;
 

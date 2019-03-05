@@ -16,7 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Controller\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\LookupController;
-use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerDependenciesTrait;
+use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerTestCase;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Symfony\Component\HttpFoundation\RequestStack;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
@@ -25,17 +25,13 @@ use Symfony\Component\HttpFoundation\Request;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 
-class LookupControllerTest extends \PHPUnit_Framework_TestCase
+class LookupControllerTest extends ControllerTestCase
 {
-    use ControllerDependenciesTrait;
-
     private const OBJECT_ID = 22;
 
     private $customItemModel;
-    private $requestStack;
     private $permissionProvider;
     private $flashBag;
-    private $request;
 
     /**
      * @var LookupController
