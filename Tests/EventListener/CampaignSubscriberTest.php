@@ -49,7 +49,7 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
     /**
      * @var CampaignSubscriber
      */
-    private $assetsSubscriber;
+    private $campaignSubscriber;
 
     protected function setUp(): void
     {
@@ -273,7 +273,7 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
             ->willReturn([
                 'field'    => '432',
                 'operator' => 'like',
-                'value'    => 'value A'
+                'value'    => 'value A',
             ]);
 
         $this->customFieldModel->expects($this->once())
@@ -311,7 +311,7 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
             ->willReturn([
                 'field'    => '432',
                 'operator' => 'like',
-                'value'    => 'value A'
+                'value'    => 'value A',
             ]);
 
         $this->customFieldModel->expects($this->once())
