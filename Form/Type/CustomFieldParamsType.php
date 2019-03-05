@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
 * @copyright   2019 Mautic, Inc. All rights reserved
 * @author      Mautic, Inc.
@@ -19,13 +21,16 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class CustomFieldParamsType extends AbstractType
 {
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'requiredValidationMessage',
             TextType::class,
             [
-                'label' => 'custom.field.label.required_validation_message',
+                'label'      => 'custom.field.label.required_validation_message',
                 'required'   => false,
             ]
         );

@@ -14,22 +14,24 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType\Form\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class RadioGroupType extends ChoiceType
 {
     /**
-     * @param OptionsResolverInterface $resolver
+     * Configures the options for this type.
+     *
+     * @param OptionsResolver $resolver The resolver for the options
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver): void
+    public function configureOptions(OptionsResolver $resolver): void
     {
+        parent::configureOptions($resolver);
+
         $resolver->setDefaults(
             [
                 'expanded' => true,
                 'multiple' => false,
             ]
         );
-
-        parent::setDefaultOptions($resolver);
     }
 }

@@ -25,7 +25,7 @@ class HtmlAreaType extends AbstractTextType
     /**
      * @return string
      */
-    public function getSymfonyFormFiledType(): string
+    public function getSymfonyFormFieldType(): string
     {
         return FormFieldHTMLType::class;
     }

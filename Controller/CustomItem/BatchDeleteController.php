@@ -14,15 +14,15 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
 use Symfony\Component\HttpFoundation\Response;
-use Mautic\CoreBundle\Controller\CommonController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Translation\TranslatorInterface;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
-use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Controller\CommonController;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderInterface;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 
 class BatchDeleteController extends CommonController
 {
@@ -37,9 +37,9 @@ class BatchDeleteController extends CommonController
     private $customItemModel;
 
     /**
-     * @var Session
+     * @var SessionProviderInterface
      */
-    private $session;
+    private $sessionProvider;
 
     /**
      * @var CustomItemPermissionProvider
@@ -47,35 +47,49 @@ class BatchDeleteController extends CommonController
     private $permissionProvider;
 
     /**
+     * @var CustomItemRouteProvider
+     */
+    private $routeProvider;
+
+    /**
+     * @var FlashBag
+     */
+    private $flashBag;
+
+    /**
      * @param RequestStack                 $requestStack
      * @param CustomItemModel              $customItemModel
-     * @param Session                      $session
-     * @param TranslatorInterface          $translator
+     * @param SessionProviderInterface     $sessionProvider
      * @param CustomItemPermissionProvider $permissionProvider
+     * @param CustomItemRouteProvider      $routeProvider
+     * @param FlashBag                     $flashBag
      */
     public function __construct(
         RequestStack $requestStack,
         CustomItemModel $customItemModel,
-        Session $session,
-        TranslatorInterface $translator,
-        CustomItemPermissionProvider $permissionProvider
+        SessionProviderInterface $sessionProvider,
+        CustomItemPermissionProvider $permissionProvider,
+        CustomItemRouteProvider $routeProvider,
+        FlashBag $flashBag
     ) {
         $this->requestStack       = $requestStack;
         $this->customItemModel    = $customItemModel;
-        $this->session            = $session;
-        $this->translator         = $translator;
+        $this->sessionProvider    = $sessionProvider;
         $this->permissionProvider = $permissionProvider;
+        $this->routeProvider      = $routeProvider;
+        $this->flashBag           = $flashBag;
     }
 
     /**
      * @param int $objectId
      *
-     * @return Response|JsonResponse
+     * @return Response
      */
-    public function deleteAction(int $objectId)
+    public function deleteAction(int $objectId): Response
     {
         $request  = $this->requestStack->getCurrentRequest();
         $itemIds  = json_decode($request->get('ids', '[]'), true);
+        $page     = $this->sessionProvider->getPage();
         $notFound = [];
         $denied   = [];
         $deleted  = [];
@@ -94,43 +108,36 @@ class BatchDeleteController extends CommonController
         }
 
         if ($deleted) {
-            $this->session->getFlashBag()->add(
-                'notice',
-                $this->translator->trans(
-                    'mautic.core.notice.batch_deleted',
-                    ['%count%' => count($deleted)],
-                    'flashes'
-                )
+            $this->flashBag->add(
+                'mautic.core.notice.batch_deleted',
+                ['%count%' => count($deleted)]
             );
         }
 
         if ($notFound) {
-            $this->session->getFlashBag()->add(
-                'error',
-                $this->translator->trans(
-                    'custom.item.error.items.not.found',
-                    ['%ids%' => implode(',', $notFound)],
-                    'flashes'
-                )
+            $this->flashBag->add(
+                'custom.item.error.items.not.found',
+                ['%ids%' => implode(',', $notFound)],
+                FlashBag::LEVEL_ERROR
             );
         }
 
         if ($denied) {
-            $this->session->getFlashBag()->add(
-                'error',
-                $this->translator->trans(
-                    'custom.item.error.items.denied',
-                    ['%ids%' => implode(',', $denied)],
-                    'flashes'
-                )
+            $this->flashBag->add(
+                'custom.item.error.items.denied',
+                ['%ids%' => implode(',', $denied)],
+                FlashBag::LEVEL_ERROR
             );
         }
 
-        return $this->forward(
-            'CustomObjectsBundle:CustomItem\List:list',
+        return $this->postActionRedirect(
             [
-                'objectId' => $objectId,
-                'page'     => $this->session->get('custom.item.page', 1),
+                'returnUrl'       => $this->routeProvider->buildListRoute($objectId, $page),
+                'viewParameters'  => ['objectId' => $objectId, 'page' => $page],
+                'contentTemplate' => 'CustomObjectsBundle:CustomItem\List:list',
+                'passthroughVars' => [
+                    'mauticContent' => 'customItem',
+                ],
             ]
         );
     }

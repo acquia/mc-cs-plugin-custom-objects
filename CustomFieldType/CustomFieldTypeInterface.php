@@ -20,6 +20,8 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 interface CustomFieldTypeInterface
 {
+    public const TABLE_NAME = 'undefined';
+
     /**
      * @return string
      */
@@ -33,7 +35,7 @@ interface CustomFieldTypeInterface
     /**
      * @return string
      */
-    public function getSymfonyFormFiledType(): string;
+    public function getSymfonyFormFieldType(): string;
 
     /**
      * @return string

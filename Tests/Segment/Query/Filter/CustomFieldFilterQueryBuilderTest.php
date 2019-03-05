@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Segment\Query\Filter;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Tools\SchemaTool;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -20,7 +19,7 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
     /** @var EntityManager */
     private $entityManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -36,23 +35,22 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
         $this->postFixtureSetup();
 
         $pluginDirectory   = $this->getContainer()->get('kernel')->locateResource('@CustomObjectsBundle');
-        $fixturesDirectory = $pluginDirectory . '/Tests/DataFixtures/ORM/Data';
+        $fixturesDirectory = $pluginDirectory.'/Tests/DataFixtures/ORM/Data';
 
         $objects = $this->loadFixtureFiles([
-            $fixturesDirectory . '/roles.yml',
-            $fixturesDirectory . '/users.yml',
-            $fixturesDirectory . '/leads.yml',
-            $fixturesDirectory . '/custom_objects.yml',
-            $fixturesDirectory . '/custom_fields.yml',
-            $fixturesDirectory . '/custom_items.yml',
-            $fixturesDirectory . '/custom_xref.yml',
-            $fixturesDirectory . '/custom_values.yml',
+            $fixturesDirectory.'/roles.yml',
+            $fixturesDirectory.'/users.yml',
+            $fixturesDirectory.'/leads.yml',
+            $fixturesDirectory.'/custom_objects.yml',
+            $fixturesDirectory.'/custom_fields.yml',
+            $fixturesDirectory.'/custom_items.yml',
+            $fixturesDirectory.'/custom_xref.yml',
+            $fixturesDirectory.'/custom_values.yml',
         ], false, null, 'doctrine'); //,ORMPurger::PURGE_MODE_DELETE);
 
         $this->setFixtureObjects($objects);
 
         $this->entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
-
     }
 
     public function tearDown()
@@ -66,9 +64,8 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
         return parent::tearDown();
     }
 
-    public function testApplyQuery()
+    public function testApplyQuery(): void
     {
-
         $queryBuilderService = new CustomFieldFilterQueryBuilder(new RandomParameterName());
 
         $filterMock = $this->createSegmentFilterMock('hate');
@@ -101,7 +98,7 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
         return $filterMock;
     }
 
-    private function getLeadsQueryBuilder()
+    private function getLeadsQueryBuilder(): QueryBuilder
     {
         $connection   = $this->entityManager->getConnection();
         $queryBuilder = new QueryBuilder($connection);

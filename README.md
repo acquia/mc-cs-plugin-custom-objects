@@ -59,8 +59,11 @@ The main purpose of this command is to generate big enough sample data to perfor
 
 ## Unit tests
 
-With this command you can run the plugin unit tests:
+With this command you can run all the tests from the `plugins/CustomObjectsBundle` dir:
 
-`$ bin/phpunit --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --filter CustomObjectsBundle`
+`$ composer run-script test`
 
-*Run it from Mautic root folder*
+If you wan to automatically fix code styles then run this:
+
+`$ composer run-script fixcs`
+

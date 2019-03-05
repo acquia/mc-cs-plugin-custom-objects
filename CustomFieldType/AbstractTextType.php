@@ -20,7 +20,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 
 abstract class AbstractTextType extends AbstractCustomFieldType
 {
-    const TABLE_NAME = 'custom_field_value_text';
+    public const TABLE_NAME = 'custom_field_value_text';
 
     /**
      * @param CustomField $customField
@@ -37,7 +37,7 @@ abstract class AbstractTextType extends AbstractCustomFieldType
     /**
      * @return string
      */
-    public function getSymfonyFormFiledType(): string
+    public function getSymfonyFormFieldType(): string
     {
         return \Symfony\Component\Form\Extension\Core\Type\TextType::class;
     }

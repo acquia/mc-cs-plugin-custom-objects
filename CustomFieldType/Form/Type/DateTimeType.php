@@ -13,10 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType\Form\Type;
 
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class CheckboxGroupType extends ChoiceType
+class DateTimeType extends \Symfony\Component\Form\Extension\Core\Type\DateTimeType
 {
     /**
      * Configures the options for this type.
@@ -29,8 +28,15 @@ class CheckboxGroupType extends ChoiceType
 
         $resolver->setDefaults(
             [
-                'expanded' => true,
-                'multiple' => true,
+                'widget'     => 'single_text',
+                'attr'       => [
+                    'class'       => 'form-control',
+                    // @todo does not work
+                    // @see 1a.content.js:301
+                    'data-toggle' => 'datetime',
+                ],
+                'format'   => 'yyyy-MM-dd HH:mm',
+                'required' => false,
             ]
         );
     }

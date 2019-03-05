@@ -23,7 +23,7 @@ class UrlType extends AbstractTextType
     /**
      * @return string
      */
-    public function getSymfonyFormFiledType(): string
+    public function getSymfonyFormFieldType(): string
     {
         return \Symfony\Component\Form\Extension\Core\Type\UrlType::class;
     }

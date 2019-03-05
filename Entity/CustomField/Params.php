@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
 * @copyright   2019 Mautic, Inc. All rights reserved
 * @author      Mautic, Inc.
@@ -19,7 +21,7 @@ class Params
     private $requiredValidationMessage;
 
     /**
-     * @param array $params|null
+     * @param mixed[] $params
      */
     public function __construct(array $params = [])
     {

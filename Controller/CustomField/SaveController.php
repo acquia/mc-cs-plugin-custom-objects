@@ -15,7 +15,6 @@ namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
