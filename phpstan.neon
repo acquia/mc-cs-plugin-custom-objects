@@ -1,3 +1,7 @@
 parameters:
 	ignoreErrors:
 		- '#Constant MAUTIC_TABLE_PREFIX not found.#'
+		- '#Call to an undefined method Mautic\\CoreBundle\\Controller\\MauticController&Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller::setTranslator().#'
+		- '#Call to an undefined method Mautic\\CoreBundle\\Controller\\MauticController&Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller::setRequest().#'
+		- '#Call to an undefined method Doctrine\\ORM\\EntityRepository::getEvents().#'
+		- '#Call to an undefined method Symfony\\Component\\Form\\FormInterface::isClicked().#'
