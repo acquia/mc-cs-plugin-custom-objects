@@ -781,6 +781,13 @@ return [
                     'mautic.helper.core_parameters',
                 ],
             ],
+            'custom_object.session.provider' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Provider\CustomObjectSessionProvider::class,
+                'arguments' => [
+                    'session',
+                    'mautic.helper.core_parameters',
+                ],
+            ],
             'custom_object.route.provider' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider::class,
                 'arguments' => [
