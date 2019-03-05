@@ -21,7 +21,9 @@ class CustomObjectRouteProvider
 
     public const ROUTE_VIEW   = 'mautic_custom_object_view';
 
-    public const ROUTE_FORM   = 'mautic_custom_object_form';
+    public const ROUTE_NEW    = 'mautic_custom_object_new';
+
+    public const ROUTE_EDIT   = 'mautic_custom_object_edit';
 
     public const ROUTE_CLONE  = 'mautic_custom_object_clone';
 
@@ -61,9 +63,7 @@ class CustomObjectRouteProvider
      */
     public function buildSaveRoute(?int $id = null): string
     {
-        $params = $id ? ['objectId' => $id] : [];
-
-        return $this->router->generate(static::ROUTE_SAVE, $params);
+        return $this->router->generate(static::ROUTE_SAVE, ['objectId' => $id]);
     }
 
     /**
@@ -77,15 +77,21 @@ class CustomObjectRouteProvider
     }
 
     /**
+     * @return string
+     */
+    public function buildNewRoute(): string
+    {
+        return $this->router->generate(static::ROUTE_NEW);
+    }
+
+    /**
      * @param int $id
      *
      * @return string
      */
-    public function buildFormRoute(?int $id = null): string
+    public function buildEditRoute(?int $id = null): string
     {
-        $params = $id ? ['objectId' => $id] : [];
-
-        return $this->router->generate(static::ROUTE_FORM, $params);
+        return $this->router->generate(static::ROUTE_EDIT, ['objectId' => $id]);
     }
 
     /**

@@ -136,14 +136,19 @@ return [
                 'controller' => 'CustomObjectsBundle:CustomObject\View:view',
                 'method'     => 'GET|POST',
             ],
-            CustomObjectRouteProvider::ROUTE_FORM => [
+            CustomObjectRouteProvider::ROUTE_NEW => [
+                'path'       => '/custom/object/new',
+                'controller' => 'CustomObjectsBundle:CustomObject\Form:new',
+                'method'     => 'GET',
+            ],
+            CustomObjectRouteProvider::ROUTE_EDIT => [
                 'path'       => '/custom/object/edit/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomObject\Form:renderForm',
+                'controller' => 'CustomObjectsBundle:CustomObject\Form:edit',
                 'method'     => 'GET',
             ],
             CustomObjectRouteProvider::ROUTE_CLONE => [
                 'path'       => '/custom/object/clone/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomObject\Clone:clone',
+                'controller' => 'CustomObjectsBundle:CustomObject\Form:clone',
                 'method'     => 'GET',
             ],
             CustomObjectRouteProvider::ROUTE_CANCEL => [

@@ -118,7 +118,7 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
 
         return [
             'attr' => [
-                'href' => $this->routeProvider->buildFormRoute($entity->getId()),
+                'href' => $this->routeProvider->buildEditRoute($entity->getId()),
             ],
             'btnText'   => 'mautic.core.form.edit',
             'iconClass' => 'fa fa-pencil-square-o',
@@ -196,7 +196,7 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
 
         return [
             'attr' => [
-                'href' => $this->routeProvider->buildFormRoute(),
+                'href' => $this->routeProvider->buildNewRoute(),
             ],
             'btnText'   => $this->translator->trans('mautic.core.form.new'),
             'iconClass' => 'fa fa-plus',
