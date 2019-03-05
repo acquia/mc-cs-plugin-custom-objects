@@ -35,7 +35,9 @@ class DynamicContentSubscriber extends CommonSubscriber
      */
     private $filterFactory;
 
-    /** @var QueryFilterHelper */
+    /**
+     * @var QueryFilterHelper
+     */
     private $queryHelper;
 
     /**
