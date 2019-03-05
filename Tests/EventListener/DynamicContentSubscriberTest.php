@@ -29,7 +29,7 @@ class DynamicContentSubscriberTest extends \Liip\FunctionalTestBundle\Test\WebTe
             $fixturesDirectory.'/custom_items.yml',
             $fixturesDirectory.'/custom_xref.yml',
             $fixturesDirectory.'/custom_values.yml',
-        ], false, null, 'doctrine', ORMPurger::PURGE_MODE_TRUNCATE);
+        ], false, null, 'doctrine');
 
         $this->setFixtureObjects($objects);
     }
