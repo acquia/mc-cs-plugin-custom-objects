@@ -1,16 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\CustomObjectsBundle\Tests\Helper;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
-use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Tests\DataFixtures\Traits\FixtureObjectsTrait;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class QueryFilterHelperTest extends WebTestCase
 {
@@ -22,7 +22,7 @@ class QueryFilterHelperTest extends WebTestCase
     /** @var ContactSegmentFilterFactory */
     private $filterFactory;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -57,10 +57,10 @@ class QueryFilterHelperTest extends WebTestCase
         $this->filterFactory = $this->getContainer()->get('mautic.lead.model.lead_segment_filter_factory');
     }
 
-    public function testGetCustomValueValueExpression()
+    public function testGetCustomValueValueExpression(): void
     {
         $fieldTypeProvider = $this->getContainer()->get('custom_field.type.provider');
-        $filterHelper = new QueryFilterHelper($fieldTypeProvider);
+        $filterHelper      = new QueryFilterHelper($fieldTypeProvider);
 
         $queryBuilder = new QueryBuilder($this->entityManager->getConnection());
 
@@ -85,7 +85,7 @@ class QueryFilterHelperTest extends WebTestCase
             );
 
             $whereResponse = $queryBuilder->getQueryPart('where');
-            $this->assertEquals($filter['match'], $whereResponse);
+            $this->assertSame($filter['match'], $whereResponse);
         }
 
         var_dump($queryBuilder->getSQL());
@@ -93,9 +93,7 @@ class QueryFilterHelperTest extends WebTestCase
         //$traitContainer
     }
 
-    private function setUpFixtures()
+    private function setUpFixtures(): void
     {
-
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /*
@@ -47,14 +48,14 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
      *
      * @return QueryBuilder
      * @throws \Doctrine\DBAL\DBALException
+     * @throws \MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException
      */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
         $filterOperator   = $filter->getOperator();
         $filterFieldId    = $filter->getField();
 
-        $tableAlias        = 'cfwq_' . (int) $filter->getField();
-
+        $tableAlias = 'cfwq_' . (int) $filter->getField();
 
         $filterQueryBuilder = $this->filterHelper->createValueQueryBuilder(
             $queryBuilder->getConnection(),
@@ -63,7 +64,6 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
             $filter->getType()
         );
         $this->filterHelper->addCustomFieldValueExpressionFromSegmentFilter($filterQueryBuilder, $tableAlias, $filter);
-
 
         $filterQueryBuilder->select($tableAlias . '_contact.contact_id as lead_id');
         $filterQueryBuilder->andWhere('l.id = ' . $tableAlias . '_contact.contact_id');
@@ -75,6 +75,7 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
             case 'neq':
             case 'notLike':
                 $queryBuilder->addLogic($queryBuilder->expr()->notExists($filterQueryBuilder->getSQL()), $filter->getGlue());
+
                 break;
             default:
                 $queryBuilder->addLogic($queryBuilder->expr()->exists($filterQueryBuilder->getSQL()), $filter->getGlue());

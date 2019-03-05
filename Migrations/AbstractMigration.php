@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
 * @copyright   2019 Mautic, Inc. All rights reserved
 * @author      Mautic, Inc.
@@ -16,14 +18,13 @@ use Doctrine\ORM\EntityManager;
 class AbstractMigration implements MigrationInterface
 {
     /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
      * @var string
      */
     protected $tablePrefix;
+    /**
+     * @var EntityManager
+     */
+    private $entityManager;
 
     /**
      * @var array
@@ -37,7 +38,7 @@ class AbstractMigration implements MigrationInterface
     public function __construct(EntityManager $entityManager, string $tablePrefix)
     {
         $this->entityManager = $entityManager;
-        $this->tablePrefix = $tablePrefix;
+        $this->tablePrefix   = $tablePrefix;
     }
 
     public function up(): void
@@ -54,7 +55,7 @@ class AbstractMigration implements MigrationInterface
         $this->entityManager->beginTransaction();
         $connection = $this->entityManager->getConnection();
 
-        foreach($this->queries as $sql) {
+        foreach ($this->queries as $sql) {
             $stmt = $connection->prepare($sql);
             $stmt->execute();
         }
@@ -69,5 +70,4 @@ class AbstractMigration implements MigrationInterface
     {
         $this->queries[] = $sql;
     }
-
 }

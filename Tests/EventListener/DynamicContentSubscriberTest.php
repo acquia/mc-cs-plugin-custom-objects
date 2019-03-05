@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\CustomObjectsBundle\Tests\EventListener;
 
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
@@ -19,11 +21,11 @@ class DynamicContentSubscriberTest extends \Liip\FunctionalTestBundle\Test\WebTe
      */
     private $entityManager;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $pluginDirectory = $this->getContainer()->get('kernel')->locateResource('@CustomObjectsBundle');
+        $pluginDirectory   = $this->getContainer()->get('kernel')->locateResource('@CustomObjectsBundle');
         $fixturesDirectory = $pluginDirectory . '/Tests/DataFixtures/ORM/Data';
 
         $this->entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
@@ -37,16 +39,17 @@ class DynamicContentSubscriberTest extends \Liip\FunctionalTestBundle\Test\WebTe
             $fixturesDirectory . '/custom_items.yml',
             $fixturesDirectory . '/custom_xref.yml',
             $fixturesDirectory . '/custom_values.yml',
-        ], false, null,'doctrine',ORMPurger::PURGE_MODE_TRUNCATE);
+        ], false, null, 'doctrine', ORMPurger::PURGE_MODE_TRUNCATE);
 
         $this->setFixtureObjects($objects);
     }
 
-    public function testSubscribesToEvent() {
-        $testValue = md5(rand(0,10000));
+    public function testSubscribesToEvent(): void
+    {
+        $testValue = md5(random_int(0, 10000));
 
         $dcSubscriberMockBuilder = $this->getMockBuilder(DynamicContentSubscriber::class)->disableOriginalConstructor();
-        $dcSubscriberMock = $dcSubscriberMockBuilder->setMethods([])->getMock();
+        $dcSubscriberMock        = $dcSubscriberMockBuilder->setMethods([])->getMock();
 
         $this->assertArrayHasKey(DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE, $eventSubscriptions = DynamicContentSubscriber::getSubscribedEvents());
 
@@ -56,6 +59,6 @@ class DynamicContentSubscriberTest extends \Liip\FunctionalTestBundle\Test\WebTe
 
         $event = new ContactFiltersEvaluateEvent([], new Lead());
 
-        $this->assertEquals($testValue, $dcSubscriberMock->$methodName($event));
+        $this->assertSame($testValue, $dcSubscriberMock->{$methodName}($event));
     }
 }

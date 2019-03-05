@@ -673,7 +673,7 @@ return [
                     'custom_object.config.provider',
                 ],
             ],
-            'custom_object.segments.filters_generate.subscriber' => [
+            'custom_object.segments.filters_generate.subscriber'   => [
                 'class'    => \MauticPlugin\CustomObjectsBundle\EventListener\SegmentFiltersChoicesGenerateSubscriber::class,
                 'arguments'=> [
                     'custom_object.repository',
@@ -686,6 +686,14 @@ return [
                 'arguments' => [
                     'doctrine',
                     'custom_object.config.provider',
+                ],
+            ],
+            'custom_object'                                        => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\DynamicContentSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.lead.model.lead_segment_filter_factory',
+                    'custom_object.query.filter.helper',
                 ],
             ],
         ],

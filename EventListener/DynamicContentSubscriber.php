@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /*
@@ -14,14 +15,11 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
-use Mautic\DebugBundle\Service\MauticDebugHelper;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
-
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
-
 
 class DynamicContentSubscriber extends CommonSubscriber
 {
@@ -51,16 +49,21 @@ class DynamicContentSubscriber extends CommonSubscriber
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE => ['evaluateFilters', 0],
         ];
     }
 
-    public function evaluateFilters(ContactFiltersEvaluateEvent $event)
+    /**
+     * @param ContactFiltersEvaluateEvent $event
+     *
+     * @throws \MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException
+     */
+    public function evaluateFilters(ContactFiltersEvaluateEvent $event): void
     {
         $eventFilters = $event->getFilters();
         if ($event->isEvaluated()) {
@@ -72,11 +75,11 @@ class DynamicContentSubscriber extends CommonSubscriber
         foreach ($eventFilters as $eventFilter) {
             $segmentFilter = $this->filterFactory->factorSegmentFilter($eventFilter);
 
-            if ($segmentFilter->getTable() != MAUTIC_TABLE_PREFIX.'custom_objects') {
+            if ($segmentFilter->getTable() !== MAUTIC_TABLE_PREFIX . 'custom_objects') {
                 continue;
             }
 
-            if ($segmentFilter->getQueryType()=='mautic.lead.query.builder.custom_field.value') {
+            if ('mautic.lead.query.builder.custom_field.value' === $segmentFilter->getQueryType()) {
                 $tableAlias         = 'cfwq_' . (int) $segmentFilter->getField();
                 $filterQueryBuilder = $this->queryHelper->createValueQueryBuilder(
                     $connection,
@@ -85,7 +88,7 @@ class DynamicContentSubscriber extends CommonSubscriber
                     $segmentFilter->getType()
                 );
                 $this->queryHelper->addCustomFieldValueExpressionFromSegmentFilter($filterQueryBuilder, $tableAlias, $segmentFilter);
-            } elseif ($segmentFilter->getQueryType()=='mautic.lead.query.builder.custom_item.value') {
+            } elseif ('mautic.lead.query.builder.custom_item.value' === $segmentFilter->getQueryType()) {
                 $tableAlias         = 'cowq_' . (int) $segmentFilter->getField();
                 $filterQueryBuilder = $this->queryHelper->createItemNameQueryBuilder($connection, $tableAlias);
                 $this->queryHelper->addCustomObjectNameExpression(
@@ -108,8 +111,9 @@ class DynamicContentSubscriber extends CommonSubscriber
                     $event->setIsEvaluated(true);
                 }
             }
-            catch (\Exception $e) {
-
+            catch (\PDOException $e) {  // just to be a little more descriptive
+                $this->logger->addError('Failed to evaluate dynamic content for custom object ' . $e->getMessage());
+                throw $e;
             }
 
             $event->stopPropagation();  // The filter is ours, we won't allow no more processing

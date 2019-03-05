@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
 * @copyright   2019 Mautic, Inc. All rights reserved
 * @author      Mautic, Inc.
@@ -30,10 +32,10 @@ class Engine
 
     public function up(string $version): void
     {
-        $version = str_replace('.', '_', $version);
+        $version        = str_replace('.', '_', $version);
         $migrationClass = "Version_{$version}";
-        $phpFile = __DIR__ . '/' . $migrationClass . '.php';
-        $migrationClass = "MauticPlugin\CustomObjectsBundle\Migrations\\$migrationClass";
+        $phpFile        = __DIR__ . '/' . $migrationClass . '.php';
+        $migrationClass = "MauticPlugin\CustomObjectsBundle\Migrations\\${migrationClass}";
 
         if (!file_exists($phpFile)) {
             return;

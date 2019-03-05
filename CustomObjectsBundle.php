@@ -76,13 +76,13 @@ class CustomObjectsBundle extends PluginBundleBase
 
     /**
      * @param Connection $connection
-     * @param array $queries
+     * @param array      $queries
      */
     private static function commit(Connection $connection, array $queries): void
     {
         if (!empty($queries)) {
-
             $connection->beginTransaction();
+
             try {
                 foreach ($queries as $query) {
                     if (!$query) {
@@ -92,7 +92,8 @@ class CustomObjectsBundle extends PluginBundleBase
                 }
 
                 $connection->commit();
-            } catch (\Exception $e) {
+            }
+            catch (\Throwable $e) {
                 $connection->rollBack();
 
                 throw $e;

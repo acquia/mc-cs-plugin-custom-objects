@@ -14,7 +14,6 @@ use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Tests\DataFixtures\Traits\FixtureObjectsTrait;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class CustomFieldFilterQueryBuilderTest extends WebTestCase
 {
@@ -57,7 +56,7 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
         $this->entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         foreach ($this->getFixturesInUnloadableOrder() as $entity) {
             $this->entityManager->remove($entity);
@@ -81,14 +80,14 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
         $queryBuilder = $this->getLeadsQueryBuilder();
         $queryBuilderService->applyQuery($queryBuilder, $filterMock);
 
-        $this->assertEquals(2, $queryBuilder->execute()->rowCount());
+        $this->assertSame(2, $queryBuilder->execute()->rowCount());
 
         $filterMock = $this->createSegmentFilterMock('love');
 
         $queryBuilder = $this->getLeadsQueryBuilder();
         $queryBuilderService->applyQuery($queryBuilder, $filterMock);
 
-        $this->assertEquals(3, $queryBuilder->execute()->rowCount());
+        $this->assertSame(3, $queryBuilder->execute()->rowCount());
     }
 
     private function createSegmentFilterMock($value, $type = 'text', $operator = 'eq', $fixtureField = 'custom_field1')
@@ -111,7 +110,7 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
         $connection   = $this->entityManager->getConnection();
         $queryBuilder = new QueryBuilder($connection);
 
-        $queryBuilder->select('l.*')->from(MAUTIC_TABLE_PREFIX . "leads", "l");
+        $queryBuilder->select('l.*')->from(MAUTIC_TABLE_PREFIX . 'leads', 'l');
 
         return $queryBuilder;
     }
