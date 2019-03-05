@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\EventListener;
 
-use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use MauticPlugin\CustomObjectsBundle\EventListener\DynamicContentSubscriber;
 use MauticPlugin\CustomObjectsBundle\Tests\DataFixtures\Traits\FixtureObjectsTrait;

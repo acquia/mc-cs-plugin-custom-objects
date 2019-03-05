@@ -55,8 +55,7 @@ final class QueryFilterHelper
         string $builderAlias,
         int $fieldId,
         ?string $fieldType = null
-    ): QueryBuilder
-    {
+    ): QueryBuilder {
         $queryBuilder      = new QueryBuilder($connection);
         $fieldType         = $fieldType ?: $this->getCustomFieldType($queryBuilder, $fieldId);
         $valueQueryBuilder = $this->getBasicItemQueryBuilder($queryBuilder, $builderAlias);
@@ -88,7 +87,7 @@ final class QueryFilterHelper
      */
     public function addCustomFieldIdRestriction(QueryBuilder $queryBuilder, string $queryBuilderAlias, int $customFieldId): void
     {
-        $queryBuilder->andWhere($queryBuilder->expr()->eq($queryBuilderAlias . '_value.custom_field_id', ":{$queryBuilderAlias}_custom_field_id"));
+        $queryBuilder->andWhere($queryBuilder->expr()->eq($queryBuilderAlias.'_value.custom_field_id', ":{$queryBuilderAlias}_custom_field_id"));
         $queryBuilder->setParameter("{$queryBuilderAlias}_custom_field_id", $customFieldId);
     }
 
@@ -104,18 +103,18 @@ final class QueryFilterHelper
      */
     public function addContactIdRestriction(QueryBuilder $queryBuilder, string $queryAlias, int $contactId): void
     {
-        if (!in_array($queryAlias . '_contact', $this->getQueryJoinAliases($queryBuilder), true)) {
-            if (!in_array($queryAlias . '_item', $this->getQueryJoinAliases($queryBuilder), true)) {
+        if (!in_array($queryAlias.'_contact', $this->getQueryJoinAliases($queryBuilder), true)) {
+            if (!in_array($queryAlias.'_item', $this->getQueryJoinAliases($queryBuilder), true)) {
                 throw new InvalidArgumentException('QueryBuilder contains no usable tables for contact restriction.');
             }
-            $tableAlias = $queryAlias . '_item.contact_id';
+            $tableAlias = $queryAlias.'_item.contact_id';
         } else {
-            $tableAlias = $queryAlias . '_contact.contact_id';
+            $tableAlias = $queryAlias.'_contact.contact_id';
         }
         $queryBuilder->andWhere(
-            $queryBuilder->expr()->eq($tableAlias, ':contact_id_' . $contactId)
+            $queryBuilder->expr()->eq($tableAlias, ':contact_id_'.$contactId)
         );
-        $queryBuilder->setParameter('contact_id_' . $contactId, $contactId);
+        $queryBuilder->setParameter('contact_id_'.$contactId, $contactId);
     }
 
     /**
@@ -169,8 +168,7 @@ final class QueryFilterHelper
         string $tableAlias,
         string $operator,
         string $value
-    ): void
-    {
+    ): void {
         $expression = $this->getCustomObjectNameExpression($queryBuilder, $tableAlias, $operator);
         $this->addOperatorExpression($queryBuilder, $tableAlias, $expression, $operator, $value);
     }
@@ -188,8 +186,7 @@ final class QueryFilterHelper
         $expression,
         string $operator,
         ?string $value
-    ): void
-    {
+    ): void {
         $valueType = null;
 
         switch ($operator) {
@@ -198,16 +195,16 @@ final class QueryFilterHelper
                 break;
             case 'notIn':
                 $valueType      = $queryBuilder->getConnection()::PARAM_STR_ARRAY;
-                $valueParameter = $tableAlias . '_value_value';
+                $valueParameter = $tableAlias.'_value_value';
 
                 break;
             case 'in':
                 $valueType      = $queryBuilder->getConnection()::PARAM_STR_ARRAY;
-                $valueParameter = $tableAlias . '_value_value';
+                $valueParameter = $tableAlias.'_value_value';
 
                 break;
             default:
-                $valueParameter = $tableAlias . '_value_value';
+                $valueParameter = $tableAlias.'_value_value';
         }
 
         switch ($operator) {
@@ -245,8 +242,7 @@ final class QueryFilterHelper
         QueryBuilder $customQuery,
         string $glue,
         string $operator
-    ): void
-    {
+    ): void {
         switch ($operator) {
             case 'empty':
             case 'notIn':
@@ -274,7 +270,7 @@ final class QueryFilterHelper
         $qb = $queryBuilder->getConnection()->
         createQueryBuilder();
 
-        $customFieldData = $qb->select('f.*')->from(MAUTIC_TABLE_PREFIX . 'custom_field', 'f')->where(
+        $customFieldData = $qb->select('f.*')->from(MAUTIC_TABLE_PREFIX.'custom_field', 'f')->where(
             $qb->expr()->eq('f.id', $customFieldId)
         )->getFirstResult();
 
@@ -295,53 +291,53 @@ final class QueryFilterHelper
         switch ($operator) {
             case 'empty':
             case 'notEmpty':
-                $expression = $customQuery->expr()->isNotNull($tableAlias . '_value.value');
+                $expression = $customQuery->expr()->isNotNull($tableAlias.'_value.value');
 
                 break;
             case 'notIn':
-                $valueParameter = $tableAlias . '_value_value';
+                $valueParameter = $tableAlias.'_value_value';
                 $expression     = $customQuery->expr()->in(
-                    $tableAlias . '_value.value',
+                    $tableAlias.'_value.value',
                     ":${valueParameter}"
                 );
 
                 break;
             case 'in':
-                $valueParameter = $tableAlias . '_value_value';
+                $valueParameter = $tableAlias.'_value_value';
                 $expression     = $customQuery->expr()->in(
-                    $tableAlias . '_value.value',
+                    $tableAlias.'_value.value',
                     ":${valueParameter}"
                 );
 
                 break;
             case 'neq':
-                $valueParameter = $tableAlias . '_value_value';
+                $valueParameter = $tableAlias.'_value_value';
                 $expression     = $customQuery->expr()->orX(
-                    $customQuery->expr()->eq($tableAlias . '_value.value', ":${valueParameter}"),
-                    $customQuery->expr()->isNull($tableAlias . '_value.value')
+                    $customQuery->expr()->eq($tableAlias.'_value.value', ":${valueParameter}"),
+                    $customQuery->expr()->isNull($tableAlias.'_value.value')
                 );
 
                 break;
             case 'contains':
-                $valueParameter = $tableAlias . '_value_value';
+                $valueParameter = $tableAlias.'_value_value';
 
-                $expression = $customQuery->expr()->like($tableAlias . '_value.value', "%:{$valueParameter}%");
+                $expression = $customQuery->expr()->like($tableAlias.'_value.value', "%:{$valueParameter}%");
 
                 break;
 
             case 'notLike':
-                $valueParameter = $tableAlias . '_value_value';
+                $valueParameter = $tableAlias.'_value_value';
 
                 $expression = $customQuery->expr()->orX(
-                    $customQuery->expr()->isNull($tableAlias . '_value.value'),
-                    $customQuery->expr()->like($tableAlias . '_value.value', ":${valueParameter}")
+                    $customQuery->expr()->isNull($tableAlias.'_value.value'),
+                    $customQuery->expr()->like($tableAlias.'_value.value', ":${valueParameter}")
                 );
 
                 break;
             default:
-                $valueParameter = $tableAlias . '_value_value';
+                $valueParameter = $tableAlias.'_value_value';
                 $expression     = $customQuery->expr()->{$operator}(
-                    $tableAlias . '_value.value',
+                    $tableAlias.'_value.value',
                     ":${valueParameter}"
                 );
         }
@@ -363,46 +359,46 @@ final class QueryFilterHelper
         switch ($operator) {
             case 'empty':
             case 'notEmpty':
-                $expression = $customQuery->expr()->isNotNull($tableAlias . '_value.value');
+                $expression = $customQuery->expr()->isNotNull($tableAlias.'_value.value');
 
                 break;
             case 'notIn':
-                $valueParameter = $tableAlias . '_value_value';
+                $valueParameter = $tableAlias.'_value_value';
                 $expression     = $customQuery->expr()->in(
-                    $tableAlias . '_item.name',
+                    $tableAlias.'_item.name',
                     ":${valueParameter}"
                 );
 
                 break;
             case 'in':
-                $valueParameter = $tableAlias . '_value_value';
+                $valueParameter = $tableAlias.'_value_value';
                 $expression     = $customQuery->expr()->in(
-                    $tableAlias . '_item.name',
+                    $tableAlias.'_item.name',
                     ":${valueParameter}"
                 );
 
                 break;
             case 'neq':
-                $valueParameter = $tableAlias . '_value_value';
+                $valueParameter = $tableAlias.'_value_value';
                 $expression     = $customQuery->expr()->orX(
-                    $customQuery->expr()->eq($tableAlias . '_item.name', ":${valueParameter}"),
-                    $customQuery->expr()->isNull($tableAlias . '_item.name')
+                    $customQuery->expr()->eq($tableAlias.'_item.name', ":${valueParameter}"),
+                    $customQuery->expr()->isNull($tableAlias.'_item.name')
                 );
 
                 break;
             case 'notLike':
-                $valueParameter = $tableAlias . '_value_value';
+                $valueParameter = $tableAlias.'_value_value';
 
                 $expression = $customQuery->expr()->orX(
-                    $customQuery->expr()->isNull($tableAlias . '_item.name'),
-                    $customQuery->expr()->like($tableAlias . '_item.name', ":${valueParameter}")
+                    $customQuery->expr()->isNull($tableAlias.'_item.name'),
+                    $customQuery->expr()->like($tableAlias.'_item.name', ":${valueParameter}")
                 );
 
                 break;
             default:
-                $valueParameter = $tableAlias . '_value_value';
+                $valueParameter = $tableAlias.'_value_value';
                 $expression     = $customQuery->expr()->{$operator}(
-                    $tableAlias . '_item.name',
+                    $tableAlias.'_item.name',
                     ":${valueParameter}"
                 );
         }
@@ -424,10 +420,10 @@ final class QueryFilterHelper
         $dataTable = $this->getTableNameFromFieldType($fieldType);
 
         $customFieldQueryBuilder->leftJoin(
-            $alias . '_item',
-            MAUTIC_TABLE_PREFIX . $dataTable,
-            $alias . '_value',
-            $alias . '_value.custom_item_id = ' . $alias . '_item.id');
+            $alias.'_item',
+            MAUTIC_TABLE_PREFIX.$dataTable,
+            $alias.'_value',
+            $alias.'_value.custom_item_id = '.$alias.'_item.id');
 
         return $customFieldQueryBuilder;
     }
@@ -444,7 +440,7 @@ final class QueryFilterHelper
         if (!isset($this->fieldTypes[$fieldType])) {
             $types = $this->fieldTypeProvider->getTypes();
             if (!isset($types[$fieldType])) {
-                throw new InvalidArgumentException('Invalid custom field type requested: ' . $fieldType . ', Available: ' . join(', ', array_keys($types)));
+                throw new InvalidArgumentException('Invalid custom field type requested: '.$fieldType.', Available: '.join(', ', array_keys($types)));
             }
             $this->fieldTypes[$fieldType] = get_class($types[$fieldType]);
         }
@@ -482,12 +478,12 @@ final class QueryFilterHelper
 
         $customFieldQueryBuilder
             ->select('*')
-            ->from(MAUTIC_TABLE_PREFIX . 'custom_item_xref_contact', $alias . '_contact')
+            ->from(MAUTIC_TABLE_PREFIX.'custom_item_xref_contact', $alias.'_contact')
             ->leftJoin(
-                $alias . '_contact',
-                MAUTIC_TABLE_PREFIX . 'custom_item',
-                $alias . '_item',
-                $alias . '_item.id=' . $alias . '_contact.custom_item_id');
+                $alias.'_contact',
+                MAUTIC_TABLE_PREFIX.'custom_item',
+                $alias.'_item',
+                $alias.'_item.id='.$alias.'_contact.custom_item_id');
 
         return $customFieldQueryBuilder;
     }
