@@ -75,7 +75,7 @@ class ListControllerTest extends \PHPUnit_Framework_TestCase
         $this->requestStack->method('getCurrentRequest')->willReturn($this->request);
     }
 
-    public function testDeleteActionIfCustomObjectNotFound(): void
+    public function testListActionIfCustomObjectNotFound(): void
     {
         $this->customObjectModel->expects($this->once())
             ->method('fetchEntity')
@@ -87,7 +87,7 @@ class ListControllerTest extends \PHPUnit_Framework_TestCase
         $this->listController->listAction(self::OBJECT_ID, self::PAGE);
     }
 
-    public function testDeleteActionIfForbidden(): void
+    public function testListActionIfForbidden(): void
     {
         $this->permissionProvider->expects($this->once())
             ->method('canViewAtAll')
@@ -101,7 +101,7 @@ class ListControllerTest extends \PHPUnit_Framework_TestCase
         $this->listController->listAction(self::OBJECT_ID, self::PAGE);
     }
 
-    public function testDeleteAction(): void
+    public function testListAction(): void
     {
         $pageLimit    = 10;
         $customObject = $this->createMock(CustomObject::class);
