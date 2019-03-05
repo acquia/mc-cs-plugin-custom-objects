@@ -152,7 +152,7 @@ class TableConfig
     }
 
     /**
-     * @return TableFilterConfig[]
+     * @return mixed[]
      */
     public function getFilters(): array
     {

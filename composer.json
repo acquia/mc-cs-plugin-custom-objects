@@ -27,7 +27,7 @@
             "@csfixer"
         ],
         "phpunit": "../../bin/phpunit -d memory_limit=2048M --bootstrap ../../vendor/autoload.php --configuration ../../app/phpunit.xml.dist --fail-on-warning --filter CustomObjectsBundle",
-        "phpstan": "vendor/bin/phpstan analyse --autoload-file=../../vendor/autoload.php --level=2 Command Config Controller CustomFieldType DTO Entity Event EventListener Exception Form Helper Migration Migrations Model Provider Repository Security Segment Tests",
+        "phpstan": "vendor/bin/phpstan analyse --autoload-file=../../vendor/autoload.php --level=3 Command Config Controller CustomFieldType DTO Entity Event EventListener Exception Form Helper Migration Migrations Model Provider Repository Security Segment Tests",
         "csfixer": "vendor/bin/ecs check .",
         "fixcs": "vendor/bin/ecs check . --fix"
     }
