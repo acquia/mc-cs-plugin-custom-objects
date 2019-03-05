@@ -5,12 +5,16 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Segment\Query\Filter;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Tools\SchemaTool;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
+use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Tests\DataFixtures\Traits\FixtureObjectsTrait;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class CustomFieldFilterQueryBuilderTest extends WebTestCase
 {
@@ -66,7 +70,11 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
 
     public function testApplyQuery(): void
     {
-        $queryBuilderService = new CustomFieldFilterQueryBuilder(new RandomParameterName());
+        $dispatcher        = $this->getContainer()->get('event_dispatcher');
+        $fieldTypeProvider = new CustomFieldTypeProvider($dispatcher);
+        $queryHelper       = new QueryFilterHelper($fieldTypeProvider);
+
+        $queryBuilderService = new CustomFieldFilterQueryBuilder(new RandomParameterName(), $queryHelper);
 
         $filterMock = $this->createSegmentFilterMock('hate');
 

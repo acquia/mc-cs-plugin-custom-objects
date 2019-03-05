@@ -252,7 +252,6 @@ final class QueryFilterHelper
      */
     private function getCustomValueValueExpression(QueryBuilder $customQuery, $tableAlias, $operator)
     {
-        var_dump($operator);
         switch ($operator) {
             case 'empty':
             case 'notEmpty':
