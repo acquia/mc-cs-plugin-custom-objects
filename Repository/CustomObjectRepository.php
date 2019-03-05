@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Repository;
 
-use Mautic\CoreBundle\Entity\CommonRepository;
-
-class CustomObjectRepository extends CommonRepository
+class CustomObjectRepository extends AbstractTableRepository
 {
+    public const TABLE_ALIAS = 'CustomObject';
 }

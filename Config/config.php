@@ -394,8 +394,7 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\ListController::class,
                 'arguments' => [
                     'request_stack',
-                    'session',
-                    'mautic.helper.core_parameters',
+                    'custom_object.session.provider',
                     'mautic.custom.model.object',
                     'custom_object.permission.provider',
                     'custom_object.route.provider',
