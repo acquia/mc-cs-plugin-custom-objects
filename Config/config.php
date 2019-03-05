@@ -442,20 +442,6 @@ return [
                     ],
                 ],
             ],
-            'custom_object.clone_controller' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\CloneController::class,
-                'arguments' => [
-                    'form.factory',
-                    'mautic.custom.model.object',
-                    'custom_object.permission.provider',
-                    'custom_object.route.provider',
-                ],
-                'methodCalls' => [
-                    'setContainer' => [
-                        '@service_container',
-                    ],
-                ],
-            ],
             'custom_object.save_controller' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\SaveController::class,
                 'arguments' => [
