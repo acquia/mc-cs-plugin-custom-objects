@@ -476,8 +476,8 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\DeleteController::class,
                 'arguments' => [
                     'mautic.custom.model.object',
-                    'session',
-                    'translator',
+                    'custom_object.session.provider',
+                    'mautic.core.service.flashbag',
                     'custom_object.permission.provider',
                 ],
                 'methodCalls' => [
