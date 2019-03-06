@@ -285,8 +285,6 @@ CustomObjectsForm = {
                 let params = JSON.parse(value);
 
                 for(key in params){
-                    console.log(params[key]);
-
                     let target = '#custom_field_params_' + key;
                     mQuery('#objectFieldModal').find(target).val(params[key]);
                 }
