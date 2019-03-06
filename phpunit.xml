@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- http://www.phpunit.de/manual/current/en/appendixes.configuration.html -->
+<phpunit
+    backupGlobals               = "false"
+    backupStaticAttributes      = "false"
+    colors                      = "true"
+    convertErrorsToExceptions   = "true"
+    convertNoticesToExceptions  = "true"
+    convertWarningsToExceptions = "true"
+    processIsolation            = "false"
+    stopOnFailure               = "false"
+    syntaxCheck                 = "false"
+    bootstrap                   = "autoload.php" >
+
+    <testsuites>
+        <testsuite name="Custom Objects Test Suite">
+            <directory>Tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <php>
+        <server name="DB_HOST" value="127.0.0.1" />
+        <server name="DB_PORT" value="3306" />
+        <server name="DB_USER" value="root" />
+        <server name="DB_PASSWD" value="root" />
+        <server name="DB_NAME" value="mautic_unittests" />
+    </php>
+
+    <filter>
+        <whitelist>
+            <directory>*</directory>
+            <exclude>
+                <directory>Assets</directory>
+                <directory>Config</directory>
+                <directory>Migrations</directory>
+                <directory>Tests</directory>
+                <directory>Translations</directory>
+                <directory>vendor</directory>
+                <directory>Views</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+
+</phpunit>
