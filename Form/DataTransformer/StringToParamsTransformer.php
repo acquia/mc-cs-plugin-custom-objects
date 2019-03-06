@@ -15,6 +15,9 @@ use JMS\Serializer\Serializer;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use Symfony\Component\Form\DataTransformerInterface;
 
+/**
+ * Used to fill panel hidden field containing params in json
+ */
 class StringToParamsTransformer implements DataTransformerInterface
 {
     /**
@@ -38,7 +41,6 @@ class StringToParamsTransformer implements DataTransformerInterface
      */
     public function transform($params)
     {
-        return $params;
         return $this->serializer->deserialize($params, Params::class, 'json');
     }
 
@@ -51,7 +53,6 @@ class StringToParamsTransformer implements DataTransformerInterface
      */
     public function reverseTransform($params)
     {
-        return $params;
         return $this->serializer->serialize($params, 'json');
     }
 }

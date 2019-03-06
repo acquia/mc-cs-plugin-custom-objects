@@ -456,6 +456,7 @@ return [
                     'custom_object.permission.provider',
                     'custom_object.route.provider',
                     'custom_field.type.provider',
+                    'custom_field.field.string.to.params.transformer',
                 ],
                 'methodCalls' => [
                     'setContainer' => [

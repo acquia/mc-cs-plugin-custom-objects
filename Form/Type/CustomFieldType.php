@@ -161,7 +161,7 @@ class CustomFieldType extends AbstractType
                 'params',
                 CustomFieldParamsType::class
             )
-            ->addModelTransformer($this->stringToParamsTransformer)
+//            ->addModelTransformer($this->stringToParamsTransformer)
         );
 
         $builder->add(
