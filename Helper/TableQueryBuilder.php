@@ -17,6 +17,7 @@ use Doctrine\ORM\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use MauticPlugin\CustomObjectsBundle\DTO\TableFilterConfig;
+use Doctrine\ORM\Query\Expr\Comparison;
 
 class TableQueryBuilder
 {
@@ -102,16 +103,26 @@ class TableQueryBuilder
         if ('orX' === $filter->getExpression() && is_array($filter->getValue())) {
             $expr = $this->queryBuilder->expr()->orX();
             foreach ($filter->getValue() as $orFilter) {
-                $exprOr = $this->queryBuilder->expr()->{$orFilter->getExpression()}($orFilter->getFullColumnName(), ':'.$orFilter->getColumnName());
-                $this->queryBuilder->setParameter($orFilter->getColumnName(), $orFilter->getValue());
-                $expr->add($exprOr);
+                $expr->add($this->createExpr($orFilter));
             }
         } else {
-            $expr = $this->queryBuilder->expr()->{$filter->getExpression()}($filter->getFullColumnName(), ':'.$filter->getColumnName());
-            $this->queryBuilder->setParameter($filter->getColumnName(), $filter->getValue());
+            $expr = $this->createExpr($filter);
         }
 
         $this->queryBuilder->andWhere($expr);
+    }
+
+    /**
+     * @param TableFilterConfig $filter
+     *
+     * @return Comparison
+     */
+    private function createExpr(TableFilterConfig $filter): Comparison
+    {
+        $expr = $this->queryBuilder->expr()->{$filter->getExpression()}($filter->getFullColumnName(), ':'.$filter->getColumnName());
+        $this->queryBuilder->setParameter($filter->getColumnName(), $filter->getValue());
+
+        return $expr;
     }
 
     /**
