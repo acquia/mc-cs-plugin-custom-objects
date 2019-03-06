@@ -11,25 +11,37 @@
 
 namespace MauticPlugin\CustomObjectsBundle\Form\DataTransformer;
 
+use JMS\Serializer\Serializer;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Component\Form\Exception\TransformationFailedException;
 
-class ParamsToJsonTransformer implements DataTransformerInterface
+class ParamsToStringTransformer implements DataTransformerInterface
 {
+    /**
+     * @var Serializer
+     */
+    private $serializer;
+
+    /**
+     * @param Serializer $serializer
+     */
+    public function __construct(Serializer $serializer)
+    {
+        $this->serializer = $serializer;
+    }
+
     /**
      * Transforms an object (Params) to a string (json).
      *
      * @param Params $params
      *
-     * @return array
+     * @return string
      */
     public function transform($params)
     {
-        $params = json_encode($params);
+        $params = $this->serializer->serialize($params->__toArray(), 'json');
 
         return $params;
-
     }
 
     /**
@@ -37,11 +49,10 @@ class ParamsToJsonTransformer implements DataTransformerInterface
      *
      * @param  string $params
      * @return Params
-     * @throws TransformationFailedException if object (issue) is not found.
      */
     public function reverseTransform($params)
     {
-        $params = json_decode($params);
+        $params = $this->serializer->deserialize($params, Params::class, 'json');
 
         return $params;
     }

@@ -714,12 +714,22 @@ return [
                 'arguments' => [
                     'custom_object.repository',
                     'custom_field.type.provider',
-                    'custom_field.field.params.transformer',
+                    'custom_field.field.params.to.string.transformer',
+                    'custom_field.field.string.to.params.transformer',
                 ],
                 'tag' => 'form.type',
             ],
-            'custom_field.field.params.transformer' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToJsonTransformer::class
+            'custom_field.field.params.to.string.transformer' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransformer::class,
+                'arguments' => [
+                    'jms_serializer'
+                ],
+            ],
+            'custom_field.field.string.to.params.transformer' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Form\DataTransformer\StringToParamsTransformer::class,
+                'arguments' => [
+                    'jms_serializer'
+                ],
             ],
             'custom_object.object.form' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType::class,

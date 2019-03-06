@@ -15,7 +15,8 @@ namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use MauticPlugin\CustomObjectsBundle\Form\CustomObjectHiddenTransformer;
-use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToJsonTransformer;
+use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransformer;
+use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\StringToParamsTransformer;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\Form\AbstractType;
@@ -41,23 +42,31 @@ class CustomFieldType extends AbstractType
     private $customFieldTypeProvider;
 
     /**
-     * @var ParamsToJsonTransformer
+     * @var ParamsToStringTransformer
      */
-    private $paramsToJsonTransformer;
+    private $paramsToStringTransformer;
 
     /**
-     * @param CustomObjectRepository  $customObjectRepository
-     * @param CustomFieldTypeProvider $customFieldTypeProvider
-     * @param ParamsToJsonTransformer $paramsToJsonTransformer
+     * @var StringToParamsTransformer
+     */
+    private $stringToParamsTransformer;
+
+    /**
+     * @param CustomObjectRepository    $customObjectRepository
+     * @param CustomFieldTypeProvider   $customFieldTypeProvider
+     * @param ParamsToStringTransformer $paramsToStringTransformer
+     * @param StringToParamsTransformer $stringToParamsTransformer
      */
     public function __construct(
         CustomObjectRepository $customObjectRepository,
         CustomFieldTypeProvider $customFieldTypeProvider,
-        ParamsToJsonTransformer $paramsToJsonTransformer
+        ParamsToStringTransformer $paramsToStringTransformer,
+        StringToParamsTransformer $stringToParamsTransformer
     ) {
         $this->customObjectRepository  = $customObjectRepository;
         $this->customFieldTypeProvider = $customFieldTypeProvider;
-        $this->paramsToJsonTransformer = $paramsToJsonTransformer;
+        $this->paramsToStringTransformer = $paramsToStringTransformer;
+        $this->stringToParamsTransformer = $stringToParamsTransformer;
     }
 
     /**
@@ -152,6 +161,7 @@ class CustomFieldType extends AbstractType
                 'params',
                 CustomFieldParamsType::class
             )
+            ->addModelTransformer($this->stringToParamsTransformer)
         );
 
         $builder->add(
@@ -248,7 +258,7 @@ class CustomFieldType extends AbstractType
                 [
                 ]
             )
-            ->addModelTransformer($this->paramsToJsonTransformer)
+            ->addModelTransformer($this->paramsToStringTransformer)
         );
 
         // Possibility to mark field as deleted in POST data

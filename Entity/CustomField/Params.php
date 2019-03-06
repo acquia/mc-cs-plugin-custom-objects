@@ -45,4 +45,16 @@ class Params
     {
         $this->requiredValidationMessage = $requiredValidationMessage;
     }
+
+    /**
+     * Used as data source for json serialization
+     *
+     * @return array
+     */
+    public function __toArray(): array
+    {
+        return [
+            'requiredValidationMessage' => $this->requiredValidationMessage
+        ];
+    }
 }
