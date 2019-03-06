@@ -134,8 +134,8 @@ class CampaignSubscriber extends CommonSubscriber
             return;
         }
 
-        $linkCustomItemId   = ArrayHelper::getValue('linkCustomItemId', $event->getConfig());
-        $unlinkCustomItemId = ArrayHelper::getValue('unlinkCustomItemId', $event->getConfig());
+        $linkCustomItemId   = (int) ArrayHelper::getValue('linkCustomItemId', $event->getConfig());
+        $unlinkCustomItemId = (int) ArrayHelper::getValue('unlinkCustomItemId', $event->getConfig());
         $contactId          = (int) $event->getLead()->getId();
 
         if ($linkCustomItemId) {
@@ -169,7 +169,7 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         try {
-            $customField = $this->customFieldModel->fetchEntity($event->getConfig()['field']);
+            $customField = $this->customFieldModel->fetchEntity((int) $event->getConfig()['field']);
         } catch (NotFoundException $e) {
             $event->setResult(false);
 
