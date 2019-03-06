@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Doctrine\Common\EventSubscriber;
+use Doctrine\ORM\Events;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
@@ -42,8 +43,8 @@ class CustomFieldSubscriber implements EventSubscriber
     public function getSubscribedEvents(): array
     {
         return [
-            'postLoad',
-            'prePersist',
+            Events::postLoad,
+            Events::prePersist,
         ];
     }
 
@@ -68,12 +69,13 @@ class CustomFieldSubscriber implements EventSubscriber
      */
     public function prePersist(LifecycleEventArgs $args): void
     {
+        // @todo not called
         $customField = $args->getObject();
 
         if (!$customField instanceof CustomField) {
             return;
         }
 
-        $customField->setParams((array) $customField->getParamsObject());
+        // @todo Param object conversion to array needed
     }
 }

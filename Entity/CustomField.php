@@ -290,7 +290,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @return Params|array
      */
-    public function getParams(): Params
+    public function getParams()
     {
         if ($this->params) {
             return $this->params;
