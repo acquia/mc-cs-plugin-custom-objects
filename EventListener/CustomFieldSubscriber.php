@@ -69,7 +69,7 @@ class CustomFieldSubscriber implements EventSubscriber
      */
     public function prePersist(LifecycleEventArgs $args): void
     {
-        // @todo not called
+        // @todo not called, probably no change in custom field / custom object
         $customField = $args->getObject();
 
         if (!$customField instanceof CustomField) {
