@@ -18,7 +18,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 class ParamsToJsonTransformer implements DataTransformerInterface
 {
     /**
-     * Transforms an object (issue) to a string (number).
+     * Transforms an object (Params) to a string (json).
      *
      * @param Params $params
      *
@@ -33,7 +33,7 @@ class ParamsToJsonTransformer implements DataTransformerInterface
     }
 
     /**
-     * Transforms a string (number) to an object (issue).
+     * Transforms a string (json) to an object (Params).
      *
      * @param  string $params
      * @return Params
