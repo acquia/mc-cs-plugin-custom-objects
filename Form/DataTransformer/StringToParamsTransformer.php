@@ -41,7 +41,10 @@ class StringToParamsTransformer implements DataTransformerInterface
      */
     public function transform($params)
     {
-        return $this->serializer->deserialize($params, Params::class, 'json');
+        $params = json_decode($params, true);
+        $params = new Params($params);
+
+        return $params;
     }
 
     /**
