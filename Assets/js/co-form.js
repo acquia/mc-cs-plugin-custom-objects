@@ -278,11 +278,22 @@ CustomObjectsForm = {
 
             let value = mQuery(input).val();
             let id = mQuery(input).attr('id');
-            let inputName = id.slice(id.lastIndexOf('_') + 1, id.length);
-            let target = '#custom_field_' + inputName;
+            let propertyName = id.slice(id.lastIndexOf('_') + 1, id.length);
+            let target = '#custom_field_' + propertyName;
 
-            mQuery('#objectFieldModal').find(target).val(value);
+            if (propertyName === 'params') {
+                let params = JSON.parse(value);
 
+                for(key in params){
+                    console.log(params[key]);
+
+                    let target = '#custom_field_params_' + key;
+                    mQuery('#objectFieldModal').find(target).val(params[key]);
+                }
+
+            } else {
+                mQuery('#objectFieldModal').find(target).val(value);
+            }
         });
     },
 
