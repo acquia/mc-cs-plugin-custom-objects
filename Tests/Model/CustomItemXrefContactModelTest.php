@@ -16,7 +16,6 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Model;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use Mautic\UserBundle\Entity\User;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\AbstractQuery;
@@ -34,8 +33,6 @@ class CustomItemXrefContactModelTest extends \PHPUnit_Framework_TestCase
     private $customItem;
 
     private $customItemXrefContact;
-
-    private $user;
 
     private $entityManager;
 
@@ -55,7 +52,6 @@ class CustomItemXrefContactModelTest extends \PHPUnit_Framework_TestCase
 
         $this->customItem                   = $this->createMock(CustomItem::class);
         $this->customItemXrefContact        = $this->createMock(CustomItemXrefContact::class);
-        $this->user                         = $this->createMock(User::class);
         $this->entityManager                = $this->createMock(EntityManager::class);
         $this->queryBuilder                 = $this->createMock(QueryBuilder::class);
         $this->query                        = $this->createMock(AbstractQuery::class);
@@ -160,7 +156,7 @@ class CustomItemXrefContactModelTest extends \PHPUnit_Framework_TestCase
                 ['customItemId', $customItemId],
                 ['contactId', $contactId]
             );
-        
+
         $this->query->expects($this->once())
             ->method('getSingleResult')
             ->willReturn($this->customItemXrefContact);

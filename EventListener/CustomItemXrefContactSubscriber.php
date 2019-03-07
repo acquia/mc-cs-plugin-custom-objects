@@ -41,8 +41,7 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
     public function __construct(
         EntityManager $entityManager,
         UserHelper $userHelper
-    )
-    {
+    ) {
         $this->entityManager = $entityManager;
         $this->userHelper    = $userHelper;
     }
@@ -53,7 +52,7 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
     public static function getSubscribedEvents(): array
     {
         return [
-            CustomItemEvents::ON_CUSTOM_ITEM_LINK_CONTACT => 'onLinkedContact',
+            CustomItemEvents::ON_CUSTOM_ITEM_LINK_CONTACT   => 'onLinkedContact',
             CustomItemEvents::ON_CUSTOM_ITEM_UNLINK_CONTACT => 'onUnlinkedContact',
         ];
     }

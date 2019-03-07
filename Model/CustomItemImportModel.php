@@ -22,7 +22,6 @@ use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel;
 
 class CustomItemImportModel extends FormModel
 {

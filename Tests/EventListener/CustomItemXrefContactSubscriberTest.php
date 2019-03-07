@@ -77,7 +77,7 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->entityManager->expects($this->once())
             ->method('persist')
             ->with($this->callback($this->makePersistCallback('link')));
-        
+
         $this->entityManager->expects($this->once())
             ->method('flush');
 
@@ -89,7 +89,7 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->entityManager->expects($this->once())
             ->method('persist')
             ->with($this->callback($this->makePersistCallback('unlink')));
-        
+
         $this->entityManager->expects($this->once())
             ->method('flush');
 
@@ -98,7 +98,7 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param string $action
-     * 
+     *
      * @return callable
      */
     private function makePersistCallback(string $action): callable

@@ -31,14 +31,10 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\NoResultException;
-use Mautic\LeadBundle\Entity\Lead;
 
 class CustomItemModelTest extends \PHPUnit_Framework_TestCase
 {
     private $customItem;
-
-    private $customItemXrefContact;
 
     private $user;
 
@@ -69,7 +65,6 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
         parent::setUp();
 
         $this->customItem                   = $this->createMock(CustomItem::class);
-        $this->customItemXrefContact        = $this->createMock(CustomItemXrefContact::class);
         $this->user                         = $this->createMock(User::class);
         $this->entityManager                = $this->createMock(EntityManager::class);
         $this->queryBuilder                 = $this->createMock(QueryBuilder::class);
