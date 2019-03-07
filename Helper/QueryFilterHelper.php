@@ -267,14 +267,15 @@ final class QueryFilterHelper
      */
     private function getCustomFieldType(QueryBuilder $queryBuilder, int $customFieldId): string
     {
-        $qb = $queryBuilder->getConnection()->
-        createQueryBuilder();
+        $qb = $queryBuilder->getConnection()->createQueryBuilder();
 
-        $customFieldData = $qb->select('f.*')->from(MAUTIC_TABLE_PREFIX.'custom_field', 'f')->where(
-            $qb->expr()->eq('f.id', $customFieldId)
-        )->getFirstResult();
+        $customFieldType = $qb->select('f.type')
+            ->from(MAUTIC_TABLE_PREFIX.'custom_field', 'f')
+            ->where($qb->expr()->eq('f.id', $customFieldId))
+            ->execute()
+            ->fetchColumn();
 
-        return $customFieldData['type'];
+        return $customFieldType ?? '';
     }
 
     /**
