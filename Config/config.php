@@ -377,6 +377,7 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\UnlinkController::class,
                 'arguments' => [
                     'mautic.custom.model.item',
+                    'mautic.custom.model.import.xref.contact',
                     'custom_item.permission.provider',
                     'mautic.core.service.flashbag',
                 ],
