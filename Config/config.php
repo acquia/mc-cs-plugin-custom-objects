@@ -525,6 +525,14 @@ return [
                     'mautic.helper.template.formatter',
                 ],
             ],
+            'mautic.custom.model.import.xref.contact' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'translator',
+                    'event_dispatcher',
+                ],
+            ],
             'mautic.custom.model.object' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel::class,
                 'arguments' => [
