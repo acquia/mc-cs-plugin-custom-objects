@@ -22,7 +22,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\UniqueEntityInterface;
 trait FixtureObjectsTrait
 {
     /**
-     * @var CommonEntity[]
+     * @var mixed[]
      */
     private $objects = [];
 
@@ -34,7 +34,7 @@ trait FixtureObjectsTrait
     /**
      * The result of loadFixtureFiles should be passed here to initialize the thread.
      *
-     * @param CommonEntity[] $objects
+     * @param mixed[] $objects
      */
     public function setFixtureObjects(array $objects): void
     {
@@ -47,7 +47,7 @@ trait FixtureObjectsTrait
     /**
      * @param string $type
      *
-     * @return CommonEntity[]
+     * @return mixed[]
      *
      * @throws FixtureNotFoundException
      */
@@ -98,7 +98,7 @@ trait FixtureObjectsTrait
     }
 
     /**
-     * @return CommonEntity[]
+     * @return mixed[]
      */
     public function getFixturesInUnloadableOrder(): array
     {
