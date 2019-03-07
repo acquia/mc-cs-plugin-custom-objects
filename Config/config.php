@@ -525,6 +525,7 @@ return [
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.custom.model.item',
+                    'mautic.custom.model.import.xref.contact',
                     'mautic.helper.template.formatter',
                 ],
             ],
