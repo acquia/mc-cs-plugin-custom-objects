@@ -51,29 +51,37 @@ class CampaignSubscriber extends CommonSubscriber
     private $customItemModel;
 
     /**
+     * @var CustomItemXrefContactModel
+     */
+    private $customItemXrefContactModel;
+
+    /**
      * @var ConfigProvider
      */
     private $configProvider;
 
     /**
-     * @param CustomFieldModel    $customFieldModel
-     * @param CustomObjectModel   $customObjectModel
-     * @param CustomItemModel     $customItemModel
-     * @param TranslatorInterface $translator
-     * @param ConfigProvider      $configProvider
+     * @param CustomFieldModel           $customFieldModel
+     * @param CustomObjectModel          $customObjectModel
+     * @param CustomItemModel            $customItemModel
+     * @param CustomItemXrefContactModel $customItemXrefContactModel
+     * @param TranslatorInterface        $translator
+     * @param ConfigProvider             $configProvider
      */
     public function __construct(
         CustomFieldModel $customFieldModel,
         CustomObjectModel $customObjectModel,
         CustomItemModel $customItemModel,
+        CustomItemXrefContactModel $customItemXrefContactModel,
         TranslatorInterface $translator,
         ConfigProvider $configProvider
     ) {
-        $this->customFieldModel  = $customFieldModel;
-        $this->customObjectModel = $customObjectModel;
-        $this->customItemModel   = $customItemModel;
-        $this->translator        = $translator;
-        $this->configProvider    = $configProvider;
+        $this->customFieldModel           = $customFieldModel;
+        $this->customObjectModel          = $customObjectModel;
+        $this->customItemModel            = $customItemModel;
+        $this->customItemXrefContactModel = $customItemXrefContactModel;
+        $this->translator                 = $translator;
+        $this->configProvider             = $configProvider;
     }
 
     /**
@@ -139,11 +147,11 @@ class CampaignSubscriber extends CommonSubscriber
         $contactId          = (int) $event->getLead()->getId();
 
         if ($linkCustomItemId) {
-            $this->customItemModel->linkContact($linkCustomItemId, $contactId);
+            $this->customItemXrefContactModel->linkContact($linkCustomItemId, $contactId);
         }
 
         if ($unlinkCustomItemId) {
-            $this->customItemModel->unlinkContact($unlinkCustomItemId, $contactId);
+            $this->customItemXrefContactModel->unlinkContact($unlinkCustomItemId, $contactId);
         }
     }
 
