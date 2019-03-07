@@ -13,52 +13,14 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Repository;
 
-use Mautic\CoreBundle\Entity\CommonRepository;
-use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
-use Doctrine\ORM\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
-class CustomItemRepository extends CommonRepository
+class CustomItemRepository extends AbstractTableRepository
 {
     public const TABLE_ALIAS = 'CustomItem';
-
-    /**
-     * @param TableConfig $tableConfig
-     *
-     * @return QueryBuilder
-     */
-    public function getTableDataQuery(TableConfig $tableConfig): QueryBuilder
-    {
-        $queryBuilder = $this->createQueryBuilder(self::TABLE_ALIAS, self::TABLE_ALIAS.'.id');
-
-        return $tableConfig->configureSelectQueryBuilder($queryBuilder, $this->getClassMetadata());
-    }
-
-    /**
-     * @param TableConfig $tableConfig
-     *
-     * @return QueryBuilder
-     */
-    public function getTableCountQuery(TableConfig $tableConfig): QueryBuilder
-    {
-        $queryBuilder = $this->createQueryBuilder(self::TABLE_ALIAS, self::TABLE_ALIAS.'.id');
-
-        return $tableConfig->configureCountQueryBuilder($queryBuilder, $this->getClassMetadata());
-    }
-
-    /**
-     * @param QueryBuilder $queryBuilder
-     * @param int          $userId
-     *
-     * @return QueryBuilder
-     */
-    public function applyOwnerId(QueryBuilder $queryBuilder, int $userId): QueryBuilder
-    {
-        return $queryBuilder->andWhere(self::TABLE_ALIAS.'.createdBy', $userId);
-    }
 
     /**
      * @param Lead         $contact
@@ -114,13 +76,5 @@ class CustomItemRepository extends CommonRepository
         }
 
         return (int) $result;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTableAlias(): string
-    {
-        return self::TABLE_ALIAS;
     }
 }

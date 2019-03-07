@@ -15,9 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
@@ -25,6 +23,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class ViewController extends CommonController
 {
@@ -34,7 +33,7 @@ class ViewController extends CommonController
     private $requestStack;
 
     /**
-     * @var FormFactory
+     * @var FormFactoryInterface
      */
     private $formFactory;
 
@@ -60,8 +59,7 @@ class ViewController extends CommonController
 
     /**
      * @param RequestStack                   $requestStack
-     * @param FormFactory                    $formFactory
-     * @param CoreParametersHelper           $coreParametersHelper
+     * @param FormFactoryInterface           $formFactory
      * @param CustomObjectModel              $customObjectModel
      * @param AuditLogModel                  $auditLogModel
      * @param CustomObjectPermissionProvider $permissionProvider
@@ -69,8 +67,7 @@ class ViewController extends CommonController
      */
     public function __construct(
         RequestStack $requestStack,
-        FormFactory $formFactory,
-        CoreParametersHelper $coreParametersHelper,
+        FormFactoryInterface $formFactory,
         CustomObjectModel $customObjectModel,
         AuditLogModel $auditLogModel,
         CustomObjectPermissionProvider $permissionProvider,
@@ -78,7 +75,6 @@ class ViewController extends CommonController
     ) {
         $this->requestStack         = $requestStack;
         $this->formFactory          = $formFactory;
-        $this->coreParametersHelper = $coreParametersHelper;
         $this->customObjectModel    = $customObjectModel;
         $this->auditLogModel        = $auditLogModel;
         $this->permissionProvider   = $permissionProvider;

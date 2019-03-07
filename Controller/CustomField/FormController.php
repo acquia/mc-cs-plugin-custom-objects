@@ -22,7 +22,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
 use Mautic\CoreBundle\Controller\CommonController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
@@ -96,9 +95,9 @@ class FormController extends CommonController
     /**
      * @param Request $request
      *
-     * @return Response|JsonResponse
+     * @return Response
      */
-    public function renderFormAction(Request $request)
+    public function renderFormAction(Request $request): Response
     {
         $objectId  = (int) $request->get('objectId');
         $fieldId   = (int) $request->get('fieldId');
@@ -130,7 +129,7 @@ class FormController extends CommonController
 
         return $this->delegateView(
             [
-                'returnUrl'      => $this->objectRouteProvider->buildFormRoute($customObject->getId()),
+                'returnUrl'      => $this->objectRouteProvider->buildEditRoute($customObject->getId()),
                 'viewParameters' => [
                     'customObject' => $customObject,
                     'customField'  => $customField,

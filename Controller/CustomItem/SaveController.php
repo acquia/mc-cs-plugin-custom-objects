@@ -26,6 +26,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Mautic\CoreBundle\Service\FlashBag;
+use Symfony\Component\HttpFoundation\Request;
 
 class SaveController extends CommonController
 {
@@ -138,7 +139,7 @@ class SaveController extends CommonController
             $detailView  = 'CustomObjectsBundle:CustomItem\View:view';
             $formView    = 'CustomObjectsBundle:CustomItem\Form:renderForm';
 
-            $request->setMethod('GET');
+            $request->setMethod(Request::METHOD_GET);
 
             return $this->forward(
                 $saveClicked ? $detailView : $formView,

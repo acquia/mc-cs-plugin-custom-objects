@@ -35,6 +35,11 @@ use Symfony\Component\Translation\TranslatorInterface;
 class CustomFieldTypeSubscriber extends CommonSubscriber
 {
     /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
+    /**
      * @param TranslatorInterface $translator
      */
     public function __construct(TranslatorInterface $translator)

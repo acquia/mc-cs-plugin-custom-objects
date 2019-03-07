@@ -21,22 +21,18 @@ use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\BatchDeleteController
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerDependenciesTrait;
+use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerTestCase;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Mautic\CoreBundle\Service\FlashBag;
 
-class BatchDeleteControllerTest extends \PHPUnit_Framework_TestCase
+class BatchDeleteControllerTest extends ControllerTestCase
 {
-    use ControllerDependenciesTrait;
-
-    private $requestStack;
     private $customItemModel;
     private $sessionprovider;
     private $flashBag;
     private $permissionProvider;
     private $routeProvider;
-    private $request;
 
     /**
      * @var BatchDeleteController

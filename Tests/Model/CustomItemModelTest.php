@@ -29,6 +29,8 @@ use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\AbstractQuery;
 
 class CustomItemModelTest extends \PHPUnit_Framework_TestCase
 {
@@ -37,6 +39,10 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
     private $user;
 
     private $entityManager;
+
+    private $queryBuilder;
+
+    private $query;
 
     private $customItemRepository;
 
@@ -61,6 +67,8 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
         $this->customItem                   = $this->createMock(CustomItem::class);
         $this->user                         = $this->createMock(User::class);
         $this->entityManager                = $this->createMock(EntityManager::class);
+        $this->queryBuilder                 = $this->createMock(QueryBuilder::class);
+        $this->query                        = $this->createMock(AbstractQuery::class);
         $this->customItemRepository         = $this->createMock(CustomItemRepository::class);
         $this->customItemPermissionProvider = $this->createMock(CustomItemPermissionProvider::class);
         $this->userHelper                   = $this->createMock(UserHelper::class);
@@ -78,6 +86,10 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
             $this->customFieldTypeProvider,
             $this->dispatcher
         );
+
+        $this->entityManager->method('createQueryBuilder')->willReturn($this->queryBuilder);
+        $this->queryBuilder->method('getQuery')->willReturn($this->query);
+        $this->userHelper->method('getUser')->willReturn($this->user);
     }
 
     public function testSaveNew(): void

@@ -11,39 +11,39 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\CustomObjectsBundle\Tests\Controller\CustomItem;
+namespace MauticPlugin\CustomObjectsBundle\Tests\Controller\CustomObject;
 
 use Symfony\Component\HttpFoundation\Request;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
-use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\SaveController;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Controller\CustomObject\SaveController;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerTestCase;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Mautic\CoreBundle\Service\FlashBag;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Form\FormFactoryInterface;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemType;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\ClickableInterface;
+use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
+use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerTestCase;
 
 class SaveControllerTest extends ControllerTestCase
 {
     private const OBJECT_ID = 33;
 
-    private const ITEM_ID = 22;
-
     private $formFactory;
-    private $customItemModel;
     private $customObjectModel;
+    private $customFieldModel;
+    private $customFieldTypeProvider;
     private $flashBag;
     private $permissionProvider;
     private $routeProvider;
-    private $customItem;
+    private $customObject;
     private $form;
 
     /**
@@ -55,32 +55,34 @@ class SaveControllerTest extends ControllerTestCase
     {
         parent::setUp();
 
-        $this->formFactory        = $this->createMock(FormFactoryInterface::class);
-        $this->customItemModel    = $this->createMock(CustomItemModel::class);
-        $this->customObjectModel  = $this->createMock(CustomObjectModel::class);
-        $this->flashBag           = $this->createMock(FlashBag::class);
-        $this->permissionProvider = $this->createMock(CustomItemPermissionProvider::class);
-        $this->routeProvider      = $this->createMock(CustomItemRouteProvider::class);
-        $this->requestStack       = $this->createMock(RequestStack::class);
-        $this->request            = $this->createMock(Request::class);
-        $this->customItem         = $this->createMock(CustomItem::class);
-        $this->form               = $this->createMock(FormInterface::class);
-        $this->saveController     = new SaveController(
+        $this->formFactory             = $this->createMock(FormFactoryInterface::class);
+        $this->customObjectModel       = $this->createMock(CustomObjectModel::class);
+        $this->customFieldModel        = $this->createMock(CustomFieldModel::class);
+        $this->flashBag                = $this->createMock(FlashBag::class);
+        $this->permissionProvider      = $this->createMock(CustomObjectPermissionProvider::class);
+        $this->routeProvider           = $this->createMock(CustomObjectRouteProvider::class);
+        $this->requestStack            = $this->createMock(RequestStack::class);
+        $this->customFieldTypeProvider = $this->createMock(CustomFieldTypeProvider::class);
+        $this->request                 = $this->createMock(Request::class);
+        $this->customObject            = $this->createMock(CustomObject::class);
+        $this->form                    = $this->createMock(FormInterface::class);
+        $this->saveController          = new SaveController(
             $this->requestStack,
-            $this->formFactory,
             $this->flashBag,
-            $this->customItemModel,
+            $this->formFactory,
             $this->customObjectModel,
+            $this->customFieldModel,
             $this->permissionProvider,
-            $this->routeProvider
+            $this->routeProvider,
+            $this->customFieldTypeProvider
         );
 
         $this->addSymfonyDependencies($this->saveController);
     }
 
-    public function testSaveActionIfExistingCustomItemNotFound(): void
+    public function testSaveActionIfExistingCustomObjectNotFound(): void
     {
-        $this->customItemModel->expects($this->once())
+        $this->customObjectModel->expects($this->once())
             ->method('fetchEntity')
             ->will($this->throwException(new NotFoundException()));
 
@@ -90,14 +92,14 @@ class SaveControllerTest extends ControllerTestCase
         $this->permissionProvider->expects($this->never())
             ->method('canCreate');
 
-        $this->saveController->saveAction(self::OBJECT_ID, self::ITEM_ID);
+        $this->saveController->saveAction(self::OBJECT_ID);
     }
 
-    public function testSaveActionIfExistingCustomItemIsForbidden(): void
+    public function testSaveActionIfExistingCustomObjectIsForbidden(): void
     {
-        $this->customItemModel->expects($this->once())
+        $this->customObjectModel->expects($this->once())
             ->method('fetchEntity')
-            ->willReturn($this->customItem);
+            ->willReturn($this->customObject);
 
         $this->permissionProvider->expects($this->once())
             ->method('canEdit')
@@ -108,22 +110,22 @@ class SaveControllerTest extends ControllerTestCase
 
         $this->expectException(AccessDeniedHttpException::class);
 
-        $this->saveController->saveAction(self::OBJECT_ID, self::ITEM_ID);
+        $this->saveController->saveAction(self::OBJECT_ID);
     }
 
-    public function testSaveActionForExistingCustomItemWithValidForm(): void
+    public function testSaveActionForExistingCustomObjectWithValidForm(): void
     {
-        $this->customItem->expects($this->once())
+        $this->customObject->expects($this->once())
             ->method('getName')
             ->willReturn('Umpalumpa');
 
-        $this->customItem->expects($this->exactly(2))
+        $this->customObject->expects($this->once())
             ->method('getId')
-            ->willReturn(self::ITEM_ID);
+            ->willReturn(self::OBJECT_ID);
 
-        $this->customItemModel->expects($this->once())
+        $this->customObjectModel->expects($this->once())
             ->method('fetchEntity')
-            ->willReturn($this->customItem);
+            ->willReturn($this->customObject);
 
         $this->permissionProvider->expects($this->once())
             ->method('canEdit');
@@ -133,23 +135,20 @@ class SaveControllerTest extends ControllerTestCase
 
         $this->routeProvider->expects($this->exactly(2))
             ->method('buildEditRoute')
-            ->with(self::OBJECT_ID, self::ITEM_ID)
-            ->willReturn('https://edit.item');
+            ->with(self::OBJECT_ID)
+            ->willReturn('https://edit.object');
 
         $this->routeProvider->expects($this->once())
             ->method('buildSaveRoute')
-            ->with(self::OBJECT_ID, self::ITEM_ID)
-            ->willReturn('https://save.item');
+            ->with(self::OBJECT_ID)
+            ->willReturn('https://save.object');
 
         $this->formFactory->expects($this->once())
             ->method('create')
             ->with(
-                CustomItemType::class,
-                $this->customItem,
-                [
-                    'action'   => 'https://save.item',
-                    'objectId' => self::OBJECT_ID,
-                ]
+                CustomObjectType::class,
+                $this->customObject,
+                ['action' => 'https://save.object']
             )
             ->willReturn($this->form);
 
@@ -171,9 +170,9 @@ class SaveControllerTest extends ControllerTestCase
             ->with('save')
             ->willReturn($this->createMock(ClickableInterface::class));
 
-        $this->customItemModel->expects($this->once())
+        $this->customObjectModel->expects($this->once())
             ->method('save')
-            ->with($this->customItem);
+            ->with($this->customObject);
 
         $this->flashBag->expects($this->once())
             ->method('add')
@@ -181,37 +180,18 @@ class SaveControllerTest extends ControllerTestCase
                 'mautic.core.notice.updated',
                 [
                     '%name%' => 'Umpalumpa',
-                    '%url%'  => 'https://edit.item',
+                    '%url%'  => 'https://edit.object',
                 ]
             );
 
-        $this->request->expects($this->once())
-            ->method('setMethod')
-            ->with(Request::METHOD_GET);
-
-        $this->saveController->saveAction(self::OBJECT_ID, self::ITEM_ID);
-    }
-
-    public function testSaveActionIfNewCustomItemIsForbidden(): void
-    {
-        $this->customItemModel->expects($this->never())
-            ->method('fetchEntity');
-
-        $this->permissionProvider->expects($this->once())
-            ->method('canCreate')
-            ->will($this->throwException(new ForbiddenException('create')));
-
-        $this->expectException(AccessDeniedHttpException::class);
+        $this->customFieldModel->expects($this->never())
+            ->method('fetchCustomFieldsForObject');
 
         $this->saveController->saveAction(self::OBJECT_ID);
     }
 
-    public function testSaveActionForNewCustomItemWithInvalidForm(): void
+    public function testSaveActionForNewCustomObjectWithInvalidForm(): void
     {
-        $this->customItemModel->expects($this->once())
-            ->method('populateCustomFields')
-            ->willReturn($this->customItem);
-
         $this->permissionProvider->expects($this->never())
             ->method('canEdit');
 
@@ -220,23 +200,20 @@ class SaveControllerTest extends ControllerTestCase
 
         $this->routeProvider->expects($this->once())
             ->method('buildNewRoute')
-            ->with(self::OBJECT_ID)
-            ->willReturn('https://create.item');
+            ->with()
+            ->willReturn('https://create.object');
 
         $this->routeProvider->expects($this->once())
             ->method('buildSaveRoute')
-            ->with(self::OBJECT_ID, null)
-            ->willReturn('https://save.item');
+            ->with(null)
+            ->willReturn('https://save.object');
 
         $this->formFactory->expects($this->once())
             ->method('create')
             ->with(
-                CustomItemType::class,
-                $this->customItem,
-                [
-                    'action'   => 'https://save.item',
-                    'objectId' => self::OBJECT_ID,
-                ]
+                CustomObjectType::class,
+                $this->isInstanceOf(CustomObject::class),
+                ['action' => 'https://save.object']
             )
             ->willReturn($this->form);
 
@@ -248,9 +225,16 @@ class SaveControllerTest extends ControllerTestCase
             ->method('isValid')
             ->willReturn(false);
 
-        $this->customItemModel->expects($this->never())
+        $this->customObjectModel->expects($this->never())
             ->method('save');
 
-        $this->saveController->saveAction(self::OBJECT_ID);
+        $this->customFieldModel->expects($this->once())
+            ->method('fetchCustomFieldsForObject')
+            ->with($this->isInstanceOf(CustomObject::class));
+
+        $this->customFieldTypeProvider->expects($this->once())
+            ->method('getTypes');
+
+        $this->saveController->saveAction();
     }
 }

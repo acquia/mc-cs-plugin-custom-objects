@@ -16,20 +16,18 @@ namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Form\FormFactory;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Controller\CommonController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
+use Mautic\CoreBundle\Service\FlashBag;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class SaveController extends CommonController
 {
@@ -39,12 +37,12 @@ class SaveController extends CommonController
     private $requestStack;
 
     /**
-     * @var Session
+     * @var FlashBag
      */
-    private $session;
+    private $flashBag;
 
     /**
-     * @var FormFactory
+     * @var FormFactoryInterface
      */
     private $formFactory;
 
@@ -75,9 +73,8 @@ class SaveController extends CommonController
 
     /**
      * @param RequestStack                   $requestStack
-     * @param Session                        $session
-     * @param FormFactory                    $formFactory
-     * @param TranslatorInterface            $translator
+     * @param FlashBag                       $flashBag
+     * @param FormFactoryInterface           $formFactory
      * @param CustomObjectModel              $customObjectModel
      * @param CustomFieldModel               $customFieldModel
      * @param CustomObjectPermissionProvider $permissionProvider
@@ -86,9 +83,8 @@ class SaveController extends CommonController
      */
     public function __construct(
         RequestStack $requestStack,
-        Session $session,
-        FormFactory $formFactory,
-        TranslatorInterface $translator,
+        FlashBag $flashBag,
+        FormFactoryInterface $formFactory,
         CustomObjectModel $customObjectModel,
         CustomFieldModel $customFieldModel,
         CustomObjectPermissionProvider $permissionProvider,
@@ -96,9 +92,8 @@ class SaveController extends CommonController
         CustomFieldTypeProvider $customFieldTypeProvider
     ) {
         $this->requestStack            = $requestStack;
-        $this->session                 = $session;
+        $this->flashBag                = $flashBag;
         $this->formFactory             = $formFactory;
-        $this->translator              = $translator;
         $this->customObjectModel       = $customObjectModel;
         $this->customFieldModel        = $customFieldModel;
         $this->permissionProvider      = $permissionProvider;
@@ -109,9 +104,9 @@ class SaveController extends CommonController
     /**
      * @param int|null $objectId
      *
-     * @return Response|JsonResponse
+     * @return Response
      */
-    public function saveAction(?int $objectId = null)
+    public function saveAction(?int $objectId = null): Response
     {
         try {
             $customObject = $objectId ? $this->customObjectModel->fetchEntity($objectId) : new CustomObject();
@@ -148,23 +143,19 @@ class SaveController extends CommonController
 
             $this->customObjectModel->save($customObject);
 
-            $this->session->getFlashBag()->add(
-                'notice',
-                $this->translator->trans(
-                    $objectId ? 'mautic.core.notice.updated' : 'mautic.core.notice.created',
-                    [
-                        '%name%' => $customObject->getName(),
-                        '%url%'  => $this->routeProvider->buildFormRoute($objectId),
-                    ],
-                    'flashes'
-                )
+            $this->flashBag->add(
+                $objectId ? 'mautic.core.notice.updated' : 'mautic.core.notice.created',
+                [
+                    '%name%' => $customObject->getName(),
+                    '%url%'  => $this->routeProvider->buildEditRoute($objectId),
+                ]
             );
 
             if ($form->get('buttons')->get('save')->isClicked()) {
                 return $this->forwardToDetail($request, $customObject);
             }
 
-            return $this->redirect($this->routeProvider->buildFormRoute($customObject->getId()));
+            return $this->redirect($this->routeProvider->buildEditRoute($customObject->getId()));
         }
 
         return $this->delegateView(
@@ -180,7 +171,7 @@ class SaveController extends CommonController
                 'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.php',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
-                    'route'         => $this->routeProvider->buildFormRoute($customObject->getId()),
+                    'route'         => $objectId ? $this->routeProvider->buildEditRoute($customObject->getId()) : $this->routeProvider->buildNewRoute(),
                 ],
             ]
         );

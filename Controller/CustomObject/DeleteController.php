@@ -17,11 +17,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Controller\CommonController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectSessionProvider;
+use Mautic\CoreBundle\Service\FlashBag;
 
 class DeleteController extends CommonController
 {
@@ -31,9 +31,14 @@ class DeleteController extends CommonController
     private $customObjectModel;
 
     /**
-     * @var Session
+     * @var CustomObjectSessionProvider
      */
-    private $session;
+    private $sessionProvider;
+
+    /**
+     * @var FlashBag
+     */
+    private $flashBag;
 
     /**
      * @var CustomObjectPermissionProvider
@@ -42,19 +47,19 @@ class DeleteController extends CommonController
 
     /**
      * @param CustomObjectModel              $customObjectModel
-     * @param Session                        $session
-     * @param TranslatorInterface            $translator
+     * @param CustomObjectSessionProvider    $sessionProvider
+     * @param FlashBag                       $flashBag
      * @param CustomObjectPermissionProvider $permissionProvider
      */
     public function __construct(
         CustomObjectModel $customObjectModel,
-        Session $session,
-        TranslatorInterface $translator,
+        CustomObjectSessionProvider $sessionProvider,
+        FlashBag $flashBag,
         CustomObjectPermissionProvider $permissionProvider
     ) {
         $this->customObjectModel  = $customObjectModel;
-        $this->session            = $session;
-        $this->translator         = $translator;
+        $this->sessionProvider    = $sessionProvider;
+        $this->flashBag           = $flashBag;
         $this->permissionProvider = $permissionProvider;
     }
 
@@ -76,21 +81,17 @@ class DeleteController extends CommonController
 
         $this->customObjectModel->delete($customObject);
 
-        $this->session->getFlashBag()->add(
-            'notice',
-            $this->translator->trans(
-                'mautic.core.notice.deleted',
-                [
-                    '%name%' => $customObject->getName(),
-                    '%id%'   => $customObject->getId(),
-                ],
-                'flashes'
-            )
+        $this->flashBag->add(
+            'mautic.core.notice.deleted',
+            [
+                '%name%' => $customObject->getName(),
+                '%id%'   => $customObject->getId(),
+            ]
         );
 
         return $this->forward(
             'CustomObjectsBundle:CustomObject\List:list',
-            ['page' => $this->session->get('custom.object.page', 1)]
+            ['page' => $this->sessionProvider->getPage()]
         );
     }
 }

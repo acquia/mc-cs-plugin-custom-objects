@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Form\FormFactory;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
@@ -24,6 +23,8 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Symfony\Component\Form\FormFactoryInterface;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel;
 
 class ViewController extends CommonController
 {
@@ -36,6 +37,11 @@ class ViewController extends CommonController
      * @var CustomItemModel
      */
     private $customItemModel;
+
+    /**
+     * @var CustomItemXrefContactModel
+     */
+    private $customItemXrefContactModel;
 
     /**
      * @var AuditLogModel
@@ -53,32 +59,35 @@ class ViewController extends CommonController
     private $routeProvider;
 
     /**
-     * @var FormFactory
+     * @var FormFactoryInterface
      */
     private $formFactory;
 
     /**
      * @param RequestStack                 $requestStack
-     * @param FormFactory                  $formFactory
+     * @param FormFactoryInterface         $formFactory
      * @param CustomItemModel              $customItemModel
+     * @param CustomItemXrefContactModel   $customItemXrefContactModel
      * @param AuditLogModel                $auditLogModel
      * @param CustomItemPermissionProvider $permissionProvider
      * @param CustomItemRouteProvider      $routeProvider
      */
     public function __construct(
         RequestStack $requestStack,
-        FormFactory $formFactory,
+        FormFactoryInterface $formFactory,
         CustomItemModel $customItemModel,
+        CustomItemXrefContactModel $customItemXrefContactModel,
         AuditLogModel $auditLogModel,
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider
     ) {
-        $this->requestStack       = $requestStack;
-        $this->formFactory        = $formFactory;
-        $this->customItemModel    = $customItemModel;
-        $this->auditLogModel      = $auditLogModel;
-        $this->permissionProvider = $permissionProvider;
-        $this->routeProvider      = $routeProvider;
+        $this->requestStack               = $requestStack;
+        $this->formFactory                = $formFactory;
+        $this->customItemModel            = $customItemModel;
+        $this->customItemXrefContactModel = $customItemXrefContactModel;
+        $this->auditLogModel              = $auditLogModel;
+        $this->permissionProvider         = $permissionProvider;
+        $this->routeProvider              = $routeProvider;
     }
 
     /**
@@ -104,7 +113,7 @@ class ViewController extends CommonController
             $this->requestStack->getCurrentRequest()->get('daterange', []),
             ['action' => $route]
         );
-        $stats = $this->customItemModel->getLinksLineChartData(
+        $stats = $this->customItemXrefContactModel->getLinksLineChartData(
             new \DateTime($dateRangeForm->get('date_from')->getData()),
             new \DateTime($dateRangeForm->get('date_to')->getData()),
             $customItem

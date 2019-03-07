@@ -136,14 +136,19 @@ return [
                 'controller' => 'CustomObjectsBundle:CustomObject\View:view',
                 'method'     => 'GET|POST',
             ],
-            CustomObjectRouteProvider::ROUTE_FORM => [
+            CustomObjectRouteProvider::ROUTE_NEW => [
+                'path'       => '/custom/object/new',
+                'controller' => 'CustomObjectsBundle:CustomObject\Form:new',
+                'method'     => 'GET',
+            ],
+            CustomObjectRouteProvider::ROUTE_EDIT => [
                 'path'       => '/custom/object/edit/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomObject\Form:renderForm',
+                'controller' => 'CustomObjectsBundle:CustomObject\Form:edit',
                 'method'     => 'GET',
             ],
             CustomObjectRouteProvider::ROUTE_CLONE => [
                 'path'       => '/custom/object/clone/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomObject\Clone:clone',
+                'controller' => 'CustomObjectsBundle:CustomObject\Form:clone',
                 'method'     => 'GET',
             ],
             CustomObjectRouteProvider::ROUTE_CANCEL => [
@@ -255,6 +260,7 @@ return [
                     'request_stack',
                     'form.factory',
                     'mautic.custom.model.item',
+                    'mautic.custom.model.import.xref.contact',
                     'mautic.core.model.auditlog',
                     'custom_item.permission.provider',
                     'custom_item.route.provider',
@@ -358,6 +364,7 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\LinkController::class,
                 'arguments' => [
                     'mautic.custom.model.item',
+                    'mautic.custom.model.import.xref.contact',
                     'custom_item.permission.provider',
                     'mautic.core.service.flashbag',
                 ],
@@ -371,8 +378,9 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\UnlinkController::class,
                 'arguments' => [
                     'mautic.custom.model.item',
+                    'mautic.custom.model.import.xref.contact',
                     'custom_item.permission.provider',
-                    'translator',
+                    'mautic.core.service.flashbag',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -394,8 +402,7 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\ListController::class,
                 'arguments' => [
                     'request_stack',
-                    'session',
-                    'mautic.helper.core_parameters',
+                    'custom_object.session.provider',
                     'mautic.custom.model.object',
                     'custom_object.permission.provider',
                     'custom_object.route.provider',
@@ -411,7 +418,6 @@ return [
                 'arguments' => [
                     'request_stack',
                     'form.factory',
-                    'mautic.helper.core_parameters',
                     'mautic.custom.model.object',
                     'mautic.core.model.auditlog',
                     'custom_object.permission.provider',
@@ -439,27 +445,12 @@ return [
                     ],
                 ],
             ],
-            'custom_object.clone_controller' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\CloneController::class,
-                'arguments' => [
-                    'form.factory',
-                    'mautic.custom.model.object',
-                    'custom_object.permission.provider',
-                    'custom_object.route.provider',
-                ],
-                'methodCalls' => [
-                    'setContainer' => [
-                        '@service_container',
-                    ],
-                ],
-            ],
             'custom_object.save_controller' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\SaveController::class,
                 'arguments' => [
                     'request_stack',
-                    'session',
+                    'mautic.core.service.flashbag',
                     'form.factory',
-                    'translator',
                     'mautic.custom.model.object',
                     'mautic.custom.model.field',
                     'custom_object.permission.provider',
@@ -476,8 +467,8 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\DeleteController::class,
                 'arguments' => [
                     'mautic.custom.model.object',
-                    'session',
-                    'translator',
+                    'custom_object.session.provider',
+                    'mautic.core.service.flashbag',
                     'custom_object.permission.provider',
                 ],
                 'methodCalls' => [
@@ -489,7 +480,7 @@ return [
             'custom_object.cancel_controller' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\CancelController::class,
                 'arguments' => [
-                    'session',
+                    'custom_object.session.provider',
                     'custom_object.route.provider',
                 ],
                 'methodCalls' => [
@@ -534,7 +525,16 @@ return [
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.custom.model.item',
+                    'mautic.custom.model.import.xref.contact',
                     'mautic.helper.template.formatter',
+                ],
+            ],
+            'mautic.custom.model.import.xref.contact' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'translator',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.custom.model.object' => [
@@ -631,6 +631,13 @@ return [
                     'translator',
                 ],
             ],
+            'custom_item.xref_contact.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomItemXrefContactSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.helper.user',
+                ],
+            ],
             'custom_item.import.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\ImportSubscriber::class,
                 'arguments' => [
@@ -669,6 +676,7 @@ return [
                     'mautic.custom.model.field',
                     'mautic.custom.model.object',
                     'mautic.custom.model.item',
+                    'mautic.custom.model.import.xref.contact',
                     'translator',
                     'custom_object.config.provider',
                 ],
@@ -787,6 +795,13 @@ return [
             ],
             'custom_item.session.provider' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Provider\CustomItemSessionProvider::class,
+                'arguments' => [
+                    'session',
+                    'mautic.helper.core_parameters',
+                ],
+            ],
+            'custom_object.session.provider' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Provider\CustomObjectSessionProvider::class,
                 'arguments' => [
                     'session',
                     'mautic.helper.core_parameters',

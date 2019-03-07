@@ -15,14 +15,14 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Controller\CustomItem;
 
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
-use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\LinkController;
+use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\UnlinkController;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerTestCase;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Mautic\CoreBundle\Service\FlashBag;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel;
 
-class LinkControllerTest extends ControllerTestCase
+class UnlinkControllerTest extends ControllerTestCase
 {
     private const ITEM_ID = 22;
 
@@ -36,9 +36,9 @@ class LinkControllerTest extends ControllerTestCase
     private $permissionProvider;
 
     /**
-     * @var LinkController
+     * @var UnlinkController
      */
-    private $linkController;
+    private $unlinkController;
 
     protected function setUp(): void
     {
@@ -48,14 +48,14 @@ class LinkControllerTest extends ControllerTestCase
         $this->customItemXrefContactModel = $this->createMock(CustomItemXrefContactModel::class);
         $this->flashBag                   = $this->createMock(FlashBag::class);
         $this->permissionProvider         = $this->createMock(CustomItemPermissionProvider::class);
-        $this->linkController             = new LinkController(
+        $this->unlinkController           = new UnlinkController(
             $this->customItemModel,
             $this->customItemXrefContactModel,
             $this->permissionProvider,
             $this->flashBag
         );
 
-        $this->addSymfonyDependencies($this->linkController);
+        $this->addSymfonyDependencies($this->unlinkController);
     }
 
     public function testSaveActionIfCustomItemNotFound(): void
@@ -71,7 +71,7 @@ class LinkControllerTest extends ControllerTestCase
             ->method('add')
             ->with('Item not found message', [], FlashBag::LEVEL_ERROR);
 
-        $this->linkController->saveAction(self::ITEM_ID, self::ENTITY_TYPE, self::ENTITY_ID);
+        $this->unlinkController->saveAction(self::ITEM_ID, self::ENTITY_TYPE, self::ENTITY_ID);
     }
 
     public function testSaveAction(): void
@@ -84,9 +84,9 @@ class LinkControllerTest extends ControllerTestCase
             ->method('canEdit');
 
         $this->customItemXrefContactModel->expects($this->once())
-            ->method('linkContact')
+            ->method('unlinkContact')
             ->with(self::ITEM_ID, self::ENTITY_ID);
 
-        $this->linkController->saveAction(self::ITEM_ID, self::ENTITY_TYPE, self::ENTITY_ID);
+        $this->unlinkController->saveAction(self::ITEM_ID, self::ENTITY_TYPE, self::ENTITY_ID);
     }
 }

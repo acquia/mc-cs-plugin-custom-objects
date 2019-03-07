@@ -19,6 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 
 class CustomObjectPermissions extends AbstractPermissions
 {
@@ -139,7 +140,7 @@ class CustomObjectPermissions extends AbstractPermissions
                 'filter'           => [
                     'force' => [
                         [
-                            'column' => 'e.isPublished',
+                            'column' => CustomObjectRepository::TABLE_ALIAS.'.isPublished',
                             'value'  => true,
                             'expr'   => 'eq',
                         ],

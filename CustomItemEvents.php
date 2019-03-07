@@ -59,6 +59,26 @@ final class CustomItemEvents
     public const ON_CUSTOM_ITEM_POST_DELETE = 'custom.item.on_post_delete';
 
     /**
+     * The custom.item.on_link_contact event is fired when a custom item is connected to a contact.
+     *
+     * The event listener receives a
+     * MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefContactEvent
+     *
+     * @var string
+     */
+    public const ON_CUSTOM_ITEM_LINK_CONTACT = 'custom.item.on_link_contact';
+
+    /**
+     * The custom.item.on_unlink_contact event is fired when a custom item is disconnected from a contact.
+     *
+     * The event listener receives a
+     * MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefContactEvent
+     *
+     * @var string
+     */
+    public const ON_CUSTOM_ITEM_UNLINK_CONTACT = 'custom.item.on_unlink_contact';
+
+    /**
      * The custom.item.on_campaign_trigger_action event is fired when the campaign action triggers.
      *
      * The event listener receives a

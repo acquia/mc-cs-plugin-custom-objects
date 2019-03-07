@@ -71,7 +71,7 @@ pipeline {
                   'hosted_plan' => 'pro'
               );" > app/config/local.php
               export SYMFONY_ENV="test"
-              bin/phpunit -d memory_limit=2048M --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --fail-on-warning --filter CustomObjectsBundle
+              bin/phpunit -d memory_limit=2048M --bootstrap vendor/autoload.php --configuration plugins/CustomObjectsBundle/phpunit.xml --fail-on-warning plugins/CustomObjectsBundle/Tests
             """
           }
         }
@@ -83,7 +83,7 @@ pipeline {
           ansiColor('xterm') {
             dir('plugins/CustomObjectsBundle') {
               sh """
-                vendor/bin/phpstan analyse --autoload-file=../../vendor/autoload.php --level=1 Command Config Controller CustomFieldType DTO Entity Event EventListener Exception Form Helper Migration Migrations Model Provider Repository Security Segment Tests
+                vendor/bin/phpstan analyse --autoload-file=../../vendor/autoload.php --level=3 Command Config Controller CustomFieldType DTO Entity Event EventListener Exception Form Helper Migration Migrations Model Provider Repository Security Segment Tests
               """
             }
           }

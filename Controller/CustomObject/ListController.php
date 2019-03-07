@@ -14,16 +14,16 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Mautic\CoreBundle\Helper\InputHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Helper\PaginationHelper;
 use Symfony\Component\HttpFoundation\Response;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectSessionProvider;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
+use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 
 class ListController extends CommonController
 {
@@ -33,9 +33,9 @@ class ListController extends CommonController
     private $requestStack;
 
     /**
-     * @var Session
+     * @var CustomObjectSessionProvider
      */
-    private $session;
+    private $sessionProvider;
 
     /**
      * @var CustomObjectModel
@@ -54,26 +54,23 @@ class ListController extends CommonController
 
     /**
      * @param RequestStack                   $requestStack
-     * @param Session                        $session
-     * @param CoreParametersHelper           $coreParametersHelper
+     * @param CustomObjectSessionProvider    $sessionProvider
      * @param CustomObjectModel              $customObjectModel
      * @param CustomObjectPermissionProvider $permissionProvider
      * @param CustomObjectRouteProvider      $routeProvider
      */
     public function __construct(
         RequestStack $requestStack,
-        Session $session,
-        CoreParametersHelper $coreParametersHelper,
+        CustomObjectSessionProvider $sessionProvider,
         CustomObjectModel $customObjectModel,
         CustomObjectPermissionProvider $permissionProvider,
         CustomObjectRouteProvider $routeProvider
     ) {
-        $this->requestStack         = $requestStack;
-        $this->session              = $session;
-        $this->coreParametersHelper = $coreParametersHelper;
-        $this->customObjectModel    = $customObjectModel;
-        $this->permissionProvider   = $permissionProvider;
-        $this->routeProvider        = $routeProvider;
+        $this->requestStack       = $requestStack;
+        $this->sessionProvider    = $sessionProvider;
+        $this->customObjectModel  = $customObjectModel;
+        $this->permissionProvider = $permissionProvider;
+        $this->routeProvider      = $routeProvider;
     }
 
     /**
@@ -86,46 +83,37 @@ class ListController extends CommonController
         try {
             $this->permissionProvider->canViewAtAll();
         } catch (ForbiddenException $e) {
-            $this->accessDenied(false, $e->getMessage());
+            return $this->accessDenied(false, $e->getMessage());
         }
 
-        $request      = $this->requestStack->getCurrentRequest();
-        $search       = InputHelper::clean($request->get('search', $this->session->get('mautic.custom.object.filter', '')));
-        $defaultlimit = (int) $this->coreParametersHelper->getParameter('default_pagelimit');
-        $sessionLimit = (int) $this->session->get('mautic.custom.object.limit', $defaultlimit);
-        $limit        = (int) $request->get('limit', $sessionLimit);
-        $orderBy      = $this->session->get('mautic.custom.object.orderby', 'e.id');
-        $orderByDir   = $this->session->get('mautic.custom.object.orderbydir', 'DESC');
-        $route        = $this->routeProvider->buildListRoute($page);
+        $request    = $this->requestStack->getCurrentRequest();
+        $search     = InputHelper::clean($request->get('search', $this->sessionProvider->getFilter()));
+        $limit      = (int) $request->get('limit', $this->sessionProvider->getPageLimit());
+        $orderBy    = $this->sessionProvider->getOrderBy(CustomObjectRepository::TABLE_ALIAS.'.id');
+        $orderByDir = $this->sessionProvider->getOrderByDir();
+        $route      = $this->routeProvider->buildListRoute($page);
 
         if ($request->query->has('orderby')) {
             $orderBy    = InputHelper::clean($request->query->get('orderby'), true);
-            $orderByDir = $this->session->get('mautic.custom.object.orderbydir', 'ASC');
+            $orderByDir = $this->sessionProvider->getOrderByDir('ASC');
             $orderByDir = 'ASC' === $orderByDir ? 'DESC' : 'ASC';
-            $this->session->set('mautic.custom.object.orderby', $orderBy);
-            $this->session->set('mautic.custom.object.orderbydir', $orderByDir);
+            $this->sessionProvider->setOrderBy($orderBy);
+            $this->sessionProvider->setOrderByDir($orderByDir);
         }
 
-        $entities = $this->customObjectModel->fetchEntities(
-            [
-                'start'      => PaginationHelper::countOffset($page, $limit),
-                'limit'      => $limit,
-                'filter'     => ['string' => $search],
-                'orderBy'    => $orderBy,
-                'orderByDir' => $orderByDir,
-            ]
-        );
+        $tableConfig = new TableConfig($limit, $page, $orderBy, $orderByDir);
 
-        $this->session->set('mautic.custom.object.page', $page);
-        $this->session->set('mautic.custom.object.limit', $limit);
-        $this->session->set('mautic.custom.object.filter', $search);
+        $this->sessionProvider->setPage($page);
+        $this->sessionProvider->setPageLimit($limit);
+        $this->sessionProvider->setFilter($search);
 
         return $this->delegateView(
             [
                 'returnUrl'      => $route,
                 'viewParameters' => [
                     'searchValue'    => $search,
-                    'items'          => $entities,
+                    'items'          => $this->customObjectModel->getTableData($tableConfig),
+                    'count'          => $this->customObjectModel->getCountForTable($tableConfig),
                     'page'           => $page,
                     'limit'          => $limit,
                     'tmpl'           => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',

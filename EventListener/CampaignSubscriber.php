@@ -27,6 +27,7 @@ use MauticPlugin\CustomObjectsBundle\Form\Type\CampaignConditionFieldValueType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel;
 
 class CampaignSubscriber extends CommonSubscriber
 {
@@ -51,29 +52,37 @@ class CampaignSubscriber extends CommonSubscriber
     private $customItemModel;
 
     /**
+     * @var CustomItemXrefContactModel
+     */
+    private $customItemXrefContactModel;
+
+    /**
      * @var ConfigProvider
      */
     private $configProvider;
 
     /**
-     * @param CustomFieldModel    $customFieldModel
-     * @param CustomObjectModel   $customObjectModel
-     * @param CustomItemModel     $customItemModel
-     * @param TranslatorInterface $translator
-     * @param ConfigProvider      $configProvider
+     * @param CustomFieldModel           $customFieldModel
+     * @param CustomObjectModel          $customObjectModel
+     * @param CustomItemModel            $customItemModel
+     * @param CustomItemXrefContactModel $customItemXrefContactModel
+     * @param TranslatorInterface        $translator
+     * @param ConfigProvider             $configProvider
      */
     public function __construct(
         CustomFieldModel $customFieldModel,
         CustomObjectModel $customObjectModel,
         CustomItemModel $customItemModel,
+        CustomItemXrefContactModel $customItemXrefContactModel,
         TranslatorInterface $translator,
         ConfigProvider $configProvider
     ) {
-        $this->customFieldModel  = $customFieldModel;
-        $this->customObjectModel = $customObjectModel;
-        $this->customItemModel   = $customItemModel;
-        $this->translator        = $translator;
-        $this->configProvider    = $configProvider;
+        $this->customFieldModel           = $customFieldModel;
+        $this->customObjectModel          = $customObjectModel;
+        $this->customItemModel            = $customItemModel;
+        $this->customItemXrefContactModel = $customItemXrefContactModel;
+        $this->translator                 = $translator;
+        $this->configProvider             = $configProvider;
     }
 
     /**
@@ -134,16 +143,16 @@ class CampaignSubscriber extends CommonSubscriber
             return;
         }
 
-        $linkCustomItemId   = ArrayHelper::getValue('linkCustomItemId', $event->getConfig());
-        $unlinkCustomItemId = ArrayHelper::getValue('unlinkCustomItemId', $event->getConfig());
+        $linkCustomItemId   = (int) ArrayHelper::getValue('linkCustomItemId', $event->getConfig());
+        $unlinkCustomItemId = (int) ArrayHelper::getValue('unlinkCustomItemId', $event->getConfig());
         $contactId          = (int) $event->getLead()->getId();
 
         if ($linkCustomItemId) {
-            $this->customItemModel->linkContact($linkCustomItemId, $contactId);
+            $this->customItemXrefContactModel->linkContact($linkCustomItemId, $contactId);
         }
 
         if ($unlinkCustomItemId) {
-            $this->customItemModel->unlinkContact($unlinkCustomItemId, $contactId);
+            $this->customItemXrefContactModel->unlinkContact($unlinkCustomItemId, $contactId);
         }
     }
 
@@ -162,14 +171,14 @@ class CampaignSubscriber extends CommonSubscriber
 
         $contact = $event->getLead();
 
-        if (!$contact || !$contact->getId()) {
+        if (empty($contact) || !$contact->getId()) {
             $event->setResult(false);
 
             return;
         }
 
         try {
-            $customField = $this->customFieldModel->fetchEntity($event->getConfig()['field']);
+            $customField = $this->customFieldModel->fetchEntity((int) $event->getConfig()['field']);
         } catch (NotFoundException $e) {
             $event->setResult(false);
 
