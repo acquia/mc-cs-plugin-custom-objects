@@ -631,6 +631,13 @@ return [
                     'translator',
                 ],
             ],
+            'custom_item.xref_contact.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomItemXrefContactSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.helper.user',
+                ],
+            ],
             'custom_item.import.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\ImportSubscriber::class,
                 'arguments' => [
