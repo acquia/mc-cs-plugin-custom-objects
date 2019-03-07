@@ -20,6 +20,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Tests\Controller\ControllerTestCase;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Mautic\CoreBundle\Service\FlashBag;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel;
 
 class LinkControllerTest extends ControllerTestCase
 {
@@ -30,6 +31,7 @@ class LinkControllerTest extends ControllerTestCase
     private const ENTITY_TYPE = 'contact';
 
     private $customItemModel;
+    private $customItemXrefContactModel;
     private $flashBag;
     private $permissionProvider;
 
@@ -42,11 +44,13 @@ class LinkControllerTest extends ControllerTestCase
     {
         parent::setUp();
 
-        $this->customItemModel    = $this->createMock(CustomItemModel::class);
-        $this->flashBag           = $this->createMock(FlashBag::class);
-        $this->permissionProvider = $this->createMock(CustomItemPermissionProvider::class);
-        $this->linkController     = new LinkController(
+        $this->customItemModel            = $this->createMock(CustomItemModel::class);
+        $this->customItemXrefContactModel = $this->createMock(CustomItemXrefContactModel::class);
+        $this->flashBag                   = $this->createMock(FlashBag::class);
+        $this->permissionProvider         = $this->createMock(CustomItemPermissionProvider::class);
+        $this->linkController             = new LinkController(
             $this->customItemModel,
+            $this->customItemXrefContactModel,
             $this->permissionProvider,
             $this->flashBag
         );
@@ -79,7 +83,7 @@ class LinkControllerTest extends ControllerTestCase
         $this->permissionProvider->expects($this->once())
             ->method('canEdit');
 
-        $this->customItemModel->expects($this->once())
+        $this->customItemXrefContactModel->expects($this->once())
             ->method('linkContact')
             ->with(self::ITEM_ID, self::ENTITY_ID);
 
