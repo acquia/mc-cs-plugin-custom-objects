@@ -47,7 +47,7 @@ class CustomItemXrefContactModelTest extends \PHPUnit_Framework_TestCase
 
     private $dispatcher;
 
-    private $customItemModel;
+    private $customItemXrefContactModel;
 
     protected function setUp(): void
     {

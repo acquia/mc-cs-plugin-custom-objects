@@ -27,6 +27,7 @@ use MauticPlugin\CustomObjectsBundle\Form\Type\CampaignConditionFieldValueType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel;
 
 class CampaignSubscriber extends CommonSubscriber
 {
