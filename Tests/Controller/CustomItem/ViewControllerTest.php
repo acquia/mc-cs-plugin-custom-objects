@@ -27,6 +27,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel;
 
 class ViewControllerTest extends ControllerTestCase
 {
@@ -35,6 +36,7 @@ class ViewControllerTest extends ControllerTestCase
     private const ITEM_ID = 22;
 
     private $customItemModel;
+    private $customItemXrefContactModel;
     private $auditLog;
     private $permissionProvider;
     private $routeProvider;
@@ -51,18 +53,20 @@ class ViewControllerTest extends ControllerTestCase
     {
         parent::setUp();
 
-        $this->customItemModel    = $this->createMock(CustomItemModel::class);
-        $this->auditLog           = $this->createMock(AuditLogModel::class);
-        $this->permissionProvider = $this->createMock(CustomItemPermissionProvider::class);
-        $this->routeProvider      = $this->createMock(CustomItemRouteProvider::class);
-        $this->requestStack       = $this->createMock(RequestStack::class);
-        $this->formFactory        = $this->createMock(FormFactoryInterface::class);
-        $this->form               = $this->createMock(FormInterface::class);
-        $this->customItem         = $this->createMock(CustomItem::class);
-        $this->viewController     = new ViewController(
+        $this->customItemModel            = $this->createMock(CustomItemModel::class);
+        $this->customItemXrefContactModel = $this->createMock(CustomItemXrefContactModel::class);
+        $this->auditLog                   = $this->createMock(AuditLogModel::class);
+        $this->permissionProvider         = $this->createMock(CustomItemPermissionProvider::class);
+        $this->routeProvider              = $this->createMock(CustomItemRouteProvider::class);
+        $this->requestStack               = $this->createMock(RequestStack::class);
+        $this->formFactory                = $this->createMock(FormFactoryInterface::class);
+        $this->form                       = $this->createMock(FormInterface::class);
+        $this->customItem                 = $this->createMock(CustomItem::class);
+        $this->viewController             = new ViewController(
             $this->requestStack,
             $this->formFactory,
             $this->customItemModel,
+            $this->customItemXrefContactModel,
             $this->auditLog,
             $this->permissionProvider,
             $this->routeProvider
@@ -144,7 +148,7 @@ class ViewControllerTest extends ControllerTestCase
             ->method('getData')
             ->willReturn('2019-03-04');
 
-        $this->customItemModel->expects($this->once())
+        $this->customItemXrefContactModel->expects($this->once())
             ->method('getLinksLineChartData')
             ->with(
                 $this->callback(function ($dateFrom) {

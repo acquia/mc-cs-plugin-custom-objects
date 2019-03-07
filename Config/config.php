@@ -260,6 +260,7 @@ return [
                     'request_stack',
                     'form.factory',
                     'mautic.custom.model.item',
+                    'mautic.custom.model.import.xref.contact',
                     'mautic.core.model.auditlog',
                     'custom_item.permission.provider',
                     'custom_item.route.provider',
@@ -363,6 +364,7 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\LinkController::class,
                 'arguments' => [
                     'mautic.custom.model.item',
+                    'mautic.custom.model.import.xref.contact',
                     'custom_item.permission.provider',
                     'mautic.core.service.flashbag',
                 ],
@@ -376,6 +378,7 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\UnlinkController::class,
                 'arguments' => [
                     'mautic.custom.model.item',
+                    'mautic.custom.model.import.xref.contact',
                     'custom_item.permission.provider',
                     'mautic.core.service.flashbag',
                 ],
@@ -522,7 +525,16 @@ return [
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.custom.model.item',
+                    'mautic.custom.model.import.xref.contact',
                     'mautic.helper.template.formatter',
+                ],
+            ],
+            'mautic.custom.model.import.xref.contact' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'translator',
+                    'event_dispatcher',
                 ],
             ],
             'mautic.custom.model.object' => [
@@ -619,6 +631,13 @@ return [
                     'translator',
                 ],
             ],
+            'custom_item.xref_contact.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomItemXrefContactSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.helper.user',
+                ],
+            ],
             'custom_item.import.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\ImportSubscriber::class,
                 'arguments' => [
@@ -657,6 +676,7 @@ return [
                     'mautic.custom.model.field',
                     'mautic.custom.model.object',
                     'mautic.custom.model.item',
+                    'mautic.custom.model.import.xref.contact',
                     'translator',
                     'custom_object.config.provider',
                 ],

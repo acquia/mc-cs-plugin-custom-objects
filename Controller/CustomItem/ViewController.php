@@ -24,6 +24,7 @@ use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Symfony\Component\Form\FormFactoryInterface;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel;
 
 class ViewController extends CommonController
 {
@@ -36,6 +37,11 @@ class ViewController extends CommonController
      * @var CustomItemModel
      */
     private $customItemModel;
+
+    /**
+     * @var CustomItemXrefContactModel
+     */
+    private $customItemXrefContactModel;
 
     /**
      * @var AuditLogModel
@@ -61,6 +67,7 @@ class ViewController extends CommonController
      * @param RequestStack                 $requestStack
      * @param FormFactoryInterface         $formFactory
      * @param CustomItemModel              $customItemModel
+     * @param CustomItemXrefContactModel   $customItemXrefContactModel
      * @param AuditLogModel                $auditLogModel
      * @param CustomItemPermissionProvider $permissionProvider
      * @param CustomItemRouteProvider      $routeProvider
@@ -69,16 +76,18 @@ class ViewController extends CommonController
         RequestStack $requestStack,
         FormFactoryInterface $formFactory,
         CustomItemModel $customItemModel,
+        CustomItemXrefContactModel $customItemXrefContactModel,
         AuditLogModel $auditLogModel,
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider
     ) {
-        $this->requestStack       = $requestStack;
-        $this->formFactory        = $formFactory;
-        $this->customItemModel    = $customItemModel;
-        $this->auditLogModel      = $auditLogModel;
-        $this->permissionProvider = $permissionProvider;
-        $this->routeProvider      = $routeProvider;
+        $this->requestStack               = $requestStack;
+        $this->formFactory                = $formFactory;
+        $this->customItemModel            = $customItemModel;
+        $this->customItemXrefContactModel = $customItemXrefContactModel;
+        $this->auditLogModel              = $auditLogModel;
+        $this->permissionProvider         = $permissionProvider;
+        $this->routeProvider              = $routeProvider;
     }
 
     /**
@@ -104,7 +113,7 @@ class ViewController extends CommonController
             $this->requestStack->getCurrentRequest()->get('daterange', []),
             ['action' => $route]
         );
-        $stats = $this->customItemModel->getLinksLineChartData(
+        $stats = $this->customItemXrefContactModel->getLinksLineChartData(
             new \DateTime($dateRangeForm->get('date_from')->getData()),
             new \DateTime($dateRangeForm->get('date_to')->getData()),
             $customItem

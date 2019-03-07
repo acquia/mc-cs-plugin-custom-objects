@@ -28,12 +28,7 @@ use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
-use Doctrine\ORM\NoResultException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use Mautic\LeadBundle\Entity\LeadEventLog;
-use Mautic\CoreBundle\Helper\Chart\LineChart;
-use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
@@ -156,69 +151,6 @@ class CustomItemModel extends FormModel
         //set the id for use in events
         $customItem->deletedId = $id;
         $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_POST_DELETE, $event);
-    }
-
-    /**
-     * @param int $customItemId
-     * @param int $contactId
-     */
-    public function linkContact(int $customItemId, int $contactId): CustomItemXrefContact
-    {
-        try {
-            $xRef = $this->getContactReference($customItemId, $contactId);
-        } catch (NoResultException $e) {
-            $contact  = $this->entityManager->getReference(Lead::class, $contactId);
-            $eventLog = $this->createContactEventLog($contact, 'link', 'CustomItem', $customItemId);
-            $xRef     = new CustomItemXrefContact(
-                $this->entityManager->getReference(CustomItem::class, $customItemId),
-                $this->entityManager->getReference(Lead::class, $contactId)
-            );
-
-            $this->entityManager->persist($xRef);
-            $this->entityManager->persist($eventLog);
-            $this->entityManager->flush();
-        }
-
-        return $xRef;
-    }
-
-    /**
-     * @param int $customItemId
-     * @param int $contactId
-     */
-    public function unlinkContact(int $customItemId, int $contactId): void
-    {
-        try {
-            $xRef     = $this->getContactReference($customItemId, $contactId);
-            $contact  = $this->entityManager->getReference(Lead::class, $contactId);
-            $eventLog = $this->createContactEventLog($contact, 'unlink', 'CustomItem', $customItemId);
-            $this->entityManager->remove($xRef);
-            $this->entityManager->persist($eventLog);
-            $this->entityManager->flush();
-        } catch (NoResultException $e) {
-            // If not found then we are done here.
-        }
-    }
-
-    /**
-     * @param int $customItemId
-     * @param int $contactId
-     *
-     * @return CustomItemXrefContact
-     *
-     * @throws NoResultException if the reference does not exist
-     */
-    public function getContactReference(int $customItemId, int $contactId): CustomItemXrefContact
-    {
-        $queryBuilder = $this->entityManager->createQueryBuilder();
-        $statement    = $queryBuilder->select('cixcont')
-            ->from(CustomItemXrefContact::class, 'cixcont')
-            ->where('cixcont.customItem = :customItemId')
-            ->andWhere('cixcont.contact = :contactId')
-            ->setParameter('customItemId', $customItemId)
-            ->setParameter('contactId', $contactId);
-
-        return $statement->getQuery()->getSingleResult();
     }
 
     /**
@@ -352,30 +284,6 @@ class CustomItemModel extends FormModel
     }
 
     /**
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
-     * @param CustomItem         $customItem
-     *
-     * @return mixed[]
-     */
-    public function getLinksLineChartData(
-        \DateTimeInterface $from,
-        \DateTimeInterface $to,
-        CustomItem $customItem
-    ): array {
-        $chart = new LineChart(null, $from, $to);
-        $query = new ChartQuery($this->entityManager->getConnection(), $from, $to);
-        $links = $query->fetchTimeData(
-            'custom_item_xref_contact',
-            'date_added',
-            ['custom_item_id' => $customItem->getId()]
-        );
-        $chart->setDataset($this->translator->trans('custom.item.linked.contacts'), $links);
-
-        return $chart->render();
-    }
-
-    /**
      * Used only by Mautic's generic methods. Use CustomItemPermissionProvider instead.
      *
      * @return string
@@ -401,29 +309,5 @@ class CustomItemModel extends FormModel
         }
 
         return $queryBuilder;
-    }
-
-    /**
-     * @param Lead    $contact
-     * @param string  $action
-     * @param string  $object
-     * @param int     $objectId
-     * @param mixed[] $properties
-     *
-     * @return LeadEventLog
-     */
-    private function createContactEventLog(Lead $contact, string $action, string $object, int $objectId, array $properties = []): LeadEventLog
-    {
-        $eventLog = new LeadEventLog();
-        $eventLog->setLead($contact);
-        $eventLog->setBundle('CustomObject');
-        $eventLog->setAction($action);
-        $eventLog->setObject($object);
-        $eventLog->setObjectId($objectId);
-        $eventLog->setUserId($this->userHelper->getUser()->getId());
-        $eventLog->setUserName($this->userHelper->getUser()->getName());
-        $eventLog->setProperties($properties);
-
-        return $eventLog;
     }
 }

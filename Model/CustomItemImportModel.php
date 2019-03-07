@@ -36,23 +36,31 @@ class CustomItemImportModel extends FormModel
     private $customItemModel;
 
     /**
+     * @var CustomItemXrefContactModel
+     */
+    private $customItemXrefContactModel;
+
+    /**
      * @var FormatterHelper
      */
     private $formatterHelper;
 
     /**
-     * @param EntityManager   $entityManager
-     * @param CustomItemModel $customItemModel
-     * @param FormatterHelper $formatterHelper
+     * @param EntityManager              $entityManager
+     * @param CustomItemModel            $customItemModel
+     * @param CustomItemXrefContactModel $customItemXrefContactModel
+     * @param FormatterHelper            $formatterHelper
      */
     public function __construct(
         EntityManager $entityManager,
         CustomItemModel $customItemModel,
+        CustomItemXrefContactModel $customItemXrefContactModel,
         FormatterHelper $formatterHelper
     ) {
-        $this->entityManager   = $entityManager;
-        $this->customItemModel = $customItemModel;
-        $this->formatterHelper = $formatterHelper;
+        $this->entityManager              = $entityManager;
+        $this->customItemModel            = $customItemModel;
+        $this->customItemXrefContactModel = $customItemXrefContactModel;
+        $this->formatterHelper            = $formatterHelper;
     }
 
     /**
@@ -139,7 +147,7 @@ class CustomItemImportModel extends FormModel
     private function linkContacts(CustomItem $customItem, array $contactIds): CustomItem
     {
         foreach ($contactIds as $contactId) {
-            $this->customItemModel->linkContact($customItem->getId(), $contactId);
+            $this->customItemXrefContactModel->linkContact($customItem->getId(), $contactId);
         }
 
         return $customItem;

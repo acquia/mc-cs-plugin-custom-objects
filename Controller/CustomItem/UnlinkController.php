@@ -21,6 +21,7 @@ use MauticPlugin\CustomObjectsBundle\Controller\JsonController;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use UnexpectedValueException;
 use Mautic\CoreBundle\Service\FlashBag;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel;
 
 class UnlinkController extends JsonController
 {
@@ -28,6 +29,11 @@ class UnlinkController extends JsonController
      * @var CustomItemModel
      */
     private $customItemModel;
+
+    /**
+     * @var CustomItemXrefContactModel
+     */
+    private $customItemXrefContactModel;
 
     /**
      * @var CustomItemPermissionProvider
@@ -41,17 +47,20 @@ class UnlinkController extends JsonController
 
     /**
      * @param CustomItemModel              $customItemModel
+     * @param CustomItemXrefContactModel   $customItemXrefContactModel
      * @param CustomItemPermissionProvider $permissionProvider
      * @param FlashBag                     $flashBag
      */
     public function __construct(
         CustomItemModel $customItemModel,
+        CustomItemXrefContactModel $customItemXrefContactModel,
         CustomItemPermissionProvider $permissionProvider,
         FlashBag $flashBag
     ) {
-        $this->customItemModel    = $customItemModel;
-        $this->permissionProvider = $permissionProvider;
-        $this->flashBag           = $flashBag;
+        $this->customItemModel            = $customItemModel;
+        $this->customItemXrefContactModel = $customItemXrefContactModel;
+        $this->permissionProvider         = $permissionProvider;
+        $this->flashBag                   = $flashBag;
     }
 
     /**
@@ -89,7 +98,7 @@ class UnlinkController extends JsonController
     {
         switch ($entityType) {
             case 'contact':
-                $this->customItemModel->unlinkContact($itemId, $entityId);
+                $this->customItemXrefContactModel->unlinkContact($itemId, $entityId);
 
                 break;
             default:

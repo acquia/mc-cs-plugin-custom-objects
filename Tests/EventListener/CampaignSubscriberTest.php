@@ -26,6 +26,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel;
 
 class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -38,6 +39,7 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
     private $customFieldModel;
     private $customObjectModel;
     private $customItemModel;
+    private $customItemXrefContactModel;
     private $translator;
     private $campaignBuilderEvent;
     private $campaignExecutionEvent;
@@ -55,20 +57,22 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->customFieldModel       = $this->createMock(CustomFieldModel::class);
-        $this->customObjectModel      = $this->createMock(CustomObjectModel::class);
-        $this->customItemModel        = $this->createMock(CustomItemModel::class);
-        $this->translator             = $this->createMock(TranslatorInterface::class);
-        $this->configProvider         = $this->createMock(ConfigProvider::class);
-        $this->campaignBuilderEvent   = $this->createMock(CampaignBuilderEvent::class);
-        $this->campaignExecutionEvent = $this->createMock(CampaignExecutionEvent::class);
-        $this->customObject           = $this->createMock(CustomObject::class);
-        $this->customField            = $this->createMock(CustomField::class);
-        $this->contact                = $this->createMock(Lead::class);
-        $this->campaignSubscriber     = new CampaignSubscriber(
+        $this->customFieldModel           = $this->createMock(CustomFieldModel::class);
+        $this->customObjectModel          = $this->createMock(CustomObjectModel::class);
+        $this->customItemModel            = $this->createMock(CustomItemModel::class);
+        $this->customItemXrefContactModel = $this->createMock(CustomItemXrefContactModel::class);
+        $this->translator                 = $this->createMock(TranslatorInterface::class);
+        $this->configProvider             = $this->createMock(ConfigProvider::class);
+        $this->campaignBuilderEvent       = $this->createMock(CampaignBuilderEvent::class);
+        $this->campaignExecutionEvent     = $this->createMock(CampaignExecutionEvent::class);
+        $this->customObject               = $this->createMock(CustomObject::class);
+        $this->customField                = $this->createMock(CustomField::class);
+        $this->contact                    = $this->createMock(Lead::class);
+        $this->campaignSubscriber         = new CampaignSubscriber(
             $this->customFieldModel,
             $this->customObjectModel,
             $this->customItemModel,
+            $this->customItemXrefContactModel,
             $this->translator,
             $this->configProvider
         );
@@ -157,10 +161,10 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getLead')
             ->willReturn($this->contact);
 
-        $this->customItemModel->expects($this->never())
+        $this->customItemXrefContactModel->expects($this->never())
             ->method('linkContact');
 
-        $this->customItemModel->expects($this->never())
+        $this->customItemXrefContactModel->expects($this->never())
             ->method('unlinkContact');
 
         $this->campaignSubscriber->onCampaignTriggerAction($this->campaignExecutionEvent);
@@ -186,11 +190,11 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getLead')
             ->willReturn($this->contact);
 
-        $this->customItemModel->expects($this->once())
+        $this->customItemXrefContactModel->expects($this->once())
             ->method('linkContact')
             ->with(564, self::CONTACT_ID);
 
-        $this->customItemModel->expects($this->once())
+        $this->customItemXrefContactModel->expects($this->once())
             ->method('unlinkContact')
             ->with(333, self::CONTACT_ID);
 
