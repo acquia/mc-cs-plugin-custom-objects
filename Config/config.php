@@ -260,6 +260,7 @@ return [
                     'request_stack',
                     'form.factory',
                     'mautic.custom.model.item',
+                    'mautic.custom.model.import.xref.contact',
                     'mautic.core.model.auditlog',
                     'custom_item.permission.provider',
                     'custom_item.route.provider',
