@@ -89,12 +89,12 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
     }
 
     /**
-     * @param        $value
+     * @param mixed  $value
      * @param string $type
      * @param string $operator
      * @param string $fixtureField
      *
-     * @return ContactSegmentFilter
+     * @return \PHPUnit_Framework_MockObject_MockObject
      *
      * @throws \MauticPlugin\CustomObjectsBundle\Tests\Exception\FixtureNotFoundException
      */
@@ -103,7 +103,7 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
         string $type = 'text',
         string $operator = 'eq',
         string $fixtureField = 'custom_field1'
-    ): ContactSegmentFilter {
+    ): \PHPUnit_Framework_MockObject_MockObject {
         $filterMock = $this->getMockBuilder(ContactSegmentFilter::class)
             ->disableOriginalConstructor()
             ->getMock();

@@ -79,7 +79,7 @@ class CustomItemFilterQueryBuilderTest extends WebTestCase
     }
 
     /**
-     * @param        $value
+     * @param mixed  $value
      * @param string $type
      * @param string $operator
      * @param string $fixtureField
