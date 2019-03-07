@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Helper;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
-use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
@@ -17,10 +15,8 @@ class QueryFilterHelperTest extends WebTestCase
 {
     use FixtureObjectsTrait;
 
-    /** @var EntityManager */
     private $entityManager;
 
-    /** @var ContactSegmentFilterFactory */
     private $filterFactory;
 
     protected function setUp(): void
