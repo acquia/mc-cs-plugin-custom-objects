@@ -49,8 +49,7 @@ class CustomFieldFactory
         $customField->setType($type);
         $customField->setTypeObject($typeObject);
         $customField->setCustomObject($customObject);
-        $customField->setParams([]);
-        $customField->setParamsObject(new Params());
+        $customField->setParams(new Params());
 
         return $customField;
     }

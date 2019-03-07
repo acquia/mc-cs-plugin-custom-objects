@@ -62,6 +62,7 @@ class CustomFieldSubscriber implements EventSubscriber
         }
 
         $customField->setTypeObject($this->customFieldTypeProvider->getType($customField->getType()));
+        $customField->setParams(new CustomField\Params($customField->getParams()));
     }
 
     /**

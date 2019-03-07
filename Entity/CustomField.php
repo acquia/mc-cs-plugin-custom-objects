@@ -302,7 +302,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @param Params|array $params
      */
-    public function setParams(Params $params): void
+    public function setParams($params): void
     {
         $this->params = $params;
     }
