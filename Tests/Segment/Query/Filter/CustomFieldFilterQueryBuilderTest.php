@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Segment\Query\Filter;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Tools\SchemaTool;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
+use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Tests\DataFixtures\Traits\FixtureObjectsTrait;
 
@@ -21,9 +24,17 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
 
     protected function setUp(): void
     {
-        $this->markTestIncomplete();
+        parent::setUp();
 
-        return;
+        $em         = $this->getContainer()->get('doctrine')->getManager();
+        $metadata   = $em->getMetadataFactory()->getAllMetadata();
+        $schemaTool = new SchemaTool($em);
+        $schemaTool->dropDatabase();
+        if (!empty($metadata)) {
+            $schemaTool->createSchema($metadata);
+        }
+        $this->postFixtureSetup();
+
         $pluginDirectory   = $this->getContainer()->get('kernel')->locateResource('@CustomObjectsBundle');
         $fixturesDirectory = $pluginDirectory.'/Tests/DataFixtures/ORM/Data';
 
@@ -41,8 +52,6 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
         $this->setFixtureObjects($objects);
 
         $this->entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
-
-        parent::setUp();
     }
 
     protected function tearDown(): void
@@ -58,7 +67,11 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
 
     public function testApplyQuery(): void
     {
-        $queryBuilderService = new CustomFieldFilterQueryBuilder(new RandomParameterName());
+        $dispatcher        = $this->getContainer()->get('event_dispatcher');
+        $fieldTypeProvider = new CustomFieldTypeProvider($dispatcher);
+        $queryHelper       = new QueryFilterHelper($fieldTypeProvider);
+
+        $queryBuilderService = new CustomFieldFilterQueryBuilder(new RandomParameterName(), $queryHelper);
 
         $filterMock = $this->createSegmentFilterMock('hate');
 
@@ -75,13 +88,29 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
         $this->assertSame(3, $queryBuilder->execute()->rowCount());
     }
 
-    private function createSegmentFilterMock(string $value): \PHPUnit_Framework_MockObject_MockObject
-    {
-        $filterMock = $this->createMock(ContactSegmentFilter::class);
+    /**
+     * @param mixed  $value
+     * @param string $type
+     * @param string $operator
+     * @param string $fixtureField
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     *
+     * @throws \MauticPlugin\CustomObjectsBundle\Tests\Exception\FixtureNotFoundException
+     */
+    private function createSegmentFilterMock(
+        $value,
+        string $type = 'text',
+        string $operator = 'eq',
+        string $fixtureField = 'custom_field1'
+    ): \PHPUnit_Framework_MockObject_MockObject {
+        $filterMock = $this->getMockBuilder(ContactSegmentFilter::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $filterMock->method('getType')->willReturn('text');
-        $filterMock->method('getOperator')->willReturn('eq');
-        $filterMock->method('getField')->willReturn((string) $this->getFixtureById('custom_field1')->getId());
+        $filterMock->method('getType')->willReturn($type);
+        $filterMock->method('getOperator')->willReturn($operator);
+        $filterMock->method('getField')->willReturn((string) $this->getFixtureById($fixtureField)->getId());
         $filterMock->method('getParameterValue')->willReturn($value);
         $filterMock->method('getParameterHolder')->willReturn((string) ':needle');
 

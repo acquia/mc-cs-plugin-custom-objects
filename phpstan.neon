@@ -8,7 +8,3 @@ parameters:
 		- '#Method MauticPlugin\\CustomObjectsBundle\\Model\\Custom(Object|Field)Model::fetchEntity\(\) should return MauticPlugin\\CustomObjectsBundle\\Entity\\Custom(Object|Field) but returns object.#'
 		- '#Method MauticPlugin\\CustomObjectsBundle\\Model\\CustomObjectModel::fetchEntities() should return Doctrine\\ORM\\Tools\\Pagination\\Paginator&iterable<MauticPlugin\\CustomObjectsBundle\\Entity\\CustomObject> but returns array|Doctrine\\ORM\\Tools\\Pagination\\Paginator.#'
 		- '#Property MauticPlugin\\CustomObjectsBundle\\Tests\\Segment\\Query\\Filter\\Custom(Item|Field)FilterQueryBuilderTest::\$entityManager \(Doctrine\\ORM\\EntityManager\) does not accept object.#'
-		- '#Cannot access offset \(int\|string\) on Mautic\\CoreBundle\\Entity\\CommonEntity.#'
-		- '#Cannot assign offset int\|string to Mautic\\CoreBundle\\Entity\\CommonEntity.#'
-		- '#Method MauticPlugin\\CustomObjectsBundle\\Tests\\Segment\\Query\\Filter\\Custom(Item|Field)FilterQueryBuilderTest::getFixturesByEntityClassName\(\) should return array<Mautic\\CoreBundle\\Entity\\CommonEntity> but returns Mautic\\CoreBundle\\Entity\\CommonEntity.#'
-		- '#Cannot access offset string on Mautic\\CoreBundle\\Entity\\CommonEntity.#'

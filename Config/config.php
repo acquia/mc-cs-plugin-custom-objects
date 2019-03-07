@@ -681,7 +681,7 @@ return [
                     'custom_object.config.provider',
                 ],
             ],
-            'custom_object.segments.filters_generate.subscriber' => [
+            'custom_object.segments.filters_generate.subscriber'   => [
                 'class'    => \MauticPlugin\CustomObjectsBundle\EventListener\SegmentFiltersChoicesGenerateSubscriber::class,
                 'arguments'=> [
                     'custom_object.repository',
@@ -694,6 +694,14 @@ return [
                 'arguments' => [
                     'doctrine',
                     'custom_object.config.provider',
+                ],
+            ],
+            'custom_object'                                        => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\DynamicContentSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'mautic.lead.model.lead_segment_filter_factory',
+                    'custom_object.query.filter.helper',
                 ],
             ],
         ],
@@ -805,7 +813,7 @@ return [
                     'router',
                 ],
             ],
-            'custom_object.permission.provider' => [
+            'custom_object.permission.provider'            => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider::class,
                 'arguments' => [
                     'mautic.security',
@@ -818,20 +826,18 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory::class,
                 'arguments' => ['custom_field.type.provider'],
             ],
-            // @todo 'custom_object.query.filter.helper' is not available atm.
-            // 'mautic.lead.query.builder.custom_field.value' => [
-            //     'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder::class,
-            //     'arguments' => ['mautic.lead.model.random_parameter_name', 'custom_object.query.filter.helper'],
-            // ],
+            'mautic.lead.query.builder.custom_field.value' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder::class,
+                'arguments' => ['mautic.lead.model.random_parameter_name', 'custom_object.query.filter.helper'],
+            ],
             'mautic.lead.query.builder.custom_item.value'  => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemFilterQueryBuilder::class,
                 'arguments' => ['mautic.lead.model.random_parameter_name'],
             ],
-            // @todo add this class first.
-            // 'custom_object.query.filter.helper'            => [
-            //     'class'     => \MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper::class,
-            //     'arguments' => ['custom_field.type.provider'],
-            // ],
+            'custom_object.query.filter.helper'            => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper::class,
+                'arguments' => ['custom_field.type.provider'],
+            ],
         ],
     ],
     'parameters' => [

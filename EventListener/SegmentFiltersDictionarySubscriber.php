@@ -16,6 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemFilterQueryBuilder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -55,6 +56,8 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
 
     /**
      * @param SegmentDictionaryGenerationEvent $event
+     *
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function onGenerateSegmentDictionary(SegmentDictionaryGenerationEvent $event): void
     {
@@ -67,6 +70,7 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
             return;
         }
 
+        /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->doctrineRegistry->getConnection()->createQueryBuilder();
         $queryBuilder
             ->select('f.id, f.label, f.type, o.id as custom_object_id')

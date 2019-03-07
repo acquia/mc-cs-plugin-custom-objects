@@ -16,16 +16,74 @@ namespace MauticPlugin\CustomObjectsBundle\Segment\Query\Filter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use Mautic\LeadBundle\Segment\RandomParameterName;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
+use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 
 class CustomItemFilterQueryBuilder extends BaseFilterQueryBuilder
 {
+    /**
+     * @var QueryFilterHelper
+     */
+    private $filterHelper;
+
+    /**
+     * @param RandomParameterName $randomParameterNameService
+     * @param QueryFilterHelper   $filterHelper
+     */
+    public function __construct(RandomParameterName $randomParameterNameService, QueryFilterHelper $filterHelper)
+    {
+        parent::__construct($randomParameterNameService);
+        $this->filterHelper = $filterHelper;
+    }
+
     /**
      * @return string
      */
     public static function getServiceId(): string
     {
         return 'mautic.lead.query.builder.custom_item.value';
+    }
+
+    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
+    {
+        $filterFieldId = $filter->getField();
+
+        $tableAlias = 'cfwq_'.(int) $filter->getField();
+
+        $filterQueryBuilder = $this->filterHelper->createItemNameQueryBuilder(
+            $queryBuilder->getConnection(),
+            $tableAlias
+        );
+
+        $this->filterHelper->addCustomObjectNameExpression(
+            $filterQueryBuilder,
+            $tableAlias,
+            $filter->getOperator(),
+            $filter->getParameterValue()
+        );
+
+        $filterQueryBuilder->select($tableAlias.'_contact.contact_id as lead_id');
+        $filterQueryBuilder->andWhere('l.id = '.$tableAlias.'_contact.contact_id');
+
+        $queryBuilder->setParameter('customFieldId_'.$tableAlias, (int) $filterFieldId);
+
+        switch ($filter->getOperator()) {
+            case 'empty':
+            case 'neq':
+            case 'notLike':
+                $queryBuilder->addLogic($queryBuilder->expr()->notExists($filterQueryBuilder->getSQL()), $filter->getGlue());
+
+                break;
+            default:
+                $queryBuilder->addLogic($queryBuilder->expr()->exists($filterQueryBuilder->getSQL()), $filter->getGlue());
+        }
+
+        foreach ($filterQueryBuilder->getParameters() as $paraName => $paraValue) {
+            $queryBuilder->setParameter($paraName, $paraValue);
+        }
+
+        return $queryBuilder;
     }
 
     /**
@@ -37,7 +95,7 @@ class CustomItemFilterQueryBuilder extends BaseFilterQueryBuilder
      * @throws InvalidArgumentException
      * @throws \Doctrine\DBAL\DBALException
      */
-    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
+    public function applyQueryOrig(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
         $filterOperator   = $filter->getOperator();
         $filterParameters = $filter->getParameterValue();

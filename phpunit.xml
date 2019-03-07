@@ -20,11 +20,7 @@
     </testsuites>
 
     <php>
-        <server name="DB_HOST" value="127.0.0.1" />
-        <server name="DB_PORT" value="3306" />
-        <server name="DB_USER" value="root" />
-        <server name="DB_PASSWD" value="root" />
-        <server name="DB_NAME" value="mautic_unittests" />
+        <server name="KERNEL_DIR" value="../../app" />
     </php>
 
     <filter>
