@@ -19,7 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 return [
     'name'        => 'Custom Objects',
     'description' => 'Adds custom objects and fields features to Mautic',
-    'version'     => '0.0',
+    'version'     => '0.0.1',
     'author'      => 'Mautic, Inc.',
 
     'routes' => [
@@ -456,6 +456,7 @@ return [
                     'custom_object.permission.provider',
                     'custom_object.route.provider',
                     'custom_field.type.provider',
+                    'custom_field.field.params.to.string.transformer',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -612,8 +613,8 @@ return [
                     'translator',
                 ],
             ],
-            'custom_field.subscriber' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldSubscriber::class,
+            'custom_field.post_load.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldPostLoadSubscriber::class,
                 'arguments' => [
                     'custom_field.type.provider',
                 ],
@@ -622,6 +623,11 @@ return [
                     'event' => 'postLoad',
                     'lazy'  => true,
                 ],
+            ],
+            // There's a problem with multiple tags and arguments definition using array.
+            // So subscriber above should contain subscriber method below. But it is not possible now.
+            'custom_field.pre_save.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldPreSaveSubscriber::class,
             ],
             'custom_item.button.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomItemButtonSubscriber::class,
@@ -714,8 +720,15 @@ return [
                 'arguments' => [
                     'custom_object.repository',
                     'custom_field.type.provider',
+                    'custom_field.field.params.to.string.transformer',
                 ],
                 'tag' => 'form.type',
+            ],
+            'custom_field.field.params.to.string.transformer' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransformer::class,
+                'arguments' => [
+                    'jms_serializer'
+                ],
             ],
             'custom_object.object.form' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType::class,

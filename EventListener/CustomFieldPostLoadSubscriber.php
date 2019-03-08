@@ -3,25 +3,26 @@
 declare(strict_types=1);
 
 /*
- * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
- *
- * @link        http://mautic.org
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
+* @copyright   2019 Mautic, Inc. All rights reserved
+* @author      Mautic, Inc.
+*
+* @link        https://mautic.com
+*
+* @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+*/
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Doctrine\Common\EventSubscriber;
+use Doctrine\ORM\Events;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 
 /**
- * CustomField entity lifecycle.
+ * CustomField entity lifecycle starts here.
  */
-class CustomFieldSubscriber implements EventSubscriber
+class CustomFieldPostLoadSubscriber implements EventSubscriber
 {
     /**
      * @var CustomFieldTypeProvider
@@ -42,8 +43,7 @@ class CustomFieldSubscriber implements EventSubscriber
     public function getSubscribedEvents(): array
     {
         return [
-            'postLoad',
-            'prePersist',
+            Events::postLoad,
         ];
     }
 
@@ -61,28 +61,6 @@ class CustomFieldSubscriber implements EventSubscriber
         }
 
         $customField->setTypeObject($this->customFieldTypeProvider->getType($customField->getType()));
-
-        $params = $customField->getParams();
-        $params = new CustomField\Params($params);
-
-        if ($params instanceof CustomField\Params) {
-            $customField->setParamsObject($params);
-        } else {
-            $customField->setParamsObject(new CustomField\Params());
-        }
-    }
-
-    /**
-     * @param LifecycleEventArgs $args
-     */
-    public function prePersist(LifecycleEventArgs $args): void
-    {
-        $customField = $args->getObject();
-
-        if (!$customField instanceof CustomField) {
-            return;
-        }
-
-        $customField->setParams((array) $customField->getParamsObject());
+        $customField->setParams(new CustomField\Params($customField->getParams()));
     }
 }

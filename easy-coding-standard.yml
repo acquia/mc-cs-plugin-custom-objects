@@ -24,6 +24,7 @@ parameters:
     SlevomatCodingStandard\Sniffs\TypeHints\TypeHintDeclarationSniff.MissingParameterTypeHint:
       - 'CustomObjectsBundle.php' # Breaks parent's method signature
       - '*Entity/*' # Proxy classes don't have parameter types and so entities cannot have them either.
+      - 'Form/DataTransformer/*' # Ignore arg typehints to keep interface compatibility
       - 'Tests/*'
     SlevomatCodingStandard\Sniffs\TypeHints\TypeHintDeclarationSniff.MissingTraversableParameterTypeHintSpecification:
       - 'CustomObjectsBundle.php'

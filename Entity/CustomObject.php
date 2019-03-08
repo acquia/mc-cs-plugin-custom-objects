@@ -35,12 +35,12 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @var string|null
      */
-    private $namePlural;
+    private $nameSingular;
 
     /**
      * @var string|null
      */
-    private $nameSingular;
+    private $namePlural;
 
     /**
      * @var string|null
@@ -98,8 +98,9 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
 
         $builder->addId();
         $builder->addCategory();
-        $builder->addNamedField('namePlural', Type::STRING, 'name_plural');
         $builder->addNamedField('nameSingular', Type::STRING, 'name_singular');
+        $builder->addNamedField('namePlural', Type::STRING, 'name_plural');
+        $builder->addNamedField('description', Type::STRING, 'description');
         $builder->addNullableField('language', Type::STRING, 'lang');
     }
 
@@ -108,10 +109,11 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('namePlural', new Assert\NotBlank());
-        $metadata->addPropertyConstraint('namePlural', new Assert\Length(['max' => 255]));
         $metadata->addPropertyConstraint('nameSingular', new Assert\NotBlank());
         $metadata->addPropertyConstraint('nameSingular', new Assert\Length(['max' => 255]));
+        $metadata->addPropertyConstraint('namePlural', new Assert\NotBlank());
+        $metadata->addPropertyConstraint('namePlural', new Assert\Length(['max' => 255]));
+        $metadata->addPropertyConstraint('description', new Assert\Length(['max' => 255]));
         $metadata->addPropertyConstraint('description', new Assert\Length(['max' => 65535]));
     }
 
@@ -134,23 +136,6 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param string|null $namePlural
-     */
-    public function setNamePlural($namePlural)
-    {
-        $this->isChanged('namePlural', $namePlural);
-        $this->namePlural = $namePlural;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getNamePlural()
-    {
-        return $this->namePlural;
-    }
-
-    /**
      * @param string|null $nameSingular
      */
     public function setNameSingular($nameSingular)
@@ -165,6 +150,23 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     public function getNameSingular()
     {
         return $this->nameSingular;
+    }
+
+    /**
+     * @param string|null $namePlural
+     */
+    public function setNamePlural($namePlural)
+    {
+        $this->isChanged('namePlural', $namePlural);
+        $this->namePlural = $namePlural;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getNamePlural()
+    {
+        return $this->namePlural;
     }
 
     /**

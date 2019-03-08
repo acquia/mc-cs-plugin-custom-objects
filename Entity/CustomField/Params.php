@@ -31,6 +31,18 @@ class Params
     }
 
     /**
+     * Used as data source for json serialization.
+     *
+     * @return string[]
+     */
+    public function __toArray(): array
+    {
+        return [
+            'requiredValidationMessage' => $this->requiredValidationMessage,
+        ];
+    }
+
+    /**
      * @return string|null
      */
     public function getRequiredValidationMessage(): ?string
