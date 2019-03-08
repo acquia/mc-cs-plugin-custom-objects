@@ -16,7 +16,6 @@ namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use MauticPlugin\CustomObjectsBundle\Form\CustomObjectHiddenTransformer;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransformer;
-use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\StringToParamsTransformer;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\Form\AbstractType;
@@ -47,26 +46,18 @@ class CustomFieldType extends AbstractType
     private $paramsToStringTransformer;
 
     /**
-     * @var StringToParamsTransformer
-     */
-    private $stringToParamsTransformer;
-
-    /**
      * @param CustomObjectRepository    $customObjectRepository
      * @param CustomFieldTypeProvider   $customFieldTypeProvider
      * @param ParamsToStringTransformer $paramsToStringTransformer
-     * @param StringToParamsTransformer $stringToParamsTransformer
      */
     public function __construct(
         CustomObjectRepository $customObjectRepository,
         CustomFieldTypeProvider $customFieldTypeProvider,
-        ParamsToStringTransformer $paramsToStringTransformer,
-        StringToParamsTransformer $stringToParamsTransformer
+        ParamsToStringTransformer $paramsToStringTransformer
     ) {
         $this->customObjectRepository  = $customObjectRepository;
         $this->customFieldTypeProvider = $customFieldTypeProvider;
         $this->paramsToStringTransformer = $paramsToStringTransformer;
-        $this->stringToParamsTransformer = $stringToParamsTransformer;
     }
 
     /**
@@ -157,11 +148,8 @@ class CustomFieldType extends AbstractType
         );
 
         $builder->add(
-            $builder->create(
-                'params',
-                CustomFieldParamsType::class
-            )
-//            ->addModelTransformer($this->stringToParamsTransformer)
+            'params',
+            CustomFieldParamsType::class
         );
 
         $builder->add(

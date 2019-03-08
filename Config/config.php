@@ -721,7 +721,6 @@ return [
                     'custom_object.repository',
                     'custom_field.type.provider',
                     'custom_field.field.params.to.string.transformer',
-                    'custom_field.field.string.to.params.transformer',
                 ],
                 'tag' => 'form.type',
             ],
