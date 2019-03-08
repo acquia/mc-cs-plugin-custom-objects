@@ -66,7 +66,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     private $defaultValue;
 
     /**
-     * @var Params|array
+     * @var Params|string[]
      */
     private $params;
 
@@ -288,7 +288,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @return Params|array
+     * @return Params|string[]
      */
     public function getParams()
     {
@@ -300,7 +300,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param Params|array $params
+     * @param Params|string[] $params
      */
     public function setParams($params): void
     {

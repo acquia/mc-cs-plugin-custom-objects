@@ -49,7 +49,7 @@ class Params
     /**
      * Used as data source for json serialization
      *
-     * @return array
+     * @return string[]
      */
     public function __toArray(): array
     {
