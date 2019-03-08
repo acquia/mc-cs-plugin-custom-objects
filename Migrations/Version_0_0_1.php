@@ -16,7 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Migrations;
 use Doctrine\DBAL\Schema\MySqlSchemaManager;
 use MauticPlugin\CustomObjectsBundle\Migration\AbstractMigration;
 
-class Version_0_01 extends AbstractMigration
+class Version_0_0_1 extends AbstractMigration
 {
     public function isApplicable(): bool
     {
