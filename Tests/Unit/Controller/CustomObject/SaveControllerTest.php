@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomObject;
 
-use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\StringToParamsTransformer;
+use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransformer;
 use Symfony\Component\HttpFoundation\Request;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
@@ -41,7 +41,7 @@ class SaveControllerTest extends ControllerTestCase
     private $customObjectModel;
     private $customFieldModel;
     private $customFieldTypeProvider;
-    private $stringToParamsTransformer;
+    private $paramsToStringTransformer;
     private $flashBag;
     private $permissionProvider;
     private $routeProvider;
@@ -65,7 +65,7 @@ class SaveControllerTest extends ControllerTestCase
         $this->routeProvider             = $this->createMock(CustomObjectRouteProvider::class);
         $this->requestStack              = $this->createMock(RequestStack::class);
         $this->customFieldTypeProvider   = $this->createMock(CustomFieldTypeProvider::class);
-        $this->stringToParamsTransformer = $this->createMock(StringToParamsTransformer::class);
+        $this->paramsToStringTransformer = $this->createMock(ParamsToStringTransformer::class);
         $this->request                   = $this->createMock(Request::class);
         $this->customObject              = $this->createMock(CustomObject::class);
         $this->form                      = $this->createMock(FormInterface::class);
@@ -78,7 +78,7 @@ class SaveControllerTest extends ControllerTestCase
             $this->permissionProvider,
             $this->routeProvider,
             $this->customFieldTypeProvider,
-            $this->stringToParamsTransformer
+            $this->paramsToStringTransformer
         );
 
         $this->addSymfonyDependencies($this->saveController);

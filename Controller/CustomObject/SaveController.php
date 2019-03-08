@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
-use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\StringToParamsTransformer;
+use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransformer;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -73,9 +73,9 @@ class SaveController extends CommonController
     private $customFieldTypeProvider;
 
     /**
-     * @var StringToParamsTransformer
+     * @var ParamsToStringTransformer
      */
-    private $stringToParamsTransformer;
+    private $paramsToStringTransformer;
 
     /**
      * @param RequestStack                   $requestStack
@@ -86,7 +86,7 @@ class SaveController extends CommonController
      * @param CustomObjectPermissionProvider $permissionProvider
      * @param CustomObjectRouteProvider      $routeProvider
      * @param CustomFieldTypeProvider        $customFieldTypeProvider
-     * @param StringToParamsTransformer      $stringToParamsTransformer
+     * @param ParamsToStringTransformer      $paramsToStringTransformer
      */
     public function __construct(
         RequestStack $requestStack,
@@ -97,7 +97,7 @@ class SaveController extends CommonController
         CustomObjectPermissionProvider $permissionProvider,
         CustomObjectRouteProvider $routeProvider,
         CustomFieldTypeProvider $customFieldTypeProvider,
-        StringToParamsTransformer $stringToParamsTransformer
+        ParamsToStringTransformer $paramsToStringTransformer
     ) {
         $this->requestStack              = $requestStack;
         $this->flashBag                  = $flashBag;
@@ -107,7 +107,7 @@ class SaveController extends CommonController
         $this->permissionProvider        = $permissionProvider;
         $this->routeProvider             = $routeProvider;
         $this->customFieldTypeProvider   = $customFieldTypeProvider;
-        $this->stringToParamsTransformer = $stringToParamsTransformer;
+        $this->paramsToStringTransformer = $paramsToStringTransformer;
     }
 
     /**
@@ -149,7 +149,7 @@ class SaveController extends CommonController
                     } else {
                         // Should be resolved better in form/transformer, but here it is more clear
                         $params = $customField['params'];
-                        $params = $this->stringToParamsTransformer->transform($params);
+                        $params = $this->paramsToStringTransformer->reverseTransform($params);
                         $customObject->getCustomFields()->get($key)->setParams($params);
                     }
                 }

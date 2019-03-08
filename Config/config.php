@@ -456,7 +456,7 @@ return [
                     'custom_object.permission.provider',
                     'custom_object.route.provider',
                     'custom_field.type.provider',
-                    'custom_field.field.string.to.params.transformer',
+                    'custom_field.field.params.to.string.transformer',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -726,12 +726,6 @@ return [
             ],
             'custom_field.field.params.to.string.transformer' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransformer::class,
-                'arguments' => [
-                    'jms_serializer'
-                ],
-            ],
-            'custom_field.field.string.to.params.transformer' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Form\DataTransformer\StringToParamsTransformer::class,
                 'arguments' => [
                     'jms_serializer'
                 ],
