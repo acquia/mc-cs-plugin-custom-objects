@@ -59,12 +59,13 @@ class CustomItemRepository extends AbstractTableRepository
         $queryBuilder->select('ci.id');
         $queryBuilder->from(MAUTIC_TABLE_PREFIX.'custom_item', 'ci');
         $queryBuilder->innerJoin('ci', MAUTIC_TABLE_PREFIX.'custom_item_xref_contact', 'cixcont', 'cixcont.custom_item_id = ci.id');
-        $queryBuilder->innerJoin('ci', MAUTIC_TABLE_PREFIX.$fieldType->getTableName(), $fieldType->getTableAlias(), "{$fieldType->getTableAlias()}.custom_item_id = ci.id");
+        $queryBuilder->innerJoin('ci', $fieldType->getTableName(), $fieldType->getTableAlias(), "{$fieldType->getTableAlias()}.custom_item_id = ci.id");
         $queryBuilder->where('cixcont.contact_id = :contactId');
         $queryBuilder->setParameter('contactId', $contact->getId());
         $queryBuilder->andWhere("{$fieldType->getTableAlias()}.custom_field_id = :customFieldId");
         $queryBuilder->setParameter('customFieldId', $customField->getId());
-        $queryBuilder->andWhere($queryBuilder->expr()->{$expr}("{$fieldType->getTableAlias()}.value", $value));
+        $queryBuilder->andWhere($queryBuilder->expr()->{$expr}("{$fieldType->getTableAlias()}.value", ':value'));
+        $queryBuilder->setParameter('value', $value);
 
         $result = $queryBuilder->execute()->fetchColumn();
 

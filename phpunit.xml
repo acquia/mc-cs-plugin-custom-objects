@@ -14,8 +14,15 @@
     bootstrap                   = "autoload.php" >
 
     <testsuites>
-        <testsuite name="Custom Objects Test Suite">
-            <directory>Tests</directory>
+        <testsuite name="unit">
+            <directory>Tests/Unit</directory>
+        </testsuite>
+        <testsuite name="functional">
+            <directory>Tests/Functional</directory>
+        </testsuite>
+        <testsuite name="all">
+            <directory>Tests/Unit</directory>
+            <directory>Tests/Functional</directory>
         </testsuite>
     </testsuites>
 

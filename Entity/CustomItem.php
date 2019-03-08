@@ -134,7 +134,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @return int|null
      */
-    public function getId(): ?int
+    public function getId()
     {
         return (int) $this->id;
     }
@@ -142,7 +142,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $name
      */
-    public function setName(?string $name): void
+    public function setName($name)
     {
         $this->isChanged('name', $name);
         $this->name = $name;
@@ -151,7 +151,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @return string|null
      */
-    public function getName(): ?string
+    public function getName()
     {
         return $this->name;
     }
@@ -159,7 +159,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @return CustomObject
      */
-    public function getCustomObject(): CustomObject
+    public function getCustomObject()
     {
         return $this->customObject;
     }
@@ -167,7 +167,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @return Category|null
      */
-    public function getCategory(): ?Category
+    public function getCategory()
     {
         return $this->category;
     }
@@ -175,7 +175,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @param Category|null $category
      */
-    public function setCategory(?Category $category): void
+    public function setCategory($category)
     {
         $this->isChanged('category', $category ? $category->getId() : null);
         $this->category = $category;
@@ -184,7 +184,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @return string
      */
-    public function getLanguage(): string
+    public function getLanguage()
     {
         return $this->language;
     }
@@ -192,7 +192,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $language
      */
-    public function setLanguage(?string $language): void
+    public function setLanguage($language)
     {
         $this->isChanged('language', $language);
         $this->language = $language;
@@ -201,7 +201,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @param CustomFieldValueInterface $customFieldValue
      */
-    public function addCustomFieldValue(CustomFieldValueInterface $customFieldValue): void
+    public function addCustomFieldValue($customFieldValue)
     {
         if (null === $this->customFieldValues) {
             $this->customFieldValues = new ArrayCollection();
@@ -213,7 +213,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @param ArrayCollection $customFieldValues
      */
-    public function setCustomFieldValues(ArrayCollection $customFieldValues): void
+    public function setCustomFieldValues($customFieldValues)
     {
         $this->customFieldValues = $customFieldValues;
     }
@@ -221,7 +221,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * Called when the custom field values are loaded from the database.
      */
-    public function createFieldValuesSnapshot(): void
+    public function createFieldValuesSnapshot()
     {
         foreach ($this->customFieldValues as $customFieldValue) {
             $this->initialCustomFieldValues[$customFieldValue->getCustomField()->getId()] = $customFieldValue->getValue();
@@ -231,7 +231,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * Called before CustomItemSave. It will record changes that happened for custom field values.
      */
-    public function recordCustomFieldValueChanges(): void
+    public function recordCustomFieldValueChanges()
     {
         foreach ($this->customFieldValues as $customFieldValue) {
             $customFieldId = $customFieldValue->getCustomField()->getId();
@@ -247,7 +247,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @return ArrayCollection
      */
-    public function getCustomFieldValues(): ArrayCollection
+    public function getCustomFieldValues()
     {
         if (null === $this->customFieldValues) {
             $this->customFieldValues = new ArrayCollection();
@@ -263,7 +263,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      *
      * @throws NotFoundException
      */
-    public function findCustomFieldValueForFieldId(int $customFieldId): CustomFieldValueInterface
+    public function findCustomFieldValueForFieldId($customFieldId)
     {
         $customFieldValue = $this->customFieldValues->get($customFieldId);
 
@@ -277,7 +277,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @param CustomItemXrefContact $reference
      */
-    public function addContactReference(CustomItemXrefContact $reference): void
+    public function addContactReference($reference)
     {
         $this->contactReferences->add($reference);
     }
@@ -285,7 +285,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @return Collection
      */
-    public function getContactReferences(): Collection
+    public function getContactReferences()
     {
         return $this->contactReferences;
     }
@@ -293,7 +293,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @param CustomItemXrefCompany $reference
      */
-    public function addCompanyReference(CustomItemXrefCompany $reference): void
+    public function addCompanyReference($reference)
     {
         $this->companyReferences->add($reference);
     }
@@ -301,7 +301,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @return Collection
      */
-    public function getCompanyReferences(): Collection
+    public function getCompanyReferences()
     {
         return $this->companyReferences;
     }
