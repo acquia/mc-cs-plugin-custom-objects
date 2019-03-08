@@ -613,8 +613,8 @@ return [
                     'translator',
                 ],
             ],
-            'custom_field.subscriber' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldSubscriber::class,
+            'custom_field.post_load.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldPostLoadSubscriber::class,
                 'arguments' => [
                     'custom_field.type.provider',
                 ],
@@ -623,6 +623,11 @@ return [
                     'event' => 'postLoad',
                     'lazy'  => true,
                 ],
+            ],
+            // There's a problem with multiple tags and arguments definition using array.
+            // So subscriber above should contain subscriber method below. But it is not possible now.
+            'custom_field.pre_save.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldPreSaveSubscriber::class,
             ],
             'custom_item.button.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomItemButtonSubscriber::class,
