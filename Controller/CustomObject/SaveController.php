@@ -147,6 +147,7 @@ class SaveController extends CommonController
                     if ($customField['deleted'] && $customField['id']) {
                         $this->customObjectModel->removeCustomFieldById($customObject, (int) $customField['id']);
                     } else {
+                        // Should be resolved better in form/transformer, but here it is more clear
                         $params = $customField['params'];
                         $params = $this->stringToParamsTransformer->transform($params);
                         $customObject->getCustomFields()->get($key)->setParams($params);
