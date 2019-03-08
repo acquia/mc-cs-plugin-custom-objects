@@ -725,13 +725,13 @@ return [
                 'tag' => 'form.type',
             ],
             'custom_field.field.params.to.string.transformer' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransformer::class,
+                'class'     => \MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransformer::class,
                 'arguments' => [
                     'jms_serializer'
                 ],
             ],
             'custom_field.field.string.to.params.transformer' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Form\DataTransformer\StringToParamsTransformer::class,
+                'class'     => \MauticPlugin\CustomObjectsBundle\Form\DataTransformer\StringToParamsTransformer::class,
                 'arguments' => [
                     'jms_serializer'
                 ],

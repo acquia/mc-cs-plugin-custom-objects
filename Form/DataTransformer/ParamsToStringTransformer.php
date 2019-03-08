@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
 * @copyright   2019 Mautic, Inc. All rights reserved
 * @author      Mautic, Inc.
@@ -37,24 +39,22 @@ class ParamsToStringTransformer implements DataTransformerInterface
      *
      * @return string
      */
-    public function transform($params)
+    public function transform($params): string
     {
-        $params = $this->serializer->serialize($params->__toArray(), 'json');
-
-        return $params;
+        return $this->serializer->serialize($params->__toArray(), 'json');
     }
 
     /**
      * Transforms a string (json) to an object (Params).
      *
-     * @param  string $params
+     * @param string $params
+     *
      * @return Params
      */
-    public function reverseTransform($params)
+    public function reverseTransform($params): Params
     {
         $params = json_decode($params, true);
-        $params = new Params($params);
 
-        return $params;
+        return new Params($params);
     }
 }

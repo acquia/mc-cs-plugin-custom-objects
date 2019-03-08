@@ -55,8 +55,8 @@ class CustomFieldType extends AbstractType
         CustomFieldTypeProvider $customFieldTypeProvider,
         ParamsToStringTransformer $paramsToStringTransformer
     ) {
-        $this->customObjectRepository  = $customObjectRepository;
-        $this->customFieldTypeProvider = $customFieldTypeProvider;
+        $this->customObjectRepository    = $customObjectRepository;
+        $this->customFieldTypeProvider   = $customFieldTypeProvider;
         $this->paramsToStringTransformer = $paramsToStringTransformer;
     }
 
@@ -246,7 +246,7 @@ class CustomFieldType extends AbstractType
                 [
                 ]
             )
-            ->addModelTransformer($this->paramsToStringTransformer)
+                ->addModelTransformer($this->paramsToStringTransformer)
         );
 
         // Possibility to mark field as deleted in POST data

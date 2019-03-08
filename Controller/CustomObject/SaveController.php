@@ -99,14 +99,14 @@ class SaveController extends CommonController
         CustomFieldTypeProvider $customFieldTypeProvider,
         StringToParamsTransformer $stringToParamsTransformer
     ) {
-        $this->requestStack            = $requestStack;
-        $this->flashBag                = $flashBag;
-        $this->formFactory             = $formFactory;
-        $this->customObjectModel       = $customObjectModel;
-        $this->customFieldModel        = $customFieldModel;
-        $this->permissionProvider      = $permissionProvider;
-        $this->routeProvider           = $routeProvider;
-        $this->customFieldTypeProvider = $customFieldTypeProvider;
+        $this->requestStack              = $requestStack;
+        $this->flashBag                  = $flashBag;
+        $this->formFactory               = $formFactory;
+        $this->customObjectModel         = $customObjectModel;
+        $this->customFieldModel          = $customFieldModel;
+        $this->permissionProvider        = $permissionProvider;
+        $this->routeProvider             = $routeProvider;
+        $this->customFieldTypeProvider   = $customFieldTypeProvider;
         $this->stringToParamsTransformer = $stringToParamsTransformer;
     }
 

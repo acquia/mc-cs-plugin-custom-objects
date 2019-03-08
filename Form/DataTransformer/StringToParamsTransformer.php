@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
 * @copyright   2019 Mautic, Inc. All rights reserved
 * @author      Mautic, Inc.
@@ -16,7 +18,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use Symfony\Component\Form\DataTransformerInterface;
 
 /**
- * Used to fill panel hidden field containing params in json
+ * Used to fill panel hidden field containing params in json.
  */
 class StringToParamsTransformer implements DataTransformerInterface
 {
@@ -36,15 +38,15 @@ class StringToParamsTransformer implements DataTransformerInterface
     /**
      * Transforms a string (json) to an object (Params).
      *
-     * @param  string $params
+     * @param string $params
+     *
      * @return Params
      */
-    public function transform($params)
+    public function transform($params): Params
     {
         $params = json_decode($params, true);
-        $params = new Params($params);
 
-        return $params;
+        return new Params($params);
     }
 
     /**
@@ -54,7 +56,7 @@ class StringToParamsTransformer implements DataTransformerInterface
      *
      * @return string
      */
-    public function reverseTransform($params)
+    public function reverseTransform($params): string
     {
         return $this->serializer->serialize($params, 'json');
     }
