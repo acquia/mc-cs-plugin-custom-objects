@@ -38,7 +38,7 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
         $this->postFixtureSetup();
 
         $pluginDirectory   = $this->getContainer()->get('kernel')->locateResource('@CustomObjectsBundle');
-        $fixturesDirectory = $pluginDirectory.'/Tests/DataFixtures/ORM/Data';
+        $fixturesDirectory = $pluginDirectory.'/Tests/Functional/DataFixtures/ORM/Data';
 
         $objects = $this->loadFixtureFiles([
             $fixturesDirectory.'/roles.yml',

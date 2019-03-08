@@ -24,7 +24,7 @@ class CustomItemFilterQueryBuilderTest extends WebTestCase
     protected function setUp(): void
     {
         $pluginDirectory   = $this->getContainer()->get('kernel')->locateResource('@CustomObjectsBundle');
-        $fixturesDirectory = $pluginDirectory.'/Tests/DataFixtures/ORM/Data';
+        $fixturesDirectory = $pluginDirectory.'/Tests/Functional/DataFixtures/ORM/Data';
 
         $objects = $this->loadFixtureFiles([
             $fixturesDirectory.'/roles.yml',
