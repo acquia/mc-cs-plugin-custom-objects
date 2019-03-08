@@ -19,7 +19,7 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
 {
     use FixtureObjectsTrait;
 
-    /** 
+    /**
      * @var EntityManager
      */
     private $entityManager;

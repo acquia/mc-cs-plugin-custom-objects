@@ -11,7 +11,7 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Model;
+namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Repository;
 
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
@@ -27,7 +27,6 @@ use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Statement;
-
 
 class CustomItemRepositoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -82,7 +81,7 @@ class CustomItemRepositoryTest extends \PHPUnit_Framework_TestCase
         $count          = 33;
         $customObjectId = 33;
         $contactId      = 33;
-    
+
         $this->customObject->expects($this->once())
             ->method('getId')
             ->willReturn($customObjectId);
