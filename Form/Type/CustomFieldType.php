@@ -242,9 +242,7 @@ class CustomFieldType extends AbstractType
         $builder->add(
             $builder->create(
                 'params',
-                HiddenType::class,
-                [
-                ]
+                HiddenType::class
             )
                 ->addModelTransformer($this->paramsToStringTransformer)
         );
