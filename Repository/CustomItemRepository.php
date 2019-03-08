@@ -64,7 +64,8 @@ class CustomItemRepository extends AbstractTableRepository
         $queryBuilder->setParameter('contactId', $contact->getId());
         $queryBuilder->andWhere("{$fieldType->getTableAlias()}.custom_field_id = :customFieldId");
         $queryBuilder->setParameter('customFieldId', $customField->getId());
-        $queryBuilder->andWhere($queryBuilder->expr()->{$expr}("{$fieldType->getTableAlias()}.value", $value));
+        $queryBuilder->andWhere($queryBuilder->expr()->{$expr}("{$fieldType->getTableAlias()}.value", ':value'));
+        $queryBuilder->setParameter('value', $value);
 
         $result = $queryBuilder->execute()->fetchColumn();
 
