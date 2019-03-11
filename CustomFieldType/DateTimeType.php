@@ -38,7 +38,11 @@ class DateTimeType extends AbstractCustomFieldType
      */
     public function createValueEntity(CustomField $customField, CustomItem $customItem, $value = null): CustomFieldValueInterface
     {
-        return new CustomFieldValueDateTime($customField, $customItem, new \DateTime($value));
+        if (null === $value) {
+            $value = 'now';
+        }
+
+        return new CustomFieldValueDateTime($customField, $customItem, new \DateTimeImmutable($value));
     }
 
     /**
