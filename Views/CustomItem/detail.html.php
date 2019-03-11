@@ -25,7 +25,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             <div class="pr-md pl-md pt-lg pb-lg">
                 <div class="box-layout">
                     <div class="col-xs-10">
-                        <div class="text-muted"><?php echo $item->getCustomObject()->getNameSingular(); ?></div>
+                        <div class="text-muted"><?php echo $view->escape($item->getCustomObject()->getNameSingular()); ?></div>
                     </div>
                     <div class="col-xs-2 text-right">
                         <?php echo $view->render('MauticCoreBundle:Helper:publishstatus_badge.html.php', ['entity' => $item]); ?>
@@ -45,8 +45,14 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                             ); ?>
                             <?php foreach ($item->getCustomFieldValues() as $fieldValue) : ?>
                             <tr>
-                                <th><?php  echo $fieldValue->getCustomField()->getName(); ?></th>
-                                <td><?php  echo $fieldValue->getValue(); ?></td>
+                                <th><?php echo $view->escape($fieldValue->getCustomField()->getName()); ?></th>
+                                <td>
+                                    <?php if ($fieldValue->getValue() instanceof \DateTimeInterface) : ?>
+                                        <?php echo $view['date']->toFull($fieldValue->getValue()); ?>
+                                    <?php else : ?>
+                                        <?php echo $view->escape($fieldValue->getValue()); ?>
+                                    <?php endif; ?>
+                                </td>
                             </tr>
                             <?php endforeach; ?>
                             </tbody>
