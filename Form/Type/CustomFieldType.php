@@ -210,6 +210,11 @@ class CustomFieldType extends AbstractType
                 return;
             }
 
+            $defaultValue = $customField->getDefaultValue();
+            if ($customField->getType() === 'date' || $customField->getType() === 'datetime') {
+                $customField->setDefaultValue(new\DateTime($defaultValue));
+            }
+
             $builder->add(
                 'field',
                 $customField->getTypeObject()->getSymfonyFormFieldType(),
