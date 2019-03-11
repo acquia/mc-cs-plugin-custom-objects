@@ -54,7 +54,7 @@ class CustomFieldValueInt extends CustomFieldValueStandard
      */
     public function setValue($value = null): void
     {
-        $this->value = (int) $value;
+        $this->value = null === $value ? null : (int) $value;
     }
 
     /**
