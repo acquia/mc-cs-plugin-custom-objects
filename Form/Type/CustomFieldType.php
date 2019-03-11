@@ -211,17 +211,19 @@ class CustomFieldType extends AbstractType
             $builder->add(
                 'field',
                 $customField->getTypeObject()->getSymfonyFormFieldType(),
-                [
-                    'mapped'     => false,
-                    'label'      => $customField->getLabel(),
-                    'required'   => false,
-                    'data'       => $customField->getDefaultValue(),
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr'       => [ // @todo this overrides configureOptions() method content
-                        'class'    => 'form-control',
-                        'readonly' => true,
-                    ],
-                ]
+                $customField->getTypeObject()->createFormTypeOptions(
+                    [
+                        'mapped'     => false,
+                        'label'      => $customField->getLabel(),
+                        'required'   => false,
+                        'data'       => $customField->getDefaultValue(),
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => [
+                            'class'    => 'form-control',
+                            'readonly' => true,
+                        ]
+                    ]
+                )
             );
         });
 

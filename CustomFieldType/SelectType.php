@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+
 class SelectType extends AbstractTextType
 {
     /**
@@ -21,10 +23,18 @@ class SelectType extends AbstractTextType
     protected $key = 'select';
 
     /**
+     * @var array
+     */
+    protected $formTypeOptions = [
+        'expanded' => false,
+        'multiple' => false,
+    ];
+
+    /**
      * @return string
      */
     public function getSymfonyFormFieldType(): string
     {
-        return Form\Type\SelectType::class;
+        return ChoiceType::class;
     }
 }

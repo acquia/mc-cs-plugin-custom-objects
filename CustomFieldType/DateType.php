@@ -29,6 +29,17 @@ class DateType extends AbstractCustomFieldType
     protected $key = 'date';
 
     /**
+     * @var array
+     */
+    protected $formTypeOptions = [
+        'widget'     => 'single_text',
+        'attr'       => [
+            'data-toggle' => 'date',
+        ],
+        'format'   => 'yyyy-MM-dd',
+    ];
+
+    /**
      * @param CustomField $customField
      * @param CustomItem  $customItem
      * @param mixed|null  $value
@@ -49,7 +60,7 @@ class DateType extends AbstractCustomFieldType
      */
     public function getSymfonyFormFieldType(): string
     {
-        return Form\Type\DateType::class;
+        return \Symfony\Component\Form\Extension\Core\Type\DateType::class;
     }
 
     /**
