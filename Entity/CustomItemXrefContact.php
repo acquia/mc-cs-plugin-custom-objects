@@ -80,7 +80,7 @@ class CustomItemXrefContact
     /**
      * @return CustomItem
      */
-    public function getCustomItem(): CustomItem
+    public function getCustomItem()
     {
         return $this->customItem;
     }
@@ -88,7 +88,7 @@ class CustomItemXrefContact
     /**
      * @return Lead
      */
-    public function getContact(): Lead
+    public function getContact()
     {
         return $this->contact;
     }
@@ -96,7 +96,7 @@ class CustomItemXrefContact
     /**
      * @return DateTimeInterface
      */
-    public function getDateAdded(): DateTimeInterface
+    public function getDateAdded()
     {
         return $this->dateAdded;
     }
