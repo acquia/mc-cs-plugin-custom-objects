@@ -137,7 +137,7 @@ class SaveController extends CommonController
 
             $saveClicked = $form->get('buttons')->get('save')->isClicked();
             $detailView  = 'CustomObjectsBundle:CustomItem\View:view';
-            $formView    = 'CustomObjectsBundle:CustomItem\Form:renderForm';
+            $formView    = 'CustomObjectsBundle:CustomItem\Form:edit';
 
             $request->setMethod(Request::METHOD_GET);
 
@@ -151,9 +151,10 @@ class SaveController extends CommonController
             [
                 'returnUrl'      => $route,
                 'viewParameters' => [
-                    'entity' => $customItem,
-                    'form'   => $form->createView(),
-                    'tmpl'   => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'entity'       => $customItem,
+                    'customObject' => $customItem->getCustomObject(),
+                    'form'         => $form->createView(),
+                    'tmpl'         => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.php',
                 'passthroughVars' => [
