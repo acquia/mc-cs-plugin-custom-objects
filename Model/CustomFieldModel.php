@@ -120,6 +120,11 @@ class CustomFieldModel extends FormModel
                         'value'  => $customObject->getId(),
                         'expr'   => 'eq',
                     ],
+                    [
+                        'column' => 'e.isPublished',
+                        'value'  => true,
+                        'expr'   => 'eq',
+                    ],
                 ],
             ],
             'orderBy'          => 'e.order',
