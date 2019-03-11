@@ -3,8 +3,8 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomField:
     custom_object: '@custom_object1'
     is_published: true
     date_added: '<date()>'
-    label: '<word()> String'
-    type: 'string'
+    label: '<word()> Text'
+    type: 'tect'
   custom_field2:
     custom_object: '@custom_object1'
     is_published: true
@@ -27,8 +27,8 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomField:
     custom_object: '@custom_object1'
     is_published: true
     date_added: '<datetime()>'
-    label: '<word()> Link'
-    type: 'link'
+    label: '<word()> Text'
+    type: 'text'
   custom_field6:
     custom_object: '@custom_object1'
     is_published: true
