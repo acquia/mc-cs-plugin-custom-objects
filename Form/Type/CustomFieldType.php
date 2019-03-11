@@ -226,6 +226,14 @@ class CustomFieldType extends AbstractType
                     ]
                 )
             );
+
+            if ($customField->getDefaultValue() instanceof \DateTime) {
+                $customField->setDefaultValue(
+                    $customField->getDefaultValue()->format("Y-m-d H:i:s")
+                );
+            }
+
+            $builder->add('defaultValue', HiddenType::class);
         });
 
         $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event): void {
@@ -240,7 +248,6 @@ class CustomFieldType extends AbstractType
 
         $builder->add('label', HiddenType::class);
         $builder->add('required', HiddenType::class);
-        $builder->add('defaultValue', HiddenType::class);
 
         $builder->add(
             $builder->create(
