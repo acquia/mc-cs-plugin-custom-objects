@@ -246,6 +246,18 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     }
 
     /**
+     * @return Collection
+     */
+    public function getPublishedFields()
+    {
+        return $this->getCustomFields()
+            ->filter(function(\MauticPlugin\CustomObjectsBundle\Entity\CustomField $customField) {
+                return $customField->isPublished();
+            }
+        );
+    }
+
+    /**
      * Called when the custom fields are loaded from the database.
      */
     public function createFieldsSnapshot()
