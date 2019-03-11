@@ -67,7 +67,7 @@ class CustomFieldType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // Is part of custom object form?
-        $customObjectForm = !empty($options['custom_object_form']);
+        $isCustomObjectForm = !empty($options['custom_object_form']);
 
         $builder->add('id', HiddenType::class);
 
@@ -104,7 +104,7 @@ class CustomFieldType extends AbstractType
             HiddenType::class
         );
 
-        if ($customObjectForm) {
+        if ($isCustomObjectForm) {
             $this->buildPanelFormFields($builder);
         } else {
             $this->buildModalFormFields($builder, $options);
