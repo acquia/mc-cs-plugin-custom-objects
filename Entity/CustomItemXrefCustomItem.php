@@ -56,7 +56,7 @@ class CustomItemXrefCustomItem
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('custom_item_xref_contact');
+        $builder->setTable('custom_item_xref_custom_item');
 
         $builder->createManyToOne('customItem', CustomItem::class)
             ->addJoinColumn('custom_item_id', 'id', false, false, 'CASCADE')
