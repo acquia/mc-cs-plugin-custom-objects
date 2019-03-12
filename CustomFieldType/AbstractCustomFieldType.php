@@ -24,6 +24,11 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     protected $key = 'undefined';
 
     /**
+     * @var mixed[]
+     */
+    protected $formTypeOptions = [];
+
+    /**
      * @var string
      */
     private $name;
@@ -99,5 +104,13 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
         }
 
         return $options;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createFormTypeOptions(array $options = []): array
+    {
+        return array_merge_recursive($this->formTypeOptions, $options);
     }
 }

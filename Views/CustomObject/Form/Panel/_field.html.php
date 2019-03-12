@@ -41,7 +41,7 @@ $deleted                    = !empty($_POST['custom_object']['customFields'][$or
     </div>
 
     <div class="row ml-0 mr-0">
-        <div id="mauticform_1" data-validate="name" data-validation-type="text" class="mauticform-row mauticform-text mauticform-field-1 mauticform-required">
+        <div class="mauticform-row">
             <?php echo $view['form']->row($customField['field']); ?>
         </div>
     </div>

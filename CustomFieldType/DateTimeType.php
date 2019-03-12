@@ -28,6 +28,17 @@ class DateTimeType extends AbstractCustomFieldType
     protected $key = 'datetime';
 
     /**
+     * {@inheritdoc}
+     */
+    protected $formTypeOptions = [
+        'widget'     => 'single_text',
+        'attr'       => [
+            'data-toggle' => 'datetime',
+        ],
+        'format'   => 'yyyy-MM-dd HH:mm',
+    ];
+
+    /**
      * @param CustomField $customField
      * @param CustomItem  $customItem
      * @param mixed|null  $value
@@ -50,7 +61,7 @@ class DateTimeType extends AbstractCustomFieldType
      */
     public function getSymfonyFormFieldType(): string
     {
-        return Form\Type\DateTimeType::class;
+        return \Symfony\Component\Form\Extension\Core\Type\DateTimeType::class;
     }
 
     /**

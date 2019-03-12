@@ -67,7 +67,7 @@ class CustomFieldType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // Is part of custom object form?
-        $customObjectForm = !empty($options['custom_object_form']);
+        $isCustomObjectForm = !empty($options['custom_object_form']);
 
         $builder->add('id', HiddenType::class);
 
@@ -104,7 +104,7 @@ class CustomFieldType extends AbstractType
             HiddenType::class
         );
 
-        if ($customObjectForm) {
+        if ($isCustomObjectForm) {
             $this->buildPanelFormFields($builder);
         } else {
             $this->buildModalFormFields($builder, $options);
@@ -168,13 +168,15 @@ class CustomFieldType extends AbstractType
             $form->add(
                 'defaultValue',
                 $customField->getTypeObject()->getSymfonyFormFieldType(),
-                [
-                    'label'      => 'custom.field.label.default_value',
-                    'required'   => false,
-                    'attr'       => [
-                        'class' => 'form-control',
-                    ],
-                ]
+                $customField->getTypeObject()->createFormTypeOptions(
+                    [
+                        'label'      => 'custom.field.label.default_value',
+                        'required'   => false,
+                        'attr'       => [
+                            'class' => 'form-control',
+                        ],
+                    ]
+                )
             );
         });
 
@@ -211,18 +213,30 @@ class CustomFieldType extends AbstractType
             $builder->add(
                 'field',
                 $customField->getTypeObject()->getSymfonyFormFieldType(),
-                [
-                    'mapped'     => false,
-                    'label'      => $customField->getLabel(),
-                    'required'   => false,
-                    'data'       => $customField->getDefaultValue(),
-                    'label_attr' => ['class' => 'control-label'],
-                    'attr'       => [ // @todo this overrides configureOptions() method content
-                        'class'    => 'form-control',
-                        'readonly' => true,
-                    ],
-                ]
+                $customField->getTypeObject()->createFormTypeOptions(
+                    [
+                        'mapped'     => false,
+                        'label'      => $customField->getLabel(),
+                        'required'   => false,
+                        'data'       => $customField->getDefaultValue(),
+                        'label_attr' => ['class' => 'control-label'],
+                        'attr'       => [
+                            'class'    => 'form-control',
+                            'readonly' => true,
+                        ],
+                    ]
+                )
             );
+
+            if ($customField->getDefaultValue() instanceof \DateTime) {
+                // @todo default value needs to be string because of DB column type
+                // @see CustomObjectsBundle/EventListener/CustomFieldPostLoadSubscriber.php:71
+                $customField->setDefaultValue(
+                    $customField->getDefaultValue()->format('Y-m-d H:i:s')
+                );
+            }
+
+            $builder->add('defaultValue', HiddenType::class);
         });
 
         $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event): void {
@@ -237,7 +251,6 @@ class CustomFieldType extends AbstractType
 
         $builder->add('label', HiddenType::class);
         $builder->add('required', HiddenType::class);
-        $builder->add('defaultValue', HiddenType::class);
 
         $builder->add(
             $builder->create(
