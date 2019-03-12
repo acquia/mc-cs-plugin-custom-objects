@@ -23,7 +23,6 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\LeadBundle\Entity\Lead;
@@ -57,17 +56,11 @@ class CustomItemModel extends FormModel
     private $customFieldValueModel;
 
     /**
-     * @var CustomFieldTypeProvider
-     */
-    private $customFieldTypeProvider;
-
-    /**
      * @param EntityManager                $entityManager
      * @param CustomItemRepository         $customItemRepository
      * @param CustomItemPermissionProvider $permissionProvider
      * @param UserHelper                   $userHelper
      * @param CustomFieldValueModel        $customFieldValueModel
-     * @param CustomFieldTypeProvider      $customFieldTypeProvider
      * @param EventDispatcherInterface     $dispatcher
      */
     public function __construct(
@@ -76,7 +69,6 @@ class CustomItemModel extends FormModel
         CustomItemPermissionProvider $permissionProvider,
         UserHelper $userHelper,
         CustomFieldValueModel $customFieldValueModel,
-        CustomFieldTypeProvider $customFieldTypeProvider,
         EventDispatcherInterface $dispatcher
     ) {
         $this->entityManager           = $entityManager;
@@ -84,7 +76,6 @@ class CustomItemModel extends FormModel
         $this->permissionProvider      = $permissionProvider;
         $this->userHelper              = $userHelper;
         $this->customFieldValueModel   = $customFieldValueModel;
-        $this->customFieldTypeProvider = $customFieldTypeProvider;
         $this->dispatcher              = $dispatcher;
     }
 
@@ -218,7 +209,7 @@ class CustomItemModel extends FormModel
         $customFields      = $customItem->getCustomObject()->getPublishedFields();
         $customFieldValues = $this->customFieldValueModel->getValuesForItem($customItem, $customFields);
 
-        $customFieldValues->map(function(CustomFieldValueInterface $customFieldValue) use ($customItem) {
+        $customFieldValues->map(function (CustomFieldValueInterface $customFieldValue) use ($customItem): void {
             $customItem->setCustomFieldValue($customFieldValue);
         });
 

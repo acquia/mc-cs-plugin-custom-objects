@@ -39,7 +39,7 @@ class CustomItemXrefCustomItem
 
     /**
      * @param CustomItem             $customItem
-     * @param LeaCustomItem          $parentCustomItem
+     * @param CustomItem             $parentCustomItem
      * @param DateTimeInterface|null $dateAdded
      */
     public function __construct(CustomItem $customItem, CustomItem $parentCustomItem, ?DateTimeInterface $dateAdded = null)

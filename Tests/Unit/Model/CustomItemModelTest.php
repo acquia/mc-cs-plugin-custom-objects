@@ -18,9 +18,7 @@ use Doctrine\ORM\EntityManager;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use Mautic\CoreBundle\Helper\UserHelper;
-use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldValueModel;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Mautic\UserBundle\Entity\User;
@@ -50,11 +48,7 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
 
     private $userHelper;
 
-    private $customFieldModel;
-
     private $customFieldValueModel;
-
-    private $customFieldTypeProvider;
 
     private $dispatcher;
 
@@ -72,18 +66,14 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
         $this->customItemRepository         = $this->createMock(CustomItemRepository::class);
         $this->customItemPermissionProvider = $this->createMock(CustomItemPermissionProvider::class);
         $this->userHelper                   = $this->createMock(UserHelper::class);
-        $this->customFieldModel             = $this->createMock(CustomFieldModel::class);
         $this->customFieldValueModel        = $this->createMock(CustomFieldValueModel::class);
-        $this->customFieldTypeProvider      = $this->createMock(CustomFieldTypeProvider::class);
         $this->dispatcher                   = $this->createMock(EventDispatcherInterface::class);
         $this->customItemModel              = new CustomItemModel(
             $this->entityManager,
             $this->customItemRepository,
             $this->customItemPermissionProvider,
             $this->userHelper,
-            $this->customFieldModel,
             $this->customFieldValueModel,
-            $this->customFieldTypeProvider,
             $this->dispatcher
         );
 

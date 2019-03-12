@@ -19,7 +19,6 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 class CustomFieldValueModel
 {
@@ -43,9 +42,9 @@ class CustomFieldValueModel
      * @param CustomItem $customItem
      * @param Collection $customFields
      *
-     * @return ArrayCollection
+     * @return Collection
      */
-    public function getValuesForItem(CustomItem $customItem, Collection $customFields): ArrayCollection
+    public function getValuesForItem(CustomItem $customItem, Collection $customFields): Collection
     {
         if (!$customItem->getId()) {
             return new ArrayCollection();
@@ -95,15 +94,15 @@ class CustomFieldValueModel
     }
 
     /**
-     * @param array      $valueRows
+     * @param mixed[]    $valueRows
      * @param Collection $customFields
      * @param CustomItem $customItem
-     * 
+     *
      * @return Collection
      */
     private function createValueObjects(array $valueRows, Collection $customFields, CustomItem $customItem): Collection
     {
-        return $customFields->map(function(CustomField $customField) use ($customItem, $valueRows) {
+        return $customFields->map(function (CustomField $customField) use ($customItem, $valueRows) {
             $entityClass      = $customField->getTypeObject()->getEntityClass();
             $customFieldValue = new $entityClass($customField, $customItem);
 
@@ -122,8 +121,8 @@ class CustomFieldValueModel
 
     /**
      * @param Collection $queries
-     * 
-     * @return array
+     *
+     * @return mixed[]
      */
     private function fetchValues(Collection $queries): array
     {
@@ -144,12 +143,12 @@ class CustomFieldValueModel
     /**
      * @param CustomItem $customItem
      * @param Collection $customFields
-     * 
+     *
      * @return Collection
      */
     private function buildQueriesForUnion(CustomItem $customItem, Collection $customFields): Collection
     {
-        return $customFields->map(function(CustomField $customField) use ($customItem) {
+        return $customFields->map(function (CustomField $customField) use ($customItem) {
             $type         = $customField->getTypeObject();
             $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
             $queryBuilder->select("{$type->getTableAlias()}.custom_field_id, {$type->getTableAlias()}.value, '{$type->getKey()}' AS type");

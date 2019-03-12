@@ -515,7 +515,6 @@ return [
                     'custom_item.permission.provider',
                     'mautic.helper.user',
                     'mautic.custom.model.field.value',
-                    'custom_field.type.provider',
                     'event_dispatcher',
                 ],
             ],
