@@ -55,10 +55,8 @@ class CustomFieldValueDate extends CustomFieldValueStandard
      */
     public function setValue($value = null): void
     {
-        if (!$value instanceof DateTimeInterface) {
-            $valueToString = print_r($value, true);
-
-            throw new \UnexpectedValueException("Value must be type of DateTimeInterface. {$valueToString} provided.");
+        if (null !== $value && !$value instanceof DateTimeInterface) {
+            $value = new \DateTimeImmutable($value);
         }
 
         $this->value = $value;

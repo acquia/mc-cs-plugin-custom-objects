@@ -14,16 +14,22 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Migrations;
 
 use MauticPlugin\CustomObjectsBundle\Migration\AbstractMigration;
+use Doctrine\DBAL\Schema\Schema;
 
 class Version_0_0 extends AbstractMigration
 {
-    public function isApplicable(): bool
+    /**
+     * {@inheritdoc}
+     */
+    protected function isApplicable(Schema $schema): bool
     {
-        return !$this->entityManager->getConnection()->getSchemaManager()
-            ->tablesExist(["{$this->tablePrefix}custom_object"]);
+        return !$schema->hasTable("{$this->tablePrefix}custom_object");
     }
 
-    public function up(): void
+    /**
+     * {@inheritdoc}
+     */
+    protected function up(): void
     {
         $this->addSql("
             CREATE TABLE `{$this->tablePrefix}custom_object` (

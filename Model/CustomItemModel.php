@@ -23,7 +23,6 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\LeadBundle\Entity\Lead;
@@ -32,6 +31,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 
 class CustomItemModel extends FormModel
 {
@@ -51,28 +51,16 @@ class CustomItemModel extends FormModel
     private $permissionProvider;
 
     /**
-     * @var CustomFieldModel
-     */
-    private $customFieldModel;
-
-    /**
      * @var CustomFieldValueModel
      */
     private $customFieldValueModel;
-
-    /**
-     * @var CustomFieldTypeProvider
-     */
-    private $customFieldTypeProvider;
 
     /**
      * @param EntityManager                $entityManager
      * @param CustomItemRepository         $customItemRepository
      * @param CustomItemPermissionProvider $permissionProvider
      * @param UserHelper                   $userHelper
-     * @param CustomFieldModel             $customFieldModel
      * @param CustomFieldValueModel        $customFieldValueModel
-     * @param CustomFieldTypeProvider      $customFieldTypeProvider
      * @param EventDispatcherInterface     $dispatcher
      */
     public function __construct(
@@ -80,18 +68,14 @@ class CustomItemModel extends FormModel
         CustomItemRepository $customItemRepository,
         CustomItemPermissionProvider $permissionProvider,
         UserHelper $userHelper,
-        CustomFieldModel $customFieldModel,
         CustomFieldValueModel $customFieldValueModel,
-        CustomFieldTypeProvider $customFieldTypeProvider,
         EventDispatcherInterface $dispatcher
     ) {
         $this->entityManager           = $entityManager;
         $this->customItemRepository    = $customItemRepository;
         $this->permissionProvider      = $permissionProvider;
         $this->userHelper              = $userHelper;
-        $this->customFieldModel        = $customFieldModel;
         $this->customFieldValueModel   = $customFieldValueModel;
-        $this->customFieldTypeProvider = $customFieldTypeProvider;
         $this->dispatcher              = $dispatcher;
     }
 
@@ -222,27 +206,12 @@ class CustomItemModel extends FormModel
      */
     public function populateCustomFields(CustomItem $customItem): CustomItem
     {
-        $values            = $customItem->getCustomFieldValues();
-        $customFields      = $this->customFieldModel->fetchCustomFieldsForObject($customItem->getCustomObject());
-        $customFieldValues = $this->customFieldValueModel->getValuesForItem($customItem);
+        $customFields      = $customItem->getCustomObject()->getPublishedFields();
+        $customFieldValues = $this->customFieldValueModel->getValuesForItem($customItem, $customFields);
 
-        foreach ($customFieldValues as $customFieldValue) {
-            $values->set($customFieldValue->getId(), $customFieldValue);
-        }
-
-        /** @var CustomField $customField */
-        foreach ($customFields as $customField) {
-            // Create default value for field that does not exist yet.
-            try {
-                $customItem->findCustomFieldValueForFieldId($customField->getId());
-            } catch (NotFoundException $e) {
-                $customFieldType = $this->customFieldTypeProvider->getType($customField->getType());
-                $values->set(
-                    $customField->getId(),
-                    $customFieldType->createValueEntity($customField, $customItem, $customField->getDefaultValue())
-                );
-            }
-        }
+        $customFieldValues->map(function (CustomFieldValueInterface $customFieldValue) use ($customItem): void {
+            $customItem->setCustomFieldValue($customFieldValue);
+        });
 
         $customItem->createFieldValuesSnapshot();
 

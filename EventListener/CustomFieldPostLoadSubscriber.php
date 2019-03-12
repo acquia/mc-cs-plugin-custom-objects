@@ -61,6 +61,9 @@ class CustomFieldPostLoadSubscriber implements EventSubscriber
         }
 
         $customField->setTypeObject($this->customFieldTypeProvider->getType($customField->getType()));
-        $customField->setParams(new CustomField\Params($customField->getParams()));
+
+        if (is_array($customField->getParams())) {
+            $customField->setParams(new CustomField\Params($customField->getParams()));
+        }
     }
 }

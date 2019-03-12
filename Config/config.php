@@ -19,7 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 return [
     'name'        => 'Custom Objects',
     'description' => 'Adds custom objects and fields features to Mautic',
-    'version'     => '0.0.1',
+    'version'     => '0.0.2',
     'author'      => 'Mautic, Inc.',
 
     'routes' => [
@@ -505,7 +505,6 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomFieldValueModel::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
-                    'custom_field.type.provider',
                 ],
             ],
             'mautic.custom.model.item' => [
@@ -515,9 +514,7 @@ return [
                     'custom_item.repository',
                     'custom_item.permission.provider',
                     'mautic.helper.user',
-                    'mautic.custom.model.field',
                     'mautic.custom.model.field.value',
-                    'custom_field.type.provider',
                     'event_dispatcher',
                 ],
             ],

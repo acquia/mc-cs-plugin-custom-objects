@@ -61,8 +61,9 @@ class Engine
             /** @var AbstractMigration $migration */
             $migration = new $migrationClass($this->entityManager, $this->tablePrefix);
 
-            $migration->up();
-            $migration->execute();
+            if ($migration->shouldExecute()) {
+                $migration->execute();
+            }
         }
 
         $this->entityManager->commit();

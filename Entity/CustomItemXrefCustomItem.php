@@ -16,22 +16,21 @@ namespace MauticPlugin\CustomObjectsBundle\Entity;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Mautic\LeadBundle\Entity\Lead;
 use DateTimeInterface;
 use DateTimeImmutable;
 use DateTimeZone;
 
-class CustomItemXrefContact
+class CustomItemXrefCustomItem
 {
-    /**
-     * @var Lead
-     */
-    private $contact;
-
     /**
      * @var CustomItem
      */
     private $customItem;
+
+    /**
+     * @var CustomItem
+     */
+    private $parentCustomItem;
 
     /**
      * @var DateTimeInterface
@@ -40,14 +39,14 @@ class CustomItemXrefContact
 
     /**
      * @param CustomItem             $customItem
-     * @param Lead                   $contact
+     * @param CustomItem             $parentCustomItem
      * @param DateTimeInterface|null $dateAdded
      */
-    public function __construct(CustomItem $customItem, Lead $contact, ?DateTimeInterface $dateAdded = null)
+    public function __construct(CustomItem $customItem, CustomItem $parentCustomItem, ?DateTimeInterface $dateAdded = null)
     {
-        $this->customItem = $customItem;
-        $this->contact    = $contact;
-        $this->dateAdded  = $dateAdded ?: new DateTimeImmutable('now', new DateTimeZone('UTC'));
+        $this->customItem       = $customItem;
+        $this->parentCustomItem = $parentCustomItem;
+        $this->dateAdded        = $dateAdded ?: new DateTimeImmutable('now', new DateTimeZone('UTC'));
     }
 
     /**
@@ -57,7 +56,7 @@ class CustomItemXrefContact
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('custom_item_xref_contact');
+        $builder->setTable('custom_item_xref_custom_item');
 
         $builder->createManyToOne('customItem', CustomItem::class)
             ->addJoinColumn('custom_item_id', 'id', false, false, 'CASCADE')
@@ -66,8 +65,8 @@ class CustomItemXrefContact
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createManyToOne('contact', Lead::class)
-            ->addJoinColumn('contact_id', 'id', false, false, 'CASCADE')
+        $builder->createManyToOne('parentCustomItem', CustomItem::class)
+            ->addJoinColumn('parent_custom_item_id', 'id', false, false, 'CASCADE')
             ->makePrimaryKey()
             ->fetchExtraLazy()
             ->build();
@@ -86,11 +85,11 @@ class CustomItemXrefContact
     }
 
     /**
-     * @return Lead
+     * @return CustomItem
      */
-    public function getContact()
+    public function getParentCustomItem()
     {
-        return $this->contact;
+        return $this->parentCustomItem;
     }
 
     /**
