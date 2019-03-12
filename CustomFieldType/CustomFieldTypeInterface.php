@@ -74,9 +74,9 @@ interface CustomFieldTypeInterface
     public function getOperatorOptions(TranslatorInterface $translator): array;
 
     /**
-     * @param array $options
+     * @param mixed[] $options
      *
-     * @return array
+     * @return mixed[]
      */
     public function createFormTypeOptions(array $options = []): array;
 }

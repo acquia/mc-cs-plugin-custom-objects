@@ -29,7 +29,7 @@ class DateType extends AbstractCustomFieldType
     protected $key = 'date';
 
     /**
-     * @var array
+     * {@inheritdoc}
      */
     protected $formTypeOptions = [
         'widget'     => 'single_text',

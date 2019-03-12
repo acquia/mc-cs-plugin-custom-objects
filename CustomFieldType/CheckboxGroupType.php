@@ -23,7 +23,7 @@ class CheckboxGroupType extends AbstractTextType
     protected $key = 'checkbox_group';
 
     /**
-     * @var array
+     * {@inheritdoc}
      */
     protected $formTypeOptions = [
         'expanded' => true,

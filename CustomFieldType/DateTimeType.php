@@ -27,6 +27,9 @@ class DateTimeType extends AbstractCustomFieldType
      */
     protected $key = 'datetime';
 
+    /**
+     * {@inheritdoc}
+     */
     protected $formTypeOptions = [
         'widget'     => 'single_text',
         'attr'       => [

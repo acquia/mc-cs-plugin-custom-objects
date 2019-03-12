@@ -23,7 +23,7 @@ class RadioGroupType extends AbstractTextType
     protected $key = 'radio_group';
 
     /**
-     * @var array
+     * {@inheritdoc}
      */
     protected $formTypeOptions = [
         'expanded' => true,

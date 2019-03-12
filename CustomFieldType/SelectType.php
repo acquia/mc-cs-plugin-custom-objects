@@ -23,7 +23,7 @@ class SelectType extends AbstractTextType
     protected $key = 'select';
 
     /**
-     * @var array
+     * {@inheritdoc}
      */
     protected $formTypeOptions = [
         'expanded' => false,
