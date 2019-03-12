@@ -61,9 +61,11 @@ class CustomFieldPostLoadSubscriber implements EventSubscriber
         }
 
         $customField->setTypeObject($this->customFieldTypeProvider->getType($customField->getType()));
+        $customField->setParams(new CustomField\Params($customField->getParams()));
 
-        if (is_array($customField->getParams())) {
-            $customField->setParams(new CustomField\Params($customField->getParams()));
+        $defaultValue = $customField->getDefaultValue();
+        if ($customField->getType() === 'date' || $customField->getType() === 'datetime') {
+            $customField->setDefaultValue(new\DateTime($defaultValue));
         }
     }
 }
