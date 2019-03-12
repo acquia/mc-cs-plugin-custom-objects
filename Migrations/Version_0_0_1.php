@@ -13,30 +13,28 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Migrations;
 
-use Doctrine\DBAL\Schema\MySqlSchemaManager;
 use MauticPlugin\CustomObjectsBundle\Migration\AbstractMigration;
+use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\SchemaException;
 
 class Version_0_0_1 extends AbstractMigration
 {
-    public function isApplicable(): bool
+    /**
+     * {@inheritdoc}
+     */
+    protected function isApplicable(Schema $schema): bool
     {
-        /** @var MySqlSchemaManager $sm */
-        $sm = $this->entityManager->getConnection()->getSchemaManager();
-
-        if (!$sm->tablesExist(["{$this->tablePrefix}custom_object"])) {
+        try {
+            return !$schema->getTable("{$this->tablePrefix}custom_object")->hasColumn('description');
+        } catch (SchemaException $e) {
             return false;
         }
-
-        $columns = $sm->listTableColumns('custom_object');
-
-        if (array_key_exists('description', $columns)) {
-            return false;
-        }
-
-        return true;
     }
 
-    public function up(): void
+    /**
+     * {@inheritdoc}
+     */
+    protected function up(): void
     {
         $this->addSql("
             ALTER TABLE `{$this->tablePrefix}custom_object`

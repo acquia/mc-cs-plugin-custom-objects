@@ -14,8 +14,9 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Migration;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\DBAL\Schema\Schema;
 
-class AbstractMigration implements MigrationInterface
+abstract class AbstractMigration implements MigrationInterface
 {
     /**
      * @var EntityManager
@@ -45,17 +46,9 @@ class AbstractMigration implements MigrationInterface
     /**
      * {@inheritdoc}
      */
-    public function isApplicable(): bool
+    public function shouldExecute(): bool
     {
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function up(): void
-    {
-        // Implement it in child class
+        return $this->isApplicable($this->entityManager->getConnection()->getSchemaManager()->createSchema());
     }
 
     /**
@@ -65,11 +58,9 @@ class AbstractMigration implements MigrationInterface
      */
     public function execute(): void
     {
-        if (!$this->queries) {
-            return;
-        }
+        $this->up();
 
-        if (!$this->isApplicable()) {
+        if (!$this->queries) {
             return;
         }
 
@@ -80,6 +71,21 @@ class AbstractMigration implements MigrationInterface
             $stmt->execute();
         }
     }
+
+    /**
+     * Define in the child migration whether the migration should be executed.
+     * Check if the migration is applied in the schema already.
+     *
+     * @param Schema $schema
+     *
+     * @return bool
+     */
+    abstract protected function isApplicable(Schema $schema): bool;
+
+    /**
+     * Define queries for migration up.
+     */
+    abstract protected function up(): void;
 
     /**
      * @param string $sql
