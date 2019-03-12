@@ -223,14 +223,14 @@ class CustomFieldType extends AbstractType
                         'attr'       => [
                             'class'    => 'form-control',
                             'readonly' => true,
-                        ]
+                        ],
                     ]
                 )
             );
 
             if ($customField->getDefaultValue() instanceof \DateTime) {
                 $customField->setDefaultValue(
-                    $customField->getDefaultValue()->format("Y-m-d H:i:s")
+                    $customField->getDefaultValue()->format('Y-m-d H:i:s')
                 );
             }
 

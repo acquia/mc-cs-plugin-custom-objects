@@ -113,8 +113,6 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
      */
     public function createFormTypeOptions(array $options = []): array
     {
-        $options = array_merge_recursive($this->formTypeOptions, $options);
-
-        return $options;
+        return array_merge_recursive($this->formTypeOptions, $options);
     }
 }

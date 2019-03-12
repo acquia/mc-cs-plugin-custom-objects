@@ -41,7 +41,7 @@ class ParamsToStringTransformer implements DataTransformerInterface
      */
     public function transform($params = null): string
     {
-        if ($params === null) {
+        if (null === $params) {
             // Param can be null because entities are not using constructors
             return $this->serializer->serialize((new Params())->__toArray(), 'json');
         }
