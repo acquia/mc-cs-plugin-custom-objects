@@ -60,12 +60,17 @@ class CustomFieldPostLoadSubscriber implements EventSubscriber
             return;
         }
 
-        $customField->setTypeObject($this->customFieldTypeProvider->getType($customField->getType()));
-        $customField->setParams(new CustomField\Params($customField->getParams()));
+        $type = $customField->getType();
+
+        $customField->setTypeObject($this->customFieldTypeProvider->getType($type));
+
+        if (is_array($customField->getParams())) {
+            $customField->setParams(new CustomField\Params($customField->getParams()));
+        }
 
         $defaultValue = $customField->getDefaultValue();
-        if ($customField->getType() === 'date' || $customField->getType() === 'datetime') {
-            $customField->setDefaultValue(new\DateTime($defaultValue));
+        if ('date' === $type || 'datetime' === $type) {
+            $customField->setDefaultValue(new \DateTime($defaultValue));
         }
     }
 }
