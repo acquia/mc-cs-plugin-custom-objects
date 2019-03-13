@@ -47,11 +47,14 @@ class Params
      */
     public function __toArray(): array
     {
-        return [
+        $return = [
             'requiredValidationMessage' => $this->requiredValidationMessage,
             'emptyValue' => $this->emptyValue,
             'allowMultiple' => $this->allowMultiple,
         ];
+
+        // Remove null and false values as they are default
+        return array_filter($return);
     }
 
     /**
