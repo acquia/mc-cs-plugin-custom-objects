@@ -15,6 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Form\Type\CustomField;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -32,6 +33,19 @@ class ParamsType extends AbstractType
             [
                 'label'      => 'custom.field.label.required_validation_message',
                 'required'   => false,
+            ]
+        );
+
+        $builder->add(
+            'options',
+            CollectionType::class,
+            [
+                'mapped' => false,
+                'allow_add' => true,
+                'allow_delete' => true,
+                'delete_empty' => true,
+                'entry_type' => OptionsType::class,
+                'prototype' => true,
             ]
         );
     }
