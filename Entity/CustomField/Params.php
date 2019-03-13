@@ -13,6 +13,11 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
+/**
+ * Stored in `custom_field.params` column
+ */
 class Params
 {
     /**
@@ -31,12 +36,31 @@ class Params
     private $allowMultiple = false;
 
     /**
+     * @var ArrayCollection|Option[]
+     */
+    private $options;
+
+    /**
+     * @todo Try to use factory if used only in \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldPostLoadSubscriber
      * @param mixed[] $params
      */
     public function __construct(array $params = [])
     {
+        if (array_key_exists('options', $params)) {
+            $options = $params['options'];
+            unset($params['options']);
+        }
+
         foreach ($params as $key => $value) {
             $this->{$key} = $value;
+        }
+
+        $this->options = new ArrayCollection();
+
+        if (isset($options)) {
+            foreach ($options as $key => $option) {
+                $this->addOption(new Option($option));
+            }
         }
     }
 
@@ -52,6 +76,13 @@ class Params
             'emptyValue' => $this->emptyValue,
             'allowMultiple' => $this->allowMultiple,
         ];
+
+        if (!empty($this->options)) {
+            foreach($this->options as $option) {
+                $return['options'][] = $option->__toArray();
+            }
+            $return['options'] = array_filter($return['options']);
+        }
 
         // Remove null and false values as they are default
         return array_filter($return);
@@ -103,5 +134,29 @@ class Params
     public function setAllowMultiple(bool $allowMultiple): void
     {
         $this->allowMultiple = $allowMultiple;
+    }
+
+    /**
+     * @param Option $option
+     */
+    public function addOption(Option $option): void
+    {
+        $this->options->add($option);
+    }
+
+    /**
+     * @param Option $option
+     */
+    public function removeOption(Option $option): void
+    {
+        $this->options->remove($option);
+    }
+
+    /**
+     * @return ArrayCollection|Option[]
+     */
+    public function getOptions(): ArrayCollection
+    {
+        return $this->options;
     }
 }
