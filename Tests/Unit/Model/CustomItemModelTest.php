@@ -29,10 +29,18 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\AbstractQuery;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
+use MauticPlugin\CustomObjectsBundle\DTO\TableFilterConfig;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 
 class CustomItemModelTest extends \PHPUnit_Framework_TestCase
 {
     private $customItem;
+
+    private $customObject;
 
     private $user;
 
@@ -59,6 +67,7 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
         parent::setUp();
 
         $this->customItem                   = $this->createMock(CustomItem::class);
+        $this->customObject                 = $this->createMock(CustomObject::class);
         $this->user                         = $this->createMock(User::class);
         $this->entityManager                = $this->createMock(EntityManager::class);
         $this->queryBuilder                 = $this->createMock(QueryBuilder::class);
@@ -138,5 +147,196 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher->expects($this->at(1))->method('dispatch')->with(CustomItemEvents::ON_CUSTOM_ITEM_POST_DELETE, $this->isInstanceOf(CustomItemEvent::class));
 
         $this->customItemModel->delete($this->customItem);
+    }
+
+    public function testFetchEntity(): void
+    {
+        $this->customItemRepository->expects($this->once())
+            ->method('getEntity')
+            ->willReturn($this->customItem);
+
+        $this->customItem->expects($this->once())
+            ->method('getCustomFieldValues')
+            ->willReturn(new ArrayCollection([$this->createMock(CustomFieldValueInterface::class)]));
+
+        $this->customItem->expects($this->never())
+            ->method('getCustomObject');
+
+        $this->customItemModel->fetchEntity(44);
+    }
+
+    public function testGetTableData(): void
+    {
+        $tableConfig       = $this->createMock(TableConfig::class);
+        $tableFilterConfig = $this->createMock(TableFilterConfig::class);
+
+        $tableConfig->expects($this->once())
+            ->method('getFilter')
+            ->with(CustomItem::class, 'customObject')
+            ->willReturn($tableFilterConfig);
+
+        $tableFilterConfig->expects($this->once())
+            ->method('getValue')
+            ->willReturn(99);
+
+        $this->customItemRepository->expects($this->once())
+            ->method('getTableDataQuery')
+            ->with($tableConfig)
+            ->willReturn($this->queryBuilder);
+
+        $this->customItemPermissionProvider->expects($this->once())
+            ->method('isGranted')
+            ->will($this->throwException(new ForbiddenException('viewother')));
+
+        $this->user->expects($this->once())
+            ->method('getId')
+            ->willReturn(22);
+
+        $this->customItemRepository->expects($this->once())
+            ->method('applyOwnerId')
+            ->with($this->queryBuilder, 22);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($this->query);
+
+        $this->query->expects($this->once())
+            ->method('getResult')
+            ->willReturn([]);
+
+        $this->customItemModel->getTableData($tableConfig);
+    }
+
+    public function testGetCountForTable(): void
+    {
+        $tableConfig       = $this->createMock(TableConfig::class);
+        $tableFilterConfig = $this->createMock(TableFilterConfig::class);
+
+        $tableConfig->expects($this->once())
+            ->method('getFilter')
+            ->with(CustomItem::class, 'customObject')
+            ->willReturn($tableFilterConfig);
+
+        $tableFilterConfig->expects($this->once())
+            ->method('getValue')
+            ->willReturn(99);
+
+        $this->customItemRepository->expects($this->once())
+            ->method('getTableCountQuery')
+            ->with($tableConfig)
+            ->willReturn($this->queryBuilder);
+
+        $this->customItemPermissionProvider->expects($this->once())
+            ->method('isGranted')
+            ->will($this->throwException(new ForbiddenException('viewother')));
+
+        $this->user->expects($this->once())
+            ->method('getId')
+            ->willReturn(22);
+
+        $this->customItemRepository->expects($this->once())
+            ->method('applyOwnerId')
+            ->with($this->queryBuilder, 22);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($this->query);
+
+        $this->query->expects($this->once())
+            ->method('getSingleScalarResult')
+            ->willReturn(4);
+
+        $this->assertSame(4, $this->customItemModel->getCountForTable($tableConfig));
+    }
+
+    public function testGetLookupData(): void
+    {
+        $tableConfig       = $this->createMock(TableConfig::class);
+        $tableFilterConfig = $this->createMock(TableFilterConfig::class);
+
+        $tableConfig->expects($this->once())
+            ->method('getFilter')
+            ->with(CustomItem::class, 'customObject')
+            ->willReturn($tableFilterConfig);
+
+        $tableFilterConfig->expects($this->once())
+            ->method('getValue')
+            ->willReturn(99);
+
+        $this->customItemRepository->expects($this->once())
+            ->method('getTableDataQuery')
+            ->with($tableConfig)
+            ->willReturn($this->queryBuilder);
+
+        $this->customItemPermissionProvider->expects($this->once())
+            ->method('isGranted')
+            ->will($this->throwException(new ForbiddenException('viewother')));
+
+        $this->user->expects($this->once())
+            ->method('getId')
+            ->willReturn(22);
+
+        $this->customItemRepository->expects($this->once())
+            ->method('applyOwnerId')
+            ->with($this->queryBuilder, 22);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('getRootAliases')
+            ->willReturn(['alias_a']);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('select')
+            ->with('alias_a.name as value, alias_a.id');
+
+        $this->queryBuilder->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($this->query);
+
+        $this->query->expects($this->once())
+            ->method('getArrayResult')
+            ->willReturn([]);
+
+        $this->customItemModel->getLookupData($tableConfig);
+    }
+
+    public function testPopulateCustomFields(): void
+    {
+        $customField       = $this->createMock(CustomField::class);
+        $customFields      = new ArrayCollection([$customField]);
+        $customFieldValue  = $this->createMock(CustomFieldValueInterface::class);
+        $customFieldValues = new ArrayCollection([$customFieldValue]);
+
+        $this->customItem->expects($this->once())
+            ->method('getCustomFieldValues')
+            ->willReturn(new ArrayCollection());
+
+        $this->customItem->expects($this->once())
+            ->method('getCustomObject')
+            ->willReturn($this->customObject);
+
+        $this->customItem->expects($this->once())
+            ->method('getCustomObject')
+            ->willReturn($this->customObject);
+
+        $this->customObject->expects($this->once())
+            ->method('getPublishedFields')
+            ->willReturn($customFields);
+
+        $this->customFieldValueModel->expects($this->once())
+            ->method('getValuesForItem')
+            ->with($this->customItem, $customFields)
+            ->willReturn($customFieldValues);
+
+        $this->customItem->expects($this->once())
+            ->method('setCustomFieldValue')
+            ->with($customFieldValue);
+
+        $this->customItem->expects($this->once())
+            ->method('createFieldValuesSnapshot');
+
+        $this->assertSame(
+            $this->customItem,
+            $this->customItemModel->populateCustomFields($this->customItem)
+        );
     }
 }
