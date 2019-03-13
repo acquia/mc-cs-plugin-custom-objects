@@ -95,7 +95,7 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
     {
         $customField  = new CustomField();
         $typeObject   = new DateType('date');
-        
+
         $customField->setTypeObject($typeObject);
         $customField->setLabel('Start Date');
         $customField->setRequired(true);
@@ -111,7 +111,7 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
             'required'   => true,
             'label_attr' => [
                 'class' => 'control-label',
-            ]
+            ],
         ], $customField->getFormFieldOptions());
     }
 }

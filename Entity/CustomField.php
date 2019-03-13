@@ -221,14 +221,14 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param array $customOptions
-     * 
-     * @return array
+     * @param mixed[] $customOptions
+     *
+     * @return mixed[]
      */
     public function getFormFieldOptions(array $customOptions = []): array
     {
         $fieldTypeOptions = $this->getTypeObject()->createFormTypeOptions();
-        $fieldOptions = [
+        $fieldOptions     = [
             'label'      => $this->getLabel(),
             'required'   => $this->isRequired(),
             'label_attr' => ['class' => 'control-label'],
