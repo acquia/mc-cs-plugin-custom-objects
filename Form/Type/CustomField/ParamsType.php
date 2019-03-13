@@ -11,7 +11,7 @@ declare(strict_types=1);
 * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
 */
 
-namespace MauticPlugin\CustomObjectsBundle\Form\Type;
+namespace MauticPlugin\CustomObjectsBundle\Form\Type\CustomField;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use Symfony\Component\Form\AbstractType;
@@ -19,7 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class CustomFieldParamsType extends AbstractType
+class ParamsType extends AbstractType
 {
     /**
      * {@inheritdoc}

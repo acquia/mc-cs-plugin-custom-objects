@@ -16,6 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use MauticPlugin\CustomObjectsBundle\Form\CustomObjectHiddenTransformer;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransformer;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CustomField\ParamsType;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\Form\AbstractType;
@@ -149,7 +150,7 @@ class CustomFieldType extends AbstractType
 
         $builder->add(
             'params',
-            CustomFieldParamsType::class
+            ParamsType::class
         );
 
         $builder->add(
