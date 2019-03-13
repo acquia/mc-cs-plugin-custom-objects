@@ -53,7 +53,7 @@ The CSV headers can be named differently and then mapped manually.
 
 ## Commands
 
-### `mautic:customobjects:generatesampledata --object-id=X --limit=Y`
+### `$ mautic:customobjects:generatesampledata --object-id=X --limit=Y`
 
 The main purpose of this command is to generate big enough sample data to perform performance tests. Will generate Y randomly-named custom items for an existing custom object X. It will put some random value to all its cusom fields and it will generate 0 to 10 randomly-named contacts and connects them to the custom item.
 
@@ -84,6 +84,10 @@ If you wan to automatically fix code styles then run this.
 #### `$ composer run-script coverage`
 
 Will generate code coverage report
+
+#### `$ composer run-script phpunit -- --filter CustomFieldTest`
+
+This way you can filter which phpunit tests you want to run.
 
 
 
