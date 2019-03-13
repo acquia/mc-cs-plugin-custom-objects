@@ -73,6 +73,13 @@ $title = $customField->getId() ? $customField->getLabel() : $customField->getTyp
 
             <div role="tabpanel" class="tab-pane" id="properties">
                 <div class="row">
+                    <div class="col-md-6">
+                        <?php
+                            echo $view['form']->row($form['params']['emptyValue']);
+                        ?>
+                    </div>
+                    <div class="col-md-6">
+                    </div>
                 </div>
             </div>
 

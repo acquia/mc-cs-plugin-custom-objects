@@ -37,17 +37,26 @@ class ParamsType extends AbstractType
         );
 
         $builder->add(
-            'options',
-            CollectionType::class,
+            'emptyValue',
+            TextType::class,
             [
-                'mapped' => false,
-                'allow_add' => true,
-                'allow_delete' => true,
-                'delete_empty' => true,
-                'entry_type' => OptionsType::class,
-                'prototype' => true,
+                'label'      => 'custom.field.label.empty_value',
+                'required'   => false,
             ]
         );
+
+//        $builder->add(
+//            'options',
+//            CollectionType::class,
+//            [
+//                'mapped' => false,
+//                'allow_add' => true,
+//                'allow_delete' => true,
+//                'delete_empty' => true,
+//                'entry_type' => OptionsType::class,
+//                'prototype' => true,
+//            ]
+//        );
     }
 
     /**
