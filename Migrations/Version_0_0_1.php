@@ -20,12 +20,17 @@ use Doctrine\DBAL\Schema\SchemaException;
 class Version_0_0_1 extends AbstractMigration
 {
     /**
+     * @var string
+     */
+    private $table = 'custom_object';
+
+    /**
      * {@inheritdoc}
      */
     protected function isApplicable(Schema $schema): bool
     {
         try {
-            return !$schema->getTable("{$this->tablePrefix}custom_object")->hasColumn('description');
+            return !$schema->getTable($this->concatPrefix($this->table))->hasColumn('description');
         } catch (SchemaException $e) {
             return false;
         }
@@ -37,7 +42,7 @@ class Version_0_0_1 extends AbstractMigration
     protected function up(): void
     {
         $this->addSql("
-            ALTER TABLE `{$this->tablePrefix}custom_object`
+            ALTER TABLE `{$this->concatPrefix($this->table)}`
             ADD `description` varchar(255) NULL AFTER `name_singular`
         ");
     }
