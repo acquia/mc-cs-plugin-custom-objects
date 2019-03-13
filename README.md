@@ -59,11 +59,31 @@ The main purpose of this command is to generate big enough sample data to perfor
 
 ## Unit tests
 
-With this command you can run all the tests from the `plugins/CustomObjectsBundle` dir:
+### Test coverage development in time
 
-`$ composer run-script test`
+![https://docs.google.com/spreadsheets/d/e/2PACX-1vQO9XArT-eiiNb__0aiUaYbic_V4bvY5M0aYSOWWajTxMgOelnsQxSOch7QlKeVXt4DVYg2ctoyJJkd/pubchart?oid=810440106&format=image](Test coverage in time)
 
-If you wan to automatically fix code styles then run this:
+_Edit [this doc](https://docs.google.com/spreadsheets/d/1CAf_VfvvmOCriGz4tFtQVDl1xxP0Y7-FQKOQhcAl6kE/edit#gid=0) to update the chart._
 
-`$ composer run-script fixcs`
+### Useful commands
+
+Always run following commands from the `plugins/CustomObjectsBundle` directory.
+
+#### `$ composer run-script test`
+
+With this command you can run all the tests for this plugin. Functional tests included.
+
+#### `$ composer run-script quicktest`
+
+With this command you can run all the tests for this plugin except functional tests which makes it fast.
+
+#### `$ composer run-script fixcs`
+
+If you wan to automatically fix code styles then run this.
+
+#### `$ composer run-script coverage`
+
+Will generate code coverage report
+
+
 
