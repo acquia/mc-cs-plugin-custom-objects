@@ -31,11 +31,11 @@ class DateTimeType extends AbstractCustomFieldType
      * {@inheritdoc}
      */
     protected $formTypeOptions = [
-        'widget'     => 'single_text',
-        'attr'       => [
+        'widget' => 'single_text',
+        'format' => 'yyyy-MM-dd HH:mm',
+        'attr'   => [
             'data-toggle' => 'datetime',
         ],
-        'format'   => 'yyyy-MM-dd HH:mm',
     ];
 
     /**
