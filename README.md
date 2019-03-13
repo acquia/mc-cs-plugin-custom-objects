@@ -61,7 +61,7 @@ The main purpose of this command is to generate big enough sample data to perfor
 
 ### Test coverage development in time
 
-![https://docs.google.com/spreadsheets/d/e/2PACX-1vQO9XArT-eiiNb__0aiUaYbic_V4bvY5M0aYSOWWajTxMgOelnsQxSOch7QlKeVXt4DVYg2ctoyJJkd/pubchart?oid=810440106&format=image](Test coverage in time)
+![Test coverage in time](https://docs.google.com/spreadsheets/d/e/2PACX-1vQO9XArT-eiiNb__0aiUaYbic_V4bvY5M0aYSOWWajTxMgOelnsQxSOch7QlKeVXt4DVYg2ctoyJJkd/pubchart?oid=810440106&format=image)
 
 _Edit [this doc](https://docs.google.com/spreadsheets/d/1CAf_VfvvmOCriGz4tFtQVDl1xxP0Y7-FQKOQhcAl6kE/edit#gid=0) to update the chart._
 
