@@ -34,12 +34,7 @@ class CustomFieldValueType extends AbstractType
         $builder->add(
             'value',
             $customField->getTypeObject()->getSymfonyFormFieldType(),
-            [
-                'label'      => $customField->getLabel(),
-                'required'   => $customField->isRequired(),
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => ['class' => 'form-control'],
-            ]
+            $customField->getFormFieldOptions()
         );
     }
 
