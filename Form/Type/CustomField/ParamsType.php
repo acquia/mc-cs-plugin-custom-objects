@@ -11,15 +11,16 @@ declare(strict_types=1);
 * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
 */
 
-namespace MauticPlugin\CustomObjectsBundle\Form\Type;
+namespace MauticPlugin\CustomObjectsBundle\Form\Type\CustomField;
 
+use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class CustomFieldParamsType extends AbstractType
+class ParamsType extends AbstractType
 {
     /**
      * {@inheritdoc}
@@ -31,6 +32,24 @@ class CustomFieldParamsType extends AbstractType
             TextType::class,
             [
                 'label'      => 'custom.field.label.required_validation_message',
+                'required'   => false,
+            ]
+        );
+
+        $builder->add(
+            'emptyValue',
+            TextType::class,
+            [
+                'label'      => 'custom.field.label.empty_value',
+                'required'   => false,
+            ]
+        );
+
+        $builder->add(
+            'allowMultiple',
+            YesNoButtonGroupType::class,
+            [
+                'label'      => 'custom.field.label.allow_multiple',
                 'required'   => false,
             ]
         );
