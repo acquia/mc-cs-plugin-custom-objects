@@ -34,8 +34,6 @@ class Params
     private $allowMultiple = false;
 
     /**
-     * @todo Try to use factory if used only in \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldPostLoadSubscriber
-     *
      * @param mixed[] $params
      */
     public function __construct(array $params = [])
