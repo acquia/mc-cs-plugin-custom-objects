@@ -33,7 +33,7 @@ class Option
     private $customField;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $label;
 
