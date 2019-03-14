@@ -36,11 +36,6 @@ class Params
     private $allowMultiple = false;
 
     /**
-     * @var ArrayCollection|Option[]
-     */
-    private $options;
-
-    /**
      * @todo Try to use factory if used only in \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldPostLoadSubscriber
      * @param mixed[] $params
      */
@@ -76,13 +71,6 @@ class Params
             'emptyValue' => $this->emptyValue,
             'allowMultiple' => $this->allowMultiple,
         ];
-
-//        if (!empty($this->options)) {
-//            foreach($this->options as $option) {
-//                $return['options'][] = $option->__toArray();
-//            }
-//            $return['options'] = array_filter($return['options']);
-//        }
 
         // Remove null and false values as they are default
         return array_filter($return);
@@ -134,29 +122,5 @@ class Params
     public function setAllowMultiple(bool $allowMultiple): void
     {
         $this->allowMultiple = $allowMultiple;
-    }
-
-    /**
-     * @param Option $option
-     */
-    public function addOption(Option $option): void
-    {
-        $this->options->add($option);
-    }
-
-    /**
-     * @param Option $option
-     */
-    public function removeOption(Option $option): void
-    {
-        $this->options->remove($option);
-    }
-
-    /**
-     * @return ArrayCollection|Option[]
-     */
-    public function getOptions(): ArrayCollection
-    {
-        return $this->options;
     }
 }

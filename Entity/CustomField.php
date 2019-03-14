@@ -13,9 +13,11 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Option;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -64,6 +66,11 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      * @var mixed
      */
     private $defaultValue;
+
+    /**
+     * @var ArrayCollection|Option[]
+     */
+    private $options;
 
     /**
      * @var Params|string[]
@@ -126,6 +133,14 @@ class CustomField extends FormEntity implements UniqueEntityInterface
             ->columnName('default_value')
             ->nullable()
             ->build();
+
+        $builder->createOneToMany('options', Option::class)
+            ->setOrderBy(['label' => 'ASC'])
+            ->mappedBy('customField')
+            ->cascadePersist()
+            ->fetchExtraLazy()
+            ->build();
+
         $builder->createField('params', Type::JSON_ARRAY)
             ->columnName('params')
             ->nullable()
@@ -303,6 +318,30 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     public function setDefaultValue($defaultValue): void
     {
         $this->defaultValue = $defaultValue;
+    }
+
+    /**
+     * @param Option $option
+     */
+    public function addOption(Option $option): void
+    {
+        $this->options->add($option);
+    }
+
+    /**
+     * @param Option $option
+     */
+    public function removeOption(Option $option): void
+    {
+        $this->options->remove($option);
+    }
+
+    /**
+     * @return ArrayCollection|Option[]
+     */
+    public function getOptions(): ArrayCollection
+    {
+        return $this->options;
     }
 
     /**

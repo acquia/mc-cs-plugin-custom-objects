@@ -11,8 +11,25 @@
 
 namespace MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 
+use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\Mapping as ORM;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
+
 class Option
 {
+    /**
+     * @var int|null
+     */
+    private $id;
+
+    /**
+     * @var CustomField|null
+     */
+    private $customField;
+
     /**
      * @var string
      */
@@ -23,31 +40,66 @@ class Option
      */
     private $value;
 
-
     /**
-     * @param mixed[] $params
+     * @param ORM\ClassMetadata $metadata
      */
-    public function __construct(array $params = [])
+    public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
-        foreach ($params as $key => $value) {
-            $this->{$key} = $value;
-        }
+        $builder = new ClassMetadataBuilder($metadata);
+
+        $builder->setTable('custom_field_option');
+
+        $builder->createManyToOne('customField', CustomField::class)
+            ->addJoinColumn('custom_field_id', 'id', false, false, 'CASCADE')
+            ->inversedBy('options')
+            ->cascadePersist()
+            ->fetchExtraLazy()
+            ->build();
+
+        $builder->addId();
+        $builder->addField('label', Type::STRING);
+        $builder->addField('value', Type::STRING);
     }
 
     /**
-     * Used as data source for json serialization.
-     *
-     * @return string[]
+     * @param ClassMetadata $metadata
      */
-    public function __toArray(): array
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $return = [
-            'label' => $this->label,
-            'value' => $this->value,
-        ];
+        $metadata->addPropertyConstraint('label', new Assert\NotBlank());
+        $metadata->addPropertyConstraint('label', new Assert\Length(['max' => 255]));
+    }
 
-        // Remove null and false values as they are default
-        return array_filter($return);
+    /**
+     * @param int|null $id
+     */
+    public function setId(?int $id): void
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @return int|null Null when it is filled as new entity with PropertyAccessor
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return CustomField|null
+     */
+    public function getCustomField(): ?CustomField
+    {
+        return $this->customField;
+    }
+
+    /**
+     * @param CustomField $customField
+     */
+    public function setCustomField(CustomField $customField): void
+    {
+        $this->customField = $customField;
     }
 
     /**
