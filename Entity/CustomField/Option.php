@@ -43,6 +43,16 @@ class Option
     private $value;
 
     /**
+     * @param array $option
+     */
+    public function __construct(array $option = [])
+    {
+        foreach ($option as $key => $value) {
+            $this->{$key} = $value;
+        }
+    }
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata): void

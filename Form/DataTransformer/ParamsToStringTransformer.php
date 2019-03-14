@@ -13,21 +13,21 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Form\DataTransformer;
 
-use JMS\Serializer\Serializer;
+use JMS\Serializer\SerializerInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use Symfony\Component\Form\DataTransformerInterface;
 
 class ParamsToStringTransformer implements DataTransformerInterface
 {
     /**
-     * @var Serializer
+     * @var SerializerInterface
      */
     private $serializer;
 
     /**
-     * @param Serializer $serializer
+     * @param SerializerInterface $serializer
      */
-    public function __construct(Serializer $serializer)
+    public function __construct(SerializerInterface $serializer)
     {
         $this->serializer = $serializer;
     }
@@ -43,7 +43,7 @@ class ParamsToStringTransformer implements DataTransformerInterface
     {
         if (null === $params) {
             // Param can be null because entities are not using constructors
-            return $this->serializer->serialize((new Params())->__toArray(), 'json');
+            return '[]';
         }
 
         return $this->serializer->serialize($params->__toArray(), 'json');
