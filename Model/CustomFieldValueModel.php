@@ -78,36 +78,36 @@ class CustomFieldValueModel
     /**
      * @param CustomFieldValueInterface $customFieldValue
      */
-    public function updateManually(CustomFieldValueInterface $customFieldValue): void
+    private function updateManually(CustomFieldValueInterface $customFieldValue): void
     {
         $fieldType    = $customFieldValue->getCustomField()->getTypeObject();
         $queryBuilder = $this->entityManager->createQueryBuilder();
-        $queryBuilder->update($fieldType->getEntityClass(), $fieldType->getTableAlias())
-            ->set("{$fieldType->getTableAlias()}.value", ':value')
-            ->where("{$fieldType->getTableAlias()}.customField = :customFieldId")
-            ->andWhere("{$fieldType->getTableAlias()}.customItem = :customItemId")
-            ->setParameter('value', $customFieldValue->getValue())
-            ->setParameter('customFieldId', (int) $customFieldValue->getCustomField()->getId())
-            ->setParameter('customItemId', (int) $customFieldValue->getCustomItem()->getId());
-        $query = $queryBuilder->getQuery();
-        $query->execute();
+        $queryBuilder->update($fieldType->getEntityClass(), $fieldType->getTableAlias());
+        $queryBuilder->set("{$fieldType->getTableAlias()}.value", ':value');
+        $queryBuilder->where("{$fieldType->getTableAlias()}.customField = :customFieldId");
+        $queryBuilder->andWhere("{$fieldType->getTableAlias()}.customItem = :customItemId");
+        $queryBuilder->setParameter('value', $customFieldValue->getValue());
+        $queryBuilder->setParameter('customFieldId', (int) $customFieldValue->getCustomField()->getId());
+        $queryBuilder->setParameter('customItemId', (int) $customFieldValue->getCustomItem()->getId());
+        $queryBuilder->getQuery()->execute();
     }
 
     /**
-     * @param mixed[]    $valueRows
+     * @param Collection $valueRows
      * @param Collection $customFields
      * @param CustomItem $customItem
      *
      * @return Collection
      */
-    private function createValueObjects(array $valueRows, Collection $customFields, CustomItem $customItem): Collection
+    private function createValueObjects(Collection $valueRows, Collection $customFields, CustomItem $customItem): Collection
     {
         return $customFields->map(function (CustomField $customField) use ($customItem, $valueRows) {
             $entityClass      = $customField->getTypeObject()->getEntityClass();
             $customFieldValue = new $entityClass($customField, $customItem);
+            $valueRow         = $valueRows->get($customField->getId());
 
-            if (isset($valueRows[$customField->getId()])) {
-                $value = $valueRows[$customField->getId()]['value'];
+            if (isset($valueRow['value'])) {
+                $value = $valueRow['value'];
                 $customFieldValue->updateThisEntityManually();
             } else {
                 $value = $customField->getDefaultValue();
@@ -122,19 +122,19 @@ class CustomFieldValueModel
     /**
      * @param Collection $queries
      *
-     * @return mixed[]
+     * @return ArrayCollection
      */
-    private function fetchValues(Collection $queries): array
+    private function fetchValues(Collection $queries): ArrayCollection
     {
         $statement = $this->entityManager->getConnection()->prepare(implode(' UNION ', $queries->toArray()));
 
         $statement->execute();
 
         $rowsRaw = $statement->fetchAll();
-        $rows    = [];
+        $rows    = new ArrayCollection();
 
         foreach ($rowsRaw as $row) {
-            $rows[$row['custom_field_id']] = $row;
+            $rows->set((int) $row['custom_field_id'], $row);
         }
 
         return $rows;
@@ -150,11 +150,12 @@ class CustomFieldValueModel
     {
         return $customFields->map(function (CustomField $customField) use ($customItem) {
             $type         = $customField->getTypeObject();
+            $alias        = $type->getTableAlias();
             $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
-            $queryBuilder->select("{$type->getTableAlias()}.custom_field_id, {$type->getTableAlias()}.value, '{$type->getKey()}' AS type");
-            $queryBuilder->from($type->getTableName(), $type->getTableAlias());
-            $queryBuilder->where("{$type->getTableAlias()}.custom_item_id = {$customItem->getId()}");
-            $queryBuilder->andWhere("{$type->getTableAlias()}.custom_field_id = {$customField->getId()}");
+            $queryBuilder->select("{$alias}.custom_field_id, {$alias}.value, '{$type->getKey()}' AS type");
+            $queryBuilder->from($alias, $alias);
+            $queryBuilder->where("{$alias}.custom_item_id = {$customItem->getId()}");
+            $queryBuilder->andWhere("{$alias}.custom_field_id = {$customField->getId()}");
 
             return $queryBuilder->getSQL();
         });
