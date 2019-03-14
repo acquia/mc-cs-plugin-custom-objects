@@ -38,7 +38,7 @@ class Option
     private $label;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $value;
 
