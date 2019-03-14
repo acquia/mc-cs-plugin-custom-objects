@@ -33,6 +33,9 @@ class ParamsType extends AbstractType
             [
                 'label'      => 'custom.field.label.required_validation_message',
                 'required'   => false,
+                'attr'       => [
+                    'class'    => 'form-control',
+                ],
             ]
         );
 
@@ -42,6 +45,9 @@ class ParamsType extends AbstractType
             [
                 'label'      => 'custom.field.label.empty_value',
                 'required'   => false,
+                'attr'       => [
+                    'class'    => 'form-control',
+                ],
             ]
         );
 
