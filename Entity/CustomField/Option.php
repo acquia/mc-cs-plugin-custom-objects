@@ -65,7 +65,7 @@ class Option
             ->addJoinColumn('custom_field_id', 'id', false, false, 'CASCADE')
             ->inversedBy('options')
             ->cascadePersist()
-            ->fetchExtraLazy()
+            ->fetchEager()
             ->build();
 
         $builder->addId();
@@ -80,6 +80,21 @@ class Option
     {
         $metadata->addPropertyConstraint('label', new Assert\NotBlank());
         $metadata->addPropertyConstraint('label', new Assert\Length(['max' => 255]));
+    }
+
+    /**
+     * @return array
+     */
+    public function __toArray(): array
+    {
+        $return = [
+            'id' => $this->id,
+            'customField' => $this->customField ? $this->customField->getId() : null,
+            'label' => $this->label,
+            'value' => $this->value,
+        ];
+
+        return array_filter($return);
     }
 
     /**
