@@ -13,10 +13,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
 /**
- * Stored in `custom_field.params` column
+ * Stored in `custom_field.params` column.
  */
 class Params
 {
@@ -37,25 +35,13 @@ class Params
 
     /**
      * @todo Try to use factory if used only in \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldPostLoadSubscriber
+     *
      * @param mixed[] $params
      */
     public function __construct(array $params = [])
     {
-        if (array_key_exists('options', $params)) {
-            $options = $params['options'];
-            unset($params['options']);
-        }
-
         foreach ($params as $key => $value) {
             $this->{$key} = $value;
-        }
-
-        $this->options = new ArrayCollection();
-
-        if (isset($options)) {
-            foreach ($options as $key => $option) {
-                $this->addOption(new Option($option));
-            }
         }
     }
 
@@ -68,8 +54,8 @@ class Params
     {
         $return = [
             'requiredValidationMessage' => $this->requiredValidationMessage,
-            'emptyValue' => $this->emptyValue,
-            'allowMultiple' => $this->allowMultiple,
+            'emptyValue'                => $this->emptyValue,
+            'allowMultiple'             => $this->allowMultiple,
         ];
 
         // Remove null and false values as they are default

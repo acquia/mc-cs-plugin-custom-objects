@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
 * @copyright   2019 Mautic, Inc. All rights reserved
 * @author      Mautic, Inc.
@@ -17,14 +19,14 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructorAndToArray()
     {
-         $requiredValidationMessage = 'requiredValidationMessage';
-         $emptyValue = 'emptyValue';
-         $allowMultiple = true;
+        $requiredValidationMessage = 'requiredValidationMessage';
+        $emptyValue                = 'emptyValue';
+        $allowMultiple             = true;
 
         $paramsArray = [
             'requiredValidationMessage' => $requiredValidationMessage,
-            'emptyValue' => $emptyValue,
-            'allowMultiple' => $allowMultiple,
+            'emptyValue'                => $emptyValue,
+            'allowMultiple'             => $allowMultiple,
         ];
 
         $params = new Params($paramsArray);
@@ -39,13 +41,13 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
     public function testToArrayRemovingFalseAndNullValues()
     {
         $requiredValidationMessage = 'requiredValidationMessage';
-        $emptyValue = null;
-        $allowMultiple = false;
+        $emptyValue                = null;
+        $allowMultiple             = false;
 
         $paramsArray = [
             'requiredValidationMessage' => $requiredValidationMessage,
-            'emptyValue' => $emptyValue,
-            'allowMultiple' => $allowMultiple,
+            'emptyValue'                => $emptyValue,
+            'allowMultiple'             => $allowMultiple,
         ];
 
         $params = new Params($paramsArray);
@@ -56,8 +58,8 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
     public function testGettersSetters()
     {
         $requiredValidationMessage = 'requiredValidationMessage';
-        $emptyValue = 'emptyValue';
-        $allowMultiple = true;
+        $emptyValue                = 'emptyValue';
+        $allowMultiple             = true;
 
         $params = new Params();
 
