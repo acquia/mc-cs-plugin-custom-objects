@@ -77,12 +77,12 @@ class Params
             'allowMultiple' => $this->allowMultiple,
         ];
 
-        if (!empty($this->options)) {
-            foreach($this->options as $option) {
-                $return['options'][] = $option->__toArray();
-            }
-            $return['options'] = array_filter($return['options']);
-        }
+//        if (!empty($this->options)) {
+//            foreach($this->options as $option) {
+//                $return['options'][] = $option->__toArray();
+//            }
+//            $return['options'] = array_filter($return['options']);
+//        }
 
         // Remove null and false values as they are default
         return array_filter($return);
