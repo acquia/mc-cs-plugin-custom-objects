@@ -53,6 +53,21 @@ class Option
     }
 
     /**
+     * @return mixed[]
+     */
+    public function __toArray(): array
+    {
+        $return = [
+            'id'          => $this->id,
+            'customField' => $this->customField ? $this->customField->getId() : null,
+            'label'       => $this->label,
+            'value'       => $this->value,
+        ];
+
+        return array_filter($return);
+    }
+
+    /**
      * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -80,21 +95,6 @@ class Option
     {
         $metadata->addPropertyConstraint('label', new Assert\NotBlank());
         $metadata->addPropertyConstraint('label', new Assert\Length(['max' => 255]));
-    }
-
-    /**
-     * @return array
-     */
-    public function __toArray(): array
-    {
-        $return = [
-            'id' => $this->id,
-            'customField' => $this->customField ? $this->customField->getId() : null,
-            'label' => $this->label,
-            'value' => $this->value,
-        ];
-
-        return array_filter($return);
     }
 
     /**

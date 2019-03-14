@@ -50,7 +50,7 @@ class OptionsToStringTransformer implements DataTransformerInterface
         $options = $options->toArray();
 
         /**
-         * @var int $key
+         * @var int
          * @var Option $option
          */
         foreach ($options as $key => $option) {
