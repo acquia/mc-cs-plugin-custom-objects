@@ -71,7 +71,7 @@ class CustomFieldPostLoadSubscriber implements EventSubscriber
         // @todo Overthink transformation of DateTime text value to object
         // @see CustomObjectsBundle/Form/Type/CustomFieldType.php:232
         $defaultValue = $customField->getDefaultValue();
-        if ('date' === $type || 'datetime' === $type) {
+        if ($defaultValue && ('date' === $type || 'datetime' === $type)) {
             $customField->setDefaultValue(new \DateTime($defaultValue));
         }
     }

@@ -206,6 +206,11 @@ class CustomItemModel extends FormModel
      */
     public function populateCustomFields(CustomItem $customItem): CustomItem
     {
+        if ($customItem->getCustomFieldValues()->count() > 0) {
+            // Field values are present already.
+            return $customItem;
+        }
+
         $customFields      = $customItem->getCustomObject()->getPublishedFields();
         $customFieldValues = $this->customFieldValueModel->getValuesForItem($customItem, $customFields);
 
