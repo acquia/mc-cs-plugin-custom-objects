@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
 * @copyright   2019 Mautic, Inc. All rights reserved
 * @author      Mautic, Inc.
@@ -59,7 +61,7 @@ class OptionsToStringTransformer implements DataTransformerInterface
     {
         $options = json_decode($options, true);
 
-        foreach ($options as $key => $option){
+        foreach ($options as $key => $option) {
             // @todo CustomField handling and test when adding & editing custom field
             $options[$key] = new Option($option);
         }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
 * @copyright   2019 Mautic, Inc. All rights reserved
 * @author      Mautic, Inc.
@@ -17,7 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransfor
 
 class ParamsToStringTransformerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testTransform()
+    public function testTransform(): void
     {
         $params = $this->createMock(Params::class);
         $params
@@ -34,7 +36,7 @@ class ParamsToStringTransformerTest extends \PHPUnit_Framework_TestCase
         $transformer = new ParamsToStringTransformer($serializer);
         $this->assertSame('[]', $transformer->transform($params));
 
-        $params = null;
+        $params     = null;
         $serializer = $this->createMock(SerializerInterface::class);
         $serializer
             ->expects($this->never())
@@ -44,12 +46,12 @@ class ParamsToStringTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('[]', $transformer->transform($params));
     }
 
-    public function testReverseTransform()
+    public function testReverseTransform(): void
     {
-        $params = '[]';
-        $serializer = $this->createMock(SerializerInterface::class);
+        $params      = '[]';
+        $serializer  = $this->createMock(SerializerInterface::class);
         $transformer = new ParamsToStringTransformer($serializer);
-        $params = $transformer->reverseTransform($params);
+        $params      = $transformer->reverseTransform($params);
         $this->assertInstanceOf(Params::class, $params);
         $this->assertSame([], $params->__toArray());
     }

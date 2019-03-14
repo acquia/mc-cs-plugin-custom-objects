@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
 * @copyright   2019 Mautic, Inc. All rights reserved
 * @author      Mautic, Inc.
@@ -17,8 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsToStringTransfo
 
 class OptionsToStringTransformerTest extends \PHPUnit_Framework_TestCase
 {
-
-    public function testTransform()
+    public function testTransform(): void
     {
         $options = $this->createMock(ArrayCollection::class);
         $options
@@ -35,7 +36,7 @@ class OptionsToStringTransformerTest extends \PHPUnit_Framework_TestCase
         $transformer = new OptionsToStringTransformer($serializer);
         $this->assertSame('[]', $transformer->transform($options));
 
-        $options = null;
+        $options    = null;
         $serializer = $this->createMock(SerializerInterface::class);
         $serializer
             ->expects($this->never())
@@ -45,12 +46,12 @@ class OptionsToStringTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('[]', $transformer->transform($options));
     }
 
-    public function testReverseTransform()
+    public function testReverseTransform(): void
     {
-        $options = '[]';
-        $serializer = $this->createMock(SerializerInterface::class);
+        $options     = '[]';
+        $serializer  = $this->createMock(SerializerInterface::class);
         $transformer = new OptionsToStringTransformer($serializer);
-        $options = $transformer->reverseTransform($options);
+        $options     = $transformer->reverseTransform($options);
         $this->assertInstanceOf(ArrayCollection::class, $options);
         $this->assertSame([], $options->toArray());
     }

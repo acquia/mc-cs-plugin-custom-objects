@@ -43,7 +43,7 @@ class Option
     private $value;
 
     /**
-     * @param array $option
+     * @param mixed[] $option
      */
     public function __construct(array $option = [])
     {

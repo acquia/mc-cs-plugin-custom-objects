@@ -20,16 +20,16 @@ class OptionTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructor()
     {
-        $id = 1;
+        $id          = 1;
         $customField = new CustomField();
-        $label = 'label';
-        $value = 'value';
+        $label       = 'label';
+        $value       = 'value';
 
         $option = [
-            'id' => $id,
+            'id'          => $id,
             'customField' => $customField,
-            'label' => $label,
-            'value' => $value,
+            'label'       => $label,
+            'value'       => $value,
         ];
 
         $option = new Option($option);
