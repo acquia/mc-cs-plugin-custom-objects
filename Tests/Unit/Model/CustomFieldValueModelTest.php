@@ -42,6 +42,8 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
+        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
+
         $this->customItem            = $this->createMock(CustomItem::class);
         $this->customField           = $this->createMock(CustomField::class);
         $this->entityManager         = $this->createMock(EntityManager::class);
@@ -116,8 +118,8 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
         $this->queryBuilder->expects($this->exactly(2))
             ->method('from')
             ->withConsecutive(
-                ['cfv_text'],
-                ['cfv_int']
+                ['custom_field_value_text'],
+                ['custom_field_value_int']
             );
 
         $this->queryBuilder->expects($this->exactly(2))

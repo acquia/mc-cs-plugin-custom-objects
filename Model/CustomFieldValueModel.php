@@ -106,7 +106,7 @@ class CustomFieldValueModel
             $customFieldValue = new $entityClass($customField, $customItem);
             $valueRow         = $valueRows->get($customField->getId());
 
-            if (isset($valueRow['value'])) {
+            if (is_array($valueRow) && array_key_exists('value', $valueRow)) {
                 $value = $valueRow['value'];
                 $customFieldValue->updateThisEntityManually();
             } else {
@@ -153,7 +153,7 @@ class CustomFieldValueModel
             $alias        = $type->getTableAlias();
             $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
             $queryBuilder->select("{$alias}.custom_field_id, {$alias}.value, '{$type->getKey()}' AS type");
-            $queryBuilder->from($alias, $alias);
+            $queryBuilder->from($type->getTableName(), $alias);
             $queryBuilder->where("{$alias}.custom_item_id = {$customItem->getId()}");
             $queryBuilder->andWhere("{$alias}.custom_field_id = {$customField->getId()}");
 
