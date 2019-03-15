@@ -50,7 +50,7 @@ class ParamsType extends AbstractType
                 ],
             ]
         );
-        
+
         $customField = $options['customField'];
         if ($customField->getTypeObject()->hasChoices()) {
             $builder->add(
