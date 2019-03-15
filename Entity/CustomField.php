@@ -345,7 +345,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      */
     public function removeOption(CustomFieldOption $option): void
     {
-        $this->options->remove($option);
+        $this->options->removeElement($option);
     }
 
     /**
