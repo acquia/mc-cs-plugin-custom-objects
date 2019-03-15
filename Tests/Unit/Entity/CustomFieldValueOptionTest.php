@@ -17,7 +17,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Option;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 
 class CustomFieldValueOptionTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,8 +25,8 @@ class CustomFieldValueOptionTest extends \PHPUnit_Framework_TestCase
     {
         $customObject = new CustomObject();
         $customField  = new CustomField();
-        $option       = new Option();
-        $option2      = new Option();
+        $option       = new CustomFieldOption();
+        $option2      = new CustomFieldOption();
         $customItem   = new CustomItem($customObject);
         $optionValue  = new CustomFieldValueOption($customField, $customItem, $option);
 

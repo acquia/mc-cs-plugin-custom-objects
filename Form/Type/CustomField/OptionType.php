@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Form\Type\CustomField;
 
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Option;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -56,7 +56,7 @@ class OptionType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'data_class'         => Option::class,
+                'data_class'         => CustomFieldOption::class,
                 'csrf_protection'    => false,
             ]
         );

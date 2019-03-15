@@ -11,16 +11,15 @@ declare(strict_types=1);
 * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
 */
 
-namespace MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+namespace MauticPlugin\CustomObjectsBundle\Entity;
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class Option
+class CustomFieldOption
 {
     /**
      * @var int|null

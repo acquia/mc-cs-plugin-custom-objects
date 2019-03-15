@@ -16,7 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Form\DataTransformer;
 use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\SerializerInterface;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsToStringTransformer;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Option;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 
 class OptionsToStringTransformerTest extends \PHPUnit_Framework_TestCase
 {
@@ -34,7 +34,7 @@ class OptionsToStringTransformerTest extends \PHPUnit_Framework_TestCase
 
     public function testTransform(): void
     {
-        $option = new Option();
+        $option = new CustomFieldOption();
         $option->setLabel('Option A');
         $option->setValue('option_a');
 

@@ -60,10 +60,15 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
         $customFields = new ArrayCollection([$this->customField]);
 
         $this->customItem->expects($this->once())
-            ->method('getId');
+            ->method('isNew')
+            ->willReturn(true);
 
-        $this->customField->expects($this->never())
-            ->method('getTypeObject');
+        $this->customField->expects($this->once())
+            ->method('getTypeObject')
+            ->willReturn(new TextType('Text'));
+
+        $this->entityManager->expects($this->never())
+            ->method('getConnection');
 
         $this->customFieldValueModel->getValuesForItem(
             $this->customItem,
@@ -76,9 +81,13 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
         $noValueField = $this->createMock(CustomField::class);
         $customFields = new ArrayCollection([$this->customField, $noValueField]);
 
-        $this->customItem->expects($this->exactly(3))
+        $this->customItem->expects($this->exactly(2))
             ->method('getId')
             ->willReturn(33);
+
+        $this->customItem->expects($this->once())
+            ->method('isNew')
+            ->willReturn(false);
 
         $this->customField->expects($this->exactly(2))
             ->method('getTypeObject')
