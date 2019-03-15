@@ -48,7 +48,7 @@ class OptionsToStringTransformer implements DataTransformerInterface
         }
 
         return $this->serializer->serialize(
-            $options->map(function (Option $option) {
+            $options->map(function (CustomFieldOption $option) {
                 return $option->__toArray();
             })->toArray(),
             'json'
