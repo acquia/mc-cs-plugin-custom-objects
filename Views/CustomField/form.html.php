@@ -71,20 +71,24 @@ $title = $customField->getId() ? $customField->getLabel() : $customField->getTyp
 
             <div role="tabpanel" class="tab-pane" id="properties">
                 <div class="row">
-                    <div class="col-md-12">
-                        <a>Add option</a>
-                    </div>
+<?php if (isset($form['options'])): ?>
+                        <div class="col-md-12">
+                            <a>Add option</a>
+                        </div>
                     <div class="col-md-12">
                         <?php echo $view['form']->row($form['options']); ?>
                     </div>
+<?php endif; ?>
                 </div>
                 <div class="row">
                     <div class="col-md-6">
                         <?php echo $view['form']->row($form['params']['emptyValue']); ?>
                     </div>
+<?php if (isset($form['params']['allowMultiple'])): ?>
                     <div class="col-md-6">
                         <?php echo $view['form']->row($form['params']['allowMultiple']); ?>
                     </div>
+<?php endif; ?>
                 </div>
             </div>
 
