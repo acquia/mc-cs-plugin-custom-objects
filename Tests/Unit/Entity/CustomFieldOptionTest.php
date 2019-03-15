@@ -11,12 +11,12 @@ declare(strict_types=1);
 * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
 */
 
-namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Entity\CustomField;
+namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Entity;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Option;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 
-class OptionTest extends \PHPUnit_Framework_TestCase
+class CustomFieldOptionTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructorAndToArray()
     {
@@ -32,7 +32,7 @@ class OptionTest extends \PHPUnit_Framework_TestCase
             'value'       => $value,
         ];
 
-        $option = new Option($optionArray);
+        $option = new CustomFieldOption($optionArray);
 
         // Because has no ID and null values are filtered with array_filter
         unset($optionArray['customField']);
@@ -42,7 +42,7 @@ class OptionTest extends \PHPUnit_Framework_TestCase
 
     public function testGettersSetters()
     {
-        $option = new Option();
+        $option = new CustomFieldOption();
 
         $label = 'label';
         $option->setLabel($label);

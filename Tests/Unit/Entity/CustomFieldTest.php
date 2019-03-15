@@ -17,7 +17,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Option;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\SelectType;
 
 class CustomFieldTest extends \PHPUnit_Framework_TestCase
@@ -122,8 +122,8 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
     {
         $customField  = new CustomField();
         $typeObject   = new SelectType('select');
-        $red          = new Option();
-        $blue         = new Option();
+        $red          = new CustomFieldOption();
+        $blue         = new CustomFieldOption();
 
         $red->setLabel('Red');
         $red->setValue('red');
@@ -152,8 +152,8 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
 
     public function testGetChoices(): void
     {
-        $optionA = new Option();
-        $optionB = new Option();
+        $optionA = new CustomFieldOption();
+        $optionB = new CustomFieldOption();
 
         $optionA->setLabel('Option A');
         $optionA->setValue('option_a');

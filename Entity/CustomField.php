@@ -18,7 +18,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Option;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -70,7 +69,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     private $defaultValue;
 
     /**
-     * @var Collection|Option[]
+     * @var Collection|CustomFieldOption[]
      */
     private $options;
 
@@ -141,7 +140,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
             ->nullable()
             ->build();
 
-        $builder->createOneToMany('options', Option::class)
+        $builder->createOneToMany('options', CustomFieldOption::class)
             ->setOrderBy(['label' => 'ASC'])
             ->mappedBy('customField')
             ->cascadePersist()
@@ -334,23 +333,23 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param Option $option
+     * @param CustomFieldOption $option
      */
-    public function addOption(Option $option): void
+    public function addOption(CustomFieldOption $option): void
     {
         $this->options->add($option);
     }
 
     /**
-     * @param Option $option
+     * @param CustomFieldOption $option
      */
-    public function removeOption(Option $option): void
+    public function removeOption(CustomFieldOption $option): void
     {
         $this->options->remove($option);
     }
 
     /**
-     * @return Collection|Option[]
+     * @return Collection|CustomFieldOption[]
      */
     public function getOptions(): Collection
     {

@@ -15,7 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Form\DataTransformer;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\SerializerInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Option;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use Symfony\Component\Form\DataTransformerInterface;
 
 class OptionsToStringTransformer implements DataTransformerInterface
@@ -34,9 +34,9 @@ class OptionsToStringTransformer implements DataTransformerInterface
     }
 
     /**
-     * Transforms an object (Option) to a string (json).
+     * Transforms an object (CustomFieldOption) to a string (json).
      *
-     * @param ArrayCollection|Option[]|null $options
+     * @param ArrayCollection|CustomFieldOption[]|null $options
      *
      * @return string
      */
@@ -56,11 +56,11 @@ class OptionsToStringTransformer implements DataTransformerInterface
     }
 
     /**
-     * Transforms a string (json) to an object (Option).
+     * Transforms a string (json) to an object (CustomFieldOption).
      *
      * @param string $options
      *
-     * @return ArrayCollection|Option[]
+     * @return ArrayCollection|CustomFieldOption[]
      */
     public function reverseTransform($options): ArrayCollection
     {
@@ -68,7 +68,7 @@ class OptionsToStringTransformer implements DataTransformerInterface
 
         foreach ($options as $key => $option) {
             // @todo CustomField handling and test when adding & editing custom field
-            $options[$key] = new Option($option);
+            $options[$key] = new CustomFieldOption($option);
         }
 
         return new ArrayCollection($options);

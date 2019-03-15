@@ -15,7 +15,6 @@ namespace MauticPlugin\CustomObjectsBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Option;
 
 /**
  * Table for multiselect/checkbox option values.
@@ -23,16 +22,16 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Option;
 class CustomFieldValueOption extends CustomFieldValueStandard
 {
     /**
-     * @var Option|null
+     * @var CustomFieldOption|null
      */
     private $option;
 
     /**
-     * @param CustomField $customField
-     * @param CustomItem  $customItem
-     * @param Option      $option
+     * @param CustomField       $customField
+     * @param CustomItem        $customItem
+     * @param CustomFieldOption $option
      */
-    public function __construct(CustomField $customField, CustomItem $customItem, Option $option)
+    public function __construct(CustomField $customField, CustomItem $customItem, CustomFieldOption $option)
     {
         parent::__construct($customField, $customItem);
 
@@ -49,7 +48,7 @@ class CustomFieldValueOption extends CustomFieldValueStandard
 
         parent::addReferenceColumns($builder);
 
-        $builder->createManyToOne('option', Option::class)
+        $builder->createManyToOne('option', CustomFieldOption::class)
             ->addJoinColumn('option_id', 'id', false, false, 'CASCADE')
             ->makePrimaryKey()
             ->fetchExtraLazy()
@@ -57,7 +56,7 @@ class CustomFieldValueOption extends CustomFieldValueStandard
     }
 
     /**
-     * @param Option $option
+     * @param CustomFieldOption $option
      */
     public function setOption($option = null): void
     {
@@ -65,7 +64,7 @@ class CustomFieldValueOption extends CustomFieldValueStandard
     }
 
     /**
-     * @return Option|null
+     * @return CustomFieldOption|null
      */
     public function getOption()
     {
