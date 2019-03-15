@@ -17,6 +17,8 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Option;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\SelectType;
 
 class CustomFieldTest extends \PHPUnit_Framework_TestCase
 {
@@ -113,5 +115,57 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
                 'class' => 'control-label',
             ],
         ], $customField->getFormFieldOptions());
+    }
+
+    public function testGetFormFieldOptionsWithChoices(): void
+    {
+        $customField  = new CustomField();
+        $typeObject   = new SelectType('select');
+        $red          = new Option();
+        $blue         = new Option();
+
+        $red->setLabel('Red');
+        $red->setValue('red');
+        $blue->setLabel('Blue');
+        $blue->setValue('blue');
+
+        $customField->setTypeObject($typeObject);
+        $customField->setLabel('Colors');
+        $customField->addOption($red);
+        $customField->addOption($blue);
+
+        $this->assertSame([
+            'expanded'   => false,
+            'multiple'   => false,
+            'label'      => 'Colors',
+            'required'   => false,
+            'label_attr' => ['class' => 'control-label',],
+            'attr'       => ['class' => 'form-control',],
+            'choices'    => [
+                'red'  => 'Red',
+                'blue' => 'Blue',
+            ],
+        ], $customField->getFormFieldOptions());
+    }
+
+    public function testGetChoices(): void
+    {
+        $optionA = new Option();
+        $optionB = new Option();
+
+        $optionA->setLabel('Option A');
+        $optionA->setValue('option_a');
+        $optionB->setLabel('Option B');
+        $optionB->setValue('option_b');
+
+        $customField = new CustomField();
+        $customField->addOption($optionA);
+        $customField->addOption($optionB);
+        $customField->setTypeObject(new SelectType('Select'));
+
+        $this->assertSame([
+            'option_a' => 'Option A',
+            'option_b' => 'Option B',
+        ], $customField->getChoices());
     }
 }

@@ -24,6 +24,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Mautic\CoreBundle\Entity\FormEntity;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
+use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class CustomField extends FormEntity implements UniqueEntityInterface
 {
@@ -99,6 +101,11 @@ class CustomField extends FormEntity implements UniqueEntityInterface
             'customObject' => $this->customObject->getId(),
             'order'        => $this->order,
         ];
+    }
+
+    public function __construct()
+    {
+        $this->options = new ArrayCollection();
     }
 
     /**
@@ -243,12 +250,17 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     public function getFormFieldOptions(array $customOptions = []): array
     {
         $fieldTypeOptions = $this->getTypeObject()->createFormTypeOptions();
+        $choices          = $this->getChoices();
         $fieldOptions     = [
             'label'      => $this->getLabel(),
             'required'   => $this->isRequired(),
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control'],
         ];
+
+        if ($choices) {
+            $fieldOptions['choices'] = $choices;
+        }
 
         return array_merge_recursive($fieldTypeOptions, $fieldOptions, $customOptions);
     }
@@ -337,11 +349,29 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @return ArrayCollection|Option[]
+     * @return Collection|Option[]
      */
-    public function getOptions(): ArrayCollection
+    public function getOptions(): Collection
     {
         return $this->options;
+    }
+
+    /**
+     * Makes an array of choices from options for Symfony form.
+     * 
+     * @return mixed[]
+     */
+    public function getChoices(): array
+    {
+        $choices = [];
+
+        if ($this->getTypeObject()->getSymfonyFormFieldType() === ChoiceType::class) {
+            foreach ($this->getOptions() as $option) {
+                $choices[$option->getValue()] = $option->getLabel();
+            };
+        }
+
+        return $choices;
     }
 
     /**
