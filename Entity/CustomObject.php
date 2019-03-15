@@ -100,7 +100,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         $builder->addCategory();
         $builder->addNamedField('nameSingular', Type::STRING, 'name_singular');
         $builder->addNamedField('namePlural', Type::STRING, 'name_plural');
-        $builder->addNamedField('description', Type::STRING, 'description');
+        $builder->addNullableField('description', Type::STRING, 'description');
         $builder->addNullableField('language', Type::STRING, 'lang');
     }
 
