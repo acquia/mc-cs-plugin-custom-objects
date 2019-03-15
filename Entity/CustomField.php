@@ -79,6 +79,11 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      */
     private $params;
 
+    public function __construct()
+    {
+        $this->options = new ArrayCollection();
+    }
+
     public function __clone()
     {
         $this->id = null;
@@ -101,11 +106,6 @@ class CustomField extends FormEntity implements UniqueEntityInterface
             'customObject' => $this->customObject->getId(),
             'order'        => $this->order,
         ];
-    }
-
-    public function __construct()
-    {
-        $this->options = new ArrayCollection();
     }
 
     /**
@@ -358,17 +358,17 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
     /**
      * Makes an array of choices from options for Symfony form.
-     * 
+     *
      * @return mixed[]
      */
     public function getChoices(): array
     {
         $choices = [];
 
-        if ($this->getTypeObject()->getSymfonyFormFieldType() === ChoiceType::class) {
+        if (ChoiceType::class === $this->getTypeObject()->getSymfonyFormFieldType()) {
             foreach ($this->getOptions() as $option) {
                 $choices[$option->getValue()] = $option->getLabel();
-            };
+            }
         }
 
         return $choices;

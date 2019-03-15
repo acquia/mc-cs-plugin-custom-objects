@@ -139,8 +139,8 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
             'multiple'   => false,
             'label'      => 'Colors',
             'required'   => false,
-            'label_attr' => ['class' => 'control-label',],
-            'attr'       => ['class' => 'form-control',],
+            'label_attr' => ['class' => 'control-label'],
+            'attr'       => ['class' => 'form-control'],
             'choices'    => [
                 'red'  => 'Red',
                 'blue' => 'Blue',
