@@ -223,6 +223,36 @@ class FormControllerTest extends ControllerTestCase
         $this->formController->cloneAction(self::OBJECT_ID, self::ITEM_ID);
     }
 
+    public function testCloneActionIfCustomItemNotFound(): void
+    {
+        $this->customItemModel->expects($this->once())
+            ->method('fetchEntity')
+            ->will($this->throwException(new NotFoundException()));
+
+        $this->routeProvider->expects($this->never())
+            ->method('buildCloneRoute');
+
+        $this->formController->cloneAction(self::OBJECT_ID, self::ITEM_ID);
+    }
+
+    public function testCloneActionIfCustomItemForbidden(): void
+    {
+        $this->customItemModel->expects($this->once())
+            ->method('fetchEntity')
+            ->willReturn($this->customItem);
+
+        $this->permissionProvider->expects($this->once())
+            ->method('canClone')
+            ->will($this->throwException(new ForbiddenException('edit')));
+
+        $this->routeProvider->expects($this->never())
+            ->method('buildCloneRoute');
+
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $this->formController->cloneAction(self::OBJECT_ID, self::ITEM_ID);
+    }
+
     private function assertRenderFormForItem(): void
     {
         $this->routeProvider->expects($this->once())
