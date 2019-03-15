@@ -15,6 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use MauticPlugin\CustomObjectsBundle\Form\CustomObjectHiddenTransformer;
+use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsToStringTransformer;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransformer;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomField\OptionType;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomField\ParamsType;
@@ -49,18 +50,26 @@ class CustomFieldType extends AbstractType
     private $paramsToStringTransformer;
 
     /**
-     * @param CustomObjectRepository    $customObjectRepository
-     * @param CustomFieldTypeProvider   $customFieldTypeProvider
-     * @param ParamsToStringTransformer $paramsToStringTransformer
+     * @var OptionsToStringTransformer
+     */
+    private $optionsToStringTransformer;
+
+    /**
+     * @param CustomObjectRepository     $customObjectRepository
+     * @param CustomFieldTypeProvider    $customFieldTypeProvider
+     * @param ParamsToStringTransformer  $paramsToStringTransformer
+     * @param OptionsToStringTransformer $optionsToStringTransformer
      */
     public function __construct(
         CustomObjectRepository $customObjectRepository,
         CustomFieldTypeProvider $customFieldTypeProvider,
-        ParamsToStringTransformer $paramsToStringTransformer
+        ParamsToStringTransformer $paramsToStringTransformer,
+        OptionsToStringTransformer $optionsToStringTransformer
     ) {
         $this->customObjectRepository     = $customObjectRepository;
         $this->customFieldTypeProvider    = $customFieldTypeProvider;
         $this->paramsToStringTransformer  = $paramsToStringTransformer;
+        $this->optionsToStringTransformer = $optionsToStringTransformer;
     }
 
     /**
@@ -270,6 +279,14 @@ class CustomFieldType extends AbstractType
                 HiddenType::class
             )
                 ->addModelTransformer($this->paramsToStringTransformer)
+        );
+
+        $builder->add(
+            $builder->create(
+                'options',
+                HiddenType::class
+            )
+                ->addModelTransformer($this->optionsToStringTransformer)
         );
 
         // Possibility to mark field as deleted in POST data
