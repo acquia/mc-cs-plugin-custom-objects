@@ -122,8 +122,7 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     {
         $type = $this->getSymfonyFormFieldType();
 
-        return
-            $type === ChoiceType::class ||
+        return             ChoiceType::class === $type ||
             is_subclass_of($this->getSymfonyFormFieldType(), ChoiceType::class);
     }
 }

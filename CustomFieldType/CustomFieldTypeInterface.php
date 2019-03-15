@@ -35,7 +35,7 @@ interface CustomFieldTypeInterface
     public function getKey(): string;
 
     /**
-     * Symfony form field representing this custom field
+     * Symfony form field representing this custom field.
      *
      * @return string
      */
