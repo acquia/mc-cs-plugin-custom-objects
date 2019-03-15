@@ -19,7 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 return [
     'name'        => 'Custom Objects',
     'description' => 'Adds custom objects and fields features to Mautic',
-    'version'     => '0.0.3',
+    'version'     => '0.0.4',
     'author'      => 'Mautic, Inc.',
 
     'routes' => [
