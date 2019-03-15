@@ -80,7 +80,6 @@ class Option
             ->addJoinColumn('custom_field_id', 'id', false, false, 'CASCADE')
             ->inversedBy('options')
             ->cascadePersist()
-            ->fetchEager()
             ->build();
 
         $builder->addId();
