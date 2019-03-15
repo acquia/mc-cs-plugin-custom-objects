@@ -46,10 +46,6 @@ class CustomFieldValueModel
      */
     public function getValuesForItem(CustomItem $customItem, Collection $customFields): Collection
     {
-        if (!$customItem->getId()) {
-            return new ArrayCollection();
-        }
-
         return $this->createValueObjects(
             $this->fetchValues(
                 $this->buildQueriesForUnion($customItem, $customFields)
@@ -126,12 +122,18 @@ class CustomFieldValueModel
      */
     private function fetchValues(Collection $queries): ArrayCollection
     {
+        $rows = new ArrayCollection();
+
+        // No need to query for values in case there are no queries
+        if (0 === $queries->count()) {
+            return $rows;
+        }
+
         $statement = $this->entityManager->getConnection()->prepare(implode(' UNION ', $queries->toArray()));
 
         $statement->execute();
 
         $rowsRaw = $statement->fetchAll();
-        $rows    = new ArrayCollection();
 
         foreach ($rowsRaw as $row) {
             $rows->set((int) $row['custom_field_id'], $row);
@@ -148,6 +150,11 @@ class CustomFieldValueModel
      */
     private function buildQueriesForUnion(CustomItem $customItem, Collection $customFields): Collection
     {
+        // No need to build queries for new CustomItem entity
+        if ($customItem->isNew()) {
+            return new ArrayCollection();
+        }
+
         return $customFields->map(function (CustomField $customField) use ($customItem) {
             $type         = $customField->getTypeObject();
             $alias        = $type->getTableAlias();
