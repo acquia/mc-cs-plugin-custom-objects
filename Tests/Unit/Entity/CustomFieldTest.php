@@ -111,7 +111,7 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
             ],
             'label'      => 'Start Date',
             'required'   => true,
-            'data'       => null,
+            'empty_data' => null,
             'label_attr' => [
                 'class' => 'control-label',
             ],
@@ -140,7 +140,7 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
             'multiple'   => false,
             'label'      => 'Colors',
             'required'   => false,
-            'data'       => null,
+            'empty_data' => null,
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control'],
             'choices'    => [
