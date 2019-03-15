@@ -22,24 +22,6 @@ use MauticPlugin\CustomObjectsBundle\Migration\Engine;
 class CustomObjectsBundle extends PluginBundleBase
 {
     /**
-     * @param Plugin           $plugin
-     * @param MauticFactory    $factory
-     * @param array|null       $metadata
-     * @param Schema|bool|null $installedSchema
-     *
-     * @throws \Exception
-     */
-    public static function onPluginInstall(Plugin $plugin, MauticFactory $factory, $metadata = null, $installedSchema = null): void
-    {
-        if (true === $installedSchema) {
-            // Schema exists
-            return;
-        }
-
-        self::runMigrations($plugin, $factory);
-    }
-
-    /**
      * @param Plugin        $plugin
      * @param MauticFactory $factory
      * @param array|null    $metadata
@@ -48,15 +30,6 @@ class CustomObjectsBundle extends PluginBundleBase
      * @throws \Exception
      */
     public static function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, Schema $installedSchema = null): void
-    {
-        self::runMigrations($plugin, $factory);
-    }
-
-    /**
-     * @param Plugin        $plugin
-     * @param MauticFactory $factory
-     */
-    private static function runMigrations(Plugin $plugin, MauticFactory $factory): void
     {
         $migrationEngine = new Engine(
             $factory->getEntityManager(),
