@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
 use Mautic\LeadBundle\Segment\OperatorOptions;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Translation\TranslatorInterface;
 
 abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
@@ -112,5 +113,17 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     public function createFormTypeOptions(array $options = []): array
     {
         return array_merge_recursive($this->formTypeOptions, $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasChoices(): bool
+    {
+        $type = $this->getSymfonyFormFieldType();
+
+        return
+            $type === ChoiceType::class ||
+            is_subclass_of($this->getSymfonyFormFieldType(), ChoiceType::class);
     }
 }

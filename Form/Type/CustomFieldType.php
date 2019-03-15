@@ -22,6 +22,7 @@ use MauticPlugin\CustomObjectsBundle\Form\Type\CustomField\ParamsType;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -160,24 +161,6 @@ class CustomFieldType extends AbstractType
         );
 
         $builder->add(
-            'params',
-            ParamsType::class
-        );
-
-        $builder->add(
-            'options',
-            CollectionType::class,
-            [
-                'mapped'       => false,
-                'allow_add'    => true,
-                'allow_delete' => true,
-                'delete_empty' => true,
-                'entry_type'   => OptionType::class,
-                'prototype'    => true,
-            ]
-        );
-
-        $builder->add(
             'required',
             YesNoButtonGroupType::class,
             [
@@ -203,6 +186,29 @@ class CustomFieldType extends AbstractType
                     ]
                 )
             );
+
+            $form->add(
+                'params',
+                ParamsType::class,
+                [
+                    'customField' => $customField,
+                ]
+            );
+
+            if ($customField->getTypeObject()->hasChoices()) {
+                $form->add(
+                    'options',
+                    CollectionType::class,
+                    [
+                        'mapped'       => false,
+                        'allow_add'    => true,
+                        'allow_delete' => true,
+                        'delete_empty' => true,
+                        'entry_type'   => OptionType::class,
+                        'prototype'    => true,
+                    ]
+                );
+            }
         });
 
         $builder->add(
