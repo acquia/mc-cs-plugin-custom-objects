@@ -47,17 +47,12 @@ class OptionsToStringTransformer implements DataTransformerInterface
             return '[]';
         }
 
-        $options = $options->toArray();
-
-        /**
-         * @var int
-         * @var Option $option
-         */
-        foreach ($options as $key => $option) {
-            $options[$key] = $option->__toArray();
-        }
-
-        return $this->serializer->serialize($options, 'json');
+        return $this->serializer->serialize(
+            $options->map(function(Option $option) {
+                return $option->__toArray();
+            })->toArray(),
+            'json'
+        );
     }
 
     /**
