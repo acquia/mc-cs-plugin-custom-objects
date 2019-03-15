@@ -145,6 +145,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
             ->setOrderBy(['label' => 'ASC'])
             ->mappedBy('customField')
             ->cascadePersist()
+            ->fetchExtraLazy()
             ->build();
 
         $builder->createField('params', Type::JSON_ARRAY)
