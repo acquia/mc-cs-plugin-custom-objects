@@ -18,26 +18,26 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Option;
 
 class OptionTest extends \PHPUnit_Framework_TestCase
 {
-    public function testConstructor()
+    public function testConstructorAndToArray()
     {
         $id          = 1;
         $customField = new CustomField();
         $label       = 'label';
         $value       = 'value';
 
-        $option = [
+        $optionArray = [
             'id'          => $id,
             'customField' => $customField,
             'label'       => $label,
             'value'       => $value,
         ];
 
-        $option = new Option($option);
+        $option = new Option($optionArray);
 
-        $this->assertSame($id, $option->getId());
-        $this->assertSame($customField, $option->getCustomField());
-        $this->assertSame($label, $option->getLabel());
-        $this->assertSame($value, $option->getValue());
+        // Because has no ID and null values are filtered with array_filter
+        unset($optionArray['customField']);
+
+        $this->assertSame($optionArray, $option->__toArray());
     }
 
     public function testGettersSetters()

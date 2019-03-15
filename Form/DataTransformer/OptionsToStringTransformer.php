@@ -42,12 +42,17 @@ class OptionsToStringTransformer implements DataTransformerInterface
      */
     public function transform($options = null): string
     {
-        if (null === $options) {
+        if (!$options) {
             // Options can be null because entities are not using constructors
             return '[]';
         }
 
-        return $this->serializer->serialize($options->toArray(), 'json');
+        return $this->serializer->serialize(
+            $options->map(function (Option $option) {
+                return $option->__toArray();
+            })->toArray(),
+            'json'
+        );
     }
 
     /**

@@ -16,26 +16,12 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Form\DataTransformer;
 use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\SerializerInterface;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsToStringTransformer;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Option;
 
 class OptionsToStringTransformerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testTransform(): void
+    public function testTransformWithEmptyOptions(): void
     {
-        $options = $this->createMock(ArrayCollection::class);
-        $options
-            ->expects($this->once())
-            ->method('toArray')
-            ->willReturn([]);
-
-        $serializer = $this->createMock(SerializerInterface::class);
-        $serializer
-            ->expects($this->once())
-            ->method('serialize')
-            ->willReturn('[]');
-
-        $transformer = new OptionsToStringTransformer($serializer);
-        $this->assertSame('[]', $transformer->transform($options));
-
         $options    = null;
         $serializer = $this->createMock(SerializerInterface::class);
         $serializer
@@ -44,6 +30,28 @@ class OptionsToStringTransformerTest extends \PHPUnit_Framework_TestCase
 
         $transformer = new OptionsToStringTransformer($serializer);
         $this->assertSame('[]', $transformer->transform($options));
+    }
+
+    public function testTransform(): void
+    {
+        $option = new Option();
+        $option->setLabel('Option A');
+        $option->setValue('option_a');
+
+        $options = new ArrayCollection([$option]);
+
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer
+            ->expects($this->once())
+            ->method('serialize')
+            ->with([[
+                'label' => 'Option A',
+                'value' => 'option_a',
+            ]])
+            ->willReturn('{"some": "json"}');
+
+        $transformer = new OptionsToStringTransformer($serializer);
+        $this->assertSame('{"some": "json"}', $transformer->transform($options));
     }
 
     public function testReverseTransform(): void
