@@ -725,7 +725,8 @@ return [
             'custom_field.field.options.to.string.transformer' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsToStringTransformer::class,
                 'arguments' => [
-                    'jms_serializer'
+                    'jms_serializer',
+                    'mautic.custom.model.field'
                 ],
             ],
             'custom_object.object.form' => [
