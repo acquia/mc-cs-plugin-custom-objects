@@ -17,6 +17,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\SerializerInterface;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsToStringTransformer;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
+use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 
 class OptionsToStringTransformerTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,11 +25,12 @@ class OptionsToStringTransformerTest extends \PHPUnit_Framework_TestCase
     {
         $options    = null;
         $serializer = $this->createMock(SerializerInterface::class);
+        $model      = $this->createMock(CustomFieldModel::class);
         $serializer
             ->expects($this->never())
             ->method('serialize');
 
-        $transformer = new OptionsToStringTransformer($serializer);
+        $transformer = new OptionsToStringTransformer($serializer, $model);
         $this->assertSame('[]', $transformer->transform($options));
     }
 
@@ -50,7 +52,9 @@ class OptionsToStringTransformerTest extends \PHPUnit_Framework_TestCase
             ]])
             ->willReturn('{"some": "json"}');
 
-        $transformer = new OptionsToStringTransformer($serializer);
+        $model = $this->createMock(CustomFieldModel::class);
+
+        $transformer = new OptionsToStringTransformer($serializer, $model);
         $this->assertSame('{"some": "json"}', $transformer->transform($options));
     }
 
@@ -58,7 +62,8 @@ class OptionsToStringTransformerTest extends \PHPUnit_Framework_TestCase
     {
         $options     = '[]';
         $serializer  = $this->createMock(SerializerInterface::class);
-        $transformer = new OptionsToStringTransformer($serializer);
+        $model       = $this->createMock(CustomFieldModel::class);
+        $transformer = new OptionsToStringTransformer($serializer, $model);
         $options     = $transformer->reverseTransform($options);
         $this->assertInstanceOf(ArrayCollection::class, $options);
         $this->assertSame([], $options->toArray());

@@ -16,6 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Form\DataTransformer;
 use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\SerializerInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
+use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use Symfony\Component\Form\DataTransformerInterface;
 
 class OptionsToStringTransformer implements DataTransformerInterface
@@ -26,11 +27,18 @@ class OptionsToStringTransformer implements DataTransformerInterface
     private $serializer;
 
     /**
-     * @param SerializerInterface $serializer
+     * @var CustomFieldModel
      */
-    public function __construct(SerializerInterface $serializer)
+    private $customFieldModel;
+
+    /**
+     * @param SerializerInterface $serializer
+     * @param CustomFieldModel    $customFieldModel
+     */
+    public function __construct(SerializerInterface $serializer, CustomFieldModel $customFieldModel)
     {
-        $this->serializer = $serializer;
+        $this->serializer       = $serializer;
+        $this->customFieldModel = $customFieldModel;
     }
 
     /**
@@ -67,8 +75,8 @@ class OptionsToStringTransformer implements DataTransformerInterface
         $options = json_decode($options, true);
 
         foreach ($options as $key => $option) {
-            // @todo CustomField handling and test when adding & editing custom field
-            $options[$key] = new CustomFieldOption($option);
+            $option['customField'] = $this->customFieldModel->fetchEntity($option['customField']);
+            $options[$key]         = new CustomFieldOption($option);
         }
 
         return new ArrayCollection($options);
