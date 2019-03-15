@@ -253,7 +253,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         $fieldOptions     = [
             'label'      => $this->getLabel(),
             'required'   => $this->isRequired(),
-            'data'       => $this->getDefaultValue(),
+            'empty_data' => $this->getDefaultValue(),
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control'],
         ];
