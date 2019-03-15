@@ -15,6 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Form\DataTransformer;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\SerializerInterface;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsToStringTransformer;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
@@ -67,5 +68,35 @@ class OptionsToStringTransformerTest extends \PHPUnit_Framework_TestCase
         $options     = $transformer->reverseTransform($options);
         $this->assertInstanceOf(ArrayCollection::class, $options);
         $this->assertSame([], $options->toArray());
+
+        $id            = 1;
+        $customFieldId = 2;
+        $customField   = new CustomField();
+        $label         = 'label';
+        $value         = 'value';
+        $options       = json_encode([[
+            'id'          => $id,
+            'customField' => $customFieldId,
+            'label'       => $label,
+            'value'       => $value,
+        ]]);
+
+        $serializer  = $this->createMock(SerializerInterface::class);
+        $model       = $this->createMock(CustomFieldModel::class);
+        $model
+            ->expects($this->once())
+            ->method('fetchEntity')
+            ->with($customFieldId)
+            ->willReturn($customField);
+
+        $transformer = new OptionsToStringTransformer($serializer, $model);
+        $options     = $transformer->reverseTransform($options);
+        $this->assertInstanceOf(ArrayCollection::class, $options);
+        $option = $options->first();
+        $this->assertInstanceOf(CustomFieldOption::class, $option);
+        $this->assertSame($id, $option->getId());
+        $this->assertSame($customField, $option->getCustomField());
+        $this->assertSame($label, $option->getLabel());
+        $this->assertSame($value, $option->getValue());
     }
 }
