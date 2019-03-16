@@ -58,10 +58,9 @@ class CustomItemXrefContactModel extends FormModel
         try {
             $xRef = $this->getContactReference($customItemId, $contactId);
         } catch (NoResultException $e) {
-
             /** @var CustomItem $customItem */
             $customItem = $this->entityManager->getReference(CustomItem::class, $customItemId);
-            
+
             /** @var Lead $contact */
             $contact = $this->entityManager->getReference(Lead::class, $contactId);
 
