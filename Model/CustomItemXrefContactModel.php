@@ -24,7 +24,7 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefContactEvent;
-use DateTimeInterface;
+use DateTime;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomItemXrefContactModel extends FormModel
@@ -58,9 +58,16 @@ class CustomItemXrefContactModel extends FormModel
         try {
             $xRef = $this->getContactReference($customItemId, $contactId);
         } catch (NoResultException $e) {
+
+            /** @var CustomItem $customItem */
+            $customItem = $this->entityManager->getReference(CustomItem::class, $customItemId);
+            
+            /** @var Lead $contact */
+            $contact = $this->entityManager->getReference(Lead::class, $contactId);
+
             $xRef = new CustomItemXrefContact(
-                $this->entityManager->getReference(CustomItem::class, $customItemId),
-                $this->entityManager->getReference(Lead::class, $contactId)
+                $customItem,
+                $contact
             );
 
             $this->entityManager->persist($xRef);
@@ -96,15 +103,15 @@ class CustomItemXrefContactModel extends FormModel
     }
 
     /**
-     * @param DateTimeInterface $from
-     * @param DateTimeInterface $to
-     * @param CustomItem        $customItem
+     * @param DateTime   $from
+     * @param DateTime   $to
+     * @param CustomItem $customItem
      *
      * @return mixed[]
      */
     public function getLinksLineChartData(
-        DateTimeInterface $from,
-        DateTimeInterface $to,
+        DateTime $from,
+        DateTime $to,
         CustomItem $customItem
     ): array {
         $chart = new LineChart(null, $from, $to);

@@ -13,6 +13,7 @@ use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CustomItemFilterQueryBuilderTest extends WebTestCase
 {
@@ -57,6 +58,7 @@ class CustomItemFilterQueryBuilderTest extends WebTestCase
 
     public function testApplyQuery(): void
     {
+        /** @var EventDispatcherInterface $dispatcher */
         $dispatcher        = $this->getContainer()->get('event_dispatcher');
         $fieldTypeProvider = new CustomFieldTypeProvider($dispatcher);
         $filterHelper      = new QueryFilterHelper($fieldTypeProvider);

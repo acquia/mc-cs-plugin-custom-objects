@@ -8,3 +8,4 @@ parameters:
 		- '#Method MauticPlugin\\CustomObjectsBundle\\Model\\Custom(Object|Field)Model::fetchEntity\(\) should return MauticPlugin\\CustomObjectsBundle\\Entity\\Custom(Object|Field) but returns object.#'
 		- '#Method MauticPlugin\\CustomObjectsBundle\\Model\\CustomObjectModel::fetchEntities() should return Doctrine\\ORM\\Tools\\Pagination\\Paginator&iterable<MauticPlugin\\CustomObjectsBundle\\Entity\\CustomObject> but returns array|Doctrine\\ORM\\Tools\\Pagination\\Paginator.#'
 		- '#Property MauticPlugin\\CustomObjectsBundle\\Tests\\Functional\\Segment\\Query\\Filter\\Custom(Item|Field)FilterQueryBuilderTest::\$entityManager \(Doctrine\\ORM\\EntityManager\) does not accept object.#'
+		- '#Parameter .+ expects .+, PHPUnit_Framework_MockObject_MockObject given\.#'

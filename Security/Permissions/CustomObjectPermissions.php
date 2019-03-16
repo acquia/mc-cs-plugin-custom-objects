@@ -71,12 +71,11 @@ class CustomObjectPermissions extends AbstractPermissions
      */
     public function definePermissions(): void
     {
-        $this->addExtendedPermissions('custom_fields');
-        $this->addExtendedPermissions(self::NAME);
+        $this->addExtendedPermissions(['custom_fields', self::NAME]);
 
         $customObjects = $this->getCustomObjects();
         foreach ($customObjects as $customObject) {
-            $this->addExtendedPermissions($customObject->getId());
+            $this->addExtendedPermissions([$customObject->getId()]);
         }
     }
 
@@ -98,7 +97,7 @@ class CustomObjectPermissions extends AbstractPermissions
 
         $customObjects = $this->getCustomObjects();
         foreach ($customObjects as $customObject) {
-            $this->addExtendedFormFields(self::NAME, $customObject->getId(), $builder, $data);
+            $this->addExtendedFormFields(self::NAME, (string) $customObject->getId(), $builder, $data);
         }
     }
 

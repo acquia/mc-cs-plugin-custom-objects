@@ -194,12 +194,12 @@ final class QueryFilterHelper
             case 'notEmpty':
                 break;
             case 'notIn':
-                $valueType      = $queryBuilder->getConnection()::PARAM_STR_ARRAY;
+                $valueType      = (string) $queryBuilder->getConnection()::PARAM_STR_ARRAY;
                 $valueParameter = $tableAlias.'_value_value';
 
                 break;
             case 'in':
-                $valueType      = $queryBuilder->getConnection()::PARAM_STR_ARRAY;
+                $valueType      = (string) $queryBuilder->getConnection()::PARAM_STR_ARRAY;
                 $valueParameter = $tableAlias.'_value_value';
 
                 break;

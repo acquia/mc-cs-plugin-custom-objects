@@ -72,12 +72,12 @@ class CustomFieldModel extends FormModel
         $now  = new DateTimeHelper();
 
         if ($entity->isNew()) {
-            $entity->setCreatedBy($user->getId());
+            $entity->setCreatedBy($user);
             $entity->setCreatedByUser($user->getName());
             $entity->setDateAdded($now->getUtcDateTime());
         }
 
-        $entity->setModifiedBy($user->getId());
+        $entity->setModifiedBy($user);
         $entity->setModifiedByUser($user->getName());
         $entity->setDateModified($now->getUtcDateTime());
 

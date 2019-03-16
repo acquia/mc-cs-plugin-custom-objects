@@ -91,12 +91,12 @@ class CustomItemModel extends FormModel
         $event = new CustomItemEvent($customItem, $customItem->isNew());
 
         if ($customItem->isNew()) {
-            $customItem->setCreatedBy($user->getId());
+            $customItem->setCreatedBy($user);
             $customItem->setCreatedByUser($user->getName());
             $customItem->setDateAdded($now->getUtcDateTime());
         }
 
-        $customItem->setModifiedBy($user->getId());
+        $customItem->setModifiedBy($user);
         $customItem->setModifiedByUser($user->getName());
         $customItem->setDateModified($now->getUtcDateTime());
 
@@ -146,13 +146,14 @@ class CustomItemModel extends FormModel
      */
     public function fetchEntity(int $id): CustomItem
     {
-        $entity = parent::getEntity($id);
+        /** @var CustomItem|null $customItem */
+        $customItem = parent::getEntity($id);
 
-        if (null === $entity) {
+        if (null === $customItem) {
             throw new NotFoundException("Custom Item with ID = {$id} was not found");
         }
 
-        return $this->populateCustomFields($entity);
+        return $this->populateCustomFields($customItem);
     }
 
     /**

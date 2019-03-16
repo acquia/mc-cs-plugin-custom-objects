@@ -155,7 +155,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         }
 
         $progress->finish();
-        $runTime = gmdate('H:i:s', microtime(true) - $startTime);
+        $runTime = gmdate('H:i:s', (int) (microtime(true) - $startTime));
 
         $io->success("Execution time: {$runTime}");
 
