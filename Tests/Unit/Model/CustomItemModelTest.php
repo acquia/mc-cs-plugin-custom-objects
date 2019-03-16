@@ -93,14 +93,13 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
 
     public function testSaveNew(): void
     {
-        $this->user->expects($this->exactly(2))->method('getId')->willReturn(55);
         $this->user->expects($this->exactly(2))->method('getName')->willReturn('John Doe');
         $this->userHelper->expects($this->once())->method('getUser')->willReturn($this->user);
         $this->customItem->expects($this->exactly(2))->method('isNew')->willReturn(true);
-        $this->customItem->expects($this->once())->method('setCreatedBy')->with(55);
+        $this->customItem->expects($this->once())->method('setCreatedBy')->with($this->user);
         $this->customItem->expects($this->once())->method('setCreatedByUser')->with('John Doe');
         $this->customItem->expects($this->once())->method('setDateAdded');
-        $this->customItem->expects($this->once())->method('setModifiedBy')->with(55);
+        $this->customItem->expects($this->once())->method('setModifiedBy')->with($this->user);
         $this->customItem->expects($this->once())->method('setModifiedByUser')->with('John Doe');
         $this->customItem->expects($this->once())->method('setDateModified');
         $this->entityManager->expects($this->at(0))->method('persist')->with($this->customItem);
@@ -118,11 +117,10 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
     {
         $customFieldValue = $this->createMock(CustomFieldValueText::class);
         $contactXref      = $this->createMock(CustomItemXrefContact::class);
-        $this->user->expects($this->once())->method('getId')->willReturn(55);
         $this->user->expects($this->once())->method('getName')->willReturn('John Doe');
         $this->userHelper->expects($this->once())->method('getUser')->willReturn($this->user);
         $this->customItem->expects($this->exactly(2))->method('isNew')->willReturn(false);
-        $this->customItem->expects($this->once())->method('setModifiedBy')->with(55);
+        $this->customItem->expects($this->once())->method('setModifiedBy')->with($this->user);
         $this->customItem->expects($this->once())->method('setModifiedByUser')->with('John Doe');
         $this->customItem->expects($this->once())->method('setDateModified');
         $this->entityManager->expects($this->at(0))->method('persist')->with($this->customItem);
