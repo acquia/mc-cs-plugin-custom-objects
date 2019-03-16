@@ -2,6 +2,15 @@
 
 declare(strict_types=1);
 
+/*
+ * @copyright   2019 Mautic Contributors. All rights reserved
+ * @author      Mautic
+ *
+ * @link        http://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Segment\Query\Filter;
 
 use Doctrine\ORM\EntityManager;
@@ -14,20 +23,23 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 
 class CustomItemFilterQueryBuilderTest extends WebTestCase
 {
     use FixtureObjectsTrait;
+    use DbalQueryTrait;
 
     /** @var EntityManager */
     private $entityManager;
 
     protected function setUp(): void
     {
-        $pluginDirectory   = $this->getContainer()->get('kernel')->locateResource('@CustomObjectsBundle');
-        $fixturesDirectory = $pluginDirectory.'/Tests/Functional/DataFixtures/ORM/Data';
-
-        $objects = $this->loadFixtureFiles([
+        /** @var EntityManager */
+        $entityManager       = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $this->entityManager = $entityManager;
+        $fixturesDirectory   = $this->getFixturesDirectory();
+        $objects             = $this->loadFixtureFiles([
             $fixturesDirectory.'/roles.yml',
             $fixturesDirectory.'/users.yml',
             $fixturesDirectory.'/leads.yml',
@@ -39,8 +51,6 @@ class CustomItemFilterQueryBuilderTest extends WebTestCase
         ], false, null, 'doctrine'); //,ORMPurger::PURGE_MODE_DELETE);
 
         $this->setFixtureObjects($objects);
-
-        $this->entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
 
         parent::setUp();
     }
@@ -59,25 +69,21 @@ class CustomItemFilterQueryBuilderTest extends WebTestCase
     public function testApplyQuery(): void
     {
         /** @var EventDispatcherInterface $dispatcher */
-        $dispatcher        = $this->getContainer()->get('event_dispatcher');
-        $fieldTypeProvider = new CustomFieldTypeProvider($dispatcher);
-        $filterHelper      = new QueryFilterHelper($fieldTypeProvider);
-
+        $dispatcher          = $this->getContainer()->get('event_dispatcher');
+        $fieldTypeProvider   = new CustomFieldTypeProvider($dispatcher);
+        $filterHelper        = new QueryFilterHelper($fieldTypeProvider);
         $queryBuilderService = new CustomItemFilterQueryBuilder(new RandomParameterName(), $filterHelper);
+        $filterMock          = $this->createSegmentFilterMock('%emotion%', 'text', 'like');
+        $queryBuilder        = $this->getLeadsQueryBuilder();
+        $queryBuilderService->applyQuery($queryBuilder, $filterMock);
 
-        $filterMock = $this->createSegmentFilterMock('%emotion%', 'text', 'like');
+        $this->assertSame(1, $this->executeSelect($queryBuilder)->rowCount());
 
+        $filterMock   = $this->createSegmentFilterMock('%Object%', 'text', 'like');
         $queryBuilder = $this->getLeadsQueryBuilder();
         $queryBuilderService->applyQuery($queryBuilder, $filterMock);
 
-        $this->assertSame(1, $queryBuilder->execute()->rowCount());
-
-        $filterMock = $this->createSegmentFilterMock('%Object%', 'text', 'like');
-
-        $queryBuilder = $this->getLeadsQueryBuilder();
-        $queryBuilderService->applyQuery($queryBuilder, $filterMock);
-
-        $this->assertSame(6, $queryBuilder->execute()->rowCount());
+        $this->assertSame(6, $this->executeSelect($queryBuilder)->rowCount());
     }
 
     /**

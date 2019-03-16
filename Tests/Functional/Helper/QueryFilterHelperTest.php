@@ -10,11 +10,15 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
+use Doctrine\ORM\EntityManager;
 
 class QueryFilterHelperTest extends WebTestCase
 {
     use FixtureObjectsTrait;
 
+    /**
+     * @var EntityManager
+     */
     private $entityManager;
 
     private $filterFactory;
@@ -23,18 +27,19 @@ class QueryFilterHelperTest extends WebTestCase
     {
         parent::setUp();
 
-        $em       = $this->getContainer()->get('doctrine')->getManager();
-        $metadata = $em->getMetadataFactory()->getAllMetadata();
-
-        $schemaTool = new SchemaTool($em);
+        /** @var EntityManager $entityManager */
+        $entityManager       = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $this->entityManager = $entityManager;
+        $this->filterFactory = $this->getContainer()->get('mautic.lead.model.lead_segment_filter_factory');
+        $metadata            = $entityManager->getMetadataFactory()->getAllMetadata();
+        $schemaTool          = new SchemaTool($entityManager);
         $schemaTool->dropDatabase();
         if (!empty($metadata)) {
             $schemaTool->createSchema($metadata);
         }
         $this->postFixtureSetup();
 
-        $pluginDirectory   = $this->getContainer()->get('kernel')->locateResource('@CustomObjectsBundle');
-        $fixturesDirectory = $pluginDirectory.'/Tests/Functional/DataFixtures/ORM/Data';
+        $fixturesDirectory = $this->getFixturesDirectory();
 
         $objects = $this->loadFixtureFiles([
             $fixturesDirectory.'/roles.yml',
@@ -48,9 +53,6 @@ class QueryFilterHelperTest extends WebTestCase
         ], false, null, 'doctrine'); //,ORMPurger::PURGE_MODE_DELETE);
 
         $this->setFixtureObjects($objects);
-
-        $this->entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
-        $this->filterFactory = $this->getContainer()->get('mautic.lead.model.lead_segment_filter_factory');
     }
 
     public function testGetCustomValueValueExpression(): void

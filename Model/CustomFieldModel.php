@@ -96,13 +96,14 @@ class CustomFieldModel extends FormModel
      */
     public function fetchEntity(int $id): CustomField
     {
-        $entity = parent::getEntity($id);
+        /** @var CustomField|null $customField */
+        $customField = parent::getEntity($id);
 
-        if (null === $entity) {
+        if (null === $customField) {
             throw new NotFoundException("Custom Field with ID = {$id} was not found");
         }
 
-        return $entity;
+        return $customField;
     }
 
     /**

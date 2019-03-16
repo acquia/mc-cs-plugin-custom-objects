@@ -2,6 +2,15 @@
 
 declare(strict_types=1);
 
+/*
+ * @copyright   2019 Mautic Contributors. All rights reserved
+ * @author      Mautic
+ *
+ * @link        http://mautic.org
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Segment\Query\Filter;
 
 use Doctrine\ORM\EntityManager;
@@ -15,10 +24,12 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 
 class CustomFieldFilterQueryBuilderTest extends WebTestCase
 {
     use FixtureObjectsTrait;
+    use DbalQueryTrait;
 
     /**
      * @var EntityManager
@@ -29,19 +40,19 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
     {
         parent::setUp();
 
-        $em         = $this->getContainer()->get('doctrine')->getManager();
-        $metadata   = $em->getMetadataFactory()->getAllMetadata();
-        $schemaTool = new SchemaTool($em);
+        /** @var EntityManager $entityManager */
+        $entityManager       = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $this->entityManager = $entityManager;
+        $metadata            = $entityManager->getMetadataFactory()->getAllMetadata();
+        $schemaTool          = new SchemaTool($entityManager);
         $schemaTool->dropDatabase();
         if (!empty($metadata)) {
             $schemaTool->createSchema($metadata);
         }
         $this->postFixtureSetup();
 
-        $pluginDirectory   = $this->getContainer()->get('kernel')->locateResource('@CustomObjectsBundle');
-        $fixturesDirectory = $pluginDirectory.'/Tests/Functional/DataFixtures/ORM/Data';
-
-        $objects = $this->loadFixtureFiles([
+        $fixturesDirectory = $this->getFixturesDirectory();
+        $objects           = $this->loadFixtureFiles([
             $fixturesDirectory.'/roles.yml',
             $fixturesDirectory.'/users.yml',
             $fixturesDirectory.'/leads.yml',
@@ -53,8 +64,6 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
         ], false, null, 'doctrine'); //,ORMPurger::PURGE_MODE_DELETE);
 
         $this->setFixtureObjects($objects);
-
-        $this->entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
     }
 
     protected function tearDown(): void
@@ -71,25 +80,22 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
     public function testApplyQuery(): void
     {
         /** @var EventDispatcherInterface $dispatcher */
-        $dispatcher        = $this->getContainer()->get('event_dispatcher');
-        $fieldTypeProvider = new CustomFieldTypeProvider($dispatcher);
-        $queryHelper       = new QueryFilterHelper($fieldTypeProvider);
-
+        $dispatcher          = $this->getContainer()->get('event_dispatcher');
+        $fieldTypeProvider   = new CustomFieldTypeProvider($dispatcher);
+        $queryHelper         = new QueryFilterHelper($fieldTypeProvider);
         $queryBuilderService = new CustomFieldFilterQueryBuilder(new RandomParameterName(), $queryHelper);
-
-        $filterMock = $this->createSegmentFilterMock('hate');
-
-        $queryBuilder = $this->getLeadsQueryBuilder();
+        $filterMock          = $this->createSegmentFilterMock('hate');
+        $queryBuilder        = $this->getLeadsQueryBuilder();
         $queryBuilderService->applyQuery($queryBuilder, $filterMock);
 
-        $this->assertSame(2, $queryBuilder->execute()->rowCount());
+        $this->assertSame(2, $this->executeSelect($queryBuilder)->rowCount());
 
         $filterMock = $this->createSegmentFilterMock('love');
 
         $queryBuilder = $this->getLeadsQueryBuilder();
         $queryBuilderService->applyQuery($queryBuilder, $filterMock);
 
-        $this->assertSame(3, $queryBuilder->execute()->rowCount());
+        $this->assertSame(3, $this->executeSelect($queryBuilder)->rowCount());
     }
 
     /**

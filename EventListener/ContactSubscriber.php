@@ -22,6 +22,7 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\LeadEventLog;
+use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 
 class ContactSubscriber extends CommonSubscriber
 {
@@ -111,6 +112,7 @@ class ContactSubscriber extends CommonSubscriber
      */
     private function getEvents(LeadTimelineEvent $event, string $action): array
     {
+        /** @var LeadEventLogRepository $eventLogRepo */
         $eventLogRepo = $this->entityManager->getRepository(LeadEventLog::class);
 
         return $eventLogRepo->getEvents(

@@ -21,9 +21,13 @@ use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQuery
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemFilterQueryBuilder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
+use Doctrine\DBAL\Connection;
+use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 
 class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
 {
+    use DbalQueryTrait;
+
     /**
      * @var Registry
      */
@@ -65,21 +69,23 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
             return;
         }
 
+        /** @var Connection $connection */
+        $connection = $this->doctrineRegistry->getConnection();
+
         // This avoids exceptions if no connection is available as in cache:clear
-        if (!$this->doctrineRegistry->getConnection()->isConnected()) {
+        if (!$connection->isConnected()) {
             return;
         }
 
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $this->doctrineRegistry->getConnection()->createQueryBuilder();
+        $queryBuilder = $connection->createQueryBuilder();
         $queryBuilder
             ->select('f.id, f.label, f.type, o.id as custom_object_id')
             ->from(MAUTIC_TABLE_PREFIX.'custom_field', 'f')
             ->innerJoin('f', MAUTIC_TABLE_PREFIX.'custom_object', 'o', 'f.custom_object_id = o.id');
 
         $registeredObjects = [];
-
-        $fields = $queryBuilder->execute()->fetchAll();
+        $fields            = $this->executeSelect($queryBuilder)->fetchAll();
 
         foreach ($fields as $field) {
             $COId = $field['custom_object_id'];

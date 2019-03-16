@@ -20,6 +20,8 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
 class CustomItemRepository extends AbstractTableRepository
 {
+    use DbalQueryTrait;
+
     public const TABLE_ALIAS = 'CustomItem';
 
     /**
@@ -67,7 +69,7 @@ class CustomItemRepository extends AbstractTableRepository
         $queryBuilder->andWhere($queryBuilder->expr()->{$expr}("{$fieldType->getTableAlias()}.value", ':value'));
         $queryBuilder->setParameter('value', $value);
 
-        $result = $queryBuilder->execute()->fetchColumn();
+        $result = $this->executeSelect($queryBuilder)->fetchColumn();
 
         if (false === $result) {
             $stringValue = print_r($value, true);

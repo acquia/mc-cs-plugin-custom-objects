@@ -138,6 +138,7 @@ class CustomObjectModel extends FormModel
      */
     public function fetchEntity(int $id): CustomObject
     {
+        /** @var CustomObject|null */
         $customObject = parent::getEntity($id);
 
         if (null === $customObject) {
