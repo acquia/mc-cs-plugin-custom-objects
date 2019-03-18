@@ -33,7 +33,7 @@ class OptionType extends AbstractType
         );
 
         $builder->add(
-            'name',
+            'label',
             TextType::class,
             [
                 'required' => true,

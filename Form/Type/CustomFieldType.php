@@ -200,7 +200,7 @@ class CustomFieldType extends AbstractType
                     'options',
                     CollectionType::class,
                     [
-                        'mapped'       => false,
+                        'mapped'       => true,
                         'allow_add'    => true,
                         'allow_delete' => true,
                         'delete_empty' => true,
