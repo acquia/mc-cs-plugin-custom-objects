@@ -8,6 +8,7 @@ use Doctrine\ORM\Tools\SchemaTool;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use MauticPlugin\CustomObjectsBundle\EventListener\DynamicContentSubscriber;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
+use Doctrine\ORM\EntityManager;
 
 class DynamicContentSubscriberTest extends \Liip\FunctionalTestBundle\Test\WebTestCase
 {
@@ -17,19 +18,18 @@ class DynamicContentSubscriberTest extends \Liip\FunctionalTestBundle\Test\WebTe
     {
         parent::setUp();
 
-        $em         = $this->getContainer()->get('doctrine')->getManager();
-        $metadata   = $em->getMetadataFactory()->getAllMetadata();
-        $schemaTool = new SchemaTool($em);
+        /** @var EntityManager $entityManager */
+        $entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $metadata      = $entityManager->getMetadataFactory()->getAllMetadata();
+        $schemaTool    = new SchemaTool($entityManager);
         $schemaTool->dropDatabase();
         if (!empty($metadata)) {
             $schemaTool->createSchema($metadata);
         }
         $this->postFixtureSetup();
 
-        $pluginDirectory   = $this->getContainer()->get('kernel')->locateResource('@CustomObjectsBundle');
-        $fixturesDirectory = $pluginDirectory.'/Tests/Functional/DataFixtures/ORM/Data';
-
-        $objects = $this->loadFixtureFiles([
+        $fixturesDirectory = $this->getFixturesDirectory();
+        $objects           = $this->loadFixtureFiles([
             $fixturesDirectory.'/roles.yml',
             $fixturesDirectory.'/users.yml',
             $fixturesDirectory.'/leads.yml',

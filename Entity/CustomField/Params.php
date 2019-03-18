@@ -46,7 +46,7 @@ class Params
     /**
      * Used as data source for json serialization.
      *
-     * @return string[]
+     * @return mixed[]
      */
     public function __toArray(): array
     {

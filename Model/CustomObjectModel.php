@@ -90,12 +90,12 @@ class CustomObjectModel extends FormModel
         $event = new CustomObjectEvent($customObject, $customObject->isNew());
 
         if ($customObject->isNew()) {
-            $customObject->setCreatedBy($user->getId());
+            $customObject->setCreatedBy($user);
             $customObject->setCreatedByUser($user->getName());
             $customObject->setDateAdded($now->getUtcDateTime());
         }
 
-        $customObject->setModifiedBy($user->getId());
+        $customObject->setModifiedBy($user);
         $customObject->setModifiedByUser($user->getName());
         $customObject->setDateModified($now->getUtcDateTime());
 
@@ -138,6 +138,7 @@ class CustomObjectModel extends FormModel
      */
     public function fetchEntity(int $id): CustomObject
     {
+        /** @var CustomObject|null */
         $customObject = parent::getEntity($id);
 
         if (null === $customObject) {
@@ -239,13 +240,13 @@ class CustomObjectModel extends FormModel
     }
 
     /**
-     * @param \DateTimeInterface $from
-     * @param \DateTimeInterface $to
-     * @param CustomObject       $customObject
+     * @param \DateTime    $from
+     * @param \DateTime    $to
+     * @param CustomObject $customObject
      *
      * @return mixed[]
      */
-    public function getItemsLineChartData(\DateTimeInterface $from, \DateTimeInterface $to, CustomObject $customObject): array
+    public function getItemsLineChartData(\DateTime $from, \DateTime $to, CustomObject $customObject): array
     {
         $chart = new LineChart(null, $from, $to);
         $query = new ChartQuery($this->entityManager->getConnection(), $from, $to);

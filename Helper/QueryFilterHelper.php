@@ -19,9 +19,12 @@ use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
+use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 
 final class QueryFilterHelper
 {
+    use DbalQueryTrait;
+
     /**
      * @var CustomFieldTypeProvider
      */
@@ -174,18 +177,18 @@ final class QueryFilterHelper
     }
 
     /**
-     * @param QueryBuilder               $queryBuilder
-     * @param string                     $tableAlias
-     * @param CompositeExpression|string $expression
-     * @param string                     $operator
-     * @param string|null                $value
+     * @param QueryBuilder                          $queryBuilder
+     * @param string                                $tableAlias
+     * @param CompositeExpression|string            $expression
+     * @param string                                $operator
+     * @param array|string|CompositeExpression|null $value
      */
     public function addOperatorExpression(
         QueryBuilder $queryBuilder,
         string $tableAlias,
         $expression,
         string $operator,
-        ?string $value
+        $value
     ): void {
         $valueType = null;
 
@@ -194,12 +197,12 @@ final class QueryFilterHelper
             case 'notEmpty':
                 break;
             case 'notIn':
-                $valueType      = $queryBuilder->getConnection()::PARAM_STR_ARRAY;
+                $valueType      = (string) $queryBuilder->getConnection()::PARAM_STR_ARRAY;
                 $valueParameter = $tableAlias.'_value_value';
 
                 break;
             case 'in':
-                $valueType      = $queryBuilder->getConnection()::PARAM_STR_ARRAY;
+                $valueType      = (string) $queryBuilder->getConnection()::PARAM_STR_ARRAY;
                 $valueParameter = $tableAlias.'_value_value';
 
                 break;
@@ -268,14 +271,13 @@ final class QueryFilterHelper
     private function getCustomFieldType(QueryBuilder $queryBuilder, int $customFieldId): string
     {
         $qb = $queryBuilder->getConnection()->createQueryBuilder();
-
-        $customFieldType = $qb->select('f.type')
+        $qb = $qb->select('f.type')
             ->from(MAUTIC_TABLE_PREFIX.'custom_field', 'f')
-            ->where($qb->expr()->eq('f.id', $customFieldId))
-            ->execute()
-            ->fetchColumn();
+            ->where($qb->expr()->eq('f.id', $customFieldId));
 
-        return $customFieldType ?? '';
+        $customFieldType = $this->executeSelect($queryBuilder)->fetchColumn();
+
+        return is_string($customFieldType) ? $customFieldType : '';
     }
 
     /**

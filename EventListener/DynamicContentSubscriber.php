@@ -20,10 +20,12 @@ use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
+use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 
 class DynamicContentSubscriber extends CommonSubscriber
 {
     use MatchFilterForLeadTrait;
+    use DbalQueryTrait;
 
     /**
      * @var EntityManager
@@ -112,7 +114,7 @@ class DynamicContentSubscriber extends CommonSubscriber
             $this->queryHelper->addContactIdRestriction($filterQueryBuilder, $tableAlias, (int) $event->getContact()->getId());
 
             try {
-                if ($filterQueryBuilder->execute()->rowCount()) {
+                if ($this->executeSelect($filterQueryBuilder)->rowCount()) {
                     $event->setIsEvaluated(true);
                     $event->setIsMatched(true);
                 } else {

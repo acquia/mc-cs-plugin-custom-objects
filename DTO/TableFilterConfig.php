@@ -91,11 +91,18 @@ class TableFilterConfig
 
     /**
      * @return string
+     *
+     * @throws \RuntimeException
      */
     public function getTableAlias(): string
     {
-        $path = explode('\\', $this->entityName);
+        $path  = explode('\\', $this->entityName);
+        $alias = end($path);
 
-        return end($path);
+        if (false === $alias) {
+            throw new \RuntimeException("Cannot create table alias from {$this->entityName}");
+        }
+
+        return $alias;
     }
 }
