@@ -144,7 +144,7 @@ class CustomFieldType extends AbstractType
      * @param FormBuilderInterface $builder
      * @param mixed[]              $options
      */
-    public function buildModalFormFields(FormBuilderInterface $builder, array $options): void
+    private function buildModalFormFields(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'label',
