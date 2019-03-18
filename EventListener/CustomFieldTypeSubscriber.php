@@ -31,6 +31,7 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextareaType;
 use Symfony\Component\Translation\TranslatorInterface;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\MultiselectType;
 
 class CustomFieldTypeSubscriber extends CommonSubscriber
 {
@@ -73,6 +74,7 @@ class CustomFieldTypeSubscriber extends CommonSubscriber
         $event->addCustomFieldType(new PhoneType($this->translator->trans('custom.field.type.phone')));
         $event->addCustomFieldType(new RadioGroupType($this->translator->trans('custom.field.type.radio_group')));
         $event->addCustomFieldType(new SelectType($this->translator->trans('custom.field.type.select')));
+        $event->addCustomFieldType(new MultiselectType($this->translator->trans('custom.field.type.multiselect')));
         $event->addCustomFieldType(new TextType($this->translator->trans('custom.field.type.text')));
         $event->addCustomFieldType(new TextareaType($this->translator->trans('custom.field.type.textarea')));
         $event->addCustomFieldType(new UrlType($this->translator->trans('custom.field.type.url')));
