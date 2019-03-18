@@ -171,6 +171,7 @@ class CustomFieldType extends AbstractType
             /** @var CustomField $customField */
             $customField = $event->getData();
             $form = $event->getForm();
+            $hasChoices = $customField->getTypeObject()->hasChoices();
 
             $form->add(
                 'defaultValue',
@@ -190,11 +191,11 @@ class CustomFieldType extends AbstractType
                 'params',
                 ParamsType::class,
                 [
-                    'customField' => $customField,
+                    'has_choices' => $hasChoices,
                 ]
             );
 
-            if ($customField->getTypeObject()->hasChoices()) {
+            if ($hasChoices) {
                 $form->add(
                     'options',
                     CollectionType::class,

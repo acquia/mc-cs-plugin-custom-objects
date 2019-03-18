@@ -51,8 +51,7 @@ class ParamsType extends AbstractType
             ]
         );
 
-        $customField = $options['customField'];
-        if ($customField->getTypeObject()->hasChoices()) {
+        if ($options['has_choices']) {
             $builder->add(
                 'allowMultiple',
                 YesNoButtonGroupType::class,
@@ -74,7 +73,7 @@ class ParamsType extends AbstractType
                 'data_class'         => Params::class,
                 'custom_object_form' => false,
                 'csrf_protection'    => false,
-                'customField'        => null,
+                'has_choices'        => false,
             ]
         );
     }
