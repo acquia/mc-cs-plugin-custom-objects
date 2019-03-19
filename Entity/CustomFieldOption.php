@@ -80,12 +80,15 @@ class CustomFieldOption
             ->inversedBy('options')
             ->cascadePersist()
             ->fetchExtraLazy()
+            ->makePrimaryKey()
             ->build();
 
-        $builder->addId();
-        $builder->addField('label', Type::STRING);
-        $builder->addField('value', Type::STRING);
-    }
+            $builder->createField('value', Type::STRING)
+                ->makePrimaryKey()
+                ->build();
+
+            $builder->addField('label', Type::STRING);
+        }
 
     /**
      * @param ClassMetadata $metadata
