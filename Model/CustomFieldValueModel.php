@@ -46,11 +46,12 @@ class CustomFieldValueModel
      */
     public function createValuesForItem(CustomItem $customItem): Collection
     {
-        $customFields = $customItem->getCustomObject()->getPublishedFields();
-        $queries      = $this->buildQueriesForUnion($customItem, $customFields);
-        $valueRows    = $this->fetchValues($queries);
+        $customFields  = $customItem->getCustomObject()->getPublishedFields();
+        $queries       = $this->buildQueriesForUnion($customItem, $customFields);
+        $valueRows     = $this->fetchValues($queries);
+        $valueEntities = $this->createValueEntities($customFields, $customItem);
 
-        return $this->createValueObjects($valueRows, $customFields, $customItem);
+        return $this->setValuesFromDatabase($valueRows, $valueEntities);
     }
 
     /**
@@ -61,7 +62,7 @@ class CustomFieldValueModel
      */
     public function save(CustomFieldValueInterface $customFieldValue): void
     {
-        if ($customFieldValue->getCustomField()->canHaveMultipleValues() && is_array($customFieldValue->getValue())) {
+        if ($customFieldValue->getCustomField()->canHaveMultipleValues()) {
             $this->deleteOptionsForField($customFieldValue);
             foreach ($customFieldValue->getValue() as $optionKey) {
                 $optionValue = clone $customFieldValue;
@@ -82,7 +83,7 @@ class CustomFieldValueModel
     /**
      * @param CustomFieldValueInterface $customFieldValue
      * 
-     * @return int Number of affected rows
+     * @return int Number of deleted rows
      */
     private function deleteOptionsForField(CustomFieldValueInterface $customFieldValue): int
     {
@@ -106,18 +107,25 @@ class CustomFieldValueModel
      *
      * @return Collection
      */
-    private function createValueObjects(Collection $valueRows, Collection $customFields, CustomItem $customItem): Collection
+    private function createValueEntities(Collection $customFields, CustomItem $customItem): Collection
     {
-        // Use new collection so we could set keys as well.
-        $customFieldValues = new ArrayCollection();
-
-        $customFields->map(function (CustomField $customField) use ($customItem, $customFieldValues) {
+        return $customFields->map(function (CustomField $customField) use ($customItem) {
             $customFieldValue = $customField->getTypeObject()->createValueEntity($customField, $customItem);
             $customFieldValue->setValue($customField->getDefaultValue());
-            $customFieldValues->set($customField->getId(), $customFieldValue);
             $customItem->setCustomFieldValue($customFieldValue);
-        });
 
+            return $customFieldValue;
+        });
+    }
+
+    /**
+     * @param Collection $valueRows
+     * @param Collection $customFields
+     *
+     * @return Collection
+     */
+    private function setValuesFromDatabase(Collection $valueRows, Collection $customFieldValues): Collection
+    {
         $valueRows->map(function (array $row) use ($customFieldValues) {
             /** @var CustomFieldValueInterface */
             $customFieldValue = $customFieldValues->get((int) $row['custom_field_id']);
