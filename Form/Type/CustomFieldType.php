@@ -201,11 +201,11 @@ class CustomFieldType extends AbstractType
                     [
                         'mapped'       => true,
                         'with_labels'  => true,
-//                        'allow_add'    => true,
-//                        'allow_delete' => true,
-//                        'delete_empty' => true,
-//                        'entry_type'   => OptionType::class,
-//                        'prototype'    => true,
+                        //                        'allow_add'    => true,
+                        //                        'allow_delete' => true,
+                        //                        'delete_empty' => true,
+                        //                        'entry_type'   => OptionType::class,
+                        //                        'prototype'    => true,
                     ]
                 );
             }
