@@ -205,7 +205,7 @@ class CustomFieldType extends AbstractType
 //                        'allow_delete' => true,
 //                        'delete_empty' => true,
 //                        'entry_type'   => OptionType::class,
-                        'prototype'    => true,
+//                        'prototype'    => true,
                     ]
                 );
             }
