@@ -357,7 +357,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         if ($this->isChoiceType()) {
             return $this->options;
         }
-        
+
         return new ArrayCollection();
     }
 

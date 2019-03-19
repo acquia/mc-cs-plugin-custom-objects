@@ -80,6 +80,14 @@ abstract class CustomFieldValueStandard implements CustomFieldValueInterface
     }
 
     /**
+     * @param mixed $value
+     */
+    public function addValue($value = null)
+    {
+        throw new \Exception('addValue is not implemented for '.self::class);
+    }
+
+    /**
      * @param ClassMetadataBuilder $builder
      */
     protected static function addReferenceColumns(ClassMetadataBuilder $builder): void

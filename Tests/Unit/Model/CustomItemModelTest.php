@@ -33,14 +33,10 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\DTO\TableFilterConfig;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 
 class CustomItemModelTest extends \PHPUnit_Framework_TestCase
 {
     private $customItem;
-
-    private $customObject;
 
     private $user;
 
@@ -67,7 +63,6 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
         parent::setUp();
 
         $this->customItem                   = $this->createMock(CustomItem::class);
-        $this->customObject                 = $this->createMock(CustomObject::class);
         $this->user                         = $this->createMock(User::class);
         $this->entityManager                = $this->createMock(EntityManager::class);
         $this->queryBuilder                 = $this->createMock(QueryBuilder::class);
@@ -299,8 +294,6 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
 
     public function testPopulateCustomFields(): void
     {
-        $customField       = $this->createMock(CustomField::class);
-        $customFields      = new ArrayCollection([$customField]);
         $customFieldValue  = $this->createMock(CustomFieldValueInterface::class);
         $customFieldValues = new ArrayCollection([$customFieldValue]);
 
@@ -308,26 +301,10 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
             ->method('getCustomFieldValues')
             ->willReturn(new ArrayCollection());
 
-        $this->customItem->expects($this->once())
-            ->method('getCustomObject')
-            ->willReturn($this->customObject);
-
-        $this->customItem->expects($this->once())
-            ->method('getCustomObject')
-            ->willReturn($this->customObject);
-
-        $this->customObject->expects($this->once())
-            ->method('getPublishedFields')
-            ->willReturn($customFields);
-
         $this->customFieldValueModel->expects($this->once())
-            ->method('getValuesForItem')
-            ->with($this->customItem, $customFields)
+            ->method('createValuesForItem')
+            ->with($this->customItem)
             ->willReturn($customFieldValues);
-
-        $this->customItem->expects($this->once())
-            ->method('setCustomFieldValue')
-            ->with($customFieldValue);
 
         $this->customItem->expects($this->once())
             ->method('createFieldValuesSnapshot');

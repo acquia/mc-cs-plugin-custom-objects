@@ -15,6 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Migrations;
 
 use MauticPlugin\CustomObjectsBundle\Migration\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\SchemaException;
 
 class Version_0_0_5 extends AbstractMigration
 {
@@ -28,9 +29,11 @@ class Version_0_0_5 extends AbstractMigration
      */
     protected function isApplicable(Schema $schema): bool
     {
-        $table = $schema->getTable($this->concatPrefix($this->table));
-
-        return $table && $table->hasColumn('option_id');
+        try {
+            return $schema->getTable($this->concatPrefix($this->table))->hasColumn('option_id');
+        } catch (SchemaException $e) {
+            return false;
+        }
     }
 
     /**

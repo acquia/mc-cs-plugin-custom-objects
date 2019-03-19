@@ -72,8 +72,8 @@ class CustomFieldValueModel
 
             return;
         }
-        
-        if ($customFieldValue->getCustomItem()->getId()){
+
+        if ($customFieldValue->getCustomItem()->getId()) {
             $this->entityManager->merge($customFieldValue);
         } else {
             $this->entityManager->persist($customFieldValue);
@@ -82,7 +82,7 @@ class CustomFieldValueModel
 
     /**
      * @param CustomFieldValueInterface $customFieldValue
-     * 
+     *
      * @return int Number of deleted rows
      */
     private function deleteOptionsForField(CustomFieldValueInterface $customFieldValue): int
@@ -95,13 +95,11 @@ class CustomFieldValueModel
         ";
 
         $query       = $this->entityManager->createQuery($dql);
-        $deletedRows = $query->execute();
 
-        return $deletedRows;
+        return $query->execute();
     }
 
     /**
-     * @param Collection $valueRows
      * @param Collection $customFields
      * @param CustomItem $customItem
      *
@@ -120,13 +118,13 @@ class CustomFieldValueModel
 
     /**
      * @param Collection $valueRows
-     * @param Collection $customFields
+     * @param Collection $customFieldValues
      *
      * @return Collection
      */
     private function setValuesFromDatabase(Collection $valueRows, Collection $customFieldValues): Collection
     {
-        $valueRows->map(function (array $row) use ($customFieldValues) {
+        $valueRows->map(function (array $row) use ($customFieldValues): void {
             /** @var CustomFieldValueInterface */
             $customFieldValue = $customFieldValues->get((int) $row['custom_field_id']);
 

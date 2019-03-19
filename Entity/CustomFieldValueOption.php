@@ -55,21 +55,21 @@ class CustomFieldValueOption extends CustomFieldValueStandard
     }
 
     /**
-     * @param string $value
+     * @param mixed $value
      */
-    public function addValue($value): void
+    public function addValue($value = null)
     {
         if (!$this->value) {
             $this->value = [];
         }
-        
+
         $this->value[] = $value;
     }
 
     /**
      * @param mixed $value
      */
-    public function setValue($value = null): void
+    public function setValue($value = null)
     {
         $this->value = $value;
     }

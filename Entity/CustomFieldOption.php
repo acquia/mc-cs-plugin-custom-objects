@@ -83,12 +83,12 @@ class CustomFieldOption
             ->makePrimaryKey()
             ->build();
 
-            $builder->createField('value', Type::STRING)
-                ->makePrimaryKey()
-                ->build();
+        $builder->createField('value', Type::STRING)
+            ->makePrimaryKey()
+            ->build();
 
-            $builder->addField('label', Type::STRING);
-        }
+        $builder->addField('label', Type::STRING);
+    }
 
     /**
      * @param ClassMetadata $metadata
