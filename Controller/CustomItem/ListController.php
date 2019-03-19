@@ -108,11 +108,10 @@ class ListController extends CommonController
         $limit        = (int) $request->get('limit', $this->sessionProvider->getPageLimit());
         $contactId    = (int) $request->get('contactId');
         $orderBy      = $this->sessionProvider->getOrderBy(CustomItemRepository::TABLE_ALIAS.'.id');
-        $orderByDir   = $this->sessionProvider->getOrderByDir();
+        $orderByDir   = $this->sessionProvider->getOrderByDir('ASC');
 
         if ($request->query->has('orderby')) {
             $orderBy    = InputHelper::clean($request->query->get('orderby'), true);
-            $orderByDir = $this->sessionProvider->getOrderByDir('ASC');
             $orderByDir = 'ASC' === $orderByDir ? 'DESC' : 'ASC';
             $this->sessionProvider->setOrderBy($orderBy);
             $this->sessionProvider->setOrderByDir($orderByDir);

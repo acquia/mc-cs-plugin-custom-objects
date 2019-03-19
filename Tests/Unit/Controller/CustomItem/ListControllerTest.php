@@ -28,6 +28,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 class ListControllerTest extends ControllerTestCase
 {
@@ -130,6 +131,84 @@ class ListControllerTest extends ControllerTestCase
             $this->assertSame(20, $tableConfig->getOffset());
             $this->assertSame('e.id', $tableConfig->getOrderBy());
             $this->assertSame('DESC', $tableConfig->getOrderDirection());
+            $customObjectFilter = $tableConfig->getFilter(CustomItem::class, 'customObject');
+            $this->assertSame(CustomItem::class, $customObjectFilter->getEntityName());
+            $this->assertSame('customObject', $customObjectFilter->getColumnName());
+            $this->assertSame(self::OBJECT_ID, $customObjectFilter->getValue());
+            $this->assertSame('eq', $customObjectFilter->getExpression());
+
+            return true;
+        };
+
+        $this->customItemModel->expects($this->once())
+            ->method('getTableData')
+            ->with($this->callback($assertTableConfig));
+
+        $this->customItemModel->expects($this->once())
+            ->method('getCountForTable')
+            ->with($this->callback($assertTableConfig));
+
+        $this->sessionProvider->expects($this->once())
+            ->method('setPage')
+            ->with(self::PAGE);
+
+        $this->sessionProvider->expects($this->once())
+            ->method('setPageLimit')
+            ->with($pageLimit);
+
+        $this->listController->listAction(self::OBJECT_ID, self::PAGE);
+    }
+
+    public function testListActionWithOrderByQueryParamAndAjax(): void
+    {
+        $pageLimit    = 10;
+        $customObject = $this->createMock(CustomObject::class);
+
+        $this->request->query = new ParameterBag(
+            [
+                'orderby' => 'e.name',
+            ]
+        );
+
+        $this->request->method('get')->will($this->returnValueMap([
+            ['limit', $pageLimit, false, $pageLimit],
+        ]));
+
+        $this->request->method('isXmlHttpRequest')
+            ->willReturn(true);
+
+        $this->permissionProvider->expects($this->once())
+            ->method('canViewAtAll');
+
+        $this->customObjectModel->expects($this->once())
+            ->method('fetchEntity')
+            ->willReturn($customObject);
+
+        $this->sessionProvider->expects($this->once())
+            ->method('getPageLimit')
+            ->willReturn($pageLimit);
+
+        $this->sessionProvider->expects($this->once())
+            ->method('getOrderBy')
+            ->willReturn('e.id');
+
+        $this->sessionProvider->expects($this->once())
+            ->method('getOrderByDir')
+            ->willReturn('DESC');
+
+        $this->sessionProvider->expects($this->once())
+            ->method('setOrderBy')
+            ->willReturn('e.name');
+
+        $this->sessionProvider->expects($this->once())
+            ->method('setOrderByDir')
+            ->willReturn('ASC');
+
+        $assertTableConfig = function (TableConfig $tableConfig) {
+            $this->assertSame(10, $tableConfig->getLimit());
+            $this->assertSame(20, $tableConfig->getOffset());
+            $this->assertSame('e.name', $tableConfig->getOrderBy());
+            $this->assertSame('ASC', $tableConfig->getOrderDirection());
             $customObjectFilter = $tableConfig->getFilter(CustomItem::class, 'customObject');
             $this->assertSame(CustomItem::class, $customObjectFilter->getEntityName());
             $this->assertSame('customObject', $customObjectFilter->getColumnName());
