@@ -221,7 +221,7 @@ class CustomFieldType extends AbstractType
             $customField = $event->getData();
             $builder = $event->getForm();
 
-            if (empty($customField)) {
+            if (!$customField) {
                 // Custom field is new without data fetched from DB
                 return;
             }
