@@ -13,16 +13,15 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\SortableListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use MauticPlugin\CustomObjectsBundle\Form\CustomObjectHiddenTransformer;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsToStringTransformer;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransformer;
-use MauticPlugin\CustomObjectsBundle\Form\Type\CustomField\OptionType;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomField\ParamsType;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -198,13 +197,14 @@ class CustomFieldType extends AbstractType
             if ($hasChoices) {
                 $form->add(
                     'options',
-                    CollectionType::class,
+                    SortableListType::class,
                     [
                         'mapped'       => true,
-                        'allow_add'    => true,
-                        'allow_delete' => true,
-                        'delete_empty' => true,
-                        'entry_type'   => OptionType::class,
+                        'with_labels'  => true,
+//                        'allow_add'    => true,
+//                        'allow_delete' => true,
+//                        'delete_empty' => true,
+//                        'entry_type'   => OptionType::class,
                         'prototype'    => true,
                     ]
                 );
