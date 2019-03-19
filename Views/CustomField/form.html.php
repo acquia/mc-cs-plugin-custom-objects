@@ -73,9 +73,6 @@ $title = $customField->getId() ? $customField->getLabel() : $customField->getTyp
                 <div class="row">
 <?php if (isset($form['options'])): ?>
                     <div class="col-md-12">
-                        <a>Add option</a>
-                    </div>
-                    <div class="col-md-12">
                         <?php echo $view['form']->row($form['options']); ?>
                     </div>
 <?php endif; ?>
