@@ -15,7 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
-class CheckboxGroupType extends AbstractTextType
+class CheckboxGroupType extends AbstractMultivalueType
 {
     /**
      * @var string
