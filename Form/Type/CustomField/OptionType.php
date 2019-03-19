@@ -61,4 +61,12 @@ class OptionType extends AbstractType
             ]
         );
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix()
+    {
+        return 'sortable_value_label_list';
+    }
 }
