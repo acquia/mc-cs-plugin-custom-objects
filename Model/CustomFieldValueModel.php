@@ -19,6 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption;
 
 class CustomFieldValueModel
 {
@@ -40,19 +41,16 @@ class CustomFieldValueModel
      * The values are joined from several tables. Each value type can have own table.
      *
      * @param CustomItem $customItem
-     * @param Collection $customFields
      *
      * @return Collection
      */
-    public function getValuesForItem(CustomItem $customItem, Collection $customFields): Collection
+    public function createValuesForItem(CustomItem $customItem): Collection
     {
-        return $this->createValueObjects(
-            $this->fetchValues(
-                $this->buildQueriesForUnion($customItem, $customFields)
-            ),
-            $customFields,
-            $customItem
-        );
+        $customFields = $customItem->getCustomObject()->getPublishedFields();
+        $queries      = $this->buildQueriesForUnion($customItem, $customFields);
+        $valueRows    = $this->fetchValues($queries);
+
+        return $this->createValueObjects($valueRows, $customFields, $customItem);
     }
 
     /**
@@ -63,22 +61,19 @@ class CustomFieldValueModel
      */
     public function save(CustomFieldValueInterface $customFieldValue): void
     {
-        if ($customFieldValue->shouldBeUpdatedManually()) {
-            $this->updateManually($customFieldValue);
-            $this->entityManager->detach($customFieldValue);
+        if ($customFieldValue->getCustomField()->canHaveMultipleValues() && is_array($customFieldValue->getValue())) {
+            $this->deleteOptionsForField($customFieldValue);
+            foreach ($customFieldValue->getValue() as $optionKey) {
+                $optionValue = clone $customFieldValue;
+                $optionValue->setValue($optionKey);
+                $this->entityManager->persist($optionValue);
+            }
 
             return;
         }
         
-        if ($customFieldValue->getCustomField()->canHaveMultipleValues()) {
-            if (is_array($customFieldValue->getValue())) {
-                $values = $customFieldValue->getValue();
-                foreach ($values as $value) {
-                    $optionValueEntity = clone $customFieldValue;
-                    $optionValueEntity->setValue($value);
-                    $this->entityManager->persist($optionValueEntity);
-                }
-            }
+        if ($customFieldValue->getCustomItem()->getId()){
+            $this->entityManager->merge($customFieldValue);
         } else {
             $this->entityManager->persist($customFieldValue);
         }
@@ -86,31 +81,22 @@ class CustomFieldValueModel
 
     /**
      * @param CustomFieldValueInterface $customFieldValue
+     * 
+     * @return int Number of affected rows
      */
-    private function updateManually(CustomFieldValueInterface $customFieldValue): void
+    private function deleteOptionsForField(CustomFieldValueInterface $customFieldValue): int
     {
-        $fieldType    = $customFieldValue->getCustomField()->getTypeObject();
-        $queryBuilder = $this->entityManager->createQueryBuilder();
-        $queryBuilder->update($fieldType->getEntityClass(), $fieldType->getTableAlias());
+        $entityClass = CustomFieldValueOption::class;
+        $dql         = "
+            delete from {$entityClass} cfvo  
+            where cfvo.customField = {$customFieldValue->getCustomField()->getId()}
+            and cfvo.customItem = {$customFieldValue->getCustomItem()->getId()}
+        ";
 
-        if ($customFieldValue->getCustomField()->canHaveMultipleValues()) {
-            if (is_array($customFieldValue->getValue())) {
-                $values = $customFieldValue->getValue();
-                foreach ($values as $key => $value) {
-                    $queryBuilder->set("{$fieldType->getTableAlias()}.value", ":value{$key}");
-                    $queryBuilder->setParameter("value{$key}", $value);
-                }
-            }
-        } else {
-            $queryBuilder->set("{$fieldType->getTableAlias()}.value", ':value');
-            $queryBuilder->setParameter('value', $customFieldValue->getValue());
-        }
+        $query       = $this->entityManager->createQuery($dql);
+        $deletedRows = $query->execute();
 
-        $queryBuilder->where("{$fieldType->getTableAlias()}.customField = :customFieldId");
-        $queryBuilder->andWhere("{$fieldType->getTableAlias()}.customItem = :customItemId");
-        $queryBuilder->setParameter('customFieldId', (int) $customFieldValue->getCustomField()->getId());
-        $queryBuilder->setParameter('customItemId', (int) $customFieldValue->getCustomItem()->getId());
-        $queryBuilder->getQuery()->execute();
+        return $deletedRows;
     }
 
     /**
@@ -129,13 +115,12 @@ class CustomFieldValueModel
             $customFieldValue = $customField->getTypeObject()->createValueEntity($customField, $customItem);
             $customFieldValue->setValue($customField->getDefaultValue());
             $customFieldValues->set($customField->getId(), $customFieldValue);
+            $customItem->setCustomFieldValue($customFieldValue);
         });
 
         $valueRows->map(function (array $row) use ($customFieldValues) {
             /** @var CustomFieldValueInterface */
             $customFieldValue = $customFieldValues->get((int) $row['custom_field_id']);
-
-            $customFieldValue->updateThisEntityManually();
 
             if ($customFieldValue->getCustomField()->canHaveMultipleValues()) {
                 $customFieldValue->addValue($row['value']);

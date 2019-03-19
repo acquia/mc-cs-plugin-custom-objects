@@ -212,12 +212,7 @@ class CustomItemModel extends FormModel
             return $customItem;
         }
 
-        $customFields      = $customItem->getCustomObject()->getPublishedFields();
-        $customFieldValues = $this->customFieldValueModel->getValuesForItem($customItem, $customFields);
-
-        $customFieldValues->map(function (CustomFieldValueInterface $customFieldValue) use ($customItem): void {
-            $customItem->setCustomFieldValue($customFieldValue);
-        });
+        $this->customFieldValueModel->createValuesForItem($customItem);
 
         $customItem->createFieldValuesSnapshot();
 

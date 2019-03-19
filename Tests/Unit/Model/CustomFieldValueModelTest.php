@@ -181,21 +181,15 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('Yellow Submarine', $storedValue->getValue());
         $this->assertSame($this->customField, $storedValue->getCustomField());
         $this->assertSame($this->customItem, $storedValue->getCustomItem());
-        $this->assertTrue($storedValue->shouldBeUpdatedManually());
 
         $this->assertSame(1000, $newValue->getValue());
         $this->assertSame($noValueField, $newValue->getCustomField());
         $this->assertSame($this->customItem, $newValue->getCustomItem());
-        $this->assertFalse($newValue->shouldBeUpdatedManually());
     }
 
     public function testSaveForEntityLoadedByEntityManager(): void
     {
         $customFieldValue = $this->createMock(CustomFieldValueInterface::class);
-
-        $customFieldValue->expects($this->once())
-            ->method('shouldBeUpdatedManually')
-            ->willReturn(false);
 
         $customFieldValue->expects($this->never())
             ->method('getCustomField');
@@ -212,10 +206,6 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
         $customFieldValue = $this->createMock(CustomFieldValueInterface::class);
         $queryBuilder     = $this->createMock(OrmQueryBuilder::class);
         $query            = $this->createMock(AbstractQuery::class);
-
-        $customFieldValue->expects($this->once())
-            ->method('shouldBeUpdatedManually')
-            ->willReturn(true);
 
         $customFieldValue->expects($this->once())
             ->method('getValue')
