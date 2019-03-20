@@ -22,11 +22,6 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 class CustomFieldOption
 {
     /**
-     * @var int|null
-     */
-    private $id;
-
-    /**
      * @var CustomField|null
      */
     private $customField;
@@ -57,7 +52,6 @@ class CustomFieldOption
     public function __toArray(): array
     {
         $return = [
-            'id'          => $this->id,
             'customField' => $this->customField ? $this->customField->getId() : null,
             'label'       => $this->label,
             'value'       => $this->value,
@@ -97,22 +91,6 @@ class CustomFieldOption
     {
         $metadata->addPropertyConstraint('label', new Assert\NotBlank());
         $metadata->addPropertyConstraint('label', new Assert\Length(['max' => 255]));
-    }
-
-    /**
-     * @param int|null $id
-     */
-    public function setId(?int $id): void
-    {
-        $this->id = $id;
-    }
-
-    /**
-     * @return int|null Null when it is filled as new entity with PropertyAccessor
-     */
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     /**
