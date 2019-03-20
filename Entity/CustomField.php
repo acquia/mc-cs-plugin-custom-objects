@@ -262,7 +262,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
             $fieldOptions['choices'] = $choices;
         }
 
-        return array_merge_recursive($fieldTypeOptions, $fieldOptions, $customOptions);
+        return array_replace_recursive($fieldTypeOptions, $fieldOptions, $customOptions);
     }
 
     /**
