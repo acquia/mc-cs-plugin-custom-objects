@@ -89,7 +89,6 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
             ->setCustomRepositoryClass(CustomObjectRepository::class);
 
         $builder->createOneToMany('customFields', CustomField::class)
-            ->setIndexBy('id')
             ->setOrderBy(['order' => 'ASC'])
             ->addJoinColumn('custom_field_id', 'id', false, false, 'CASCADE')
             ->mappedBy('customObject')
