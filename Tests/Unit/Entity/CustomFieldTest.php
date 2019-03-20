@@ -110,12 +110,14 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
                 'class'       => 'form-control',
             ],
             'label'      => 'Start Date',
-            'required'   => true,
+            'required'   => false,
             'empty_data' => null,
             'label_attr' => [
                 'class' => 'control-label',
             ],
-        ], $customField->getFormFieldOptions());
+        ],
+            $customField->getFormFieldOptions(['required' => false])
+        );
     }
 
     public function testGetFormFieldOptionsWithChoices(): void
@@ -139,7 +141,7 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
             'expanded'   => false,
             'multiple'   => false,
             'label'      => 'Colors',
-            'required'   => false,
+            'required'   => true,
             'empty_data' => null,
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control'],
@@ -147,7 +149,9 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
                 'red'  => 'Red',
                 'blue' => 'Blue',
             ],
-        ], $customField->getFormFieldOptions());
+        ],
+            $customField->getFormFieldOptions(['required' => true])
+        );
     }
 
     public function testGetChoices(): void
