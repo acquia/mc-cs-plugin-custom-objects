@@ -11,7 +11,7 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Entity;
+namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Event;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefContactEvent;
