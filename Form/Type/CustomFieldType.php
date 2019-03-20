@@ -275,5 +275,35 @@ class CustomFieldType extends AbstractType
 
         // Possibility to mark field as deleted in POST data
         $builder->add('deleted', HiddenType::class, ['mapped' => false]);
+
+        $this->fixValidationBeforeSubmit($builder);
+    }
+
+    /**
+     * Fix possible collision of value with validator for custom field demo in panel.
+     *
+     * @param FormBuilderInterface $builder
+     */
+    private function fixValidationBeforeSubmit(FormBuilderInterface $builder): void
+    {
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            function (FormEvent $event): void {
+                $form = $event->getForm();
+
+                // Fix invalid value for integer field
+                if ($form->has('field')) {
+                    $form->remove('field');
+                    $form->add(
+                        'field',
+                        'text',
+                        [
+                            'required' => false,
+                            'mapped'   => false,
+                        ]
+                    );
+                }
+            }
+        );
     }
 }
