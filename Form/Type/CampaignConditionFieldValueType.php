@@ -22,6 +22,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 
 class CampaignConditionFieldValueType extends AbstractType
 {
@@ -71,14 +72,19 @@ class CampaignConditionFieldValueType extends AbstractType
                 'label'    => 'custom.item.field',
                 'choices'  => $fields,
                 'attr'     => [
-                    'class'    => 'form-control',
-                    'onchange' => 'CustomObjects.updateFormFieldOptions(this)',
+                    'class' => 'form-control',
                 ],
                 'choice_attr' => function ($fieldId) use ($fields) {
-                    $field = $fields[$fieldId];
+                    $field     = $fields[$fieldId];
+                    $operators = $field->getTypeObject()->getOperatorOptions($this->translator);
+                    $options   = $field->getOptions()->map(function (CustomFieldOption $option) use(&$options) {
+                        return ['value' => $option->getValue(), 'label' => $option->getLabel()];
+                    });
 
                     return [
-                        'data-operators' => json_encode($field->getTypeObject()->getOperatorOptions($this->translator)),
+                        'data-operators'  => json_encode($operators),
+                        'data-options'    => json_encode($options->toArray()),
+                        'data-field-type' => $field->getType(),
                     ];
                 },
             ]
