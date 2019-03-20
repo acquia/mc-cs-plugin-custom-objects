@@ -42,7 +42,7 @@ class OptionsToStringTransformer implements DataTransformerInterface
     }
 
     /**
-     * Transforms an object (CustomFieldOption) to a string (json).
+     * Transforms a collection of objects (CustomFieldOption[]) to a string (json).
      *
      * @param ArrayCollection|CustomFieldOption[]|null $options
      *
@@ -64,7 +64,7 @@ class OptionsToStringTransformer implements DataTransformerInterface
     }
 
     /**
-     * Transforms a string (json) to an object (CustomFieldOption).
+     * Transforms a string (json) to an objects (CustomFieldOption[]).
      *
      * @param string $options
      *
