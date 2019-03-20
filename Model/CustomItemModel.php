@@ -27,7 +27,6 @@ use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
