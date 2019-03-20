@@ -233,6 +233,7 @@ class CustomFieldType extends AbstractType
                     [
                         'mapped'     => false,
                         'required'   => false,
+                        'data'       => $customField->getDefaultValue(),
                         'attr'       => [
                             'readonly' => true,
                         ],
