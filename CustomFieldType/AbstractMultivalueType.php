@@ -57,7 +57,7 @@ abstract class AbstractMultivalueType extends AbstractCustomFieldType
     public function getOperators(): array
     {
         $allOperators     = parent::getOperators();
-        $allowedOperators = array_flip(['=', '!=', 'empty', '!empty', 'like', '!like', 'in', '!in', 'startsWith', 'endsWith', 'contains']);
+        $allowedOperators = array_flip(['empty', '!empty', 'in', '!in']);
 
         return array_intersect_key($allOperators, $allowedOperators);
     }

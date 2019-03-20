@@ -61,7 +61,7 @@ class IntType extends AbstractCustomFieldType
     public function getOperators(): array
     {
         $allOperators     = parent::getOperators();
-        $allowedOperators = array_flip(['=', '!=', 'gt', 'gte', 'lt', 'lte', 'empty', '!empty', 'between', '!between', 'in', '!in']);
+        $allowedOperators = array_flip(['=', '!=', 'gt', 'gte', 'lt', 'lte', 'empty', '!empty']);
 
         return array_intersect_key($allOperators, $allowedOperators);
     }
