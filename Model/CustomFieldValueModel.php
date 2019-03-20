@@ -19,6 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption;
 
 class CustomFieldValueModel
 {
@@ -40,19 +41,17 @@ class CustomFieldValueModel
      * The values are joined from several tables. Each value type can have own table.
      *
      * @param CustomItem $customItem
-     * @param Collection $customFields
      *
      * @return Collection
      */
-    public function getValuesForItem(CustomItem $customItem, Collection $customFields): Collection
+    public function createValuesForItem(CustomItem $customItem): Collection
     {
-        return $this->createValueObjects(
-            $this->fetchValues(
-                $this->buildQueriesForUnion($customItem, $customFields)
-            ),
-            $customFields,
-            $customItem
-        );
+        $customFields  = $customItem->getCustomObject()->getPublishedFields();
+        $queries       = $this->buildQueriesForUnion($customItem, $customFields);
+        $valueRows     = $this->fetchValues($queries);
+        $valueEntities = $this->createValueEntities($customFields, $customItem);
+
+        return $this->setValuesFromDatabase($valueRows, $valueEntities);
     }
 
     /**
@@ -63,9 +62,19 @@ class CustomFieldValueModel
      */
     public function save(CustomFieldValueInterface $customFieldValue): void
     {
-        if ($customFieldValue->shouldBeUpdatedManually()) {
-            $this->updateManually($customFieldValue);
-            $this->entityManager->detach($customFieldValue);
+        if ($customFieldValue->getCustomField()->canHaveMultipleValues()) {
+            $this->deleteOptionsForField($customFieldValue);
+            foreach ($customFieldValue->getValue() as $optionKey) {
+                $optionValue = clone $customFieldValue;
+                $optionValue->setValue($optionKey);
+                $this->entityManager->persist($optionValue);
+            }
+
+            return;
+        }
+
+        if ($customFieldValue->getCustomItem()->getId()) {
+            $this->entityManager->merge($customFieldValue);
         } else {
             $this->entityManager->persist($customFieldValue);
         }
@@ -73,46 +82,60 @@ class CustomFieldValueModel
 
     /**
      * @param CustomFieldValueInterface $customFieldValue
+     *
+     * @return int Number of deleted rows
      */
-    private function updateManually(CustomFieldValueInterface $customFieldValue): void
+    private function deleteOptionsForField(CustomFieldValueInterface $customFieldValue): int
     {
-        $fieldType    = $customFieldValue->getCustomField()->getTypeObject();
-        $queryBuilder = $this->entityManager->createQueryBuilder();
-        $queryBuilder->update($fieldType->getEntityClass(), $fieldType->getTableAlias());
-        $queryBuilder->set("{$fieldType->getTableAlias()}.value", ':value');
-        $queryBuilder->where("{$fieldType->getTableAlias()}.customField = :customFieldId");
-        $queryBuilder->andWhere("{$fieldType->getTableAlias()}.customItem = :customItemId");
-        $queryBuilder->setParameter('value', $customFieldValue->getValue());
-        $queryBuilder->setParameter('customFieldId', (int) $customFieldValue->getCustomField()->getId());
-        $queryBuilder->setParameter('customItemId', (int) $customFieldValue->getCustomItem()->getId());
-        $queryBuilder->getQuery()->execute();
+        $entityClass = CustomFieldValueOption::class;
+        $dql         = "
+            delete from {$entityClass} cfvo  
+            where cfvo.customField = {$customFieldValue->getCustomField()->getId()}
+            and cfvo.customItem = {$customFieldValue->getCustomItem()->getId()}
+        ";
+
+        $query       = $this->entityManager->createQuery($dql);
+
+        return $query->execute();
     }
 
     /**
-     * @param Collection $valueRows
      * @param Collection $customFields
      * @param CustomItem $customItem
      *
      * @return Collection
      */
-    private function createValueObjects(Collection $valueRows, Collection $customFields, CustomItem $customItem): Collection
+    private function createValueEntities(Collection $customFields, CustomItem $customItem): Collection
     {
-        return $customFields->map(function (CustomField $customField) use ($customItem, $valueRows) {
-            $entityClass      = $customField->getTypeObject()->getEntityClass();
-            $customFieldValue = new $entityClass($customField, $customItem);
-            $valueRow         = $valueRows->get($customField->getId());
-
-            if (is_array($valueRow) && array_key_exists('value', $valueRow)) {
-                $value = $valueRow['value'];
-                $customFieldValue->updateThisEntityManually();
-            } else {
-                $value = $customField->getDefaultValue();
-            }
-
-            $customFieldValue->setValue($value);
+        return $customFields->map(function (CustomField $customField) use ($customItem) {
+            $customFieldValue = $customField->getTypeObject()->createValueEntity($customField, $customItem);
+            $customFieldValue->setValue($customField->getDefaultValue());
+            $customItem->setCustomFieldValue($customFieldValue);
 
             return $customFieldValue;
         });
+    }
+
+    /**
+     * @param Collection $valueRows
+     * @param Collection $customFieldValues
+     *
+     * @return Collection
+     */
+    private function setValuesFromDatabase(Collection $valueRows, Collection $customFieldValues): Collection
+    {
+        $valueRows->map(function (array $row) use ($customFieldValues): void {
+            /** @var CustomFieldValueInterface */
+            $customFieldValue = $customFieldValues->get((int) $row['custom_field_id']);
+
+            if ($customFieldValue->getCustomField()->canHaveMultipleValues()) {
+                $customFieldValue->addValue($row['value']);
+            } else {
+                $customFieldValue->setValue($row['value']);
+            }
+        });
+
+        return $customFieldValues;
     }
 
     /**
@@ -122,24 +145,16 @@ class CustomFieldValueModel
      */
     private function fetchValues(Collection $queries): ArrayCollection
     {
-        $rows = new ArrayCollection();
-
         // No need to query for values in case there are no queries
         if (0 === $queries->count()) {
-            return $rows;
+            return new ArrayCollection();
         }
 
         $statement = $this->entityManager->getConnection()->prepare(implode(' UNION ', $queries->toArray()));
 
         $statement->execute();
 
-        $rowsRaw = $statement->fetchAll();
-
-        foreach ($rowsRaw as $row) {
-            $rows->set((int) $row['custom_field_id'], $row);
-        }
-
-        return $rows;
+        return new ArrayCollection($statement->fetchAll());
     }
 
     /**

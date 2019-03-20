@@ -79,17 +79,12 @@ abstract class CustomFieldValueStandard implements CustomFieldValueInterface
         return $this->customItem;
     }
 
-    public function updateThisEntityManually(): void
-    {
-        $this->updateManually = true;
-    }
-
     /**
-     * @return bool
+     * @param mixed $value
      */
-    public function shouldBeUpdatedManually(): bool
+    public function addValue($value = null)
     {
-        return $this->updateManually;
+        throw new \Exception('addValue is not implemented for '.self::class);
     }
 
     /**

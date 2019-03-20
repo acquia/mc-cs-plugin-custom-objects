@@ -24,12 +24,12 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Statement;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
-use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use Doctrine\ORM\AbstractQuery;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
 {
+    private $customObject;
     private $customItem;
     private $customField;
     private $entityManager;
@@ -44,6 +44,7 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
 
         defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
+        $this->customObject          = $this->createMock(CustomObject::class);
         $this->customItem            = $this->createMock(CustomItem::class);
         $this->customField           = $this->createMock(CustomField::class);
         $this->entityManager         = $this->createMock(EntityManager::class);
@@ -60,6 +61,14 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
         $customFields = new ArrayCollection([$this->customField]);
 
         $this->customItem->expects($this->once())
+            ->method('getCustomObject')
+            ->willReturn($this->customObject);
+
+        $this->customObject->expects($this->once())
+            ->method('getPublishedFields')
+            ->willReturn($customFields);
+
+        $this->customItem->expects($this->once())
             ->method('isNew')
             ->willReturn(true);
 
@@ -70,18 +79,23 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
         $this->entityManager->expects($this->never())
             ->method('getConnection');
 
-        $this->customFieldValueModel->getValuesForItem(
-            $this->customItem,
-            $customFields
-        );
+        $this->customFieldValueModel->createValuesForItem($this->customItem);
     }
 
     public function testGetValuesForItemIfItemHasId(): void
     {
         $noValueField = $this->createMock(CustomField::class);
-        $customFields = new ArrayCollection([$this->customField, $noValueField]);
+        $customFields = new ArrayCollection([44 => $this->customField, 66 => $noValueField]);
 
-        $this->customItem->expects($this->exactly(2))
+        $this->customItem->expects($this->once())
+            ->method('getCustomObject')
+            ->willReturn($this->customObject);
+
+        $this->customObject->expects($this->once())
+            ->method('getPublishedFields')
+            ->willReturn($customFields);
+
+        $this->customItem->expects($this->any())
             ->method('getId')
             ->willReturn(33);
 
@@ -97,7 +111,7 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
             ->method('getTypeObject')
             ->willReturn(new IntType('Number'));
 
-        $noValueField->expects($this->exactly(2))
+        $noValueField->expects($this->any())
             ->method('getId')
             ->willReturn(66);
 
@@ -105,7 +119,7 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
             ->method('getDefaultValue')
             ->willReturn(1000);
 
-        $this->customField->expects($this->exactly(2))
+        $this->customField->expects($this->any())
             ->method('getId')
             ->willReturn(44);
 
@@ -168,37 +182,60 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
                 'value'           => 'Yellow Submarine',
             ]]);
 
-        $values = $this->customFieldValueModel->getValuesForItem(
-            $this->customItem,
-            $customFields
-        );
+        $values = $this->customFieldValueModel->createValuesForItem($this->customItem);
 
         $this->assertSame(2, $values->count());
 
-        $storedValue = $values->get(0);
-        $newValue    = $values->get(1);
+        $storedValue = $values->get(44);
+        $newValue    = $values->get(66);
 
         $this->assertSame('Yellow Submarine', $storedValue->getValue());
         $this->assertSame($this->customField, $storedValue->getCustomField());
         $this->assertSame($this->customItem, $storedValue->getCustomItem());
-        $this->assertTrue($storedValue->shouldBeUpdatedManually());
 
         $this->assertSame(1000, $newValue->getValue());
         $this->assertSame($noValueField, $newValue->getCustomField());
         $this->assertSame($this->customItem, $newValue->getCustomItem());
-        $this->assertFalse($newValue->shouldBeUpdatedManually());
     }
 
-    public function testSaveForEntityLoadedByEntityManager(): void
+    public function testSaveForNewCustomItem(): void
     {
         $customFieldValue = $this->createMock(CustomFieldValueInterface::class);
 
         $customFieldValue->expects($this->once())
-            ->method('shouldBeUpdatedManually')
-            ->willReturn(false);
+            ->method('getCustomField')
+            ->willReturn($this->customField);
 
-        $customFieldValue->expects($this->never())
-            ->method('getCustomField');
+        $customFieldValue->expects($this->once())
+            ->method('getCustomItem')
+            ->willReturn($this->customItem);
+
+        $this->customItem->expects($this->once())
+            ->method('getId')
+            ->willReturn(99);
+
+        $this->entityManager->expects($this->once())
+            ->method('merge')
+            ->with($customFieldValue);
+
+        $this->customFieldValueModel->save($customFieldValue);
+    }
+
+    public function testSaveForExistingCustomItem(): void
+    {
+        $customFieldValue = $this->createMock(CustomFieldValueInterface::class);
+
+        $customFieldValue->expects($this->once())
+            ->method('getCustomField')
+            ->willReturn($this->customField);
+
+        $customFieldValue->expects($this->once())
+            ->method('getCustomItem')
+            ->willReturn($this->customItem);
+
+        $this->customItem->expects($this->once())
+            ->method('getId')
+            ->willReturn(null);
 
         $this->entityManager->expects($this->once())
             ->method('persist')
@@ -207,26 +244,10 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
         $this->customFieldValueModel->save($customFieldValue);
     }
 
-    public function testSaveForEntityLoadedByDbalQuery(): void
+    public function testSaveForMultivalueField(): void
     {
         $customFieldValue = $this->createMock(CustomFieldValueInterface::class);
-        $queryBuilder     = $this->createMock(OrmQueryBuilder::class);
         $query            = $this->createMock(AbstractQuery::class);
-
-        $customFieldValue->expects($this->once())
-            ->method('shouldBeUpdatedManually')
-            ->willReturn(true);
-
-        $customFieldValue->expects($this->once())
-            ->method('getValue')
-            ->willReturn('Včela píchá');
-
-        $this->entityManager->expects($this->never())
-            ->method('persist');
-
-        $this->entityManager->expects($this->once())
-            ->method('createQueryBuilder')
-            ->willReturn($queryBuilder);
 
         $customFieldValue->expects($this->exactly(2))
             ->method('getCustomField')
@@ -236,48 +257,42 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
             ->method('getCustomItem')
             ->willReturn($this->customItem);
 
-        $this->customField->expects($this->once())
-            ->method('getTypeObject')
-            ->willReturn(new TextType('Text'));
+        $customFieldValue->expects($this->once())
+            ->method('getValue')
+            ->willReturn(['red', 'green']);
 
-        $this->customField->expects($this->once())
-            ->method('getId')
-            ->willReturn(54);
+        $customFieldValue->expects($this->exactly(2))
+            ->method('setValue')
+            ->withConsecutive(['red'], ['green']);
 
         $this->customItem->expects($this->once())
             ->method('getId')
-            ->willReturn(23);
+            ->willReturn(99);
 
-        $queryBuilder->expects($this->once())
-            ->method('update')
-            ->with(CustomFieldValueText::class, 'cfv_text');
+        $this->customField->expects($this->any())
+            ->method('getId')
+            ->willReturn(44);
 
-        $queryBuilder->expects($this->once())
-            ->method('set')
-            ->with('cfv_text.value', ':value');
+        $this->customField->expects($this->once())
+            ->method('canHaveMultipleValues')
+            ->willReturn(true);
 
-        $queryBuilder->expects($this->once())
-            ->method('where')
-            ->with('cfv_text.customField = :customFieldId');
-
-        $queryBuilder->expects($this->once())
-            ->method('andWhere')
-            ->with('cfv_text.customItem = :customItemId');
-
-        $queryBuilder->expects($this->exactly(3))
-            ->method('setParameter')
-            ->withConsecutive(
-                ['value', 'Včela píchá', null],
-                ['customFieldId', 54, null],
-                ['customItemId', 23, null]
-            );
-
-        $queryBuilder->expects($this->once())
-            ->method('getQuery')
+        $this->entityManager->expects($this->once())
+            ->method('createQuery')
+            ->with('
+            delete from MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption cfvo  
+            where cfvo.customField = 44
+            and cfvo.customItem = 99
+        ')
             ->willReturn($query);
 
         $query->expects($this->once())
-            ->method('execute');
+            ->method('execute')
+            ->willReturn(2);
+
+        $this->entityManager->expects($this->exactly(2))
+            ->method('persist')
+            ->with($customFieldValue);
 
         $this->customFieldValueModel->save($customFieldValue);
     }

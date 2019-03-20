@@ -17,6 +17,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 
 class CustomFieldValueType extends AbstractType
 {
@@ -26,6 +27,7 @@ class CustomFieldValueType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        /** @var CustomItem $customItem */
         $customItem       = $options['customItem'];
         $customFieldId    = (int) $builder->getName();
         $customFieldValue = $customItem->findCustomFieldValueForFieldId($customFieldId);

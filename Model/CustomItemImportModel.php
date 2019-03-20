@@ -100,7 +100,6 @@ class CustomItemImportModel extends FormModel
 
             try {
                 $customFieldValue = $customItem->findCustomFieldValueForFieldId((int) $customFieldId);
-                $customFieldValue->updateThisEntityManually();
             } catch (NotFoundException $e) {
                 $customFieldValue = $this->createNewCustomFieldValue($customObject, $customItem, (int) $customFieldId, $csvValue);
             }

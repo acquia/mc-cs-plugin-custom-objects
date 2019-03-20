@@ -89,8 +89,9 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
             ->setCustomRepositoryClass(CustomObjectRepository::class);
 
         $builder->createOneToMany('customFields', CustomField::class)
+            ->setIndexBy('id')
             ->setOrderBy(['order' => 'ASC'])
-            ->addJoinColumn('custom_item_id', 'id', false, false, 'CASCADE')
+            ->addJoinColumn('custom_field_id', 'id', false, false, 'CASCADE')
             ->mappedBy('customObject')
             ->cascadePersist()
             ->fetchExtraLazy()
@@ -114,7 +115,6 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         $metadata->addPropertyConstraint('namePlural', new Assert\NotBlank());
         $metadata->addPropertyConstraint('namePlural', new Assert\Length(['max' => 255]));
         $metadata->addPropertyConstraint('description', new Assert\Length(['max' => 255]));
-        $metadata->addPropertyConstraint('description', new Assert\Length(['max' => 65535]));
     }
 
     /**

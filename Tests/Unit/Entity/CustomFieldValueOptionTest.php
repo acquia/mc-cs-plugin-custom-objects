@@ -17,7 +17,6 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 
 class CustomFieldValueOptionTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,18 +24,17 @@ class CustomFieldValueOptionTest extends \PHPUnit_Framework_TestCase
     {
         $customObject = new CustomObject();
         $customField  = new CustomField();
-        $option       = new CustomFieldOption();
-        $option2      = new CustomFieldOption();
+        $value1       = 'red';
+        $value2       = 'blue';
         $customItem   = new CustomItem($customObject);
-        $optionValue  = new CustomFieldValueOption($customField, $customItem, $option);
+        $optionValue  = new CustomFieldValueOption($customField, $customItem, $value1);
 
         $this->assertSame($customField, $optionValue->getCustomField());
         $this->assertSame($customItem, $optionValue->getCustomItem());
-        $this->assertSame($option, $optionValue->getOption());
-        $this->assertSame($option, $optionValue->getValue());
+        $this->assertSame($value1, $optionValue->getValue());
 
-        $optionValue->setOption($option2);
+        $optionValue->setValue($value2);
 
-        $this->assertSame($option2, $optionValue->getValue());
+        $this->assertSame($value2, $optionValue->getValue());
     }
 }

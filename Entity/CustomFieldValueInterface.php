@@ -38,12 +38,10 @@ interface CustomFieldValueInterface extends UniqueEntityInterface
     /**
      * @param mixed $value
      */
-    public function setValue($value = null);
-
-    public function updateThisEntityManually();
+    public function addValue($value = null);
 
     /**
-     * @return bool
+     * @param mixed $value
      */
-    public function shouldBeUpdatedManually();
+    public function setValue($value = null);
 }

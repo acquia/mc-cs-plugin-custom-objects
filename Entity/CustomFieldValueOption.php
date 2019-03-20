@@ -15,6 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Doctrine\DBAL\Types\Type;
 
 /**
  * Table for multiselect/checkbox option values.
@@ -22,20 +23,20 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 class CustomFieldValueOption extends CustomFieldValueStandard
 {
     /**
-     * @var CustomFieldOption|null
+     * @var string[]|string|null
      */
-    private $option;
+    private $value;
 
     /**
-     * @param CustomField       $customField
-     * @param CustomItem        $customItem
-     * @param CustomFieldOption $option
+     * @param CustomField          $customField
+     * @param CustomItem           $customItem
+     * @param string|string[]|null $value
      */
-    public function __construct(CustomField $customField, CustomItem $customItem, CustomFieldOption $option)
+    public function __construct(CustomField $customField, CustomItem $customItem, $value = null)
     {
         parent::__construct($customField, $customItem);
 
-        $this->option = $option;
+        $this->value = $value;
     }
 
     /**
@@ -48,35 +49,29 @@ class CustomFieldValueOption extends CustomFieldValueStandard
 
         parent::addReferenceColumns($builder);
 
-        $builder->createManyToOne('option', CustomFieldOption::class)
-            ->addJoinColumn('option_id', 'id', false, false, 'CASCADE')
+        $builder->createField('value', Type::STRING)
             ->makePrimaryKey()
-            ->fetchExtraLazy()
             ->build();
-    }
-
-    /**
-     * @param CustomFieldOption $option
-     */
-    public function setOption($option = null): void
-    {
-        $this->option = $option;
-    }
-
-    /**
-     * @return CustomFieldOption|null
-     */
-    public function getOption()
-    {
-        return $this->option;
     }
 
     /**
      * @param mixed $value
      */
-    public function setValue($value = null): void
+    public function addValue($value = null)
     {
-        $this->setOption($value);
+        if (!$this->value) {
+            $this->value = [];
+        }
+
+        $this->value[] = $value;
+    }
+
+    /**
+     * @param mixed $value
+     */
+    public function setValue($value = null)
+    {
+        $this->value = $value;
     }
 
     /**
@@ -84,6 +79,6 @@ class CustomFieldValueOption extends CustomFieldValueStandard
      */
     public function getValue()
     {
-        return $this->getOption();
+        return $this->value;
     }
 }

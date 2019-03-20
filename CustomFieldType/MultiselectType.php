@@ -13,28 +13,18 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-
-class CheckboxGroupType extends AbstractMultivalueType
+class MultiselectType extends AbstractMultivalueType
 {
     /**
      * @var string
      */
-    protected $key = 'checkbox_group';
+    protected $key = 'multiselect';
 
     /**
      * {@inheritdoc}
      */
     protected $formTypeOptions = [
-        'expanded' => true,
+        'expanded' => false,
         'multiple' => true,
     ];
-
-    /**
-     * @return string
-     */
-    public function getSymfonyFormFieldType(): string
-    {
-        return ChoiceType::class;
-    }
 }

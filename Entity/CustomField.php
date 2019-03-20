@@ -25,6 +25,7 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\AbstractMultivalueType;
 
 class CustomField extends FormEntity implements UniqueEntityInterface
 {
@@ -353,7 +354,11 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      */
     public function getOptions(): Collection
     {
-        return $this->options;
+        if ($this->isChoiceType()) {
+            return $this->options;
+        }
+
+        return new ArrayCollection();
     }
 
     /**
@@ -365,10 +370,8 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     {
         $choices = [];
 
-        if (ChoiceType::class === $this->getTypeObject()->getSymfonyFormFieldType()) {
-            foreach ($this->getOptions() as $option) {
-                $choices[$option->getValue()] = $option->getLabel();
-            }
+        foreach ($this->getOptions() as $option) {
+            $choices[$option->getValue()] = $option->getLabel();
         }
 
         return $choices;
@@ -392,5 +395,22 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     public function setParams($params): void
     {
         $this->params = $params;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isChoiceType(): bool
+    {
+        return ChoiceType::class === $this->getTypeObject()->getSymfonyFormFieldType() ||
+            is_subclass_of($this->getTypeObject()->getSymfonyFormFieldType(), ChoiceType::class);
+    }
+
+    /**
+     * @return bool
+     */
+    public function canHaveMultipleValues(): bool
+    {
+        return $this->getTypeObject() instanceof AbstractMultivalueType;
     }
 }

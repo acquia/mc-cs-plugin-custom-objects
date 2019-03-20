@@ -14,36 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Repository;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 
 class CustomFieldValueRepository extends CommonRepository
 {
-    /**
-     * @param CustomItem $customItem
-     *
-     * @return mixed[]
-     */
-    public function getValuesForItem(CustomItem $customItem): array
-    {
-        $values = [];
-        $q      = $this->createQueryBuilder('cfv', 'cfv.id');
-        $q->select('DISTINCT(cfvt.id) AS value_id, IDENTITY(cfv.customField) AS field_id, cfvt.value')
-            ->innerJoin(CustomFieldValueText::class, 'cfvt')
-            ->where(
-                $q->expr()->andX(
-                    $q->expr()->eq('cfv.customObject', ':customObject')
-                )
-            )
-            ->setParameter('customObject', $customItem->getCustomObject()->getId());
-
-        $rows = $q->getQuery()->getArrayResult();
-
-        foreach ($rows as $row) {
-            // @todo make multi-select values an array?
-            $values[$row['field_id']] = $row['value'];
-        }
-
-        return $values;
-    }
 }
