@@ -18,6 +18,9 @@ use MauticPlugin\CustomObjectsBundle\DTO\TableFilterConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query\Expr;
 
 class TableConfigTest extends \PHPUnit_Framework_TestCase
 {
@@ -67,7 +70,7 @@ class TableConfigTest extends \PHPUnit_Framework_TestCase
         $tableConfig->addFilterDTO($filterA);
         $tableConfig->addFilterDTO($filterC);
         $tableConfig->addFilter(CustomObject::class, 'columnB', 'value B');
-        $tableConfig->addFilterIfNotEmpty(CustomItem::class, 'columnD', 'value D');
+        $tableConfig->addFilterIfNotEmpty(CustomItem::class, 'columnD', 'value D', 'like');
         $tableConfig->addFilterIfNotEmpty(CustomItem::class, 'columnE', null);
 
         $filters = $tableConfig->getFilters();
@@ -81,6 +84,54 @@ class TableConfigTest extends \PHPUnit_Framework_TestCase
 
         $this->expectException(NotFoundException::class);
         $this->assertSame($filterC, $tableConfig->getFilter(CustomObject::class, 'columnX'));
+    }
+
+    public function testGetFilterIfEntityNotFound(): void
+    {
+        $tableConfig = $this->initTableConfig();
+        $this->expectException(NotFoundException::class);
+        $this->expectExceptionMessage('No filter for entity MauticPlugin\CustomObjectsBundle\Entity\CustomObject exists');
+        $tableConfig->getFilter(CustomObject::class, 'unicorn');
+    }
+
+    public function testGetFilterIfColumnNotFound(): void
+    {
+        $tableConfig = $this->initTableConfig();
+        $tableConfig->addFilter(CustomObject::class, 'columnB', 'value B');
+        $this->expectException(NotFoundException::class);
+        $this->expectExceptionMessage('Filter for entity MauticPlugin\CustomObjectsBundle\Entity\CustomObject and column blah does not exist');
+        $tableConfig->getFilter(CustomObject::class, 'blah');
+    }
+
+    public function testConfigureSelectQueryBuilder(): void
+    {
+        $queryBuilder  = $this->createMock(QueryBuilder::class);
+        $classMetadata = $this->createMock(ClassMetadata::class);
+        $tableConfig   = $this->initTableConfig();
+
+        $queryBuilder->expects($this->once())
+            ->method('select');
+
+        $configuredBuilder = $tableConfig->configureSelectQueryBuilder($queryBuilder, $classMetadata);
+        $this->assertSame($queryBuilder, $configuredBuilder);
+    }
+
+    public function testConfigureCountQueryBuilder(): void
+    {
+        $queryBuilder  = $this->createMock(QueryBuilder::class);
+        $classMetadata = $this->createMock(ClassMetadata::class);
+        $expr          = $this->createMock(Expr::class);
+        $tableConfig   = $this->initTableConfig();
+
+        $queryBuilder->expects($this->once())
+            ->method('expr')
+            ->willReturn($expr);
+
+        $queryBuilder->expects($this->once())
+            ->method('select');
+
+        $configuredBuilder = $tableConfig->configureCountQueryBuilder($queryBuilder, $classMetadata);
+        $this->assertSame($queryBuilder, $configuredBuilder);
     }
 
     /**
