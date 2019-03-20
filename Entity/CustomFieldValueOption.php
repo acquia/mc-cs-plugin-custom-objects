@@ -23,7 +23,7 @@ use Doctrine\DBAL\Types\Type;
 class CustomFieldValueOption extends CustomFieldValueStandard
 {
     /**
-     * @var string|null
+     * @var string[]|string|null
      */
     private $value;
 
