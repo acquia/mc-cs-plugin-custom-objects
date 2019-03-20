@@ -51,5 +51,15 @@ class CustomFieldOptionTest extends \PHPUnit_Framework_TestCase
         $value = 'value';
         $option->setValue($value);
         $this->assertSame($value, $option->getValue());
+
+        $id = 30;
+        $this->assertNull($option->getId());
+        $option->setId($id);
+        $this->assertSame($id, $option->getId());
+
+        $customField = new CustomField();
+        $this->assertNull($option->getCustomField());
+        $option->setCustomField($customField);
+        $this->assertSame($customField, $option->getCustomField());
     }
 }
