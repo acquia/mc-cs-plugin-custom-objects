@@ -229,19 +229,6 @@ class CustomItemModel extends FormModel
     }
 
     /**
-     * @param CustomField $customField
-     * @param Lead        $contact
-     * @param string      $expr
-     * @param mixed       $value
-     *
-     * @return int
-     */
-    public function findItemIdForValue(CustomField $customField, Lead $contact, string $expr, $value): int
-    {
-        return $this->customItemRepository->findItemIdForValue($customField, $contact, $expr, $value);
-    }
-
-    /**
      * @param Lead         $contact
      * @param CustomObject $customObject
      *

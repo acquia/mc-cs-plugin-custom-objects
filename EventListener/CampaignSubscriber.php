@@ -28,6 +28,7 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 
 class CampaignSubscriber extends CommonSubscriber
 {
@@ -52,6 +53,11 @@ class CampaignSubscriber extends CommonSubscriber
     private $customItemModel;
 
     /**
+     * @var CustomItemRepository
+     */
+    private $customItemRepository;
+
+    /**
      * @var CustomItemXrefContactModel
      */
     private $customItemXrefContactModel;
@@ -65,6 +71,7 @@ class CampaignSubscriber extends CommonSubscriber
      * @param CustomFieldModel           $customFieldModel
      * @param CustomObjectModel          $customObjectModel
      * @param CustomItemModel            $customItemModel
+     * @param CustomItemRepository       $customItemRepository
      * @param CustomItemXrefContactModel $customItemXrefContactModel
      * @param TranslatorInterface        $translator
      * @param ConfigProvider             $configProvider
@@ -73,6 +80,7 @@ class CampaignSubscriber extends CommonSubscriber
         CustomFieldModel $customFieldModel,
         CustomObjectModel $customObjectModel,
         CustomItemModel $customItemModel,
+        CustomItemRepository $customItemRepository,
         CustomItemXrefContactModel $customItemXrefContactModel,
         TranslatorInterface $translator,
         ConfigProvider $configProvider
@@ -80,6 +88,7 @@ class CampaignSubscriber extends CommonSubscriber
         $this->customFieldModel           = $customFieldModel;
         $this->customObjectModel          = $customObjectModel;
         $this->customItemModel            = $customItemModel;
+        $this->customItemRepository       = $customItemRepository;
         $this->customItemXrefContactModel = $customItemXrefContactModel;
         $this->translator                 = $translator;
         $this->configProvider             = $configProvider;
@@ -186,7 +195,7 @@ class CampaignSubscriber extends CommonSubscriber
         }
 
         try {
-            $customItemId = $this->customItemModel->findItemIdForValue(
+            $customItemId = $this->customItemRepository->findItemIdForValue(
                 $customField,
                 $contact,
                 $customField->getTypeObject()->getOperators()[$event->getConfig()['operator']]['expr'],

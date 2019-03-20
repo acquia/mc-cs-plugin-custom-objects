@@ -679,6 +679,7 @@ return [
                     'mautic.custom.model.field',
                     'mautic.custom.model.object',
                     'mautic.custom.model.item',
+                    'custom_item.repository',
                     'mautic.custom.model.import.xref.contact',
                     'translator',
                     'custom_object.config.provider',
