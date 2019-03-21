@@ -49,9 +49,10 @@ class CustomFieldValueModel
         $customFields  = $customItem->getCustomObject()->getPublishedFields();
         $queries       = $this->buildQueriesForUnion($customItem, $customFields);
         $valueRows     = $this->fetchValues($queries);
-        $valueEntities = $this->createValueEntities($customFields, $customItem);
+        
+        $this->createValueEntities($customFields, $customItem);
 
-        return $this->setValuesFromDatabase($valueRows, $valueEntities);
+        return $this->setValuesFromDatabase($valueRows, $customItem);
     }
 
     /**
@@ -100,30 +101,33 @@ class CustomFieldValueModel
     }
 
     /**
+     * Creates custom field value entities and add them to the CustomItem entity
      * @param Collection $customFields
      * @param CustomItem $customItem
-     *
-     * @return Collection
      */
-    private function createValueEntities(Collection $customFields, CustomItem $customItem): Collection
+    private function createValueEntities(Collection $customFields, CustomItem $customItem): void
     {
-        return $customFields->map(function (CustomField $customField) use ($customItem) {
-            $customFieldValue = $customField->getTypeObject()->createValueEntity($customField, $customItem);
-            $customFieldValue->setValue($customField->getDefaultValue());
-            $customItem->setCustomFieldValue($customFieldValue);
-
-            return $customFieldValue;
+        $customFields->map(function (CustomField $customField) use ($customItem) {
+            $customItem->addCustomFieldValue(
+                $customField->getTypeObject()->createValueEntity(
+                    $customField,
+                    $customItem,
+                    $customField->getDefaultValue()
+                )
+            );
         });
     }
 
     /**
      * @param Collection $valueRows
-     * @param Collection $customFieldValues
+     * @param CustomItem $customItem
      *
      * @return Collection
      */
-    private function setValuesFromDatabase(Collection $valueRows, Collection $customFieldValues): Collection
+    private function setValuesFromDatabase(Collection $valueRows, CustomItem $customItem): Collection
     {
+        $customFieldValues = $customItem->getCustomFieldValues();
+        
         $valueRows->map(function (array $row) use ($customFieldValues): void {
             /** @var CustomFieldValueInterface */
             $customFieldValue = $customFieldValues->get((int) $row['custom_field_id']);
