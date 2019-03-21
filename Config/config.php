@@ -604,12 +604,6 @@ return [
                     'custom_object.config.provider',
                 ],
             ],
-            'custom_field.type.subscriber' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldTypeSubscriber::class,
-                'arguments' => [
-                    'translator',
-                ],
-            ],
             'custom_field.post_load.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldPostLoadSubscriber::class,
                 'arguments' => [
@@ -770,6 +764,83 @@ return [
                     'custom_object.random.helper',
                 ],
                 'tag' => 'console.command',
+            ],
+        ],
+        'fieldTypes' => [
+            'custom.field.type.checkbox_group' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\CheckboxGroupType::class,
+                'arguments' => ['translator'],
+                'tag'       => 'custom.field.type',
+            ],
+            'custom.field.type.country' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\CountryListType::class,
+                'arguments' => ['translator'],
+                'tag'       => 'custom.field.type',
+            ],
+            'custom.field.type.date' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\DateType::class,
+                'arguments' => ['translator'],
+                'tag'       => 'custom.field.type',
+            ],
+            'custom.field.type.datetime' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\DateTimeType::class,
+                'arguments' => ['translator'],
+                'tag'       => 'custom.field.type',
+            ],
+            'custom.field.type.email' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\EmailType::class,
+                'arguments' => ['translator'],
+                'tag'       => 'custom.field.type',
+            ],
+            'custom.field.type.hidden' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\HiddenType::class,
+                'arguments' => ['translator'],
+                'tag'       => 'custom.field.type',
+            ],
+            'custom.field.type.html_area' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\HtmlAreaType::class,
+                'arguments' => ['translator'],
+                'tag'       => 'custom.field.type',
+            ],
+            'custom.field.type.int' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType::class,
+                'arguments' => ['translator'],
+                'tag'       => 'custom.field.type',
+            ],
+            'custom.field.type.phone' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\PhoneType::class,
+                'arguments' => ['translator'],
+                'tag'       => 'custom.field.type',
+            ],
+            'custom.field.type.radio_group' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\RadioGroupType::class,
+                'arguments' => ['translator'],
+                'tag'       => 'custom.field.type',
+            ],
+            'custom.field.type.select' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\SelectType::class,
+                'arguments' => ['translator'],
+                'tag'       => 'custom.field.type',
+            ],
+            'custom.field.type.multiselect' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\MultiselectType::class,
+                'arguments' => ['translator'],
+                'tag'       => 'custom.field.type',
+            ],
+            'custom.field.type.text' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType::class,
+                'arguments' => ['translator'],
+                'tag'       => 'custom.field.type',
+            ],
+            'custom.field.type.textarea' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\TextareaType::class,
+                'arguments' => ['translator'],
+                'tag'       => 'custom.field.type',
+            ],
+            'custom.field.type.url' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\UrlType::class,
+                'arguments' => ['translator'],
+                'tag'       => 'custom.field.type',
             ],
         ],
         'other' => [

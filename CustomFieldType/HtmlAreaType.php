@@ -20,6 +20,11 @@ class HtmlAreaType extends AbstractTextType
     /**
      * @var string
      */
+    public const NAME = 'custom.field.type.html_area';
+
+    /**
+     * @var string
+     */
     protected $key = 'html_area';
 
     /**

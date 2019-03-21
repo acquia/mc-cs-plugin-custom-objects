@@ -20,6 +20,11 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 
 class DateTimeType extends AbstractCustomFieldType
 {
+    /**
+     * @var string
+     */
+    public const NAME = 'custom.field.type.datetime';
+
     public const TABLE_NAME = 'custom_field_value_datetime';
 
     /**

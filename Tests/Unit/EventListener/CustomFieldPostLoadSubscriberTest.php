@@ -20,6 +20,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomFieldPostLoadSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -60,7 +61,7 @@ class CustomFieldPostLoadSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testPostLoadWhenParamsIsNotAnArray(): void
     {
-        $typeObject = new TextType('text');
+        $typeObject = new TextType($this->createMock(TranslatorInterface::class));
 
         $this->event->expects($this->once())
             ->method('getObject')
@@ -91,7 +92,7 @@ class CustomFieldPostLoadSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testPostLoadWhenParamsIsAnArray(): void
     {
-        $typeObject = new TextType('text');
+        $typeObject = new TextType($this->createMock(TranslatorInterface::class));
 
         $this->event->expects($this->once())
             ->method('getObject')

@@ -24,6 +24,7 @@ use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextareaType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateTimeType;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomItemImportModelTest extends \PHPUnit_Framework_TestCase
 {
@@ -79,9 +80,9 @@ class CustomItemImportModelTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->descriptionField->method('getId')->willReturn(33);
-        $this->descriptionField->method('getTypeObject')->willReturn(new TextareaType('textarea'));
+        $this->descriptionField->method('getTypeObject')->willReturn(new TextareaType($this->createMock(TranslatorInterface::class)));
         $this->dateField->method('getId')->willReturn(34);
-        $this->dateField->method('getTypeObject')->willReturn(new DateTimeType('date time'));
+        $this->dateField->method('getTypeObject')->willReturn(new DateTimeType($this->createMock(TranslatorInterface::class)));
     }
 
     public function testImportForCreated(): void

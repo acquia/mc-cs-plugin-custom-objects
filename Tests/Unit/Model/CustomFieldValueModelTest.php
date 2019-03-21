@@ -26,6 +26,7 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use Doctrine\ORM\AbstractQuery;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
 {
@@ -74,7 +75,7 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
 
         $this->customField->expects($this->once())
             ->method('getTypeObject')
-            ->willReturn(new TextType('Text'));
+            ->willReturn(new TextType($this->createMock(TranslatorInterface::class)));
 
         $this->entityManager->expects($this->never())
             ->method('getConnection');
@@ -109,11 +110,11 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
 
         $this->customField->expects($this->exactly(2))
             ->method('getTypeObject')
-            ->willReturn(new TextType('Text'));
+            ->willReturn(new TextType($this->createMock(TranslatorInterface::class)));
 
         $noValueField->expects($this->exactly(2))
             ->method('getTypeObject')
-            ->willReturn(new IntType('Number'));
+            ->willReturn(new IntType($this->createMock(TranslatorInterface::class)));
 
         $noValueField->expects($this->any())
             ->method('getId')

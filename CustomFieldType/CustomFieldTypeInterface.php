@@ -22,6 +22,8 @@ interface CustomFieldTypeInterface
 {
     public const TABLE_NAME = 'undefined';
 
+    public const NAME = 'undefined';
+
     /**
      * @return string
      */

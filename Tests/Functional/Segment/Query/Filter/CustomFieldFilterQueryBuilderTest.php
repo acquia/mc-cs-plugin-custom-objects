@@ -23,7 +23,6 @@ use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 
 class CustomFieldFilterQueryBuilderTest extends WebTestCase
@@ -79,9 +78,8 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
 
     public function testApplyQuery(): void
     {
-        /** @var EventDispatcherInterface $dispatcher */
-        $dispatcher          = $this->getContainer()->get('event_dispatcher');
-        $fieldTypeProvider   = new CustomFieldTypeProvider($dispatcher);
+        /** @var CustomFieldTypeProvider $fieldTypeProvider */
+        $fieldTypeProvider   = $this->getContainer()->get('custom_field.type.provider');
         $queryHelper         = new QueryFilterHelper($fieldTypeProvider);
         $queryBuilderService = new CustomFieldFilterQueryBuilder(new RandomParameterName(), $queryHelper);
         $filterMock          = $this->createSegmentFilterMock('hate');

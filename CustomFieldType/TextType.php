@@ -18,5 +18,10 @@ class TextType extends AbstractTextType
     /**
      * @var string
      */
+    public const NAME = 'custom.field.type.text';
+
+    /**
+     * @var string
+     */
     protected $key = 'text';
 }

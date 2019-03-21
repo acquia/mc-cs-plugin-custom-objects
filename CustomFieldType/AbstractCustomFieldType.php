@@ -29,16 +29,16 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     protected $formTypeOptions = [];
 
     /**
-     * @var string
+     * @var TranslatorInterface
      */
-    private $name;
+    protected $translator;
 
     /**
-     * @param string $name field type name translated to user's language
+     * @param TranslatorInterface $translator
      */
-    public function __construct(string $name)
+    public function __construct(TranslatorInterface $translator)
     {
-        $this->name = $name;
+        $this->translator = $translator;
     }
 
     /**
@@ -54,7 +54,7 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
      */
     public function getName(): string
     {
-        return $this->name;
+        return $this->translator->trans(static::NAME);
     }
 
     /**

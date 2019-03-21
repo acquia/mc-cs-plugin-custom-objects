@@ -19,6 +19,7 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\SelectType;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomFieldTest extends \PHPUnit_Framework_TestCase
 {
@@ -54,7 +55,7 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
     public function testGettersSetters(): void
     {
         $customObject = new CustomObject();
-        $typeObject   = new DateType('date');
+        $typeObject   = new DateType($this->createMock(TranslatorInterface::class));
         $customField  = new CustomField();
 
         // Test Initial values
@@ -96,7 +97,7 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
     public function testGetFormFieldOptions(): void
     {
         $customField  = new CustomField();
-        $typeObject   = new DateType('date');
+        $typeObject   = new DateType($this->createMock(TranslatorInterface::class));
 
         $customField->setTypeObject($typeObject);
         $customField->setLabel('Start Date');
@@ -123,7 +124,7 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
     public function testGetFormFieldOptionsWithChoices(): void
     {
         $customField  = new CustomField();
-        $typeObject   = new SelectType('select');
+        $typeObject   = new SelectType($this->createMock(TranslatorInterface::class));
         $red          = new CustomFieldOption();
         $blue         = new CustomFieldOption();
 
@@ -167,7 +168,7 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
         $customField = new CustomField();
         $customField->addOption($optionA);
         $customField->addOption($optionB);
-        $customField->setTypeObject(new SelectType('Select'));
+        $customField->setTypeObject(new SelectType($this->createMock(TranslatorInterface::class)));
 
         $this->assertSame([
             'option_a' => 'Option A',

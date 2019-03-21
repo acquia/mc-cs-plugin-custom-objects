@@ -20,6 +20,11 @@ class CountryListType extends SelectType
     /**
      * @var string
      */
+    public const NAME = 'custom.field.type.country_list';
+
+    /**
+     * @var string
+     */
     protected $key = 'country_list';
 
     /**
