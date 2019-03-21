@@ -535,6 +535,12 @@ return [
                     'event_dispatcher',
                 ],
             ],
+            'mautic.custom.model.field.option' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomFieldOptionModel::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
             'mautic.custom.model.object' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel::class,
                 'arguments' => [
@@ -619,6 +625,9 @@ return [
             // So subscriber above should contain subscriber method below. But it is not possible now.
             'custom_field.pre_save.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldPreSaveSubscriber::class,
+                'arguments' => [
+                    'mautic.custom.model.field.option'
+                ]
             ],
             'custom_item.button.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomItemButtonSubscriber::class,
