@@ -15,7 +15,6 @@ namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueDate;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueDateTime;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 
@@ -52,7 +51,7 @@ class DateType extends AbstractCustomFieldType
             $value = new \DateTimeImmutable($value);
         }
 
-        return new CustomFieldValueDateTime($customField, $customItem, $value);
+        return new CustomFieldValueDate($customField, $customItem, $value);
     }
 
     /**
@@ -69,5 +68,16 @@ class DateType extends AbstractCustomFieldType
     public function getEntityClass(): string
     {
         return CustomFieldValueDate::class;
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getOperators(): array
+    {
+        $allOperators     = parent::getOperators();
+        $allowedOperators = array_flip(['=', '!=', 'gt', 'gte', 'lt', 'lte', 'empty', '!empty']);
+
+        return array_intersect_key($allOperators, $allowedOperators);
     }
 }

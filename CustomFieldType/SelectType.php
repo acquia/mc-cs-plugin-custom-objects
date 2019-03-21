@@ -37,4 +37,15 @@ class SelectType extends AbstractTextType
     {
         return ChoiceType::class;
     }
+
+    /**
+     * @return mixed[]
+     */
+    public function getOperators(): array
+    {
+        $allOperators     = parent::getOperators();
+        $allowedOperators = array_flip(['=', '!=', 'empty', '!empty']);
+
+        return array_intersect_key($allOperators, $allowedOperators);
+    }
 }

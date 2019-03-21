@@ -17,7 +17,6 @@ use MauticPlugin\CustomObjectsBundle\EventListener\CampaignSubscriber;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use Symfony\Component\Translation\TranslatorInterface;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
@@ -27,6 +26,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 
 class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -38,7 +38,7 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
 
     private $customFieldModel;
     private $customObjectModel;
-    private $customItemModel;
+    private $customItemRepository;
     private $customItemXrefContactModel;
     private $translator;
     private $campaignBuilderEvent;
@@ -59,7 +59,7 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->customFieldModel           = $this->createMock(CustomFieldModel::class);
         $this->customObjectModel          = $this->createMock(CustomObjectModel::class);
-        $this->customItemModel            = $this->createMock(CustomItemModel::class);
+        $this->customItemRepository       = $this->createMock(CustomItemRepository::class);
         $this->customItemXrefContactModel = $this->createMock(CustomItemXrefContactModel::class);
         $this->translator                 = $this->createMock(TranslatorInterface::class);
         $this->configProvider             = $this->createMock(ConfigProvider::class);
@@ -71,7 +71,7 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->campaignSubscriber         = new CampaignSubscriber(
             $this->customFieldModel,
             $this->customObjectModel,
-            $this->customItemModel,
+            $this->customItemRepository,
             $this->customItemXrefContactModel,
             $this->translator,
             $this->configProvider
@@ -284,7 +284,7 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('fetchEntity')
             ->willReturn($this->customField);
 
-        $this->customItemModel->expects($this->once())
+        $this->customItemRepository->expects($this->once())
             ->method('findItemIdForValue')
             ->with($this->customField, $this->contact, 'like', 'value A')
             ->will($this->throwException(new NotFoundException()));
@@ -322,7 +322,7 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('fetchEntity')
             ->willReturn($this->customField);
 
-        $this->customItemModel->expects($this->once())
+        $this->customItemRepository->expects($this->once())
             ->method('findItemIdForValue')
             ->with($this->customField, $this->contact, 'like', 'value A')
             ->willReturn(4344);

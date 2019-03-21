@@ -21,3 +21,4 @@
         <?php echo $view['form']->row($form['value']); ?>
     </div>
 </div>
+<script>CustomObjects.initCustomFieldConditions()</script>

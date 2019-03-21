@@ -15,7 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
-class RadioGroupType extends AbstractTextType
+class RadioGroupType extends SelectType
 {
     /**
      * @var string

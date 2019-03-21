@@ -15,14 +15,39 @@ CustomObjects = {
         })
     },
 
-    updateFormFieldOptions(fieldSelectHtml) {
-        let fieldSelect = mQuery(fieldSelectHtml);
+    initCustomFieldConditions() {
+        let form = mQuery('form[name=campaignevent]');
+        let fieldSelect = form.find('#campaignevent_properties_field');
+        let operatorSelect = form.find('#campaignevent_properties_operator');
+
+        CustomObjects.updateFormFieldOptions(fieldSelect, operatorSelect);
+
+        fieldSelect.on('change', function() {
+            CustomObjects.updateFormFieldOptions(fieldSelect, operatorSelect);
+        });
+
+        operatorSelect.on('change', function() {
+            CustomObjects.updateFormFieldOptions(fieldSelect, operatorSelect);
+        });
+    },
+
+    updateFormFieldOptions(fieldSelect, operatorSelect) {
+        let valueField = mQuery('#campaignevent_properties_value');
         let operators = JSON.parse(fieldSelect.find(':selected').attr('data-operators'));
-        let operatorSelect = mQuery('#campaignevent_properties_operator');
+        let options = JSON.parse(fieldSelect.find(':selected').attr('data-options'));
         let selectedOperator = operatorSelect.find(':selected').attr('value');
+        let isEmptyOperator = selectedOperator === 'empty' || selectedOperator === '!empty';
+        let valueFieldAttrs = {
+            'class': valueField.attr('class'),
+            'id': valueField.attr('id'),
+            'name': valueField.attr('name'),
+            'autocomplete': valueField.attr('autocomplete'),
+            'value': valueField.attr('value')
+        };
+
         operatorSelect.empty();
 
-        for (var operatorKey in operators) {
+        for (let operatorKey in operators) {
             let option = mQuery('<option/>').attr('value', operatorKey).text(operators[operatorKey]);
             if (operatorKey == selectedOperator) {
                 option.attr('selected', true);
@@ -30,6 +55,37 @@ CustomObjects = {
             operatorSelect.append(option);
         }
 
+        Mautic.destroyChosen(valueField);
+
+        let newValueField = mQuery('<input/>').attr('type', 'text');
+
+        if (options.length && !isEmptyOperator) {
+            newValueField = mQuery('<select/>');
+            for (let optionKey in options) {
+                let optionData = options[optionKey];
+                let option = mQuery("<option></option>")
+                    .attr('value', optionData.value)
+                    .text(optionData.label);
+                if (valueField.attr('value') == optionData.value) {
+                    option.attr('selected', true);
+                }
+                newValueField.append(option);
+            };
+        }
+
+        if (isEmptyOperator) {
+            newValueField.attr('readonly', true);
+        } else {
+            newValueField.attr('value', valueFieldAttrs['value']);
+        }
+
+        newValueField.attr(valueFieldAttrs);
+        valueField.replaceWith(newValueField);
+
+        if (valueField.is('select')) {
+            // I would love this to work, but Chosen doesn't want to initialize on this select...
+            Mautic.activateChosenSelect(valueField);
+        }
         operatorSelect.trigger("chosen:updated");
     },
 
