@@ -18,6 +18,8 @@ use Mautic\PluginBundle\Bundle\PluginBundleBase;
 use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use MauticPlugin\CustomObjectsBundle\Migration\Engine;
+use MauticPlugin\CustomObjectsBundle\DependencyInjection\Compiler\CustomFieldTypePass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class CustomObjectsBundle extends PluginBundleBase
 {
@@ -38,5 +40,13 @@ class CustomObjectsBundle extends PluginBundleBase
         );
 
         $migrationEngine->up();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function build(ContainerBuilder $container): void
+    {
+        $container->addCompilerPass(new CustomFieldTypePass());
     }
 }

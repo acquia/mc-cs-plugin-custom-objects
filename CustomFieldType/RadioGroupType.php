@@ -20,6 +20,11 @@ class RadioGroupType extends SelectType
     /**
      * @var string
      */
+    public const NAME = 'custom.field.type.radio_group';
+
+    /**
+     * @var string
+     */
     protected $key = 'radio_group';
 
     /**

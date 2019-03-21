@@ -79,7 +79,7 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->customObject->method('getId')->willReturn(self::OBJECT_ID);
         $this->customField->method('getId')->willReturn(self::FIELD_ID);
-        $this->customField->method('getTypeObject')->willReturn(new TextType('text'));
+        $this->customField->method('getTypeObject')->willReturn(new TextType($this->translator));
         $this->contact->method('getId')->willReturn(self::CONTACT_ID);
     }
 

@@ -18,5 +18,10 @@ class PhoneType extends AbstractTextType
     /**
      * @var string
      */
+    public const NAME = 'custom.field.type.phone';
+
+    /**
+     * @var string
+     */
     protected $key = 'phone';
 }

@@ -18,6 +18,11 @@ class TextareaType extends AbstractTextType
     /**
      * @var string
      */
+    public const NAME = 'custom.field.type.textarea';
+
+    /**
+     * @var string
+     */
     protected $key = 'textarea';
 
     /**

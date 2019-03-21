@@ -18,6 +18,11 @@ class UrlType extends AbstractTextType
     /**
      * @var string
      */
+    public const NAME = 'custom.field.type.url';
+
+    /**
+     * @var string
+     */
     protected $key = 'url';
 
     /**

@@ -20,6 +20,11 @@ class SelectType extends AbstractTextType
     /**
      * @var string
      */
+    public const NAME = 'custom.field.type.select';
+
+    /**
+     * @var string
+     */
     protected $key = 'select';
 
     /**

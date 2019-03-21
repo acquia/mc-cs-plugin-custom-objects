@@ -20,6 +20,11 @@ class CheckboxGroupType extends AbstractMultivalueType
     /**
      * @var string
      */
+    public const NAME = 'custom.field.type.checkbox_group';
+
+    /**
+     * @var string
+     */
     protected $key = 'checkbox_group';
 
     /**

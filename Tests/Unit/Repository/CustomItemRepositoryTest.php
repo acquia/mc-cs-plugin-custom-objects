@@ -27,6 +27,7 @@ use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Statement;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomItemRepositoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -151,7 +152,7 @@ class CustomItemRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $this->customField->expects($this->once())
             ->method('getTypeObject')
-            ->willReturn(new IntType('number'));
+            ->willReturn(new IntType($this->createMock(TranslatorInterface::class)));
 
         $this->queryBuilderDbal->expects($this->once())
             ->method('select')

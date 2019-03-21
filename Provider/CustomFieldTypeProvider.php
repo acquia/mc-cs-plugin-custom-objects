@@ -13,31 +13,15 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Provider;
 
-use MauticPlugin\CustomObjectsBundle\CustomFieldEvents;
-use MauticPlugin\CustomObjectsBundle\Event\CustomFieldTypeEvent;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CustomFieldTypeProvider
 {
     /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
-
-    /**
      * @var CustomFieldTypeInterface[]
      */
     private $customFieldTypes = [];
-
-    /**
-     * @param EventDispatcherInterface $dispatcher
-     */
-    public function __construct(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
 
     /**
      * Builds the list of custom field type objects.
@@ -46,12 +30,6 @@ class CustomFieldTypeProvider
      */
     public function getTypes(): array
     {
-        if (empty($this->customFieldTypes)) {
-            $event = new CustomFieldTypeEvent();
-            $this->dispatcher->dispatch(CustomFieldEvents::MAKE_FIELD_TYPE_LIST, $event);
-            $this->customFieldTypes = $event->getCustomFieldTypes();
-        }
-
         return $this->customFieldTypes;
     }
 
@@ -71,5 +49,13 @@ class CustomFieldTypeProvider
         }
 
         throw new NotFoundException("Field type '{$key}' does not exist.");
+    }
+
+    /**
+     * @param CustomFieldTypeInterface $customFieldType
+     */
+    public function addType(CustomFieldTypeInterface $customFieldType): void
+    {
+        $this->customFieldTypes[$customFieldType->getKey()] = $customFieldType;
     }
 }

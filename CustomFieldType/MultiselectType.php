@@ -18,6 +18,11 @@ class MultiselectType extends AbstractMultivalueType
     /**
      * @var string
      */
+    public const NAME = 'custom.field.type.multiselect';
+
+    /**
+     * @var string
+     */
     protected $key = 'multiselect';
 
     /**

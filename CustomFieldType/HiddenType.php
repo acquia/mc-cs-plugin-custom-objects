@@ -18,6 +18,11 @@ class HiddenType extends AbstractTextType
     /**
      * @var string
      */
+    public const NAME = 'custom.field.type.hidden';
+
+    /**
+     * @var string
+     */
     protected $key = 'hidden';
 
     /**

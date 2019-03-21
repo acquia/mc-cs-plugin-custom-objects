@@ -18,6 +18,11 @@ class EmailType extends AbstractTextType
     /**
      * @var string
      */
+    public const NAME = 'custom.field.type.email';
+
+    /**
+     * @var string
+     */
     protected $key = 'email';
 
     /**
