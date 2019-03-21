@@ -86,8 +86,12 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
     {
         $noValueField = $this->createMock(CustomField::class);
         $customFields = new ArrayCollection([44 => $this->customField, 66 => $noValueField]);
+        $customItem   = $this->getMockBuilder(CustomItem::class)
+            ->setMethods(['getCustomObject', 'getPublishedFields', 'getId', 'isNew'])
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->customItem->expects($this->once())
+        $customItem->expects($this->once())
             ->method('getCustomObject')
             ->willReturn($this->customObject);
 
@@ -95,11 +99,11 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
             ->method('getPublishedFields')
             ->willReturn($customFields);
 
-        $this->customItem->expects($this->any())
+        $customItem->expects($this->any())
             ->method('getId')
             ->willReturn(33);
 
-        $this->customItem->expects($this->once())
+        $customItem->expects($this->once())
             ->method('isNew')
             ->willReturn(false);
 
@@ -182,7 +186,9 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
                 'value'           => 'Yellow Submarine',
             ]]);
 
-        $values = $this->customFieldValueModel->createValuesForItem($this->customItem);
+        $this->customFieldValueModel->createValuesForItem($customItem);
+
+        $values = $customItem->getCustomFieldValues();
 
         $this->assertSame(2, $values->count());
 
@@ -191,11 +197,11 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame('Yellow Submarine', $storedValue->getValue());
         $this->assertSame($this->customField, $storedValue->getCustomField());
-        $this->assertSame($this->customItem, $storedValue->getCustomItem());
+        $this->assertSame($customItem, $storedValue->getCustomItem());
 
         $this->assertSame(1000, $newValue->getValue());
         $this->assertSame($noValueField, $newValue->getCustomField());
-        $this->assertSame($this->customItem, $newValue->getCustomItem());
+        $this->assertSame($customItem, $newValue->getCustomItem());
     }
 
     public function testSaveForNewCustomItem(): void

@@ -8,3 +8,4 @@ parameters:
 		- '#Parameter .+ expects .+, PHPUnit_Framework_MockObject_MockObject given\.#'
 		- '#Method MauticPlugin\\CustomObjectsBundle\\Controller\\CustomObject\\ViewController::viewAction() should return Symfony\\Component\\HttpFoundation\\Response but returns array|Symfony\\Component\\HttpFoundation\\JsonResponse|Symfony\\Component\\HttpFoundation\\RedirectResponse.#'
 		- '#Cannot cast array<string>|bool|string|null to int.#'
+		- '#Call to an undefined method PHPUnit_Framework_MockObject_MockObject::[a-zA-Z0-9_]+\(\)#'

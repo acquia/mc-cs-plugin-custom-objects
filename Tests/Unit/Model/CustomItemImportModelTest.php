@@ -104,9 +104,9 @@ class CustomItemImportModelTest extends \PHPUnit_Framework_TestCase
             ->with($this->callback(function (CustomItem $customItem) {
                 $this->assertSame('Mautic Demo', $customItem->getName());
                 $this->assertSame($this->customObject, $customItem->getCustomObject());
-                $fieldValues = $customItem->getCustomFieldValues();
-                $dateField = $fieldValues[0];
-                $descriptionField = $fieldValues[1];
+                $fieldValues      = $customItem->getCustomFieldValues();
+                $descriptionField = $fieldValues->get(33);
+                $dateField        = $fieldValues->get(34);
                 $this->assertSame('2019-03-04', $dateField->getValue()->format('Y-m-d'));
                 $this->assertSame($this->dateField, $dateField->getCustomField());
                 $this->assertSame('Showing demo of Mautic to potential clients.', $descriptionField->getValue());
