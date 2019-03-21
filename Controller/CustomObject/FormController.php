@@ -90,8 +90,6 @@ class FormController extends CommonController
         try {
             $this->permissionProvider->canCreate();
             $customObject = new CustomObject();
-        } catch (NotFoundException $e) {
-            return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
             return $this->accessDenied(false, $e->getMessage());
         }

@@ -207,9 +207,7 @@ class TableConfig
      */
     public function configureSelectQueryBuilder(QueryBuilder $queryBuilder, ClassMetadata $metadata): QueryBuilder
     {
-        $tableQueryBuilder = new TableQueryBuilder($this, $queryBuilder, $metadata);
-
-        return $tableQueryBuilder->getTableDataQuery();
+        return $this->configureQueryBuilder($queryBuilder, $metadata)->getTableDataQuery();
     }
 
     /**
@@ -220,8 +218,17 @@ class TableConfig
      */
     public function configureCountQueryBuilder(QueryBuilder $queryBuilder, ClassMetadata $metadata): QueryBuilder
     {
-        $tableQueryBuilder = new TableQueryBuilder($this, $queryBuilder, $metadata);
+        return $this->configureQueryBuilder($queryBuilder, $metadata)->getTableCountQuery();
+    }
 
-        return $tableQueryBuilder->getTableCountQuery();
+    /**
+     * @param QueryBuilder  $queryBuilder
+     * @param ClassMetadata $metadata
+     *
+     * @return TableQueryBuilder
+     */
+    private function configureQueryBuilder(QueryBuilder $queryBuilder, ClassMetadata $metadata): TableQueryBuilder
+    {
+        return new TableQueryBuilder($this, $queryBuilder, $metadata);
     }
 }

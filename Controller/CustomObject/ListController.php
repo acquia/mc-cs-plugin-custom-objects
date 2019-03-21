@@ -90,12 +90,11 @@ class ListController extends CommonController
         $search     = InputHelper::clean($request->get('search', $this->sessionProvider->getFilter()));
         $limit      = (int) $request->get('limit', $this->sessionProvider->getPageLimit());
         $orderBy    = $this->sessionProvider->getOrderBy(CustomObjectRepository::TABLE_ALIAS.'.id');
-        $orderByDir = $this->sessionProvider->getOrderByDir();
+        $orderByDir = $this->sessionProvider->getOrderByDir('ASC');
         $route      = $this->routeProvider->buildListRoute($page);
 
         if ($request->query->has('orderby')) {
             $orderBy    = InputHelper::clean($request->query->get('orderby'), true);
-            $orderByDir = $this->sessionProvider->getOrderByDir('ASC');
             $orderByDir = 'ASC' === $orderByDir ? 'DESC' : 'ASC';
             $this->sessionProvider->setOrderBy($orderBy);
             $this->sessionProvider->setOrderByDir($orderByDir);
