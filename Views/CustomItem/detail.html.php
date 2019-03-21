@@ -49,6 +49,8 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                 <td>
                                     <?php if ($fieldValue->getValue() instanceof \DateTimeInterface) : ?>
                                         <?php echo $view['date']->toFull($fieldValue->getValue()); ?>
+                                    <?php elseif (is_array($fieldValue->getValue())) : ?>
+                                        <?php echo $view->escape($view['formatter']->arrayToString($fieldValue->getValue())); ?>
                                     <?php else : ?>
                                         <?php echo $view->escape($fieldValue->getValue()); ?>
                                     <?php endif; ?>
