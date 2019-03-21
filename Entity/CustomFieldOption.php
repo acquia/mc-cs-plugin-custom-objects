@@ -19,7 +19,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class CustomFieldOption
+class CustomFieldOption implements \ArrayAccess
 {
     /**
      * @var CustomField|null
@@ -139,5 +139,37 @@ class CustomFieldOption
     public function setValue(string $value): void
     {
         $this->value = $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offsetExists($offset)
+    {
+        return isset($this->{$offset});
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offsetGet($offset)
+    {
+        return $this->offsetExists($offset) ? $this->{$offset} : null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offsetSet($offset, $value)
+    {
+        $this->{$offset} = $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offsetUnset($offset)
+    {
+        $this->{$offset} = null;
     }
 }
