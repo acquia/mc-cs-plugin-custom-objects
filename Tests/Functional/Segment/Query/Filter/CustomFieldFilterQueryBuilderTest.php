@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Segment\Query\Filter;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Tools\SchemaTool;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -24,11 +23,13 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
+use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
 
 class CustomFieldFilterQueryBuilderTest extends WebTestCase
 {
     use FixtureObjectsTrait;
     use DbalQueryTrait;
+    use DatabaseSchemaTrait;
 
     /**
      * @var EntityManager
@@ -42,12 +43,7 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
         /** @var EntityManager $entityManager */
         $entityManager       = $this->getContainer()->get('doctrine.orm.entity_manager');
         $this->entityManager = $entityManager;
-        $metadata            = $entityManager->getMetadataFactory()->getAllMetadata();
-        $schemaTool          = new SchemaTool($entityManager);
-        $schemaTool->dropDatabase();
-        if (!empty($metadata)) {
-            $schemaTool->createSchema($metadata);
-        }
+        $this->createFreshDatabaseSchema($entityManager);
         $this->postFixtureSetup();
 
         $fixturesDirectory = $this->getFixturesDirectory();
