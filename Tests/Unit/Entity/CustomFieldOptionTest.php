@@ -20,13 +20,11 @@ class CustomFieldOptionTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructorAndToArray()
     {
-        $id          = 1;
         $customField = new CustomField();
         $label       = 'label';
         $value       = 'value';
 
         $optionArray = [
-            'id'          => $id,
             'customField' => $customField,
             'label'       => $label,
             'value'       => $value,

@@ -69,13 +69,11 @@ class OptionsToStringTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(ArrayCollection::class, $options);
         $this->assertSame([], $options->toArray());
 
-        $id            = 1;
         $customFieldId = 2;
         $customField   = new CustomField();
         $label         = 'label';
         $value         = 'value';
         $options       = json_encode([[
-            'id'          => $id,
             'customField' => $customFieldId,
             'label'       => $label,
             'value'       => $value,
@@ -94,7 +92,6 @@ class OptionsToStringTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(ArrayCollection::class, $options);
         $option = $options->first();
         $this->assertInstanceOf(CustomFieldOption::class, $option);
-        $this->assertSame($id, $option->getId());
         $this->assertSame($customField, $option->getCustomField());
         $this->assertSame($label, $option->getLabel());
         $this->assertSame($value, $option->getValue());
