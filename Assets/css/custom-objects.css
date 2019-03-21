@@ -11,3 +11,7 @@
 .panel .btn-group {
     z-index: 1000;
 }
+
+input[type=checkbox].form-control {
+    height: auto;
+}
