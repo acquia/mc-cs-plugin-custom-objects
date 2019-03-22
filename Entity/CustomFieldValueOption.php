@@ -71,10 +71,6 @@ class CustomFieldValueOption extends CustomFieldValueStandard
      */
     public function setValue($value = null)
     {
-        if (is_string($value) && false !== mb_strpos($value, ',')) {
-            $value = explode(',', $value);
-        }
-
         $this->value = $value;
     }
 

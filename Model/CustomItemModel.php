@@ -104,14 +104,10 @@ class CustomItemModel extends FormModel
             $this->customFieldValueModel->save($customFieldValue);
         }
 
-        foreach ($customItem->getContactReferences() as $reference) {
-            $this->entityManager->persist($reference);
-        }
-
         $customItem->recordCustomFieldValueChanges();
 
         $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, $event);
-        $this->entityManager->flush();
+        $this->entityManager->flush($customItem);
         $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $event);
 
         return $customItem;

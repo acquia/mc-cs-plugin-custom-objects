@@ -26,7 +26,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\AbstractQuery;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
@@ -99,7 +98,6 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
         $this->customItem->expects($this->once())->method('setDateModified');
         $this->entityManager->expects($this->at(0))->method('persist')->with($this->customItem);
         $this->customItem->expects($this->once())->method('getCustomFieldValues')->willReturn(new ArrayCollection());
-        $this->customItem->expects($this->once())->method('getContactReferences')->willReturn(new ArrayCollection());
         $this->customItem->expects($this->once())->method('recordCustomFieldValueChanges');
         $this->dispatcher->expects($this->at(0))->method('dispatch')->with(CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, $this->isInstanceOf(CustomItemEvent::class));
         $this->entityManager->expects($this->at(1))->method('flush');
@@ -111,7 +109,6 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
     public function testSaveEdit(): void
     {
         $customFieldValue = $this->createMock(CustomFieldValueText::class);
-        $contactXref      = $this->createMock(CustomItemXrefContact::class);
         $this->user->expects($this->once())->method('getName')->willReturn('John Doe');
         $this->userHelper->expects($this->once())->method('getUser')->willReturn($this->user);
         $this->customItem->expects($this->exactly(2))->method('isNew')->willReturn(false);
@@ -120,12 +117,10 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
         $this->customItem->expects($this->once())->method('setDateModified');
         $this->entityManager->expects($this->at(0))->method('persist')->with($this->customItem);
         $this->customItem->expects($this->once())->method('getCustomFieldValues')->willReturn(new ArrayCollection([$customFieldValue]));
-        $this->customItem->expects($this->once())->method('getContactReferences')->willReturn(new ArrayCollection([$contactXref]));
         $this->customItem->expects($this->once())->method('recordCustomFieldValueChanges');
         $this->customFieldValueModel->expects($this->once())->method('save')->with($customFieldValue);
-        $this->entityManager->expects($this->at(1))->method('persist')->with($contactXref);
         $this->dispatcher->expects($this->at(0))->method('dispatch')->with(CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, $this->isInstanceOf(CustomItemEvent::class));
-        $this->entityManager->expects($this->at(2))->method('flush');
+        $this->entityManager->expects($this->at(1))->method('flush');
         $this->dispatcher->expects($this->at(1))->method('dispatch')->with(CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $this->isInstanceOf(CustomItemEvent::class));
 
         $this->assertSame($this->customItem, $this->customItemModel->save($this->customItem));

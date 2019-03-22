@@ -29,6 +29,11 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemImportModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 
 class ImportSubscriberTest extends KernelTestCase
 {
@@ -39,6 +44,11 @@ class ImportSubscriberTest extends KernelTestCase
      */
     private $container;
 
+    /**
+     * @var EntityManager
+     */
+    private $entityManager;
+
     protected function setUp(): void
     {
         self::bootKernel();
@@ -46,76 +56,144 @@ class ImportSubscriberTest extends KernelTestCase
         $this->container = static::$kernel->getContainer();
 
         /** @var EntityManager $entityManager */
-        $entityManager = $this->container->get('doctrine.orm.entity_manager');
+        $entityManager       = $this->container->get('doctrine.orm.entity_manager');
+        $this->entityManager = $entityManager;
 
         $this->createFreshDatabaseSchema($entityManager);
     }
 
     /**
+     * Tests insert of 1 custom item.
+     * Tests update of 1 custom item.
+     * Tests creating contact links.
+     *
      * @todo Test fail on empty required field.
-     * @todo Test creating contact links.
      * @todo Test validation of each field type fails the import.
+     * @todo Test validation that a choice type has the value key from the csv.
      */
-    public function testImportForCreated(): void
+    public function testImportForAllFieldTypesWithValidValuesAndLinksPlusUpdateToo(): void
     {
-        $customObject = $this->createCustomObjectWithAllFields();
-
-        $rowData = [
-            'name'     => 'Mautic CI Test',
-            // 'contacts' => '3262739,3262738,3262737',
+        $jane         = $this->createContact('jane@doe.email');
+        $john         = $this->createContact('john@doe.email');
+        $customObject = $this->createCustomObjectWithAllFields('Import CI all fields test Custom Object');
+        $csvRow       = [
+            'name'           => 'Import CI all fields test Custom Item',
+            'contacts'       => "{$jane->getId()},{$john->getId()}",
+            'text'           => 'Some text value',
+            'checkbox_group' => 'option_b',
+            'country_list'   => 'Czech Republic',
+            'datetime'       => '2019-03-04 12:35:09',
+            'date'           => '2019-03-04',
+            'email'          => 'info@doe.corp',
+            'hidden'         => 'secret hidden text',
+            'html_area'      => '<h1>Hello</h1>',
+            'int'            => '3453562',
+            'multiselect'    => 'option_b,option_a',
+            'phone'          => '+420111222333',
+            'radio_group'    => 'option_a',
+            'select'         => 'option_b',
+            'textarea'       => "Some looong\ntext\n\nhere",
+            'url'            => 'https://mautic.org',
         ];
 
-        $mappedFields = [
-            'name'     => 'customItemName',
-            // 'contacts' => 'linkedContactIds',
-        ];
+        $expectedValues                   = $csvRow;
+        $expectedValues['datetime']       = new \DateTimeImmutable('2019-03-04 12:35:09');
+        $expectedValues['date']           = new \DateTimeImmutable('2019-03-04 00:00:00');
+        $expectedValues['checkbox_group'] = ['option_b'];
+        $expectedValues['multiselect']    = ['option_a', 'option_b'];
 
-        $customObject->getCustomFields()->map(function (CustomField $customField) use (&$mappedFields, &$rowData): void {
+        // Import the custom item
+        $insertStatus = $this->importCsvRow($customObject, $csvRow);
+
+        $this->assertFalse($insertStatus);
+
+        $this->entityManager->clear();
+
+        // Fetch the imported custom item
+        $insertedCustomItem = $this->getCustomItemByName($csvRow['name']);
+
+        $this->assertInstanceOf(CustomItem::class, $insertedCustomItem);
+
+        $insertId = $insertedCustomItem->getId();
+
+        $this->assertSame($customObject->getCustomFields()->count(), $insertedCustomItem->getCustomFieldValues()->count());
+        $this->assertSame(2, $insertedCustomItem->getContactReferences()->count());
+
+        $customObject->getCustomFields()->map(function (CustomField $customField) use ($insertedCustomItem, $expectedValues): void {
+            $valueEntity = $insertedCustomItem->getCustomFieldValues()->get($customField->getId());
+            $this->assertEquals($expectedValues[$customField->getType()], $valueEntity->getValue());
+        });
+
+        $editCsvRow = $csvRow;
+
+        // Update some values
+        $editCsvRow['name'] = 'Import CI all fields test Custom Item - updated';
+        $editCsvRow['date'] = '2019-05-24';
+        $editCsvRow['url']  = 'https://mautic.com';
+        $editCsvRow['id']   = (string) $insertedCustomItem->getId();
+
+        // Update the custom item
+        $updateStatus = $this->importCsvRow($customObject, $editCsvRow);
+
+        $expectedUpdatedValues                   = $editCsvRow;
+        $expectedUpdatedValues['datetime']       = new \DateTimeImmutable('2019-03-04 12:35:09');
+        $expectedUpdatedValues['date']           = new \DateTimeImmutable('2019-05-24 00:00:00');
+        $expectedUpdatedValues['checkbox_group'] = ['option_b'];
+        $expectedUpdatedValues['multiselect']    = ['option_a', 'option_b'];
+
+        $this->assertTrue($updateStatus);
+
+        $this->entityManager->clear();
+
+        // Fetch the imported custom item again
+        $updatedCustomItem = $this->getCustomItemByName($editCsvRow['name']);
+
+        $this->assertInstanceOf(CustomItem::class, $updatedCustomItem);
+
+        $customObject->getCustomFields()->map(function (CustomField $customField) use ($updatedCustomItem, $expectedUpdatedValues): void {
+            $valueEntity = $updatedCustomItem->getCustomFieldValues()->get($customField->getId());
+            $this->assertEquals($expectedUpdatedValues[$customField->getType()], $valueEntity->getValue());
+        });
+
+        $this->assertSame($insertId, $updatedCustomItem->getId());
+    }
+
+    /**
+     * @param CustomObject $customObject
+     * @param string[]     $csvRow
+     *
+     * @return bool
+     */
+    private function importCsvRow(CustomObject $customObject, array $csvRow): bool
+    {
+        $rowData      = [];
+        $mappedFields = [];
+
+        if (isset($csvRow['name'])) {
+            $rowData['name']      = $csvRow['name'];
+            $mappedFields['name'] = 'customItemName';
+        }
+
+        if (isset($csvRow['contacts'])) {
+            $rowData['contacts']      = $csvRow['contacts'];
+            $mappedFields['contacts'] = 'linkedContactIds';
+        }
+
+        if (isset($csvRow['id'])) {
+            $rowData['id']      = $csvRow['id'];
+            $mappedFields['id'] = 'customItemId';
+        }
+
+        $customObject->getCustomFields()->map(function (CustomField $customField) use (&$mappedFields, &$rowData, $csvRow): void {
             $key                = $customField->getTypeObject()->getKey();
             $mappedFields[$key] = (string) $customField->getId();
 
             if ($customField->isChoiceType()) {
-                $optionA = new CustomFieldOption();
-                $optionA->setCustomField($customField);
-                $optionA->setLabel('Option A');
-                $optionA->setValue('option_a');
-                $customField->addOption($optionA);
-
-                $optionB = new CustomFieldOption();
-                $optionB->setCustomField($customField);
-                $optionB->setLabel('Option B');
-                $optionB->setValue('option_b');
-                $customField->addOption($optionB);
+                $this->addFieldOption($customField, 'Option A', 'option_a');
+                $this->addFieldOption($customField, 'Option B', 'option_b');
             }
 
-            switch ($customField->getType()) {
-                case 'date':
-                    $rowData[$key] = '2019-03-04';
-
-                    break;
-                case 'datetime':
-                    $rowData[$key] = '2019-03-04 12:35:09';
-
-                    break;
-                case 'email':
-                    $rowData[$key] = 'john@doe.email';
-
-                    break;
-                case 'int':
-                    $rowData[$key] = '45433';
-
-                    break;
-                default:
-                    if ($customField->canHaveMultipleValues()) {
-                        $rowData[$key] = 'option_a,option_b';
-                    } elseif ($customField->isChoiceType()) {
-                        $rowData[$key] = 'option_b';
-                    } else {
-                        $rowData[$key] = 'Some text';
-                    }
-
-                    break;
-            }
+            $rowData[$key] = $csvRow[$customField->getType()];
         });
 
         /** @var CustomObjectModel $customObjectModel */
@@ -123,10 +201,10 @@ class ImportSubscriberTest extends KernelTestCase
 
         /** @var CustomItemImportModel $customItemImportModel */
         $customItemImportModel = $this->container->get('mautic.custom.model.import.item');
+        $configProvider        = $this->createMock(ConfigProvider::class);
+        $permissionProvider    = $this->createMock(CustomItemPermissionProvider::class);
 
-        $configProvider     = $this->createMock(ConfigProvider::class);
-        $permissionProvider = $this->createMock(CustomItemPermissionProvider::class);
-        $importSubscriber   = new ImportSubscriber(
+        $importSubscriber = new ImportSubscriber(
             $customObjectModel,
             $customItemImportModel,
             $configProvider,
@@ -144,14 +222,75 @@ class ImportSubscriberTest extends KernelTestCase
 
         $import             = new Import();
         $leadEventLog       = new LeadEventLog();
-        $importProcessevent = new ImportProcessEvent($import, $leadEventLog, $rowData);
+        $importProcessEvent = new ImportProcessEvent($import, $leadEventLog, $rowData);
 
         $import->setMatchedFields($mappedFields);
         $import->setObject("custom-object:{$customObject->getId()}");
-        $importSubscriber->onImportProcess($importProcessevent);
+
+        $importSubscriber->onImportProcess($importProcessEvent);
+
+        return $importProcessEvent->wasMerged();
     }
 
-    private function createCustomObjectWithAllFields(): CustomObject
+    /**
+     * @param CustomField $customField
+     * @param string      $label
+     * @param string      $value
+     */
+    private function addFieldOption(CustomField $customField, string $label, string $value): void
+    {
+        $option = new CustomFieldOption();
+        $option->setCustomField($customField);
+        $option->setLabel($label);
+        $option->setValue($value);
+        $customField->addOption($option);
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return CustomItem|mixed
+     */
+    private function getCustomItemByName(string $name)
+    {
+        /** @var CustomItemRepository $customItemRepository */
+        $customItemRepository = $this->container->get('custom_item.repository');
+
+        /** @var CustomItemModel $customItemModel */
+        $customItemModel = $this->container->get('mautic.custom.model.item');
+
+        /** @var CustomItem $customItem */
+        $customItem = $customItemRepository->findOneBy(['name' => $name]);
+
+        if (!$customItem) {
+            return;
+        }
+
+        return $customItemModel->populateCustomFields($customItem);
+    }
+
+    /**
+     * @param string $email
+     *
+     * @return Lead
+     */
+    private function createContact(string $email): Lead
+    {
+        /** @var LeadModel $contactModel */
+        $contactModel = $this->container->get('mautic.lead.model.lead');
+        $contact      = new Lead();
+        $contact->setEmail($email);
+        $contactModel->saveEntity($contact);
+
+        return $contact;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return CustomObject
+     */
+    private function createCustomObjectWithAllFields(string $name): CustomObject
     {
         /** @var CustomObjectModel $customObjectModel */
         $customObjectModel = $this->container->get('mautic.custom.model.object');
@@ -161,8 +300,8 @@ class ImportSubscriberTest extends KernelTestCase
         $customFieldTypeProvider = $this->container->get('custom_field.type.provider');
         $customFieldTypes        = $customFieldTypeProvider->getTypes();
 
-        $customObject->setNameSingular('Import CI test');
-        $customObject->setNamePlural('Import CI tests');
+        $customObject->setNameSingular($name);
+        $customObject->setNamePlural("{$name}s");
 
         foreach ($customFieldTypes as $customFieldType) {
             $customField = new CustomField();
