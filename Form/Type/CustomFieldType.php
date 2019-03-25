@@ -13,16 +13,15 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
-use Mautic\CoreBundle\Form\Type\SortableValueLabelListType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\CustomObjectHiddenTransformer;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsToStringTransformer;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransformer;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CustomField\OptionsType;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomField\ParamsType;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -198,28 +197,7 @@ class CustomFieldType extends AbstractType
             if ($hasChoices) {
                 $form->add(
                     'options',
-                    CollectionType::class,
-                    [
-                        'label'      => false,
-                        'entry_type' => SortableValueLabelListType::class,
-                        'options'    => [
-                            'label'    => false,
-                            'required' => false,
-                            'attr'     => [
-                                'class'         => 'form-control',
-                                'preaddon'      => true,
-                                'preaddon_attr' => [
-                                    'onclick' => true,
-                                ],
-                                'postaddon' => true,
-                            ],
-                            'error_bubbling' => true,
-                        ],
-                        'allow_add'      => true,
-                        'allow_delete'   => true,
-                        'prototype'      => true,
-                        'error_bubbling' => false,
-                    ]
+                    OptionsType::class
                 );
             }
         });
