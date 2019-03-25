@@ -279,13 +279,14 @@ class CustomFieldType extends AbstractType
                 ->addModelTransformer($this->paramsToStringTransformer)
         );
 
-        $builder->add(
-            $builder->create(
-                'options',
-                HiddenType::class
-            )
-                ->addModelTransformer($this->optionsToStringTransformer)
-        );
+        // @todo This breaks saving of CO
+//        $builder->add(
+//            $builder->create(
+//                'options',
+//                HiddenType::class
+//            )
+//                ->addModelTransformer($this->optionsToStringTransformer)
+//        );
 
         // Possibility to mark field as deleted in POST data
         $builder->add('deleted', HiddenType::class, ['mapped' => false]);
