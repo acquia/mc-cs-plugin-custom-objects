@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Helper;
 
-use Doctrine\ORM\Tools\SchemaTool;
 use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
 use Doctrine\ORM\EntityManager;
+use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
 
 class QueryFilterHelperTest extends WebTestCase
 {
     use FixtureObjectsTrait;
+    use DatabaseSchemaTrait;
 
     /**
      * @var EntityManager
@@ -31,15 +32,10 @@ class QueryFilterHelperTest extends WebTestCase
         $entityManager       = $this->getContainer()->get('doctrine.orm.entity_manager');
         $this->entityManager = $entityManager;
         $this->filterFactory = $this->getContainer()->get('mautic.lead.model.lead_segment_filter_factory');
-        $metadata            = $entityManager->getMetadataFactory()->getAllMetadata();
-        $schemaTool          = new SchemaTool($entityManager);
-        $schemaTool->dropDatabase();
-        if (!empty($metadata)) {
-            $schemaTool->createSchema($metadata);
-        }
-        $this->postFixtureSetup();
+        $fixturesDirectory   = $this->getFixturesDirectory();
 
-        $fixturesDirectory = $this->getFixturesDirectory();
+        $this->createFreshDatabaseSchema($entityManager);
+        $this->postFixtureSetup();
 
         $objects = $this->loadFixtureFiles([
             $fixturesDirectory.'/roles.yml',

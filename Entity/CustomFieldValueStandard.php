@@ -30,13 +30,6 @@ abstract class CustomFieldValueStandard implements CustomFieldValueInterface
     protected $customItem;
 
     /**
-     * Flag to know whether to update this entity manually or let EntityManager to handle it.
-     *
-     * @var bool
-     */
-    protected $updateManually = false;
-
-    /**
      * @param CustomField $customField
      * @param CustomItem  $customItem
      */

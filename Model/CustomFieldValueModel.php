@@ -54,7 +54,8 @@ class CustomFieldValueModel
 
     /**
      * If the entities were created manually, not fetched by Entity Manager
-     * then we have to update them manually without help of EntityManager.
+     * then we have to merge them to the entity manager and flush.
+     * New entities are just persisted. Call flush after.
      *
      * @param CustomFieldValueInterface $customFieldValue
      */
@@ -62,7 +63,15 @@ class CustomFieldValueModel
     {
         if ($customFieldValue->getCustomField()->canHaveMultipleValues()) {
             $this->deleteOptionsForField($customFieldValue);
-            foreach ($customFieldValue->getValue() as $optionKey) {
+            $options = $customFieldValue->getValue();
+            if (is_string($options)) {
+                if (false !== mb_strpos($options, ',')) {
+                    $options = explode(',', $options);
+                } else {
+                    $options = [$options];
+                }
+            }
+            foreach ($options as $optionKey) {
                 $optionValue = clone $customFieldValue;
                 $optionValue->setValue($optionKey);
                 $this->entityManager->persist($optionValue);
@@ -72,7 +81,8 @@ class CustomFieldValueModel
         }
 
         if ($customFieldValue->getCustomItem()->getId()) {
-            $this->entityManager->merge($customFieldValue);
+            $customFieldValue = $this->entityManager->merge($customFieldValue);
+            $this->entityManager->flush($customFieldValue);
         } else {
             $this->entityManager->persist($customFieldValue);
         }

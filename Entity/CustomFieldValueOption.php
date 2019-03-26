@@ -36,7 +36,7 @@ class CustomFieldValueOption extends CustomFieldValueStandard
     {
         parent::__construct($customField, $customItem);
 
-        $this->value = $value;
+        $this->setValue($value);
     }
 
     /**

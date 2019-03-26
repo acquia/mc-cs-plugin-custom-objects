@@ -146,7 +146,8 @@ class CustomItemImportModel extends FormModel
     private function linkContacts(CustomItem $customItem, array $contactIds): CustomItem
     {
         foreach ($contactIds as $contactId) {
-            $this->customItemXrefContactModel->linkContact($customItem->getId(), $contactId);
+            $xref = $this->customItemXrefContactModel->linkContact($customItem->getId(), $contactId);
+            $customItem->addContactReference($xref);
         }
 
         return $customItem;
@@ -192,7 +193,6 @@ class CustomItemImportModel extends FormModel
         if (false !== $idKey) {
             try {
                 $customItem = $this->customItemModel->fetchEntity((int) $rowData[$idKey]);
-                $customItem = $this->customItemModel->populateCustomFields($customItem);
             } catch (NotFoundException $e) {
             }
         }

@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\EventListener;
 
-use Doctrine\ORM\Tools\SchemaTool;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use MauticPlugin\CustomObjectsBundle\EventListener\DynamicContentSubscriber;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
+use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
 use Doctrine\ORM\EntityManager;
 
 class DynamicContentSubscriberTest extends \Liip\FunctionalTestBundle\Test\WebTestCase
 {
     use FixtureObjectsTrait;
+    use DatabaseSchemaTrait;
 
     protected function setUp(): void
     {
@@ -20,12 +21,8 @@ class DynamicContentSubscriberTest extends \Liip\FunctionalTestBundle\Test\WebTe
 
         /** @var EntityManager $entityManager */
         $entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
-        $metadata      = $entityManager->getMetadataFactory()->getAllMetadata();
-        $schemaTool    = new SchemaTool($entityManager);
-        $schemaTool->dropDatabase();
-        if (!empty($metadata)) {
-            $schemaTool->createSchema($metadata);
-        }
+
+        $this->createFreshDatabaseSchema($entityManager);
         $this->postFixtureSetup();
 
         $fixturesDirectory = $this->getFixturesDirectory();
@@ -46,8 +43,7 @@ class DynamicContentSubscriberTest extends \Liip\FunctionalTestBundle\Test\WebTe
     public function testSubscribesToEvent(): void
     {
         $eventSubscriptions = DynamicContentSubscriber::getSubscribedEvents();
-
-        $methodName = $eventSubscriptions[DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE][0];
+        $methodName         = $eventSubscriptions[DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE][0];
 
         $this->assertSame('evaluateFilters', $methodName);
     }
