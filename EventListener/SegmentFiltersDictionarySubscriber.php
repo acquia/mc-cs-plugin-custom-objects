@@ -73,7 +73,7 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
         $connection = $this->doctrineRegistry->getConnection();
 
         // This avoids exceptions if no connection is available as in cache:clear
-        if (!$connection->isConnected()) {
+        if (!$connection->isConnected() && false) {
             return;
         }
 
