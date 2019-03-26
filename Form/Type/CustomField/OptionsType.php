@@ -13,55 +13,52 @@ namespace MauticPlugin\CustomObjectsBundle\Form\Type\CustomField;
 
 use Mautic\CoreBundle\Form\Type\SortableValueLabelListType;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsTransformer;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class OptionsType extends CollectionType
+class OptionsType extends AbstractType
 {
     /**
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        parent::buildForm($builder, $options);
-        $builder->addModelTransformer(new OptionsTransformer());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
-    {
-        parent::configureOptions($resolver);
-        $options = $resolver->resolve();
-
-        $options = array_merge_recursive(
-            $options,
-            [
-                'label'      => false,
-                'entry_type' => SortableValueLabelListType::class,
-                'options'    => [
-                    'label'    => false,
-                    'required' => false,
-                    'attr'     => [
-                        'class'         => 'form-control',
-                        'preaddon'      => true,
-                        'preaddon_attr' => [
-                            'onclick' => true,
+        $builder
+            ->add(
+                'list',
+                CollectionType::class,
+                [
+                    'label'      => false,
+                    'entry_type' => SortableValueLabelListType::class,
+                    'options'    => [
+                        'label'    => false,
+                        'required' => false,
+                        'attr'     => [
+                            'class'         => 'form-control',
+                            'preaddon'      => true,
+                            'preaddon_attr' => [
+                                'onclick' => true,
+                            ],
+                            'postaddon' => true,
                         ],
-                        'postaddon' => true,
+                        'error_bubbling' => true,
                     ],
-                    'error_bubbling' => true,
-                ],
-                'allow_add'      => true,
-                'allow_delete'   => true,
-                'prototype'      => true,
-                'error_bubbling' => false,
-            ]
-        );
+                    'allow_add'      => true,
+                    'allow_delete'   => true,
+                    'prototype'      => true,
+                    'error_bubbling' => false,
+                ]
+            )
+            ->addModelTransformer(new OptionsTransformer())
+//            ->setDataMapper(
+//                new PropertyPathMapper(
+//                    new OptionsPropertyAccessor([ 'options' => 'list' ])
+//                )
+//            )
+        ;
 
-        return $options;
     }
 
     /**

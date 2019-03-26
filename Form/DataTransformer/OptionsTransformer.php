@@ -11,20 +11,32 @@
 
 namespace MauticPlugin\CustomObjectsBundle\Form\DataTransformer;
 
+use Doctrine\ORM\PersistentCollection;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use Symfony\Component\Form\DataTransformerInterface;
 
 class OptionsTransformer implements DataTransformerInterface
 {
     /**
+     * @param PersistentCollection|CustomFieldOption[] $value
      * {@inheritdoc}
      */
     public function transform($value)
     {
-        if ($value) {
-            throw new \InvalidArgumentException("Not implemented");
+        if (!$value || !$value->count()) {
+            // @todo empty value
+            return ['list' => []];
         }
 
-        return ['list' => []] ;
+        $return = [];
+
+        foreach ($value as $option) {
+            $return[] = $option;
+        }
+
+        return  [
+            'list' => $return,
+        ];
     }
 
     /**
