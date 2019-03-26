@@ -16,7 +16,8 @@ use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 
 class OptionsType extends AbstractType
 {
@@ -59,6 +60,15 @@ class OptionsType extends AbstractType
 //            )
         ;
 
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        $view->vars['isSortable']     = true;
+        $view->vars['addValueButton'] = 'mautic.core.form.list.additem';
     }
 
     /**
