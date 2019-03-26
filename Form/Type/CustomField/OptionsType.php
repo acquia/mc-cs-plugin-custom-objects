@@ -12,6 +12,7 @@
 namespace MauticPlugin\CustomObjectsBundle\Form\Type\CustomField;
 
 use Mautic\CoreBundle\Form\Type\SortableValueLabelListType;
+use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsTransformer;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -24,6 +25,7 @@ class OptionsType extends CollectionType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         parent::buildForm($builder, $options);
+        $builder->addModelTransformer(new OptionsTransformer());
     }
 
     /**
@@ -60,5 +62,21 @@ class OptionsType extends CollectionType
         );
 
         return $options;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlockPrefix(): string
+    {
+        return $this->getName();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName(): string
+    {
+        return 'sortablelist';
     }
 }
