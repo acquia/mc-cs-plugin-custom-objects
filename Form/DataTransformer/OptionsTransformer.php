@@ -11,6 +11,7 @@
 
 namespace MauticPlugin\CustomObjectsBundle\Form\DataTransformer;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\PersistentCollection;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use Symfony\Component\Form\DataTransformerInterface;
@@ -24,7 +25,6 @@ class OptionsTransformer implements DataTransformerInterface
     public function transform($value)
     {
         if (!$value || !$value->count()) {
-            // @todo empty value
             return ['list' => []];
         }
 
@@ -44,6 +44,12 @@ class OptionsTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        return $value;
+        if (count($value['list'])) {
+            $collection = new ArrayCollection($value['list']);
+        } else {
+            $collection = new ArrayCollection();
+        }
+
+        return $collection;
     }
 }
