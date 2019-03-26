@@ -70,7 +70,7 @@ class CustomItemXrefContactModel extends FormModel
             );
 
             $this->entityManager->persist($xRef);
-            $this->entityManager->flush();
+            $this->entityManager->flush($xRef);
 
             $this->dispatcher->dispatch(
                 CustomItemEvents::ON_CUSTOM_ITEM_LINK_CONTACT,
@@ -90,7 +90,7 @@ class CustomItemXrefContactModel extends FormModel
         try {
             $xRef = $this->getContactReference($customItemId, $contactId);
             $this->entityManager->remove($xRef);
-            $this->entityManager->flush();
+            $this->entityManager->flush($xRef);
 
             $this->dispatcher->dispatch(
                 CustomItemEvents::ON_CUSTOM_ITEM_UNLINK_CONTACT,

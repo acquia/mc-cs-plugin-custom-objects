@@ -145,11 +145,15 @@ class ImportSubscriber extends CommonSubscriber
             return;
         }
 
-        $customObjectId = $this->getCustomObjectId($event->getImport()->getObject());
-        $this->permissionProvider->canCreate($customObjectId);
-        $customObject = $this->customObjectModel->fetchEntity($customObjectId);
-        $merged       = $this->customItemImportModel->import($event->getImport(), $event->getRowData(), $customObject);
-        $event->setWasMerged($merged);
+        try {
+            $customObjectId = $this->getCustomObjectId($event->getImport()->getObject());
+            $this->permissionProvider->canCreate($customObjectId);
+            $customObject = $this->customObjectModel->fetchEntity($customObjectId);
+            $merged       = $this->customItemImportModel->import($event->getImport(), $event->getRowData(), $customObject);
+            $event->setWasMerged($merged);
+        } catch (NotFoundException $e) {
+            // Not a Custom Object import or the custom object doesn't exist anymore. Move on.
+        }
     }
 
     /**

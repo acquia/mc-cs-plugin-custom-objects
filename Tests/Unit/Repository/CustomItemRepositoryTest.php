@@ -28,6 +28,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Statement;
 use Symfony\Component\Translation\TranslatorInterface;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
 class CustomItemRepositoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -48,6 +49,8 @@ class CustomItemRepositoryTest extends \PHPUnit_Framework_TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
         $this->entityManager        = $this->createMock(EntityManager::class);
         $this->classMetadata        = $this->createMock(ClassMetadata::class);
@@ -134,8 +137,6 @@ class CustomItemRepositoryTest extends \PHPUnit_Framework_TestCase
 
     public function testFindItemIdForValue(): void
     {
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-
         $count          = 33;
         $expr           = 'lte';
         $value          = 1000;
@@ -205,6 +206,26 @@ class CustomItemRepositoryTest extends \PHPUnit_Framework_TestCase
                 $expr,
                 $value
             )
+        );
+    }
+
+    public function testFindItemIdForValueIfNotFound(): void
+    {
+        $this->customField->expects($this->once())
+            ->method('getTypeObject')
+            ->willReturn(new IntType($this->createMock(TranslatorInterface::class)));
+
+        $this->statement->expects($this->once())
+            ->method('fetchColumn')
+            ->willReturn(false);
+
+        $this->expectException(NotFoundException::class);
+
+        $this->customItemRepository->findItemIdForValue(
+            $this->customField,
+            $this->contact,
+            'lte',
+            1000
         );
     }
 }

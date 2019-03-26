@@ -27,6 +27,8 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder as DBALQueryBuilder;
 use Doctrine\DBAL\Driver\Statement;
 use Symfony\Component\Translation\TranslatorInterface;
+use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefContactEvent;
 
 class CustomItemXrefContactModelTest extends \PHPUnit_Framework_TestCase
 {
@@ -99,10 +101,63 @@ class CustomItemXrefContactModelTest extends \PHPUnit_Framework_TestCase
             )
             ->will($this->onConsecutiveCalls($this->customItem, $this->createMock(Lead::class)));
 
+        $this->entityManager->expects($this->once())
+            ->method('persist')
+            ->with($this->isInstanceOf(CustomItemXrefContact::class));
+
+        $this->entityManager->expects($this->once())
+            ->method('flush')
+            ->with($this->isInstanceOf(CustomItemXrefContact::class));
+
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                CustomItemEvents::ON_CUSTOM_ITEM_LINK_CONTACT,
+                $this->isInstanceOf(CustomItemXrefContactEvent::class)
+            );
+
         $this->assertInstanceOf(
             CustomItemXrefContact::class,
             $this->customItemXrefContactModel->linkContact($customItemId, $contactId)
         );
+    }
+
+    public function testUnlinkContactIfReferenceExists(): void
+    {
+        $customItemId = 36;
+        $contactId    = 22;
+
+        $this->privateTestGetContactReference();
+
+        $this->entityManager->expects($this->once())
+            ->method('remove')
+            ->with($this->customItemXrefContact);
+
+        $this->entityManager->expects($this->once())
+            ->method('flush')
+            ->with($this->customItemXrefContact);
+
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                CustomItemEvents::ON_CUSTOM_ITEM_UNLINK_CONTACT,
+                $this->isInstanceOf(CustomItemXrefContactEvent::class)
+            );
+
+        $this->customItemXrefContactModel->unlinkContact($customItemId, $contactId);
+    }
+
+    public function testUnlinkContactIfReferenceNotFound(): void
+    {
+        $customItemId = 36;
+        $contactId    = 22;
+
+        $this->privateTestGetContactReference(false);
+
+        $this->entityManager->expects($this->never())
+            ->method('remove');
+
+        $this->customItemXrefContactModel->unlinkContact($customItemId, $contactId);
     }
 
     public function testGetLinksLineChartData(): void
@@ -141,7 +196,15 @@ class CustomItemXrefContactModelTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(32, $chartData['datasets'][0]['data']);
     }
 
-    private function privateTestGetContactReference(): void
+    public function testGetPermissionBase(): void
+    {
+        $this->assertSame(
+            'custom_objects:custom_items',
+            $this->customItemXrefContactModel->getPermissionBase()
+        );
+    }
+
+    private function privateTestGetContactReference($shouldFindEntity = true): void
     {
         $customItemId = 36;
         $contactId    = 22;
@@ -157,8 +220,14 @@ class CustomItemXrefContactModelTest extends \PHPUnit_Framework_TestCase
                 ['contactId', $contactId]
             );
 
-        $this->query->expects($this->once())
-            ->method('getSingleResult')
-            ->willReturn($this->customItemXrefContact);
+        if ($shouldFindEntity) {
+            $this->query->expects($this->once())
+                ->method('getSingleResult')
+                ->willReturn($this->customItemXrefContact);
+        } else {
+            $this->query->expects($this->once())
+                ->method('getSingleResult')
+                ->will($this->throwException(new NoResultException()));
+        }
     }
 }
