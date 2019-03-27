@@ -38,9 +38,9 @@ class OptionsType extends AbstractType
                         'required' => false,
                         'attr'     => [
                             'class'         => 'form-control',
-                            'preaddon'      => true,
+                            'preaddon'      => 'fa fa-times',
                             'preaddon_attr' => [
-                                'onclick' => true,
+                                'onclick' => 'Mautic.removeFormListOption(this);',
                             ],
                             'postaddon' => true,
                         ],
