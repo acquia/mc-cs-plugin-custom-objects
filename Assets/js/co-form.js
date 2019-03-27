@@ -291,6 +291,26 @@ CustomObjectsForm = {
                         mQuery('#objectFieldModal').find(target).val(params[key]);
                     }
 
+                } else if (propertyName === 'options') {
+                    let options = JSON.parse(value);
+
+                    let content = mQuery('#sortable-custom_field_options').html('');
+                    let prototype = mQuery('#custom_field_options_list a[data-prototype]').attr('data-prototype');
+
+                    let order = 0; // @todo replace with real order
+
+                    for(let option in options){
+                        let html = prototype.replace(/__name__/g, order.toString());
+                        html = mQuery(html);
+
+                        html.find("input[id*='label']").val(options[option]['label']);
+                        html.find("input[id*='value']").val(options[option]['value']);
+
+                        content.append(html);
+
+                        order = order + 1;
+                    }
+
                 } else {
                     mQuery('#objectFieldModal').find(target).val(value);
                 }
