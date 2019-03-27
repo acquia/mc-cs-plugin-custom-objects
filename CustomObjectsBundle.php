@@ -33,10 +33,20 @@ class CustomObjectsBundle extends PluginBundleBase
      */
     public static function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, Schema $installedSchema = null): void
     {
+        $entityManager = $factory->getEntityManager();
+        $tablePrefix   = $factory->getParameter('mautic.db_table_prefix');
+
         $migrationEngine = new Engine(
-            $factory->getEntityManager(),
-            $factory->getParameter('mautic.db_table_prefix'),
+            $entityManager,
+            $tablePrefix,
             dirname(__FILE__)
+        );
+
+        self::installAllTablesIfMissing(
+            $entityManager->getConnection()->getSchemaManager()->createSchema(),
+            $tablePrefix,
+            $factory,
+            $metadata
         );
 
         $migrationEngine->up();
@@ -48,5 +58,21 @@ class CustomObjectsBundle extends PluginBundleBase
     public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass(new CustomFieldTypePass());
+    }
+
+    /**
+     * In some rare cases it can happen that the plugin tables weren't created on plugin install.
+     * Create them on plugin update if they are missing.
+     *
+     * @param Schema        $schema
+     * @param string        $tablePrefix
+     * @param array|null    $metadata
+     * @param MauticFactory $factory
+     */
+    private static function installAllTablesIfMissing(Schema $schema, string $tablePrefix, MauticFactory $factory, array $metadata = null): void
+    {
+        if (!$schema->hasTable($tablePrefix.'custom_object')) {
+            self::installPluginSchema($metadata, $factory, null);
+        }
     }
 }
