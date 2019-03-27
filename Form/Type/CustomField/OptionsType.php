@@ -42,7 +42,7 @@ class OptionsType extends AbstractType
                             'preaddon_attr' => [
                                 'onclick' => 'Mautic.removeFormListOption(this);',
                             ],
-                            'postaddon' => true,
+                            'postaddon' => 'fa fa-ellipsis-v handle',
                         ],
                         'error_bubbling' => true,
                     ],
