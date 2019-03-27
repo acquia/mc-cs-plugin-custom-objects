@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\CustomObjectHiddenTransformer;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsToStringTransformer;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransformer;
@@ -28,6 +29,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 
@@ -54,21 +56,29 @@ class CustomFieldType extends AbstractType
     private $optionsToStringTransformer;
 
     /**
+     * @var CustomFieldFactory
+     */
+    private $customFieldFactory;
+
+    /**
      * @param CustomObjectRepository     $customObjectRepository
      * @param CustomFieldTypeProvider    $customFieldTypeProvider
      * @param ParamsToStringTransformer  $paramsToStringTransformer
      * @param OptionsToStringTransformer $optionsToStringTransformer
+     * @param CustomFieldFactory         $customFieldFactory
      */
     public function __construct(
         CustomObjectRepository $customObjectRepository,
         CustomFieldTypeProvider $customFieldTypeProvider,
         ParamsToStringTransformer $paramsToStringTransformer,
-        OptionsToStringTransformer $optionsToStringTransformer
+        OptionsToStringTransformer $optionsToStringTransformer,
+        CustomFieldFactory $customFieldFactory
     ) {
         $this->customObjectRepository     = $customObjectRepository;
         $this->customFieldTypeProvider    = $customFieldTypeProvider;
         $this->paramsToStringTransformer  = $paramsToStringTransformer;
         $this->optionsToStringTransformer = $optionsToStringTransformer;
+        $this->customFieldFactory = $customFieldFactory;
     }
 
     /**
@@ -127,9 +137,16 @@ class CustomFieldType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver): void
     {
+        $factory = $this->customFieldFactory;
+
         $resolver->setDefaults(
             [
                 'data_class'         => CustomField::class,
+                'empty_data'         => function (FormInterface $form) use ($factory){
+                    $type = $form->get('type')->getData();
+                    $customObject = $form->get('customObject')->getData();
+                    return $factory->create($type, $customObject);
+                },
                 'custom_object_form' => false, // Is form used as subform?
                 'csrf_protection'    => false,
                 'allow_extra_fields' => true,
