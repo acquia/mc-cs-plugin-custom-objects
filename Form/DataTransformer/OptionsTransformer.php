@@ -44,6 +44,13 @@ class OptionsTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
+        foreach ($value['list'] as $key => $option) {
+            if (is_array($option)) {
+                // Remove incomplete options (missing label or value) represented as array, not CustomFieldOption
+                unset($value['list'][$key]);
+            }
+        }
+
         if (count($value['list'])) {
             $collection = new ArrayCollection($value['list']);
         } else {
