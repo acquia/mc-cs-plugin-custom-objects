@@ -334,7 +334,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param CustomFieldOption|array $option
+     * @param CustomFieldOption|string[] $option
      */
     public function addOption($option): void
     {

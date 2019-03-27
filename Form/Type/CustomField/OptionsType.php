@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
 * @copyright   2019 Mautic, Inc. All rights reserved
 * @author      Mautic, Inc.
@@ -47,7 +49,7 @@ class OptionsType extends AbstractType
                         ],
                         'constraints'    => [
                             // @todo Not working, removing in OptionsTransformer
-                            new NotBlank(['message' => 'mautic.form.lists.notblank'])
+                            new NotBlank(['message' => 'mautic.form.lists.notblank']),
                         ],
                         'error_bubbling' => true,
                     ],
@@ -57,15 +59,13 @@ class OptionsType extends AbstractType
                     'error_bubbling' => false,
                 ]
             )
-            ->addModelTransformer(new OptionsTransformer())
-        ;
-
+            ->addModelTransformer(new OptionsTransformer());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['isSortable']     = true;
         $view->vars['addValueButton'] = 'mautic.core.form.list.additem';

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
 * @copyright   2019 Mautic, Inc. All rights reserved
 * @author      Mautic, Inc.
@@ -20,9 +22,10 @@ class OptionsTransformer implements DataTransformerInterface
 {
     /**
      * @param PersistentCollection|CustomFieldOption[] $value
-     * {@inheritdoc}
+     *
+     * @return string[]
      */
-    public function transform($value)
+    public function transform($value): array
     {
         if (!$value || !$value->count()) {
             return ['list' => []];
@@ -34,23 +37,26 @@ class OptionsTransformer implements DataTransformerInterface
             $return[] = $option;
         }
 
-        return  [
+        return [
             'list' => $return,
         ];
     }
 
     /**
-     * {@inheritdoc}
+     * @param string[] $value
+     *
+     * @return ArrayCollection
      */
-    public function reverseTransform($value)
+    public function reverseTransform($value): ArrayCollection
     {
         $values = [];
 
-        /** @var CustomFieldOption $option */
+        /** @var CustomFieldOption|array $option */
         foreach ($value['list'] as $key => $option) {
             if (is_array($option)) {
                 // Remove incomplete options (missing label or value) represented as array, not CustomFieldOption
                 unset($value['list'][$key]);
+
                 continue;
             }
 

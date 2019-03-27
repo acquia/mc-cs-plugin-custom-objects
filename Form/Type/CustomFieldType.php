@@ -78,7 +78,7 @@ class CustomFieldType extends AbstractType
         $this->customFieldTypeProvider    = $customFieldTypeProvider;
         $this->paramsToStringTransformer  = $paramsToStringTransformer;
         $this->optionsToStringTransformer = $optionsToStringTransformer;
-        $this->customFieldFactory = $customFieldFactory;
+        $this->customFieldFactory         = $customFieldFactory;
     }
 
     /**
@@ -142,9 +142,10 @@ class CustomFieldType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class'         => CustomField::class,
-                'empty_data'         => function (FormInterface $form) use ($factory){
+                'empty_data'         => function (FormInterface $form) use ($factory) {
                     $type = $form->get('type')->getData();
                     $customObject = $form->get('customObject')->getData();
+
                     return $factory->create($type, $customObject);
                 },
                 'custom_object_form' => false, // Is form used as subform?
