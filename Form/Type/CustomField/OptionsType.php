@@ -18,6 +18,7 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class OptionsType extends AbstractType
 {
@@ -43,6 +44,10 @@ class OptionsType extends AbstractType
                                 'onclick' => 'Mautic.removeFormListOption(this);',
                             ],
                             'postaddon' => 'fa fa-ellipsis-v handle',
+                        ],
+                        'constraints'    => [
+                            // @todo Not working, removing in OptionsTransformer
+                            new NotBlank(['message' => 'mautic.form.lists.notblank'])
                         ],
                         'error_bubbling' => true,
                     ],
