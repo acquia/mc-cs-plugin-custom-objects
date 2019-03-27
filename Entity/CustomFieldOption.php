@@ -37,6 +37,11 @@ class CustomFieldOption implements \ArrayAccess
     private $value;
 
     /**
+     * @var int|null
+     */
+    private $order;
+
+    /**
      * @param mixed[] $option
      */
     public function __construct(array $option = [])
@@ -55,6 +60,7 @@ class CustomFieldOption implements \ArrayAccess
             'customField' => $this->customField ? $this->customField->getId() : null,
             'label'       => $this->label,
             'value'       => $this->value,
+            'order'       => $this->order,
         ];
 
         return array_filter($return);
@@ -82,6 +88,11 @@ class CustomFieldOption implements \ArrayAccess
             ->build();
 
         $builder->addField('label', Type::STRING);
+
+        $builder->createField('order', 'integer')
+            ->columnName('option_order')
+            ->nullable()
+            ->build();
     }
 
     /**
@@ -139,6 +150,22 @@ class CustomFieldOption implements \ArrayAccess
     public function setValue(string $value): void
     {
         $this->value = $value;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getOrder(): ?int
+    {
+        return $this->order;
+    }
+
+    /**
+     * @param int|null $order
+     */
+    public function setOrder(?int $order): void
+    {
+        $this->order = $order;
     }
 
     /**
