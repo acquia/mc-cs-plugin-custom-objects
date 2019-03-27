@@ -53,11 +53,6 @@ class OptionsType extends AbstractType
                 ]
             )
             ->addModelTransformer(new OptionsTransformer())
-//            ->setDataMapper(
-//                new PropertyPathMapper(
-//                    new OptionsPropertyAccessor([ 'options' => 'list' ])
-//                )
-//            )
         ;
 
     }

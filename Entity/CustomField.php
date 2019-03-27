@@ -334,10 +334,15 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param CustomFieldOption $option
+     * @param CustomFieldOption|array $option
      */
-    public function addOption(CustomFieldOption $option): void
+    public function addOption($option): void
     {
+        if (is_array($option)) {
+            $option = new CustomFieldOption($option);
+            $option->setCustomField($this);
+        }
+
         $this->options->add($option);
     }
 
