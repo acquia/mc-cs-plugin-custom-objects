@@ -49,7 +49,7 @@ class OptionsTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value): ArrayCollection
     {
-        $values = [];
+        $values  = [];
         $options = [];
 
         /** @var CustomFieldOption|array $option */
@@ -74,7 +74,7 @@ class OptionsTransformer implements DataTransformerInterface
                 continue;
             }
 
-            $values[] = $option->getValue();
+            $values[]  = $option->getValue();
             $options[] = $option;
         }
 
