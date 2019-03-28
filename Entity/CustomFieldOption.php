@@ -128,7 +128,7 @@ class CustomFieldOption implements \ArrayAccess
      */
     public function getLabel(): string
     {
-        return $this->label;
+        return (string) $this->label;
     }
 
     /**
@@ -144,7 +144,7 @@ class CustomFieldOption implements \ArrayAccess
      */
     public function getValue(): string
     {
-        return $this->value;
+        return (string) $this->value;
     }
 
     /**
