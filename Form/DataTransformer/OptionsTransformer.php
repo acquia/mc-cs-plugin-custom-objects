@@ -50,10 +50,17 @@ class OptionsTransformer implements DataTransformerInterface
     public function reverseTransform($value): ArrayCollection
     {
         $values = [];
+        $options = [];
 
         /** @var CustomFieldOption|array $option */
         foreach ($value['list'] as $key => $option) {
             if (is_array($option)) {
+                // Newly created option
+                $option = new CustomFieldOption($option);
+                $option->setOrder($key);
+            }
+
+            if (!$option->getLabel() || !$option->getValue()) {
                 // Remove incomplete options (missing label or value) represented as array, not CustomFieldOption
                 unset($value['list'][$key]);
 
@@ -63,15 +70,14 @@ class OptionsTransformer implements DataTransformerInterface
             if (in_array($option->getValue(), $values, false)) {
                 // Remove options with the same value as invalid
                 unset($value['list'][$key]);
+
+                continue;
             }
+
+            $values[] = $option->getValue();
+            $options[] = $option;
         }
 
-        if (count($value['list'])) {
-            $collection = new ArrayCollection($value['list']);
-        } else {
-            $collection = new ArrayCollection();
-        }
-
-        return $collection;
+        return new ArrayCollection($options);
     }
 }
