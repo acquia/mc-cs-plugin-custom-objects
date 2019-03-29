@@ -15,7 +15,9 @@ namespace MauticPlugin\CustomObjectsBundle\Form\DataTransformer;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\SerializerInterface;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException as NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use Symfony\Component\Form\DataTransformerInterface;
 
@@ -30,6 +32,11 @@ class OptionsToStringTransformer implements DataTransformerInterface
      * @var CustomFieldModel
      */
     private $customFieldModel;
+
+    /**
+     * @var CustomField[];
+     */
+    private $customFieldCache = [];
 
     /**
      * @param SerializerInterface $serializer
@@ -75,10 +82,25 @@ class OptionsToStringTransformer implements DataTransformerInterface
         $options = json_decode($options, true);
 
         foreach ($options as $key => $option) {
-            $option['customField'] = $this->customFieldModel->fetchEntity($option['customField']);
+            $option['customField'] = $this->fetchCustomFieldById($option['customField']);
             $options[$key]         = new CustomFieldOption($option);
         }
 
         return new ArrayCollection($options);
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return CustomField
+     * @throws NotFoundException
+     */
+    private function fetchCustomFieldById(int $id): CustomField
+    {
+        if(!array_key_exists($id, $this->customFieldCache)) {
+            $this->customFieldCache[$id] = $this->customFieldModel->fetchEntity($id);
+        }
+
+        return $this->customFieldCache[$id];
     }
 }
