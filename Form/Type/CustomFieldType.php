@@ -137,12 +137,10 @@ class CustomFieldType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver): void
     {
-        $factory = $this->customFieldFactory;
-
         $resolver->setDefaults(
             [
                 'data_class'         => CustomField::class,
-                'empty_data'         => function (FormInterface $form) use ($factory) {
+                'empty_data'         => function (FormInterface $form) {
                     $type = $form->get('type')->getData();
                     $customObject = $form->get('customObject')->getData();
 
