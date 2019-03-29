@@ -31,14 +31,14 @@ class OptionsTransformer implements DataTransformerInterface
             return ['list' => []];
         }
 
-        $return = [];
+        $optionList = [];
 
         foreach ($value as $option) {
-            $return[] = $option;
+            $optionList[] = $option;
         }
 
         return [
-            'list' => $return,
+            'list' => $optionList,
         ];
     }
 
