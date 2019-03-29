@@ -146,7 +146,7 @@ class CustomFieldType extends AbstractType
                     $type = $form->get('type')->getData();
                     $customObject = $form->get('customObject')->getData();
 
-                    return $factory->create($type, $customObject);
+                    return $this->customFieldFactory->create($type, $customObject);
                 },
                 'custom_object_form' => false, // Is form used as subform?
                 'csrf_protection'    => false,
