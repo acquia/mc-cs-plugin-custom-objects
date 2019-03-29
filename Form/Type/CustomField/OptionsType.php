@@ -47,10 +47,6 @@ class OptionsType extends AbstractType
                             ],
                             'postaddon' => 'fa fa-ellipsis-v handle',
                         ],
-                        'constraints'    => [
-                            // @todo Not working, removing in OptionsTransformer
-                            new NotBlank(['message' => 'mautic.form.lists.notblank']),
-                        ],
                         'error_bubbling' => true,
                     ],
                     'allow_add'      => true,
