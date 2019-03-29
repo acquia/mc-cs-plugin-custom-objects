@@ -51,14 +51,16 @@ class ParamsType extends AbstractType
             ]
         );
 
-        $builder->add(
-            'allowMultiple',
-            YesNoButtonGroupType::class,
-            [
-                'label'      => 'custom.field.label.allow_multiple',
-                'required'   => false,
-            ]
-        );
+        if ($options['has_choices']) {
+            $builder->add(
+                'allowMultiple',
+                YesNoButtonGroupType::class,
+                [
+                    'label'      => 'custom.field.label.allow_multiple',
+                    'required'   => false,
+                ]
+            );
+        }
     }
 
     /**
@@ -71,6 +73,7 @@ class ParamsType extends AbstractType
                 'data_class'         => Params::class,
                 'custom_object_form' => false,
                 'csrf_protection'    => false,
+                'has_choices'        => false,
             ]
         );
     }

@@ -19,7 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 return [
     'name'        => 'Custom Objects',
     'description' => 'Adds custom objects and fields features to Mautic',
-    'version'     => '0.0.6',
+    'version'     => '0.0.7',
     'author'      => 'Mautic, Inc.',
 
     'routes' => [
@@ -535,6 +535,12 @@ return [
                     'event_dispatcher',
                 ],
             ],
+            'mautic.custom.model.field.option' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomFieldOptionModel::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
             'mautic.custom.model.object' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel::class,
                 'arguments' => [
@@ -619,6 +625,9 @@ return [
             // So subscriber above should contain subscriber method below. But it is not possible now.
             'custom_field.pre_save.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldPreSaveSubscriber::class,
+                'arguments' => [
+                    'mautic.custom.model.field.option'
+                ]
             ],
             'custom_item.button.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomItemButtonSubscriber::class,
@@ -712,6 +721,8 @@ return [
                     'custom_object.repository',
                     'custom_field.type.provider',
                     'custom_field.field.params.to.string.transformer',
+                    'custom_field.field.options.to.string.transformer',
+                    'custom_object.custom_field_factory',
                 ],
                 'tag' => 'form.type',
             ],
@@ -724,7 +735,8 @@ return [
             'custom_field.field.options.to.string.transformer' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsToStringTransformer::class,
                 'arguments' => [
-                    'jms_serializer'
+                    'jms_serializer',
+                    'mautic.custom.model.field'
                 ],
             ],
             'custom_object.object.form' => [

@@ -142,7 +142,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
             ->build();
 
         $builder->createOneToMany('options', CustomFieldOption::class)
-            ->setOrderBy(['label' => 'ASC'])
+            ->setOrderBy(['order' => 'ASC'])
             ->mappedBy('customField')
             ->cascadePersist()
             ->fetchExtraLazy()
@@ -334,10 +334,16 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param CustomFieldOption $option
+     * @param CustomFieldOption|string[] $option
      */
-    public function addOption(CustomFieldOption $option): void
+    public function addOption($option): void
     {
+        if (is_array($option)) {
+            $option = new CustomFieldOption($option);
+            $option->setCustomField($this);
+        }
+
+        $option->setOrder($this->options->count());
         $this->options->add($option);
     }
 

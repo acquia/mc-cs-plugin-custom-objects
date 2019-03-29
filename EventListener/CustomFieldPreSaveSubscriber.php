@@ -16,6 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
+use MauticPlugin\CustomObjectsBundle\Model\CustomFieldOptionModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 
@@ -24,6 +25,21 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
  */
 class CustomFieldPreSaveSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var CustomFieldOptionModel
+     */
+    private $customFieldOptionModel;
+
+    /**
+     * CustomFieldPreSaveSubscriber constructor.
+     *
+     * @param CustomFieldOptionModel $customFieldOptionModel
+     */
+    public function __construct(CustomFieldOptionModel $customFieldOptionModel)
+    {
+        $this->customFieldOptionModel = $customFieldOptionModel;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -43,6 +59,10 @@ class CustomFieldPreSaveSubscriber implements EventSubscriberInterface
     {
         $event->getCustomObject()->getCustomFields()->map(
             function (CustomField $customField): void {
+                if ($customField->getId()) {
+                    $this->customFieldOptionModel->deleteByCustomFieldId($customField->getId());
+                }
+
                 $params = $customField->getParams();
 
                 if ($params instanceof Params) {
