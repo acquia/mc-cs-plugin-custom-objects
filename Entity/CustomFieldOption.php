@@ -91,6 +91,7 @@ class CustomFieldOption implements \ArrayAccess
 
         $builder->createField('order', 'integer')
             ->columnName('option_order')
+            ->option('unsigned', true)
             ->nullable()
             ->build();
     }
