@@ -17,7 +17,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\SerializerInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException as NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use Symfony\Component\Form\DataTransformerInterface;
 
@@ -93,11 +93,12 @@ class OptionsToStringTransformer implements DataTransformerInterface
      * @param int $id
      *
      * @return CustomField
+     *
      * @throws NotFoundException
      */
     private function fetchCustomFieldById(int $id): CustomField
     {
-        if(!array_key_exists($id, $this->customFieldCache)) {
+        if (!array_key_exists($id, $this->customFieldCache)) {
             $this->customFieldCache[$id] = $this->customFieldModel->fetchEntity($id);
         }
 

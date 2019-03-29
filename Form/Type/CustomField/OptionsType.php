@@ -20,7 +20,6 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Validator\Constraints\NotBlank;
 
 class OptionsType extends AbstractType
 {
