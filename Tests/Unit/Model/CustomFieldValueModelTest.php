@@ -27,6 +27,8 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use Doctrine\ORM\AbstractQuery;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
 {
@@ -38,6 +40,8 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
     private $queryBuilder;
     private $statement;
     private $customFieldValueModel;
+    private $validator;
+    private $violationList;
 
     protected function setUp(): void
     {
@@ -52,8 +56,11 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
         $this->connection            = $this->createMock(Connection::class);
         $this->queryBuilder          = $this->createMock(QueryBuilder::class);
         $this->statement             = $this->createMock(Statement::class);
+        $this->validator             = $this->createMock(ValidatorInterface::class);
+        $this->violationList         = $this->createMock(ConstraintViolationListInterface::class);
         $this->customFieldValueModel = new CustomFieldValueModel(
-            $this->entityManager
+            $this->entityManager,
+            $this->validator
         );
     }
 
@@ -225,6 +232,11 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
             ->method('merge')
             ->with($customFieldValue);
 
+        $this->validator->expects($this->once())
+            ->method('validate')
+            ->with($customFieldValue)
+            ->willReturn($this->violationList);
+
         $this->customFieldValueModel->save($customFieldValue);
     }
 
@@ -247,6 +259,11 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
         $this->entityManager->expects($this->once())
             ->method('persist')
             ->with($customFieldValue);
+
+        $this->validator->expects($this->once())
+            ->method('validate')
+            ->with($customFieldValue)
+            ->willReturn($this->violationList);
 
         $this->customFieldValueModel->save($customFieldValue);
     }
@@ -300,6 +317,11 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
         $this->entityManager->expects($this->exactly(2))
             ->method('persist')
             ->with($customFieldValue);
+
+        $this->validator->expects($this->exactly(2))
+            ->method('validate')
+            ->with($customFieldValue)
+            ->willReturn($this->violationList);
 
         $this->customFieldValueModel->save($customFieldValue);
     }
