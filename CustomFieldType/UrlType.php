@@ -13,6 +13,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
+use Symfony\Component\Validator\Constraints\UrlValidator;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Constraints\Url;
+
 class UrlType extends AbstractTextType
 {
     /**
@@ -31,5 +35,19 @@ class UrlType extends AbstractTextType
     public function getSymfonyFormFieldType(): string
     {
         return \Symfony\Component\Form\Extension\Core\Type\UrlType::class;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function validateValue($value = null, ExecutionContextInterface $context): void
+    {
+        if (empty($value)) {
+            return;
+        }
+
+        $validator = new UrlValidator();
+        $validator->initialize($context);
+        $validator->validate($value, new Url());
     }
 }
