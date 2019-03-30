@@ -13,6 +13,11 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\EmailBundle\Helper\EmailValidator;
+use Mautic\EmailBundle\Exception\InvalidEmailException;
+
 class EmailType extends AbstractTextType
 {
     /**
@@ -24,6 +29,21 @@ class EmailType extends AbstractTextType
      * @var string
      */
     protected $key = 'email';
+    /**
+     * @var EmailValidator
+     */
+    private $emailValidator;
+
+    /**
+     * @param TranslatorInterface $translator
+     * @param EmailValidator      $emailValidator
+     */
+    public function __construct(TranslatorInterface $translator, EmailValidator $emailValidator)
+    {
+        parent::__construct($translator);
+
+        $this->emailValidator = $emailValidator;
+    }
 
     /**
      * @return string
@@ -31,5 +51,23 @@ class EmailType extends AbstractTextType
     public function getSymfonyFormFieldType(): string
     {
         return \Symfony\Component\Form\Extension\Core\Type\EmailType::class;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function validateValue($value = null, ExecutionContextInterface $context): void
+    {
+        if (empty($value)) {
+            return;
+        }
+
+        try {
+            $this->emailValidator->validate($value);
+        } catch (InvalidEmailException $e) {
+            $context->buildViolation($e->getMessage())
+                ->atPath('value')
+                ->addViolation();
+        }
     }
 }
