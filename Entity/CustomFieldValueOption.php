@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Doctrine\DBAL\Types\Type;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Table for multiselect/checkbox option values.
@@ -61,17 +62,29 @@ class CustomFieldValueOption extends CustomFieldValueStandard
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        die('ddd');
-        $metadata->addPropertyConstraint('value', new Assert\Choice([
-            'callback' => 'getOptionValues',
-        ]));
+        $metadata->addConstraint(new Assert\Callback('validateOptionValueExists'));
     }
 
-    public function getOptionValues(): array
+    /**
+     * Validate whether the value exists also as the option value.
+     *
+     * @param ExecutionContextInterface $context
+     */
+    public function validateOptionValueExists(ExecutionContextInterface $context): void
     {
-        $options = $this->getCustomField()->getOptions();
+        $customField = $this->getCustomField();
+        $valueExists = $customField->getOptions()->exists(function (int $key, CustomFieldOption $option) {
+            return $this->getValue() === $option->getValue();
+        });
 
-        return $options;
+        if (!$valueExists) {
+            $possibleValues = implode(', ', $customField->getOptions()->map(function (CustomFieldOption $option) {
+                return $option->getValue();
+            })->getValues());
+            $context->buildViolation("Value '{$this->getValue()}' does not exist in the list of options of field '{$customField->getLabel()}' ({$customField->getId()}). Possible values: {$possibleValues}")
+                ->atPath('value')
+                ->addViolation();
+        }
     }
 
     /**
