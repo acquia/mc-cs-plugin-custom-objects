@@ -83,7 +83,7 @@ class CustomFieldValueOptionTest extends \PHPUnit_Framework_TestCase
         $option       = new CustomFieldOption();
         $context      = $this->createMock(ExecutionContextInterface::class);
         $constraint   = $this->createMock(ConstraintViolationBuilderInterface::class);
-        
+
         $customField->setTypeObject(new SelectType($this->createMock(TranslatorInterface::class)));
 
         $option->setValue('red');
