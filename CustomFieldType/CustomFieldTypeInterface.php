@@ -35,9 +35,18 @@ interface CustomFieldTypeInterface
     public function getKey(): string;
 
     /**
+     * Symfony form field representing this custom field.
+     *
      * @return string
      */
     public function getSymfonyFormFieldType(): string;
+
+    /**
+     * Has this field multiple choicesS?
+     *
+     * @return bool
+     */
+    public function hasChoices(): bool;
 
     /**
      * @return string

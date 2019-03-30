@@ -19,13 +19,8 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-class CustomFieldOption
+class CustomFieldOption implements \ArrayAccess
 {
-    /**
-     * @var int|null
-     */
-    private $id;
-
     /**
      * @var CustomField|null
      */
@@ -40,6 +35,11 @@ class CustomFieldOption
      * @var string|null
      */
     private $value;
+
+    /**
+     * @var int|null
+     */
+    private $order;
 
     /**
      * @param mixed[] $option
@@ -57,10 +57,10 @@ class CustomFieldOption
     public function __toArray(): array
     {
         $return = [
-            'id'          => $this->id,
             'customField' => $this->customField ? $this->customField->getId() : null,
             'label'       => $this->label,
             'value'       => $this->value,
+            'order'       => $this->order,
         ];
 
         return array_filter($return);
@@ -88,6 +88,12 @@ class CustomFieldOption
             ->build();
 
         $builder->addField('label', Type::STRING);
+
+        $builder->createField('order', 'integer')
+            ->columnName('option_order')
+            ->option('unsigned', true)
+            ->nullable()
+            ->build();
     }
 
     /**
@@ -97,22 +103,9 @@ class CustomFieldOption
     {
         $metadata->addPropertyConstraint('label', new Assert\NotBlank());
         $metadata->addPropertyConstraint('label', new Assert\Length(['max' => 255]));
-    }
-
-    /**
-     * @param int|null $id
-     */
-    public function setId(?int $id): void
-    {
-        $this->id = $id;
-    }
-
-    /**
-     * @return int|null Null when it is filled as new entity with PropertyAccessor
-     */
-    public function getId(): ?int
-    {
-        return $this->id;
+        $metadata->addPropertyConstraint('value', new Assert\NotBlank());
+        $metadata->addPropertyConstraint('value', new Assert\Length(['max' => 255]));
+        $metadata->addPropertyConstraint('order', new Assert\NotNull());
     }
 
     /**
@@ -136,7 +129,7 @@ class CustomFieldOption
      */
     public function getLabel(): string
     {
-        return $this->label;
+        return (string) $this->label;
     }
 
     /**
@@ -152,7 +145,7 @@ class CustomFieldOption
      */
     public function getValue(): string
     {
-        return $this->value;
+        return (string) $this->value;
     }
 
     /**
@@ -161,5 +154,53 @@ class CustomFieldOption
     public function setValue(string $value): void
     {
         $this->value = $value;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getOrder(): ?int
+    {
+        return $this->order;
+    }
+
+    /**
+     * @param int|null $order
+     */
+    public function setOrder(?int $order): void
+    {
+        $this->order = $order;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offsetExists($offset)
+    {
+        return isset($this->{$offset});
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offsetGet($offset)
+    {
+        return $this->offsetExists($offset) ? $this->{$offset} : null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offsetSet($offset, $value)
+    {
+        $this->{$offset} = $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offsetUnset($offset)
+    {
+        $this->{$offset} = null;
     }
 }

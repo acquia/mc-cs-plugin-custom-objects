@@ -158,6 +158,11 @@ class SaveController extends CommonController
      */
     private function buildSuccessForm(CustomObject $customObject, CustomField $customField): JsonResponse
     {
+        foreach ($customField->getOptions() as $option) {
+            // Custom field relationship is missing when creating new options
+            $option->setCustomField($customField);
+        }
+
         $customFieldForm = $this->formFactory->create(
             CustomFieldType::class,
             $customField,

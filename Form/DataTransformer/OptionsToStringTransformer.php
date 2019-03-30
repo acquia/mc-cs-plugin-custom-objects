@@ -15,7 +15,10 @@ namespace MauticPlugin\CustomObjectsBundle\Form\DataTransformer;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\SerializerInterface;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use Symfony\Component\Form\DataTransformerInterface;
 
 class OptionsToStringTransformer implements DataTransformerInterface
@@ -26,15 +29,27 @@ class OptionsToStringTransformer implements DataTransformerInterface
     private $serializer;
 
     /**
-     * @param SerializerInterface $serializer
+     * @var CustomFieldModel
      */
-    public function __construct(SerializerInterface $serializer)
+    private $customFieldModel;
+
+    /**
+     * @var CustomField[];
+     */
+    private $customFieldCache = [];
+
+    /**
+     * @param SerializerInterface $serializer
+     * @param CustomFieldModel    $customFieldModel
+     */
+    public function __construct(SerializerInterface $serializer, CustomFieldModel $customFieldModel)
     {
-        $this->serializer = $serializer;
+        $this->serializer       = $serializer;
+        $this->customFieldModel = $customFieldModel;
     }
 
     /**
-     * Transforms an object (CustomFieldOption) to a string (json).
+     * Transforms a collection of objects (CustomFieldOption[]) to a string (json).
      *
      * @param ArrayCollection|CustomFieldOption[]|null $options
      *
@@ -56,7 +71,7 @@ class OptionsToStringTransformer implements DataTransformerInterface
     }
 
     /**
-     * Transforms a string (json) to an object (CustomFieldOption).
+     * Transforms a string (json) to an objects (CustomFieldOption[]).
      *
      * @param string $options
      *
@@ -67,10 +82,26 @@ class OptionsToStringTransformer implements DataTransformerInterface
         $options = json_decode($options, true);
 
         foreach ($options as $key => $option) {
-            // @todo CustomField handling and test when adding & editing custom field
-            $options[$key] = new CustomFieldOption($option);
+            $option['customField'] = $this->fetchCustomFieldById($option['customField']);
+            $options[$key]         = new CustomFieldOption($option);
         }
 
         return new ArrayCollection($options);
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return CustomField
+     *
+     * @throws NotFoundException
+     */
+    private function fetchCustomFieldById(int $id): CustomField
+    {
+        if (!array_key_exists($id, $this->customFieldCache)) {
+            $this->customFieldCache[$id] = $this->customFieldModel->fetchEntity($id);
+        }
+
+        return $this->customFieldCache[$id];
     }
 }

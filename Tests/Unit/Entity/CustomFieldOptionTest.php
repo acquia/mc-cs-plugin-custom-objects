@@ -20,16 +20,16 @@ class CustomFieldOptionTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructorAndToArray()
     {
-        $id          = 1;
         $customField = new CustomField();
         $label       = 'label';
         $value       = 'value';
+        $order       = 1;
 
         $optionArray = [
-            'id'          => $id,
             'customField' => $customField,
             'label'       => $label,
             'value'       => $value,
+            'order'       => $order,
         ];
 
         $option = new CustomFieldOption($optionArray);
@@ -52,14 +52,13 @@ class CustomFieldOptionTest extends \PHPUnit_Framework_TestCase
         $option->setValue($value);
         $this->assertSame($value, $option->getValue());
 
-        $id = 30;
-        $this->assertNull($option->getId());
-        $option->setId($id);
-        $this->assertSame($id, $option->getId());
-
         $customField = new CustomField();
         $this->assertNull($option->getCustomField());
         $option->setCustomField($customField);
         $this->assertSame($customField, $option->getCustomField());
+
+        $order = 1;
+        $option->setOrder($order);
+        $this->assertSame($order, $option->getOrder());
     }
 }

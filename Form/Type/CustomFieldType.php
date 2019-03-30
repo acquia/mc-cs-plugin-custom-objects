@@ -14,20 +14,22 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
-use MauticPlugin\CustomObjectsBundle\Form\CustomObjectHiddenTransformer;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
+use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\CustomObjectHiddenTransformer;
+use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsToStringTransformer;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransformer;
-use MauticPlugin\CustomObjectsBundle\Form\Type\CustomField\OptionType;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CustomField\OptionsType;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomField\ParamsType;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 
@@ -49,18 +51,34 @@ class CustomFieldType extends AbstractType
     private $paramsToStringTransformer;
 
     /**
-     * @param CustomObjectRepository    $customObjectRepository
-     * @param CustomFieldTypeProvider   $customFieldTypeProvider
-     * @param ParamsToStringTransformer $paramsToStringTransformer
+     * @var OptionsToStringTransformer
+     */
+    private $optionsToStringTransformer;
+
+    /**
+     * @var CustomFieldFactory
+     */
+    private $customFieldFactory;
+
+    /**
+     * @param CustomObjectRepository     $customObjectRepository
+     * @param CustomFieldTypeProvider    $customFieldTypeProvider
+     * @param ParamsToStringTransformer  $paramsToStringTransformer
+     * @param OptionsToStringTransformer $optionsToStringTransformer
+     * @param CustomFieldFactory         $customFieldFactory
      */
     public function __construct(
         CustomObjectRepository $customObjectRepository,
         CustomFieldTypeProvider $customFieldTypeProvider,
-        ParamsToStringTransformer $paramsToStringTransformer
+        ParamsToStringTransformer $paramsToStringTransformer,
+        OptionsToStringTransformer $optionsToStringTransformer,
+        CustomFieldFactory $customFieldFactory
     ) {
         $this->customObjectRepository     = $customObjectRepository;
         $this->customFieldTypeProvider    = $customFieldTypeProvider;
         $this->paramsToStringTransformer  = $paramsToStringTransformer;
+        $this->optionsToStringTransformer = $optionsToStringTransformer;
+        $this->customFieldFactory         = $customFieldFactory;
     }
 
     /**
@@ -122,6 +140,12 @@ class CustomFieldType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class'         => CustomField::class,
+                'empty_data'         => function (FormInterface $form) {
+                    $type = $form->get('type')->getData();
+                    $customObject = $form->get('customObject')->getData();
+
+                    return $this->customFieldFactory->create($type, $customObject);
+                },
                 'custom_object_form' => false, // Is form used as subform?
                 'csrf_protection'    => false,
                 'allow_extra_fields' => true,
@@ -135,7 +159,7 @@ class CustomFieldType extends AbstractType
      * @param FormBuilderInterface $builder
      * @param mixed[]              $options
      */
-    public function buildModalFormFields(FormBuilderInterface $builder, array $options): void
+    private function buildModalFormFields(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'label',
@@ -151,24 +175,6 @@ class CustomFieldType extends AbstractType
         );
 
         $builder->add(
-            'params',
-            ParamsType::class
-        );
-
-        $builder->add(
-            'options',
-            CollectionType::class,
-            [
-                'mapped'       => false,
-                'allow_add'    => true,
-                'allow_delete' => true,
-                'delete_empty' => true,
-                'entry_type'   => OptionType::class,
-                'prototype'    => true,
-            ]
-        );
-
-        $builder->add(
             'required',
             YesNoButtonGroupType::class,
             [
@@ -180,6 +186,7 @@ class CustomFieldType extends AbstractType
             /** @var CustomField $customField */
             $customField = $event->getData();
             $form = $event->getForm();
+            $hasChoices = $customField->getTypeObject()->hasChoices();
 
             $form->add(
                 'defaultValue',
@@ -194,6 +201,21 @@ class CustomFieldType extends AbstractType
                     ]
                 )
             );
+
+            $form->add(
+                'params',
+                ParamsType::class,
+                [
+                    'has_choices' => $hasChoices,
+                ]
+            );
+
+            if ($hasChoices) {
+                $form->add(
+                    'options',
+                    OptionsType::class
+                );
+            }
         });
 
         $builder->add(
@@ -271,6 +293,15 @@ class CustomFieldType extends AbstractType
                 HiddenType::class
             )
                 ->addModelTransformer($this->paramsToStringTransformer)
+        );
+
+        // @todo This breaks saving of CO
+        $builder->add(
+            $builder->create(
+                'options',
+                HiddenType::class
+            )
+                ->addModelTransformer($this->optionsToStringTransformer)
         );
 
         // Possibility to mark field as deleted in POST data
