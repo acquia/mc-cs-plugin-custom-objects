@@ -103,7 +103,7 @@ class CustomFieldOption implements \ArrayAccess
     {
         $metadata->addPropertyConstraint('label', new Assert\NotBlank());
         $metadata->addPropertyConstraint('label', new Assert\Length(['max' => 255]));
-        $metadata->addPropertyConstraint('value', new Assert\NotBlank());
+        $metadata->addPropertyConstraint('value', new Assert\NotNull());
         $metadata->addPropertyConstraint('value', new Assert\Length(['max' => 255]));
         $metadata->addPropertyConstraint('order', new Assert\NotNull());
     }

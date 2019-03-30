@@ -34,6 +34,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
+use MauticPlugin\CustomObjectsBundle\Helper\RandomHelper;
 
 class ImportSubscriberTest extends KernelTestCase
 {
@@ -156,7 +157,38 @@ class ImportSubscriberTest extends KernelTestCase
         });
 
         $this->assertSame($insertId, $updatedCustomItem->getId());
+
+        // Lets do some validation tests with the same database to save some test runtime.
+        $this->testSelectValidationWithUndefinedOptionValue($customObject, $csvRow);
+        // $this->testMultiselectValidationWithTooLongValue($customObject, $csvRow);
     }
+
+    /**
+     * Try to save a multiselect option that does not exist.
+     *
+     * @param CustomObject $customObject
+     * @param string[]     $csvRow
+     */
+    private function testSelectValidationWithUndefinedOptionValue(CustomObject $customObject, array $csvRow): void
+    {
+        $csvRow['multiselect'] = 'unicorn';
+
+        $this->importCsvRow($customObject, $csvRow);
+    }
+
+    /**
+     * Try to save a multiselect option that does not exist.
+     *
+     * @param CustomObject $customObject
+     * @param string[]     $csvRow
+     */
+    // private function testMultiselectValidationWithTooLongValue(CustomObject $customObject, array $csvRow): void
+    // {
+    //     $stringLegth = 300;
+    //     $csvRow['multiselect'] = (new RandomHelper)->getString($stringLegth);
+
+    //     $this->importCsvRow($customObject, $csvRow);
+    // }
 
     /**
      * @param CustomObject $customObject

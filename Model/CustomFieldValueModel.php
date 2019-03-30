@@ -20,6 +20,8 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
 
 class CustomFieldValueModel
 {
@@ -29,12 +31,20 @@ class CustomFieldValueModel
     private $entityManager;
 
     /**
-     * @param EntityManager $entityManager
+     * @var ValidatorInterface
+     */
+    private $validator;
+
+    /**
+     * @param EntityManager      $entityManager
+     * @param ValidatorInterface $validator
      */
     public function __construct(
-        EntityManager $entityManager
+        EntityManager $entityManager,
+        ValidatorInterface $validator
     ) {
         $this->entityManager = $entityManager;
+        $this->validator     = $validator;
     }
 
     /**
@@ -73,11 +83,24 @@ class CustomFieldValueModel
             }
             foreach ($options as $optionKey) {
                 $optionValue = clone $customFieldValue;
-                $optionValue->setValue($optionKey);
+                $optionValue->setValue(trim($optionKey));
+
+                $errors = $this->validator->validate($optionValue);
+
+                if ($errors->count() > 0) {
+                    throw new InvalidValueException((string) $errors);
+                }
+
                 $this->entityManager->persist($optionValue);
             }
 
             return;
+        }
+
+        $errors = $this->validator->validate($customFieldValue);
+
+        if ($errors->count() > 0) {
+            throw new InvalidValueException((string) $errors);
         }
 
         if ($customFieldValue->getCustomItem()->getId()) {

@@ -16,6 +16,8 @@ namespace MauticPlugin\CustomObjectsBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Doctrine\DBAL\Types\Type;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Table for multiselect/checkbox option values.
@@ -52,6 +54,24 @@ class CustomFieldValueOption extends CustomFieldValueStandard
         $builder->createField('value', Type::STRING)
             ->makePrimaryKey()
             ->build();
+    }
+
+    /**
+     * @param ClassMetadata $metadata
+     */
+    public static function loadValidatorMetadata(ClassMetadata $metadata): void
+    {
+        die('ddd');
+        $metadata->addPropertyConstraint('value', new Assert\Choice([
+            'callback' => 'getOptionValues',
+        ]));
+    }
+
+    public function getOptionValues(): array
+    {
+        $options = $this->getCustomField()->getOptions();
+
+        return $options;
     }
 
     /**
