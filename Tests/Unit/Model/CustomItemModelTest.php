@@ -34,6 +34,9 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use Mautic\LeadBundle\Entity\Lead;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 class CustomItemModelTest extends \PHPUnit_Framework_TestCase
 {
@@ -160,6 +163,23 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
 
         $this->customItem->expects($this->never())
             ->method('getCustomObject');
+
+        $this->customItemModel->fetchEntity(44);
+    }
+
+    public function testFetchEntityIfNotFound(): void
+    {
+        $this->customItemRepository->expects($this->once())
+            ->method('getEntity')
+            ->willReturn(null);
+
+        $this->customItem->expects($this->never())
+            ->method('getCustomFieldValues');
+
+        $this->customItem->expects($this->never())
+            ->method('getCustomObject');
+
+        $this->expectException(NotFoundException::class);
 
         $this->customItemModel->fetchEntity(44);
     }
@@ -319,5 +339,23 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
             $this->customItem,
             $this->customItemModel->populateCustomFields($this->customItem)
         );
+    }
+
+    public function testCountItemsLinkedToContact(): void
+    {
+        $customObject = $this->createMock(CustomObject::class);
+        $contact      = $this->createMock(Lead::class);
+
+        $this->customItemRepository->expects($this->once())
+            ->method('countItemsLinkedToContact')
+            ->with($customObject, $contact)
+            ->willReturn(33);
+
+        $this->assertSame(33, $this->customItemModel->countItemsLinkedToContact($customObject, $contact));
+    }
+
+    public function testGetPermissionBase(): void
+    {
+        $this->assertSame('custom_objects:custom_objects', $this->customItemModel->getPermissionBase());
     }
 }
