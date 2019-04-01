@@ -1,3 +1,4 @@
+// Custom Object create/edit form handling is here
 // Init stuff on refresh:
 
 Mautic.customObjectOnLoad = function() {
