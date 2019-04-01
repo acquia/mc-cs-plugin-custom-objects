@@ -29,11 +29,6 @@ class Params
     private $emptyValue;
 
     /**
-     * @var bool
-     */
-    private $allowMultiple = false;
-
-    /**
      * @param mixed[] $params
      */
     public function __construct(array $params = [])
@@ -53,7 +48,6 @@ class Params
         $return = [
             'requiredValidationMessage' => $this->requiredValidationMessage,
             'emptyValue'                => $this->emptyValue,
-            'allowMultiple'             => $this->allowMultiple,
         ];
 
         // Remove null and false values as they are default
@@ -90,21 +84,5 @@ class Params
     public function setEmptyValue(?string $emptyValue): void
     {
         $this->emptyValue = $emptyValue;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isAllowMultiple(): bool
-    {
-        return $this->allowMultiple;
-    }
-
-    /**
-     * @param bool $allowMultiple
-     */
-    public function setAllowMultiple(bool $allowMultiple): void
-    {
-        $this->allowMultiple = $allowMultiple;
     }
 }

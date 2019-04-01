@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Form\Type\CustomField;
 
-use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -50,17 +49,6 @@ class ParamsType extends AbstractType
                 ],
             ]
         );
-
-        if ($options['has_choices']) {
-            $builder->add(
-                'allowMultiple',
-                YesNoButtonGroupType::class,
-                [
-                    'label'      => 'custom.field.label.allow_multiple',
-                    'required'   => false,
-                ]
-            );
-        }
     }
 
     /**

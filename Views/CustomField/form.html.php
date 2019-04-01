@@ -81,11 +81,6 @@ $title = $customField->getId() ? $customField->getLabel() : $customField->getTyp
                     <div class="col-md-6">
                         <?php echo $view['form']->row($form['params']['emptyValue']); ?>
                     </div>
-<?php if (isset($form['params']['allowMultiple'])): ?>
-                    <div class="col-md-6">
-                        <?php echo $view['form']->row($form['params']['allowMultiple']); ?>
-                    </div>
-<?php endif; ?>
                 </div>
             </div>
 

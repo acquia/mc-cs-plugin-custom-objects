@@ -21,19 +21,16 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
     {
         $requiredValidationMessage = 'requiredValidationMessage';
         $emptyValue                = 'emptyValue';
-        $allowMultiple             = true;
 
         $paramsArray = [
             'requiredValidationMessage' => $requiredValidationMessage,
             'emptyValue'                => $emptyValue,
-            'allowMultiple'             => $allowMultiple,
         ];
 
         $params = new Params($paramsArray);
 
         $this->assertSame($requiredValidationMessage, $params->getRequiredValidationMessage());
         $this->assertSame($emptyValue, $params->getEmptyValue());
-        $this->assertSame($allowMultiple, $params->isAllowMultiple());
 
         $this->assertSame($paramsArray, $params->__toArray());
     }
@@ -42,12 +39,10 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
     {
         $requiredValidationMessage = 'requiredValidationMessage';
         $emptyValue                = null;
-        $allowMultiple             = false;
 
         $paramsArray = [
             'requiredValidationMessage' => $requiredValidationMessage,
             'emptyValue'                => $emptyValue,
-            'allowMultiple'             => $allowMultiple,
         ];
 
         $params = new Params($paramsArray);
@@ -59,7 +54,6 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
     {
         $requiredValidationMessage = 'requiredValidationMessage';
         $emptyValue                = 'emptyValue';
-        $allowMultiple             = true;
 
         $params = new Params();
 
@@ -68,8 +62,5 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
 
         $params->setEmptyValue($emptyValue);
         $this->assertSame($emptyValue, $params->getEmptyValue());
-
-        $params->setAllowMultiple($allowMultiple);
-        $this->assertSame($allowMultiple, $params->isAllowMultiple());
     }
 }
