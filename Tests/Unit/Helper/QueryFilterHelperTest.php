@@ -25,7 +25,7 @@ class QueryFilterHelperTest extends \PHPUnit_Framework_TestCase
     private $connection;
     private $queryFilterHelper;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

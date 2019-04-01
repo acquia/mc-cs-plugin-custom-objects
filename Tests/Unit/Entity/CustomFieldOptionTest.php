@@ -84,6 +84,5 @@ class CustomFieldOptionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($option['label']);
         $this->assertSame('', $option->getLabel());
-
     }
 }
