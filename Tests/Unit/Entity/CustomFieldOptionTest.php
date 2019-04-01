@@ -52,6 +52,10 @@ class CustomFieldOptionTest extends \PHPUnit_Framework_TestCase
         $option->setValue($value);
         $this->assertSame($value, $option->getValue());
 
+        $order = 3;
+        $option->setOrder($order);
+        $this->assertSame($order, $option->getOrder());
+
         $customField = new CustomField();
         $this->assertNull($option->getCustomField());
         $option->setCustomField($customField);
@@ -60,5 +64,26 @@ class CustomFieldOptionTest extends \PHPUnit_Framework_TestCase
         $order = 1;
         $option->setOrder($order);
         $this->assertSame($order, $option->getOrder());
+    }
+
+    public function testArrayAccessor()
+    {
+        $option = new CustomFieldOption();
+
+        $option->setLabel('label');
+
+        $this->assertSame('label', $option['label']);
+        $this->assertSame('label', $option->getLabel());
+
+        $option['label'] = 'babel';
+
+        $this->assertSame('babel', $option['label']);
+        $this->assertSame('babel', $option->getLabel());
+
+        unset($option['label']);
+
+        $this->assertNull($option['label']);
+        $this->assertSame('', $option->getLabel());
+
     }
 }
