@@ -34,12 +34,4 @@ class RadioGroupType extends SelectType
         'expanded' => true,
         'multiple' => false,
     ];
-
-    /**
-     * @return string
-     */
-    public function getSymfonyFormFieldType(): string
-    {
-        return ChoiceType::class;
-    }
 }

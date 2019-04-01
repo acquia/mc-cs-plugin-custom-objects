@@ -34,12 +34,4 @@ class CheckboxGroupType extends AbstractMultivalueType
         'expanded' => true,
         'multiple' => true,
     ];
-
-    /**
-     * @return string
-     */
-    public function getSymfonyFormFieldType(): string
-    {
-        return ChoiceType::class;
-    }
 }
