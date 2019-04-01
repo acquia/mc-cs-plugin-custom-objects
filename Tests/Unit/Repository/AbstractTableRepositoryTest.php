@@ -17,7 +17,6 @@ use MauticPlugin\CustomObjectsBundle\Repository\AbstractTableRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\DBAL\Connection;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 
 class AbstractTableRepositoryTest extends \PHPUnit_Framework_TestCase
@@ -25,7 +24,6 @@ class AbstractTableRepositoryTest extends \PHPUnit_Framework_TestCase
     private $entityManager;
     private $classMetadata;
     private $queryBuilder;
-    private $connection;
     private $tableConfig;
     private $customTableRepository;
 
@@ -34,10 +32,9 @@ class AbstractTableRepositoryTest extends \PHPUnit_Framework_TestCase
         parent::setUp();
 
         defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
-        
+
         $this->entityManager = $this->createMock(EntityManager::class);
         $this->queryBuilder  = $this->createMock(QueryBuilder::class);
-        $this->connection    = $this->createMock(Connection::class);
         $this->tableConfig   = $this->createMock(TableConfig::class);
         $this->classMetadata = $this->getMockBuilder(ClassMetadata::class)
             ->setConstructorArgs([AbstractTableRepository::class])->getMock();

@@ -76,54 +76,54 @@ class CustomObjectPermissionsTest extends \PHPUnit_Framework_TestCase
         $this->permissions->definePermissions();
 
         $configuredPermissions = $this->permissions->getPermissions();
-        $expectedPermissions = [
+        $expectedPermissions   = [
             'custom_fields' => [
-                'viewown' => 2,
-                'viewother' => 4,
-                'editown' => 8,
-                'editother' => 16,
-                'create' => 32,
-                'deleteown' => 64,
-                'deleteother' => 128,
-                'full' => 1024,
-                'publishown' => 256,
+                'viewown'      => 2,
+                'viewother'    => 4,
+                'editown'      => 8,
+                'editother'    => 16,
+                'create'       => 32,
+                'deleteown'    => 64,
+                'deleteother'  => 128,
+                'full'         => 1024,
+                'publishown'   => 256,
                 'publishother' => 512,
             ],
             'custom_objects' => [
-                'viewown' => 2,
-                'viewother' => 4,
-                'editown' => 8,
-                'editother' => 16,
-                'create' => 32,
-                'deleteown' => 64,
-                'deleteother' => 128,
-                'full' => 1024,
-                'publishown' => 256,
+                'viewown'      => 2,
+                'viewother'    => 4,
+                'editown'      => 8,
+                'editother'    => 16,
+                'create'       => 32,
+                'deleteown'    => 64,
+                'deleteother'  => 128,
+                'full'         => 1024,
+                'publishown'   => 256,
                 'publishother' => 512,
             ],
             45 => [
-                'viewown' => 2,
-                'viewother' => 4,
-                'editown' => 8,
-                'editother' => 16,
-                'create' => 32,
-                'deleteown' => 64,
-                'deleteother' => 128,
-                'full' => 1024,
-                'publishown' => 256,
+                'viewown'      => 2,
+                'viewother'    => 4,
+                'editown'      => 8,
+                'editother'    => 16,
+                'create'       => 32,
+                'deleteown'    => 64,
+                'deleteother'  => 128,
+                'full'         => 1024,
+                'publishown'   => 256,
                 'publishother' => 512,
-            ]
+            ],
         ];
 
         $this->assertSame($expectedPermissions, $configuredPermissions);
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertSame('custom_objects', $this->permissions->getName());
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $this->customObject->expects($this->once())
             ->method('getId')
@@ -156,7 +156,7 @@ class CustomObjectPermissionsTest extends \PHPUnit_Framework_TestCase
         $this->permissions->buildForm($this->formBuilder, [], []);
     }
 
-    public function testIsEnabled()
+    public function testIsEnabled(): void
     {
         $this->assertFalse($this->permissions->isEnabled());
 
