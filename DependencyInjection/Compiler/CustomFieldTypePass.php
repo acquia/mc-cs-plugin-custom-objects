@@ -15,7 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
+use Symfony\Component\DependencyInjection\Definition;
 
 class CustomFieldTypePass implements CompilerPassInterface
 {
@@ -24,7 +24,7 @@ class CustomFieldTypePass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container): void
     {
-        /** @var CustomFieldTypeProvider $customFieldTypeProvider */
+        /** @var Definition $customFieldTypeProvider */
         $customFieldTypeProvider = $container->findDefinition('custom_field.type.provider');
         $customFieldTypeDiKeys   = array_keys($container->findTaggedServiceIds('custom.field.type'));
 
