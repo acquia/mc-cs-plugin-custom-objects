@@ -31,11 +31,6 @@ final class QueryFilterHelper
     private $fieldTypeProvider;
 
     /**
-     * @var string[]
-     */
-    private $fieldTypes = [];
-
-    /**
      * @param CustomFieldTypeProvider $fieldTypeProvider
      */
     public function __construct(CustomFieldTypeProvider $fieldTypeProvider)
@@ -420,7 +415,7 @@ final class QueryFilterHelper
      */
     private function addCustomFieldValueJoin(QueryBuilder $customFieldQueryBuilder, string $alias, string $fieldType): QueryBuilder
     {
-        $dataTable = $this->getTableNameFromFieldType($fieldType);
+        $dataTable = $this->fieldTypeProvider->getType($fieldType)->getTableName();
 
         $customFieldQueryBuilder->leftJoin(
             $alias.'_item',
@@ -429,26 +424,6 @@ final class QueryFilterHelper
             $alias.'_value.custom_item_id = '.$alias.'_item.id');
 
         return $customFieldQueryBuilder;
-    }
-
-    /**
-     * @param string $fieldType
-     *
-     * @return string
-     *
-     * @throws InvalidArgumentException
-     */
-    private function getTableNameFromFieldType(string $fieldType): string
-    {
-        if (!isset($this->fieldTypes[$fieldType])) {
-            $types = $this->fieldTypeProvider->getTypes();
-            if (!isset($types[$fieldType])) {
-                throw new InvalidArgumentException('Invalid custom field type requested: '.$fieldType.', Available: '.join(', ', array_keys($types)));
-            }
-            $this->fieldTypes[$fieldType] = get_class($types[$fieldType]);
-        }
-
-        return $this->fieldTypes[$fieldType]::TABLE_NAME;
     }
 
     /**
