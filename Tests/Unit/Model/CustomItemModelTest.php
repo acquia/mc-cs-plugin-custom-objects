@@ -32,6 +32,8 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\DTO\TableFilterConfig;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Validator\ConstraintViolationListInterface;
 
 class CustomItemModelTest extends \PHPUnit_Framework_TestCase
 {
@@ -55,6 +57,10 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
 
     private $dispatcher;
 
+    private $validator;
+
+    private $violationList;
+
     private $customItemModel;
 
     protected function setUp(): void
@@ -71,13 +77,16 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
         $this->userHelper                   = $this->createMock(UserHelper::class);
         $this->customFieldValueModel        = $this->createMock(CustomFieldValueModel::class);
         $this->dispatcher                   = $this->createMock(EventDispatcherInterface::class);
+        $this->validator                    = $this->createMock(ValidatorInterface::class);
+        $this->violationList                = $this->createMock(ConstraintViolationListInterface::class);
         $this->customItemModel              = new CustomItemModel(
             $this->entityManager,
             $this->customItemRepository,
             $this->customItemPermissionProvider,
             $this->userHelper,
             $this->customFieldValueModel,
-            $this->dispatcher
+            $this->dispatcher,
+            $this->validator
         );
 
         $this->entityManager->method('createQueryBuilder')->willReturn($this->queryBuilder);
@@ -102,6 +111,7 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher->expects($this->at(0))->method('dispatch')->with(CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, $this->isInstanceOf(CustomItemEvent::class));
         $this->entityManager->expects($this->at(1))->method('flush');
         $this->dispatcher->expects($this->at(1))->method('dispatch')->with(CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $this->isInstanceOf(CustomItemEvent::class));
+        $this->validator->expects($this->once())->method('validate')->with($this->customItem)->willReturn($this->violationList);
 
         $this->assertSame($this->customItem, $this->customItemModel->save($this->customItem));
     }
@@ -122,6 +132,7 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher->expects($this->at(0))->method('dispatch')->with(CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, $this->isInstanceOf(CustomItemEvent::class));
         $this->entityManager->expects($this->at(1))->method('flush');
         $this->dispatcher->expects($this->at(1))->method('dispatch')->with(CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $this->isInstanceOf(CustomItemEvent::class));
+        $this->validator->expects($this->once())->method('validate')->with($this->customItem)->willReturn($this->violationList);
 
         $this->assertSame($this->customItem, $this->customItemModel->save($this->customItem));
     }

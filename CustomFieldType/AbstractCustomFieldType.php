@@ -16,6 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
 {
@@ -124,5 +125,12 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
 
         return ChoiceType::class === $type ||
             is_subclass_of($this->getSymfonyFormFieldType(), ChoiceType::class);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function validateValue($value = null, ExecutionContextInterface $context): void
+    {
     }
 }

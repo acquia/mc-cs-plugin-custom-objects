@@ -13,6 +13,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
+use libphonenumber\PhoneNumberUtil;
+use libphonenumber\NumberParseException;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+
 class PhoneType extends AbstractTextType
 {
     /**
@@ -24,4 +28,30 @@ class PhoneType extends AbstractTextType
      * @var string
      */
     protected $key = 'phone';
+
+    /**
+     * {@inheritdoc}
+     */
+    public function validateValue($value = null, ExecutionContextInterface $context): void
+    {
+        if (empty($value)) {
+            return;
+        }
+
+        $phoneUtil = PhoneNumberUtil::getInstance();
+
+        try {
+            $phoneNumber = $phoneUtil->parse($value, PhoneNumberUtil::UNKNOWN_REGION);
+
+            if (false === $phoneUtil->isValidNumber($phoneNumber)) {
+                $context->buildViolation("'{$value} is not valid phone number'")
+                    ->atPath('value')
+                    ->addViolation();
+            }
+        } catch (NumberParseException $e) {
+            $context->buildViolation($e->getMessage())
+                ->atPath('value')
+                ->addViolation();
+        }
+    }
 }

@@ -505,6 +505,7 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomFieldValueModel::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
+                    'validator',
                 ],
             ],
             'mautic.custom.model.item' => [
@@ -516,6 +517,7 @@ return [
                     'mautic.helper.user',
                     'mautic.custom.model.field.value',
                     'event_dispatcher',
+                    'validator',
                 ],
             ],
             'mautic.custom.model.import.item' => [
@@ -801,7 +803,7 @@ return [
             ],
             'custom.field.type.email' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\EmailType::class,
-                'arguments' => ['translator'],
+                'arguments' => ['translator', 'mautic.validator.email'],
                 'tag'       => 'custom.field.type',
             ],
             'custom.field.type.hidden' => [

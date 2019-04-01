@@ -37,6 +37,22 @@ class RandomHelper
     }
 
     /**
+     * @param int $limit
+     *
+     * @return string
+     */
+    public function getString(int $limit): string
+    {
+        $string = '';
+
+        while (strlen($string) <= $limit) {
+            $string .= $this->getWord();
+        }
+
+        return substr($string, 0, $limit);
+    }
+
+    /**
      * @return string
      */
     public function getWord(): string

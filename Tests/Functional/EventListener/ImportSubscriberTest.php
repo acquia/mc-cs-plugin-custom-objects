@@ -34,6 +34,7 @@ use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
 
 class ImportSubscriberTest extends KernelTestCase
 {
@@ -89,7 +90,7 @@ class ImportSubscriberTest extends KernelTestCase
             'html_area'      => '<h1>Hello</h1>',
             'int'            => '3453562',
             'multiselect'    => 'option_b,option_a',
-            'phone'          => '+420111222333',
+            'phone'          => '+420775603019',
             'radio_group'    => 'option_a',
             'select'         => 'option_b',
             'textarea'       => "Some looong\ntext\n\nhere",
@@ -156,6 +157,117 @@ class ImportSubscriberTest extends KernelTestCase
         });
 
         $this->assertSame($insertId, $updatedCustomItem->getId());
+
+        // Lets do some validation tests with the same database to save some test runtime.
+        $this->validateSelectOptionValueExists($customObject, $csvRow);
+        $this->validateDateValue($customObject, $csvRow);
+        $this->validateEmail($customObject, $csvRow);
+        $this->validatePhone($customObject, $csvRow);
+        $this->validateUrl($customObject, $csvRow);
+        $this->validateNameCannotBeEmpty($customObject, $csvRow);
+    }
+
+    /**
+     * Try to save a multiselect option that does not exist.
+     *
+     * @param CustomObject $customObject
+     * @param string[]     $csvRow
+     */
+    private function validateSelectOptionValueExists(CustomObject $customObject, array $csvRow): void
+    {
+        $csvRow['multiselect']    = 'unicorn';
+
+        try {
+            $this->importCsvRow($customObject, $csvRow);
+        } catch (InvalidValueException $e) {
+            $this->assertContains("Value 'unicorn' does not exist in the list of options of field 'Multiselect Test Field' (12). Possible values: option_a, option_b", $e->getMessage());
+        }
+    }
+
+    /**
+     * Try to save a multiselect option that does not exist.
+     *
+     * @param CustomObject $customObject
+     * @param string[]     $csvRow
+     */
+    private function validateDateValue(CustomObject $customObject, array $csvRow): void
+    {
+        $csvRow['datetime'] = 'unicorn';
+        $csvRow['date']     = 'unicorn';
+
+        try {
+            $this->importCsvRow($customObject, $csvRow);
+        } catch (InvalidValueException $e) {
+            $this->assertContains('Failed to parse time string (unicorn)', $e->getMessage());
+        }
+    }
+
+    /**
+     * Try to save a multiselect option that does not exist.
+     *
+     * @param CustomObject $customObject
+     * @param string[]     $csvRow
+     */
+    private function validateEmail(CustomObject $customObject, array $csvRow): void
+    {
+        $csvRow['email'] = 'bogus.@email';
+
+        try {
+            $this->importCsvRow($customObject, $csvRow);
+        } catch (InvalidValueException $e) {
+            $this->assertContains('bogus.@email is invalid', $e->getMessage());
+        }
+    }
+
+    /**
+     * Try to save a multiselect option that does not exist.
+     *
+     * @param CustomObject $customObject
+     * @param string[]     $csvRow
+     */
+    private function validatePhone(CustomObject $customObject, array $csvRow): void
+    {
+        $csvRow['phone'] = '+420111222333';
+
+        try {
+            $this->importCsvRow($customObject, $csvRow);
+        } catch (InvalidValueException $e) {
+            $this->assertContains('+420111222333 is not valid phone number', $e->getMessage());
+        }
+    }
+
+    /**
+     * Try to save a multiselect option that does not exist.
+     *
+     * @param CustomObject $customObject
+     * @param string[]     $csvRow
+     */
+    private function validateUrl(CustomObject $customObject, array $csvRow): void
+    {
+        $csvRow['url'] = 'unicorn';
+
+        try {
+            $this->importCsvRow($customObject, $csvRow);
+        } catch (InvalidValueException $e) {
+            $this->assertContains('This value is not a valid URL', $e->getMessage());
+        }
+    }
+
+    /**
+     * Try to save a multiselect option that does not exist.
+     *
+     * @param CustomObject $customObject
+     * @param string[]     $csvRow
+     */
+    private function validateNameCannotBeEmpty(CustomObject $customObject, array $csvRow): void
+    {
+        $csvRow['name'] = '';
+
+        try {
+            $this->importCsvRow($customObject, $csvRow);
+        } catch (InvalidValueException $e) {
+            $this->assertContains('This value should not be blank.', $e->getMessage());
+        }
     }
 
     /**
@@ -187,13 +299,7 @@ class ImportSubscriberTest extends KernelTestCase
         $customObject->getCustomFields()->map(function (CustomField $customField) use (&$mappedFields, &$rowData, $csvRow): void {
             $key                = $customField->getTypeObject()->getKey();
             $mappedFields[$key] = (string) $customField->getId();
-
-            if ($customField->isChoiceType()) {
-                $this->addFieldOption($customField, 'Option A', 'option_a');
-                $this->addFieldOption($customField, 'Option B', 'option_b');
-            }
-
-            $rowData[$key] = $csvRow[$customField->getType()];
+            $rowData[$key]      = $csvRow[$customField->getType()];
         });
 
         /** @var CustomObjectModel $customObjectModel */
@@ -308,6 +414,12 @@ class ImportSubscriberTest extends KernelTestCase
             $customField->setTypeObject($customFieldType);
             $customField->setType($customFieldType->getKey());
             $customField->setLabel("{$customFieldType->getName()} Test Field");
+
+            if ($customField->isChoiceType()) {
+                $this->addFieldOption($customField, 'Option A', 'option_a');
+                $this->addFieldOption($customField, 'Option B', 'option_b');
+            }
+
             $customObject->addCustomField($customField);
         }
 

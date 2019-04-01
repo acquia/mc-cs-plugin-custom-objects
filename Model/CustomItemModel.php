@@ -30,6 +30,9 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
 
 class CustomItemModel extends FormModel
 {
@@ -54,12 +57,18 @@ class CustomItemModel extends FormModel
     private $customFieldValueModel;
 
     /**
+     * @var ValidatorInterface
+     */
+    private $validator;
+
+    /**
      * @param EntityManager                $entityManager
      * @param CustomItemRepository         $customItemRepository
      * @param CustomItemPermissionProvider $permissionProvider
      * @param UserHelper                   $userHelper
      * @param CustomFieldValueModel        $customFieldValueModel
      * @param EventDispatcherInterface     $dispatcher
+     * @param ValidatorInterface           $validator
      */
     public function __construct(
         EntityManager $entityManager,
@@ -67,7 +76,8 @@ class CustomItemModel extends FormModel
         CustomItemPermissionProvider $permissionProvider,
         UserHelper $userHelper,
         CustomFieldValueModel $customFieldValueModel,
-        EventDispatcherInterface $dispatcher
+        EventDispatcherInterface $dispatcher,
+        ValidatorInterface $validator
     ) {
         $this->entityManager           = $entityManager;
         $this->customItemRepository    = $customItemRepository;
@@ -75,6 +85,7 @@ class CustomItemModel extends FormModel
         $this->userHelper              = $userHelper;
         $this->customFieldValueModel   = $customFieldValueModel;
         $this->dispatcher              = $dispatcher;
+        $this->validator               = $validator;
     }
 
     /**
@@ -100,8 +111,14 @@ class CustomItemModel extends FormModel
 
         $this->entityManager->persist($customItem);
 
-        foreach ($customItem->getCustomFieldValues() as $customFieldValue) {
+        $customItem->getCustomFieldValues()->map(function (CustomFieldValueInterface $customFieldValue): void {
             $this->customFieldValueModel->save($customFieldValue);
+        });
+
+        $errors = $this->validator->validate($customItem);
+
+        if ($errors->count() > 0) {
+            throw new InvalidValueException((string) $errors);
         }
 
         $customItem->recordCustomFieldValueChanges();

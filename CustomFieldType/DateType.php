@@ -17,6 +17,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueDate;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
 
 class DateType extends AbstractCustomFieldType
 {
@@ -49,11 +50,17 @@ class DateType extends AbstractCustomFieldType
      * @param mixed|null  $value
      *
      * @return CustomFieldValueInterface
+     *
+     * @throws InvalidValueException
      */
     public function createValueEntity(CustomField $customField, CustomItem $customItem, $value = null): CustomFieldValueInterface
     {
         if (null !== $value) {
-            $value = new \DateTimeImmutable($value);
+            try {
+                $value = new \DateTimeImmutable($value);
+            } catch (\Throwable $e) {
+                throw new InvalidValueException($e->getMessage());
+            }
         }
 
         return new CustomFieldValueDate($customField, $customItem, $value);
