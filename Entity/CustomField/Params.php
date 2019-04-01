@@ -24,11 +24,6 @@ class Params
     private $requiredValidationMessage;
 
     /**
-     * @var string|null
-     */
-    private $emptyValue;
-
-    /**
      * @param mixed[] $params
      */
     public function __construct(array $params = [])
@@ -47,7 +42,6 @@ class Params
     {
         $return = [
             'requiredValidationMessage' => $this->requiredValidationMessage,
-            'emptyValue'                => $this->emptyValue,
         ];
 
         // Remove null and false values as they are default
@@ -68,21 +62,5 @@ class Params
     public function setRequiredValidationMessage(?string $requiredValidationMessage): void
     {
         $this->requiredValidationMessage = $requiredValidationMessage;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getEmptyValue(): ?string
-    {
-        return $this->emptyValue;
-    }
-
-    /**
-     * @param string|null $emptyValue
-     */
-    public function setEmptyValue(?string $emptyValue): void
-    {
-        $this->emptyValue = $emptyValue;
     }
 }

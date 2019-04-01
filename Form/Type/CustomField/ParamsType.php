@@ -37,18 +37,6 @@ class ParamsType extends AbstractType
                 ],
             ]
         );
-
-        $builder->add(
-            'emptyValue',
-            TextType::class,
-            [
-                'label'      => 'custom.field.label.empty_value',
-                'required'   => false,
-                'attr'       => [
-                    'class'    => 'form-control',
-                ],
-            ]
-        );
     }
 
     /**

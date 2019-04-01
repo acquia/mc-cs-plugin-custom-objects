@@ -77,11 +77,6 @@ $title = $customField->getId() ? $customField->getLabel() : $customField->getTyp
                     </div>
 <?php endif; ?>
                 </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <?php echo $view['form']->row($form['params']['emptyValue']); ?>
-                    </div>
-                </div>
             </div>
 
         </div>
