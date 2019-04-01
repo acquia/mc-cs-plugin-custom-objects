@@ -15,3 +15,7 @@
 input[type=checkbox].form-control {
     height: auto;
 }
+
+.drop-here input {
+    width: 100% !important;
+}
