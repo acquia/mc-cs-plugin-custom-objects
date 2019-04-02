@@ -23,7 +23,7 @@ class CustomFieldTypeProviderTest extends \PHPUnit_Framework_TestCase
     public function testWorkflow(): void
     {
         $customFieldTypeProvider = new CustomFieldTypeProvider();
-        $textType               = new TextType($this->createMock(TranslatorInterface::class));
+        $textType                = new TextType($this->createMock(TranslatorInterface::class));
 
         $customFieldTypeProvider->addType($textType);
 
