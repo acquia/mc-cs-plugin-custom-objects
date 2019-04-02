@@ -197,7 +197,8 @@ class CustomFieldType extends AbstractType
                 'params',
                 ParamsType::class,
                 [
-                    'has_choices' => $hasChoices,
+                    'has_choices'     => $hasChoices,
+                    'use_empty_value' => $customField->getTypeObject()->useEmptyValue(),
                 ]
             );
 

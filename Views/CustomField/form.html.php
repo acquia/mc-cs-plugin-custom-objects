@@ -78,9 +78,11 @@ $title = $customField->getId() ? $customField->getLabel() : $customField->getTyp
 <?php endif; ?>
                 </div>
                 <div class="row">
+<?php if ($customField->getTypeObject()->useEmptyValue()): ?>
                     <div class="col-md-6">
                         <?php echo $view['form']->row($form['params']['emptyValue']); ?>
                     </div>
+<?php endif; ?>
                 </div>
             </div>
 

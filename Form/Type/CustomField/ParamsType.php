@@ -38,17 +38,19 @@ class ParamsType extends AbstractType
             ]
         );
 
-        $builder->add(
-            'emptyValue',
-            TextType::class,
-            [
-                'label'      => 'custom.field.label.empty_value',
-                'required'   => false,
-                'attr'       => [
-                    'class'    => 'form-control',
-                ],
-            ]
-        );
+        if ($options['use_empty_value']) {
+            $builder->add(
+                'emptyValue',
+                TextType::class,
+                [
+                    'label'      => 'custom.field.label.empty_value',
+                    'required'   => false,
+                    'attr'       => [
+                        'class'    => 'form-control',
+                    ],
+                ]
+            );
+        }
     }
 
     /**
@@ -62,6 +64,7 @@ class ParamsType extends AbstractType
                 'custom_object_form' => false,
                 'csrf_protection'    => false,
                 'has_choices'        => false,
+                'use_empty_value'    => false, // @see \MauticPlugin\CustomObjectsBundle\CustomFieldType\AbstractCustomFieldType::useEmptyValue()
             ]
         );
     }

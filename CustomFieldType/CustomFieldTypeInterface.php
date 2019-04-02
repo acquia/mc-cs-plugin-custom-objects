@@ -97,4 +97,11 @@ interface CustomFieldTypeInterface
      * @return mixed[]
      */
     public function createFormTypeOptions(array $options = []): array;
+
+    /**
+     * Using "empty value" is needed.
+     *
+     * @return bool
+     */
+    public function useEmptyValue(): bool;
 }

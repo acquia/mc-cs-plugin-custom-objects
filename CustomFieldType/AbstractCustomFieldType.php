@@ -133,4 +133,12 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     public function validateValue($value = null, ExecutionContextInterface $context): void
     {
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function useEmptyValue(): bool
+    {
+        return $this->hasChoices() && (!$this instanceof AbstractMultivalueType);
+    }
 }
