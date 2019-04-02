@@ -18,7 +18,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 class CustomItemRouteProviderTest extends \PHPUnit_Framework_TestCase
 {
-    private const ITEM_ID = 44;
+    private const ITEM_ID   = 44;
     private const OBJECT_ID = 33;
 
     private $router;
@@ -33,7 +33,7 @@ class CustomItemRouteProviderTest extends \PHPUnit_Framework_TestCase
         parent::setUp();
 
         $this->router                   = $this->createMock(RouterInterface::class);
-        $this->customItemRouteProvider = new CustomItemRouteProvider($this->router);
+        $this->customItemRouteProvider  = new CustomItemRouteProvider($this->router);
     }
 
     public function testBuildListRoute(): void
