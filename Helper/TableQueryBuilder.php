@@ -114,7 +114,7 @@ class TableQueryBuilder
 
     /**
      * isNull and isNotNull returns string instead of Comparison.
-     * 
+     *
      * @param TableFilterConfig $filter
      *
      * @return Comparison|string
