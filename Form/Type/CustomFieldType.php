@@ -240,19 +240,24 @@ class CustomFieldType extends AbstractType
                 return;
             }
 
+            $fieldOptions = [
+                'mapped'     => false,
+                'required'   => false,
+                'data'       => $customField->getDefaultValue(),
+                'attr'       => [
+                    'readonly' => true,
+                ],
+            ];
+
+            if ($customField->getTypeObject()->useEmptyValue() && $customField->getParams()->getEmptyValue()) {
+                $fieldOptions['placeholder'] = $customField->getParams()->getEmptyValue();
+            }
+
+            // Demo field in panel
             $builder->add(
                 'field',
                 $customField->getTypeObject()->getSymfonyFormFieldType(),
-                $customField->getFormFieldOptions(
-                    [
-                        'mapped'     => false,
-                        'required'   => false,
-                        'data'       => $customField->getDefaultValue(),
-                        'attr'       => [
-                            'readonly' => true,
-                        ],
-                    ]
-                )
+                $customField->getFormFieldOptions($fieldOptions)
             );
 
             if ($customField->getDefaultValue() instanceof \DateTime) {
