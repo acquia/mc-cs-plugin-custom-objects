@@ -107,7 +107,7 @@ class CustomItemImportModel extends FormModel
             $customFieldValue->setValue($csvValue);
         }
 
-        $this->customItemModel->save($customItem);
+        $customItem = $this->customItemModel->save($customItem);
 
         $this->linkContacts($customItem, $contactIds);
 

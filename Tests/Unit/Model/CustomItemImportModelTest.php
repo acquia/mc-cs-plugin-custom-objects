@@ -25,6 +25,9 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextareaType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateTimeType;
 use Symfony\Component\Translation\TranslatorInterface;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use Mautic\UserBundle\Entity\User;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 
 class CustomItemImportModelTest extends \PHPUnit_Framework_TestCase
 {
@@ -91,6 +94,9 @@ class CustomItemImportModelTest extends \PHPUnit_Framework_TestCase
             ->method('getMatchedFields')
             ->willReturn(self::MAPPED_FIELDS);
 
+        $this->customItemModel->expects($this->never())
+            ->method('fetchEntity');
+
         $this->formatterHelper->expects($this->once())
             ->method('simpleCsvToArray')
             ->with('3262739,3262738,3262737')
@@ -99,6 +105,13 @@ class CustomItemImportModelTest extends \PHPUnit_Framework_TestCase
         $this->customObject->expects($this->exactly(2))
             ->method('getCustomFields')
             ->willReturn([$this->descriptionField, $this->dateField]);
+
+        $customItem = $this->createMock(CustomItem::class);
+
+        // Simulate save.
+        $customItem->expects($this->exactly(3))
+            ->method('getId')
+            ->willReturn(1234);
 
         $this->customItemModel->expects($this->once())
             ->method('save')
@@ -114,11 +127,139 @@ class CustomItemImportModelTest extends \PHPUnit_Framework_TestCase
                 $this->assertSame($this->descriptionField, $descriptionField->getCustomField());
 
                 return true;
-            }));
+            }))
+            ->willReturn($customItem);
 
         $this->assertSame(
             false,
             $this->customItemImportModel->import($this->import, self::ROW_DATA, $this->customObject)
         );
+    }
+
+    public function testImportForCreatedWhenObjectHasNoFields(): void
+    {
+        $this->import->expects($this->exactly(2))
+            ->method('getMatchedFields')
+            ->willReturn(self::MAPPED_FIELDS);
+
+        $this->formatterHelper->expects($this->once())
+            ->method('simpleCsvToArray')
+            ->with('3262739,3262738,3262737')
+            ->willReturn([3262739, 3262738, 3262737]);
+
+        $this->customObject->expects($this->exactly(1))
+            ->method('getCustomFields')
+            ->willReturn([]);
+
+        $this->customItemModel->expects($this->never())
+            ->method('save');
+
+        $this->expectException(NotFoundException::class);
+
+        $this->customItemImportModel->import($this->import, self::ROW_DATA, $this->customObject);
+    }
+
+    public function testImportForUpdatedWithSetOwner(): void
+    {
+        $mappedFields       = self::MAPPED_FIELDS;
+        $rowData            = self::ROW_DATA;
+        $mappedFields['id'] = 'customItemId';
+        $rowData['id']      = '555';
+        $customItem         = $this->createMock(CustomItem::class);
+
+        $customItem->expects($this->exactly(2))
+            ->method('findCustomFieldValueForFieldId')
+            ->willReturn($this->createMock(CustomFieldValueInterface::class));
+
+        $customItem->expects($this->exactly(4))
+            ->method('getId')
+            ->willReturn(555);
+
+        $this->import->expects($this->exactly(2))
+            ->method('getMatchedFields')
+            ->willReturn($mappedFields);
+
+        $this->customItemModel->expects($this->once())
+            ->method('fetchEntity')
+            ->with(555)
+            ->willReturn($customItem);
+
+        $this->import->expects($this->exactly(1))
+            ->method('getDefault')
+            ->with('owner')
+            ->willReturn(222);
+
+        $this->entityManager->expects($this->exactly(1))
+            ->method('find')
+            ->with(User::class, 222)
+            ->willReturn(222);
+
+        $this->formatterHelper->expects($this->once())
+            ->method('simpleCsvToArray')
+            ->with('3262739,3262738,3262737')
+            ->willReturn([3262739, 3262738, 3262737]);
+
+        $this->customItemXrefContactModel->expects($this->exactly(3))
+            ->method('linkContact')
+            ->withConsecutive(
+                [555, 3262739],
+                [555, 3262738],
+                [555, 3262737]
+            );
+
+        $this->customItemModel->expects($this->once())
+            ->method('save')
+            ->with($customItem)
+            ->willReturn($customItem);
+
+        $this->customItemImportModel->import($this->import, $rowData, $this->customObject);
+    }
+
+    public function testImportForUpdatedWhenItemNotFound(): void
+    {
+        $mappedFields       = self::MAPPED_FIELDS;
+        $rowData            = self::ROW_DATA;
+        $mappedFields['id'] = 'customItemId';
+        $rowData['id']      = '555';
+
+        $this->import->expects($this->exactly(2))
+            ->method('getMatchedFields')
+            ->willReturn($mappedFields);
+
+        $this->customObject->expects($this->exactly(2))
+            ->method('getCustomFields')
+            ->willReturn([$this->descriptionField, $this->dateField]);
+
+        $this->customItemModel->expects($this->once())
+            ->method('fetchEntity')
+            ->with(555)
+            ->will($this->throwException(new NotFoundException()));
+
+        $this->formatterHelper->expects($this->once())
+            ->method('simpleCsvToArray')
+            ->with('3262739,3262738,3262737')
+            ->willReturn([3262739, 3262738, 3262737]);
+
+        $this->customItemXrefContactModel->expects($this->exactly(3))
+            ->method('linkContact')
+            ->withConsecutive(
+                [1234, 3262739],
+                [1234, 3262738],
+                [1234, 3262737]
+            );
+
+        $customItem = $this->createMock(CustomItem::class);
+
+        // Simulate save.
+        $customItem->expects($this->exactly(3))
+            ->method('getId')
+            ->willReturn(1234);
+
+        $this->customItemModel->expects($this->once())
+            ->method('save')
+            ->with($this->isInstanceOf(CustomItem::class))
+            ->willReturn($customItem);
+
+        $this->customItemImportModel->import($this->import, $rowData, $this->customObject);
     }
 }
