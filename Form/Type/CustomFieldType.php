@@ -371,7 +371,5 @@ class CustomFieldType extends AbstractType
                 ]
             );
         }
-
-
     }
 }
