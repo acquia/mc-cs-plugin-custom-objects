@@ -59,7 +59,7 @@ return [
             CustomItemRouteProvider::ROUTE_VIEW => [
                 'path'       => '/custom/object/{objectId}/item/view/{itemId}',
                 'controller' => 'CustomObjectsBundle:CustomItem\View:view',
-                'method'     => 'GET',
+                'method'     => 'GET|POST',
             ],
             CustomItemRouteProvider::ROUTE_NEW => [
                 'path'       => '/custom/object/{objectId}/item/new',
