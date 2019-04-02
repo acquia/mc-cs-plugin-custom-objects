@@ -83,7 +83,7 @@ If you wan to automatically fix code styles then run this.
 
 #### `$ composer run-script coverage`
 
-Will generate code coverage report
+Will generate code coverage report into the console in the text form as well as more detailed report into `Tests/Coverage` folder where you can see which lines are or aren't covered. View the report by pointing your browser to `http://[localmautic.test]/plugins/CustomObjectsBundle/Tests/Coverage/index.html`.
 
 #### `$ composer run-script phpunit -- --filter CustomFieldTest`
 
