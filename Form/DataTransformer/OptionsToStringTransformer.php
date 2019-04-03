@@ -82,7 +82,10 @@ class OptionsToStringTransformer implements DataTransformerInterface
         $options = json_decode($options, true);
 
         foreach ($options as $key => $option) {
-            $option['customField'] = $this->fetchCustomFieldById($option['customField']);
+            if (array_key_exists('customField', $option)) {
+                // It does not exists in newly created custom fields
+                $option['customField'] = $this->fetchCustomFieldById($option['customField']);
+            }
             $options[$key]         = new CustomFieldOption($option);
         }
 
