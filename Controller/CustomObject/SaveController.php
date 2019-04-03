@@ -108,15 +108,15 @@ class SaveController extends CommonController
         ParamsToStringTransformer $paramsToStringTransformer,
         OptionsToStringTransformer $optionsToStringTransformer
     ) {
-        $this->requestStack              = $requestStack;
-        $this->flashBag                  = $flashBag;
-        $this->formFactory               = $formFactory;
-        $this->customObjectModel         = $customObjectModel;
-        $this->customFieldModel          = $customFieldModel;
-        $this->permissionProvider        = $permissionProvider;
-        $this->routeProvider             = $routeProvider;
-        $this->customFieldTypeProvider   = $customFieldTypeProvider;
-        $this->paramsToStringTransformer = $paramsToStringTransformer;
+        $this->requestStack               = $requestStack;
+        $this->flashBag                   = $flashBag;
+        $this->formFactory                = $formFactory;
+        $this->customObjectModel          = $customObjectModel;
+        $this->customFieldModel           = $customFieldModel;
+        $this->permissionProvider         = $permissionProvider;
+        $this->routeProvider              = $routeProvider;
+        $this->customFieldTypeProvider    = $customFieldTypeProvider;
+        $this->paramsToStringTransformer  = $paramsToStringTransformer;
         $this->optionsToStringTransformer = $optionsToStringTransformer;
     }
 
@@ -150,7 +150,6 @@ class SaveController extends CommonController
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-
             $this->handleRawPost($customObject, $request->get('custom_object'));
 
             $this->customObjectModel->save($customObject);
@@ -189,6 +188,10 @@ class SaveController extends CommonController
         );
     }
 
+    /**
+     * @param CustomObject $customObject
+     * @param string[]     $rawCustomObject
+     */
     private function handleRawPost(CustomObject $customObject, array $rawCustomObject): void
     {
         if (empty($rawCustomObject['customFields'])) {

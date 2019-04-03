@@ -59,20 +59,20 @@ class SaveControllerTest extends ControllerTestCase
     {
         parent::setUp();
 
-        $this->formFactory               = $this->createMock(FormFactoryInterface::class);
-        $this->customObjectModel         = $this->createMock(CustomObjectModel::class);
-        $this->customFieldModel          = $this->createMock(CustomFieldModel::class);
-        $this->flashBag                  = $this->createMock(FlashBag::class);
-        $this->permissionProvider        = $this->createMock(CustomObjectPermissionProvider::class);
-        $this->routeProvider             = $this->createMock(CustomObjectRouteProvider::class);
-        $this->requestStack              = $this->createMock(RequestStack::class);
-        $this->customFieldTypeProvider   = $this->createMock(CustomFieldTypeProvider::class);
-        $this->paramsToStringTransformer = $this->createMock(ParamsToStringTransformer::class);
+        $this->formFactory                = $this->createMock(FormFactoryInterface::class);
+        $this->customObjectModel          = $this->createMock(CustomObjectModel::class);
+        $this->customFieldModel           = $this->createMock(CustomFieldModel::class);
+        $this->flashBag                   = $this->createMock(FlashBag::class);
+        $this->permissionProvider         = $this->createMock(CustomObjectPermissionProvider::class);
+        $this->routeProvider              = $this->createMock(CustomObjectRouteProvider::class);
+        $this->requestStack               = $this->createMock(RequestStack::class);
+        $this->customFieldTypeProvider    = $this->createMock(CustomFieldTypeProvider::class);
+        $this->paramsToStringTransformer  = $this->createMock(ParamsToStringTransformer::class);
         $this->optionsToStringTransformer = $this->createMock(OptionsToStringTransformer::class);
-        $this->request                   = $this->createMock(Request::class);
-        $this->customObject              = $this->createMock(CustomObject::class);
-        $this->form                      = $this->createMock(FormInterface::class);
-        $this->saveController            = new SaveController(
+        $this->request                    = $this->createMock(Request::class);
+        $this->customObject               = $this->createMock(CustomObject::class);
+        $this->form                       = $this->createMock(FormInterface::class);
+        $this->saveController             = new SaveController(
             $this->requestStack,
             $this->flashBag,
             $this->formFactory,

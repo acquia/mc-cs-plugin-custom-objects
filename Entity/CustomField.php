@@ -357,7 +357,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         foreach ($options as $option) {
             $option->setCustomField($this);
             $option->setOrder($order);
-            $order ++;
+            ++$order;
         }
 
         $this->options = $options;
