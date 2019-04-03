@@ -69,23 +69,23 @@ _Edit [this doc](https://docs.google.com/spreadsheets/d/1CAf_VfvvmOCriGz4tFtQVDl
 
 Always run following commands from the `plugins/CustomObjectsBundle` directory.
 
-#### `$ composer run-script test`
+#### `$ composer test`
 
 With this command you can run all the tests for this plugin. Functional tests included.
 
-#### `$ composer run-script quicktest`
+#### `$ composer quicktest`
 
 With this command you can run all the tests for this plugin except functional tests which makes it fast.
 
-#### `$ composer run-script fixcs`
+#### `$ composer fixcs`
 
 If you wan to automatically fix code styles then run this.
 
-#### `$ composer run-script coverage`
+#### `$ composer coverage`
 
-Will generate code coverage report
+Will generate code coverage report into the console in the text form as well as more detailed report into `Tests/Coverage` folder where you can see which lines are or aren't covered. View the report by pointing your browser to `http://[localmautic.test]/plugins/CustomObjectsBundle/Tests/Coverage/index.html`.
 
-#### `$ composer run-script phpunit -- --filter CustomFieldTest`
+#### `$ composer phpunit -- --filter CustomFieldTest`
 
 This way you can filter which phpunit tests you want to run.
 

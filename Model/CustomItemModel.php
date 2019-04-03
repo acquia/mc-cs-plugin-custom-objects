@@ -254,11 +254,14 @@ class CustomItemModel extends FormModel
     /**
      * Used only by Mautic's generic methods. Use CustomItemPermissionProvider instead.
      *
+     * 'custom_objects:custom_objects' is used as custom item permissions are dynamic
+     * and must contain the specific custom object ID.
+     *
      * @return string
      */
     public function getPermissionBase(): string
     {
-        return 'custom_objects:custom_items';
+        return 'custom_objects:custom_objects';
     }
 
     /**

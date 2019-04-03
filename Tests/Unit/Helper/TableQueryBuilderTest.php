@@ -91,6 +91,41 @@ class TableQueryBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->queryBuilder, $this->tableQueryBuilder->getTableDataQuery());
     }
 
+    public function testGetTableCountQueryWithBadJoin(): void
+    {
+        $filters = [
+            CustomObject::class => [new TableFilterConfig('UnicornClass', 'id', 45, 'eq')],
+        ];
+
+        $this->expr->expects($this->once())
+            ->method('count')
+            ->willReturn(self::ROOT_ALIAS);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('expr')
+            ->willReturn($this->expr);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('select');
+
+        $this->queryBuilder->expects($this->once())
+            ->method('getAllAliases')
+            ->willReturn([self::ROOT_ALIAS]);
+
+        $this->tableConfig->expects($this->once())
+            ->method('getFilters')
+            ->willReturn($filters);
+
+        $this->classMetadata->expects($this->once())
+            ->method('getAssociationsByTargetClass')
+            ->with('UnicornClass')
+            ->willReturn([]);
+
+        $this->expectException(\UnexpectedValueException::class);
+
+        $this->tableQueryBuilder->getTableCountQuery();
+    }
+
     public function testGetTableCountQueryWithoutFilters(): void
     {
         $this->expr->expects($this->once())

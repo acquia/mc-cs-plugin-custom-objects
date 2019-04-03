@@ -168,7 +168,10 @@ class CustomItemRouteProvider
      */
     public function buildNewImportRoute(int $objectId): string
     {
-        return $this->buildImportRoute($objectId, 'new');
+        return $this->router->generate(static::ROUTE_IMPORT_ACTION, [
+            'object'       => $this->buildImportRouteObject($objectId),
+            'objectAction' => 'new',
+        ]);
     }
 
     /**
@@ -179,20 +182,6 @@ class CustomItemRouteProvider
     public function buildListImportRoute(int $objectId): string
     {
         return $this->router->generate(static::ROUTE_IMPORT_LIST, ['object' => $this->buildImportRouteObject($objectId)]);
-    }
-
-    /**
-     * @param int    $objectId
-     * @param string $objectAction
-     *
-     * @return string
-     */
-    private function buildImportRoute(int $objectId, string $objectAction): string
-    {
-        return $this->router->generate(static::ROUTE_IMPORT_ACTION, [
-            'object'       => $this->buildImportRouteObject($objectId),
-            'objectAction' => $objectAction,
-        ]);
     }
 
     /**

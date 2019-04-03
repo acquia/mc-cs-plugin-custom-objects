@@ -113,11 +113,13 @@ class TableQueryBuilder
     }
 
     /**
+     * isNull and isNotNull returns string instead of Comparison.
+     *
      * @param TableFilterConfig $filter
      *
-     * @return Comparison
+     * @return Comparison|string
      */
-    private function createExpr(TableFilterConfig $filter): Comparison
+    private function createExpr(TableFilterConfig $filter)
     {
         $expr = $this->queryBuilder->expr()->{$filter->getExpression()}($filter->getFullColumnName(), ':'.$filter->getColumnName());
         $this->queryBuilder->setParameter($filter->getColumnName(), $filter->getValue());
