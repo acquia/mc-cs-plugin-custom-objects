@@ -134,10 +134,9 @@ $view['slots']->set(
                                 </div>
                                 <div class="col-md-7 va-m">
                                     <h5 class="fw-sb text-primary mb-xs"><?php echo $field->getLabel(); ?></h5>
-                                    <h6 class="text-white dark-md"><?php echo $view['translator']->trans(
-                                            'mautic.form.details.field_type',
-                                            ['%type%' => $field->getType()]
-                                        ); ?></h6>
+                                </div>
+                                <div class="col-md-4 va-m text-right">
+                                    <em class="text-white dark-sm"><?php echo $field->getTypeObject()->getName() ?></em>
                                 </div>
                             </div>
                         </li>
