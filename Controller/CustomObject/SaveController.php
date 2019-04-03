@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsToStringTransformer;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransformer;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
@@ -78,6 +80,11 @@ class SaveController extends CommonController
     private $paramsToStringTransformer;
 
     /**
+     * @var OptionsToStringTransformer
+     */
+    private $optionsToStringTransformer;
+
+    /**
      * @param RequestStack                   $requestStack
      * @param FlashBag                       $flashBag
      * @param FormFactoryInterface           $formFactory
@@ -87,6 +94,7 @@ class SaveController extends CommonController
      * @param CustomObjectRouteProvider      $routeProvider
      * @param CustomFieldTypeProvider        $customFieldTypeProvider
      * @param ParamsToStringTransformer      $paramsToStringTransformer
+     * @param OptionsToStringTransformer     $optionsToStringTransformer
      */
     public function __construct(
         RequestStack $requestStack,
@@ -97,7 +105,8 @@ class SaveController extends CommonController
         CustomObjectPermissionProvider $permissionProvider,
         CustomObjectRouteProvider $routeProvider,
         CustomFieldTypeProvider $customFieldTypeProvider,
-        ParamsToStringTransformer $paramsToStringTransformer
+        ParamsToStringTransformer $paramsToStringTransformer,
+        OptionsToStringTransformer $optionsToStringTransformer
     ) {
         $this->requestStack              = $requestStack;
         $this->flashBag                  = $flashBag;
@@ -108,6 +117,7 @@ class SaveController extends CommonController
         $this->routeProvider             = $routeProvider;
         $this->customFieldTypeProvider   = $customFieldTypeProvider;
         $this->paramsToStringTransformer = $paramsToStringTransformer;
+        $this->optionsToStringTransformer = $optionsToStringTransformer;
     }
 
     /**
@@ -143,15 +153,22 @@ class SaveController extends CommonController
             $rawCustomObject = $request->get('custom_object');
 
             if (!empty($rawCustomObject['customFields'])) {
-                foreach ($rawCustomObject['customFields'] as $key => $customField) {
-                    if ($customField['deleted'] && $customField['id']) {
+                foreach ($rawCustomObject['customFields'] as $key => $rawCustomField) {
+                    if ($rawCustomField['deleted'] && $rawCustomField['id']) {
                         // Remove deleted custom fields
-                        $this->customObjectModel->removeCustomFieldById($customObject, (int) $customField['id']);
+                        $this->customObjectModel->removeCustomFieldById($customObject, (int) $rawCustomField['id']);
                     } else {
                         // Should be resolved better in form/transformer, but here it is more clear
-                        $params = $customField['params'];
+                        $params = $rawCustomField['params'];
                         $params = $this->paramsToStringTransformer->reverseTransform($params);
-                        $customObject->getCustomFields()->get($key)->setParams($params);
+
+                        $options = $rawCustomField['options'];
+                        $options = $this->optionsToStringTransformer->reverseTransform($options);
+
+                        /** @var CustomField $customField */
+                        $customField = $customObject->getCustomFields()->get($key);
+                        $customField->setParams($params);
+                        $customField->setOptions($options);
                     }
                 }
             }

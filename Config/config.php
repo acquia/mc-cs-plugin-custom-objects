@@ -457,6 +457,7 @@ return [
                     'custom_object.route.provider',
                     'custom_field.type.provider',
                     'custom_field.field.params.to.string.transformer',
+                    'custom_field.field.options.to.string.transformer',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
