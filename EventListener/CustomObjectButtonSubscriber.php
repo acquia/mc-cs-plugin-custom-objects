@@ -58,10 +58,10 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
         CustomItemPermissionProvider $customItemPermissionProvider,
         CustomItemRouteProvider $customItemRouteProvider
     ) {
-        $this->permissionProvider = $permissionProvider;
-        $this->routeProvider      = $routeProvider;
+        $this->permissionProvider           = $permissionProvider;
+        $this->routeProvider                = $routeProvider;
         $this->customItemPermissionProvider = $customItemPermissionProvider;
-        $this->customItemRouteProvider = $customItemRouteProvider;
+        $this->customItemRouteProvider      = $customItemRouteProvider;
     }
 
     /**
@@ -94,7 +94,9 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
                 $this->addEntityButtons($event, ButtonHelper::LOCATION_PAGE_ACTIONS);
                 $event->addButton($this->defineCloseButton(), ButtonHelper::LOCATION_PAGE_ACTIONS, $event->getRoute());
 
-                if ($customObject = $event->getItem()) {
+                $customObject = $event->getItem();
+
+                if ($customObject) {
                     $event->addButton($this->defineViewCustomItemsButton($customObject), ButtonHelper::LOCATION_PAGE_ACTIONS, $event->getRoute());
                     $event->addButton($this->defineCreateNewCustomItemButton($customObject), ButtonHelper::LOCATION_PAGE_ACTIONS, $event->getRoute());
                 }
@@ -230,7 +232,7 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
     /**
      * @param CustomObject $customObject
      *
-     * @return array
+     * @return string[]
      */
     private function defineViewCustomItemsButton(CustomObject $customObject): array
     {
@@ -249,7 +251,7 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
     /**
      * @param CustomObject $customObject
      *
-     * @return array
+     * @return string[]
      */
     private function defineCreateNewCustomItemButton(CustomObject $customObject): array
     {

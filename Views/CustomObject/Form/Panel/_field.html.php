@@ -52,6 +52,6 @@ $deleted                    = !empty($_POST['custom_object']['customFields'][$or
     <?php echo $view['form']->rest($customField); ?>
     <div class="panel-footer">
         <i class="fa fa-cog" aria-hidden="true"></i>
-        <span class="inline-spacer"><?php echo $customFieldEntity->getTypeObject()->getName()?></span>
+        <span class="inline-spacer"><?php echo $customFieldEntity->getTypeObject()->getName(); ?></span>
     </div>
 </div>

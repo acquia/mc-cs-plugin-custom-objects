@@ -136,7 +136,7 @@ $view['slots']->set(
                                     <h5 class="fw-sb text-primary mb-xs"><?php echo $field->getLabel(); ?></h5>
                                 </div>
                                 <div class="col-md-4 va-m text-right">
-                                    <em class="text-white dark-sm"><?php echo $field->getTypeObject()->getName() ?></em>
+                                    <em class="text-white dark-sm"><?php echo $field->getTypeObject()->getName(); ?></em>
                                 </div>
                             </div>
                         </li>
