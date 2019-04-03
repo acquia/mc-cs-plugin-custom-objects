@@ -678,6 +678,8 @@ return [
                 'arguments' => [
                     'custom_object.permission.provider',
                     'custom_object.route.provider',
+                    'custom_item.permission.provider',
+                    'custom_item.route.provider',
                 ],
             ],
             'custom_item.campaign.subscriber' => [

@@ -19,6 +19,8 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 
@@ -35,15 +37,31 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
     private $routeProvider;
 
     /**
+     * @var CustomItemPermissionProvider
+     */
+    private $customItemPermissionProvider;
+
+    /**
+     * @var CustomItemRouteProvider
+     */
+    private $customItemRouteProvider;
+
+    /**
      * @param CustomObjectPermissionProvider $permissionProvider
      * @param CustomObjectRouteProvider      $routeProvider
+     * @param CustomItemPermissionProvider   $customItemPermissionProvider
+     * @param CustomItemRouteProvider        $customItemRouteProvider
      */
     public function __construct(
         CustomObjectPermissionProvider $permissionProvider,
-        CustomObjectRouteProvider $routeProvider
+        CustomObjectRouteProvider $routeProvider,
+        CustomItemPermissionProvider $customItemPermissionProvider,
+        CustomItemRouteProvider $customItemRouteProvider
     ) {
         $this->permissionProvider = $permissionProvider;
         $this->routeProvider      = $routeProvider;
+        $this->customItemPermissionProvider = $customItemPermissionProvider;
+        $this->customItemRouteProvider = $customItemRouteProvider;
     }
 
     /**
@@ -75,6 +93,11 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
             case CustomObjectRouteProvider::ROUTE_VIEW:
                 $this->addEntityButtons($event, ButtonHelper::LOCATION_PAGE_ACTIONS);
                 $event->addButton($this->defineCloseButton(), ButtonHelper::LOCATION_PAGE_ACTIONS, $event->getRoute());
+
+                if ($customObject = $event->getItem()) {
+                    $event->addButton($this->defineViewCustomItemsButton($customObject), ButtonHelper::LOCATION_PAGE_ACTIONS, $event->getRoute());
+                    $event->addButton($this->defineCreateNewCustomItemButton($customObject), ButtonHelper::LOCATION_PAGE_ACTIONS, $event->getRoute());
+                }
 
                 break;
         }
@@ -192,7 +215,7 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
      */
     private function defineNewButton(): array
     {
-        $this->permissionProvider->canCreate();
+//        $this->permissionProvider->canCreate();
 
         return [
             'attr' => [
@@ -201,6 +224,44 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
             'btnText'   => $this->translator->trans('mautic.core.form.new'),
             'iconClass' => 'fa fa-plus',
             'priority'  => 500,
+        ];
+    }
+
+    /**
+     * @param CustomObject $customObject
+     *
+     * @return array
+     */
+    private function defineViewCustomItemsButton(CustomObject $customObject): array
+    {
+        $this->customItemPermissionProvider->canViewAtAll($customObject->getId());
+
+        return [
+            'attr' => [
+                'href' => $this->customItemRouteProvider->buildListRoute($customObject->getId()),
+            ],
+            'btnText'   => 'custom.items.view.link',
+            'iconClass' => 'fa fa-fw fa-list-alt',
+            'priority'  => 0,
+        ];
+    }
+
+    /**
+     * @param CustomObject $customObject
+     *
+     * @return array
+     */
+    private function defineCreateNewCustomItemButton(CustomObject $customObject): array
+    {
+        $this->customItemPermissionProvider->canCreate($customObject->getId());
+
+        return [
+            'attr' => [
+                'href' => $this->customItemRouteProvider->buildNewRoute($customObject->getId()),
+            ],
+            'btnText'   => 'custom.item.create.link',
+            'iconClass' => 'fa fa-fw fa-plus',
+            'priority'  => 0,
         ];
     }
 }
