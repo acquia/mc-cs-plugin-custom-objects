@@ -1,3 +1,4 @@
+// Custom Object create/edit form handling is here
 // Init stuff on refresh:
 
 Mautic.customObjectOnLoad = function() {
@@ -297,7 +298,7 @@ CustomObjectsForm = {
                     let content = mQuery('#sortable-custom_field_options').html('');
                     let prototype = mQuery('#custom_field_options_list a[data-prototype]').attr('data-prototype');
 
-                    let order = 0; // @todo replace with real order
+                    let order = 0;
 
                     for(let option in options){
                         let html = prototype.replace(/__name__/g, order.toString());

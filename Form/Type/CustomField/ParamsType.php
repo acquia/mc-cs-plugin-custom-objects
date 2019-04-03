@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Form\Type\CustomField;
 
-use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -39,25 +38,16 @@ class ParamsType extends AbstractType
             ]
         );
 
-        $builder->add(
-            'emptyValue',
-            TextType::class,
-            [
-                'label'      => 'custom.field.label.empty_value',
-                'required'   => false,
-                'attr'       => [
-                    'class'    => 'form-control',
-                ],
-            ]
-        );
-
-        if ($options['has_choices']) {
+        if ($options['use_empty_value']) {
             $builder->add(
-                'allowMultiple',
-                YesNoButtonGroupType::class,
+                'emptyValue',
+                TextType::class,
                 [
-                    'label'      => 'custom.field.label.allow_multiple',
+                    'label'      => 'custom.field.label.empty_value',
                     'required'   => false,
+                    'attr'       => [
+                        'class'    => 'form-control',
+                    ],
                 ]
             );
         }
@@ -74,6 +64,7 @@ class ParamsType extends AbstractType
                 'custom_object_form' => false,
                 'csrf_protection'    => false,
                 'has_choices'        => false,
+                'use_empty_value'    => false, // @see \MauticPlugin\CustomObjectsBundle\CustomFieldType\AbstractCustomFieldType::useEmptyValue()
             ]
         );
     }
