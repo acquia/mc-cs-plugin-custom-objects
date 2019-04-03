@@ -352,6 +352,10 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      */
     public function setOptions(Collection $options): void
     {
+        foreach ($options as $option) {
+            $option->setCustomField($this);
+        }
+
         $this->options = $options;
     }
 
