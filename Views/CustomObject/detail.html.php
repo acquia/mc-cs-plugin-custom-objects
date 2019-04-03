@@ -139,12 +139,6 @@ $view['slots']->set(
                                             ['%type%' => $field->getType()]
                                         ); ?></h6>
                                 </div>
-                                <div class="col-md-4 va-m text-right">
-                                    <em class="text-white dark-sm"><?php echo $view['translator']->trans(
-                                            'mautic.form.details.field_order',
-                                            ['%order%' => $field->getOrder()]
-                                        ); ?></em>
-                                </div>
                             </div>
                         </li>
                     <?php endforeach; ?>
