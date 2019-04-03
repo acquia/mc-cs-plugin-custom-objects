@@ -150,28 +150,8 @@ class SaveController extends CommonController
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $rawCustomObject = $request->get('custom_object');
 
-            if (!empty($rawCustomObject['customFields'])) {
-                foreach ($rawCustomObject['customFields'] as $key => $rawCustomField) {
-                    if ($rawCustomField['deleted'] && $rawCustomField['id']) {
-                        // Remove deleted custom fields
-                        $this->customObjectModel->removeCustomFieldById($customObject, (int) $rawCustomField['id']);
-                    } else {
-                        // Should be resolved better in form/transformer, but here it is more clear
-                        $params = $rawCustomField['params'];
-                        $params = $this->paramsToStringTransformer->reverseTransform($params);
-
-                        $options = $rawCustomField['options'];
-                        $options = $this->optionsToStringTransformer->reverseTransform($options);
-
-                        /** @var CustomField $customField */
-                        $customField = $customObject->getCustomFields()->get($key);
-                        $customField->setParams($params);
-                        $customField->setOptions($options);
-                    }
-                }
-            }
+            $this->handleRawPost($customObject, $request->get('custom_object'));
 
             $this->customObjectModel->save($customObject);
 
@@ -207,6 +187,32 @@ class SaveController extends CommonController
                 ],
             ]
         );
+    }
+
+    private function handleRawPost(CustomObject $customObject, array $rawCustomObject): void
+    {
+        if (empty($rawCustomObject['customFields'])) {
+            return;
+        }
+
+        foreach ($rawCustomObject['customFields'] as $key => $rawCustomField) {
+            if ($rawCustomField['deleted'] && $rawCustomField['id']) {
+                // Remove deleted custom fields
+                $this->customObjectModel->removeCustomFieldById($customObject, (int) $rawCustomField['id']);
+            } else {
+                // Should be resolved better in form/transformer, but here it is more clear
+                $params = $rawCustomField['params'];
+                $params = $this->paramsToStringTransformer->reverseTransform($params);
+
+                $options = $rawCustomField['options'];
+                $options = $this->optionsToStringTransformer->reverseTransform($options);
+
+                /** @var CustomField $customField */
+                $customField = $customObject->getCustomFields()->get($key);
+                $customField->setParams($params);
+                $customField->setOptions($options);
+            }
+        }
     }
 
     /**
