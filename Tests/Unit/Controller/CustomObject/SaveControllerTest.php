@@ -195,6 +195,11 @@ class SaveControllerTest extends ControllerTestCase
         $this->customFieldModel->expects($this->never())
             ->method('fetchCustomFieldsForObject');
 
+        $this->request->expects($this->once())
+            ->method('get')
+            ->with('custom_object')
+            ->willReturn([]);
+
         $this->saveController->saveAction(self::OBJECT_ID);
     }
 
