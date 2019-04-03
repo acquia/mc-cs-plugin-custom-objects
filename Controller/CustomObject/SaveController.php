@@ -145,6 +145,7 @@ class SaveController extends CommonController
             if (!empty($rawCustomObject['customFields'])) {
                 foreach ($rawCustomObject['customFields'] as $key => $customField) {
                     if ($customField['deleted'] && $customField['id']) {
+                        // Remove deleted custom fields
                         $this->customObjectModel->removeCustomFieldById($customObject, (int) $customField['id']);
                     } else {
                         // Should be resolved better in form/transformer, but here it is more clear
