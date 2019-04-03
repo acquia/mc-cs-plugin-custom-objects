@@ -12,6 +12,8 @@
 /**
  * Panels rendered in CO form.
  */
+
+/** @var \MauticPlugin\CustomObjectsBundle\Entity\CustomField $customFieldEntity */
 $customFieldEntity          = $customField->vars['data'];
 $customField->vars['index'] = $customField->vars['name'];
 $order                      = (int) $customField->vars['value']->getOrder();
@@ -48,4 +50,8 @@ $deleted                    = !empty($_POST['custom_object']['customFields'][$or
         </div>
     </div>
     <?php echo $view['form']->rest($customField); ?>
+    <div class="panel-footer">
+        <i class="fa fa-cog" aria-hidden="true"></i>
+        <span class="inline-spacer"><?php echo $customFieldEntity->getTypeObject()->getName()?></span>
+    </div>
 </div>
