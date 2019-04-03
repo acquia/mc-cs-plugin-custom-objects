@@ -118,7 +118,6 @@ $view['slots']->set(
 
             <!-- #fields-container -->
             <div class="tab-pane fade active in bdr-w-0" id="fields-container">
-                <h5 class="fw-sb mb-xs"><?php echo $view['translator']->trans('custom.field.title'); ?></h5>
                 <ul class="list-group mb-xs">
                     <?php /** @var MauticPlugin\CustomObjectsBundle\Entity\CustomField $field */
                     foreach ($customObject->getCustomFields() as $field) : ?>
