@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Provider;
 
-class CustomObjectSessionProvider extends StandardSessionProvider
+class CustomObjectSessionProvider extends AbstractSessionProvider
 {
     public const KEY_PAGE = 'custom.object.page';
 
