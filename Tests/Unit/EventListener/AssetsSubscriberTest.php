@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\EventListener\AssetsSubscriber;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpFoundation\Request;
 
 class AssetsSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -25,6 +26,8 @@ class AssetsSubscriberTest extends \PHPUnit_Framework_TestCase
     private $configProvider;
 
     private $getResponseEvent;
+
+    private $request;
 
     private $assetsSubscriber;
 
@@ -35,6 +38,7 @@ class AssetsSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assetsHelper     = $this->createMock(AssetsHelper::class);
         $this->configProvider   = $this->createMock(ConfigProvider::class);
         $this->getResponseEvent = $this->createMock(GetResponseEvent::class);
+        $this->request          = $this->createMock(Request::class);
         $this->assetsSubscriber = new AssetsSubscriber($this->assetsHelper, $this->configProvider);
     }
 
@@ -53,6 +57,30 @@ class AssetsSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assetsSubscriber->loadAssets($this->getResponseEvent);
     }
 
+    public function testPluginEnabledOnPublicPage(): void
+    {
+        $this->configProvider->expects($this->once())
+            ->method('pluginIsEnabled')
+            ->willReturn(true);
+
+        $this->getResponseEvent->expects($this->once())
+            ->method('isMasterRequest')
+            ->willReturn(true);
+
+        $this->getResponseEvent->expects($this->once())
+            ->method('getRequest')
+            ->willReturn($this->request);
+
+        $this->request->expects($this->once())
+            ->method('getPathInfo')
+            ->willReturn('/email/unsubscribe/5c9f4105548a6783784018');
+
+        $this->assetsHelper->expects($this->never())
+            ->method('addStylesheet');
+
+        $this->assetsSubscriber->loadAssets($this->getResponseEvent);
+    }
+
     public function testPluginEnabled(): void
     {
         $this->configProvider->expects($this->once())
@@ -62,6 +90,14 @@ class AssetsSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->getResponseEvent->expects($this->once())
             ->method('isMasterRequest')
             ->willReturn(true);
+
+        $this->getResponseEvent->expects($this->once())
+            ->method('getRequest')
+            ->willReturn($this->request);
+
+        $this->request->expects($this->once())
+            ->method('getPathInfo')
+            ->willReturn('/s/dashboard');
 
         $this->assetsHelper->expects($this->once())
             ->method('addStylesheet');

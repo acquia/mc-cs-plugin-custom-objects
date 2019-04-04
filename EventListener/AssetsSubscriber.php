@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
+use Symfony\Component\HttpFoundation\Request;
 
 class AssetsSubscriber extends CommonSubscriber
 {
@@ -35,8 +36,10 @@ class AssetsSubscriber extends CommonSubscriber
      * @param AssetsHelper   $assetHelper
      * @param ConfigProvider $configProvider
      */
-    public function __construct(AssetsHelper $assetHelper, ConfigProvider $configProvider)
-    {
+    public function __construct(
+        AssetsHelper $assetHelper,
+        ConfigProvider $configProvider
+    ) {
         $this->assetHelper    = $assetHelper;
         $this->configProvider = $configProvider;
     }
@@ -56,10 +59,22 @@ class AssetsSubscriber extends CommonSubscriber
      */
     public function loadAssets(GetResponseEvent $event): void
     {
-        if ($this->configProvider->pluginIsEnabled() && $event->isMasterRequest()) {
+        if ($this->configProvider->pluginIsEnabled() && $event->isMasterRequest() && $this->isMauticAdministrationPage($event->getRequest())) {
             $this->assetHelper->addScript('plugins/CustomObjectsBundle/Assets/js/custom-objects.js');
             $this->assetHelper->addScript('plugins/CustomObjectsBundle/Assets/js/co-form.js');
             $this->assetHelper->addStylesheet('plugins/CustomObjectsBundle/Assets/css/custom-objects.css');
         }
+    }
+
+    /**
+     * Returns true for routes that starts with /s/.
+     *
+     * @param Request $request
+     *
+     * @return bool
+     */
+    private function isMauticAdministrationPage(Request $request): bool
+    {
+        return preg_match('/^\/s\//', $request->getPathInfo()) >= 1;
     }
 }
