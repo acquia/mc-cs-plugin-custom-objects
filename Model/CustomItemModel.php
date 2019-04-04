@@ -208,7 +208,17 @@ class CustomItemModel extends FormModel
         $rootAlias          = $queryBuilder->getRootAliases()[0];
         $queryBuilder->select("{$rootAlias}.name as value, {$rootAlias}.id");
 
-        return array_values($queryBuilder->getQuery()->getArrayResult());
+        $rows       = $queryBuilder->getQuery()->getArrayResult();
+        $lookupData = [];
+
+        foreach ($rows as $row) {
+            $lookupData[] = [
+                'id'    => $row['id'],
+                'value' => "{$row['value']} ({$row['id']})",
+            ];
+        }
+
+        return $lookupData;
     }
 
     /**
