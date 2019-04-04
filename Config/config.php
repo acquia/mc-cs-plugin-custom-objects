@@ -662,6 +662,7 @@ return [
                     'translator',
                     'custom_item.route.provider',
                     'mautic.custom.model.item',
+                    'custom_object.config.provider',
                 ],
             ],
             'custom_object.audit.log.subscriber' => [
