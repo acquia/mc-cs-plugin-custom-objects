@@ -95,7 +95,7 @@ class ContactSubscriberTest extends \PHPUnit_Framework_TestCase
                 'CI Unlinked',
                 'CI Unlinked'
             ));
-    
+
         $this->leadTimelineEvent->expects($this->exactly(2))
             ->method('addEventType')
             ->withConsecutive(
@@ -137,8 +137,8 @@ class ContactSubscriberTest extends \PHPUnit_Framework_TestCase
                     'date_added' => '2019-04-04 12:13:14',
                     'object_id'  => 222,
                     'lead_id'    => 333,
-                    'id'         => 444
-                ]
+                    'id'         => 444,
+                ],
             ]]);
 
         $customItem   = $this->createMock(CustomItem::class);
@@ -175,14 +175,14 @@ class ContactSubscriberTest extends \PHPUnit_Framework_TestCase
                 'event'           => 'customitem.unlinked',
                 'eventId'         => 'customitem.unlinked.444',
                 'eventType'       => 'CI Unlinked',
-                'eventLabel'      => ['label' => 'CI Unlinked','href' => 'view/route',],
+                'eventLabel'      => ['label' => 'CI Unlinked', 'href' => 'view/route'],
                 'timestamp'       => '2019-04-04 12:13:14',
-                'icon'            => "fa-unlink",
+                'icon'            => 'fa-unlink',
                 'extra'           => [
                     'date_added' => '2019-04-04 12:13:14',
                     'object_id'  => 222,
                     'lead_id'    => 333,
-                    'id'         => 444
+                    'id'         => 444,
                 ],
                 'contactId'       => 333,
                 'contentTemplate' => 'CustomObjectsBundle:SubscribedEvents\Timeline:link.html.php',
@@ -212,7 +212,7 @@ class ContactSubscriberTest extends \PHPUnit_Framework_TestCase
                 'CI Linked not found',
                 'CI Unlinked'
             ));
-    
+
         $this->leadTimelineEvent->expects($this->exactly(2))
             ->method('addEventType')
             ->withConsecutive(
@@ -258,8 +258,8 @@ class ContactSubscriberTest extends \PHPUnit_Framework_TestCase
                     'date_added' => '2019-04-04 12:13:14',
                     'object_id'  => 222,
                     'lead_id'    => 333,
-                    'id'         => 444
-                ]
+                    'id'         => 444,
+                ],
             ]]);
 
         $this->customItemModel->expects($this->once())
@@ -274,12 +274,12 @@ class ContactSubscriberTest extends \PHPUnit_Framework_TestCase
                 'eventType'       => 'CI Linked',
                 'eventLabel'      => 'CI Linked not found',
                 'timestamp'       => '2019-04-04 12:13:14',
-                'icon'            => "fa-link",
+                'icon'            => 'fa-link',
                 'extra'           => [
                     'date_added' => '2019-04-04 12:13:14',
                     'object_id'  => 222,
                     'lead_id'    => 333,
-                    'id'         => 444
+                    'id'         => 444,
                 ],
                 'contactId'       => 333,
                 'contentTemplate' => 'CustomObjectsBundle:SubscribedEvents\Timeline:link.html.php',
