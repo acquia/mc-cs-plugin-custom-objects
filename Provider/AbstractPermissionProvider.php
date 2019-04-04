@@ -17,7 +17,7 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Mautic\CoreBundle\Entity\FormEntity;
 
-abstract class StandardPermissionProvider
+abstract class AbstractPermissionProvider
 {
     public const BASE = 'undefined';
 
@@ -55,7 +55,9 @@ abstract class StandardPermissionProvider
     public function hasEntityAccess(string $permission, FormEntity $entity): void
     {
         if (!$this->corePermissions->hasEntityAccess(static::BASE.$permission.'own', static::BASE.$permission.'other', $entity->getCreatedBy())) {
-            throw new ForbiddenException($permission);
+            $entityId = method_exists($entity, 'getId') ? $entity->getId() : null;
+
+            throw new ForbiddenException($permission, get_class($entity), $entityId);
         }
     }
 
