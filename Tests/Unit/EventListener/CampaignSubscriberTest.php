@@ -229,6 +229,26 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->campaignSubscriber->onCampaignTriggerCondition($this->campaignExecutionEvent);
     }
 
+    public function testOnCampaignTriggerConditionWhenContactEmpty(): void
+    {
+        $this->configProvider->expects($this->once())
+            ->method('pluginIsEnabled')
+            ->willReturn(true);
+
+        $this->campaignExecutionEvent->expects($this->once())
+            ->method('getEvent')
+            ->willReturn(['type' => 'custom_item.63.fieldvalue']);
+
+        $this->campaignExecutionEvent->expects($this->once())
+            ->method('getLead')
+            ->willReturn(null);
+
+        $this->campaignExecutionEvent->expects($this->never())
+            ->method('getConfig');
+
+        $this->campaignSubscriber->onCampaignTriggerCondition($this->campaignExecutionEvent);
+    }
+
     public function testOnCampaignTriggerConditionWhenFieldNotFound(): void
     {
         $this->configProvider->expects($this->once())
