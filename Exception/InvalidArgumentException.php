@@ -7,7 +7,7 @@ declare(strict_types=1);
  *
  * @author      Mautic, Inc.
  *
- * @link        http://mautic.org
+ * @link        https://mautic.com
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
