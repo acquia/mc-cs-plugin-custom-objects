@@ -23,6 +23,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
+use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 
 class ContactSubscriber extends CommonSubscriber
 {
@@ -47,21 +48,29 @@ class ContactSubscriber extends CommonSubscriber
     private $customItemModel;
 
     /**
+     * @var ConfigProvider
+     */
+    private $configProvider;
+
+    /**
      * @param EntityManager           $entityManager
      * @param TranslatorInterface     $translator
      * @param CustomItemRouteProvider $routeProvider
      * @param CustomItemModel         $customItemModel
+     * @param ConfigProvider          $configProvider
      */
     public function __construct(
         EntityManager $entityManager,
         TranslatorInterface $translator,
         CustomItemRouteProvider $routeProvider,
-        CustomItemModel $customItemModel
+        CustomItemModel $customItemModel,
+        ConfigProvider $configProvider
     ) {
         $this->entityManager   = $entityManager;
         $this->translator      = $translator;
         $this->routeProvider   = $routeProvider;
         $this->customItemModel = $customItemModel;
+        $this->configProvider  = $configProvider;
     }
 
     /**
@@ -81,6 +90,10 @@ class ContactSubscriber extends CommonSubscriber
      */
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
+        if (!$this->configProvider->pluginIsEnabled()) {
+            return;
+        }
+
         $eventTypes = [
             'customitem.linked'   => 'custom.item.event.linked',
             'customitem.unlinked' => 'custom.item.event.unlinked',
@@ -149,7 +162,7 @@ class ContactSubscriber extends CommonSubscriber
                 }
                 $event->addEvent([
                     'event'           => $eventTypeKey,
-                    'eventId'         => $eventTypeKey.$link['id'],
+                    'eventId'         => $eventTypeKey.'.'.$link['id'],
                     'eventType'       => $eventTypeName,
                     'eventLabel'      => $eventLabel,
                     'timestamp'       => $link['date_added'],

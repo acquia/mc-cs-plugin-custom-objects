@@ -7,7 +7,7 @@ declare(strict_types=1);
  *
  * @author      Mautic, Inc.
  *
- * @link        http://mautic.org
+ * @link        https://mautic.com
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -16,28 +16,27 @@ namespace MauticPlugin\CustomObjectsBundle\Exception;
 
 use Exception;
 use Throwable;
-use MauticPlugin\CustomObjectsBundle\Entity\UniqueEntityInterface;
 
 class ForbiddenException extends Exception
 {
     /**
-     * @param string                     $permission
-     * @param UniqueEntityInterface|null $entity
-     * @param int                        $code
-     * @param Throwable|null             $throwable
+     * @param string         $permission
+     * @param string         $entityType
+     * @param int            $entityId
+     * @param int            $code
+     * @param Throwable|null $throwable
      */
     public function __construct(
         string $permission,
-        ?UniqueEntityInterface $entity = null,
+        ?string $entityType = null,
+        ?int $entityId = null,
         int $code = 403,
         ?Throwable $throwable = null
     ) {
-        $message = "You do not have permission to {$permission}";
-
-        if ($entity) {
-            $message .= " item with ID {$entity->getId()}";
-        }
-
-        parent::__construct($message, $code, $throwable);
+        parent::__construct(
+            trim("You do not have permission to {$permission} {$entityType} {$entityId}"),
+            $code,
+            $throwable
+        );
     }
 }

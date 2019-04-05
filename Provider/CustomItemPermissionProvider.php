@@ -42,7 +42,7 @@ class CustomItemPermissionProvider
     public function isGranted(string $permission, int $customObjectId): void
     {
         if (!$this->corePermissions->isGranted($this->getPermissionName($customObjectId, $permission))) {
-            throw new ForbiddenException($permission);
+            throw new ForbiddenException($permission, 'Items for Custom Object', $customObjectId);
         }
     }
 
@@ -56,7 +56,7 @@ class CustomItemPermissionProvider
     {
         $permissionName = $this->getPermissionName($entity->getCustomObject()->getId(), $permission);
         if (!$this->corePermissions->hasEntityAccess("{$permissionName}own", "{$permissionName}other", $entity->getCreatedBy())) {
-            throw new ForbiddenException($permission);
+            throw new ForbiddenException($permission, 'CustomItem', $entity->getId());
         }
     }
 

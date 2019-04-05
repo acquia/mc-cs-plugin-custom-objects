@@ -111,18 +111,15 @@ CustomObjects = {
             let idInput = mQuery(nameInput.attr('data-id-input-selector'));
             CustomObjects.initCustomItemTypeahead(nameInput, customObjectId, null, function(selectedItem) {
                 idInput.val(selectedItem.id);
-                CustomObjects.displaySelectedItemInfo(nameInput, idInput);
                 CustomObjects.addIconToInput(nameInput, 'check');
             });
             nameInput.on('blur', function() {
                 if (!nameInput.val()) {
                     idInput.val('');
-                    CustomObjects.displaySelectedItemInfo(nameInput, idInput);
                     CustomObjects.removeIconFromInput(nameInput);
                 }
             });
             if (idInput.val()) {
-                CustomObjects.displaySelectedItemInfo(nameInput, idInput);
                 CustomObjects.addIconToInput(nameInput, 'check');
             }
         })
@@ -149,18 +146,6 @@ CustomObjects = {
         formGroup.find('.sr-only').remove();
         input.removeAttr('aria-describedby');
         formGroup.removeClass('has-feedback');
-    },
-
-    displaySelectedItemInfo(nameInput, idInput) {
-        let formGroup = nameInput.closest('.form-group');
-        formGroup.find('.selected-message').remove();
-
-        if (idInput.val()) {
-            let selectedMessage = nameInput.attr('data-selected-message');
-            selectedMessage = selectedMessage.replace('%id%', idInput.val());
-            let selectedMessageEl = mQuery('<span/>').addClass('selected-message text-success').text(selectedMessage);
-            formGroup.append(selectedMessageEl);
-        }
     },
 
     reloadItemsTable(customObjectId, contactId) {

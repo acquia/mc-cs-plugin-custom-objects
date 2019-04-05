@@ -22,6 +22,8 @@ class ContactListController extends CommonController
     use EntityContactsTrait;
 
     /**
+     * @codeCoverageIgnore as this just calls a Mautic core method
+     *
      * @param int $objectId
      * @param int $page
      *

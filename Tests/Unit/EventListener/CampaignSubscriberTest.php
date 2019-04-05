@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 /*
  * @copyright   2019 Mautic Contributors. All rights reserved
- * @author      Mautic
+ * @author      Mautic, Inc
  *
- * @link        http://mautic.org
+ * @link        https://mautic.com
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
@@ -222,6 +222,26 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->campaignExecutionEvent->expects($this->once())
             ->method('getEvent')
             ->willReturn(['type' => 'whatever.action']);
+
+        $this->campaignExecutionEvent->expects($this->never())
+            ->method('getConfig');
+
+        $this->campaignSubscriber->onCampaignTriggerCondition($this->campaignExecutionEvent);
+    }
+
+    public function testOnCampaignTriggerConditionWhenContactEmpty(): void
+    {
+        $this->configProvider->expects($this->once())
+            ->method('pluginIsEnabled')
+            ->willReturn(true);
+
+        $this->campaignExecutionEvent->expects($this->once())
+            ->method('getEvent')
+            ->willReturn(['type' => 'custom_item.63.fieldvalue']);
+
+        $this->campaignExecutionEvent->expects($this->once())
+            ->method('getLead')
+            ->willReturn(null);
 
         $this->campaignExecutionEvent->expects($this->never())
             ->method('getConfig');
