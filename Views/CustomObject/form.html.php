@@ -29,67 +29,83 @@ $view['slots']->set('headerTitle', $header);
 
 <!-- start: box layout -->
 <div class="box-layout">
-    <!-- container -->
-    <div class="col-md-9 bg-auto height-auto bdr-r">
 
-        <div class="pa-md" id="details-container">
-            <div class="row">
-                <div class="col-md-4">
-                    <?php echo $view['form']->row($form['nameSingular']); ?>
-                    <?php echo $view['form']->row($form['namePlural']); ?>
-                    <?php echo $view['form']->row($form['description']); ?>
-                </div>
-            </div>
-        </div>
+    <div class="col-md-9 height-auto bg-white">
+        <div class="row">
+            <div class="col-xs-12">
+                <!-- tabs controls -->
+                <ul class="bg-auto nav nav-tabs pr-md pl-md">
+                    <li class="active"><a href="#details-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans(
+                                'mautic.core.details'
+                            ); ?></a></li>
+                    <li id="fields-tab"><a href="#fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans(
+                                'mautic.form.tab.fields'
+                            ); ?></a></li>
+                </ul>
+                <!--/ tabs controls -->
+                <div class="tab-content pa-md">
+                    <div class="tab-pane fade in active bdr-w-0" id="details-container">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <?php echo $view['form']->row($form['nameSingular']); ?>
+                                <?php echo $view['form']->row($form['namePlural']); ?>
+                                <?php echo $view['form']->row($form['description']); ?>
+                            </div>
+                        </div>
+                    </div>
 
-        <hr>
+                    <div class="tab-pane fade bdr-w-0" id="fields-container">
+                        <?php echo $view->render('MauticFormBundle:Builder:style.html.php'); ?>
+                        <div id="mauticforms_fields">
+                            <div class="row">
+                                <div class="available-fields mb-md col-sm-4">
+                                    <select class="chosen form-builder-new-component" data-placeholder="<?php echo $view['translator']->trans('mautic.form.form.component.fields'); ?>">
+                                        <option value=""></option>
+                                        <?php foreach ($availableFieldTypes as $fieldType): ?>
 
-        <div class="pa-md" id="fields-container">
-            <?php echo $view->render('MauticFormBundle:Builder:style.html.php'); ?>
-            <div id="mauticforms_fields">
-                <div class="row">
-                    <div class="available-fields mb-md col-sm-4">
-                        <select class="chosen form-builder-new-component" data-placeholder="<?php echo $view['translator']->trans('mautic.form.form.component.fields'); ?>">
-                            <option value=""></option>
-                            <?php foreach ($availableFieldTypes as $fieldType): ?>
-
-                                <option data-toggle="ajaxmodal"
-                                        data-target="#objectFieldModal"
-                                        data-href="<?php
-                                            echo $view['router']->path(
-                                                \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider::ROUTE_FORM,
-                                                [
-                                                    'objectId'  => $customObject->getId(),
-                                                    'fieldType' => $fieldType->getKey(),
-                                                ]
+                                            <option data-toggle="ajaxmodal"
+                                                    data-target="#objectFieldModal"
+                                                    data-href="<?php
+                                                        echo $view['router']->path(
+                                                            \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider::ROUTE_FORM,
+                                                            [
+                                                                'objectId'  => $customObject->getId(),
+                                                                'fieldType' => $fieldType->getKey(),
+                                                            ]
+                                                        );
+                                                    ?>">
+                                                <?php echo $fieldType->getName(); ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="drop-here">
+                                <?php
+                                    foreach ($form->children['customFields']->getIterator() as $customField):
+                                        $customFieldEntity = $customField->vars['data'];
+                                        if (!in_array($customFieldEntity->getId(), $deletedFields, true)) :
+                                            echo $view->render(
+                                                "CustomObjectsBundle:CustomObject:Form\\Panel\\{$customFieldEntity->getType()}.html.php",
+                                                ['customField' => $customField, 'customObject' => $customObject]
                                             );
-                                        ?>">
-                                    <?php echo $fieldType->getName(); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
+                                        endif;
+                                    endforeach;
+                                    $form->children['customFields']->setRendered();
+                                ?>
+                            </div>
+                            <?php if (!count($customFields)): ?>
+                                <div class="alert alert-info" id="form-field-placeholder">
+                                    <p><?php echo $view['translator']->trans('mautic.form.form.addfield'); ?></p>
+                                </div>
+                            <?php endif; ?>
+                        </div>
                     </div>
+
                 </div>
-                <div class="drop-here">
-                    <?php
-                        foreach ($form->children['customFields']->getIterator() as $customField):
-                            $customFieldEntity = $customField->vars['data'];
-                            if (!in_array($customFieldEntity->getId(), $deletedFields, true)) :
-                                echo $view->render(
-                                    "CustomObjectsBundle:CustomObject:Form\\Panel\\{$customFieldEntity->getType()}.html.php",
-                                    ['customField' => $customField, 'customObject' => $customObject]
-                                );
-                            endif;
-                        endforeach;
-                        $form->children['customFields']->setRendered();
-                    ?>
-                </div>
-                <?php if (!count($customFields)): ?>
-                    <div class="alert alert-info" id="form-field-placeholder">
-                        <p><?php echo $view['translator']->trans('mautic.form.form.addfield'); ?></p>
-                    </div>
-                <?php endif; ?>
+
             </div>
+
         </div>
 
     </div>
