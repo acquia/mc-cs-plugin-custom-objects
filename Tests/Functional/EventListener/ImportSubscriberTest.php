@@ -87,7 +87,6 @@ class ImportSubscriberTest extends KernelTestCase
             'date'           => '2019-03-04',
             'email'          => 'info@doe.corp',
             'hidden'         => 'secret hidden text',
-            'html_area'      => '<h1>Hello</h1>',
             'int'            => '3453562',
             'multiselect'    => 'option_b,option_a',
             'phone'          => '+420775603019',
