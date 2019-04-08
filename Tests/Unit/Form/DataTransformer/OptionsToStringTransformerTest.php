@@ -95,5 +95,23 @@ class OptionsToStringTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($customField, $option->getCustomField());
         $this->assertSame($label, $option->getLabel());
         $this->assertSame($value, $option->getValue());
+
+        // Without custom field id
+        $label         = 'label';
+        $value         = 'value';
+        $options       = json_encode([[
+            'label'       => $label,
+            'value'       => $value,
+        ]]);
+
+        $serializer  = $this->createMock(SerializerInterface::class);
+        $model       = $this->createMock(CustomFieldModel::class);
+
+        $transformer = new OptionsToStringTransformer($serializer, $model);
+        $options     = $transformer->reverseTransform($options);
+        $this->assertInstanceOf(ArrayCollection::class, $options);
+        $option = $options->first();
+        $this->assertSame($label, $option->getLabel());
+        $this->assertSame($value, $option->getValue());
     }
 }

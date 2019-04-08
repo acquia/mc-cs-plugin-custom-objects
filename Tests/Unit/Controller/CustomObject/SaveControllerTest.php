@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomObject;
 
+use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsToStringTransformer;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransformer;
 use Symfony\Component\HttpFoundation\Request;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
@@ -42,6 +43,7 @@ class SaveControllerTest extends ControllerTestCase
     private $customFieldModel;
     private $customFieldTypeProvider;
     private $paramsToStringTransformer;
+    private $optionsToStringTransformer;
     private $flashBag;
     private $permissionProvider;
     private $routeProvider;
@@ -57,19 +59,20 @@ class SaveControllerTest extends ControllerTestCase
     {
         parent::setUp();
 
-        $this->formFactory               = $this->createMock(FormFactoryInterface::class);
-        $this->customObjectModel         = $this->createMock(CustomObjectModel::class);
-        $this->customFieldModel          = $this->createMock(CustomFieldModel::class);
-        $this->flashBag                  = $this->createMock(FlashBag::class);
-        $this->permissionProvider        = $this->createMock(CustomObjectPermissionProvider::class);
-        $this->routeProvider             = $this->createMock(CustomObjectRouteProvider::class);
-        $this->requestStack              = $this->createMock(RequestStack::class);
-        $this->customFieldTypeProvider   = $this->createMock(CustomFieldTypeProvider::class);
-        $this->paramsToStringTransformer = $this->createMock(ParamsToStringTransformer::class);
-        $this->request                   = $this->createMock(Request::class);
-        $this->customObject              = $this->createMock(CustomObject::class);
-        $this->form                      = $this->createMock(FormInterface::class);
-        $this->saveController            = new SaveController(
+        $this->formFactory                = $this->createMock(FormFactoryInterface::class);
+        $this->customObjectModel          = $this->createMock(CustomObjectModel::class);
+        $this->customFieldModel           = $this->createMock(CustomFieldModel::class);
+        $this->flashBag                   = $this->createMock(FlashBag::class);
+        $this->permissionProvider         = $this->createMock(CustomObjectPermissionProvider::class);
+        $this->routeProvider              = $this->createMock(CustomObjectRouteProvider::class);
+        $this->requestStack               = $this->createMock(RequestStack::class);
+        $this->customFieldTypeProvider    = $this->createMock(CustomFieldTypeProvider::class);
+        $this->paramsToStringTransformer  = $this->createMock(ParamsToStringTransformer::class);
+        $this->optionsToStringTransformer = $this->createMock(OptionsToStringTransformer::class);
+        $this->request                    = $this->createMock(Request::class);
+        $this->customObject               = $this->createMock(CustomObject::class);
+        $this->form                       = $this->createMock(FormInterface::class);
+        $this->saveController             = new SaveController(
             $this->requestStack,
             $this->flashBag,
             $this->formFactory,
@@ -78,7 +81,8 @@ class SaveControllerTest extends ControllerTestCase
             $this->permissionProvider,
             $this->routeProvider,
             $this->customFieldTypeProvider,
-            $this->paramsToStringTransformer
+            $this->paramsToStringTransformer,
+            $this->optionsToStringTransformer
         );
 
         $this->addSymfonyDependencies($this->saveController);
@@ -190,6 +194,11 @@ class SaveControllerTest extends ControllerTestCase
 
         $this->customFieldModel->expects($this->never())
             ->method('fetchCustomFieldsForObject');
+
+        $this->request->expects($this->once())
+            ->method('get')
+            ->with('custom_object')
+            ->willReturn([]);
 
         $this->saveController->saveAction(self::OBJECT_ID);
     }

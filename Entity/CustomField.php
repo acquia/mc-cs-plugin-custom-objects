@@ -348,6 +348,22 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     }
 
     /**
+     * @param Collection|CustomFieldOption[] $options
+     */
+    public function setOptions(Collection $options): void
+    {
+        $order = 1;
+
+        foreach ($options as $option) {
+            $option->setCustomField($this);
+            $option->setOrder($order);
+            ++$order;
+        }
+
+        $this->options = $options;
+    }
+
+    /**
      * @param CustomFieldOption $option
      */
     public function removeOption(CustomFieldOption $option): void

@@ -118,7 +118,6 @@ $view['slots']->set(
 
             <!-- #fields-container -->
             <div class="tab-pane fade active in bdr-w-0" id="fields-container">
-                <h5 class="fw-sb mb-xs"><?php echo $view['translator']->trans('custom.field.title'); ?></h5>
                 <ul class="list-group mb-xs">
                     <?php /** @var MauticPlugin\CustomObjectsBundle\Entity\CustomField $field */
                     foreach ($customObject->getCustomFields() as $field) : ?>
@@ -135,16 +134,9 @@ $view['slots']->set(
                                 </div>
                                 <div class="col-md-7 va-m">
                                     <h5 class="fw-sb text-primary mb-xs"><?php echo $field->getLabel(); ?></h5>
-                                    <h6 class="text-white dark-md"><?php echo $view['translator']->trans(
-                                            'mautic.form.details.field_type',
-                                            ['%type%' => $field->getType()]
-                                        ); ?></h6>
                                 </div>
                                 <div class="col-md-4 va-m text-right">
-                                    <em class="text-white dark-sm"><?php echo $view['translator']->trans(
-                                            'mautic.form.details.field_order',
-                                            ['%order%' => $field->getOrder()]
-                                        ); ?></em>
+                                    <em class="text-white dark-sm"><?php echo $field->getTypeObject()->getName(); ?></em>
                                 </div>
                             </div>
                         </li>
@@ -159,31 +151,6 @@ $view['slots']->set(
 
     <!-- right section -->
     <div class="col-md-3 bg-white bdr-l height-auto">
-
-        <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mb-0">
-            <div class="panel-heading">
-                <div class="panel-title">Actions</div>
-            </div>
-            <div class="panel-body pt-xs">
-                <ul class="media-list media-list-feed">
-                    <li>
-                        <a href="<?php
-                        echo $view['router']->path(
-                            \MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider::ROUTE_LIST,
-                            ['objectId' => $customObject->getId()]
-                        ); ?>"><?php echo $view['translator']->trans('custom.items.view.link'); ?></a>
-                    </li>
-                    <li>
-                        <a href="<?php
-                        echo $view['router']->path(
-                            \MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider::ROUTE_NEW,
-                            ['objectId' => $customObject->getId()]
-                        ); ?>"><?php echo $view['translator']->trans('custom.item.create.link'); ?></a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
         <!-- recent activity -->
         <?php echo $view->render('MauticCoreBundle:Helper:recentactivity.html.php', ['logs' => $logs]); ?>
     </div>

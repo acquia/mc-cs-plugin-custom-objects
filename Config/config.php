@@ -457,6 +457,7 @@ return [
                     'custom_object.route.provider',
                     'custom_field.type.provider',
                     'custom_field.field.params.to.string.transformer',
+                    'custom_field.field.options.to.string.transformer',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -677,6 +678,8 @@ return [
                 'arguments' => [
                     'custom_object.permission.provider',
                     'custom_object.route.provider',
+                    'custom_item.permission.provider',
+                    'custom_item.route.provider',
                 ],
             ],
             'custom_item.campaign.subscriber' => [
