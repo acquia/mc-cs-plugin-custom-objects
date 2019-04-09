@@ -815,11 +815,6 @@ return [
                 'arguments' => ['translator'],
                 'tag'       => 'custom.field.type',
             ],
-            'custom.field.type.html_area' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\HtmlAreaType::class,
-                'arguments' => ['translator'],
-                'tag'       => 'custom.field.type',
-            ],
             'custom.field.type.int' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType::class,
                 'arguments' => ['translator'],

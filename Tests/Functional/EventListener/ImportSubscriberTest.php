@@ -87,7 +87,6 @@ class ImportSubscriberTest extends KernelTestCase
             'date'           => '2019-03-04',
             'email'          => 'info@doe.corp',
             'hidden'         => 'secret hidden text',
-            'html_area'      => '<h1>Hello</h1>',
             'int'            => '3453562',
             'multiselect'    => 'option_b,option_a',
             'phone'          => '+420775603019',
@@ -180,7 +179,7 @@ class ImportSubscriberTest extends KernelTestCase
         try {
             $this->importCsvRow($customObject, $csvRow);
         } catch (InvalidValueException $e) {
-            $this->assertContains("Value 'unicorn' does not exist in the list of options of field 'Multiselect Test Field' (12). Possible values: option_a, option_b", $e->getMessage());
+            $this->assertContains("Value 'unicorn' does not exist in the list of options of field 'Multiselect Test Field' (11). Possible values: option_a, option_b", $e->getMessage());
         }
     }
 
