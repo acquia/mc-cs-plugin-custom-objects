@@ -174,12 +174,12 @@ class ImportSubscriberTest extends KernelTestCase
      */
     private function validateSelectOptionValueExists(CustomObject $customObject, array $csvRow): void
     {
-        $csvRow['multiselect']    = 'option_a';
+        $csvRow['multiselect']    = 'unicorn';
 
         try {
             $this->importCsvRow($customObject, $csvRow);
         } catch (InvalidValueException $e) {
-            $this->assertContains("Value 'unicorn' does not exist in the list of options of field 'Multiselect Test Field' (12). Possible values: option_a, option_b", $e->getMessage());
+            $this->assertContains("Value 'unicorn' does not exist in the list of options of field 'Multiselect Test Field' (11). Possible values: option_a, option_b", $e->getMessage());
         }
     }
 
