@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Event\MenuEvent;
 use MauticPlugin\CustomObjectsBundle\EventListener\MenuSubscriber;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 
 class MenuSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -28,6 +29,9 @@ class MenuSubscriberTest extends \PHPUnit_Framework_TestCase
 
     private $menuEvent;
 
+    /**
+     * @var MenuSubscriber
+     */
     private $menuSubscriber;
 
     protected function setUp(): void
@@ -58,12 +62,15 @@ class MenuSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('pluginIsEnabled')
             ->willReturn(true);
 
-        $this->menuEvent->expects($this->once())
+        $this->menuEvent->expects($this->exactly(2))
             ->method('getType')
-            ->willReturn('not-main');
+            ->willReturn('not-main-or-admin');
 
         $this->customObjectModel->expects($this->never())
             ->method('fetchAllPublishedEntities');
+
+        $this->menuEvent->expects($this->never())
+            ->method('addMenuItems');
 
         $this->menuSubscriber->onBuildMenu($this->menuEvent);
     }
@@ -74,7 +81,7 @@ class MenuSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('pluginIsEnabled')
             ->willReturn(true);
 
-        $this->menuEvent->expects($this->once())
+        $this->menuEvent->expects($this->exactly(2))
             ->method('getType')
             ->willReturn('main');
 
@@ -98,7 +105,7 @@ class MenuSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('pluginIsEnabled')
             ->willReturn(true);
 
-        $this->menuEvent->expects($this->once())
+        $this->menuEvent->expects($this->exactly(2))
             ->method('getType')
             ->willReturn('main');
 
@@ -119,7 +126,7 @@ class MenuSubscriberTest extends \PHPUnit_Framework_TestCase
                 ],
             ]);
 
-        $this->menuEvent->expects($this->at(1))
+        $this->menuEvent->expects($this->at(2))
             ->method('addMenuItems')
             ->willReturn([
                 'items' => [
@@ -129,6 +136,36 @@ class MenuSubscriberTest extends \PHPUnit_Framework_TestCase
                         'access'          => 'custom_fields:custom_fields:view',
                         'id'              => 'mautic_custom_object_333',
                         'parent'          => 'custom.object.title',
+                    ],
+                ],
+            ]);
+
+        $this->menuSubscriber->onBuildMenu($this->menuEvent);
+    }
+
+    public function testAdminMenu(): void
+    {
+        $this->configProvider->expects($this->once())
+            ->method('pluginIsEnabled')
+            ->willReturn(true);
+
+        $this->menuEvent->expects($this->exactly(2))
+            ->method('getType')
+            ->willReturn('admin');
+
+        $this->customObjectModel->expects($this->never())
+            ->method('fetchAllPublishedEntities');
+
+        $this->menuEvent->expects($this->once())
+            ->method('addMenuItems')
+            ->willReturn([
+                'priority' => 61,
+                'items'    => [
+                    'custom.object.config.menu.title' => [
+                        'id'        => CustomObjectRouteProvider::ROUTE_LIST,
+                        'route'     => CustomObjectRouteProvider::ROUTE_LIST,
+                        'access'    => 'custom_objects:custom_objects:view',
+                        'iconClass' => 'fa-list-alt',
                     ],
                 ],
             ]);
