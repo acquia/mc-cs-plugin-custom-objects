@@ -86,7 +86,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
                             );
                         }
                     } else {
-                        $this->addEntityButtons($event, ButtonHelper::LOCATION_LIST_ACTIONS);
+                        $this->addEntityButtons($event, ButtonHelper::LOCATION_LIST_ACTIONS, $customObjectId);
                         $event->addButton(
                             $this->defineNewButton($customObjectId),
                             ButtonHelper::LOCATION_PAGE_ACTIONS,
@@ -114,9 +114,10 @@ class CustomItemButtonSubscriber extends CommonSubscriber
                 break;
 
             case CustomItemRouteProvider::ROUTE_VIEW:
-                $this->addEntityButtons($event, ButtonHelper::LOCATION_PAGE_ACTIONS);
+                $customObjectId = $this->getCustomObjectIdFromEvent($event);
+                $this->addEntityButtons($event, ButtonHelper::LOCATION_PAGE_ACTIONS, $customObjectId);
                 $event->addButton(
-                    $this->defineCloseButton($this->getCustomObjectIdFromEvent($event)),
+                    $this->defineCloseButton($customObjectId),
                     ButtonHelper::LOCATION_PAGE_ACTIONS,
                     $event->getRoute()
                 );
@@ -128,13 +129,12 @@ class CustomItemButtonSubscriber extends CommonSubscriber
     /**
      * @param CustomButtonEvent $event
      * @param string            $location
+     * @param int               $customObjectId
      */
-    private function addEntityButtons(CustomButtonEvent $event, string $location): void
+    private function addEntityButtons(CustomButtonEvent $event, string $location, int $customObjectId): void
     {
         $customItem = $event->getItem();
         if ($customItem && $customItem instanceof CustomItem) {
-            $customObjectId = $this->getCustomObjectIdFromEvent($event);
-
             try {
                 $event->addButton($this->defineDeleteButton($customObjectId, $customItem), $location, $event->getRoute());
             } catch (ForbiddenException $e) {
@@ -183,10 +183,8 @@ class CustomItemButtonSubscriber extends CommonSubscriber
     {
         return [
             'attr' => [
-                'href'  => $this->routeProvider->buildListRoute($customObjectId),
-                'class' => 'btn btn-default',
+                'href' => $this->routeProvider->buildListRoute($customObjectId),
             ],
-            'class'     => 'btn btn-default',
             'btnText'   => 'mautic.core.form.close',
             'iconClass' => 'fa fa-fw fa-remove',
             'priority'  => 400,
@@ -252,7 +250,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
             'attr' => [
                 'href' => $this->routeProvider->buildNewRoute($customObjectId),
             ],
-            'btnText'   => $this->translator->trans('mautic.core.form.new'),
+            'btnText'   => 'mautic.core.form.new',
             'iconClass' => 'fa fa-plus',
             'priority'  => 500,
         ];
@@ -299,7 +297,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
             'attr' => [
                 'href' => $this->routeProvider->buildNewImportRoute($customObjectId),
             ],
-            'btnText'   => $this->translator->trans('mautic.lead.import'),
+            'btnText'   => 'mautic.lead.import',
             'iconClass' => 'fa fa-upload',
             'priority'  => 350,
         ];
@@ -314,13 +312,13 @@ class CustomItemButtonSubscriber extends CommonSubscriber
      */
     private function defineImportListButton(int $customObjectId): array
     {
-        $this->permissionProvider->canCreate($customObjectId);
+        $this->permissionProvider->canViewAtAll($customObjectId);
 
         return [
             'attr' => [
                 'href' => $this->routeProvider->buildListImportRoute($customObjectId),
             ],
-            'btnText'   => $this->translator->trans('mautic.lead.lead.import.index'),
+            'btnText'   => 'mautic.lead.lead.import.index',
             'iconClass' => 'fa fa-history',
             'priority'  => 300,
         ];
