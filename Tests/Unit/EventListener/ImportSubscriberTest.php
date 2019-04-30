@@ -23,6 +23,9 @@ use Mautic\LeadBundle\Event\ImportProcessEvent;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use Doctrine\Common\Collections\ArrayCollection;
 
 class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -61,7 +64,7 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testPluginDisabledForImportInit(): void
+    public function testOnImportInitWhenPluginIsDisabled(): void
     {
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
@@ -73,7 +76,7 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->importSubscriber->onImportInit($this->importInitEvent);
     }
 
-    public function testImportInit(): void
+    public function testOnImportInit(): void
     {
         $customObject = $this->createMock(CustomObject::class);
 
@@ -118,19 +121,113 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->importSubscriber->onImportInit($this->importInitEvent);
     }
 
-    public function testPluginDisabledForFieldMapping(): void
+    public function testOnImportInitWhenCustomObjectNotFound(): void
+    {
+        $customObject = $this->createMock(CustomObject::class);
+
+        $customObject->method('getNamePlural')->willReturn('Test Object');
+
+        $this->configProvider->expects($this->once())
+            ->method('pluginIsEnabled')
+            ->willReturn(true);
+
+        $this->importInitEvent->expects($this->once())
+            ->method('getRouteObjectName')
+            ->willReturn('custom-object:35');
+
+        $this->customObjectModel->expects($this->once())
+            ->method('fetchEntity')
+            ->with(35)
+            ->will($this->throwException(new NotFoundException()));
+
+        $this->importInitEvent->expects($this->never())
+            ->method('setObjectIsSupported');
+
+        $this->importInitEvent->expects($this->never())
+            ->method('stopPropagation');
+
+        $this->importSubscriber->onImportInit($this->importInitEvent);
+    }
+
+    public function testOnFieldMappingWhenPluginIsDisabled(): void
     {
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
             ->willReturn(false);
 
-        $this->importInitEvent->expects($this->never())
+        $this->importMappingEvent->expects($this->never())
             ->method('getRouteObjectName');
 
         $this->importSubscriber->onFieldMapping($this->importMappingEvent);
     }
 
-    public function testPluginDisabledForImportProcess(): void
+    public function testOnFieldMappingWhenNotCustomObjectRoute(): void
+    {
+        $this->configProvider->expects($this->once())
+            ->method('pluginIsEnabled')
+            ->willReturn(true);
+
+        $this->importMappingEvent->expects($this->once())
+            ->method('getRouteObjectName')
+            ->willReturn('page');
+
+        $this->customObjectModel->expects($this->never())
+            ->method('fetchEntity');
+
+        $this->importSubscriber->onFieldMapping($this->importMappingEvent);
+    }
+
+    public function testOnFieldMapping(): void
+    {
+        $this->configProvider->expects($this->once())
+            ->method('pluginIsEnabled')
+            ->willReturn(true);
+
+        $this->importMappingEvent->expects($this->once())
+            ->method('getRouteObjectName')
+            ->willReturn('custom-object:35');
+
+        $customObject = $this->createMock(CustomObject::class);
+        $customField  = $this->createMock(CustomField::class);
+
+        $customField->expects($this->once())
+            ->method('getId')
+            ->willReturn(456);
+
+        $customField->expects($this->once())
+            ->method('getName')
+            ->willReturn('Field A');
+
+        $customObject->expects($this->once())
+            ->method('getCustomFields')
+            ->willReturn(new ArrayCollection([$customField]));
+
+        $customObject->expects($this->once())
+            ->method('getNamePlural')
+            ->willReturn('Object A');
+
+        $this->customObjectModel->expects($this->once())
+            ->method('fetchEntity')
+            ->with(35)
+            ->willReturn($customObject);
+
+        $this->importMappingEvent->expects($this->once())
+            ->method('setFields')
+            ->with([
+                'Object A' => [
+                    'customItemId'   => 'mautic.core.id',
+                    'customItemName' => 'custom.item.name.label',
+                    456              => 'Field A'
+                ],
+                'mautic.lead.special_fields' => [
+                    'linkedContactIds' => 'custom.item.link.contact.ids'
+                ],
+            ]);
+
+        $this->importSubscriber->onFieldMapping($this->importMappingEvent);
+    }
+
+    public function testOnImportProcessWhenPluginIsDisabled(): void
     {
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
