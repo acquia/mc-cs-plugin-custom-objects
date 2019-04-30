@@ -97,8 +97,15 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
                 $customObject = $event->getItem();
 
                 if ($customObject) {
-                    $event->addButton($this->defineViewCustomItemsButton($customObject), ButtonHelper::LOCATION_PAGE_ACTIONS, $event->getRoute());
-                    $event->addButton($this->defineCreateNewCustomItemButton($customObject), ButtonHelper::LOCATION_PAGE_ACTIONS, $event->getRoute());
+                    try {
+                        $event->addButton($this->defineViewCustomItemsButton($customObject), ButtonHelper::LOCATION_PAGE_ACTIONS, $event->getRoute());
+                    } catch (ForbiddenException $e) {
+                    }
+
+                    try {
+                        $event->addButton($this->defineCreateNewCustomItemButton($customObject), ButtonHelper::LOCATION_PAGE_ACTIONS, $event->getRoute());
+                    } catch (ForbiddenException $e) {
+                    }
                 }
 
                 break;
@@ -159,9 +166,7 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
         return [
             'attr' => [
                 'href'  => $this->routeProvider->buildListRoute(),
-                'class' => 'btn btn-default',
             ],
-            'class'     => 'btn btn-default',
             'btnText'   => 'mautic.core.form.close',
             'iconClass' => 'fa fa-fw fa-remove',
             'priority'  => 400,
@@ -217,13 +222,13 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
      */
     private function defineNewButton(): array
     {
-//        $this->permissionProvider->canCreate();
+        $this->permissionProvider->canCreate();
 
         return [
             'attr' => [
                 'href' => $this->routeProvider->buildNewRoute(),
             ],
-            'btnText'   => $this->translator->trans('mautic.core.form.new'),
+            'btnText'   => 'mautic.core.form.new',
             'iconClass' => 'fa fa-plus',
             'priority'  => 500,
         ];

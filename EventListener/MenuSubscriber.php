@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Event\MenuEvent;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 
 class MenuSubscriber extends CommonSubscriber
 {
@@ -57,14 +58,22 @@ class MenuSubscriber extends CommonSubscriber
      */
     public function onBuildMenu(MenuEvent $event): void
     {
-        if (!$this->configProvider->pluginIsEnabled()) {
-            return;
-        }
+        if ($this->configProvider->pluginIsEnabled()) {
+            if ('main' === $event->getType()) {
+                $this->addMainMenuItems($event);
+            }
 
-        if ('main' !== $event->getType()) {
-            return;
+            if ('admin' === $event->getType()) {
+                $this->addAdminMenuItems($event);
+            }
         }
+    }
 
+    /**
+     * @param MenuEvent $event
+     */
+    private function addMainMenuItems(MenuEvent $event): void
+    {
         $customObjects = $this->customObjectModel->fetchAllPublishedEntities();
 
         if (!$customObjects) {
@@ -99,5 +108,25 @@ class MenuSubscriber extends CommonSubscriber
                 ]
             );
         }
+    }
+
+    /**
+     * @param MenuEvent $event
+     */
+    private function addAdminMenuItems(MenuEvent $event): void
+    {
+        $event->addMenuItems(
+            [
+                'priority' => 61,
+                'items'    => [
+                    'custom.object.config.menu.title' => [
+                        'id'        => CustomObjectRouteProvider::ROUTE_LIST,
+                        'route'     => CustomObjectRouteProvider::ROUTE_LIST,
+                        'access'    => 'custom_objects:custom_objects:view',
+                        'iconClass' => 'fa-list-alt',
+                    ],
+                ],
+            ]
+        );
     }
 }

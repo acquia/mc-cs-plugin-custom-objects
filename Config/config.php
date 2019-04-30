@@ -175,22 +175,6 @@ return [
         ],
     ],
 
-    'menu' => [
-        'admin' => [
-            'custom.object.config.menu.title' => [
-                'id'        => CustomObjectRouteProvider::ROUTE_LIST,
-                'route'     => CustomObjectRouteProvider::ROUTE_LIST,
-                'access'    => 'custom_objects:custom_objects:view',
-                'iconClass' => 'fa-list-alt',
-                'checks'    => [
-                    'parameters' => [
-                        ConfigProvider::CONFIG_PARAM_ENABLED => true,
-                    ],
-                ],
-            ],
-        ],
-    ],
-
     'services' => [
         'controllers' => [
             // Custom Fields

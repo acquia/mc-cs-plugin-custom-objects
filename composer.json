@@ -3,6 +3,9 @@
     "description": "This plugin adds custom objects feature.",
     "type": "mautic-plugin",
     "version": "1.0-dev",
+    "config": {
+        "process-timeout": 2000
+    },
     "keywords": [
         "custom",
         "mautic",
