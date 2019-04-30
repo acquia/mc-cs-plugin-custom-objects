@@ -224,7 +224,7 @@ class CustomObjectButtonSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->itemPermissionProvider->expects($this->once())
             ->method('canViewAtAll')
             ->with(555);
-            
+
         $this->itemRouteProvider->expects($this->once())
             ->method('buildListRoute')
             ->willReturn('generated/item/list/route');

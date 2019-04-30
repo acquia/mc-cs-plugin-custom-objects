@@ -217,10 +217,10 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
                 'Object A' => [
                     'customItemId'   => 'mautic.core.id',
                     'customItemName' => 'custom.item.name.label',
-                    456              => 'Field A'
+                    456              => 'Field A',
                 ],
                 'mautic.lead.special_fields' => [
-                    'linkedContactIds' => 'custom.item.link.contact.ids'
+                    'linkedContactIds' => 'custom.item.link.contact.ids',
                 ],
             ]);
 

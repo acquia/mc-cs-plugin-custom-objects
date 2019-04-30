@@ -222,7 +222,7 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
      */
     private function defineNewButton(): array
     {
-       $this->permissionProvider->canCreate();
+        $this->permissionProvider->canCreate();
 
         return [
             'attr' => [
