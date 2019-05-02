@@ -140,7 +140,14 @@ class CustomItemRouteProviderTest extends \PHPUnit_Framework_TestCase
     {
         $this->router->expects($this->once())
             ->method('generate')
-            ->with(CustomItemRouteProvider::ROUTE_LOOKUP, ['objectId' => self::OBJECT_ID])
+            ->with(
+                CustomItemRouteProvider::ROUTE_LOOKUP,
+                [
+                    'objectId'         => self::OBJECT_ID,
+                    'filterEntityType' => null,
+                    'filterEntityId'   => null,
+                ]
+            )
             ->willReturn('the/generated/route');
 
         $this->customItemRouteProvider->buildLookupRoute(self::OBJECT_ID);

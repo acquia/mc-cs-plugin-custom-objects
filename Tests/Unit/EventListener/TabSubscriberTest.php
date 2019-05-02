@@ -20,6 +20,8 @@ use Mautic\CoreBundle\Event\CustomContentEvent;
 use MauticPlugin\CustomObjectsBundle\EventListener\TabSubscriber;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Mautic\LeadBundle\Entity\Lead;
+use Symfony\Component\Translation\TranslatorInterface;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 
 class TabSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,6 +31,10 @@ class TabSubscriberTest extends \PHPUnit_Framework_TestCase
 
     private $configProvider;
 
+    private $translator;
+
+    private $customItemRouteProvider;
+
     private $customContentEvent;
 
     private $tabSubscriber;
@@ -37,14 +43,18 @@ class TabSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->customObjectModel  = $this->createMock(CustomObjectModel::class);
-        $this->customItemModel    = $this->createMock(CustomItemModel::class);
-        $this->configProvider     = $this->createMock(ConfigProvider::class);
-        $this->customContentEvent = $this->createMock(CustomContentEvent::class);
-        $this->tabSubscriber      = new TabSubscriber(
+        $this->customObjectModel       = $this->createMock(CustomObjectModel::class);
+        $this->customItemModel         = $this->createMock(CustomItemModel::class);
+        $this->configProvider          = $this->createMock(ConfigProvider::class);
+        $this->translator              = $this->createMock(TranslatorInterface::class);
+        $this->customItemRouteProvider = $this->createMock(CustomItemRouteProvider::class);
+        $this->customContentEvent      = $this->createMock(CustomContentEvent::class);
+        $this->tabSubscriber           = new TabSubscriber(
             $this->customObjectModel,
             $this->customItemModel,
-            $this->configProvider
+            $this->configProvider,
+            $this->translator,
+            $this->customItemRouteProvider
         );
     }
 
@@ -65,6 +75,14 @@ class TabSubscriberTest extends \PHPUnit_Framework_TestCase
         $customObject = $this->createMock(CustomObject::class);
         $contact      = $this->createMock(Lead::class);
 
+        $customObject->expects($this->once())
+            ->method('getId')
+            ->willReturn(555);
+
+        $customObject->expects($this->once())
+            ->method('getNamePlural')
+            ->willReturn('Object A');
+
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
             ->willReturn(true);
@@ -83,8 +101,9 @@ class TabSubscriberTest extends \PHPUnit_Framework_TestCase
             ->with(
                 'CustomObjectsBundle:SubscribedEvents/Tab:link.html.php',
                 [
-                    'customObject' => $customObject,
-                    'count'        => 13,
+                    'count' => 13,
+                    'title' => 'Object A',
+                    'tabId' => 'custom-object-555',
                 ]
             );
 
@@ -111,6 +130,7 @@ class TabSubscriberTest extends \PHPUnit_Framework_TestCase
         $contact      = $this->createMock(Lead::class);
 
         $contact->method('getId')->willReturn(45);
+        $customObject->method('getId')->willReturn(555);
 
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
@@ -130,15 +150,35 @@ class TabSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getVars')
             ->willReturn(['lead' => $contact]);
 
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with('custom.item.link.search.placeholder')
+            ->willReturn('translated placeholder');
+
+        $this->customItemRouteProvider->expects($this->once())
+            ->method('buildLookupRoute')
+            ->with(555, 'contact', 45)
+            ->willReturn('lookup/route');
+
+        $this->customItemRouteProvider->expects($this->once())
+            ->method('buildNewRoute')
+            ->with(555)
+            ->willReturn('new/route');
+
         $this->customContentEvent->expects($this->at(3))
             ->method('addTemplate')
             ->with(
                 'CustomObjectsBundle:SubscribedEvents/Tab:content.html.php',
                 [
-                    'customObject' => $customObject,
-                    'page'         => 1,
-                    'search'       => '',
-                    'contactId'    => 45,
+                    'page'              => 1,
+                    'search'            => '',
+                    'customObjectId'    => 555,
+                    'currentEntityId'   => 45,
+                    'currentEntityType' => 'contact',
+                    'tabId'             => 'custom-object-555',
+                    'placeholder'       => 'translated placeholder',
+                    'lookupRoute'       => 'lookup/route',
+                    'newRoute'          => 'new/route',
                 ]
             );
 

@@ -109,7 +109,8 @@ class LookupControllerTest extends ControllerTestCase
             ->method('add');
 
         $this->request->method('get')->will($this->returnValueMap([
-            ['contactId', null, false, 45],
+            ['filterEntityId', null, false, 45],
+            ['filterEntityType', null, false, 'contact'],
         ]));
 
         $this->customItemModel->expects($this->once())
