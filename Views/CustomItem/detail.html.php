@@ -117,6 +117,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                     <?php echo $view['translator']->trans('mautic.lead.leads'); ?>
                 </a>
             </li>
+            <?php echo $view['content']->getCustomContent('tabs', $mauticTemplateVars); ?>
         </ul>
         <!--/ tabs controls -->
 
@@ -125,6 +126,7 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             <div class="tab-pane active bdr-w-0 page-list" id="contacts-container">
                 <?php echo $contacts; ?>
             </div>
+            <?php echo $view['content']->getCustomContent('tabs.content', $mauticTemplateVars); ?>
         </div>
         <!-- end: tab-content -->
     </div>
