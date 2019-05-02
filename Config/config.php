@@ -468,6 +468,7 @@ return [
                 'arguments' => [
                     'custom_object.session.provider',
                     'custom_object.route.provider',
+                    'mautic.custom.model.object',
                 ],
                 'methodCalls' => [
                     'setContainer' => [

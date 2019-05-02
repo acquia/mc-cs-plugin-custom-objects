@@ -163,6 +163,11 @@ class SaveController extends CommonController
             );
 
             if ($form->get('buttons')->get('save')->isClicked()) {
+                if (!$this->customObjectModel->isLocked($customObject)) {
+                    // New entity should be locked after save
+                    $this->customObjectModel->lockEntity($customObject);
+                }
+
                 return $this->forwardToDetail($request, $customObject);
             }
 
@@ -220,14 +225,16 @@ class SaveController extends CommonController
 
     /**
      * @param Request      $request
-     * @param CustomObject $entity
+     * @param CustomObject $customObject
      *
      * @return Response
      */
-    private function forwardToDetail(Request $request, CustomObject $entity): Response
+    private function forwardToDetail(Request $request, CustomObject $customObject): Response
     {
         $request->setMethod('GET');
-        $params = ['objectId' => $entity->getId()];
+        $params = ['objectId' => $customObject->getId()];
+
+        $this->customObjectModel->unlockEntity($customObject);
 
         return $this->forward('CustomObjectsBundle:CustomObject\View:view', $params);
     }
