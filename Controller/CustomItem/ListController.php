@@ -103,12 +103,13 @@ class ListController extends CommonController
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        $request      = $this->requestStack->getCurrentRequest();
-        $search       = InputHelper::clean($request->get('search', $this->sessionProvider->getFilter()));
-        $limit        = (int) $request->get('limit', $this->sessionProvider->getPageLimit());
-        $contactId    = (int) $request->get('contactId');
-        $orderBy      = $this->sessionProvider->getOrderBy(CustomItemRepository::TABLE_ALIAS.'.id');
-        $orderByDir   = $this->sessionProvider->getOrderByDir('ASC');
+        $request          = $this->requestStack->getCurrentRequest();
+        $search           = InputHelper::clean($request->get('search', $this->sessionProvider->getFilter()));
+        $limit            = (int) $request->get('limit', $this->sessionProvider->getPageLimit());
+        $filterEntityId   = (int) $request->get('filterEntityId');
+        $filterEntityType = $request->get('filterEntityType');
+        $orderBy          = $this->sessionProvider->getOrderBy(CustomItemRepository::TABLE_ALIAS.'.id');
+        $orderByDir       = $this->sessionProvider->getOrderByDir('ASC');
 
         if ($request->query->has('orderby')) {
             $orderBy    = InputHelper::clean($request->query->get('orderby'), true);
@@ -119,7 +120,13 @@ class ListController extends CommonController
 
         $tableConfig = new TableConfig($limit, $page, $orderBy, $orderByDir);
         $tableConfig->addFilter(CustomItem::class, 'customObject', $objectId);
-        $tableConfig->addFilterIfNotEmpty(CustomItemXrefContact::class, 'contact', $contactId);
+
+        switch ($filterEntityType) {
+            case 'contact':
+                $tableConfig->addFilterIfNotEmpty(CustomItemXrefContact::class, 'contact', $filterEntityId);
+
+                break;
+        }
 
         $this->sessionProvider->setPage($page);
         $this->sessionProvider->setPageLimit($limit);
@@ -127,14 +134,15 @@ class ListController extends CommonController
 
         $response = [
             'viewParameters' => [
-                'searchValue'    => $search,
-                'customObject'   => $customObject,
-                'contactId'      => $contactId,
-                'items'          => $this->customItemModel->getTableData($tableConfig),
-                'itemCount'      => $this->customItemModel->getCountForTable($tableConfig),
-                'page'           => $page,
-                'limit'          => $limit,
-                'tmpl'           => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                'searchValue'      => $search,
+                'customObject'     => $customObject,
+                'filterEntityId'   => $filterEntityId,
+                'filterEntityType' => $filterEntityType,
+                'items'            => $this->customItemModel->getTableData($tableConfig),
+                'itemCount'        => $this->customItemModel->getCountForTable($tableConfig),
+                'page'             => $page,
+                'limit'            => $limit,
+                'tmpl'             => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
             ],
             'contentTemplate' => 'CustomObjectsBundle:CustomItem:list.html.php',
             'passthroughVars' => [

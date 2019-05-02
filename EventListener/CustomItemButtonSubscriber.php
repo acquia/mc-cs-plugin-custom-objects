@@ -73,14 +73,15 @@ class CustomItemButtonSubscriber extends CommonSubscriber
         switch ($event->getRoute()) {
             case CustomItemRouteProvider::ROUTE_LIST:
                 try {
-                    $customObjectId      = $this->getCustomObjectIdFromEvent($event);
-                    $contactId           = $event->getRequest()->query->get('contactId', false);
-                    $onContactDetailPage = (bool) $contactId;
-                    if ($onContactDetailPage) {
+                    $customObjectId   = $this->getCustomObjectIdFromEvent($event);
+                    $filterEntityId   = $event->getRequest()->query->get('filterEntityId', false);
+                    $filterEntityType = $event->getRequest()->query->get('filterEntityType', false);
+                    $loadedInTab      = (bool) $filterEntityId;
+                    if ($loadedInTab && 'contact' === $filterEntityType) {
                         $customItem = $event->getItem();
                         if ($customItem && $customItem instanceof CustomItem) {
                             $event->addButton(
-                                $this->defineUnlinkContactButton($customObjectId, $customItem->getId(), (int) $contactId),
+                                $this->defineUnlinkContactButton($customObjectId, $customItem->getId(), (int) $filterEntityId),
                                 ButtonHelper::LOCATION_LIST_ACTIONS,
                                 $event->getRoute()
                             );
@@ -272,7 +273,7 @@ class CustomItemButtonSubscriber extends CommonSubscriber
         return [
             'attr' => [
                 'href'        => '#',
-                'onclick'     => "CustomObjects.unlinkFromContact(this, event, ${customObjectId}, ${contactId});",
+                'onclick'     => "CustomObjects.unlinkCustomItemFromEntity(this, event, ${customObjectId}, 'contact', ${contactId}, 'custom-object-${customObjectId}');",
                 'data-action' => $this->routeProvider->buildUnlinkContactRoute($customItemId, $contactId),
                 'data-toggle' => '',
             ],

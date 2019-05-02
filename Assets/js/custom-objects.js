@@ -90,17 +90,15 @@ CustomObjects = {
     },
 
     // Called from tab content HTML:
-    initContactTabForCustomObject(customObjectId) {
-        let contactId = mQuery('input#leadId').val();
-        let selector = CustomObjects.createTabSelector(customObjectId, '[data-toggle="typeahead"]');
-        let input = mQuery(selector);
-        CustomObjects.initCustomItemTypeahead(input, customObjectId, contactId, function(selectedItem) {
-            CustomObjects.linkContactWithCustomItem(contactId, selectedItem.id, function() {
-                CustomObjects.reloadItemsTable(customObjectId, contactId);
+    initTabShowingLinkedItems(customObjectId, currentEntityId, currentEntityType, tabId) {
+        let input = mQuery('#'+tabId+'-container [data-toggle="typeahead"]');
+        CustomObjects.initCustomItemTypeahead(input, customObjectId, function(selectedItem) {
+            CustomObjects.linkCustomItemWithEntity(selectedItem.id, currentEntityId, currentEntityType, function() {
+                CustomObjects.reloadItemsTable(customObjectId, currentEntityId, currentEntityType, tabId);
                 input.val('');
             });
         });
-        CustomObjects.reloadItemsTable(customObjectId, contactId);
+        CustomObjects.reloadItemsTable(customObjectId, currentEntityId, currentEntityType, tabId);
     },
 
     initCustomItemTypeaheadsOnCampaignEventForm() {
@@ -148,13 +146,15 @@ CustomObjects = {
         formGroup.removeClass('has-feedback');
     },
 
-    reloadItemsTable(customObjectId, contactId) {
-        CustomObjects.getItemsForObject(customObjectId, contactId, function(response) {
-            CustomObjects.refreshTabContent(customObjectId, response.newContent);
+    reloadItemsTable(customObjectId, currentEntityId, currentEntityType, tabId) {
+        CustomObjects.getItemsForObjectLinkedToEntity(customObjectId, currentEntityId, currentEntityType, function(response) {
+            let selector = '#'+tabId+'-container .custom-item-list';
+            mQuery(selector).html(response.newContent);
+            Mautic.onPageLoad(selector);
         });
     },
 
-    initCustomItemTypeahead(input, customObjectId, contactId, onSelectCallback) {
+    initCustomItemTypeahead(input, customObjectId, onSelectCallback) {
         // Initialize only once
         if (input.attr('data-typeahead-initialized')) {
             return;
@@ -166,7 +166,7 @@ CustomObjects = {
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value', 'id'),
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             remote: {
-                url: url+'?filter=%QUERY&contactId='+contactId,
+                url: url+'?filter=%QUERY',
                 wildcard: '%QUERY',
                 ajax: {
                     beforeSend: function() {
@@ -188,7 +188,7 @@ CustomObjects = {
             minLength: 0,
             highlight: true,
         }, {
-            name: 'custom-items-'+customObjectId+'-'+contactId,
+            name: 'custom-items-'+customObjectId,
             display: 'value',
             source: customItems.ttAdapter()
         }).bind('typeahead:selected', function(e, selectedItem) {
@@ -197,42 +197,27 @@ CustomObjects = {
         });
     },
 
-    linkContactWithCustomItem(contactId, customItemId, callback) {
+    linkCustomItemWithEntity(customItemId, entitytId, entityType, callback) {
         mQuery.ajax({
             type: 'POST',
-            url: mauticBaseUrl+'s/custom/item/'+customItemId+'/link/contact/'+contactId+'.json',
-            data: {contactId: contactId},
-            success: function (response) {
-                callback(response);
-            },
+            url: mauticBaseUrl+'s/custom/item/'+customItemId+'/link/'+entityType+'/'+entitytId+'.json',
+            success: callback,
         });
     },
 
-    unlinkFromContact(elHtml, event, customObjectId, contactId) {
+    unlinkCustomItemFromEntity(elHtml, event, customObjectId, currentEntityType, currentEntityId, tabId) { // update this to use it for all entity types
         event.preventDefault();
         mQuery.ajax({type: 'POST', url: mQuery(elHtml).attr('data-action'), success: function() {
-            CustomObjects.reloadItemsTable(customObjectId, contactId);
+            CustomObjects.reloadItemsTable(customObjectId, currentEntityId, currentEntityType, tabId);
         }});
     },
 
-    getItemsForObject(customObjectId, contactId, callback) {
+    getItemsForObjectLinkedToEntity(customObjectId, currentEntityId, currentEntityType, callback) {
         mQuery.ajax({
             type: 'GET',
             url: mauticBaseUrl+'s/custom/object/'+customObjectId+'/item?tmpl=list',
-            data: {contactId: contactId},
-            success: function (response) {
-                callback(response);
-            },
+            data: {filterEntityId: currentEntityId, 'filterEntityType': currentEntityType},
+            success: callback,
         });
-    },
-
-    refreshTabContent(customObjectId, content) {
-        let selector = CustomObjects.createTabSelector(customObjectId, '.custom-item-list');
-        mQuery(selector).html(content);
-        Mautic.onPageLoad(selector);
-    },
-
-    createTabSelector(customObjectId, suffix) {
-        return '#custom-object-'+customObjectId+'-container '+suffix;
     },
 };

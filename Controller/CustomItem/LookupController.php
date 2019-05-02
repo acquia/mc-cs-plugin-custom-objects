@@ -81,15 +81,16 @@ class LookupController extends JsonController
             return $this->renderJson([]);
         }
 
-        $request     = $this->requestStack->getCurrentRequest();
-        $nameFilter  = InputHelper::clean($request->get('filter'));
-        $contactId   = (int) InputHelper::clean($request->get('contactId'));
-        $tableConfig = new TableConfig(10, 1, CustomItemRepository::TABLE_ALIAS.'.name', 'ASC');
+        $request          = $this->requestStack->getCurrentRequest();
+        $nameFilter       = InputHelper::clean($request->get('filter'));
+        $filterEntityId   = (int) $request->get('filterEntityId');
+        $filterEntityType = InputHelper::clean($request->get('filterEntityType'));
+        $tableConfig      = new TableConfig(10, 1, CustomItemRepository::TABLE_ALIAS.'.name', 'ASC');
         $tableConfig->addFilter(CustomItem::class, 'customObject', $objectId);
         $tableConfig->addFilterIfNotEmpty(CustomItem::class, 'name', "%{$nameFilter}%", 'like');
 
-        if ($contactId) {
-            $notContact = $tableConfig->createFilter(CustomItemXrefContact::class, 'contact', $contactId, 'neq');
+        if ($filterEntityId && 'contact' === $filterEntityType) {
+            $notContact = $tableConfig->createFilter(CustomItemXrefContact::class, 'contact', $filterEntityId, 'neq');
             $isNull     = $tableConfig->createFilter(CustomItemXrefContact::class, 'contact', null, 'isNull');
             $orX        = $tableConfig->createFilter(CustomItemXrefContact::class, 'contact', [$notContact, $isNull], 'orX');
             $tableConfig->addFilterDTO($orX);

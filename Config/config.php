@@ -103,9 +103,13 @@ return [
                 'method'     => 'POST',
             ],
             CustomItemRouteProvider::ROUTE_LOOKUP => [
-                'path'       => '/custom/object/{objectId}/item/lookup.json',
+                'path'       => '/custom/object/{objectId}/item/lookup.json?filterEntityId={filterEntityId}&filterEntityType={filterEntityType}',
                 'controller' => 'CustomObjectsBundle:CustomItem\Lookup:list',
                 'method'     => 'GET',
+                'defaults'   => [
+                    'filterEntityId'   => null,
+                    'filterEntityType' => null,
+                ],
             ],
             CustomItemRouteProvider::ROUTE_LINK => [
                 'path'       => '/custom/item/{itemId}/link/{entityType}/{entityId}.json',
@@ -595,6 +599,8 @@ return [
                     'mautic.custom.model.object',
                     'mautic.custom.model.item',
                     'custom_object.config.provider',
+                    'translator',
+                    'custom_item.route.provider',
                 ],
             ],
             'custom_field.post_load.subscriber' => [
