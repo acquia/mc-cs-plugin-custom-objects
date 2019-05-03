@@ -116,6 +116,7 @@ class FormController extends BaseFormController
         if ($this->customObjectModel->isLocked($customObject)) {
             return $this->isLocked([], $customObject, 'page.page');
         }
+
         $this->customObjectModel->lockEntity($customObject);
 
         return $this->renderForm($customObject, $this->routeProvider->buildEditRoute($objectId));

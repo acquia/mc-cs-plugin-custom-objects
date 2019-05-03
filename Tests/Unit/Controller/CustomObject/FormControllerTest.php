@@ -181,6 +181,13 @@ class FormControllerTest extends ControllerTestCase
             )
             ->willReturn($this->form);
 
+        $this->customObjectModel->expects($this->once())
+            ->method('isLocked')
+            ->willReturn(false);
+
+        $this->customObjectModel->expects($this->once())
+            ->method('lockEntity');
+
         $this->routeProvider->expects($this->once())
             ->method('buildSaveRoute')
             ->with(self::OBJECT_ID)
