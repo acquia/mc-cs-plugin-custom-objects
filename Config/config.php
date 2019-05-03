@@ -103,13 +103,9 @@ return [
                 'method'     => 'POST',
             ],
             CustomItemRouteProvider::ROUTE_LOOKUP => [
-                'path'       => '/custom/object/{objectId}/item/lookup.json?filterEntityId={filterEntityId}&filterEntityType={filterEntityType}',
+                'path'       => '/custom/object/{objectId}/item/lookup.json',
                 'controller' => 'CustomObjectsBundle:CustomItem\Lookup:list',
                 'method'     => 'GET',
-                'defaults'   => [
-                    'filterEntityId'   => null,
-                    'filterEntityType' => null,
-                ],
             ],
             CustomItemRouteProvider::ROUTE_LINK => [
                 'path'       => '/custom/item/{itemId}/link/{entityType}/{entityId}.json',
@@ -597,7 +593,7 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\TabSubscriber::class,
                 'arguments' => [
                     'mautic.custom.model.object',
-                    'mautic.custom.model.item',
+                    'custom_item.repository',
                     'custom_object.config.provider',
                     'translator',
                     'custom_item.route.provider',
@@ -633,6 +629,7 @@ return [
             'custom_item.xref_contact.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomItemXrefContactSubscriber::class,
                 'arguments' => [
+                    'mautic.custom.model.import.xref.contact',
                     'doctrine.orm.entity_manager',
                     'mautic.helper.user',
                 ],

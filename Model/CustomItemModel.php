@@ -251,17 +251,6 @@ class CustomItemModel extends FormModel
     }
 
     /**
-     * @param Lead         $contact
-     * @param CustomObject $customObject
-     *
-     * @return int
-     */
-    public function countItemsLinkedToContact(CustomObject $customObject, Lead $contact): int
-    {
-        return $this->customItemRepository->countItemsLinkedToContact($customObject, $contact);
-    }
-
-    /**
      * Used only by Mautic's generic methods. Use CustomItemPermissionProvider instead.
      *
      * 'custom_objects:custom_objects' is used as custom item permissions are dynamic

@@ -154,7 +154,7 @@ class TabSubscriber extends CommonSubscriber
             foreach ($objects as $object) {
                 $data = [
                     'title' => $object->getNamePlural(),
-                    'count' => $this->customItemModel->countItemsLinkedToContact($object, $contact),
+                    'count' => $this->customItemRepository->countItemsLinkedToContact($object, $contact),
                     'tabId' => "custom-object-{$object->getId()}",
                 ];
 

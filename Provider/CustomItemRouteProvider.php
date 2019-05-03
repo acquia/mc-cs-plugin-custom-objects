@@ -72,14 +72,18 @@ class CustomItemRouteProvider
     }
 
     /**
-     * @param int $customItemId
-     * @param int $contactId
+     * @param int    $customItemId
+     * @param string $entityType
+     * @param int    $entityId
      *
      * @return string
      */
-    public function buildUnlinkContactRoute(int $customItemId, int $contactId): string
+    public function buildUnlinkRoute(int $customItemId, string $entityType, int $entityId): string
     {
-        return $this->router->generate(static::ROUTE_UNLINK, ['itemId' => $customItemId, 'entityType' => 'contact', 'entityId' => $contactId]);
+        return $this->router->generate(
+            static::ROUTE_UNLINK,
+            ['itemId' => $customItemId, 'entityType' => $entityType, 'entityId' => $entityId]
+        );
     }
 
     /**
