@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
+use Mautic\CoreBundle\Controller\FormController as BaseFormController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemType;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
-use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
@@ -26,7 +26,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
-class FormController extends CommonController
+class FormController extends BaseFormController
 {
     /**
      * @var FormFactory
@@ -109,6 +109,12 @@ class FormController extends CommonController
         } catch (ForbiddenException $e) {
             return $this->accessDenied(false, $e->getMessage());
         }
+
+        if ($this->customItemModel->isLocked($customItem)) {
+            return $this->isLocked([], $customItem, 'page.page');
+        }
+
+        $this->customItemModel->lockEntity($customItem);
 
         return $this->renderFormForItem($customItem, $customObject, $this->routeProvider->buildEditRoute($objectId, $itemId));
     }

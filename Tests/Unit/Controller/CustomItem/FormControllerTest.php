@@ -192,6 +192,13 @@ class FormControllerTest extends ControllerTestCase
             ->method('canEdit')
             ->with($this->customItem);
 
+        $this->customItemModel->expects($this->once())
+            ->method('isLocked')
+            ->willReturn(false);
+
+        $this->customItemModel->expects($this->once())
+            ->method('lockEntity');
+
         $this->routeProvider->expects($this->once())
             ->method('buildEditRoute')
             ->with(self::OBJECT_ID, self::ITEM_ID);
