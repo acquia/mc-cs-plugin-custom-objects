@@ -20,7 +20,7 @@ use DateTimeInterface;
 use DateTimeImmutable;
 use DateTimeZone;
 
-class CustomItemXrefCustomItem
+class CustomItemXrefCustomItem implements CustomItemXrefInterface
 {
     /**
      * @var CustomItem
@@ -90,6 +90,14 @@ class CustomItemXrefCustomItem
     public function getParentCustomItem()
     {
         return $this->parentCustomItem;
+    }
+
+    /**
+     * @return CustomItem
+     */
+    public function getLinkedEntity()
+    {
+        return $this->getParentCustomItem();
     }
 
     /**

@@ -352,7 +352,7 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\LinkController::class,
                 'arguments' => [
                     'mautic.custom.model.item',
-                    'mautic.custom.model.import.xref.contact',
+                    'event_dispatcher',
                     'custom_item.permission.provider',
                     'mautic.core.service.flashbag',
                 ],
@@ -366,7 +366,7 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\UnlinkController::class,
                 'arguments' => [
                     'mautic.custom.model.item',
-                    'mautic.custom.model.import.xref.contact',
+                    'event_dispatcher',
                     'custom_item.permission.provider',
                     'mautic.core.service.flashbag',
                 ],

@@ -59,24 +59,34 @@ final class CustomItemEvents
     public const ON_CUSTOM_ITEM_POST_DELETE = 'custom.item.on_post_delete';
 
     /**
-     * The custom.item.on_link_contact event is fired when a custom item is connected to a contact.
+     * The custom.item.on_link_entity_id event is fired when a custom item is about to be connected to an (at that time) unknown entity.
      *
      * The event listener receives a
-     * MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefContactEvent
+     * MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent
      *
      * @var string
      */
-    public const ON_CUSTOM_ITEM_LINK_CONTACT = 'custom.item.on_link_contact';
+    public const ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY = 'custom.item.on_link_entity_id';
 
     /**
-     * The custom.item.on_unlink_contact event is fired when a custom item is disconnected from a contact.
+     * The custom.item.on_link_entity event is fired when a custom item is connected to an entity.
      *
      * The event listener receives a
-     * MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefContactEvent
+     * MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent
      *
      * @var string
      */
-    public const ON_CUSTOM_ITEM_UNLINK_CONTACT = 'custom.item.on_unlink_contact';
+    public const ON_CUSTOM_ITEM_LINK_ENTITY = 'custom.item.on_link_entity';
+
+    /**
+     * The custom.item.on_unlink_entity event is fired when a custom item is disconnected from an entity.
+     *
+     * The event listener receives a
+     * MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent
+     *
+     * @var string
+     */
+    public const ON_CUSTOM_ITEM_UNLINK_ENTITY = 'custom.item.on_unlink_entity';
 
     /**
      * The custom.item.on_campaign_trigger_action event is fired when the campaign action triggers.

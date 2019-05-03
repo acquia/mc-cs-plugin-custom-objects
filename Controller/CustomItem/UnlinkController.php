@@ -22,6 +22,10 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use UnexpectedValueException;
 use Mautic\CoreBundle\Service\FlashBag;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
 
 class UnlinkController extends JsonController
 {
@@ -31,9 +35,9 @@ class UnlinkController extends JsonController
     private $customItemModel;
 
     /**
-     * @var CustomItemXrefContactModel
+     * @var EventDispatcherInterface
      */
-    private $customItemXrefContactModel;
+    private $dispatcher;
 
     /**
      * @var CustomItemPermissionProvider
@@ -47,20 +51,20 @@ class UnlinkController extends JsonController
 
     /**
      * @param CustomItemModel              $customItemModel
-     * @param CustomItemXrefContactModel   $customItemXrefContactModel
+     * @param EventDispatcherInterface   $dispatcher
      * @param CustomItemPermissionProvider $permissionProvider
      * @param FlashBag                     $flashBag
      */
     public function __construct(
         CustomItemModel $customItemModel,
-        CustomItemXrefContactModel $customItemXrefContactModel,
+        EventDispatcherInterface $dispatcher,
         CustomItemPermissionProvider $permissionProvider,
         FlashBag $flashBag
     ) {
-        $this->customItemModel            = $customItemModel;
-        $this->customItemXrefContactModel = $customItemXrefContactModel;
-        $this->permissionProvider         = $permissionProvider;
-        $this->flashBag                   = $flashBag;
+        $this->customItemModel    = $customItemModel;
+        $this->dispatcher         = $dispatcher;
+        $this->permissionProvider = $permissionProvider;
+        $this->flashBag           = $flashBag;
     }
 
     /**
@@ -74,37 +78,31 @@ class UnlinkController extends JsonController
     {
         try {
             $customItem = $this->customItemModel->fetchEntity($itemId);
+
             $this->permissionProvider->canEdit($customItem);
-            $this->unlinkBasedOnEntityType($itemId, $entityType, $entityId);
+
+            $event = $this->dispatcher->dispatch(
+                CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY,
+                new CustomItemXrefEntityDiscoveryEvent($customItem, $entityType, $entityId)
+            );
+
+            if (null === $event->getXrefEntity()) {
+                throw new UnexpectedValueException("Entity {$entityType} was not able to be unlinked from {$customItem->getName()} ({$customItem->getId()})");
+            }
+
+            $this->dispatcher->dispatch(
+                CustomItemEvents::ON_CUSTOM_ITEM_UNLINK_ENTITY,
+                new CustomItemXrefEntityEvent($event->getXrefEntity())
+            );
+
             $this->flashBag->add(
                 'custom.item.unlinked',
-                ['%itemId%' => $itemId, '%entityType%' => $entityType, '%entityId%' => $entityId]
+                ['%itemId%' => $customItem->getId(), '%itemName%' => $customItem->getName(), '%entityType%' => $entityType, '%entityId%' => $entityId]
             );
         } catch (ForbiddenException | NotFoundException | UnexpectedValueException $e) {
             $this->flashBag->add($e->getMessage(), [], FlashBag::LEVEL_ERROR);
         }
 
         return $this->renderJson();
-    }
-
-    /**
-     * @param int    $itemId
-     * @param string $entityType
-     * @param int    $entityId
-     *
-     * @throws UnexpectedValueException
-     */
-    private function unlinkBasedOnEntityType(int $itemId, string $entityType, int $entityId): void
-    {
-        switch ($entityType) {
-            case 'contact':
-                $this->customItemXrefContactModel->unlinkContact($itemId, $entityId);
-
-                break;
-            default:
-                throw new UnexpectedValueException("Entity {$entityType} cannot be linked to a custom item");
-
-                break;
-        }
     }
 }

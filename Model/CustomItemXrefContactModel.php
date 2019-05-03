@@ -16,14 +16,10 @@ namespace MauticPlugin\CustomObjectsBundle\Model;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use Doctrine\ORM\NoResultException;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefContactEvent;
 use DateTime;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -35,70 +31,15 @@ class CustomItemXrefContactModel extends FormModel
     private $entityManager;
 
     /**
-     * @param EntityManager            $entityManager
-     * @param TranslatorInterface      $translator
-     * @param EventDispatcherInterface $dispatcher
+     * @param EntityManager       $entityManager
+     * @param TranslatorInterface $translator
      */
     public function __construct(
         EntityManager $entityManager,
-        TranslatorInterface $translator,
-        EventDispatcherInterface $dispatcher
+        TranslatorInterface $translator
     ) {
         $this->entityManager = $entityManager;
         $this->translator    = $translator;
-        $this->dispatcher    = $dispatcher;
-    }
-
-    /**
-     * @param int $customItemId
-     * @param int $contactId
-     */
-    public function linkContact(int $customItemId, int $contactId): CustomItemXrefContact
-    {
-        try {
-            $xRef = $this->getContactReference($customItemId, $contactId);
-        } catch (NoResultException $e) {
-            /** @var CustomItem $customItem */
-            $customItem = $this->entityManager->getReference(CustomItem::class, $customItemId);
-
-            /** @var Lead $contact */
-            $contact = $this->entityManager->getReference(Lead::class, $contactId);
-
-            $xRef = new CustomItemXrefContact(
-                $customItem,
-                $contact
-            );
-
-            $this->entityManager->persist($xRef);
-            $this->entityManager->flush($xRef);
-
-            $this->dispatcher->dispatch(
-                CustomItemEvents::ON_CUSTOM_ITEM_LINK_CONTACT,
-                new CustomItemXrefContactEvent($xRef)
-            );
-        }
-
-        return $xRef;
-    }
-
-    /**
-     * @param int $customItemId
-     * @param int $contactId
-     */
-    public function unlinkContact(int $customItemId, int $contactId): void
-    {
-        try {
-            $xRef = $this->getContactReference($customItemId, $contactId);
-            $this->entityManager->remove($xRef);
-            $this->entityManager->flush($xRef);
-
-            $this->dispatcher->dispatch(
-                CustomItemEvents::ON_CUSTOM_ITEM_UNLINK_CONTACT,
-                new CustomItemXrefContactEvent($xRef)
-            );
-        } catch (NoResultException $e) {
-            // If not found then we are done here.
-        }
     }
 
     /**
@@ -143,7 +84,7 @@ class CustomItemXrefContactModel extends FormModel
      *
      * @throws NoResultException if the reference does not exist
      */
-    private function getContactReference(int $customItemId, int $contactId): CustomItemXrefContact
+    public function getContactXrefEntity(int $customItemId, int $contactId): CustomItemXrefContact
     {
         $queryBuilder = $this->entityManager->createQueryBuilder();
         $queryBuilder->select('cixcont');

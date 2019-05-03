@@ -15,15 +15,23 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefContactEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\UserHelper;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel;
+use Doctrine\ORM\NoResultException;
 
 class CustomItemXrefContactSubscriber extends CommonSubscriber
 {
+    /**
+     * @var CustomItemXrefContactModel
+     */
+    private $customItemXrefContactModel;
+
     /**
      * @var EntityManager
      */
@@ -35,15 +43,18 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
     private $userHelper;
 
     /**
-     * @param EntityManager $entityManager
-     * @param UserHelper    $userHelper
+     * @param CustomItemXrefContactModel $customItemXrefContactModel
+     * @param EntityManager              $entityManager
+     * @param UserHelper                 $userHelper
      */
     public function __construct(
+        CustomItemXrefContactModel $customItemXrefContactModel,
         EntityManager $entityManager,
         UserHelper $userHelper
     ) {
-        $this->entityManager = $entityManager;
-        $this->userHelper    = $userHelper;
+        $this->customItemXrefContactModel = $customItemXrefContactModel;
+        $this->entityManager              = $entityManager;
+        $this->userHelper                 = $userHelper;
     }
 
     /**
@@ -52,25 +63,79 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
     public static function getSubscribedEvents(): array
     {
         return [
-            CustomItemEvents::ON_CUSTOM_ITEM_LINK_CONTACT   => 'onLinkedContact',
-            CustomItemEvents::ON_CUSTOM_ITEM_UNLINK_CONTACT => 'onUnlinkedContact',
+            CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY => 'onEntityLinkDiscovery',
+            CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY           => [
+                ['saveLink', 1000],
+                ['createNewEvenLogForLinkedContact', 0]
+            ],
+            CustomItemEvents::ON_CUSTOM_ITEM_UNLINK_ENTITY         => [
+                ['deleteLink', 1000],
+                ['createNewEvenLogForUnlinkedContact', 0]
+            ],
         ];
     }
 
     /**
-     * @param CustomItemXrefContactEvent $event
+     * @param CustomItemXrefEntityDiscoveryEvent $event
      */
-    public function onLinkedContact(CustomItemXrefContactEvent $event): void
+    public function onEntityLinkDiscovery(CustomItemXrefEntityDiscoveryEvent $event): void
     {
-        $this->saveEventLog($event->getXref(), 'link');
+        if ('contact' === $event->getEntityType()) {
+            try {
+                $xRef = $this->customItemXrefContactModel->getContactXrefEntity($event->getCustomItem()->getId(), $event->getEntityId());
+            } catch (NoResultException $e) {
+                /** @var Lead $contact */
+                $contact = $this->entityManager->getReference(Lead::class, $event->getEntityId());
+                $xRef    = new CustomItemXrefContact($event->getCustomItem(), $contact);
+            }
+    
+            $event->setXrefEntity($xRef);
+            $event->stopPropagation();
+        }
     }
 
     /**
-     * @param CustomItemXrefContactEvent $event
+     * Save the xref only if it isn't in the entity manager already as it means it was loaded from the database already.
+     * 
+     * @param CustomItemXrefEntityEvent $event
      */
-    public function onUnlinkedContact(CustomItemXrefContactEvent $event): void
+    public function saveLink(CustomItemXrefEntityEvent $event): void
     {
-        $this->saveEventLog($event->getXref(), 'unlink');
+        if ($event->getXref() instanceof CustomItemXrefContact && !$this->entityManager->contains($event->getXref())) {
+            $this->entityManager->persist($event->getXref());
+            $this->entityManager->flush($event->getXref());
+        }
+    }
+
+    /**
+     * @param CustomItemXrefEntityEvent $event
+     */
+    public function createNewEvenLogForLinkedContact(CustomItemXrefEntityEvent $event): void
+    {
+        if ($event->getXref() instanceof CustomItemXrefContact) {
+            $this->saveEventLog($event->getXref(), 'link');
+        }
+    }
+
+    /**
+     * @param CustomItemXrefEntityEvent $event
+     */
+    public function deleteLink(CustomItemXrefEntityEvent $event): void
+    {
+        if ($event->getXref() instanceof CustomItemXrefContact && $this->entityManager->contains($event->getXref())) {
+            $this->entityManager->remove($event->getXref());
+            $this->entityManager->flush($event->getXref());
+        }
+    }
+
+    /**
+     * @param CustomItemXrefEntityEvent $event
+     */
+    public function createNewEvenLogForUnlinkedContact(CustomItemXrefEntityEvent $event): void
+    {
+        if ($event->getXref() instanceof CustomItemXrefContact) {
+            $this->saveEventLog($event->getXref(), 'unlink');
+        }
     }
 
     /**

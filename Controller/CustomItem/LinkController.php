@@ -22,7 +22,10 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use UnexpectedValueException;
 use Mautic\CoreBundle\Service\FlashBag;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
 
 class LinkController extends JsonController
 {
@@ -32,9 +35,9 @@ class LinkController extends JsonController
     private $customItemModel;
 
     /**
-     * @var CustomItemXrefContactModel
+     * @var EventDispatcherInterface
      */
-    private $customItemXrefContactModel;
+    private $dispatcher;
 
     /**
      * @var CustomItemPermissionProvider
@@ -48,20 +51,20 @@ class LinkController extends JsonController
 
     /**
      * @param CustomItemModel              $customItemModel
-     * @param CustomItemXrefContactModel   $customItemXrefContactModel
+     * @param EventDispatcherInterface     $dispatcher
      * @param CustomItemPermissionProvider $permissionProvider
      * @param FlashBag                     $flashBag
      */
     public function __construct(
         CustomItemModel $customItemModel,
-        CustomItemXrefContactModel $customItemXrefContactModel,
+        EventDispatcherInterface $dispatcher,
         CustomItemPermissionProvider $permissionProvider,
         FlashBag $flashBag
     ) {
-        $this->customItemModel            = $customItemModel;
-        $this->customItemXrefContactModel = $customItemXrefContactModel;
-        $this->permissionProvider         = $permissionProvider;
-        $this->flashBag                   = $flashBag;
+        $this->customItemModel    = $customItemModel;
+        $this->dispatcher         = $dispatcher;
+        $this->permissionProvider = $permissionProvider;
+        $this->flashBag           = $flashBag;
     }
 
     /**
@@ -75,8 +78,27 @@ class LinkController extends JsonController
     {
         try {
             $customItem = $this->customItemModel->fetchEntity($itemId);
+            
             $this->permissionProvider->canEdit($customItem);
-            $this->makeLinkBasedOnEntityType($itemId, $entityType, $entityId);
+
+            $event = $this->dispatcher->dispatch(
+                CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY,
+                new CustomItemXrefEntityDiscoveryEvent($customItem, $entityType, $entityId)
+            );
+
+            if (null === $event->getXrefEntity()) {
+                throw new UnexpectedValueException("Entity {$entityType} was not able to be linked to {$customItem->getName()} ({$customItem->getId()})");
+            }
+
+            $this->dispatcher->dispatch(
+                CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY,
+                new CustomItemXrefEntityEvent($event->getXrefEntity())
+            );
+
+            $this->flashBag->add(
+                'custom.item.linked',
+                ['%itemId%' => $customItem->getId(), '%itemName%' => $customItem->getName(), '%entityType%' => $entityType, '%entityId%' => $entityId]
+            );
         } catch (UniqueConstraintViolationException $e) {
             $this->flashBag->add(
                 'custom.item.error.link.exists.already',
@@ -88,27 +110,5 @@ class LinkController extends JsonController
         }
 
         return $this->renderJson();
-    }
-
-    /**
-     * @param int    $itemId
-     * @param string $entityType
-     * @param int    $entityId
-     *
-     * @throws UnexpectedValueException
-     * @throws UniqueConstraintViolationException
-     */
-    private function makeLinkBasedOnEntityType(int $itemId, string $entityType, int $entityId): void
-    {
-        switch ($entityType) {
-            case 'contact':
-                $this->customItemXrefContactModel->linkContact($itemId, $entityId);
-
-                break;
-            default:
-                throw new UnexpectedValueException("Entity {$entityType} cannot be linked to a custom item");
-
-                break;
-        }
     }
 }

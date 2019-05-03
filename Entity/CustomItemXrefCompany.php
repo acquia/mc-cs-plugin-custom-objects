@@ -21,7 +21,7 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Mautic\LeadBundle\Entity\Company;
 
-class CustomItemXrefCompany
+class CustomItemXrefCompany implements CustomItemXrefInterface
 {
     /**
      * @var Company
@@ -91,6 +91,14 @@ class CustomItemXrefCompany
     public function getCompany()
     {
         return $this->company;
+    }
+
+    /**
+     * @return Company
+     */
+    public function getLinkedEntity()
+    {
+        return $this->getCompany();
     }
 
     /**
