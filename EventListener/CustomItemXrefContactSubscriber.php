@@ -23,6 +23,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\UserHelper;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
 use Doctrine\ORM\NoResultException;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
 
 class CustomItemXrefContactSubscriber extends CommonSubscriber
 {
@@ -37,8 +38,8 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
     private $userHelper;
 
     /**
-     * @param EntityManager              $entityManager
-     * @param UserHelper                 $userHelper
+     * @param EntityManager $entityManager
+     * @param UserHelper    $userHelper
      */
     public function __construct(
         EntityManager $entityManager,
@@ -54,6 +55,7 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
     public static function getSubscribedEvents(): array
     {
         return [
+            CustomItemEvents::ON_CUSTOM_ITEM_LIST_QUERY            => 'onListQuery',
             CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY => 'onEntityLinkDiscovery',
             CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY           => [
                 ['saveLink', 1000],
@@ -64,6 +66,20 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
                 ['createNewEvenLogForUnlinkedContact', 0]
             ],
         ];
+    }
+
+    /**
+     * @param CustomItemListQueryEvent $event
+     */
+    public function onListQuery(CustomItemListQueryEvent $event): void
+    {
+        if ('contact' === $event->getTableConfig()->getParameter('filterEntityType') && $event->getTableConfig()->getParameter('filterEntityId')) {
+            $event->getTableConfig()->addFilterIfNotEmpty(
+                CustomItemXrefContact::class,
+                'contact',
+                $event->getTableConfig()->getParameter('filterEntityId')
+            );
+        }
     }
 
     /**

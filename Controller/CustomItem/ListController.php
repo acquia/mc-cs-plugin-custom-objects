@@ -125,20 +125,6 @@ class ListController extends CommonController
         $tableConfig->addParameter('filterEntityId', $filterEntityId);
         $tableConfig->addParameter('search', $search);
 
-        switch ($filterEntityType) {
-            case 'contact':
-                $tableConfig->addFilterIfNotEmpty(CustomItemXrefContact::class, 'contact', $filterEntityId);
-
-                break;
-            // case 'customItem':
-            //     $item   = $tableConfig->createFilter(CustomItemXrefCustomItem::class, 'customItem', $filterEntityId);
-            //     $parent = $tableConfig->createFilter(CustomItemXrefCustomItem::class, 'parentCustomItem', $filterEntityId);
-            //     $orX    = $tableConfig->createFilter(CustomItemXrefCustomItem::class, '', [$item, $parent], 'orX');
-            //     $tableConfig->addFilterDTO($orX);
-
-            //     break;
-        }
-
         $this->sessionProvider->setPage($page);
         $this->sessionProvider->setPageLimit($limit);
         $this->sessionProvider->setFilter($search);
