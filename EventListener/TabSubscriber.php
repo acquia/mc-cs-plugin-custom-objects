@@ -18,12 +18,12 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Event\CustomContentEvent;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use Symfony\Component\Translation\TranslatorInterface;
 use Mautic\LeadBundle\Entity\Lead;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 
 class TabSubscriber extends CommonSubscriber
 {
@@ -37,9 +37,9 @@ class TabSubscriber extends CommonSubscriber
     private $customObjectModel;
 
     /**
-     * @var CustomItemModel
+     * @var CustomItemRepository
      */
-    private $customItemModel;
+    private $customItemRepository;
 
     /**
      * @var ConfigProvider
@@ -58,20 +58,20 @@ class TabSubscriber extends CommonSubscriber
 
     /**
      * @param CustomObjectModel       $customObjectModel
-     * @param CustomItemModel         $customItemModel
+     * @param CustomItemRepository    $customItemRepository
      * @param ConfigProvider          $configProvider
      * @param TranslatorInterface     $translator
      * @param CustomItemRouteProvider $customItemRouteProvider
      */
     public function __construct(
         CustomObjectModel $customObjectModel,
-        CustomItemModel $customItemModel,
+        CustomItemRepository $customItemRepository,
         ConfigProvider $configProvider,
         TranslatorInterface $translator,
         CustomItemRouteProvider $customItemRouteProvider
     ) {
         $this->customObjectModel       = $customObjectModel;
-        $this->customItemModel         = $customItemModel;
+        $this->customItemRepository    = $customItemRepository;
         $this->configProvider          = $configProvider;
         $this->translator              = $translator;
         $this->customItemRouteProvider = $customItemRouteProvider;
@@ -104,37 +104,47 @@ class TabSubscriber extends CommonSubscriber
     private function addTabsToCustomItemDetailPage(CustomContentEvent $event): void
     {
         if ($event->checkContext('CustomObjectsBundle:CustomItem:detail.html.php', 'tabs')) {
-            $vars = $event->getVars();
+            $vars    = $event->getVars();
+            $objects = $this->getCustomObjects();
 
             /** @var CustomItem $item */
             $item = $vars['item'];
 
-            $data = [
-                'title'      => 'custom.item.linked.items',
-                'count'      => 0,
-                'tabId'      => 'linked-custom-items',
-                'attributes' => [
-                    "data-custom-item-id=\"{$item->getId()}\"",
-                ],
-            ];
+            /** @var CustomObject $object */
+            foreach ($objects as $object) {
+                $data = [
+                    'title' => $object->getNamePlural(),
+                    'count' => $this->customItemRepository->countItemsLinkedToAnotherItem($object, $item),
+                    'tabId' => "custom-object-{$object->getId()}",
+                ];
 
-            $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:link.html.php', $data);
+                $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:link.html.php', $data);
+            }
         }
 
         if ($event->checkContext('CustomObjectsBundle:CustomItem:detail.html.php', 'tabs.content')) {
-            $vars = $event->getVars();
+            $vars    = $event->getVars();
+            $objects = $this->getCustomObjects();
 
             /** @var CustomItem $item */
             $item = $vars['item'];
 
-            $data = [
-                'customObject' => $item->getCustomObject(),
-                'page'         => 1,
-                'search'       => '',
-                'contactId'    => 2,
-            ];
+            /** @var CustomObject $object */
+            foreach ($objects as $object) {
+                $data = [
+                    'customObjectId'    => $object->getId(),
+                    'currentEntityId'   => $item->getId(),
+                    'currentEntityType' => 'customItem',
+                    'tabId'             => "custom-object-{$object->getId()}",
+                    'page'              => 1,
+                    'search'            => '',
+                    'placeholder'       => $this->translator->trans('custom.item.link.search.placeholder', ['%object%' => $object->getNameSingular()]),
+                    'lookupRoute'       => $this->customItemRouteProvider->buildLookupRoute((int) $object->getId(), 'customItem', (int) $item->getId()),
+                    'newRoute'          => $this->customItemRouteProvider->buildNewRoute((int) $object->getId()),
+                ];
 
-            $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:content.html.php', $data);
+                $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:content.html.php', $data);
+            }
         }
     }
 

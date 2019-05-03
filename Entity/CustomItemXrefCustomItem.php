@@ -60,13 +60,14 @@ class CustomItemXrefCustomItem implements CustomItemXrefInterface
 
         $builder->createManyToOne('customItem', CustomItem::class)
             ->addJoinColumn('custom_item_id', 'id', false, false, 'CASCADE')
-            ->inversedBy('contactReferences')
+            ->inversedBy('customItemReferences')
             ->makePrimaryKey()
             ->fetchExtraLazy()
             ->build();
 
         $builder->createManyToOne('parentCustomItem', CustomItem::class)
             ->addJoinColumn('parent_custom_item_id', 'id', false, false, 'CASCADE')
+            ->inversedBy('customItemReferences')
             ->makePrimaryKey()
             ->fetchExtraLazy()
             ->build();

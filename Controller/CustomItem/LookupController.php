@@ -25,6 +25,7 @@ use MauticPlugin\CustomObjectsBundle\Controller\JsonController;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Mautic\CoreBundle\Service\FlashBag;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
 
 class LookupController extends JsonController
 {
@@ -94,6 +95,11 @@ class LookupController extends JsonController
             $isNull     = $tableConfig->createFilter(CustomItemXrefContact::class, 'contact', null, 'isNull');
             $orX        = $tableConfig->createFilter(CustomItemXrefContact::class, 'contact', [$notContact, $isNull], 'orX');
             $tableConfig->addFilterDTO($orX);
+        }
+
+        if ($filterEntityId && 'customItem' === $filterEntityType) {
+            $tableConfig->addFilter(CustomItemXrefCustomItem::class, 'parentCustomItem', $filterEntityId, 'neq');
+            $tableConfig->addFilter(CustomItemXrefCustomItem::class, 'customItem', $filterEntityId, 'neq');
         }
 
         return $this->renderJson(['items' => $this->customItemModel->getLookupData($tableConfig)]);

@@ -75,25 +75,4 @@ class CustomItemXrefContactModel extends FormModel
     {
         return 'custom_objects:custom_items';
     }
-
-    /**
-     * @param int $customItemId
-     * @param int $contactId
-     *
-     * @return CustomItemXrefContact
-     *
-     * @throws NoResultException if the reference does not exist
-     */
-    public function getContactXrefEntity(int $customItemId, int $contactId): CustomItemXrefContact
-    {
-        $queryBuilder = $this->entityManager->createQueryBuilder();
-        $queryBuilder->select('cixcont');
-        $queryBuilder->from(CustomItemXrefContact::class, 'cixcont');
-        $queryBuilder->where('cixcont.customItem = :customItemId');
-        $queryBuilder->andWhere('cixcont.contact = :contactId');
-        $queryBuilder->setParameter('customItemId', $customItemId);
-        $queryBuilder->setParameter('contactId', $contactId);
-
-        return $queryBuilder->getQuery()->getSingleResult();
-    }
 }

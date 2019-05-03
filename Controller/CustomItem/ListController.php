@@ -27,6 +27,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderInterface;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
 
 class ListController extends CommonController
 {
@@ -107,7 +108,7 @@ class ListController extends CommonController
         $search           = InputHelper::clean($request->get('search', $this->sessionProvider->getFilter()));
         $limit            = (int) $request->get('limit', $this->sessionProvider->getPageLimit());
         $filterEntityId   = (int) $request->get('filterEntityId');
-        $filterEntityType = $request->get('filterEntityType');
+        $filterEntityType = InputHelper::clean($request->get('filterEntityType'));
         $orderBy          = $this->sessionProvider->getOrderBy(CustomItemRepository::TABLE_ALIAS.'.id');
         $orderByDir       = $this->sessionProvider->getOrderByDir('ASC');
 
@@ -120,12 +121,22 @@ class ListController extends CommonController
 
         $tableConfig = new TableConfig($limit, $page, $orderBy, $orderByDir);
         $tableConfig->addFilter(CustomItem::class, 'customObject', $objectId);
+        $tableConfig->addParameter('filterEntityType', $filterEntityType);
+        $tableConfig->addParameter('filterEntityId', $filterEntityId);
+        $tableConfig->addParameter('search', $search);
 
         switch ($filterEntityType) {
             case 'contact':
                 $tableConfig->addFilterIfNotEmpty(CustomItemXrefContact::class, 'contact', $filterEntityId);
 
                 break;
+            // case 'customItem':
+            //     $item   = $tableConfig->createFilter(CustomItemXrefCustomItem::class, 'customItem', $filterEntityId);
+            //     $parent = $tableConfig->createFilter(CustomItemXrefCustomItem::class, 'parentCustomItem', $filterEntityId);
+            //     $orX    = $tableConfig->createFilter(CustomItemXrefCustomItem::class, '', [$item, $parent], 'orX');
+            //     $tableConfig->addFilterDTO($orX);
+
+            //     break;
         }
 
         $this->sessionProvider->setPage($page);

@@ -22,16 +22,10 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\UserHelper;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel;
 use Doctrine\ORM\NoResultException;
 
 class CustomItemXrefContactSubscriber extends CommonSubscriber
 {
-    /**
-     * @var CustomItemXrefContactModel
-     */
-    private $customItemXrefContactModel;
-
     /**
      * @var EntityManager
      */
@@ -43,16 +37,13 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
     private $userHelper;
 
     /**
-     * @param CustomItemXrefContactModel $customItemXrefContactModel
      * @param EntityManager              $entityManager
      * @param UserHelper                 $userHelper
      */
     public function __construct(
-        CustomItemXrefContactModel $customItemXrefContactModel,
         EntityManager $entityManager,
         UserHelper $userHelper
     ) {
-        $this->customItemXrefContactModel = $customItemXrefContactModel;
         $this->entityManager              = $entityManager;
         $this->userHelper                 = $userHelper;
     }
@@ -82,7 +73,7 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
     {
         if ('contact' === $event->getEntityType()) {
             try {
-                $xRef = $this->customItemXrefContactModel->getContactXrefEntity($event->getCustomItem()->getId(), $event->getEntityId());
+                $xRef = $this->getContactXrefEntity($event->getCustomItem()->getId(), $event->getEntityId());
             } catch (NoResultException $e) {
                 /** @var Lead $contact */
                 $contact = $this->entityManager->getReference(Lead::class, $event->getEntityId());
@@ -172,5 +163,26 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
         $eventLog->setProperties($properties);
 
         return $eventLog;
+    }
+
+    /**
+     * @param int $customItemId
+     * @param int $contactId
+     *
+     * @return CustomItemXrefContact
+     *
+     * @throws NoResultException if the reference does not exist
+     */
+    private function getContactXrefEntity(int $customItemId, int $contactId): CustomItemXrefContact
+    {
+        $queryBuilder = $this->entityManager->createQueryBuilder();
+        $queryBuilder->select('cixcont');
+        $queryBuilder->from(CustomItemXrefContact::class, 'cixcont');
+        $queryBuilder->where('cixcont.customItem = :customItemId');
+        $queryBuilder->andWhere('cixcont.contact = :contactId');
+        $queryBuilder->setParameter('customItemId', $customItemId);
+        $queryBuilder->setParameter('contactId', $contactId);
+
+        return $queryBuilder->getQuery()->getSingleResult();
     }
 }

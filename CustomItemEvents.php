@@ -59,6 +59,16 @@ final class CustomItemEvents
     public const ON_CUSTOM_ITEM_POST_DELETE = 'custom.item.on_post_delete';
 
     /**
+     * The custom.item.on_item_list_query event is fired when custom items list query is being buid.
+     *
+     * The event listener receives a
+     * MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent
+     *
+     * @var string
+     */
+    public const ON_CUSTOM_ITEM_LIST_QUERY = 'custom.item.on_item_list_query';
+    
+    /**
      * The custom.item.on_link_entity_id event is fired when a custom item is about to be connected to an (at that time) unknown entity.
      *
      * The event listener receives a

@@ -17,6 +17,9 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use Doctrine\ORM\Query\Expr\Join;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
 
 class CustomItemRepository extends AbstractTableRepository
 {
@@ -39,9 +42,31 @@ class CustomItemRepository extends AbstractTableRepository
         $queryBuilder->andWhere('cixctct.contact = :contactId');
         $queryBuilder->setParameter('customObjectId', $customObject->getId());
         $queryBuilder->setParameter('contactId', $contact->getId());
-        $result = $queryBuilder->getQuery()->getSingleScalarResult();
 
-        return (int) $result;
+        return (int) $queryBuilder->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * @param CustomItem   $customItem
+     * @param CustomObject $customObject
+     *
+     * @return int
+     */
+    public function countItemsLinkedToAnotherItem(CustomObject $customObject, CustomItem $customItem): int
+    {
+        $queryBuilder = $this->createQueryBuilder('ci', 'ci.id');
+        $queryBuilder->select($queryBuilder->expr()->countDistinct('ci.id'));
+        $queryBuilder->innerJoin(CustomItemXrefCustomItem::class, 'cixci', Join::WITH, 'ci.id = cixci.customItem OR ci.id = cixci.parentCustomItem');
+        $queryBuilder->where('ci.customObject = :customObjectId');
+        $queryBuilder->andWhere('ci.id != :customItemId');
+        $queryBuilder->andWhere($queryBuilder->expr()->orX(
+            $queryBuilder->expr()->eq('cixci.parentCustomItem', ':customItemId'),
+            $queryBuilder->expr()->eq('cixci.customItem', ':customItemId')
+        ));
+        $queryBuilder->setParameter('customObjectId', $customObject->getId());
+        $queryBuilder->setParameter('customItemId', $customItem->getId());
+
+        return (int) $queryBuilder->getQuery()->getSingleScalarResult();
     }
 
     /**

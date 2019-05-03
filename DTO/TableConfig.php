@@ -17,6 +17,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use Doctrine\ORM\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Helper\TableQueryBuilder;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Mautic\CoreBundle\Helper\ArrayHelper;
 
 class TableConfig
 {
@@ -44,6 +45,11 @@ class TableConfig
      * @var mixed[]
      */
     private $filters = [];
+
+    /**
+     * @var mixed[]
+     */
+    private $parameters = [];
 
     /**
      * @param int    $limit
@@ -91,6 +97,26 @@ class TableConfig
     public function getLimit(): int
     {
         return $this->limit;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed  $value
+     */
+    public function addParameter(string $key, $value)
+    {
+        $this->parameters[$key] = $value;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed  $defaultValue
+     * 
+     * @return mixed
+     */
+    public function getParameter(string $key, $defaultValue = null)
+    {
+        return ArrayHelper::getValue($key, $this->parameters, $defaultValue);
     }
 
     /**

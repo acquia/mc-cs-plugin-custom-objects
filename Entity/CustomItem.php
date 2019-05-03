@@ -25,6 +25,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use Mautic\CoreBundle\Helper\ArrayHelper;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
 
 class CustomItem extends FormEntity implements UniqueEntityInterface
 {
@@ -74,14 +75,20 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     private $companyReferences;
 
     /**
+     * @var ArrayCollection
+     */
+    private $customItemReferences;
+
+    /**
      * @param CustomObject $customObject
      */
     public function __construct(CustomObject $customObject)
     {
-        $this->customObject      = $customObject;
-        $this->customFieldValues = new ArrayCollection();
-        $this->contactReferences = new ArrayCollection();
-        $this->companyReferences = new ArrayCollection();
+        $this->customObject         = $customObject;
+        $this->customFieldValues    = new ArrayCollection();
+        $this->contactReferences    = new ArrayCollection();
+        $this->companyReferences    = new ArrayCollection();
+        $this->customItemReferences = new ArrayCollection();
     }
 
     public function __clone()
@@ -112,6 +119,12 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
 
         $builder->createOneToMany('companyReferences', CustomItemXrefCompany::class)
             ->addJoinColumn('id', 'custom_item_id', false, false, 'CASCADE')
+            ->mappedBy('customItem')
+            ->fetchExtraLazy()
+            ->build();
+
+        $builder->createOneToMany('customItemReferences', CustomItemXrefCustomItem::class)
+            ->addJoinColumn('id', 'parent_custom_item_id', false, false, 'CASCADE')
             ->mappedBy('customItem')
             ->fetchExtraLazy()
             ->build();
@@ -304,5 +317,21 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     public function getCompanyReferences()
     {
         return $this->companyReferences;
+    }
+
+    /**
+     * @param CustomItemXrefCustomItem $reference
+     */
+    public function addCustomItemReference($reference)
+    {
+        $this->customItemReferences->add($reference);
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getCustomItemReferences()
+    {
+        return $this->customItemReferences;
     }
 }

@@ -25,14 +25,13 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use Doctrine\ORM\QueryBuilder;
-use Mautic\LeadBundle\Entity\Lead;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
 
 class CustomItemModel extends FormModel
 {
@@ -178,6 +177,11 @@ class CustomItemModel extends FormModel
         $queryBuilder       = $this->customItemRepository->getTableDataQuery($tableConfig);
         $queryBuilder       = $this->applyOwnerFilter($queryBuilder, $customObjectFilter->getValue());
 
+        $this->dispatcher->dispatch(
+            CustomItemEvents::ON_CUSTOM_ITEM_LIST_QUERY,
+            new CustomItemListQueryEvent($queryBuilder, $tableConfig)
+        );
+        
         return $queryBuilder->getQuery()->getResult();
     }
 
@@ -191,6 +195,11 @@ class CustomItemModel extends FormModel
         $customObjectFilter = $tableConfig->getFilter(CustomItem::class, 'customObject');
         $queryBuilder       = $this->customItemRepository->getTableCountQuery($tableConfig);
         $queryBuilder       = $this->applyOwnerFilter($queryBuilder, $customObjectFilter->getValue());
+
+        $this->dispatcher->dispatch(
+            CustomItemEvents::ON_CUSTOM_ITEM_LIST_QUERY,
+            new CustomItemListQueryEvent($queryBuilder, $tableConfig)
+        );
 
         return (int) $queryBuilder->getQuery()->getSingleScalarResult();
     }
