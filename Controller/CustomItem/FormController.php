@@ -16,6 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 use Mautic\CoreBundle\Controller\FormController as BaseFormController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemType;
+use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
@@ -54,24 +55,32 @@ class FormController extends BaseFormController
     private $routeProvider;
 
     /**
+     * @var LockFlashMessageHelper
+     */
+    private $lockFlashMessageHelper;
+
+    /**
      * @param FormFactory                  $formFactory
      * @param CustomObjectModel            $customObjectModel
      * @param CustomItemModel              $customItemModel
      * @param CustomItemPermissionProvider $permissionProvider
      * @param CustomItemRouteProvider      $routeProvider
+     * @param LockFlashMessageHelper       $lockFlashMessageHelper
      */
     public function __construct(
         FormFactory $formFactory,
         CustomObjectModel $customObjectModel,
         CustomItemModel $customItemModel,
         CustomItemPermissionProvider $permissionProvider,
-        CustomItemRouteProvider $routeProvider
+        CustomItemRouteProvider $routeProvider,
+        LockFlashMessageHelper $lockFlashMessageHelper
     ) {
-        $this->formFactory        = $formFactory;
-        $this->customObjectModel  = $customObjectModel;
-        $this->customItemModel    = $customItemModel;
-        $this->permissionProvider = $permissionProvider;
-        $this->routeProvider      = $routeProvider;
+        $this->formFactory            = $formFactory;
+        $this->customObjectModel      = $customObjectModel;
+        $this->customItemModel        = $customItemModel;
+        $this->permissionProvider     = $permissionProvider;
+        $this->routeProvider          = $routeProvider;
+        $this->lockFlashMessageHelper = $lockFlashMessageHelper;
     }
 
     /**
@@ -111,7 +120,16 @@ class FormController extends BaseFormController
         }
 
         if ($this->customItemModel->isLocked($customItem)) {
-            return $this->isLocked([], $customItem, 'page.page');
+            $returnUrl = $this->generateUrl('mautic_custom_item_edit', ['objectId' => $objectId, 'itemId' => $itemId]);
+
+            $this->lockFlashMessageHelper->addFlash(
+                $customItem,
+                $returnUrl,
+                $this->canEdit($customItem),
+                'custom.item'
+            );
+
+            return $this->ajaxAction(['returnUrl' => $returnUrl]);
         }
 
         $this->customItemModel->lockEntity($customItem);

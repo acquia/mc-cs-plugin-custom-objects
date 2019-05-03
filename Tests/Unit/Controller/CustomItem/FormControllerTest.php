@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomItem;
 
+use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
 use Symfony\Component\HttpFoundation\Request;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
@@ -40,6 +41,7 @@ class FormControllerTest extends ControllerTestCase
     private $formFactory;
     private $permissionProvider;
     private $routeProvider;
+    private $lockFlashMessageHelper;
     private $customObject;
     private $customItem;
     private $form;
@@ -53,21 +55,23 @@ class FormControllerTest extends ControllerTestCase
     {
         parent::setUp();
 
-        $this->customItemModel    = $this->createMock(CustomItemModel::class);
-        $this->customObjectModel  = $this->createMock(CustomObjectModel::class);
-        $this->formFactory        = $this->createMock(FormFactory::class);
-        $this->permissionProvider = $this->createMock(CustomItemPermissionProvider::class);
-        $this->routeProvider      = $this->createMock(CustomItemRouteProvider::class);
-        $this->request            = $this->createMock(Request::class);
-        $this->customObject       = $this->createMock(CustomObject::class);
-        $this->customItem         = $this->createMock(CustomItem::class);
-        $this->form               = $this->createMock(FormInterface::class);
-        $this->formController     = new FormController(
+        $this->customItemModel         = $this->createMock(CustomItemModel::class);
+        $this->customObjectModel       = $this->createMock(CustomObjectModel::class);
+        $this->formFactory             = $this->createMock(FormFactory::class);
+        $this->permissionProvider      = $this->createMock(CustomItemPermissionProvider::class);
+        $this->routeProvider           = $this->createMock(CustomItemRouteProvider::class);
+        $this->lockFlashMessageHelper  = $this->createMock(LockFlashMessageHelper::class);
+        $this->request                 = $this->createMock(Request::class);
+        $this->customObject            = $this->createMock(CustomObject::class);
+        $this->customItem              = $this->createMock(CustomItem::class);
+        $this->form                    = $this->createMock(FormInterface::class);
+        $this->formController          = new FormController(
             $this->formFactory,
             $this->customObjectModel,
             $this->customItemModel,
             $this->permissionProvider,
-            $this->routeProvider
+            $this->routeProvider,
+            $this->lockFlashMessageHelper
         );
 
         $this->addSymfonyDependencies($this->formController);

@@ -263,6 +263,7 @@ return [
                     'mautic.custom.model.item',
                     'custom_item.permission.provider',
                     'custom_item.route.provider',
+                    'custom_object.lock_flash_message.helper',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
