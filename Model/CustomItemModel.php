@@ -173,9 +173,7 @@ class CustomItemModel extends FormModel
      */
     public function getTableData(TableConfig $tableConfig): array
     {
-        $customObjectFilter = $tableConfig->getFilter(CustomItem::class, 'customObject');
-        $queryBuilder       = $this->customItemRepository->getTableDataQuery($tableConfig);
-        $queryBuilder       = $this->applyOwnerFilter($queryBuilder, $customObjectFilter->getValue());
+        $queryBuilder = $this->createListQueryBuilder($tableConfig);
 
         $this->dispatcher->dispatch(
             CustomItemEvents::ON_CUSTOM_ITEM_LIST_QUERY,
@@ -211,23 +209,26 @@ class CustomItemModel extends FormModel
      */
     public function getLookupData(TableConfig $tableConfig): array
     {
-        $customObjectFilter = $tableConfig->getFilter(CustomItem::class, 'customObject');
-        $queryBuilder       = $this->customItemRepository->getTableDataQuery($tableConfig);
-        $queryBuilder       = $this->applyOwnerFilter($queryBuilder, $customObjectFilter->getValue());
-        $rootAlias          = $queryBuilder->getRootAliases()[0];
+        $queryBuilder = $this->createListQueryBuilder($tableConfig);
+        $rootAlias    = $queryBuilder->getRootAliases()[0];
         $queryBuilder->select("{$rootAlias}.name as value, {$rootAlias}.id");
 
-        $rows       = $queryBuilder->getQuery()->getArrayResult();
-        $lookupData = [];
+        $this->dispatcher->dispatch(
+            CustomItemEvents::ON_CUSTOM_ITEM_LOOKUP_QUERY,
+            new CustomItemListQueryEvent($queryBuilder, $tableConfig)
+        );
+
+        $rows = $queryBuilder->getQuery()->getArrayResult();
+        $data = [];
 
         foreach ($rows as $row) {
-            $lookupData[] = [
+            $data[] = [
                 'id'    => $row['id'],
                 'value' => "{$row['value']} ({$row['id']})",
             ];
         }
 
-        return $lookupData;
+        return $data;
     }
 
     /**
@@ -270,6 +271,15 @@ class CustomItemModel extends FormModel
     public function getPermissionBase(): string
     {
         return 'custom_objects:custom_objects';
+    }
+
+    private function createListQueryBuilder(TableConfig $tableConfig)
+    {
+        $customObjectFilter = $tableConfig->getFilter(CustomItem::class, 'customObject');
+        $queryBuilder       = $this->customItemRepository->getTableDataQuery($tableConfig);
+        $queryBuilder       = $this->applyOwnerFilter($queryBuilder, $customObjectFilter->getValue());
+
+        return $queryBuilder;
     }
 
     /**
