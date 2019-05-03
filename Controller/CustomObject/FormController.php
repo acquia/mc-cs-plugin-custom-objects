@@ -16,6 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 use Mautic\CoreBundle\Controller\FormController as BaseFormController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
+use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use Symfony\Component\HttpFoundation\Response;
@@ -59,12 +60,18 @@ class FormController extends BaseFormController
     private $customFieldTypeProvider;
 
     /**
+     * @var LockFlashMessageHelper
+     */
+    private $lockFlashMessageHelper;
+
+    /**
      * @param FormFactory                    $formFactory
      * @param CustomObjectModel              $customObjectModel
      * @param CustomFieldModel               $customFieldModel
      * @param CustomObjectPermissionProvider $permissionProvider
      * @param CustomObjectRouteProvider      $routeProvider
      * @param CustomFieldTypeProvider        $customFieldTypeProvider
+     * @param LockFlashMessageHelper         $lockFlashMessageHelper
      */
     public function __construct(
         FormFactory $formFactory,
@@ -72,7 +79,8 @@ class FormController extends BaseFormController
         CustomFieldModel $customFieldModel,
         CustomObjectPermissionProvider $permissionProvider,
         CustomObjectRouteProvider $routeProvider,
-        CustomFieldTypeProvider $customFieldTypeProvider
+        CustomFieldTypeProvider $customFieldTypeProvider,
+        LockFlashMessageHelper $lockFlashMessageHelper
     ) {
         $this->formFactory             = $formFactory;
         $this->customObjectModel       = $customObjectModel;
@@ -80,6 +88,7 @@ class FormController extends BaseFormController
         $this->permissionProvider      = $permissionProvider;
         $this->routeProvider           = $routeProvider;
         $this->customFieldTypeProvider = $customFieldTypeProvider;
+        $this->lockFlashMessageHelper  = $lockFlashMessageHelper;
     }
 
     /**
@@ -114,7 +123,16 @@ class FormController extends BaseFormController
         }
 
         if ($this->customObjectModel->isLocked($customObject)) {
-            return $this->isLocked([], $customObject, 'page.page');
+            $returnUrl = $this->generateUrl('mautic_custom_object_edit', ['objectId' => $objectId]);
+
+            $this->lockFlashMessageHelper->addFlash(
+                $customObject,
+                $returnUrl,
+                $this->canEdit($customObject),
+                'custom.object'
+            );
+
+            return $this->ajaxAction(['returnUrl' => $returnUrl]);
         }
 
         $this->customObjectModel->lockEntity($customObject);

@@ -422,6 +422,7 @@ return [
                     'custom_object.permission.provider',
                     'custom_object.route.provider',
                     'custom_field.type.provider',
+                    'custom_object.lock_flash_message.helper',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -903,6 +904,15 @@ return [
                 'arguments' => [
                     'mautic.security',
                 ],
+            ],
+            'custom_object.lock_flash_message.helper' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper::class,
+                'arguments' => [
+                    'mautic.helper.core_parameters',
+                    'translator',
+                    'mautic.core.service.flashbag',
+                    'router',
+                ]
             ],
             'custom_object.random.helper'                  => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Helper\RandomHelper::class,
