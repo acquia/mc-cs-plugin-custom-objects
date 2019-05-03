@@ -40,7 +40,7 @@ class CancelControllerTest extends ControllerTestCase
 
         $this->sessionProvider  = $this->createMock(CustomItemSessionProvider::class);
         $this->routeProvider    = $this->createMock(CustomItemRouteProvider::class);
-        $this->customItemModel = $this->createMock(CustomItemModel::class);
+        $this->customItemModel  = $this->createMock(CustomItemModel::class);
 
         $this->cancelController = new CancelController(
             $this->sessionProvider,
