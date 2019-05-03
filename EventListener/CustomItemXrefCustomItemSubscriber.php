@@ -56,7 +56,8 @@ class CustomItemXrefCustomItemSubscriber extends CommonSubscriber
     public static function getSubscribedEvents(): array
     {
         return [
-            CustomItemEvents::ON_CUSTOM_ITEM_LIST_QUERY            => 'onListQuery',
+            CustomItemEvents::ON_CUSTOM_ITEM_LOOKUP_QUERY          => 'onListQuery',
+            CustomItemEvents::ON_CUSTOM_ITEM_LIST_QUERY            => 'onLookupQuery',
             CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY => 'onEntityLinkDiscovery',
             CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY           => [
                 ['saveLink', 1000],
@@ -85,6 +86,28 @@ class CustomItemXrefCustomItemSubscriber extends CommonSubscriber
             $queryBuilder->andWhere($queryBuilder->expr()->orX(
                 $queryBuilder->expr()->eq('CustomItemXrefCustomItem.parentCustomItem', ':customItemId'),
                 $queryBuilder->expr()->eq('CustomItemXrefCustomItem.customItem', ':customItemId')
+            ));
+            $queryBuilder->andWhere('CustomItem.id != :customItemId');
+            $queryBuilder->setParameter('customItemId', $event->getTableConfig()->getParameter('filterEntityId'));
+        }
+    }
+
+    /**
+     * @param CustomItemListQueryEvent $event
+     */
+    public function onLookupQuery(CustomItemListQueryEvent $event): void
+    {
+        if ('customItem' === $event->getTableConfig()->getParameter('filterEntityType') && $event->getTableConfig()->getParameter('filterEntityId')) {
+            $queryBuilder = $event->getQueryBuilder();
+            $queryBuilder->leftJoin(
+                CustomItemXrefCustomItem::class,
+                'CustomItemXrefCustomItem',
+                Join::WITH,
+                'CustomItem.id = CustomItemXrefCustomItem.customItem OR CustomItem.id = CustomItemXrefCustomItem.parentCustomItem'
+            );
+            $queryBuilder->andWhere($queryBuilder->expr()->orX(
+                $queryBuilder->expr()->neq('CustomItemXrefCustomItem.parentCustomItem', ':customItemId'),
+                $queryBuilder->expr()->neq('CustomItemXrefCustomItem.customItem', ':customItemId')
             ));
             $queryBuilder->andWhere('CustomItem.id != :customItemId');
             $queryBuilder->setParameter('customItemId', $event->getTableConfig()->getParameter('filterEntityId'));

@@ -89,17 +89,14 @@ class LookupController extends JsonController
         $tableConfig      = new TableConfig(10, 1, CustomItemRepository::TABLE_ALIAS.'.name', 'ASC');
         $tableConfig->addFilter(CustomItem::class, 'customObject', $objectId);
         $tableConfig->addFilterIfNotEmpty(CustomItem::class, 'name', "%{$nameFilter}%", 'like');
+        $tableConfig->addParameter('filterEntityType', $filterEntityType);
+        $tableConfig->addParameter('filterEntityId', $filterEntityId);
 
         if ($filterEntityId && 'contact' === $filterEntityType) {
             $notContact = $tableConfig->createFilter(CustomItemXrefContact::class, 'contact', $filterEntityId, 'neq');
             $isNull     = $tableConfig->createFilter(CustomItemXrefContact::class, 'contact', null, 'isNull');
             $orX        = $tableConfig->createFilter(CustomItemXrefContact::class, 'contact', [$notContact, $isNull], 'orX');
             $tableConfig->addFilterDTO($orX);
-        }
-
-        if ($filterEntityId && 'customItem' === $filterEntityType) {
-            $tableConfig->addFilter(CustomItemXrefCustomItem::class, 'parentCustomItem', $filterEntityId, 'neq');
-            $tableConfig->addFilter(CustomItemXrefCustomItem::class, 'customItem', $filterEntityId, 'neq');
         }
 
         return $this->renderJson(['items' => $this->customItemModel->getLookupData($tableConfig)]);
