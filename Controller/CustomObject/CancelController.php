@@ -46,8 +46,8 @@ class CancelController extends CommonController
         CustomObjectRouteProvider $routeProvider,
         CustomObjectModel $customObjectModel
     ) {
-        $this->sessionProvider = $sessionProvider;
-        $this->routeProvider   = $routeProvider;
+        $this->sessionProvider   = $sessionProvider;
+        $this->routeProvider     = $routeProvider;
         $this->customObjectModel = $customObjectModel;
     }
 
@@ -56,12 +56,13 @@ class CancelController extends CommonController
      *
      * @return Response
      */
-
     public function cancelAction(?int $objectId): Response
     {
         $page = $this->sessionProvider->getPage();
 
-        if ($customObject = $this->customObjectModel->getEntity($objectId)) {
+        $customObject = $this->customObjectModel->getEntity($objectId);
+
+        if ($customObject) {
             $this->customObjectModel->unlockEntity($customObject);
         }
 

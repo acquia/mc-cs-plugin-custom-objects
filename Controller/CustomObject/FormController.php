@@ -26,7 +26,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 
-class FormController  extends BaseFormController
+class FormController extends BaseFormController
 {
     /**
      * @var FormFactory
@@ -115,9 +115,8 @@ class FormController  extends BaseFormController
 
         if ($this->customObjectModel->isLocked($customObject)) {
             return $this->isLocked([], $customObject, 'page.page');
-        } else {
-            $this->customObjectModel->lockEntity($customObject);
         }
+        $this->customObjectModel->lockEntity($customObject);
 
         return $this->renderForm($customObject, $this->routeProvider->buildEditRoute($objectId));
     }
