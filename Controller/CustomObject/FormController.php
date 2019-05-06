@@ -139,13 +139,7 @@ class FormController extends BaseFormController
                 'custom.object'
             );
 
-            $viewUrl = $this->routeProvider->buildViewRoute($objectId);
-
-            if ($this->requestStack->getCurrentRequest()->isXmlHttpRequest()) {
-                return $this->ajaxAction(['returnUrl' => $viewUrl]);
-            }
-
-            return $this->redirect($viewUrl);
+            return $this->redirect($this->routeProvider->buildViewRoute($objectId));
         }
 
         $this->customObjectModel->lockEntity($customObject);
