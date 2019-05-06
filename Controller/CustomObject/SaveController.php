@@ -154,7 +154,7 @@ class SaveController extends BaseFormController
             $this->lockFlashMessageHelper->addFlash(
                 $customObject,
                 $this->routeProvider->buildEditRoute($objectId),
-                false,
+                false, // Do not offer lock override, when this lock was overridden
                 'custom.object'
             );
 

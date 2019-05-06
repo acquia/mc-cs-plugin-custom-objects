@@ -133,11 +133,17 @@ class SaveController extends BaseFormController
             $this->lockFlashMessageHelper->addFlash(
                 $customItem,
                 $this->routeProvider->buildEditRoute($objectId, $itemId),
-                $this->canEdit($customItem),
+                false, // Do not offer lock override, when this lock was overridden
                 'custom.item'
             );
 
-            return $this->redirect($this->routeProvider->buildViewRoute($objectId, $itemId));
+            $viewUrl = $this->routeProvider->buildViewRoute($objectId, $itemId);
+
+            if ($this->requestStack->getCurrentRequest()->isXmlHttpRequest()) {
+                return $this->ajaxAction(['returnUrl' => $viewUrl]);
+            }
+
+            return $this->redirect($viewUrl);
         }
 
         $request = $this->requestStack->getCurrentRequest();

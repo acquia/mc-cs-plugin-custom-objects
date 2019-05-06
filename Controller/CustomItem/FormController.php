@@ -18,6 +18,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemType;
 use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Form\FormFactory;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
