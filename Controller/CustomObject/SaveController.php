@@ -186,7 +186,7 @@ class SaveController extends BaseFormController
 
             if ($form->get('buttons')->get('save')->isClicked()) {
                 if (!$this->customObjectModel->isLocked($customObject)) {
-                    // New entity should be locked after save
+                    // New entity should be locked after "apply"
                     $this->customObjectModel->lockEntity($customObject);
                 }
 
