@@ -20,12 +20,11 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Doctrine\ORM\Query\Expr\Join;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
+use Mautic\CoreBundle\Entity\CommonRepository;
 
-class CustomItemRepository extends AbstractTableRepository
+class CustomItemRepository extends CommonRepository
 {
     use DbalQueryTrait;
-
-    public const TABLE_ALIAS = 'CustomItem';
 
     /**
      * @param Lead         $contact
@@ -84,7 +83,7 @@ class CustomItemRepository extends AbstractTableRepository
         $fieldType    = $customField->getTypeObject();
         $queryBuilder = $this->_em->getConnection()->createQueryBuilder();
         $queryBuilder->select('ci.id');
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX.'custom_item', 'ci');
+        $queryBuilder->from(MAUTIC_TABLE_PREFIX.CustomItem::TABLE_NAME, 'ci');
         $queryBuilder->innerJoin('ci', MAUTIC_TABLE_PREFIX.'custom_item_xref_contact', 'cixcont', 'cixcont.custom_item_id = ci.id');
         $queryBuilder->innerJoin('ci', $fieldType->getTableName(), $fieldType->getTableAlias(), "{$fieldType->getTableAlias()}.custom_item_id = ci.id");
         $queryBuilder->where('cixcont.contact_id = :contactId');
@@ -104,5 +103,15 @@ class CustomItemRepository extends AbstractTableRepository
         }
 
         return (int) $result;
+    }
+
+    /**
+     * Used by internal Mautic methods. Use the contstant difectly instead.
+     *
+     * @return string
+     */
+    public function getTableAlias(): string
+    {
+        return CustomItem::TABLE_ALIAS;
     }
 }

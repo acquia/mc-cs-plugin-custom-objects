@@ -170,7 +170,7 @@ class CustomObjectModel extends FormModel
             'filter'           => [
                 'force' => [
                     [
-                        'column' => CustomObjectRepository::TABLE_ALIAS.'.isPublished',
+                        'column' => CustomObject::TABLE_ALIAS.'.isPublished',
                         'value'  => true,
                         'expr'   => 'eq',
                     ],
@@ -186,8 +186,7 @@ class CustomObjectModel extends FormModel
      */
     public function getTableData(TableConfig $tableConfig): array
     {
-        $queryBuilder = $this->customObjectRepository->getTableDataQuery($tableConfig);
-        $queryBuilder = $this->applyOwnerFilter($queryBuilder);
+        $queryBuilder = $this->createListQueryBuilder($tableConfig);
 
         return $queryBuilder->getQuery()->getResult();
     }
@@ -199,8 +198,8 @@ class CustomObjectModel extends FormModel
      */
     public function getCountForTable(TableConfig $tableConfig): int
     {
-        $queryBuilder = $this->customObjectRepository->getTableCountQuery($tableConfig);
-        $queryBuilder = $this->applyOwnerFilter($queryBuilder);
+        $queryBuilder = $this->createListQueryBuilder($tableConfig);
+        $queryBuilder->select($queryBuilder->expr()->count('DISTINCT '.CustomObject::TABLE_ALIAS));
 
         return (int) $queryBuilder->getQuery()->getSingleScalarResult();
     }
@@ -257,6 +256,28 @@ class CustomObjectModel extends FormModel
     }
 
     /**
+     * @param TableConfig $tableConfig
+     * 
+     * @return QueryBuilder
+     */
+    private function createListQueryBuilder(TableConfig $tableConfig)
+    {
+        $queryBuilder = $this->entityManager->createQueryBuilder();
+        $queryBuilder->select(CustomObject::TABLE_ALIAS);
+        $queryBuilder->from(CustomObject::class, CustomObject::TABLE_ALIAS);
+        $queryBuilder->setMaxResults($tableConfig->getLimit());
+        $queryBuilder->setFirstResult($tableConfig->getOffset());
+        $queryBuilder->orderBy($tableConfig->getOrderBy(), $tableConfig->getOrderDirection());
+
+        if ($search = $tableConfig->getParameter('search')) {
+            $queryBuilder->andWhere(CustomObject::TABLE_ALIAS.'.name LIKE %:search%');
+            $queryBuilder->setParameter('search', $search);
+        }
+
+        return $this->applyOwnerFilter($queryBuilder);
+    }
+
+    /**
      * Adds condition for creator if the user doesn't have permissions to view other.
      *
      * @param mixed[] $args
@@ -278,7 +299,7 @@ class CustomObjectModel extends FormModel
 
             $limitOwnerFilter = [
                 [
-                    'column' => CustomObjectRepository::TABLE_ALIAS.'.createdBy',
+                    'column' => CustomObject::TABLE_ALIAS.'.createdBy',
                     'expr'   => 'eq',
                     'value'  => $this->userHelper->getUser()->getId(),
                 ],
@@ -302,10 +323,7 @@ class CustomObjectModel extends FormModel
         try {
             $this->permissionProvider->isGranted('viewother');
         } catch (ForbiddenException $e) {
-            $this->customObjectRepository->applyOwnerId(
-                $queryBuilder,
-                $this->userHelper->getUser()->getId()
-            );
+            $queryBuilder->andWhere(CustomObject::TABLE_ALIAS.'.createdBy', $this->userHelper->getUser()->getId());
         }
 
         return $queryBuilder;

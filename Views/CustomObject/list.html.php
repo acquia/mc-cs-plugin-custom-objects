@@ -10,7 +10,7 @@
  */
 
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 if ('index' === $tmpl) {
     $view->extend('CustomObjectsBundle:CustomObject:index.html.php');
@@ -36,7 +36,7 @@ if ('index' === $tmpl) {
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
                         'sessionVar' => 'custom.object',
-                        'orderBy'    => CustomObjectRepository::TABLE_ALIAS.'.name',
+                        'orderBy'    => CustomObject::TABLE_ALIAS.'.name',
                         'text'       => 'mautic.core.name',
                         'class'      => 'col-custom_object_-name',
                     ]
@@ -46,7 +46,7 @@ if ('index' === $tmpl) {
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
                         'sessionVar' => 'custom.object',
-                        'orderBy'    => CustomObjectRepository::TABLE_ALIAS.'.id',
+                        'orderBy'    => CustomObject::TABLE_ALIAS.'.id',
                         'text'       => 'mautic.core.id',
                         'class'      => 'visible-md visible-lg col-asset-id',
                         'default'    => true,

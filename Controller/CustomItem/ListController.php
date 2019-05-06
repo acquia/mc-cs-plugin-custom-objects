@@ -24,7 +24,6 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderInterface;
 
 class ListController extends CommonController
@@ -107,7 +106,7 @@ class ListController extends CommonController
         $limit            = (int) $request->get('limit', $this->sessionProvider->getPageLimit());
         $filterEntityId   = (int) $request->get('filterEntityId');
         $filterEntityType = InputHelper::clean($request->get('filterEntityType'));
-        $orderBy          = $this->sessionProvider->getOrderBy(CustomItemRepository::TABLE_ALIAS.'.id');
+        $orderBy          = $this->sessionProvider->getOrderBy(CustomItem::TABLE_ALIAS.'.id');
         $orderByDir       = $this->sessionProvider->getOrderByDir('ASC');
 
         if ($request->query->has('orderby')) {
@@ -118,7 +117,7 @@ class ListController extends CommonController
         }
 
         $tableConfig = new TableConfig($limit, $page, $orderBy, $orderByDir);
-        $tableConfig->addFilter(CustomItem::class, 'customObject', $objectId);
+        $tableConfig->addParameter('customObjectId', $objectId);
         $tableConfig->addParameter('filterEntityType', $filterEntityType);
         $tableConfig->addParameter('filterEntityId', $filterEntityId);
         $tableConfig->addParameter('search', $search);

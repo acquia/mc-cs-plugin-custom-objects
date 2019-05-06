@@ -13,7 +13,18 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Repository;
 
-class CustomObjectRepository extends AbstractTableRepository
+use Mautic\CoreBundle\Entity\CommonRepository;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+
+class CustomObjectRepository extends CommonRepository
 {
-    public const TABLE_ALIAS = 'CustomObject';
+    /**
+     * Used by internal Mautic methods. Use the contstant difectly instead.
+     *
+     * @return string
+     */
+    public function getTableAlias()
+    {
+        return CustomObject::TABLE_ALIAS;
+    }
 }

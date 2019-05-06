@@ -190,9 +190,8 @@ class CustomItemModel extends FormModel
      */
     public function getCountForTable(TableConfig $tableConfig): int
     {
-        $customObjectFilter = $tableConfig->getFilter(CustomItem::class, 'customObject');
-        $queryBuilder       = $this->customItemRepository->getTableCountQuery($tableConfig);
-        $queryBuilder       = $this->applyOwnerFilter($queryBuilder, $customObjectFilter->getValue());
+        $queryBuilder = $this->createListQueryBuilder($tableConfig);
+        $queryBuilder->select($queryBuilder->expr()->count('DISTINCT '.CustomItem::TABLE_ALIAS));
 
         $this->dispatcher->dispatch(
             CustomItemEvents::ON_CUSTOM_ITEM_LIST_QUERY,
@@ -273,13 +272,29 @@ class CustomItemModel extends FormModel
         return 'custom_objects:custom_objects';
     }
 
+    /**
+     * @param TableConfig $tableConfig
+     * 
+     * @return QueryBuilder
+     */
     private function createListQueryBuilder(TableConfig $tableConfig)
     {
-        $customObjectFilter = $tableConfig->getFilter(CustomItem::class, 'customObject');
-        $queryBuilder       = $this->customItemRepository->getTableDataQuery($tableConfig);
-        $queryBuilder       = $this->applyOwnerFilter($queryBuilder, $customObjectFilter->getValue());
+        $customObjectId = $tableConfig->getParameter('customObjectId');
+        $queryBuilder   = $this->entityManager->createQueryBuilder();
+        $queryBuilder->select(CustomItem::TABLE_ALIAS);
+        $queryBuilder->from(CustomItem::class, CustomItem::TABLE_ALIAS);
+        $queryBuilder->setMaxResults($tableConfig->getLimit());
+        $queryBuilder->setFirstResult($tableConfig->getOffset());
+        $queryBuilder->orderBy($tableConfig->getOrderBy(), $tableConfig->getOrderDirection());
+        $queryBuilder->where(CustomItem::TABLE_ALIAS.'.customObject = :customObjectId');
+        $queryBuilder->setParameter('customObjectId', $customObjectId);
 
-        return $queryBuilder;
+        if ($search = $tableConfig->getParameter('search')) {
+            $queryBuilder->andWhere(CustomItem::TABLE_ALIAS.'.name LIKE %:search%');
+            $queryBuilder->setParameter('search', $search);
+        }
+
+        return $this->applyOwnerFilter($queryBuilder, $customObjectId);
     }
 
     /**
@@ -294,7 +309,7 @@ class CustomItemModel extends FormModel
         try {
             $this->permissionProvider->isGranted('viewother', $customObjectId);
         } catch (ForbiddenException $e) {
-            $this->customItemRepository->applyOwnerId($queryBuilder, $this->userHelper->getUser()->getId());
+            $queryBuilder->andWhere(CustomItem::TABLE_ALIAS.'.createdBy', $this->userHelper->getUser()->getId());
         }
 
         return $queryBuilder;

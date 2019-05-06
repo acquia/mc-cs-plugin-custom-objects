@@ -20,12 +20,9 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Mautic\CoreBundle\Helper\InputHelper;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Controller\JsonController;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Mautic\CoreBundle\Service\FlashBag;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
 
 class LookupController extends JsonController
 {
@@ -83,12 +80,12 @@ class LookupController extends JsonController
         }
 
         $request          = $this->requestStack->getCurrentRequest();
-        $nameFilter       = InputHelper::clean($request->get('filter'));
+        $search           = InputHelper::clean($request->get('filter'));
         $filterEntityId   = (int) $request->get('filterEntityId');
         $filterEntityType = InputHelper::clean($request->get('filterEntityType'));
-        $tableConfig      = new TableConfig(10, 1, CustomItemRepository::TABLE_ALIAS.'.name', 'ASC');
-        $tableConfig->addFilter(CustomItem::class, 'customObject', $objectId);
-        $tableConfig->addFilterIfNotEmpty(CustomItem::class, 'name', "%{$nameFilter}%", 'like');
+        $tableConfig      = new TableConfig(10, 1, CustomItem::TABLE_ALIAS.'.name', 'ASC');
+        $tableConfig->addParameter('search', $search);
+        $tableConfig->addParameter('customObjectId', $objectId);
         $tableConfig->addParameter('filterEntityType', $filterEntityType);
         $tableConfig->addParameter('filterEntityId', $filterEntityId);
 

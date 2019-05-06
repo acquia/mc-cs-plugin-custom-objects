@@ -29,6 +29,9 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
 
 class CustomItem extends FormEntity implements UniqueEntityInterface
 {
+    public const TABLE_NAME  = 'custom_item';
+    public const TABLE_ALIAS = 'CustomItem';
+
     /**
      * @var int|null
      */
@@ -103,7 +106,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('custom_item')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(CustomItemRepository::class);
 
         $builder->createManyToOne('customObject', CustomObject::class)

@@ -22,8 +22,8 @@ use Mautic\CoreBundle\Helper\InputHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use Symfony\Component\HttpFoundation\Response;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectSessionProvider;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 class ListController extends CommonController
 {
@@ -89,7 +89,7 @@ class ListController extends CommonController
         $request    = $this->requestStack->getCurrentRequest();
         $search     = InputHelper::clean($request->get('search', $this->sessionProvider->getFilter()));
         $limit      = (int) $request->get('limit', $this->sessionProvider->getPageLimit());
-        $orderBy    = $this->sessionProvider->getOrderBy(CustomObjectRepository::TABLE_ALIAS.'.id');
+        $orderBy    = $this->sessionProvider->getOrderBy(CustomObject::TABLE_ALIAS.'.id');
         $orderByDir = $this->sessionProvider->getOrderByDir('ASC');
         $route      = $this->routeProvider->buildListRoute($page);
 
