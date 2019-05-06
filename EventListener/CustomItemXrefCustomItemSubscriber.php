@@ -56,8 +56,8 @@ class CustomItemXrefCustomItemSubscriber extends CommonSubscriber
     public static function getSubscribedEvents(): array
     {
         return [
-            CustomItemEvents::ON_CUSTOM_ITEM_LOOKUP_QUERY          => 'onListQuery',
-            CustomItemEvents::ON_CUSTOM_ITEM_LIST_QUERY            => 'onLookupQuery',
+            CustomItemEvents::ON_CUSTOM_ITEM_LOOKUP_QUERY          => 'onLookupQuery',
+            CustomItemEvents::ON_CUSTOM_ITEM_LIST_QUERY            => 'onListQuery',
             CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY => 'onEntityLinkDiscovery',
             CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY           => [
                 ['saveLink', 1000],
