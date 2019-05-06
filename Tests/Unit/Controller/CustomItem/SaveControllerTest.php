@@ -135,6 +135,11 @@ class SaveControllerTest extends ControllerTestCase
         $this->permissionProvider->expects($this->never())
             ->method('canCreate');
 
+        $this->customObjectModel->expects($this->once())
+            ->method('isLocked')
+            ->with($this->customItem)
+            ->willReturn(false);
+
         $this->routeProvider->expects($this->exactly(2))
             ->method('buildEditRoute')
             ->with(self::OBJECT_ID, self::ITEM_ID)
