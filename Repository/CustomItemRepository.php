@@ -56,12 +56,12 @@ class CustomItemRepository extends AbstractTableRepository
     {
         $queryBuilder = $this->createQueryBuilder('ci', 'ci.id');
         $queryBuilder->select($queryBuilder->expr()->countDistinct('ci.id'));
-        $queryBuilder->innerJoin(CustomItemXrefCustomItem::class, 'cixci', Join::WITH, 'ci.id = cixci.customItem OR ci.id = cixci.parentCustomItem');
+        $queryBuilder->innerJoin(CustomItemXrefCustomItem::class, 'cixci', Join::WITH, 'ci.id = cixci.customItemLower OR ci.id = cixci.customItemHigher');
         $queryBuilder->where('ci.customObject = :customObjectId');
         $queryBuilder->andWhere('ci.id != :customItemId');
         $queryBuilder->andWhere($queryBuilder->expr()->orX(
-            $queryBuilder->expr()->eq('cixci.parentCustomItem', ':customItemId'),
-            $queryBuilder->expr()->eq('cixci.customItem', ':customItemId')
+            $queryBuilder->expr()->eq('cixci.customItemLower', ':customItemId'),
+            $queryBuilder->expr()->eq('cixci.customItemHigher', ':customItemId')
         ));
         $queryBuilder->setParameter('customObjectId', $customObject->getId());
         $queryBuilder->setParameter('customItemId', $customItem->getId());

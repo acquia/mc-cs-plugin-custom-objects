@@ -124,7 +124,8 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
             ->build();
 
         $builder->createOneToMany('customItemReferences', CustomItemXrefCustomItem::class)
-            ->addJoinColumn('id', 'parent_custom_item_id', false, false, 'CASCADE')
+            ->addJoinColumn('id', 'custom_item_id_lower', false, false, 'CASCADE')
+            ->addJoinColumn('id', 'custom_item_id_higher', false, false, 'CASCADE')
             ->mappedBy('customItem')
             ->fetchExtraLazy()
             ->build();

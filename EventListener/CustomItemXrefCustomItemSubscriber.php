@@ -61,11 +61,11 @@ class CustomItemXrefCustomItemSubscriber extends CommonSubscriber
             CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY => 'onEntityLinkDiscovery',
             CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY           => [
                 ['saveLink', 1000],
-                // ['createNewEvenLogForLinkedCustomItem', 0] // @todo
+                ['createNewEvenLogForLinkedCustomItem', 0]
             ],
             CustomItemEvents::ON_CUSTOM_ITEM_UNLINK_ENTITY         => [
                 ['deleteLink', 1000],
-                // ['createNewEvenLogForUnlinkedCustomItem', 0] // @todo
+                ['createNewEvenLogForUnlinkedCustomItem', 0]
             ],
         ];
     }
@@ -81,11 +81,11 @@ class CustomItemXrefCustomItemSubscriber extends CommonSubscriber
                 CustomItemXrefCustomItem::class,
                 'CustomItemXrefCustomItem',
                 Join::WITH,
-                'CustomItem.id = CustomItemXrefCustomItem.customItem OR CustomItem.id = CustomItemXrefCustomItem.parentCustomItem'
+                'CustomItem.id = CustomItemXrefCustomItem.customItemLower OR CustomItem.id = CustomItemXrefCustomItem.customItemHigher'
             );
             $queryBuilder->andWhere($queryBuilder->expr()->orX(
-                $queryBuilder->expr()->eq('CustomItemXrefCustomItem.parentCustomItem', ':customItemId'),
-                $queryBuilder->expr()->eq('CustomItemXrefCustomItem.customItem', ':customItemId')
+                $queryBuilder->expr()->eq('CustomItemXrefCustomItem.customItemLower', ':customItemId'),
+                $queryBuilder->expr()->eq('CustomItemXrefCustomItem.customItemHigher', ':customItemId')
             ));
             $queryBuilder->andWhere('CustomItem.id != :customItemId');
             $queryBuilder->setParameter('customItemId', $event->getTableConfig()->getParameter('filterEntityId'));
@@ -103,11 +103,13 @@ class CustomItemXrefCustomItemSubscriber extends CommonSubscriber
                 CustomItemXrefCustomItem::class,
                 'CustomItemXrefCustomItem',
                 Join::WITH,
-                'CustomItem.id = CustomItemXrefCustomItem.customItem OR CustomItem.id = CustomItemXrefCustomItem.parentCustomItem'
+                'CustomItem.id = CustomItemXrefCustomItem.customItemLower OR CustomItem.id = CustomItemXrefCustomItem.customItemHigher'
             );
             $queryBuilder->andWhere($queryBuilder->expr()->orX(
-                $queryBuilder->expr()->neq('CustomItemXrefCustomItem.parentCustomItem', ':customItemId'),
-                $queryBuilder->expr()->neq('CustomItemXrefCustomItem.customItem', ':customItemId')
+                $queryBuilder->expr()->neq('CustomItemXrefCustomItem.customItemLower', ':customItemId'),
+                $queryBuilder->expr()->neq('CustomItemXrefCustomItem.customItemHigher', ':customItemId'),
+                $queryBuilder->expr()->isNull('CustomItemXrefCustomItem.customItemLower'),
+                $queryBuilder->expr()->isNull('CustomItemXrefCustomItem.customItemHigher')
             ));
             $queryBuilder->andWhere('CustomItem.id != :customItemId');
             $queryBuilder->setParameter('customItemId', $event->getTableConfig()->getParameter('filterEntityId'));
@@ -122,16 +124,12 @@ class CustomItemXrefCustomItemSubscriber extends CommonSubscriber
     public function onEntityLinkDiscovery(CustomItemXrefEntityDiscoveryEvent $event): void
     {
         if ('customItem' === $event->getEntityType()) {
-            if ($event->getCustomItem()->getId() === $event->getEntityId()) {
-                throw new UnexpectedValueException("It is not possible to link identical custom item.");
-            }
-
             try {
                 $xRef = $this->getXrefEntity($event->getCustomItem()->getId(), $event->getEntityId());
             } catch (NoResultException $e) {
-                /** @var CustomItem $parentCustomItem */
-                $parentCustomItem = $this->entityManager->getReference(CustomItem::class, $event->getEntityId());
-                $xRef             = new CustomItemXrefCustomItem($event->getCustomItem(), $parentCustomItem);
+                /** @var CustomItem $customItemB */
+                $customItemB = $this->entityManager->getReference(CustomItem::class, $event->getEntityId());
+                $xRef        = new CustomItemXrefCustomItem($event->getCustomItem(), $customItemB);
             }
     
             $event->setXrefEntity($xRef);
@@ -184,22 +182,22 @@ class CustomItemXrefCustomItemSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param int $customItemId
-     * @param int $parentCustomItemId
+     * @param int $customItemAId
+     * @param int $customItemBId
      *
      * @return CustomItemXrefCustomItem
      *
      * @throws NoResultException if the reference does not exist
      */
-    public function getXrefEntity(int $customItemId, int $parentCustomItemId): CustomItemXrefCustomItem
+    public function getXrefEntity(int $customItemAId, int $customItemBId): CustomItemXrefCustomItem
     {
         $queryBuilder = $this->entityManager->createQueryBuilder();
         $queryBuilder->select('cixci');
         $queryBuilder->from(CustomItemXrefCustomItem::class, 'cixci');
-        $queryBuilder->where('cixci.customItem = :customItemId');
-        $queryBuilder->andWhere('cixci.parentCustomItem = :parentCustomItemId');
-        $queryBuilder->setParameter('customItemId', $customItemId);
-        $queryBuilder->setParameter('parentCustomItemId', $parentCustomItemId);
+        $queryBuilder->where('cixci.customItemLower = :customItemLower');
+        $queryBuilder->andWhere('cixci.customItemHigher = :customItemHigher');
+        $queryBuilder->setParameter('customItemLower', min($customItemAId, $customItemBId));
+        $queryBuilder->setParameter('customItemHigher', max($customItemAId, $customItemBId));
 
         return $queryBuilder->getQuery()->getSingleResult();
     }
