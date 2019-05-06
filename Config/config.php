@@ -258,7 +258,6 @@ return [
             'custom_item.form_controller' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\FormController::class,
                 'arguments' => [
-                    'request_stack',
                     'form.factory',
                     'mautic.custom.model.object',
                     'mautic.custom.model.item',
@@ -419,7 +418,6 @@ return [
             'custom_object.form_controller' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\FormController::class,
                 'arguments' => [
-                    'request_stack',
                     'form.factory',
                     'mautic.custom.model.object',
                     'mautic.custom.model.field',

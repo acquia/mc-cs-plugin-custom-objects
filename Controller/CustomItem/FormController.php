@@ -18,7 +18,6 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemType;
 use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Form\FormFactory;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
@@ -30,11 +29,6 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 class FormController extends BaseFormController
 {
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
     /**
      * @var FormFactory
      */
@@ -66,7 +60,6 @@ class FormController extends BaseFormController
     private $lockFlashMessageHelper;
 
     /**
-     * @param RequestStack                 $requestStack
      * @param FormFactory                  $formFactory
      * @param CustomObjectModel            $customObjectModel
      * @param CustomItemModel              $customItemModel
@@ -75,7 +68,6 @@ class FormController extends BaseFormController
      * @param LockFlashMessageHelper       $lockFlashMessageHelper
      */
     public function __construct(
-        RequestStack $requestStack,
         FormFactory $formFactory,
         CustomObjectModel $customObjectModel,
         CustomItemModel $customItemModel,
@@ -83,7 +75,6 @@ class FormController extends BaseFormController
         CustomItemRouteProvider $routeProvider,
         LockFlashMessageHelper $lockFlashMessageHelper
     ) {
-        $this->requestStack           = $requestStack;
         $this->formFactory            = $formFactory;
         $this->customObjectModel      = $customObjectModel;
         $this->customItemModel        = $customItemModel;
