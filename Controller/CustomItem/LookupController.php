@@ -92,13 +92,6 @@ class LookupController extends JsonController
         $tableConfig->addParameter('filterEntityType', $filterEntityType);
         $tableConfig->addParameter('filterEntityId', $filterEntityId);
 
-        if ($filterEntityId && 'contact' === $filterEntityType) {
-            $notContact = $tableConfig->createFilter(CustomItemXrefContact::class, 'contact', $filterEntityId, 'neq');
-            $isNull     = $tableConfig->createFilter(CustomItemXrefContact::class, 'contact', null, 'isNull');
-            $orX        = $tableConfig->createFilter(CustomItemXrefContact::class, 'contact', [$notContact, $isNull], 'orX');
-            $tableConfig->addFilterDTO($orX);
-        }
-
         return $this->renderJson(['items' => $this->customItemModel->getLookupData($tableConfig)]);
     }
 }

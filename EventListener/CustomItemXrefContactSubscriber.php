@@ -45,8 +45,8 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
         EntityManager $entityManager,
         UserHelper $userHelper
     ) {
-        $this->entityManager              = $entityManager;
-        $this->userHelper                 = $userHelper;
+        $this->entityManager = $entityManager;
+        $this->userHelper    = $userHelper;
     }
 
     /**
@@ -55,6 +55,7 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
     public static function getSubscribedEvents(): array
     {
         return [
+            CustomItemEvents::ON_CUSTOM_ITEM_LOOKUP_QUERY          => 'onLookupQuery',
             CustomItemEvents::ON_CUSTOM_ITEM_LIST_QUERY            => 'onListQuery',
             CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY => 'onEntityLinkDiscovery',
             CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY           => [
@@ -73,12 +74,28 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
      */
     public function onListQuery(CustomItemListQueryEvent $event): void
     {
-        if ('contact' === $event->getTableConfig()->getParameter('filterEntityType') && $event->getTableConfig()->getParameter('filterEntityId')) {
-            $event->getTableConfig()->addFilterIfNotEmpty(
-                CustomItemXrefContact::class,
-                'contact',
-                $event->getTableConfig()->getParameter('filterEntityId')
-            );
+        $tableConfig = $event->getTableConfig();
+        if ('contact' === $tableConfig->getParameter('filterEntityType') && $tableConfig->getParameter('filterEntityId')) {
+            $queryBuilder = $event->getQueryBuilder();
+            $queryBuilder->leftJoin('CustomItem.contactReferences', 'CustomItemXrefContact');
+            $queryBuilder->andWhere('CustomItemXrefContact.contact = :contactId');
+            $queryBuilder->setParameter('contactId', $tableConfig->getParameter('filterEntityId'));
+        }
+    }
+
+    /**
+     * @param CustomItemListQueryEvent $event
+     */
+    public function onLookupQuery(CustomItemListQueryEvent $event): void
+    {
+        $tableConfig = $event->getTableConfig();
+        if ('contact' === $tableConfig->getParameter('filterEntityType') && $tableConfig->getParameter('filterEntityId')) {
+            $queryBuilder = $event->getQueryBuilder();
+            $queryBuilder->leftJoin('CustomItem.contactReferences', 'CustomItemXrefContact');
+            $queryBuilder->andWhere($queryBuilder->expr()->orX(
+                $queryBuilder->expr()->neq('CustomItemXrefContact.contact', $tableConfig->getParameter('filterEntityId')),
+                $queryBuilder->expr()->isNull('CustomItemXrefContact.contact')
+            ));
         }
     }
 
