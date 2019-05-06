@@ -13,9 +13,11 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
+use Mautic\CoreBundle\Controller\FormController as BaseFormController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsToStringTransformer;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransformer;
+use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -24,7 +26,6 @@ use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
-use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
@@ -32,7 +33,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use Mautic\CoreBundle\Service\FlashBag;
 use Symfony\Component\Form\FormFactoryInterface;
 
-class SaveController extends CommonController
+class SaveController extends BaseFormController
 {
     /**
      * @var RequestStack
@@ -85,6 +86,11 @@ class SaveController extends CommonController
     private $optionsToStringTransformer;
 
     /**
+     * @var LockFlashMessageHelper
+     */
+    private $lockFlashMessageHelper;
+
+    /**
      * @param RequestStack                   $requestStack
      * @param FlashBag                       $flashBag
      * @param FormFactoryInterface           $formFactory
@@ -95,6 +101,7 @@ class SaveController extends CommonController
      * @param CustomFieldTypeProvider        $customFieldTypeProvider
      * @param ParamsToStringTransformer      $paramsToStringTransformer
      * @param OptionsToStringTransformer     $optionsToStringTransformer
+     * @param LockFlashMessageHelper         $lockFlashMessageHelper
      */
     public function __construct(
         RequestStack $requestStack,
@@ -106,7 +113,8 @@ class SaveController extends CommonController
         CustomObjectRouteProvider $routeProvider,
         CustomFieldTypeProvider $customFieldTypeProvider,
         ParamsToStringTransformer $paramsToStringTransformer,
-        OptionsToStringTransformer $optionsToStringTransformer
+        OptionsToStringTransformer $optionsToStringTransformer,
+        LockFlashMessageHelper $lockFlashMessageHelper
     ) {
         $this->requestStack               = $requestStack;
         $this->flashBag                   = $flashBag;
@@ -118,6 +126,7 @@ class SaveController extends CommonController
         $this->customFieldTypeProvider    = $customFieldTypeProvider;
         $this->paramsToStringTransformer  = $paramsToStringTransformer;
         $this->optionsToStringTransformer = $optionsToStringTransformer;
+        $this->lockFlashMessageHelper = $lockFlashMessageHelper;
     }
 
     /**
@@ -138,6 +147,19 @@ class SaveController extends CommonController
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
             return $this->accessDenied(false, $e->getMessage());
+        }
+
+        if ($this->customObjectModel->isLocked($customObject)) {
+            $viewUrl = $this->routeProvider->buildViewRoute($objectId);
+
+            $this->lockFlashMessageHelper->addFlash(
+                $customObject,
+                $viewUrl,
+                $this->canEdit($customObject),
+                'custom.object'
+            );
+
+            return $this->redirect($viewUrl);
         }
 
         $request = $this->requestStack->getCurrentRequest();
