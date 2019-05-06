@@ -417,6 +417,7 @@ return [
             'custom_object.form_controller' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\FormController::class,
                 'arguments' => [
+                    'request_stack',
                     'form.factory',
                     'mautic.custom.model.object',
                     'mautic.custom.model.field',

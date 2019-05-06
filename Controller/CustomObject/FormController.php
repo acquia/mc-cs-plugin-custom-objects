@@ -19,6 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
 use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
@@ -29,6 +30,11 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 
 class FormController extends BaseFormController
 {
+    /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
     /**
      * @var FormFactory
      */
@@ -65,6 +71,7 @@ class FormController extends BaseFormController
     private $lockFlashMessageHelper;
 
     /**
+     * @param RequestStack                   $requestStack
      * @param FormFactory                    $formFactory
      * @param CustomObjectModel              $customObjectModel
      * @param CustomFieldModel               $customFieldModel
@@ -74,6 +81,7 @@ class FormController extends BaseFormController
      * @param LockFlashMessageHelper         $lockFlashMessageHelper
      */
     public function __construct(
+        RequestStack $requestStack,
         FormFactory $formFactory,
         CustomObjectModel $customObjectModel,
         CustomFieldModel $customFieldModel,
@@ -82,6 +90,7 @@ class FormController extends BaseFormController
         CustomFieldTypeProvider $customFieldTypeProvider,
         LockFlashMessageHelper $lockFlashMessageHelper
     ) {
+        $this->requestStack            = $requestStack;
         $this->formFactory             = $formFactory;
         $this->customObjectModel       = $customObjectModel;
         $this->customFieldModel        = $customFieldModel;
@@ -132,7 +141,11 @@ class FormController extends BaseFormController
                 'custom.object'
             );
 
-            return $this->ajaxAction(['returnUrl' => $returnUrl]);
+            if ($this->requestStack->getCurrentRequest()->isXmlHttpRequest()) {
+                return $this->ajaxAction(['returnUrl' => $returnUrl]);
+            }
+
+            $this->redirect($returnUrl);
         }
 
         $this->customObjectModel->lockEntity($customObject);
