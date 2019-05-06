@@ -120,7 +120,7 @@ class FormController extends BaseFormController
         }
 
         if ($this->customItemModel->isLocked($customItem)) {
-            $returnUrl = $this->generateUrl('mautic_custom_item_edit', ['objectId' => $objectId, 'itemId' => $itemId]);
+            $returnUrl = $this->routeProvider->buildEditRoute($objectId, $itemId);
 
             $this->lockFlashMessageHelper->addFlash(
                 $customItem,
