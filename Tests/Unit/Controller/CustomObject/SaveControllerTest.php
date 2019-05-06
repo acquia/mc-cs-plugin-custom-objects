@@ -15,6 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomObject;
 
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsToStringTransformer;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransformer;
+use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
 use Symfony\Component\HttpFoundation\Request;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
@@ -47,6 +48,7 @@ class SaveControllerTest extends ControllerTestCase
     private $flashBag;
     private $permissionProvider;
     private $routeProvider;
+    private $lockFlashMessageHelper;
     private $customObject;
     private $form;
 
@@ -69,6 +71,7 @@ class SaveControllerTest extends ControllerTestCase
         $this->customFieldTypeProvider    = $this->createMock(CustomFieldTypeProvider::class);
         $this->paramsToStringTransformer  = $this->createMock(ParamsToStringTransformer::class);
         $this->optionsToStringTransformer = $this->createMock(OptionsToStringTransformer::class);
+        $this->lockFlashMessageHelper     = $this->createMock(LockFlashMessageHelper::class);
         $this->request                    = $this->createMock(Request::class);
         $this->customObject               = $this->createMock(CustomObject::class);
         $this->form                       = $this->createMock(FormInterface::class);
@@ -82,7 +85,8 @@ class SaveControllerTest extends ControllerTestCase
             $this->routeProvider,
             $this->customFieldTypeProvider,
             $this->paramsToStringTransformer,
-            $this->optionsToStringTransformer
+            $this->optionsToStringTransformer,
+            $this->lockFlashMessageHelper
         );
 
         $this->addSymfonyDependencies($this->saveController);
