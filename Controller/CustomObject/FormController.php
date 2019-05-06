@@ -132,20 +132,21 @@ class FormController extends BaseFormController
         }
 
         if ($this->customObjectModel->isLocked($customObject)) {
-            $editUrl = $this->routeProvider->buildEditRoute($objectId);
 
             $this->lockFlashMessageHelper->addFlash(
                 $customObject,
-                $editUrl,
+                $this->routeProvider->buildEditRoute($objectId),
                 $this->canEdit($customObject),
                 'custom.object'
             );
 
+            $viewUrl = $this->routeProvider->buildViewRoute($objectId);
+
             if ($this->requestStack->getCurrentRequest()->isXmlHttpRequest()) {
-                return $this->ajaxAction(['returnUrl' => $editUrl]);
+                return $this->ajaxAction(['returnUrl' => $viewUrl]);
             }
 
-            return $this->redirect($this->routeProvider->buildViewRoute($objectId));
+            return $this->redirect($viewUrl);
         }
 
         $this->customObjectModel->lockEntity($customObject);
