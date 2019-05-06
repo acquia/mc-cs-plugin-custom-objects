@@ -13,13 +13,14 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
+use Mautic\CoreBundle\Controller\FormController as BaseFormController;
+use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactoryInterface;
-use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
@@ -28,7 +29,7 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Mautic\CoreBundle\Service\FlashBag;
 use Symfony\Component\HttpFoundation\Request;
 
-class SaveController extends CommonController
+class SaveController extends BaseFormController
 {
     /**
      * @var RequestStack
@@ -66,6 +67,11 @@ class SaveController extends CommonController
     private $routeProvider;
 
     /**
+     * @var LockFlashMessageHelper
+     */
+    private $lockFlashMessageHelper;
+
+    /**
      * @param RequestStack                 $requestStack
      * @param FormFactoryInterface         $formFactory
      * @param FlashBag                     $flashBag
@@ -73,6 +79,7 @@ class SaveController extends CommonController
      * @param CustomObjectModel            $customObjectModel
      * @param CustomItemPermissionProvider $permissionProvider
      * @param CustomItemRouteProvider      $routeProvider
+     * @param LockFlashMessageHelper       $lockFlashMessageHelper
      */
     public function __construct(
         RequestStack $requestStack,
@@ -81,15 +88,17 @@ class SaveController extends CommonController
         CustomItemModel $customItemModel,
         CustomObjectModel $customObjectModel,
         CustomItemPermissionProvider $permissionProvider,
-        CustomItemRouteProvider $routeProvider
+        CustomItemRouteProvider $routeProvider,
+        LockFlashMessageHelper $lockFlashMessageHelper
     ) {
-        $this->requestStack       = $requestStack;
-        $this->formFactory        = $formFactory;
-        $this->flashBag           = $flashBag;
-        $this->customItemModel    = $customItemModel;
-        $this->customObjectModel  = $customObjectModel;
-        $this->permissionProvider = $permissionProvider;
-        $this->routeProvider      = $routeProvider;
+        $this->requestStack           = $requestStack;
+        $this->formFactory            = $formFactory;
+        $this->flashBag               = $flashBag;
+        $this->customItemModel        = $customItemModel;
+        $this->customObjectModel      = $customObjectModel;
+        $this->permissionProvider     = $permissionProvider;
+        $this->routeProvider          = $routeProvider;
+        $this->lockFlashMessageHelper = $lockFlashMessageHelper;
     }
 
     /**
@@ -117,6 +126,18 @@ class SaveController extends CommonController
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
             return $this->accessDenied(false, $e->getMessage());
+        }
+
+        if ($this->customObjectModel->isLocked($customItem)) {
+
+            $this->lockFlashMessageHelper->addFlash(
+                $customItem,
+                $this->routeProvider->buildEditRoute($objectId, $itemId),
+                $this->canEdit($customItem),
+                'custom.item'
+            );
+
+            return $this->redirect($this->routeProvider->buildViewRoute($objectId, $itemId));
         }
 
         $request = $this->requestStack->getCurrentRequest();

@@ -30,6 +30,11 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 class FormController extends BaseFormController
 {
     /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
+    /**
      * @var FormFactory
      */
     private $formFactory;
@@ -60,6 +65,7 @@ class FormController extends BaseFormController
     private $lockFlashMessageHelper;
 
     /**
+     * @param RequestStack                 $requestStack
      * @param FormFactory                  $formFactory
      * @param CustomObjectModel            $customObjectModel
      * @param CustomItemModel              $customItemModel
@@ -68,6 +74,7 @@ class FormController extends BaseFormController
      * @param LockFlashMessageHelper       $lockFlashMessageHelper
      */
     public function __construct(
+        RequestStack $requestStack,
         FormFactory $formFactory,
         CustomObjectModel $customObjectModel,
         CustomItemModel $customItemModel,
@@ -75,6 +82,7 @@ class FormController extends BaseFormController
         CustomItemRouteProvider $routeProvider,
         LockFlashMessageHelper $lockFlashMessageHelper
     ) {
+        $this->requestStack           = $requestStack;
         $this->formFactory            = $formFactory;
         $this->customObjectModel      = $customObjectModel;
         $this->customItemModel        = $customItemModel;
@@ -120,16 +128,21 @@ class FormController extends BaseFormController
         }
 
         if ($this->customItemModel->isLocked($customItem)) {
-            $returnUrl = $this->routeProvider->buildEditRoute($objectId, $itemId);
 
             $this->lockFlashMessageHelper->addFlash(
                 $customItem,
-                $returnUrl,
+                $this->routeProvider->buildEditRoute($objectId, $itemId),
                 $this->canEdit($customItem),
                 'custom.item'
             );
 
-            return $this->ajaxAction(['returnUrl' => $returnUrl]);
+            $viewUrl = $this->routeProvider->buildViewRoute($objectId, $itemId);
+
+            if ($this->requestStack->getCurrentRequest()->isXmlHttpRequest()) {
+                return $this->ajaxAction(['returnUrl' => $viewUrl]);
+            }
+
+            return $this->redirect($viewUrl);
         }
 
         $this->customItemModel->lockEntity($customItem);
