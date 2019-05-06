@@ -129,7 +129,6 @@ class FormController extends BaseFormController
         }
 
         if ($this->customItemModel->isLocked($customItem)) {
-
             $this->lockFlashMessageHelper->addFlash(
                 $customItem,
                 $this->routeProvider->buildEditRoute($objectId, $itemId),

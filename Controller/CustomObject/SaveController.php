@@ -126,7 +126,7 @@ class SaveController extends BaseFormController
         $this->customFieldTypeProvider    = $customFieldTypeProvider;
         $this->paramsToStringTransformer  = $paramsToStringTransformer;
         $this->optionsToStringTransformer = $optionsToStringTransformer;
-        $this->lockFlashMessageHelper = $lockFlashMessageHelper;
+        $this->lockFlashMessageHelper     = $lockFlashMessageHelper;
     }
 
     /**
@@ -150,7 +150,6 @@ class SaveController extends BaseFormController
         }
 
         if ($this->customObjectModel->isLocked($customObject)) {
-
             $this->lockFlashMessageHelper->addFlash(
                 $customObject,
                 $this->routeProvider->buildEditRoute($objectId),
