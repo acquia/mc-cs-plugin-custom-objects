@@ -60,9 +60,8 @@ class CancelController extends CommonController
     {
         $page = $this->sessionProvider->getPage();
 
-        $customObject = $this->customObjectModel->getEntity($objectId);
-
-        if ($customObject) {
+        if ($objectId) {
+            $customObject = $this->customObjectModel->fetchEntity($objectId);
             $this->customObjectModel->unlockEntity($customObject);
         }
 

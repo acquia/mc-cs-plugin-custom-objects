@@ -61,9 +61,8 @@ class CancelController extends CommonController
     {
         $page = $this->sessionProvider->getPage();
 
-        $customItem = $this->customItemModel->getEntity($itemId);
-
-        if ($customItem) {
+        if ($itemId) {
+            $customItem = $this->customItemModel->fetchEntity($itemId);
             $this->customItemModel->unlockEntity($customItem);
         }
 

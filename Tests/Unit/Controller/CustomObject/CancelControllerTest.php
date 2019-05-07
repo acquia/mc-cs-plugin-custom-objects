@@ -56,10 +56,8 @@ class CancelControllerTest extends ControllerTestCase
             ->method('getPage')
             ->willReturn($pageNumber);
 
-        $this->customObjectModel->expects($this->once())
-            ->method('getEntity')
-            ->with(null)
-            ->willReturn(null);
+        $this->customObjectModel->expects($this->never())
+            ->method('fetchEntity');
 
         $this->routeProvider->expects($this->once())
             ->method('buildListRoute')
@@ -80,7 +78,7 @@ class CancelControllerTest extends ControllerTestCase
             ->willReturn($pageNumber);
 
         $this->customObjectModel->expects($this->once())
-            ->method('getEntity')
+            ->method('fetchEntity')
             ->with($customObjectId)
             ->willReturn($customObject);
 
