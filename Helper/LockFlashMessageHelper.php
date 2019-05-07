@@ -62,12 +62,12 @@ class LockFlashMessageHelper
      * @param mixed  $entity
      * @param string $returnUrl
      * @param bool   $canEdit
-     * @param string $model
+     * @param string $modelName pattern 'bundle.modelName'
      */
-    public function addFlash($entity, string $returnUrl, bool $canEdit, string $model): void
+    public function addFlash($entity, string $returnUrl, bool $canEdit, string $modelName): void
     {
-        $date      = $entity->getCheckedOut();
-        $override  = '';
+        $datetime = $entity->getCheckedOut();
+        $override = '';
 
         if ($canEdit) {
             $override = $this->translator->trans(
@@ -77,7 +77,7 @@ class LockFlashMessageHelper
                         'mautic_core_form_action',
                         [
                             'objectAction' => 'unlock',
-                            'objectModel'  => $model,
+                            'objectModel'  => $modelName,
                             'objectId'     => $entity->getId(),
                             'returnUrl'    => $returnUrl,
                             'name'         => urlencode($entity->getName()),
@@ -102,9 +102,9 @@ class LockFlashMessageHelper
                         'returnUrl'    => $returnUrl,
                     ]
                 ),
-                '%date%'     => $date->format($this->coreParametersHelper->getParameter('date_format_dateonly')),
-                '%time%'     => $date->format($this->coreParametersHelper->getParameter('date_format_timeonly')),
-                '%datetime%' => $date->format($this->coreParametersHelper->getParameter('date_format_full')),
+                '%date%'     => $datetime->format($this->coreParametersHelper->getParameter('date_format_dateonly')),
+                '%time%'     => $datetime->format($this->coreParametersHelper->getParameter('date_format_timeonly')),
+                '%datetime%' => $datetime->format($this->coreParametersHelper->getParameter('date_format_full')),
                 '%override%' => $override,
             ],
             'error'
