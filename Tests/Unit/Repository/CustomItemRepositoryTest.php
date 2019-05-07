@@ -29,6 +29,9 @@ use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Statement;
 use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use Doctrine\ORM\Query\Expr\Join;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
 
 class CustomItemRepositoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -44,6 +47,10 @@ class CustomItemRepositoryTest extends \PHPUnit_Framework_TestCase
     private $expr;
     private $expressionBuilder;
     private $query;
+
+    /**
+     * @var CustomItemRepository
+     */
     private $customItemRepository;
 
     protected function setUp(): void
@@ -83,8 +90,8 @@ class CustomItemRepositoryTest extends \PHPUnit_Framework_TestCase
     public function testCountItemsLinkedToContact(): void
     {
         $count          = 33;
-        $customObjectId = 33;
-        $contactId      = 33;
+        $customObjectId = 43;
+        $contactId      = 53;
 
         $this->customObject->expects($this->once())
             ->method('getId')
@@ -135,13 +142,88 @@ class CustomItemRepositoryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testFindItemIdForValue(): void
+    public function testCountItemsLinkedToAnotherItem(): void
     {
         $count          = 33;
-        $expr           = 'lte';
-        $value          = 1000;
-        $contactId      = 33;
-        $customFieldId  = 33;
+        $customObjectId = 43;
+        $customItemId   = 53;
+        $customItem     = $this->createMock(CustomItem::class);
+
+        $this->customObject->expects($this->once())
+            ->method('getId')
+            ->willReturn($customObjectId);
+
+        $customItem->expects($this->once())
+            ->method('getId')
+            ->willReturn($customItemId);
+
+        $this->expr->expects($this->once())
+            ->method('countDistinct')
+            ->with('ci.id')
+            ->willReturn('COUNT(ci.id)');
+
+        $this->queryBuilder->expects($this->exactly(2))
+            ->method('select')
+            ->withConsecutive(['ci'], ['COUNT(ci.id)']);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('from')
+            ->with(null, 'ci', 'ci.id');
+
+        $this->queryBuilder->expects($this->once())
+            ->method('innerJoin')
+            ->with(
+                CustomItemXrefCustomItem::class,
+                'cixci',
+                Join::WITH,
+                'ci.id = cixci.customItemLower OR ci.id = cixci.customItemHigher'
+            );
+
+        $this->queryBuilder->expects($this->once())
+            ->method('where')
+            ->with('ci.customObject = :customObjectId');
+
+        $this->queryBuilder->expects($this->exactly(2))
+            ->method('andWhere')
+            ->withConsecutive(
+                ['ci.id != :customItemId'],
+                [null] // Whatever Expr returns.
+            );
+
+        $this->expr->expects($this->exactly(2))
+            ->method('eq')
+            ->withConsecutive(
+                ['cixci.customItemLower', ':customItemId'],
+                ['cixci.customItemHigher', ':customItemId']
+            );
+
+        $this->queryBuilder->expects($this->exactly(2))
+            ->method('setParameter')
+            ->withConsecutive(
+                ['customObjectId', $customObjectId],
+                ['customItemId', $customItemId]
+            );
+
+        $this->query->expects($this->once())
+            ->method('getSingleScalarResult')
+            ->willReturn($count);
+
+        $this->assertSame(
+            $count,
+            $this->customItemRepository->countItemsLinkedToAnotherItem(
+                $this->customObject,
+                $customItem
+            )
+        );
+    }
+
+    public function testFindItemIdForValue(): void
+    {
+        $count         = 33;
+        $expr          = 'lte';
+        $value         = 1000;
+        $contactId     = 33;
+        $customFieldId = 33;
 
         $this->contact->expects($this->once())
             ->method('getId')
@@ -227,5 +309,10 @@ class CustomItemRepositoryTest extends \PHPUnit_Framework_TestCase
             'lte',
             1000
         );
+    }
+
+    public function testGetTableAlias(): void
+    {
+        $this->assertSame(CustomItem::TABLE_ALIAS, $this->customItemRepository->getTableAlias());
     }
 }
