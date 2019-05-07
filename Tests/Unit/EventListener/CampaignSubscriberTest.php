@@ -171,6 +171,43 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->campaignSubscriber->onCampaignTriggerAction($this->campaignExecutionEvent);
     }
 
+    public function testOnCampaignTriggerActionWhenItemsNotFound(): void
+    {
+        $this->configProvider->expects($this->once())
+            ->method('pluginIsEnabled')
+            ->willReturn(true);
+
+        $this->campaignExecutionEvent->expects($this->once())
+            ->method('getEvent')
+            ->willReturn(['type' => 'custom_item.63.linkcontact']);
+
+        $this->campaignExecutionEvent->method('getConfig')
+            ->willReturn([
+                'linkCustomItemId'   => '564',
+                'unlinkCustomItemId' => '333',
+            ]);
+
+        $this->campaignExecutionEvent->expects($this->once())
+            ->method('getLead')
+            ->willReturn($this->contact);
+
+        $this->customItemModel->expects($this->exactly(2))
+            ->method('fetchEntity')
+            ->withConsecutive([564], [333])
+            ->will($this->onConsecutiveCalls(
+                $this->throwException(new NotFoundException()),
+                $this->throwException(new NotFoundException())
+            ));
+
+        $this->customItemModel->expects($this->never())
+            ->method('linkEntity');
+
+        $this->customItemModel->expects($this->never())
+            ->method('unlinkEntity');
+
+        $this->campaignSubscriber->onCampaignTriggerAction($this->campaignExecutionEvent);
+    }
+
     public function testOnCampaignTriggerAction(): void
     {
         $customItem564 = $this->createMock(CustomItem::class);
