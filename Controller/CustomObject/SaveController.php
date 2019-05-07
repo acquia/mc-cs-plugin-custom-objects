@@ -186,11 +186,6 @@ class SaveController extends BaseFormController
                 return $this->forwardToDetail($request, $customObject);
             }
 
-            if (!$this->customObjectModel->isLocked($customObject)) {
-                // New entity should be locked after "apply"
-                $this->customObjectModel->lockEntity($customObject);
-            }
-
             return $this->redirect($this->routeProvider->buildEditRoute($customObject->getId()));
         }
 

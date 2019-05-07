@@ -160,7 +160,10 @@ class SaveController extends BaseFormController
             $formView    = 'CustomObjectsBundle:CustomItem\Form:edit';
 
             $request->setMethod(Request::METHOD_GET);
-            $this->customItemModel->unlockEntity($customItem);
+
+            if ($saveClicked) {
+                $this->customItemModel->unlockEntity($customItem);
+            }
 
             return $this->forward(
                 $saveClicked ? $detailView : $formView,

@@ -198,10 +198,6 @@ class SaveControllerTest extends ControllerTestCase
             ->method('setMethod')
             ->with(Request::METHOD_GET);
 
-        $this->customItemModel->expects($this->once())
-            ->method('unlockEntity')
-            ->with($this->customItem);
-
         $this->saveController->saveAction(self::OBJECT_ID, self::ITEM_ID);
     }
 
