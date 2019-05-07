@@ -35,6 +35,10 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use Doctrine\ORM\Query\Expr;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefInterface;
+use UnexpectedValueException;
 
 class CustomItemModelTest extends \PHPUnit_Framework_TestCase
 {
@@ -150,6 +154,110 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher->expects($this->at(1))->method('dispatch')->with(CustomItemEvents::ON_CUSTOM_ITEM_POST_DELETE, $this->isInstanceOf(CustomItemEvent::class));
 
         $this->customItemModel->delete($this->customItem);
+    }
+
+    public function testLinkEntityIfXrefNotFound(): void
+    {
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY,
+                $this->callback(function (CustomItemXrefEntityDiscoveryEvent $event) {
+                    $this->assertSame($this->customItem, $event->getCustomItem());
+                    $this->assertSame('contact', $event->getEntityType());
+                    $this->assertSame(123, $event->getEntityId());
+
+                    return true;
+                })
+            );
+
+        $this->expectException(UnexpectedValueException::class);
+        $this->customItemModel->linkEntity($this->customItem, 'contact', 123);
+    }
+
+    public function testLinkEntity(): void
+    {
+        $xref = $this->createMock(CustomItemXrefInterface::class);
+
+        $this->dispatcher->expects($this->exactly(2))
+            ->method('dispatch')
+            ->withConsecutive(
+                [
+                    CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY,
+                    $this->callback(function (CustomItemXrefEntityDiscoveryEvent $event) use ($xref) {
+                        $this->assertSame($this->customItem, $event->getCustomItem());
+                        $this->assertSame('contact', $event->getEntityType());
+                        $this->assertSame(123, $event->getEntityId());
+
+                        // Simulate that a subscriber subscribed a Xref entity.
+                        $event->setXrefEntity($xref);
+
+                        return true;
+                    }),
+                ],
+                [
+                    CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY,
+                    $this->callback(function (CustomItemXrefEntityEvent $event) use ($xref) {
+                        $this->assertSame($xref, $event->getXref());
+
+                        return true;
+                    }),
+                ]
+            );
+
+        $this->assertSame($xref, $this->customItemModel->linkEntity($this->customItem, 'contact', 123));
+    }
+
+    public function testUninkEntityIfXrefNotFound(): void
+    {
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY,
+                $this->callback(function (CustomItemXrefEntityDiscoveryEvent $event) {
+                    $this->assertSame($this->customItem, $event->getCustomItem());
+                    $this->assertSame('contact', $event->getEntityType());
+                    $this->assertSame(123, $event->getEntityId());
+
+                    return true;
+                })
+            );
+
+        $this->expectException(UnexpectedValueException::class);
+        $this->customItemModel->unlinkEntity($this->customItem, 'contact', 123);
+    }
+
+    public function testUninkEntity(): void
+    {
+        $xref = $this->createMock(CustomItemXrefInterface::class);
+
+        $this->dispatcher->expects($this->exactly(2))
+            ->method('dispatch')
+            ->withConsecutive(
+                [
+                    CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY,
+                    $this->callback(function (CustomItemXrefEntityDiscoveryEvent $event) use ($xref) {
+                        $this->assertSame($this->customItem, $event->getCustomItem());
+                        $this->assertSame('contact', $event->getEntityType());
+                        $this->assertSame(123, $event->getEntityId());
+
+                        // Simulate that a subscriber subscribed a Xref entity.
+                        $event->setXrefEntity($xref);
+
+                        return true;
+                    }),
+                ],
+                [
+                    CustomItemEvents::ON_CUSTOM_ITEM_UNLINK_ENTITY,
+                    $this->callback(function (CustomItemXrefEntityEvent $event) use ($xref) {
+                        $this->assertSame($xref, $event->getXref());
+
+                        return true;
+                    }),
+                ]
+            );
+
+        $this->assertSame($xref, $this->customItemModel->unlinkEntity($this->customItem, 'contact', 123));
     }
 
     public function testFetchEntity(): void

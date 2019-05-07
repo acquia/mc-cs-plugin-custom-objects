@@ -84,9 +84,9 @@ class CustomItemXrefEntityDiscoveryEvent extends Event
     }
 
     /**
-     * @return CustomItemXrefInterface
+     * @return ?CustomItemXrefInterface
      */
-    public function getXrefEntity(): CustomItemXrefInterface
+    public function getXrefEntity(): ?CustomItemXrefInterface
     {
         return $this->customItemXrefEntity;
     }

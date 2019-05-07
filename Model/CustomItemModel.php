@@ -82,13 +82,13 @@ class CustomItemModel extends FormModel
         EventDispatcherInterface $dispatcher,
         ValidatorInterface $validator
     ) {
-        $this->entityManager           = $entityManager;
-        $this->customItemRepository    = $customItemRepository;
-        $this->permissionProvider      = $permissionProvider;
-        $this->userHelper              = $userHelper;
-        $this->customFieldValueModel   = $customFieldValueModel;
-        $this->dispatcher              = $dispatcher;
-        $this->validator               = $validator;
+        $this->entityManager         = $entityManager;
+        $this->customItemRepository  = $customItemRepository;
+        $this->permissionProvider    = $permissionProvider;
+        $this->userHelper            = $userHelper;
+        $this->customFieldValueModel = $customFieldValueModel;
+        $this->dispatcher            = $dispatcher;
+        $this->validator             = $validator;
     }
 
     /**
