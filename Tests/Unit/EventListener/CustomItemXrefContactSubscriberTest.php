@@ -22,10 +22,19 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\UserBundle\Entity\User;
 use Mautic\LeadBundle\Entity\LeadEventLog;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
+use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Query\Expr;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\NoResultException;
 
 class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     private const ITEM_ID = 90;
+
+    private const ENTITY_ID = 123;
 
     private const USER_ID = 4;
 
@@ -37,7 +46,15 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
 
     private $entityManager;
 
+    private $queryBuilder;
+
+    private $query;
+
     private $event;
+
+    private $listEvent;
+
+    private $discoveryEvent;
 
     private $contact;
 
@@ -55,9 +72,13 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
         parent::setUp();
 
         $this->entityManager  = $this->createMock(EntityManager::class);
+        $this->queryBuilder   = $this->createMock(QueryBuilder::class);
+        $this->query          = $this->createMock(AbstractQuery::class);
         $this->userHelper     = $this->createMock(UserHelper::class);
         $this->user           = $this->createMock(User::class);
         $this->event          = $this->createMock(CustomItemXrefEntityEvent::class);
+        $this->listEvent      = $this->createMock(CustomItemListQueryEvent::class);
+        $this->discoveryEvent = $this->createMock(CustomItemXrefEntityDiscoveryEvent::class);
         $this->contact        = $this->createMock(Lead::class);
         $this->customItem     = $this->createMock(CustomItem::class);
         $this->xref           = $this->createMock(CustomItemXrefContact::class);
@@ -73,6 +94,214 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->userHelper->method('getUser')->willReturn($this->user);
         $this->user->method('getId')->willReturn(self::USER_ID);
         $this->user->method('getName')->willReturn(self::USER_NAME);
+        $this->entityManager->method('createQueryBuilder')->willReturn($this->queryBuilder);
+    }
+
+    public function testOnListQueryWhenNoEntity(): void
+    {
+        $tableConfig = new TableConfig(10, 1, 'id');
+
+        $this->listEvent->expects($this->once())
+            ->method('getTableConfig')
+            ->willReturn($tableConfig);
+
+        $this->listEvent->expects($this->never())
+            ->method('getQueryBuilder')
+            ->willReturn($tableConfig);
+
+        $this->xrefSubscriber->onListQuery($this->listEvent);
+    }
+
+    public function testOnListQuery(): void
+    {
+        $tableConfig = new TableConfig(10, 1, 'id');
+        $tableConfig->addParameter('filterEntityType', 'contact');
+        $tableConfig->addParameter('filterEntityId', 123);
+
+        $this->listEvent->expects($this->once())
+            ->method('getTableConfig')
+            ->willReturn($tableConfig);
+
+        $this->listEvent->expects($this->once())
+            ->method('getQueryBuilder')
+            ->willReturn($this->queryBuilder);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('leftJoin')
+            ->with('CustomItem.contactReferences', 'CustomItemXrefContact');
+
+        $this->queryBuilder->expects($this->once())
+            ->method('andWhere')
+            ->with('CustomItemXrefContact.contact = :contactId');
+
+        $this->queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('contactId', 123);
+
+        $this->xrefSubscriber->onListQuery($this->listEvent);
+    }
+
+    public function testOnLookupQueryyWhenNoEntity(): void
+    {
+        $tableConfig = new TableConfig(10, 1, 'id');
+
+        $this->listEvent->expects($this->once())
+            ->method('getTableConfig')
+            ->willReturn($tableConfig);
+
+        $this->listEvent->expects($this->never())
+            ->method('getQueryBuilder')
+            ->willReturn($tableConfig);
+
+        $this->xrefSubscriber->onLookupQuery($this->listEvent);
+    }
+
+    public function testOnLookupQuery(): void
+    {
+        $expr        = $this->createMock(Expr::class);
+        $tableConfig = new TableConfig(10, 1, 'id');
+        $tableConfig->addParameter('filterEntityType', 'contact');
+        $tableConfig->addParameter('filterEntityId', 123);
+
+        $this->listEvent->expects($this->once())
+            ->method('getTableConfig')
+            ->willReturn($tableConfig);
+
+        $this->listEvent->expects($this->once())
+            ->method('getQueryBuilder')
+            ->willReturn($this->queryBuilder);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('leftJoin')
+            ->with('CustomItem.contactReferences', 'CustomItemXrefContact');
+
+        $this->queryBuilder->expects($this->once())->method('andWhere');
+
+        $this->queryBuilder->method('expr')->willReturn($expr);
+
+        $expr->expects($this->once())->method('orX');
+
+        $expr->expects($this->once())
+            ->method('neq')
+            ->with('CustomItemXrefContact.contact', 123);
+
+        $expr->expects($this->once())
+            ->method('isNull')
+            ->with('CustomItemXrefContact.contact');
+
+        $this->xrefSubscriber->onLookupQuery($this->listEvent);
+    }
+
+    public function testonEntityLinkDiscoveryForAnotherEntity(): void
+    {
+        $this->discoveryEvent->expects($this->once())
+            ->method('getEntityType')
+            ->willReturn('unicorn');
+
+        $this->discoveryEvent->expects($this->never())
+            ->method('setXrefEntity');
+
+        $this->xrefSubscriber->onEntityLinkDiscovery($this->discoveryEvent);
+    }
+
+    public function testonEntityLinkDiscoveryWhenXrefExists(): void
+    {
+        $this->discoveryEvent->expects($this->once())
+            ->method('getEntityType')
+            ->willReturn('contact');
+
+        $this->discoveryEvent->expects($this->once())
+            ->method('getEntityId')
+            ->willReturn(self::ENTITY_ID);
+
+        $this->discoveryEvent->expects($this->once())
+            ->method('getCustomItem')
+            ->willReturn($this->customItem);
+
+        $this->customItem->expects($this->once())
+            ->method('getId')
+            ->willReturn(self::ITEM_ID);
+
+        $this->assertGetContactXrefEntity();
+
+        $this->discoveryEvent->expects($this->once())
+            ->method('stopPropagation');
+
+        $this->discoveryEvent->expects($this->once())
+            ->method('setXrefEntity')
+            ->with($this->xref);
+
+        $this->xrefSubscriber->onEntityLinkDiscovery($this->discoveryEvent);
+    }
+
+    public function testonEntityLinkDiscoveryWhenXrefNotFound(): void
+    {
+        $contact = new Lead();
+
+        $this->discoveryEvent->expects($this->once())
+            ->method('getEntityType')
+            ->willReturn('contact');
+
+        $this->discoveryEvent->expects($this->exactly(2))
+            ->method('getEntityId')
+            ->willReturn(self::ENTITY_ID);
+
+        $this->discoveryEvent->expects($this->exactly(2))
+            ->method('getCustomItem')
+            ->willReturn($this->customItem);
+
+        $this->customItem->expects($this->once())
+            ->method('getId')
+            ->willReturn(self::ITEM_ID);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($this->query);
+
+        $this->query->expects($this->once())
+            ->method('getSingleResult')
+            ->will($this->throwException(new NoResultException()));
+
+        $this->entityManager->expects($this->once())
+            ->method('getReference')
+            ->with(Lead::class, self::ENTITY_ID)
+            ->willReturn($contact);
+
+        $this->discoveryEvent->expects($this->once())
+            ->method('stopPropagation');
+
+        $this->discoveryEvent->expects($this->once())
+            ->method('setXrefEntity')
+            ->with($this->callback(function (CustomItemXrefContact $xref) use ($contact) {
+                // newly created Xref entity.
+                $this->assertSame($this->customItem, $xref->getCustomItem());
+                $this->assertSame($contact, $xref->getContact());
+
+                return true;
+            }));
+
+        $this->xrefSubscriber->onEntityLinkDiscovery($this->discoveryEvent);
+    }
+
+    public function testSaveLink(): void
+    {
+        $this->event->expects($this->exactly(4))
+            ->method('getXref')
+            ->willReturn($this->xref);
+
+        $this->entityManager->expects($this->once())
+            ->method('contains')
+            ->with($this->xref)
+            ->willReturn(false);
+
+        $this->entityManager->expects($this->once())
+            ->method('persist')
+            ->with($this->xref);
+
+        $this->entityManager->expects($this->once())
+            ->method('flush');
+
+        $this->xrefSubscriber->saveLink($this->event);
     }
 
     public function testCreateNewEventLogForLinkedContact(): void
@@ -85,6 +314,27 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('flush');
 
         $this->xrefSubscriber->createNewEventLogForLinkedContact($this->event);
+    }
+
+    public function testDeleteLink(): void
+    {
+        $this->event->expects($this->exactly(4))
+            ->method('getXref')
+            ->willReturn($this->xref);
+
+        $this->entityManager->expects($this->once())
+            ->method('contains')
+            ->with($this->xref)
+            ->willReturn(true);
+
+        $this->entityManager->expects($this->once())
+            ->method('remove')
+            ->with($this->xref);
+
+        $this->entityManager->expects($this->once())
+            ->method('flush');
+
+        $this->xrefSubscriber->deleteLink($this->event);
     }
 
     public function testCreateNewEventLogForUnlinkedContact(): void
@@ -117,5 +367,42 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
 
             return true;
         };
+    }
+
+    /**
+     * Tests CustomItemXrefContactSubscriber::getContactXrefEntity.
+     */
+    private function assertGetContactXrefEntity(): void
+    {
+        $this->queryBuilder->expects($this->once())
+            ->method('select')
+            ->with('cixcont');
+
+        $this->queryBuilder->expects($this->once())
+            ->method('from')
+            ->with(CustomItemXrefContact::class, 'cixcont');
+
+        $this->queryBuilder->expects($this->once())
+            ->method('where')
+            ->with('cixcont.customItem = :customItemId');
+
+        $this->queryBuilder->expects($this->once())
+            ->method('andWhere')
+            ->with('cixcont.contact = :contactId');
+
+        $this->queryBuilder->expects($this->exactly(2))
+            ->method('setParameter')
+            ->withConsecutive(
+                ['customItemId', self::ITEM_ID, null],
+                ['contactId', self::ENTITY_ID, null]
+            );
+
+        $this->queryBuilder->expects($this->once())
+            ->method('getQuery')
+            ->willReturn($this->query);
+
+        $this->query->expects($this->once())
+            ->method('getSingleResult')
+            ->willReturn($this->xref);
     }
 }
