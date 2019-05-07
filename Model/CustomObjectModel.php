@@ -199,7 +199,7 @@ class CustomObjectModel extends FormModel
     public function getCountForTable(TableConfig $tableConfig): int
     {
         $queryBuilder = $this->createListQueryBuilder($tableConfig);
-        $queryBuilder->select($queryBuilder->expr()->count('DISTINCT '.CustomObject::TABLE_ALIAS));
+        $queryBuilder->select($queryBuilder->expr()->countDistinct(CustomObject::TABLE_ALIAS));
 
         return (int) $queryBuilder->getQuery()->getSingleScalarResult();
     }

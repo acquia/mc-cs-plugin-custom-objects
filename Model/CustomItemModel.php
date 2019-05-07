@@ -243,7 +243,7 @@ class CustomItemModel extends FormModel
     public function getCountForTable(TableConfig $tableConfig): int
     {
         $queryBuilder = $this->createListQueryBuilder($tableConfig);
-        $queryBuilder->select($queryBuilder->expr()->count('DISTINCT '.CustomItem::TABLE_ALIAS));
+        $queryBuilder->select($queryBuilder->expr()->countDistinct(CustomItem::TABLE_ALIAS));
 
         $this->dispatcher->dispatch(
             CustomItemEvents::ON_CUSTOM_ITEM_LIST_QUERY,

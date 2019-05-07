@@ -55,7 +55,12 @@ class CustomItemRepository extends CommonRepository
     {
         $queryBuilder = $this->createQueryBuilder('ci', 'ci.id');
         $queryBuilder->select($queryBuilder->expr()->countDistinct('ci.id'));
-        $queryBuilder->innerJoin(CustomItemXrefCustomItem::class, 'cixci', Join::WITH, 'ci.id = cixci.customItemLower OR ci.id = cixci.customItemHigher');
+        $queryBuilder->innerJoin(
+            CustomItemXrefCustomItem::class,
+            'cixci',
+            Join::WITH,
+            'ci.id = cixci.customItemLower OR ci.id = cixci.customItemHigher'
+        );
         $queryBuilder->where('ci.customObject = :customObjectId');
         $queryBuilder->andWhere('ci.id != :customItemId');
         $queryBuilder->andWhere($queryBuilder->expr()->orX(

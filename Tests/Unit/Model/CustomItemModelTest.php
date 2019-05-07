@@ -253,8 +253,8 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
             ->willReturn($expr);
 
         $expr->expects($this->once())
-            ->method('count')
-            ->with('DISTINCT CustomItem')
+            ->method('countDistinct')
+            ->with('CustomItem')
             ->willReturn('the select count expr');
 
         $this->queryBuilder->expects($this->once())

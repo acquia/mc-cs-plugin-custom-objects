@@ -66,7 +66,8 @@ class CustomItemXrefCustomItemSubscriber extends CommonSubscriber
      */
     public function onListQuery(CustomItemListQueryEvent $event): void
     {
-        if ('customItem' === $event->getTableConfig()->getParameter('filterEntityType') && $event->getTableConfig()->getParameter('filterEntityId')) {
+        $tableConfig = $event->getTableConfig();
+        if ('customItem' === $tableConfig->getParameter('filterEntityType') && $tableConfig->getParameter('filterEntityId')) {
             $queryBuilder = $event->getQueryBuilder();
             $queryBuilder->leftJoin(
                 CustomItemXrefCustomItem::class,
@@ -74,12 +75,12 @@ class CustomItemXrefCustomItemSubscriber extends CommonSubscriber
                 Join::WITH,
                 'CustomItem.id = CustomItemXrefCustomItem.customItemLower OR CustomItem.id = CustomItemXrefCustomItem.customItemHigher'
             );
+            $queryBuilder->andWhere('CustomItem.id != :customItemId');
             $queryBuilder->andWhere($queryBuilder->expr()->orX(
                 $queryBuilder->expr()->eq('CustomItemXrefCustomItem.customItemLower', ':customItemId'),
                 $queryBuilder->expr()->eq('CustomItemXrefCustomItem.customItemHigher', ':customItemId')
             ));
-            $queryBuilder->andWhere('CustomItem.id != :customItemId');
-            $queryBuilder->setParameter('customItemId', $event->getTableConfig()->getParameter('filterEntityId'));
+            $queryBuilder->setParameter('customItemId', $tableConfig->getParameter('filterEntityId'));
         }
     }
 
@@ -88,7 +89,8 @@ class CustomItemXrefCustomItemSubscriber extends CommonSubscriber
      */
     public function onLookupQuery(CustomItemListQueryEvent $event): void
     {
-        if ('customItem' === $event->getTableConfig()->getParameter('filterEntityType') && $event->getTableConfig()->getParameter('filterEntityId')) {
+        $tableConfig = $event->getTableConfig();
+        if ('customItem' === $tableConfig->getParameter('filterEntityType') && $tableConfig->getParameter('filterEntityId')) {
             $queryBuilder = $event->getQueryBuilder();
             $queryBuilder->leftJoin(
                 CustomItemXrefCustomItem::class,
@@ -96,14 +98,14 @@ class CustomItemXrefCustomItemSubscriber extends CommonSubscriber
                 Join::WITH,
                 'CustomItem.id = CustomItemXrefCustomItem.customItemLower OR CustomItem.id = CustomItemXrefCustomItem.customItemHigher'
             );
+            $queryBuilder->andWhere('CustomItem.id != :customItemId');
             $queryBuilder->andWhere($queryBuilder->expr()->orX(
                 $queryBuilder->expr()->neq('CustomItemXrefCustomItem.customItemLower', ':customItemId'),
                 $queryBuilder->expr()->neq('CustomItemXrefCustomItem.customItemHigher', ':customItemId'),
                 $queryBuilder->expr()->isNull('CustomItemXrefCustomItem.customItemLower'),
                 $queryBuilder->expr()->isNull('CustomItemXrefCustomItem.customItemHigher')
             ));
-            $queryBuilder->andWhere('CustomItem.id != :customItemId');
-            $queryBuilder->setParameter('customItemId', $event->getTableConfig()->getParameter('filterEntityId'));
+            $queryBuilder->setParameter('customItemId', $tableConfig->getParameter('filterEntityId'));
         }
     }
 
