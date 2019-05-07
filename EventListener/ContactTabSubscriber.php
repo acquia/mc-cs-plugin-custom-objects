@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * @copyright   2018 Mautic, Inc. All rights reserved
+ * @copyright   2019 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
  *
  * @link        https://mautic.com
@@ -19,13 +19,12 @@ use Mautic\CoreBundle\Event\CustomContentEvent;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use Symfony\Component\Translation\TranslatorInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 
-class TabSubscriber extends CommonSubscriber
+class ContactTabSubscriber extends CommonSubscriber
 {
     /**
      * @var TranslatorInterface
@@ -92,67 +91,10 @@ class TabSubscriber extends CommonSubscriber
      */
     public function injectTabs(CustomContentEvent $event): void
     {
-        if ($this->configProvider->pluginIsEnabled()) {
-            $this->addTabsToContactDetailPage($event);
-            $this->addTabsToCustomItemDetailPage($event);
-        }
-    }
-
-    /**
-     * @param CustomContentEvent $event
-     */
-    private function addTabsToCustomItemDetailPage(CustomContentEvent $event): void
-    {
-        if ($event->checkContext('CustomObjectsBundle:CustomItem:detail.html.php', 'tabs')) {
-            $vars    = $event->getVars();
-            $objects = $this->getCustomObjects();
-
-            /** @var CustomItem $item */
-            $item = $vars['item'];
-
-            /** @var CustomObject $object */
-            foreach ($objects as $object) {
-                $data = [
-                    'title' => $object->getNamePlural(),
-                    'count' => $this->customItemRepository->countItemsLinkedToAnotherItem($object, $item),
-                    'tabId' => "custom-object-{$object->getId()}",
-                ];
-
-                $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:link.html.php', $data);
-            }
+        if (!$this->configProvider->pluginIsEnabled()) {
+            return;
         }
 
-        if ($event->checkContext('CustomObjectsBundle:CustomItem:detail.html.php', 'tabs.content')) {
-            $vars    = $event->getVars();
-            $objects = $this->getCustomObjects();
-
-            /** @var CustomItem $item */
-            $item = $vars['item'];
-
-            /** @var CustomObject $object */
-            foreach ($objects as $object) {
-                $data = [
-                    'customObjectId'    => $object->getId(),
-                    'currentEntityId'   => $item->getId(),
-                    'currentEntityType' => 'customItem',
-                    'tabId'             => "custom-object-{$object->getId()}",
-                    'page'              => 1,
-                    'search'            => '',
-                    'placeholder'       => $this->translator->trans('custom.item.link.search.placeholder', ['%object%' => $object->getNameSingular()]),
-                    'lookupRoute'       => $this->customItemRouteProvider->buildLookupRoute((int) $object->getId(), 'customItem', (int) $item->getId()),
-                    'newRoute'          => $this->customItemRouteProvider->buildNewRoute((int) $object->getId()),
-                ];
-
-                $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:content.html.php', $data);
-            }
-        }
-    }
-
-    /**
-     * @param CustomContentEvent $event
-     */
-    private function addTabsToContactDetailPage(CustomContentEvent $event): void
-    {
         if ($event->checkContext('MauticLeadBundle:Lead:lead.html.php', 'tabs')) {
             $vars    = $event->getVars();
             $objects = $this->getCustomObjects();

@@ -585,12 +585,21 @@ return [
                     'custom_object.config.provider',
                 ],
             ],
-            'custom_object.tab.subscriber' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\TabSubscriber::class,
+            'custom_object.contact.tab.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\ContactTabSubscriber::class,
                 'arguments' => [
                     'mautic.custom.model.object',
                     'custom_item.repository',
                     'custom_object.config.provider',
+                    'translator',
+                    'custom_item.route.provider',
+                ],
+            ],
+            'custom_object.custom_item.tab.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomItemTabSubscriber::class,
+                'arguments' => [
+                    'mautic.custom.model.object',
+                    'custom_item.repository',
                     'translator',
                     'custom_item.route.provider',
                 ],

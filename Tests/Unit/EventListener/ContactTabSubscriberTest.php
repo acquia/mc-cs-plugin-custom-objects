@@ -17,13 +17,13 @@ use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use Mautic\CoreBundle\Event\CustomContentEvent;
-use MauticPlugin\CustomObjectsBundle\EventListener\TabSubscriber;
+use MauticPlugin\CustomObjectsBundle\EventListener\ContactTabSubscriber;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 
-class TabSubscriberTest extends \PHPUnit_Framework_TestCase
+class ContactTabSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     private $customObjectModel;
 
@@ -38,7 +38,7 @@ class TabSubscriberTest extends \PHPUnit_Framework_TestCase
     private $customContentEvent;
 
     /**
-     * @var TabSubscriber
+     * @var ContactTabSubscriber
      */
     private $tabSubscriber;
 
@@ -52,7 +52,7 @@ class TabSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->translator                   = $this->createMock(TranslatorInterface::class);
         $this->customItemRouteProvider      = $this->createMock(CustomItemRouteProvider::class);
         $this->customContentEvent           = $this->createMock(CustomContentEvent::class);
-        $this->tabSubscriber                = new TabSubscriber(
+        $this->tabSubscriber                = new ContactTabSubscriber(
             $this->customObjectModel,
             $this->customItemRepository,
             $this->configProvider,
