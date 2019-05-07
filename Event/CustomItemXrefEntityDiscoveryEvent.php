@@ -40,9 +40,9 @@ class CustomItemXrefEntityDiscoveryEvent extends Event
     private $customItemXrefEntity;
 
     /**
-     * @param integer $itemId
-     * @param string  $entityType
-     * @param integer $entityId
+     * @param CustomItem $customItem
+     * @param string     $entityType
+     * @param int        $entityId
      */
     public function __construct(CustomItem $customItem, string $entityType, int $entityId)
     {

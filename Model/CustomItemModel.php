@@ -32,6 +32,10 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
+use UnexpectedValueException;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefInterface;
 
 class CustomItemModel extends FormModel
 {
@@ -131,6 +135,54 @@ class CustomItemModel extends FormModel
 
     /**
      * @param CustomItem $customItem
+     * @param string     $entityType
+     * @param int        $entityId
+     *
+     * @return CustomItemXrefInterface
+     *
+     * @throws UnexpectedValueException
+     */
+    public function linkEntity(CustomItem $customItem, string $entityType, int $entityId): CustomItemXrefInterface
+    {
+        $event = new CustomItemXrefEntityDiscoveryEvent($customItem, $entityType, $entityId);
+
+        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY, $event);
+
+        if (!$event->getXrefEntity() instanceof CustomItemXrefInterface) {
+            throw new UnexpectedValueException("Entity {$entityType} was not able to be linked to {$customItem->getName()} ({$customItem->getId()})");
+        }
+
+        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY, new CustomItemXrefEntityEvent($event->getXrefEntity()));
+
+        return $event->getXrefEntity();
+    }
+
+    /**
+     * @param CustomItem $customItem
+     * @param string     $entityType
+     * @param int        $entityId
+     *
+     * @return CustomItemXrefInterface
+     *
+     * @throws UnexpectedValueException
+     */
+    public function unlinkEntity(CustomItem $customItem, string $entityType, int $entityId): CustomItemXrefInterface
+    {
+        $event = new CustomItemXrefEntityDiscoveryEvent($customItem, $entityType, $entityId);
+
+        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY, $event);
+
+        if (!$event->getXrefEntity() instanceof CustomItemXrefInterface) {
+            throw new UnexpectedValueException("Entity {$entityType} was not able to be unlinked from {$customItem->getName()} ({$customItem->getId()})");
+        }
+
+        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_UNLINK_ENTITY, new CustomItemXrefEntityEvent($event->getXrefEntity()));
+
+        return $event->getXrefEntity();
+    }
+
+    /**
+     * @param CustomItem $customItem
      */
     public function delete(CustomItem $customItem): void
     {
@@ -179,7 +231,7 @@ class CustomItemModel extends FormModel
             CustomItemEvents::ON_CUSTOM_ITEM_LIST_QUERY,
             new CustomItemListQueryEvent($queryBuilder, $tableConfig)
         );
-        
+
         return $queryBuilder->getQuery()->getResult();
     }
 
@@ -274,10 +326,10 @@ class CustomItemModel extends FormModel
 
     /**
      * @param TableConfig $tableConfig
-     * 
+     *
      * @return QueryBuilder
      */
-    private function createListQueryBuilder(TableConfig $tableConfig)
+    private function createListQueryBuilder(TableConfig $tableConfig): QueryBuilder
     {
         $customObjectId = $tableConfig->getParameter('customObjectId');
         $queryBuilder   = $this->entityManager->createQueryBuilder();
@@ -289,7 +341,9 @@ class CustomItemModel extends FormModel
         $queryBuilder->where(CustomItem::TABLE_ALIAS.'.customObject = :customObjectId');
         $queryBuilder->setParameter('customObjectId', $customObjectId);
 
-        if ($search = $tableConfig->getParameter('search')) {
+        $search = $tableConfig->getParameter('search');
+
+        if ($search) {
             $queryBuilder->andWhere(CustomItem::TABLE_ALIAS.'.name LIKE %:search%');
             $queryBuilder->setParameter('search', $search);
         }

@@ -77,7 +77,7 @@ final class CustomItemEvents
      * @var string
      */
     public const ON_CUSTOM_ITEM_LOOKUP_QUERY = 'custom.item.on_item_lookup_query';
-    
+
     /**
      * The custom.item.on_link_entity_id event is fired when a custom item is about to be connected to an (at that time) unknown entity.
      *

@@ -20,10 +20,10 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Mautic\CoreBundle\Service\FlashBag;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\DBAL\Driver\DriverException;
+use UnexpectedValueException;
 
 class LinkControllerTest extends ControllerTestCase
 {
@@ -34,7 +34,6 @@ class LinkControllerTest extends ControllerTestCase
     private const ENTITY_TYPE = 'contact';
 
     private $customItemModel;
-    private $customItemXrefContactModel;
     private $flashBag;
     private $permissionProvider;
 
@@ -48,12 +47,10 @@ class LinkControllerTest extends ControllerTestCase
         parent::setUp();
 
         $this->customItemModel            = $this->createMock(CustomItemModel::class);
-        $this->customItemXrefContactModel = $this->createMock(CustomItemXrefContactModel::class);
         $this->flashBag                   = $this->createMock(FlashBag::class);
         $this->permissionProvider         = $this->createMock(CustomItemPermissionProvider::class);
         $this->linkController             = new LinkController(
             $this->customItemModel,
-            $this->customItemXrefContactModel,
             $this->permissionProvider,
             $this->flashBag
         );
@@ -122,32 +119,41 @@ class LinkControllerTest extends ControllerTestCase
 
     public function testSaveActionIfCustomItemLinkedToUnknownEntityType(): void
     {
+        $customItem = $this->createMock(CustomItem::class);
+
         $this->customItemModel->expects($this->once())
             ->method('fetchEntity')
-            ->willReturn($this->createMock(CustomItem::class));
+            ->willReturn($customItem);
 
         $this->permissionProvider->expects($this->once())
             ->method('canEdit');
 
+        $this->customItemModel->expects($this->once())
+            ->method('linkEntity')
+            ->with($customItem, 'unicorn', self::ENTITY_ID)
+            ->will($this->throwException(new UnexpectedValueException('Entity unicorn cannot be linked to a custom item')));
+
         $this->flashBag->expects($this->once())
             ->method('add')
-            ->with('Entity banana cannot be linked to a custom item', [], FlashBag::LEVEL_ERROR);
+            ->with('Entity unicorn cannot be linked to a custom item', [], FlashBag::LEVEL_ERROR);
 
-        $this->linkController->saveAction(self::ITEM_ID, 'banana', self::ENTITY_ID);
+        $this->linkController->saveAction(self::ITEM_ID, 'unicorn', self::ENTITY_ID);
     }
 
     public function testSaveAction(): void
     {
+        $customItem = $this->createMock(CustomItem::class);
+
         $this->customItemModel->expects($this->once())
             ->method('fetchEntity')
-            ->willReturn($this->createMock(CustomItem::class));
+            ->willReturn($customItem);
 
         $this->permissionProvider->expects($this->once())
             ->method('canEdit');
 
-        $this->customItemXrefContactModel->expects($this->once())
-            ->method('linkContact')
-            ->with(self::ITEM_ID, self::ENTITY_ID);
+        $this->customItemModel->expects($this->once())
+            ->method('linkEntity')
+            ->with($customItem, self::ENTITY_TYPE, self::ENTITY_ID);
 
         $this->linkController->saveAction(self::ITEM_ID, self::ENTITY_TYPE, self::ENTITY_ID);
     }

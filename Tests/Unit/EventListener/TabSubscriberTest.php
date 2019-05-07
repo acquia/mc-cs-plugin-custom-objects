@@ -15,7 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use Mautic\CoreBundle\Event\CustomContentEvent;
 use MauticPlugin\CustomObjectsBundle\EventListener\TabSubscriber;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
@@ -27,7 +27,7 @@ class TabSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     private $customObjectModel;
 
-    private $customItemModel;
+    private $customItemRepository;
 
     private $configProvider;
 
@@ -37,21 +37,24 @@ class TabSubscriberTest extends \PHPUnit_Framework_TestCase
 
     private $customContentEvent;
 
+    /**
+     * @var TabSubscriber
+     */
     private $tabSubscriber;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->customObjectModel       = $this->createMock(CustomObjectModel::class);
-        $this->customItemModel         = $this->createMock(CustomItemModel::class);
-        $this->configProvider          = $this->createMock(ConfigProvider::class);
-        $this->translator              = $this->createMock(TranslatorInterface::class);
-        $this->customItemRouteProvider = $this->createMock(CustomItemRouteProvider::class);
-        $this->customContentEvent      = $this->createMock(CustomContentEvent::class);
-        $this->tabSubscriber           = new TabSubscriber(
+        $this->customObjectModel            = $this->createMock(CustomObjectModel::class);
+        $this->customItemRepository         = $this->createMock(CustomItemRepository::class);
+        $this->configProvider               = $this->createMock(ConfigProvider::class);
+        $this->translator                   = $this->createMock(TranslatorInterface::class);
+        $this->customItemRouteProvider      = $this->createMock(CustomItemRouteProvider::class);
+        $this->customContentEvent           = $this->createMock(CustomContentEvent::class);
+        $this->tabSubscriber                = new TabSubscriber(
             $this->customObjectModel,
-            $this->customItemModel,
+            $this->customItemRepository,
             $this->configProvider,
             $this->translator,
             $this->customItemRouteProvider
@@ -116,7 +119,7 @@ class TabSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('fetchAllPublishedEntities')
             ->willReturn([$customObject]);
 
-        $this->customItemModel->expects($this->once())
+        $this->customItemRepository->expects($this->once())
             ->method('countItemsLinkedToContact')
             ->with($customObject, $contact)
             ->willReturn(13);

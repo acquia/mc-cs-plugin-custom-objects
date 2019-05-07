@@ -23,9 +23,9 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 class ListControllerTest extends ControllerTestCase
 {
@@ -98,7 +98,7 @@ class ListControllerTest extends ControllerTestCase
 
         $this->sessionProvider->expects($this->once())
             ->method('getOrderBy')
-            ->willReturn(CustomObjectRepository::TABLE_ALIAS.'.id');
+            ->willReturn(CustomObject::TABLE_ALIAS.'.id');
 
         $this->sessionProvider->expects($this->once())
             ->method('getOrderByDir')
@@ -107,7 +107,7 @@ class ListControllerTest extends ControllerTestCase
         $assertTableConfig = function (TableConfig $tableConfig) {
             $this->assertSame(10, $tableConfig->getLimit());
             $this->assertSame(20, $tableConfig->getOffset());
-            $this->assertSame(CustomObjectRepository::TABLE_ALIAS.'.id', $tableConfig->getOrderBy());
+            $this->assertSame(CustomObject::TABLE_ALIAS.'.id', $tableConfig->getOrderBy());
             $this->assertSame('DESC', $tableConfig->getOrderDirection());
 
             return true;

@@ -25,8 +25,9 @@ use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 
 class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -39,7 +40,7 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
     private $customFieldModel;
     private $customObjectModel;
     private $customItemRepository;
-    private $customItemXrefContactModel;
+    private $customItemModel;
     private $translator;
     private $campaignBuilderEvent;
     private $campaignExecutionEvent;
@@ -57,22 +58,22 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->customFieldModel           = $this->createMock(CustomFieldModel::class);
-        $this->customObjectModel          = $this->createMock(CustomObjectModel::class);
-        $this->customItemRepository       = $this->createMock(CustomItemRepository::class);
-        $this->customItemXrefContactModel = $this->createMock(CustomItemXrefContactModel::class);
-        $this->translator                 = $this->createMock(TranslatorInterface::class);
-        $this->configProvider             = $this->createMock(ConfigProvider::class);
-        $this->campaignBuilderEvent       = $this->createMock(CampaignBuilderEvent::class);
-        $this->campaignExecutionEvent     = $this->createMock(CampaignExecutionEvent::class);
-        $this->customObject               = $this->createMock(CustomObject::class);
-        $this->customField                = $this->createMock(CustomField::class);
-        $this->contact                    = $this->createMock(Lead::class);
-        $this->campaignSubscriber         = new CampaignSubscriber(
+        $this->customFieldModel       = $this->createMock(CustomFieldModel::class);
+        $this->customObjectModel      = $this->createMock(CustomObjectModel::class);
+        $this->customItemRepository   = $this->createMock(CustomItemRepository::class);
+        $this->customItemModel        = $this->createMock(CustomItemModel::class);
+        $this->translator             = $this->createMock(TranslatorInterface::class);
+        $this->configProvider         = $this->createMock(ConfigProvider::class);
+        $this->campaignBuilderEvent   = $this->createMock(CampaignBuilderEvent::class);
+        $this->campaignExecutionEvent = $this->createMock(CampaignExecutionEvent::class);
+        $this->customObject           = $this->createMock(CustomObject::class);
+        $this->customField            = $this->createMock(CustomField::class);
+        $this->contact                = $this->createMock(Lead::class);
+        $this->campaignSubscriber     = new CampaignSubscriber(
             $this->customFieldModel,
             $this->customObjectModel,
             $this->customItemRepository,
-            $this->customItemXrefContactModel,
+            $this->customItemModel,
             $this->translator,
             $this->configProvider
         );
@@ -161,17 +162,20 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getLead')
             ->willReturn($this->contact);
 
-        $this->customItemXrefContactModel->expects($this->never())
-            ->method('linkContact');
+        $this->customItemModel->expects($this->never())
+            ->method('linkEntity');
 
-        $this->customItemXrefContactModel->expects($this->never())
-            ->method('unlinkContact');
+        $this->customItemModel->expects($this->never())
+            ->method('unlinkEntity');
 
         $this->campaignSubscriber->onCampaignTriggerAction($this->campaignExecutionEvent);
     }
 
     public function testOnCampaignTriggerAction(): void
     {
+        $customItem564 = $this->createMock(CustomItem::class);
+        $customItem333 = $this->createMock(CustomItem::class);
+
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
             ->willReturn(true);
@@ -190,13 +194,18 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getLead')
             ->willReturn($this->contact);
 
-        $this->customItemXrefContactModel->expects($this->once())
-            ->method('linkContact')
-            ->with(564, self::CONTACT_ID);
+        $this->customItemModel->expects($this->exactly(2))
+            ->method('fetchEntity')
+            ->withConsecutive([564], [333])
+            ->will($this->onConsecutiveCalls($customItem564, $customItem333));
 
-        $this->customItemXrefContactModel->expects($this->once())
-            ->method('unlinkContact')
-            ->with(333, self::CONTACT_ID);
+        $this->customItemModel->expects($this->once())
+            ->method('linkEntity')
+            ->with($customItem564, 'contact', self::CONTACT_ID);
+
+        $this->customItemModel->expects($this->once())
+            ->method('unlinkEntity')
+            ->with($customItem333, 'contact', self::CONTACT_ID);
 
         $this->campaignSubscriber->onCampaignTriggerAction($this->campaignExecutionEvent);
     }

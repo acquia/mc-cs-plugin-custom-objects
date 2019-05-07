@@ -24,8 +24,8 @@ use UnexpectedValueException;
 /**
  * As the {custom item} - {custom item} table can store the IDs both ways (higher - lower, lower - higher)
  * and both ways are valid, let's create a rule that one the first column will always contain the lower
- * ID and the second always the higher to avoid duplicates. As an example:
- * 
+ * ID and the second always the higher to avoid duplicates. As an example:.
+ *
  * 23 - 44 is correct
  * 44 - 23 is not correct according to the rule.
  */
@@ -50,13 +50,13 @@ class CustomItemXrefCustomItem implements CustomItemXrefInterface
      * @param CustomItem             $customItemA
      * @param CustomItem             $customItemB
      * @param DateTimeInterface|null $dateAdded
-     * 
+     *
      * @throws UnexpectedValueException
      */
     public function __construct(CustomItem $customItemA, CustomItem $customItemB, ?DateTimeInterface $dateAdded = null)
     {
         if ($customItemA->getId() === $customItemB->getId()) {
-            throw new UnexpectedValueException("It is not possible to link identical custom item.");
+            throw new UnexpectedValueException('It is not possible to link identical custom item.');
         }
 
         if ($customItemA->getId() < $customItemB->getId()) {

@@ -25,7 +25,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use Mautic\CoreBundle\Helper\ArrayHelper;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
 
 class CustomItem extends FormEntity implements UniqueEntityInterface
 {
@@ -292,7 +291,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param CustomItemXrefContact $reference
+     * @param CustomItemXrefInterface $reference
      */
     public function addContactReference($reference)
     {
@@ -308,7 +307,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param CustomItemXrefCompany $reference
+     * @param CustomItemXrefInterface $reference
      */
     public function addCompanyReference($reference)
     {
@@ -324,7 +323,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param CustomItemXrefCustomItem $reference
+     * @param CustomItemXrefInterface $reference
      */
     public function addCustomItemReference($reference)
     {

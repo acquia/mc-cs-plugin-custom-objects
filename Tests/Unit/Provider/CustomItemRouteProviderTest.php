@@ -53,7 +53,7 @@ class CustomItemRouteProviderTest extends \PHPUnit_Framework_TestCase
             ->with(CustomItemRouteProvider::ROUTE_UNLINK, ['itemId' => self::ITEM_ID, 'entityType' => 'contact', 'entityId' => 66])
             ->willReturn('the/generated/route');
 
-        $this->customItemRouteProvider->buildUnlinkContactRoute(self::ITEM_ID, 66);
+        $this->customItemRouteProvider->buildUnlinkRoute(self::ITEM_ID, 'contact', 66);
     }
 
     public function testBuildNewRoute(): void

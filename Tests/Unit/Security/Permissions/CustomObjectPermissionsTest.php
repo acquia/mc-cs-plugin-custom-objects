@@ -17,7 +17,6 @@ use MauticPlugin\CustomObjectsBundle\Security\Permissions\CustomObjectPermission
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use Symfony\Component\Translation\TranslatorInterface;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -64,7 +63,7 @@ class CustomObjectPermissionsTest extends \PHPUnit_Framework_TestCase
                 'filter'           => [
                     'force' => [
                         [
-                            'column' => CustomObjectRepository::TABLE_ALIAS.'.isPublished',
+                            'column' => CustomObject::TABLE_ALIAS.'.isPublished',
                             'value'  => true,
                             'expr'   => 'eq',
                         ],

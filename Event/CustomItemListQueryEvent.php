@@ -31,7 +31,7 @@ class CustomItemListQueryEvent extends Event
 
     /**
      * @param QueryBuilder $queryBuilder
-     * @param TableConfig $tableConfig
+     * @param TableConfig  $tableConfig
      */
     public function __construct(QueryBuilder $queryBuilder, TableConfig $tableConfig)
     {

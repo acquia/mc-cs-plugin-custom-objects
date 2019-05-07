@@ -17,7 +17,6 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Helper\UserHelper;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
 use Doctrine\ORM\NoResultException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
@@ -34,20 +33,12 @@ class CustomItemXrefCustomItemSubscriber extends CommonSubscriber
     private $entityManager;
 
     /**
-     * @var UserHelper
-     */
-    private $userHelper;
-
-    /**
      * @param EntityManager $entityManager
-     * @param UserHelper    $userHelper
      */
     public function __construct(
-        EntityManager $entityManager,
-        UserHelper $userHelper
+        EntityManager $entityManager
     ) {
         $this->entityManager = $entityManager;
-        $this->userHelper    = $userHelper;
     }
 
     /**
@@ -61,11 +52,11 @@ class CustomItemXrefCustomItemSubscriber extends CommonSubscriber
             CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY => 'onEntityLinkDiscovery',
             CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY           => [
                 ['saveLink', 1000],
-                ['createNewEvenLogForLinkedCustomItem', 0]
+                ['createNewEvenLogForLinkedCustomItem', 0],
             ],
             CustomItemEvents::ON_CUSTOM_ITEM_UNLINK_ENTITY         => [
                 ['deleteLink', 1000],
-                ['createNewEvenLogForUnlinkedCustomItem', 0]
+                ['createNewEvenLogForUnlinkedCustomItem', 0],
             ],
         ];
     }
@@ -118,7 +109,7 @@ class CustomItemXrefCustomItemSubscriber extends CommonSubscriber
 
     /**
      * @param CustomItemXrefEntityDiscoveryEvent $event
-     * 
+     *
      * @throws UnexpectedValueException
      */
     public function onEntityLinkDiscovery(CustomItemXrefEntityDiscoveryEvent $event): void
@@ -131,7 +122,7 @@ class CustomItemXrefCustomItemSubscriber extends CommonSubscriber
                 $customItemB = $this->entityManager->getReference(CustomItem::class, $event->getEntityId());
                 $xRef        = new CustomItemXrefCustomItem($event->getCustomItem(), $customItemB);
             }
-    
+
             $event->setXrefEntity($xRef);
             $event->stopPropagation();
         }
@@ -139,7 +130,7 @@ class CustomItemXrefCustomItemSubscriber extends CommonSubscriber
 
     /**
      * Save the xref only if it isn't in the entity manager already as it means it was loaded from the database already.
-     * 
+     *
      * @param CustomItemXrefEntityEvent $event
      */
     public function saveLink(CustomItemXrefEntityEvent $event): void

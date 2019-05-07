@@ -23,7 +23,7 @@ class CustomObjectRepository extends CommonRepository
      *
      * @return string
      */
-    public function getTableAlias()
+    public function getTableAlias(): string
     {
         return CustomObject::TABLE_ALIAS;
     }

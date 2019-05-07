@@ -29,14 +29,12 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\AbstractQuery;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
-use MauticPlugin\CustomObjectsBundle\DTO\TableFilterConfig;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use Mautic\LeadBundle\Entity\Lead;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use Doctrine\ORM\Query\Expr;
 
 class CustomItemModelTest extends \PHPUnit_Framework_TestCase
 {
@@ -64,6 +62,9 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
 
     private $violationList;
 
+    /**
+     * @var CustomItemModel
+     */
     private $customItemModel;
 
     protected function setUp(): void
@@ -186,22 +187,17 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
 
     public function testGetTableData(): void
     {
-        $tableConfig       = $this->createMock(TableConfig::class);
-        $tableFilterConfig = $this->createMock(TableFilterConfig::class);
+        $tableConfig = $this->createMock(TableConfig::class);
 
-        $tableConfig->expects($this->once())
-            ->method('getFilter')
-            ->with(CustomItem::class, 'customObject')
-            ->willReturn($tableFilterConfig);
-
-        $tableFilterConfig->expects($this->once())
-            ->method('getValue')
-            ->willReturn(99);
-
-        $this->customItemRepository->expects($this->once())
-            ->method('getTableDataQuery')
-            ->with($tableConfig)
-            ->willReturn($this->queryBuilder);
+        $tableConfig->expects($this->exactly(2))
+            ->method('getParameter')
+            ->withConsecutive(
+                ['customObjectId'],
+                ['search']
+            )->will($this->onConsecutiveCalls(
+                44,
+                null
+            ));
 
         $this->customItemPermissionProvider->expects($this->once())
             ->method('isGranted')
@@ -210,10 +206,6 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
         $this->user->expects($this->once())
             ->method('getId')
             ->willReturn(22);
-
-        $this->customItemRepository->expects($this->once())
-            ->method('applyOwnerId')
-            ->with($this->queryBuilder, 22);
 
         $this->queryBuilder->expects($this->once())
             ->method('getQuery')
@@ -228,22 +220,18 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCountForTable(): void
     {
-        $tableConfig       = $this->createMock(TableConfig::class);
-        $tableFilterConfig = $this->createMock(TableFilterConfig::class);
+        $tableConfig = $this->createMock(TableConfig::class);
+        $expr        = $this->createMock(Expr::class);
 
-        $tableConfig->expects($this->once())
-            ->method('getFilter')
-            ->with(CustomItem::class, 'customObject')
-            ->willReturn($tableFilterConfig);
-
-        $tableFilterConfig->expects($this->once())
-            ->method('getValue')
-            ->willReturn(99);
-
-        $this->customItemRepository->expects($this->once())
-            ->method('getTableCountQuery')
-            ->with($tableConfig)
-            ->willReturn($this->queryBuilder);
+        $tableConfig->expects($this->exactly(2))
+            ->method('getParameter')
+            ->withConsecutive(
+                ['customObjectId'],
+                ['search']
+            )->will($this->onConsecutiveCalls(
+                44,
+                null
+            ));
 
         $this->customItemPermissionProvider->expects($this->once())
             ->method('isGranted')
@@ -253,9 +241,37 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
             ->method('getId')
             ->willReturn(22);
 
-        $this->customItemRepository->expects($this->once())
-            ->method('applyOwnerId')
-            ->with($this->queryBuilder, 22);
+        $this->queryBuilder->expects($this->exactly(2))
+            ->method('select')
+            ->withConsecutive(
+                [CustomItem::TABLE_ALIAS],
+                ['the select count expr']
+            );
+
+        $this->queryBuilder->expects($this->once())
+            ->method('expr')
+            ->willReturn($expr);
+
+        $expr->expects($this->once())
+            ->method('count')
+            ->with('DISTINCT CustomItem')
+            ->willReturn('the select count expr');
+
+        $this->queryBuilder->expects($this->once())
+            ->method('from')
+            ->with(CustomItem::class, CustomItem::TABLE_ALIAS);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('where')
+            ->with(CustomItem::TABLE_ALIAS.'.customObject = :customObjectId');
+
+        $this->queryBuilder->expects($this->once())
+            ->method('andWhere')
+            ->with(CustomItem::TABLE_ALIAS.'.createdBy', 22);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('customObjectId', 44);
 
         $this->queryBuilder->expects($this->once())
             ->method('getQuery')
@@ -270,22 +286,17 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
 
     public function testGetLookupData(): void
     {
-        $tableConfig       = $this->createMock(TableConfig::class);
-        $tableFilterConfig = $this->createMock(TableFilterConfig::class);
+        $tableConfig = $this->createMock(TableConfig::class);
 
-        $tableConfig->expects($this->once())
-            ->method('getFilter')
-            ->with(CustomItem::class, 'customObject')
-            ->willReturn($tableFilterConfig);
-
-        $tableFilterConfig->expects($this->once())
-            ->method('getValue')
-            ->willReturn(99);
-
-        $this->customItemRepository->expects($this->once())
-            ->method('getTableDataQuery')
-            ->with($tableConfig)
-            ->willReturn($this->queryBuilder);
+        $tableConfig->expects($this->exactly(2))
+            ->method('getParameter')
+            ->withConsecutive(
+                ['customObjectId'],
+                ['search']
+            )->will($this->onConsecutiveCalls(
+                44,
+                'Item A'
+            ));
 
         $this->customItemPermissionProvider->expects($this->once())
             ->method('isGranted')
@@ -295,17 +306,30 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
             ->method('getId')
             ->willReturn(22);
 
-        $this->customItemRepository->expects($this->once())
-            ->method('applyOwnerId')
-            ->with($this->queryBuilder, 22);
-
         $this->queryBuilder->expects($this->once())
             ->method('getRootAliases')
             ->willReturn(['alias_a']);
 
-        $this->queryBuilder->expects($this->once())
+        $this->queryBuilder->expects($this->exactly(2))
             ->method('select')
-            ->with('alias_a.name as value, alias_a.id');
+            ->withConsecutive(
+                [CustomItem::TABLE_ALIAS],
+                ['alias_a.name as value, alias_a.id']
+            );
+
+        $this->queryBuilder->expects($this->exactly(2))
+            ->method('andWhere')
+            ->withConsecutive(
+                [CustomItem::TABLE_ALIAS.'.name LIKE %:search%'],
+                [CustomItem::TABLE_ALIAS.'.createdBy', 22]
+            );
+
+        $this->queryBuilder->expects($this->exactly(2))
+            ->method('setParameter')
+            ->withConsecutive(
+                ['customObjectId', 44],
+                ['search', 'Item A']
+            );
 
         $this->queryBuilder->expects($this->once())
             ->method('getQuery')
@@ -342,19 +366,6 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
             $this->customItem,
             $this->customItemModel->populateCustomFields($this->customItem)
         );
-    }
-
-    public function testCountItemsLinkedToContact(): void
-    {
-        $customObject = $this->createMock(CustomObject::class);
-        $contact      = $this->createMock(Lead::class);
-
-        $this->customItemRepository->expects($this->once())
-            ->method('countItemsLinkedToContact')
-            ->with($customObject, $contact)
-            ->willReturn(33);
-
-        $this->assertSame(33, $this->customItemModel->countItemsLinkedToContact($customObject, $contact));
     }
 
     public function testGetPermissionBase(): void

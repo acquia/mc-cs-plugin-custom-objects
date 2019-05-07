@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
 use MauticPlugin\CustomObjectsBundle\EventListener\CustomItemXrefContactSubscriber;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefContactEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
@@ -45,6 +45,9 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
 
     private $xref;
 
+    /**
+     * @var CustomItemXrefContactSubscriber
+     */
     private $xrefSubscriber;
 
     protected function setUp(): void
@@ -54,7 +57,7 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->entityManager  = $this->createMock(EntityManager::class);
         $this->userHelper     = $this->createMock(UserHelper::class);
         $this->user           = $this->createMock(User::class);
-        $this->event          = $this->createMock(CustomItemXrefContactEvent::class);
+        $this->event          = $this->createMock(CustomItemXrefEntityEvent::class);
         $this->contact        = $this->createMock(Lead::class);
         $this->customItem     = $this->createMock(CustomItem::class);
         $this->xref           = $this->createMock(CustomItemXrefContact::class);
@@ -72,7 +75,7 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->user->method('getName')->willReturn(self::USER_NAME);
     }
 
-    public function testOnLinkedContact(): void
+    public function testCreateNewEventLogForLinkedContact(): void
     {
         $this->entityManager->expects($this->once())
             ->method('persist')
@@ -81,10 +84,10 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->entityManager->expects($this->once())
             ->method('flush');
 
-        $this->xrefSubscriber->onLinkedContact($this->event);
+        $this->xrefSubscriber->createNewEventLogForLinkedContact($this->event);
     }
 
-    public function testOnUnlinkedContact(): void
+    public function testCreateNewEventLogForUnlinkedContact(): void
     {
         $this->entityManager->expects($this->once())
             ->method('persist')
@@ -93,7 +96,7 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->entityManager->expects($this->once())
             ->method('flush');
 
-        $this->xrefSubscriber->onUnlinkedContact($this->event);
+        $this->xrefSubscriber->createNewEventLogForUnlinkedContact($this->event);
     }
 
     /**

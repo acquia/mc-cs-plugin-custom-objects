@@ -94,7 +94,7 @@ class CustomItemXrefContact implements CustomItemXrefInterface
     }
 
     /**
-     * @return Contact
+     * @return Lead
      */
     public function getLinkedEntity()
     {

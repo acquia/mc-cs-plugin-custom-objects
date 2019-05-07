@@ -21,11 +21,6 @@ use MauticPlugin\CustomObjectsBundle\Controller\JsonController;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use UnexpectedValueException;
 use Mautic\CoreBundle\Service\FlashBag;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
 
 class UnlinkController extends JsonController
 {
@@ -33,11 +28,6 @@ class UnlinkController extends JsonController
      * @var CustomItemModel
      */
     private $customItemModel;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $dispatcher;
 
     /**
      * @var CustomItemPermissionProvider
@@ -51,18 +41,15 @@ class UnlinkController extends JsonController
 
     /**
      * @param CustomItemModel              $customItemModel
-     * @param EventDispatcherInterface   $dispatcher
      * @param CustomItemPermissionProvider $permissionProvider
      * @param FlashBag                     $flashBag
      */
     public function __construct(
         CustomItemModel $customItemModel,
-        EventDispatcherInterface $dispatcher,
         CustomItemPermissionProvider $permissionProvider,
         FlashBag $flashBag
     ) {
         $this->customItemModel    = $customItemModel;
-        $this->dispatcher         = $dispatcher;
         $this->permissionProvider = $permissionProvider;
         $this->flashBag           = $flashBag;
     }
@@ -81,19 +68,7 @@ class UnlinkController extends JsonController
 
             $this->permissionProvider->canEdit($customItem);
 
-            $event = $this->dispatcher->dispatch(
-                CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY,
-                new CustomItemXrefEntityDiscoveryEvent($customItem, $entityType, $entityId)
-            );
-
-            if (null === $event->getXrefEntity()) {
-                throw new UnexpectedValueException("Entity {$entityType} was not able to be unlinked from {$customItem->getName()} ({$customItem->getId()})");
-            }
-
-            $this->dispatcher->dispatch(
-                CustomItemEvents::ON_CUSTOM_ITEM_UNLINK_ENTITY,
-                new CustomItemXrefEntityEvent($event->getXrefEntity())
-            );
+            $this->customItemModel->unlinkEntity($customItem, $entityType, $entityId);
 
             $this->flashBag->add(
                 'custom.item.unlinked',

@@ -257,10 +257,10 @@ class CustomObjectModel extends FormModel
 
     /**
      * @param TableConfig $tableConfig
-     * 
+     *
      * @return QueryBuilder
      */
-    private function createListQueryBuilder(TableConfig $tableConfig)
+    private function createListQueryBuilder(TableConfig $tableConfig): QueryBuilder
     {
         $queryBuilder = $this->entityManager->createQueryBuilder();
         $queryBuilder->select(CustomObject::TABLE_ALIAS);
@@ -269,7 +269,9 @@ class CustomObjectModel extends FormModel
         $queryBuilder->setFirstResult($tableConfig->getOffset());
         $queryBuilder->orderBy($tableConfig->getOrderBy(), $tableConfig->getOrderDirection());
 
-        if ($search = $tableConfig->getParameter('search')) {
+        $search = $tableConfig->getParameter('search');
+
+        if ($search) {
             $queryBuilder->andWhere(CustomObject::TABLE_ALIAS.'.name LIKE %:search%');
             $queryBuilder->setParameter('search', $search);
         }

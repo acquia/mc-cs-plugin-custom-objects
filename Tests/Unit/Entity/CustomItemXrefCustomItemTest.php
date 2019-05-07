@@ -16,22 +16,65 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Entity;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
 use DateTimeImmutable;
+use UnexpectedValueException;
 
 class CustomItemXrefCustomItemTest extends \PHPUnit_Framework_TestCase
 {
-    public function testGetters(): void
+    public function testGettersIfCustomItemAIsLower(): void
     {
-        $customItem       = $this->createMock(CustomItem::class);
-        $parentCustomItem = $this->createMock(CustomItem::class);
-        $dateAdded        = new DateTimeImmutable('2019-03-04 12:34:56');
-        $xref             = new CustomItemXrefCustomItem(
-            $customItem,
-            $parentCustomItem,
+        $customItemA = $this->createMock(CustomItem::class);
+        $customItemB = $this->createMock(CustomItem::class);
+        $dateAdded   = new DateTimeImmutable('2019-03-04 12:34:56');
+
+        $customItemA->method('getId')->willReturn(33);
+        $customItemB->method('getId')->willReturn(55);
+
+        $xref = new CustomItemXrefCustomItem(
+            $customItemA,
+            $customItemB,
             $dateAdded
         );
 
-        $this->assertSame($customItem, $xref->getCustomItem());
-        $this->assertSame($parentCustomItem, $xref->getParentCustomItem());
+        $this->assertSame($customItemA, $xref->getCustomItemLower());
+        $this->assertSame($customItemB, $xref->getCustomItemHigher());
         $this->assertSame($dateAdded, $xref->getDateAdded());
+    }
+
+    public function testGettersIfCustomItemBIsLower(): void
+    {
+        $customItemA = $this->createMock(CustomItem::class);
+        $customItemB = $this->createMock(CustomItem::class);
+        $dateAdded   = new DateTimeImmutable('2019-03-04 12:34:56');
+
+        $customItemA->method('getId')->willReturn(55);
+        $customItemB->method('getId')->willReturn(33);
+
+        $xref = new CustomItemXrefCustomItem(
+            $customItemA,
+            $customItemB,
+            $dateAdded
+        );
+
+        $this->assertSame($customItemB, $xref->getCustomItemLower());
+        $this->assertSame($customItemA, $xref->getCustomItemHigher());
+        $this->assertSame($dateAdded, $xref->getDateAdded());
+    }
+
+    public function testGettersIfCustomItemsAreEqual(): void
+    {
+        $customItemA = $this->createMock(CustomItem::class);
+        $customItemB = $this->createMock(CustomItem::class);
+        $dateAdded   = new DateTimeImmutable('2019-03-04 12:34:56');
+
+        $customItemA->method('getId')->willReturn(55);
+        $customItemB->method('getId')->willReturn(55);
+
+        $this->expectException(UnexpectedValueException::class);
+
+        new CustomItemXrefCustomItem(
+            $customItemA,
+            $customItemB,
+            $dateAdded
+        );
     }
 }

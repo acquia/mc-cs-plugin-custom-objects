@@ -75,8 +75,8 @@ class CustomItemButtonSubscriberTest extends \PHPUnit_Framework_TestCase
             ->with(self::OBJECT_ID);
 
         $this->routeProvider->expects($this->once())
-            ->method('buildUnlinkContactRoute')
-            ->with(self::ITEM_ID, self::CONTACT_ID)
+            ->method('buildUnlinkRoute')
+            ->with(self::ITEM_ID, 'contact', self::CONTACT_ID)
             ->willReturn('generated/route');
 
         $this->translator->expects($this->once())

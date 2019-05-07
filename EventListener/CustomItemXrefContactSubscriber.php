@@ -60,11 +60,11 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
             CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY => 'onEntityLinkDiscovery',
             CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY           => [
                 ['saveLink', 1000],
-                ['createNewEvenLogForLinkedContact', 0]
+                ['createNewEventLogForLinkedContact', 0],
             ],
             CustomItemEvents::ON_CUSTOM_ITEM_UNLINK_ENTITY         => [
                 ['deleteLink', 1000],
-                ['createNewEvenLogForUnlinkedContact', 0]
+                ['createNewEventLogForUnlinkedContact', 0],
             ],
         ];
     }
@@ -112,7 +112,7 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
                 $contact = $this->entityManager->getReference(Lead::class, $event->getEntityId());
                 $xRef    = new CustomItemXrefContact($event->getCustomItem(), $contact);
             }
-    
+
             $event->setXrefEntity($xRef);
             $event->stopPropagation();
         }
@@ -120,7 +120,7 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
 
     /**
      * Save the xref only if it isn't in the entity manager already as it means it was loaded from the database already.
-     * 
+     *
      * @param CustomItemXrefEntityEvent $event
      */
     public function saveLink(CustomItemXrefEntityEvent $event): void
@@ -134,7 +134,7 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
     /**
      * @param CustomItemXrefEntityEvent $event
      */
-    public function createNewEvenLogForLinkedContact(CustomItemXrefEntityEvent $event): void
+    public function createNewEventLogForLinkedContact(CustomItemXrefEntityEvent $event): void
     {
         if ($event->getXref() instanceof CustomItemXrefContact) {
             $this->saveEventLog($event->getXref(), 'link');
@@ -155,7 +155,7 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
     /**
      * @param CustomItemXrefEntityEvent $event
      */
-    public function createNewEvenLogForUnlinkedContact(CustomItemXrefEntityEvent $event): void
+    public function createNewEventLogForUnlinkedContact(CustomItemXrefEntityEvent $event): void
     {
         if ($event->getXref() instanceof CustomItemXrefContact) {
             $this->saveEventLog($event->getXref(), 'unlink');

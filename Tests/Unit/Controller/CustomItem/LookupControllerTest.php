@@ -17,13 +17,11 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\LookupController;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Symfony\Component\HttpFoundation\RequestStack;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Mautic\CoreBundle\Service\FlashBag;
 use Symfony\Component\HttpFoundation\Request;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 
 class LookupControllerTest extends ControllerTestCase
 {
@@ -88,11 +86,10 @@ class LookupControllerTest extends ControllerTestCase
                 $this->assertSame(0, $tableConfig->getOffset());
                 $this->assertSame('CustomItem.name', $tableConfig->getOrderBy());
                 $this->assertSame('ASC', $tableConfig->getOrderDirection());
-                $customObjectFilter = $tableConfig->getFilter(CustomItem::class, 'customObject');
-                $this->assertSame(CustomItem::class, $customObjectFilter->getEntityName());
-                $this->assertSame('customObject', $customObjectFilter->getColumnName());
-                $this->assertSame(self::OBJECT_ID, $customObjectFilter->getValue());
-                $this->assertSame('eq', $customObjectFilter->getExpression());
+                $this->assertSame('', $tableConfig->getParameter('search'));
+                $this->assertSame(self::OBJECT_ID, $tableConfig->getParameter('customObjectId'));
+                $this->assertSame('', $tableConfig->getParameter('filterEntityType'));
+                $this->assertSame(0, $tableConfig->getParameter('filterEntityId'));
 
                 return true;
             }));
@@ -100,7 +97,7 @@ class LookupControllerTest extends ControllerTestCase
         $this->lookupController->listAction(self::OBJECT_ID);
     }
 
-    public function testListActionForContact(): void
+    public function testListActionForContactEntity(): void
     {
         $this->permissionProvider->expects($this->once())
             ->method('canViewAtAll');
@@ -120,26 +117,10 @@ class LookupControllerTest extends ControllerTestCase
                 $this->assertSame(0, $tableConfig->getOffset());
                 $this->assertSame('CustomItem.name', $tableConfig->getOrderBy());
                 $this->assertSame('ASC', $tableConfig->getOrderDirection());
-                $customObjectFilter = $tableConfig->getFilter(CustomItem::class, 'customObject');
-                $this->assertSame(CustomItem::class, $customObjectFilter->getEntityName());
-                $this->assertSame('customObject', $customObjectFilter->getColumnName());
-                $this->assertSame(self::OBJECT_ID, $customObjectFilter->getValue());
-                $this->assertSame('eq', $customObjectFilter->getExpression());
-                $contactXrefFilter = $tableConfig->getFilter(CustomItemXrefContact::class, 'contact');
-                $this->assertSame(CustomItemXrefContact::class, $contactXrefFilter->getEntityName());
-                $this->assertSame('contact', $contactXrefFilter->getColumnName());
-                $this->assertCount(2, $contactXrefFilter->getValue());
-                $this->assertSame('orX', $contactXrefFilter->getExpression());
-                $contactExcludeFilter = $contactXrefFilter->getValue()[0];
-                $this->assertSame(CustomItemXrefContact::class, $contactExcludeFilter->getEntityName());
-                $this->assertSame('contact', $contactExcludeFilter->getColumnName());
-                $this->assertSame(45, $contactExcludeFilter->getValue());
-                $this->assertSame('neq', $contactExcludeFilter->getExpression());
-                $contactNullFilter = $contactXrefFilter->getValue()[1];
-                $this->assertSame(CustomItemXrefContact::class, $contactNullFilter->getEntityName());
-                $this->assertSame('contact', $contactNullFilter->getColumnName());
-                $this->assertSame(null, $contactNullFilter->getValue());
-                $this->assertSame('isNull', $contactNullFilter->getExpression());
+                $this->assertSame('', $tableConfig->getParameter('search'));
+                $this->assertSame(self::OBJECT_ID, $tableConfig->getParameter('customObjectId'));
+                $this->assertSame('contact', $tableConfig->getParameter('filterEntityType'));
+                $this->assertSame(45, $tableConfig->getParameter('filterEntityId'));
 
                 return true;
             }));

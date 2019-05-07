@@ -13,9 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\DTO;
 
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 
 class TableConfig
@@ -39,11 +36,6 @@ class TableConfig
      * @var string
      */
     private $orderDirection;
-
-    /**
-     * @var mixed[]
-     */
-    private $filters = [];
 
     /**
      * @var mixed[]
@@ -102,7 +94,7 @@ class TableConfig
      * @param string $key
      * @param mixed  $value
      */
-    public function addParameter(string $key, $value)
+    public function addParameter(string $key, $value): void
     {
         $this->parameters[$key] = $value;
     }
@@ -110,7 +102,7 @@ class TableConfig
     /**
      * @param string $key
      * @param mixed  $defaultValue
-     * 
+     *
      * @return mixed
      */
     public function getParameter(string $key, $defaultValue = null)

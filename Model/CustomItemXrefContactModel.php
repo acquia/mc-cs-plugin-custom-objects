@@ -16,8 +16,6 @@ namespace MauticPlugin\CustomObjectsBundle\Model;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Model\FormModel;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
-use Doctrine\ORM\NoResultException;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use DateTime;

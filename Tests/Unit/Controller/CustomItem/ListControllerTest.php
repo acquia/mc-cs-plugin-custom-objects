@@ -22,7 +22,6 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemSessionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
@@ -131,11 +130,10 @@ class ListControllerTest extends ControllerTestCase
             $this->assertSame(20, $tableConfig->getOffset());
             $this->assertSame('e.id', $tableConfig->getOrderBy());
             $this->assertSame('DESC', $tableConfig->getOrderDirection());
-            $customObjectFilter = $tableConfig->getFilter(CustomItem::class, 'customObject');
-            $this->assertSame(CustomItem::class, $customObjectFilter->getEntityName());
-            $this->assertSame('customObject', $customObjectFilter->getColumnName());
-            $this->assertSame(self::OBJECT_ID, $customObjectFilter->getValue());
-            $this->assertSame('eq', $customObjectFilter->getExpression());
+            $this->assertSame(self::OBJECT_ID, $tableConfig->getParameter('customObjectId'));
+            $this->assertSame('', $tableConfig->getParameter('filterEntityType'));
+            $this->assertSame(0, $tableConfig->getParameter('filterEntityId'));
+            $this->assertSame('', $tableConfig->getParameter('search'));
 
             return true;
         };
@@ -209,11 +207,10 @@ class ListControllerTest extends ControllerTestCase
             $this->assertSame(20, $tableConfig->getOffset());
             $this->assertSame('e.name', $tableConfig->getOrderBy());
             $this->assertSame('ASC', $tableConfig->getOrderDirection());
-            $customObjectFilter = $tableConfig->getFilter(CustomItem::class, 'customObject');
-            $this->assertSame(CustomItem::class, $customObjectFilter->getEntityName());
-            $this->assertSame('customObject', $customObjectFilter->getColumnName());
-            $this->assertSame(self::OBJECT_ID, $customObjectFilter->getValue());
-            $this->assertSame('eq', $customObjectFilter->getExpression());
+            $this->assertSame(self::OBJECT_ID, $tableConfig->getParameter('customObjectId'));
+            $this->assertSame('', $tableConfig->getParameter('filterEntityType'));
+            $this->assertSame(0, $tableConfig->getParameter('filterEntityId'));
+            $this->assertSame('', $tableConfig->getParameter('search'));
 
             return true;
         };
