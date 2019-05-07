@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
@@ -31,20 +32,26 @@ class CancelController extends CommonController
     private $routeProvider;
 
     /**
+     * @var CustomItemModel
+     */
+    private $customItemModel;
+
+    /**
      * @param CustomItemSessionProvider $sessionProvider
      * @param CustomItemRouteProvider   $routeProvider
+     * @param CustomItemModel           $customItemModel
      */
     public function __construct(
         CustomItemSessionProvider $sessionProvider,
-        CustomItemRouteProvider $routeProvider
+        CustomItemRouteProvider $routeProvider,
+        CustomItemModel $customItemModel
     ) {
         $this->sessionProvider = $sessionProvider;
         $this->routeProvider   = $routeProvider;
+        $this->customItemModel = $customItemModel;
     }
 
     /**
-     * @todo unlock entity?
-     *
      * @param int      $objectId
      * @param int|null $itemId
      *
@@ -53,6 +60,11 @@ class CancelController extends CommonController
     public function cancelAction(int $objectId, ?int $itemId = null): Response
     {
         $page = $this->sessionProvider->getPage();
+
+        if ($itemId) {
+            $customItem = $this->customItemModel->fetchEntity($itemId);
+            $this->customItemModel->unlockEntity($customItem);
+        }
 
         return $this->postActionRedirect(
             [

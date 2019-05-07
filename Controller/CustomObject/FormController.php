@@ -13,20 +13,21 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
+use Mautic\CoreBundle\Controller\FormController as BaseFormController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
+use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
-use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 
-class FormController extends CommonController
+class FormController extends BaseFormController
 {
     /**
      * @var FormFactory
@@ -59,12 +60,18 @@ class FormController extends CommonController
     private $customFieldTypeProvider;
 
     /**
+     * @var LockFlashMessageHelper
+     */
+    private $lockFlashMessageHelper;
+
+    /**
      * @param FormFactory                    $formFactory
      * @param CustomObjectModel              $customObjectModel
      * @param CustomFieldModel               $customFieldModel
      * @param CustomObjectPermissionProvider $permissionProvider
      * @param CustomObjectRouteProvider      $routeProvider
      * @param CustomFieldTypeProvider        $customFieldTypeProvider
+     * @param LockFlashMessageHelper         $lockFlashMessageHelper
      */
     public function __construct(
         FormFactory $formFactory,
@@ -72,7 +79,8 @@ class FormController extends CommonController
         CustomFieldModel $customFieldModel,
         CustomObjectPermissionProvider $permissionProvider,
         CustomObjectRouteProvider $routeProvider,
-        CustomFieldTypeProvider $customFieldTypeProvider
+        CustomFieldTypeProvider $customFieldTypeProvider,
+        LockFlashMessageHelper $lockFlashMessageHelper
     ) {
         $this->formFactory             = $formFactory;
         $this->customObjectModel       = $customObjectModel;
@@ -80,6 +88,7 @@ class FormController extends CommonController
         $this->permissionProvider      = $permissionProvider;
         $this->routeProvider           = $routeProvider;
         $this->customFieldTypeProvider = $customFieldTypeProvider;
+        $this->lockFlashMessageHelper  = $lockFlashMessageHelper;
     }
 
     /**
@@ -112,6 +121,19 @@ class FormController extends CommonController
         } catch (ForbiddenException $e) {
             return $this->accessDenied(false, $e->getMessage());
         }
+
+        if ($this->customObjectModel->isLocked($customObject)) {
+            $this->lockFlashMessageHelper->addFlash(
+                $customObject,
+                $this->routeProvider->buildEditRoute($objectId),
+                $this->canEdit($customObject),
+                'custom.object'
+            );
+
+            return $this->redirect($this->routeProvider->buildViewRoute($objectId));
+        }
+
+        $this->customObjectModel->lockEntity($customObject);
 
         return $this->renderForm($customObject, $this->routeProvider->buildEditRoute($objectId));
     }

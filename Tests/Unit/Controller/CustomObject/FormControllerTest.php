@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomObject;
 
+use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
 use Symfony\Component\HttpFoundation\Request;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
@@ -39,6 +40,7 @@ class FormControllerTest extends ControllerTestCase
     private $permissionProvider;
     private $routeProvider;
     private $customFieldTypeProvider;
+    private $lockFlashMessageHelper;
     private $customObject;
     private $form;
 
@@ -57,6 +59,7 @@ class FormControllerTest extends ControllerTestCase
         $this->permissionProvider      = $this->createMock(CustomObjectPermissionProvider::class);
         $this->routeProvider           = $this->createMock(CustomObjectRouteProvider::class);
         $this->customFieldTypeProvider = $this->createMock(CustomFieldTypeProvider::class);
+        $this->lockFlashMessageHelper  = $this->createMock(LockFlashMessageHelper::class);
         $this->request                 = $this->createMock(Request::class);
         $this->customObject            = $this->createMock(CustomObject::class);
         $this->form                    = $this->createMock(FormInterface::class);
@@ -66,7 +69,8 @@ class FormControllerTest extends ControllerTestCase
             $this->customFieldModel,
             $this->permissionProvider,
             $this->routeProvider,
-            $this->customFieldTypeProvider
+            $this->customFieldTypeProvider,
+            $this->lockFlashMessageHelper
         );
 
         $this->addSymfonyDependencies($this->formController);
@@ -180,6 +184,13 @@ class FormControllerTest extends ControllerTestCase
                 ['action' => 'https://list.items']
             )
             ->willReturn($this->form);
+
+        $this->customObjectModel->expects($this->once())
+            ->method('isLocked')
+            ->willReturn(false);
+
+        $this->customObjectModel->expects($this->once())
+            ->method('lockEntity');
 
         $this->routeProvider->expects($this->once())
             ->method('buildSaveRoute')

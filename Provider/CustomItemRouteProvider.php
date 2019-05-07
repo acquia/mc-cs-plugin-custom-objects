@@ -104,6 +104,7 @@ class CustomItemRouteProvider
     }
 
     /**
+     * @param int $objectId
      * @param int $itemId
      *
      * @return string
@@ -114,6 +115,7 @@ class CustomItemRouteProvider
     }
 
     /**
+     * @param int $objectId
      * @param int $itemId
      *
      * @return string
@@ -124,7 +126,10 @@ class CustomItemRouteProvider
     }
 
     /**
+     * @param int $objectId
      * @param int $itemId
+     *
+     * @return string
      */
     public function buildCloneRoute(int $objectId, int $itemId): string
     {
@@ -132,6 +137,7 @@ class CustomItemRouteProvider
     }
 
     /**
+     * @param int $objectId
      * @param int $itemId
      *
      * @return string

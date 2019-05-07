@@ -13,11 +13,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
+use Mautic\CoreBundle\Controller\FormController as BaseFormController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemType;
+use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactory;
-use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
@@ -26,7 +27,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
-class FormController extends CommonController
+class FormController extends BaseFormController
 {
     /**
      * @var FormFactory
@@ -54,24 +55,32 @@ class FormController extends CommonController
     private $routeProvider;
 
     /**
+     * @var LockFlashMessageHelper
+     */
+    private $lockFlashMessageHelper;
+
+    /**
      * @param FormFactory                  $formFactory
      * @param CustomObjectModel            $customObjectModel
      * @param CustomItemModel              $customItemModel
      * @param CustomItemPermissionProvider $permissionProvider
      * @param CustomItemRouteProvider      $routeProvider
+     * @param LockFlashMessageHelper       $lockFlashMessageHelper
      */
     public function __construct(
         FormFactory $formFactory,
         CustomObjectModel $customObjectModel,
         CustomItemModel $customItemModel,
         CustomItemPermissionProvider $permissionProvider,
-        CustomItemRouteProvider $routeProvider
+        CustomItemRouteProvider $routeProvider,
+        LockFlashMessageHelper $lockFlashMessageHelper
     ) {
-        $this->formFactory        = $formFactory;
-        $this->customObjectModel  = $customObjectModel;
-        $this->customItemModel    = $customItemModel;
-        $this->permissionProvider = $permissionProvider;
-        $this->routeProvider      = $routeProvider;
+        $this->formFactory            = $formFactory;
+        $this->customObjectModel      = $customObjectModel;
+        $this->customItemModel        = $customItemModel;
+        $this->permissionProvider     = $permissionProvider;
+        $this->routeProvider          = $routeProvider;
+        $this->lockFlashMessageHelper = $lockFlashMessageHelper;
     }
 
     /**
@@ -109,6 +118,19 @@ class FormController extends CommonController
         } catch (ForbiddenException $e) {
             return $this->accessDenied(false, $e->getMessage());
         }
+
+        if ($this->customItemModel->isLocked($customItem)) {
+            $this->lockFlashMessageHelper->addFlash(
+                $customItem,
+                $this->routeProvider->buildEditRoute($objectId, $itemId),
+                $this->canEdit($customItem),
+                'custom.item'
+            );
+
+            return $this->redirect($this->routeProvider->buildViewRoute($objectId, $itemId));
+        }
+
+        $this->customItemModel->lockEntity($customItem);
 
         return $this->renderFormForItem($customItem, $customObject, $this->routeProvider->buildEditRoute($objectId, $itemId));
     }
