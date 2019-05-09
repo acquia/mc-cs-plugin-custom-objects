@@ -227,14 +227,6 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param ArrayCollection $customFieldValues
-     */
-    public function setCustomFieldValues($customFieldValues)
-    {
-        $this->customFieldValues = $customFieldValues;
-    }
-
-    /**
      * Called when the custom field values are loaded from the database.
      */
     public function createFieldValuesSnapshot()
