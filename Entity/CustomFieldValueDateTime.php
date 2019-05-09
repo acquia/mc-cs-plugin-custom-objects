@@ -18,7 +18,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use DateTimeInterface;
 
-class CustomFieldValueDateTime extends CustomFieldValueStandard
+class CustomFieldValueDateTime extends AbstractCustomFieldValue
 {
     /**
      * @var DateTimeInterface|null

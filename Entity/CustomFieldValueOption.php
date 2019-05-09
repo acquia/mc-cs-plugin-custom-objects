@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 /**
  * Table for multiselect/checkbox option values.
  */
-class CustomFieldValueOption extends CustomFieldValueStandard
+class CustomFieldValueOption extends AbstractCustomFieldValue
 {
     /**
      * @var string[]|string|null

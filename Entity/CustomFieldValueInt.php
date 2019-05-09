@@ -17,7 +17,7 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
-class CustomFieldValueInt extends CustomFieldValueStandard
+class CustomFieldValueInt extends AbstractCustomFieldValue
 {
     /**
      * @var int|null
