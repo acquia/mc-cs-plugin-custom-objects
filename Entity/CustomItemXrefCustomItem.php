@@ -55,7 +55,7 @@ class CustomItemXrefCustomItem implements CustomItemXrefInterface
      */
     public function __construct(CustomItem $customItemA, CustomItem $customItemB, ?DateTimeInterface $dateAdded = null)
     {
-        if ($customItemA->getId() === $customItemB->getId()) {
+        if ($customItemA->getId() && $customItemA->getId() === $customItemB->getId()) {
             throw new UnexpectedValueException('It is not possible to link identical custom item.');
         }
 
