@@ -30,6 +30,7 @@ class ContactTabSubscriber extends CommonSubscriber
      * @var TranslatorInterface
      */
     protected $translator;
+
     /**
      * @var CustomObjectModel
      */
