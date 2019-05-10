@@ -100,8 +100,10 @@ class CustomItemXrefCustomItemSubscriber extends CommonSubscriber
             );
             $queryBuilder->andWhere('CustomItem.id != :customItemId');
             $queryBuilder->andWhere($queryBuilder->expr()->orX(
-                $queryBuilder->expr()->neq('CustomItemXrefCustomItem.customItemLower', ':customItemId'),
-                $queryBuilder->expr()->neq('CustomItemXrefCustomItem.customItemHigher', ':customItemId'),
+                $queryBuilder->expr()->andX(
+                    $queryBuilder->expr()->neq('CustomItemXrefCustomItem.customItemLower', ':customItemId'),
+                    $queryBuilder->expr()->neq('CustomItemXrefCustomItem.customItemHigher', ':customItemId')
+                ),
                 $queryBuilder->expr()->isNull('CustomItemXrefCustomItem.customItemLower'),
                 $queryBuilder->expr()->isNull('CustomItemXrefCustomItem.customItemHigher')
             ));
