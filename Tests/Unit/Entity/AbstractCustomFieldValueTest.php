@@ -38,7 +38,7 @@ class AbstractCustomFieldValueTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($customItem, $abstractCFValue->getCustomItem());
         $this->assertSame(123, $abstractCFValue->getId());
 
-        $this->expectException(\Exception::class);
+        $this->expectException(\Throwable::class);
         $abstractCFValue->addValue();
     }
 }
