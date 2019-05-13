@@ -340,7 +340,7 @@ class CustomItemModel extends FormModel
         $queryBuilder->orderBy($tableConfig->getOrderBy(), $tableConfig->getOrderDirection());
         $queryBuilder->where(CustomItem::TABLE_ALIAS.'.customObject = :customObjectId');
         $queryBuilder->setParameter('customObjectId', $customObjectId);
-        
+
         $search = $tableConfig->getParameter('search');
 
         if ($search) {

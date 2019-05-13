@@ -414,21 +414,17 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
             ->method('getId')
             ->willReturn(22);
 
-        $this->queryBuilder->expects($this->once())
-            ->method('getRootAliases')
-            ->willReturn(['alias_a']);
-
         $this->queryBuilder->expects($this->exactly(2))
             ->method('select')
             ->withConsecutive(
                 [CustomItem::TABLE_ALIAS],
-                ['alias_a.name as value, alias_a.id']
+                ['CustomItem.name as value, CustomItem.id']
             );
 
         $this->queryBuilder->expects($this->exactly(2))
             ->method('andWhere')
             ->withConsecutive(
-                [CustomItem::TABLE_ALIAS.'.name LIKE %:search%'],
+                [CustomItem::TABLE_ALIAS.'.name LIKE :search'],
                 [CustomItem::TABLE_ALIAS.'.createdBy', 22]
             );
 
@@ -436,7 +432,7 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
             ->method('setParameter')
             ->withConsecutive(
                 ['customObjectId', 44],
-                ['search', 'Item A']
+                ['search', '%Item A%']
             );
 
         $this->queryBuilder->expects($this->once())
