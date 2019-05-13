@@ -20,6 +20,7 @@ use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
+use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 
 class DynamicContentSubscriber extends CommonSubscriber
@@ -43,18 +44,26 @@ class DynamicContentSubscriber extends CommonSubscriber
     private $queryHelper;
 
     /**
+     * @var ConfigProvider
+     */
+    private $configProvider;
+
+    /**
      * @param EntityManager               $entityManager
      * @param ContactSegmentFilterFactory $filterFactory
      * @param QueryFilterHelper           $queryHelper
+     * @param ConfigProvider              $configProvider
      */
     public function __construct(
         EntityManager $entityManager,
         ContactSegmentFilterFactory $filterFactory,
-        QueryFilterHelper $queryHelper)
+        QueryFilterHelper $queryHelper,
+        ConfigProvider $configProvider)
     {
         $this->entityManager = $entityManager;
         $this->filterFactory = $filterFactory;
         $this->queryHelper   = $queryHelper;
+        $this->configProvider = $configProvider;
     }
 
     /**
@@ -75,6 +84,10 @@ class DynamicContentSubscriber extends CommonSubscriber
      */
     public function evaluateFilters(ContactFiltersEvaluateEvent $event): void
     {
+        if (!$this->configProvider->pluginIsEnabled()) {
+            return;
+        }
+
         $eventFilters = $event->getFilters();
         if ($event->isEvaluated()) {
             return;

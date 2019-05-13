@@ -703,6 +703,7 @@ return [
                     'doctrine.orm.entity_manager',
                     'mautic.lead.model.lead_segment_filter_factory',
                     'custom_object.query.filter.helper',
+                    'custom_object.config.provider'
                 ],
             ],
         ],
