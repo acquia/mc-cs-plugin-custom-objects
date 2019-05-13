@@ -261,7 +261,7 @@ class CustomItemModel extends FormModel
     public function getLookupData(TableConfig $tableConfig): array
     {
         $queryBuilder = $this->createListQueryBuilder($tableConfig);
-        $rootAlias    = $queryBuilder->getRootAliases()[0];
+        $rootAlias    = CustomItem::TABLE_ALIAS;
         $queryBuilder->select("{$rootAlias}.name as value, {$rootAlias}.id");
 
         $this->dispatcher->dispatch(
@@ -340,12 +340,12 @@ class CustomItemModel extends FormModel
         $queryBuilder->orderBy($tableConfig->getOrderBy(), $tableConfig->getOrderDirection());
         $queryBuilder->where(CustomItem::TABLE_ALIAS.'.customObject = :customObjectId');
         $queryBuilder->setParameter('customObjectId', $customObjectId);
-
+        
         $search = $tableConfig->getParameter('search');
 
         if ($search) {
-            $queryBuilder->andWhere(CustomItem::TABLE_ALIAS.'.name LIKE %:search%');
-            $queryBuilder->setParameter('search', $search);
+            $queryBuilder->andWhere(CustomItem::TABLE_ALIAS.'.name LIKE :search');
+            $queryBuilder->setParameter('search', "%{$search}%");
         }
 
         return $this->applyOwnerFilter($queryBuilder, $customObjectId);
