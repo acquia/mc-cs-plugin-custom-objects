@@ -76,7 +76,7 @@ class LookupController extends JsonController
         } catch (ForbiddenException $e) {
             $this->flashBag->add($e->getMessage(), [], FlashBag::LEVEL_ERROR);
 
-            return $this->renderJson([]);
+            return $this->renderJson();
         }
 
         $request          = $this->requestStack->getCurrentRequest();

@@ -149,8 +149,8 @@ class CampaignSubscriber extends CommonSubscriber
 
         if ($linkCustomItemId) {
             try {
-                $cutomItem = $this->customItemModel->fetchEntity($linkCustomItemId);
-                $this->customItemModel->linkEntity($cutomItem, 'contact', $contactId);
+                $customItem = $this->customItemModel->fetchEntity($linkCustomItemId);
+                $this->customItemModel->linkEntity($customItem, 'contact', $contactId);
             } catch (NotFoundException $e) {
                 // Do nothing  if the custom item doesn't exist anymore.
             }
@@ -158,8 +158,8 @@ class CampaignSubscriber extends CommonSubscriber
 
         if ($unlinkCustomItemId) {
             try {
-                $cutomItem = $this->customItemModel->fetchEntity($unlinkCustomItemId);
-                $this->customItemModel->unlinkEntity($cutomItem, 'contact', $contactId);
+                $customItem = $this->customItemModel->fetchEntity($unlinkCustomItemId);
+                $this->customItemModel->unlinkEntity($customItem, 'contact', $contactId);
             } catch (NotFoundException $e) {
                 // Do nothing  if the custom item doesn't exist anymore.
             }

@@ -19,7 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 class CustomObjectRepository extends CommonRepository
 {
     /**
-     * Used by internal Mautic methods. Use the contstant difectly instead.
+     * Used by internal Mautic methods. Use the contstant directly instead.
      *
      * @return string
      */
