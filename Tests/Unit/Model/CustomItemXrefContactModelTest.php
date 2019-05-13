@@ -14,27 +14,19 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Model;
 
 use Doctrine\ORM\EntityManager;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\NoResultException;
-use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel;
 use DateTime;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder as DBALQueryBuilder;
 use Doctrine\DBAL\Driver\Statement;
 use Symfony\Component\Translation\TranslatorInterface;
-use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefContactEvent;
 
 class CustomItemXrefContactModelTest extends \PHPUnit_Framework_TestCase
 {
     private $customItem;
-
-    private $customItemXrefContact;
 
     private $entityManager;
 
@@ -44,8 +36,9 @@ class CustomItemXrefContactModelTest extends \PHPUnit_Framework_TestCase
 
     private $translator;
 
-    private $dispatcher;
-
+    /**
+     * @var CustomItemXrefContactModel
+     */
     private $customItemXrefContactModel;
 
     protected function setUp(): void
@@ -53,111 +46,17 @@ class CustomItemXrefContactModelTest extends \PHPUnit_Framework_TestCase
         parent::setUp();
 
         $this->customItem                   = $this->createMock(CustomItem::class);
-        $this->customItemXrefContact        = $this->createMock(CustomItemXrefContact::class);
         $this->entityManager                = $this->createMock(EntityManager::class);
         $this->queryBuilder                 = $this->createMock(QueryBuilder::class);
         $this->query                        = $this->createMock(AbstractQuery::class);
         $this->translator                   = $this->createMock(TranslatorInterface::class);
-        $this->dispatcher                   = $this->createMock(EventDispatcherInterface::class);
         $this->customItemXrefContactModel   = new CustomItemXrefContactModel(
             $this->entityManager,
-            $this->translator,
-            $this->dispatcher
+            $this->translator
         );
 
         $this->entityManager->method('createQueryBuilder')->willReturn($this->queryBuilder);
         $this->queryBuilder->method('getQuery')->willReturn($this->query);
-    }
-
-    public function testLinkContactIfReferenceExists(): void
-    {
-        $customItemId = 36;
-        $contactId    = 22;
-
-        $this->privateTestGetContactReference();
-
-        $this->entityManager->expects($this->never())->method('getReference');
-
-        $this->assertSame(
-            $this->customItemXrefContact,
-            $this->customItemXrefContactModel->linkContact($customItemId, $contactId)
-        );
-    }
-
-    public function testLinkContactIfReferenceDoesNotExist(): void
-    {
-        $customItemId = 36;
-        $contactId    = 22;
-
-        $this->query->expects($this->once())
-            ->method('getSingleResult')
-            ->will($this->throwException(new NoResultException()));
-
-        $this->entityManager->expects($this->exactly(2))
-            ->method('getReference')
-            ->withConsecutive(
-                [CustomItem::class, $customItemId],
-                [Lead::class, $contactId]
-            )
-            ->will($this->onConsecutiveCalls($this->customItem, $this->createMock(Lead::class)));
-
-        $this->entityManager->expects($this->once())
-            ->method('persist')
-            ->with($this->isInstanceOf(CustomItemXrefContact::class));
-
-        $this->entityManager->expects($this->once())
-            ->method('flush')
-            ->with($this->isInstanceOf(CustomItemXrefContact::class));
-
-        $this->dispatcher->expects($this->once())
-            ->method('dispatch')
-            ->with(
-                CustomItemEvents::ON_CUSTOM_ITEM_LINK_CONTACT,
-                $this->isInstanceOf(CustomItemXrefContactEvent::class)
-            );
-
-        $this->assertInstanceOf(
-            CustomItemXrefContact::class,
-            $this->customItemXrefContactModel->linkContact($customItemId, $contactId)
-        );
-    }
-
-    public function testUnlinkContactIfReferenceExists(): void
-    {
-        $customItemId = 36;
-        $contactId    = 22;
-
-        $this->privateTestGetContactReference();
-
-        $this->entityManager->expects($this->once())
-            ->method('remove')
-            ->with($this->customItemXrefContact);
-
-        $this->entityManager->expects($this->once())
-            ->method('flush')
-            ->with($this->customItemXrefContact);
-
-        $this->dispatcher->expects($this->once())
-            ->method('dispatch')
-            ->with(
-                CustomItemEvents::ON_CUSTOM_ITEM_UNLINK_CONTACT,
-                $this->isInstanceOf(CustomItemXrefContactEvent::class)
-            );
-
-        $this->customItemXrefContactModel->unlinkContact($customItemId, $contactId);
-    }
-
-    public function testUnlinkContactIfReferenceNotFound(): void
-    {
-        $customItemId = 36;
-        $contactId    = 22;
-
-        $this->privateTestGetContactReference(false);
-
-        $this->entityManager->expects($this->never())
-            ->method('remove');
-
-        $this->customItemXrefContactModel->unlinkContact($customItemId, $contactId);
     }
 
     public function testGetLinksLineChartData(): void
@@ -202,32 +101,5 @@ class CustomItemXrefContactModelTest extends \PHPUnit_Framework_TestCase
             'custom_objects:custom_items',
             $this->customItemXrefContactModel->getPermissionBase()
         );
-    }
-
-    private function privateTestGetContactReference($shouldFindEntity = true): void
-    {
-        $customItemId = 36;
-        $contactId    = 22;
-
-        $this->queryBuilder->expects($this->once())->method('select')->with('cixcont');
-        $this->queryBuilder->expects($this->once())->method('from')->with(CustomItemXrefContact::class, 'cixcont');
-        $this->queryBuilder->expects($this->once())->method('where')->with('cixcont.customItem = :customItemId');
-        $this->queryBuilder->expects($this->once())->method('andWhere')->with('cixcont.contact = :contactId');
-        $this->queryBuilder->expects($this->exactly(2))
-            ->method('setParameter')
-            ->withConsecutive(
-                ['customItemId', $customItemId],
-                ['contactId', $contactId]
-            );
-
-        if ($shouldFindEntity) {
-            $this->query->expects($this->once())
-                ->method('getSingleResult')
-                ->willReturn($this->customItemXrefContact);
-        } else {
-            $this->query->expects($this->once())
-                ->method('getSingleResult')
-                ->will($this->throwException(new NoResultException()));
-        }
     }
 }

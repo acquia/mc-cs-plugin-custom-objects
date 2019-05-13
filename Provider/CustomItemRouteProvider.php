@@ -72,14 +72,18 @@ class CustomItemRouteProvider
     }
 
     /**
-     * @param int $customItemId
-     * @param int $contactId
+     * @param int    $customItemId
+     * @param string $entityType
+     * @param int    $entityId
      *
      * @return string
      */
-    public function buildUnlinkContactRoute(int $customItemId, int $contactId): string
+    public function buildUnlinkRoute(int $customItemId, string $entityType, int $entityId): string
     {
-        return $this->router->generate(static::ROUTE_UNLINK, ['itemId' => $customItemId, 'entityType' => 'contact', 'entityId' => $contactId]);
+        return $this->router->generate(
+            static::ROUTE_UNLINK,
+            ['itemId' => $customItemId, 'entityType' => $entityType, 'entityId' => $entityId]
+        );
     }
 
     /**
@@ -148,13 +152,18 @@ class CustomItemRouteProvider
     }
 
     /**
-     * @param int $objectId
+     * @param int     $objectId
+     * @param ?string $entityType
+     * @param ?int    $entityId
      *
      * @return string
      */
-    public function buildLookupRoute(int $objectId): string
+    public function buildLookupRoute(int $objectId, ?string $entityType = null, ?int $entityId = null): string
     {
-        return $this->router->generate(static::ROUTE_LOOKUP, ['objectId' => $objectId]);
+        return $this->router->generate(
+            static::ROUTE_LOOKUP,
+            ['objectId' => $objectId, 'filterEntityType' => $entityType, 'filterEntityId' => $entityId]
+        );
     }
 
     /**

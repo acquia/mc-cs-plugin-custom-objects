@@ -64,19 +64,19 @@ class CustomItemButtonSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getRoute')
             ->willReturn(CustomItemRouteProvider::ROUTE_LIST, ['route', ['objectId' => self::OBJECT_ID]]);
 
-        $this->event->expects($this->once())
+        $this->event->expects($this->exactly(2))
             ->method('getRequest')
             ->willReturn($this->request);
 
-        $this->request->query = new ParameterBag(['contactId' => self::CONTACT_ID]);
+        $this->request->query = new ParameterBag(['filterEntityId' => self::CONTACT_ID, 'filterEntityType' => 'contact']);
 
         $this->permissionProvider->expects($this->once())
             ->method('canCreate')
             ->with(self::OBJECT_ID);
 
         $this->routeProvider->expects($this->once())
-            ->method('buildUnlinkContactRoute')
-            ->with(self::ITEM_ID, self::CONTACT_ID)
+            ->method('buildUnlinkRoute')
+            ->with(self::ITEM_ID, 'contact', self::CONTACT_ID)
             ->willReturn('generated/route');
 
         $this->translator->expects($this->once())
@@ -97,7 +97,7 @@ class CustomItemButtonSubscriberTest extends \PHPUnit_Framework_TestCase
             ->with([
                 'attr' => [
                     'href'        => '#',
-                    'onclick'     => 'CustomObjects.unlinkFromContact(this, event, 555, 84);',
+                    'onclick'     => "CustomObjects.unlinkCustomItemFromEntity(this, event, 555, 'contact', 84, 'custom-object-555');",
                     'data-action' => 'generated/route',
                     'data-toggle' => '',
                 ],
@@ -115,7 +115,7 @@ class CustomItemButtonSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getRoute')
             ->willReturn(CustomItemRouteProvider::ROUTE_LIST, ['route', ['objectId' => self::OBJECT_ID]]);
 
-        $this->event->expects($this->once())
+        $this->event->expects($this->exactly(2))
             ->method('getRequest')
             ->willReturn($this->request);
 
@@ -253,7 +253,7 @@ class CustomItemButtonSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getRoute')
             ->willReturn(CustomItemRouteProvider::ROUTE_LIST, ['route', ['objectId' => self::OBJECT_ID]]);
 
-        $this->event->expects($this->once())
+        $this->event->expects($this->exactly(2))
             ->method('getRequest')
             ->willReturn($this->request);
 

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /*
  * @copyright   2018 Mautic, Inc. All rights reserved
@@ -10,10 +12,12 @@
  */
 ?>
 <li>
-    <a class="custom-object-tab" href="#custom-object-<?php echo $customObject->getId(); ?>-container" role="tab" data-toggle="tab" data-custom-object-id="<?php echo $customObject->getId(); ?>" id="custom-object-<?php echo $customObject->getId(); ?>">
-        <span class="label label-primary mr-sm" id="custom-object-<?php echo $customObject->getId(); ?>-count">
+    <a href="#<?php echo $tabId; ?>-container" role="tab" data-toggle="tab" id="<?php echo $tabId; ?>">
+        <?php if (isset($count)) : ?>
+        <span class="label label-primary mr-sm" id="<?php echo $tabId; ?>-count">
             <?php echo $count; ?>
         </span>
-        <?php echo $view['translator']->trans($customObject->getNamePlural()); ?>
+        <?php endif; ?>
+        <?php echo $view->escape($view['translator']->trans($title)); ?>
     </a>
 </li>

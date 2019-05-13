@@ -17,12 +17,14 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use Doctrine\ORM\Query\Expr\Join;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
+use Mautic\CoreBundle\Entity\CommonRepository;
 
-class CustomItemRepository extends AbstractTableRepository
+class CustomItemRepository extends CommonRepository
 {
     use DbalQueryTrait;
-
-    public const TABLE_ALIAS = 'CustomItem';
 
     /**
      * @param Lead         $contact
@@ -39,9 +41,36 @@ class CustomItemRepository extends AbstractTableRepository
         $queryBuilder->andWhere('cixctct.contact = :contactId');
         $queryBuilder->setParameter('customObjectId', $customObject->getId());
         $queryBuilder->setParameter('contactId', $contact->getId());
-        $result = $queryBuilder->getQuery()->getSingleScalarResult();
 
-        return (int) $result;
+        return (int) $queryBuilder->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * @param CustomItem   $customItem
+     * @param CustomObject $customObject
+     *
+     * @return int
+     */
+    public function countItemsLinkedToAnotherItem(CustomObject $customObject, CustomItem $customItem): int
+    {
+        $queryBuilder = $this->createQueryBuilder('ci', 'ci.id');
+        $queryBuilder->select($queryBuilder->expr()->countDistinct('ci.id'));
+        $queryBuilder->innerJoin(
+            CustomItemXrefCustomItem::class,
+            'cixci',
+            Join::WITH,
+            'ci.id = cixci.customItemLower OR ci.id = cixci.customItemHigher'
+        );
+        $queryBuilder->where('ci.customObject = :customObjectId');
+        $queryBuilder->andWhere('ci.id != :customItemId');
+        $queryBuilder->andWhere($queryBuilder->expr()->orX(
+            $queryBuilder->expr()->eq('cixci.customItemLower', ':customItemId'),
+            $queryBuilder->expr()->eq('cixci.customItemHigher', ':customItemId')
+        ));
+        $queryBuilder->setParameter('customObjectId', $customObject->getId());
+        $queryBuilder->setParameter('customItemId', $customItem->getId());
+
+        return (int) $queryBuilder->getQuery()->getSingleScalarResult();
     }
 
     /**
@@ -59,7 +88,7 @@ class CustomItemRepository extends AbstractTableRepository
         $fieldType    = $customField->getTypeObject();
         $queryBuilder = $this->_em->getConnection()->createQueryBuilder();
         $queryBuilder->select('ci.id');
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX.'custom_item', 'ci');
+        $queryBuilder->from(MAUTIC_TABLE_PREFIX.CustomItem::TABLE_NAME, 'ci');
         $queryBuilder->innerJoin('ci', MAUTIC_TABLE_PREFIX.'custom_item_xref_contact', 'cixcont', 'cixcont.custom_item_id = ci.id');
         $queryBuilder->innerJoin('ci', $fieldType->getTableName(), $fieldType->getTableAlias(), "{$fieldType->getTableAlias()}.custom_item_id = ci.id");
         $queryBuilder->where('cixcont.contact_id = :contactId');
@@ -79,5 +108,15 @@ class CustomItemRepository extends AbstractTableRepository
         }
 
         return (int) $result;
+    }
+
+    /**
+     * Used by internal Mautic methods. Use the contstant difectly instead.
+     *
+     * @return string
+     */
+    public function getTableAlias(): string
+    {
+        return CustomItem::TABLE_ALIAS;
     }
 }

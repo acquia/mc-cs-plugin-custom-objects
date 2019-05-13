@@ -20,8 +20,8 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Mautic\CoreBundle\Service\FlashBag;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use UnexpectedValueException;
 
 class UnlinkControllerTest extends ControllerTestCase
 {
@@ -32,7 +32,6 @@ class UnlinkControllerTest extends ControllerTestCase
     private const ENTITY_TYPE = 'contact';
 
     private $customItemModel;
-    private $customItemXrefContactModel;
     private $flashBag;
     private $permissionProvider;
 
@@ -46,12 +45,10 @@ class UnlinkControllerTest extends ControllerTestCase
         parent::setUp();
 
         $this->customItemModel            = $this->createMock(CustomItemModel::class);
-        $this->customItemXrefContactModel = $this->createMock(CustomItemXrefContactModel::class);
         $this->flashBag                   = $this->createMock(FlashBag::class);
         $this->permissionProvider         = $this->createMock(CustomItemPermissionProvider::class);
         $this->unlinkController           = new UnlinkController(
             $this->customItemModel,
-            $this->customItemXrefContactModel,
             $this->permissionProvider,
             $this->flashBag
         );
@@ -72,8 +69,8 @@ class UnlinkControllerTest extends ControllerTestCase
             ->method('add')
             ->with('Item not found message', [], FlashBag::LEVEL_ERROR);
 
-        $this->customItemXrefContactModel->expects($this->never())
-            ->method('unlinkContact');
+        $this->customItemModel->expects($this->never())
+            ->method('unlinkEntity');
 
         $this->unlinkController->saveAction(self::ITEM_ID, self::ENTITY_TYPE, self::ENTITY_ID);
     }
@@ -95,8 +92,8 @@ class UnlinkControllerTest extends ControllerTestCase
             ->method('add')
             ->with('You do not have permission to edit', [], FlashBag::LEVEL_ERROR);
 
-        $this->customItemXrefContactModel->expects($this->never())
-            ->method('unlinkContact');
+        $this->customItemModel->expects($this->never())
+            ->method('unlinkEntity');
 
         $this->unlinkController->saveAction(self::ITEM_ID, self::ENTITY_TYPE, self::ENTITY_ID);
     }
@@ -107,28 +104,30 @@ class UnlinkControllerTest extends ControllerTestCase
             ->method('fetchEntity')
             ->willReturn($this->createMock(CustomItem::class));
 
+        $this->customItemModel->expects($this->once())
+            ->method('unlinkEntity')
+            ->will($this->throwException(new UnexpectedValueException('Entity unicorn cannot be linked to a custom item')));
+
         $this->flashBag->expects($this->once())
             ->method('add')
             ->with('Entity unicorn cannot be linked to a custom item', [], FlashBag::LEVEL_ERROR);
-
-        $this->customItemXrefContactModel->expects($this->never())
-            ->method('unlinkContact');
 
         $this->unlinkController->saveAction(self::ITEM_ID, 'unicorn', self::ENTITY_ID);
     }
 
     public function testSaveAction(): void
     {
+        $customItem = $this->createMock(CustomItem::class);
         $this->customItemModel->expects($this->once())
             ->method('fetchEntity')
-            ->willReturn($this->createMock(CustomItem::class));
+            ->willReturn($customItem);
 
         $this->permissionProvider->expects($this->once())
             ->method('canEdit');
 
-        $this->customItemXrefContactModel->expects($this->once())
-            ->method('unlinkContact')
-            ->with(self::ITEM_ID, self::ENTITY_ID);
+        $this->customItemModel->expects($this->once())
+            ->method('unlinkEntity')
+            ->with($customItem, self::ENTITY_TYPE, self::ENTITY_ID);
 
         $this->unlinkController->saveAction(self::ITEM_ID, self::ENTITY_TYPE, self::ENTITY_ID);
     }

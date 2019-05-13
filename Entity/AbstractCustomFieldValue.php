@@ -17,7 +17,7 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
 
-abstract class CustomFieldValueStandard implements CustomFieldValueInterface
+abstract class AbstractCustomFieldValue implements CustomFieldValueInterface
 {
     /**
      * @var CustomField

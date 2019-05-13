@@ -19,18 +19,27 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use DateTimeInterface;
 use DateTimeImmutable;
 use DateTimeZone;
+use UnexpectedValueException;
 
-class CustomItemXrefCustomItem
+/**
+ * As the {custom item} - {custom item} table can store the IDs both ways (higher - lower, lower - higher)
+ * and both ways are valid, let's create a rule that one the first column will always contain the lower
+ * ID and the second always the higher to avoid duplicates. As an example:.
+ *
+ * 23 - 44 is correct
+ * 44 - 23 is not correct according to the rule.
+ */
+class CustomItemXrefCustomItem implements CustomItemXrefInterface
 {
     /**
      * @var CustomItem
      */
-    private $customItem;
+    private $customItemLower;
 
     /**
      * @var CustomItem
      */
-    private $parentCustomItem;
+    private $customItemHigher;
 
     /**
      * @var DateTimeInterface
@@ -38,15 +47,27 @@ class CustomItemXrefCustomItem
     private $dateAdded;
 
     /**
-     * @param CustomItem             $customItem
-     * @param CustomItem             $parentCustomItem
+     * @param CustomItem             $customItemA
+     * @param CustomItem             $customItemB
      * @param DateTimeInterface|null $dateAdded
+     *
+     * @throws UnexpectedValueException
      */
-    public function __construct(CustomItem $customItem, CustomItem $parentCustomItem, ?DateTimeInterface $dateAdded = null)
+    public function __construct(CustomItem $customItemA, CustomItem $customItemB, ?DateTimeInterface $dateAdded = null)
     {
-        $this->customItem       = $customItem;
-        $this->parentCustomItem = $parentCustomItem;
-        $this->dateAdded        = $dateAdded ?: new DateTimeImmutable('now', new DateTimeZone('UTC'));
+        if ($customItemA->getId() && $customItemA->getId() === $customItemB->getId()) {
+            throw new UnexpectedValueException('It is not possible to link identical custom item.');
+        }
+
+        if ($customItemA->getId() < $customItemB->getId()) {
+            $this->customItemLower  = $customItemA;
+            $this->customItemHigher = $customItemB;
+        } else {
+            $this->customItemLower  = $customItemB;
+            $this->customItemHigher = $customItemA;
+        }
+
+        $this->dateAdded = $dateAdded ?: new DateTimeImmutable('now', new DateTimeZone('UTC'));
     }
 
     /**
@@ -58,15 +79,16 @@ class CustomItemXrefCustomItem
 
         $builder->setTable('custom_item_xref_custom_item');
 
-        $builder->createManyToOne('customItem', CustomItem::class)
-            ->addJoinColumn('custom_item_id', 'id', false, false, 'CASCADE')
-            ->inversedBy('contactReferences')
+        $builder->createManyToOne('customItemLower', CustomItem::class)
+            ->addJoinColumn('custom_item_id_lower', 'id', false, false, 'CASCADE')
+            ->inversedBy('customItemReferences')
             ->makePrimaryKey()
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createManyToOne('parentCustomItem', CustomItem::class)
-            ->addJoinColumn('parent_custom_item_id', 'id', false, false, 'CASCADE')
+        $builder->createManyToOne('customItemHigher', CustomItem::class)
+            ->addJoinColumn('custom_item_id_higher', 'id', false, false, 'CASCADE')
+            ->inversedBy('customItemReferences')
             ->makePrimaryKey()
             ->fetchExtraLazy()
             ->build();
@@ -81,15 +103,31 @@ class CustomItemXrefCustomItem
      */
     public function getCustomItem()
     {
-        return $this->customItem;
+        return $this->getCustomItemLower();
     }
 
     /**
      * @return CustomItem
      */
-    public function getParentCustomItem()
+    public function getLinkedEntity()
     {
-        return $this->parentCustomItem;
+        return $this->getCustomItemHigher();
+    }
+
+    /**
+     * @return CustomItem
+     */
+    public function getCustomItemLower()
+    {
+        return $this->customItemLower;
+    }
+
+    /**
+     * @return CustomItem
+     */
+    public function getCustomItemHigher()
+    {
+        return $this->customItemHigher;
     }
 
     /**

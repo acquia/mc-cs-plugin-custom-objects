@@ -19,7 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 return [
     'name'        => 'Custom Objects',
     'description' => 'Adds custom objects and fields features to Mautic',
-    'version'     => '0.0.7',
+    'version'     => '0.0.8',
     'author'      => 'Mautic, Inc.',
 
     'routes' => [
@@ -350,7 +350,6 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\LinkController::class,
                 'arguments' => [
                     'mautic.custom.model.item',
-                    'mautic.custom.model.import.xref.contact',
                     'custom_item.permission.provider',
                     'mautic.core.service.flashbag',
                 ],
@@ -364,7 +363,6 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\UnlinkController::class,
                 'arguments' => [
                     'mautic.custom.model.item',
-                    'mautic.custom.model.import.xref.contact',
                     'custom_item.permission.provider',
                     'mautic.core.service.flashbag',
                 ],
@@ -515,7 +513,6 @@ return [
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.custom.model.item',
-                    'mautic.custom.model.import.xref.contact',
                     'mautic.helper.template.formatter',
                 ],
             ],
@@ -524,7 +521,6 @@ return [
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'translator',
-                    'event_dispatcher',
                 ],
             ],
             'mautic.custom.model.field.option' => [
@@ -594,12 +590,23 @@ return [
                     'custom_object.config.provider',
                 ],
             ],
-            'custom_object.tab.subscriber' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\TabSubscriber::class,
+            'custom_object.contact.tab.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\ContactTabSubscriber::class,
                 'arguments' => [
                     'mautic.custom.model.object',
-                    'mautic.custom.model.item',
+                    'custom_item.repository',
                     'custom_object.config.provider',
+                    'translator',
+                    'custom_item.route.provider',
+                ],
+            ],
+            'custom_object.custom_item.tab.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomItemTabSubscriber::class,
+                'arguments' => [
+                    'mautic.custom.model.object',
+                    'custom_item.repository',
+                    'translator',
+                    'custom_item.route.provider',
                 ],
             ],
             'custom_field.post_load.subscriber' => [
@@ -634,6 +641,12 @@ return [
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.helper.user',
+                ],
+            ],
+            'custom_item.xref_item.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomItemXrefCustomItemSubscriber::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
                 ],
             ],
             'custom_item.import.subscriber' => [
@@ -677,7 +690,7 @@ return [
                     'mautic.custom.model.field',
                     'mautic.custom.model.object',
                     'custom_item.repository',
-                    'mautic.custom.model.import.xref.contact',
+                    'mautic.custom.model.item',
                     'translator',
                     'custom_object.config.provider',
                 ],

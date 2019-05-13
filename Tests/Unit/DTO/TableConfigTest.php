@@ -14,13 +14,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\DTO;
 
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
-use MauticPlugin\CustomObjectsBundle\DTO\TableFilterConfig;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Query\Expr;
 
 class TableConfigTest extends \PHPUnit_Framework_TestCase
 {
@@ -59,79 +52,6 @@ class TableConfigTest extends \PHPUnit_Framework_TestCase
         $tableConfig = $this->initTableConfig(self::LIMIT, 1);
 
         $this->assertSame(0, $tableConfig->getOffset());
-    }
-
-    public function testFilterWorkflow(): void
-    {
-        $tableConfig = $this->initTableConfig(self::LIMIT, 1);
-        $filterA     = new TableFilterConfig(CustomObject::class, 'columnA', 'value A', 'lte');
-        $filterC     = $tableConfig->createFilter(CustomObject::class, 'columnC', 'value C', 'like');
-
-        $tableConfig->addFilterDTO($filterA);
-        $tableConfig->addFilterDTO($filterC);
-        $tableConfig->addFilter(CustomObject::class, 'columnB', 'value B');
-        $tableConfig->addFilterIfNotEmpty(CustomItem::class, 'columnD', 'value D', 'like');
-        $tableConfig->addFilterIfNotEmpty(CustomItem::class, 'columnE', null);
-
-        $filters = $tableConfig->getFilters();
-        $this->assertCount(2, $filters); // 2 entities
-        $this->assertCount(3, $filters[CustomObject::class]); // 3 filters for this entity
-        $this->assertCount(1, $filters[CustomItem::class]); // 1 filter for this entity
-
-        $this->assertSame($filterC, $tableConfig->getFilter(CustomObject::class, 'columnC'));
-        $this->assertTrue($tableConfig->hasFilter(CustomObject::class, 'columnC'));
-        $this->assertFalse($tableConfig->hasFilter(CustomObject::class, 'columnZ'));
-
-        $this->expectException(NotFoundException::class);
-        $this->assertSame($filterC, $tableConfig->getFilter(CustomObject::class, 'columnX'));
-    }
-
-    public function testGetFilterIfEntityNotFound(): void
-    {
-        $tableConfig = $this->initTableConfig();
-        $this->expectException(NotFoundException::class);
-        $this->expectExceptionMessage('No filter for entity MauticPlugin\CustomObjectsBundle\Entity\CustomObject exists');
-        $tableConfig->getFilter(CustomObject::class, 'unicorn');
-    }
-
-    public function testGetFilterIfColumnNotFound(): void
-    {
-        $tableConfig = $this->initTableConfig();
-        $tableConfig->addFilter(CustomObject::class, 'columnB', 'value B');
-        $this->expectException(NotFoundException::class);
-        $this->expectExceptionMessage('Filter for entity MauticPlugin\CustomObjectsBundle\Entity\CustomObject and column blah does not exist');
-        $tableConfig->getFilter(CustomObject::class, 'blah');
-    }
-
-    public function testConfigureSelectQueryBuilder(): void
-    {
-        $queryBuilder  = $this->createMock(QueryBuilder::class);
-        $classMetadata = $this->createMock(ClassMetadata::class);
-        $tableConfig   = $this->initTableConfig();
-
-        $queryBuilder->expects($this->once())
-            ->method('select');
-
-        $configuredBuilder = $tableConfig->configureSelectQueryBuilder($queryBuilder, $classMetadata);
-        $this->assertSame($queryBuilder, $configuredBuilder);
-    }
-
-    public function testConfigureCountQueryBuilder(): void
-    {
-        $queryBuilder  = $this->createMock(QueryBuilder::class);
-        $classMetadata = $this->createMock(ClassMetadata::class);
-        $expr          = $this->createMock(Expr::class);
-        $tableConfig   = $this->initTableConfig();
-
-        $queryBuilder->expects($this->once())
-            ->method('expr')
-            ->willReturn($expr);
-
-        $queryBuilder->expects($this->once())
-            ->method('select');
-
-        $configuredBuilder = $tableConfig->configureCountQueryBuilder($queryBuilder, $classMetadata);
-        $this->assertSame($queryBuilder, $configuredBuilder);
     }
 
     /**

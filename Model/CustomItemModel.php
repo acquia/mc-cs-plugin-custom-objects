@@ -25,14 +25,17 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use Doctrine\ORM\QueryBuilder;
-use Mautic\LeadBundle\Entity\Lead;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
+use UnexpectedValueException;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefInterface;
 
 class CustomItemModel extends FormModel
 {
@@ -79,13 +82,13 @@ class CustomItemModel extends FormModel
         EventDispatcherInterface $dispatcher,
         ValidatorInterface $validator
     ) {
-        $this->entityManager           = $entityManager;
-        $this->customItemRepository    = $customItemRepository;
-        $this->permissionProvider      = $permissionProvider;
-        $this->userHelper              = $userHelper;
-        $this->customFieldValueModel   = $customFieldValueModel;
-        $this->dispatcher              = $dispatcher;
-        $this->validator               = $validator;
+        $this->entityManager         = $entityManager;
+        $this->customItemRepository  = $customItemRepository;
+        $this->permissionProvider    = $permissionProvider;
+        $this->userHelper            = $userHelper;
+        $this->customFieldValueModel = $customFieldValueModel;
+        $this->dispatcher            = $dispatcher;
+        $this->validator             = $validator;
     }
 
     /**
@@ -132,6 +135,54 @@ class CustomItemModel extends FormModel
 
     /**
      * @param CustomItem $customItem
+     * @param string     $entityType
+     * @param int        $entityId
+     *
+     * @return CustomItemXrefInterface
+     *
+     * @throws UnexpectedValueException
+     */
+    public function linkEntity(CustomItem $customItem, string $entityType, int $entityId): CustomItemXrefInterface
+    {
+        $event = new CustomItemXrefEntityDiscoveryEvent($customItem, $entityType, $entityId);
+
+        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY, $event);
+
+        if (!$event->getXrefEntity() instanceof CustomItemXrefInterface) {
+            throw new UnexpectedValueException("Entity {$entityType} was not able to be linked to {$customItem->getName()} ({$customItem->getId()})");
+        }
+
+        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY, new CustomItemXrefEntityEvent($event->getXrefEntity()));
+
+        return $event->getXrefEntity();
+    }
+
+    /**
+     * @param CustomItem $customItem
+     * @param string     $entityType
+     * @param int        $entityId
+     *
+     * @return CustomItemXrefInterface
+     *
+     * @throws UnexpectedValueException
+     */
+    public function unlinkEntity(CustomItem $customItem, string $entityType, int $entityId): CustomItemXrefInterface
+    {
+        $event = new CustomItemXrefEntityDiscoveryEvent($customItem, $entityType, $entityId);
+
+        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY, $event);
+
+        if (!$event->getXrefEntity() instanceof CustomItemXrefInterface) {
+            throw new UnexpectedValueException("Entity {$entityType} was not able to be unlinked from {$customItem->getName()} ({$customItem->getId()})");
+        }
+
+        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_UNLINK_ENTITY, new CustomItemXrefEntityEvent($event->getXrefEntity()));
+
+        return $event->getXrefEntity();
+    }
+
+    /**
+     * @param CustomItem $customItem
      */
     public function delete(CustomItem $customItem): void
     {
@@ -174,9 +225,12 @@ class CustomItemModel extends FormModel
      */
     public function getTableData(TableConfig $tableConfig): array
     {
-        $customObjectFilter = $tableConfig->getFilter(CustomItem::class, 'customObject');
-        $queryBuilder       = $this->customItemRepository->getTableDataQuery($tableConfig);
-        $queryBuilder       = $this->applyOwnerFilter($queryBuilder, $customObjectFilter->getValue());
+        $queryBuilder = $this->createListQueryBuilder($tableConfig);
+
+        $this->dispatcher->dispatch(
+            CustomItemEvents::ON_CUSTOM_ITEM_LIST_QUERY,
+            new CustomItemListQueryEvent($queryBuilder, $tableConfig)
+        );
 
         return $queryBuilder->getQuery()->getResult();
     }
@@ -188,9 +242,13 @@ class CustomItemModel extends FormModel
      */
     public function getCountForTable(TableConfig $tableConfig): int
     {
-        $customObjectFilter = $tableConfig->getFilter(CustomItem::class, 'customObject');
-        $queryBuilder       = $this->customItemRepository->getTableCountQuery($tableConfig);
-        $queryBuilder       = $this->applyOwnerFilter($queryBuilder, $customObjectFilter->getValue());
+        $queryBuilder = $this->createListQueryBuilder($tableConfig);
+        $queryBuilder->select($queryBuilder->expr()->countDistinct(CustomItem::TABLE_ALIAS));
+
+        $this->dispatcher->dispatch(
+            CustomItemEvents::ON_CUSTOM_ITEM_LIST_QUERY,
+            new CustomItemListQueryEvent($queryBuilder, $tableConfig)
+        );
 
         return (int) $queryBuilder->getQuery()->getSingleScalarResult();
     }
@@ -202,23 +260,26 @@ class CustomItemModel extends FormModel
      */
     public function getLookupData(TableConfig $tableConfig): array
     {
-        $customObjectFilter = $tableConfig->getFilter(CustomItem::class, 'customObject');
-        $queryBuilder       = $this->customItemRepository->getTableDataQuery($tableConfig);
-        $queryBuilder       = $this->applyOwnerFilter($queryBuilder, $customObjectFilter->getValue());
-        $rootAlias          = $queryBuilder->getRootAliases()[0];
+        $queryBuilder = $this->createListQueryBuilder($tableConfig);
+        $rootAlias    = CustomItem::TABLE_ALIAS;
         $queryBuilder->select("{$rootAlias}.name as value, {$rootAlias}.id");
 
-        $rows       = $queryBuilder->getQuery()->getArrayResult();
-        $lookupData = [];
+        $this->dispatcher->dispatch(
+            CustomItemEvents::ON_CUSTOM_ITEM_LOOKUP_QUERY,
+            new CustomItemListQueryEvent($queryBuilder, $tableConfig)
+        );
+
+        $rows = $queryBuilder->getQuery()->getArrayResult();
+        $data = [];
 
         foreach ($rows as $row) {
-            $lookupData[] = [
+            $data[] = [
                 'id'    => $row['id'],
                 'value' => "{$row['value']} ({$row['id']})",
             ];
         }
 
-        return $lookupData;
+        return $data;
     }
 
     /**
@@ -251,17 +312,6 @@ class CustomItemModel extends FormModel
     }
 
     /**
-     * @param Lead         $contact
-     * @param CustomObject $customObject
-     *
-     * @return int
-     */
-    public function countItemsLinkedToContact(CustomObject $customObject, Lead $contact): int
-    {
-        return $this->customItemRepository->countItemsLinkedToContact($customObject, $contact);
-    }
-
-    /**
      * Used only by Mautic's generic methods. Use CustomItemPermissionProvider instead.
      *
      * 'custom_objects:custom_objects' is used as custom item permissions are dynamic
@@ -272,6 +322,33 @@ class CustomItemModel extends FormModel
     public function getPermissionBase(): string
     {
         return 'custom_objects:custom_objects';
+    }
+
+    /**
+     * @param TableConfig $tableConfig
+     *
+     * @return QueryBuilder
+     */
+    private function createListQueryBuilder(TableConfig $tableConfig): QueryBuilder
+    {
+        $customObjectId = $tableConfig->getParameter('customObjectId');
+        $queryBuilder   = $this->entityManager->createQueryBuilder();
+        $queryBuilder->select(CustomItem::TABLE_ALIAS);
+        $queryBuilder->from(CustomItem::class, CustomItem::TABLE_ALIAS);
+        $queryBuilder->setMaxResults($tableConfig->getLimit());
+        $queryBuilder->setFirstResult($tableConfig->getOffset());
+        $queryBuilder->orderBy($tableConfig->getOrderBy(), $tableConfig->getOrderDirection());
+        $queryBuilder->where(CustomItem::TABLE_ALIAS.'.customObject = :customObjectId');
+        $queryBuilder->setParameter('customObjectId', $customObjectId);
+
+        $search = $tableConfig->getParameter('search');
+
+        if ($search) {
+            $queryBuilder->andWhere(CustomItem::TABLE_ALIAS.'.name LIKE :search');
+            $queryBuilder->setParameter('search', "%{$search}%");
+        }
+
+        return $this->applyOwnerFilter($queryBuilder, $customObjectId);
     }
 
     /**
@@ -286,7 +363,7 @@ class CustomItemModel extends FormModel
         try {
             $this->permissionProvider->isGranted('viewother', $customObjectId);
         } catch (ForbiddenException $e) {
-            $this->customItemRepository->applyOwnerId($queryBuilder, $this->userHelper->getUser()->getId());
+            $queryBuilder->andWhere(CustomItem::TABLE_ALIAS.'.createdBy', $this->userHelper->getUser()->getId());
         }
 
         return $queryBuilder;

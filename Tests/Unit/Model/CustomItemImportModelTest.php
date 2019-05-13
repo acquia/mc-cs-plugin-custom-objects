@@ -19,7 +19,6 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemImportModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Mautic\LeadBundle\Entity\Import;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextareaType;
@@ -53,15 +52,16 @@ class CustomItemImportModelTest extends \PHPUnit_Framework_TestCase
 
     private $customItemModel;
 
-    private $customItemXrefContactModel;
-
     private $formatterHelper;
-
-    private $customItemImportModel;
 
     private $descriptionField;
 
     private $dateField;
+
+    /**
+     * @var CustomItemImportModel
+     */
+    private $customItemImportModel;
 
     protected function setUp(): void
     {
@@ -73,12 +73,10 @@ class CustomItemImportModelTest extends \PHPUnit_Framework_TestCase
         $this->import                     = $this->createMock(Import::class);
         $this->customItemModel            = $this->createMock(CustomItemModel::class);
         $this->entityManager              = $this->createMock(EntityManager::class);
-        $this->customItemXrefContactModel = $this->createMock(CustomItemXrefContactModel::class);
         $this->formatterHelper            = $this->createMock(FormatterHelper::class);
         $this->customItemImportModel      = new CustomItemImportModel(
             $this->entityManager,
             $this->customItemModel,
-            $this->customItemXrefContactModel,
             $this->formatterHelper
         );
 
@@ -107,11 +105,6 @@ class CustomItemImportModelTest extends \PHPUnit_Framework_TestCase
             ->willReturn([$this->descriptionField, $this->dateField]);
 
         $customItem = $this->createMock(CustomItem::class);
-
-        // Simulate save.
-        $customItem->expects($this->exactly(3))
-            ->method('getId')
-            ->willReturn(1234);
 
         $this->customItemModel->expects($this->once())
             ->method('save')
@@ -171,7 +164,7 @@ class CustomItemImportModelTest extends \PHPUnit_Framework_TestCase
             ->method('findCustomFieldValueForFieldId')
             ->willReturn($this->createMock(CustomFieldValueInterface::class));
 
-        $customItem->expects($this->exactly(4))
+        $customItem->expects($this->once())
             ->method('getId')
             ->willReturn(555);
 
@@ -199,12 +192,12 @@ class CustomItemImportModelTest extends \PHPUnit_Framework_TestCase
             ->with('3262739,3262738,3262737')
             ->willReturn([3262739, 3262738, 3262737]);
 
-        $this->customItemXrefContactModel->expects($this->exactly(3))
-            ->method('linkContact')
+        $this->customItemModel->expects($this->exactly(3))
+            ->method('linkEntity')
             ->withConsecutive(
-                [555, 3262739],
-                [555, 3262738],
-                [555, 3262737]
+                [$customItem, 'contact', 3262739],
+                [$customItem, 'contact', 3262738],
+                [$customItem, 'contact', 3262737]
             );
 
         $this->customItemModel->expects($this->once())
@@ -221,6 +214,7 @@ class CustomItemImportModelTest extends \PHPUnit_Framework_TestCase
         $rowData            = self::ROW_DATA;
         $mappedFields['id'] = 'customItemId';
         $rowData['id']      = '555';
+        $customItem         = $this->createMock(CustomItem::class);
 
         $this->import->expects($this->exactly(2))
             ->method('getMatchedFields')
@@ -240,20 +234,13 @@ class CustomItemImportModelTest extends \PHPUnit_Framework_TestCase
             ->with('3262739,3262738,3262737')
             ->willReturn([3262739, 3262738, 3262737]);
 
-        $this->customItemXrefContactModel->expects($this->exactly(3))
-            ->method('linkContact')
+        $this->customItemModel->expects($this->exactly(3))
+            ->method('linkEntity')
             ->withConsecutive(
-                [1234, 3262739],
-                [1234, 3262738],
-                [1234, 3262737]
+                [$customItem, 'contact', 3262739],
+                [$customItem, 'contact', 3262738],
+                [$customItem, 'contact', 3262737]
             );
-
-        $customItem = $this->createMock(CustomItem::class);
-
-        // Simulate save.
-        $customItem->expects($this->exactly(3))
-            ->method('getId')
-            ->willReturn(1234);
 
         $this->customItemModel->expects($this->once())
             ->method('save')

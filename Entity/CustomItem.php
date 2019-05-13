@@ -28,6 +28,9 @@ use Mautic\CoreBundle\Helper\ArrayHelper;
 
 class CustomItem extends FormEntity implements UniqueEntityInterface
 {
+    public const TABLE_NAME  = 'custom_item';
+    public const TABLE_ALIAS = 'CustomItem';
+
     /**
      * @var int|null
      */
@@ -74,14 +77,20 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     private $companyReferences;
 
     /**
+     * @var ArrayCollection
+     */
+    private $customItemReferences;
+
+    /**
      * @param CustomObject $customObject
      */
     public function __construct(CustomObject $customObject)
     {
-        $this->customObject      = $customObject;
-        $this->customFieldValues = new ArrayCollection();
-        $this->contactReferences = new ArrayCollection();
-        $this->companyReferences = new ArrayCollection();
+        $this->customObject         = $customObject;
+        $this->customFieldValues    = new ArrayCollection();
+        $this->contactReferences    = new ArrayCollection();
+        $this->companyReferences    = new ArrayCollection();
+        $this->customItemReferences = new ArrayCollection();
     }
 
     public function __clone()
@@ -96,7 +105,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('custom_item')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(CustomItemRepository::class);
 
         $builder->createManyToOne('customObject', CustomObject::class)
@@ -112,6 +121,13 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
 
         $builder->createOneToMany('companyReferences', CustomItemXrefCompany::class)
             ->addJoinColumn('id', 'custom_item_id', false, false, 'CASCADE')
+            ->mappedBy('customItem')
+            ->fetchExtraLazy()
+            ->build();
+
+        $builder->createOneToMany('customItemReferences', CustomItemXrefCustomItem::class)
+            ->addJoinColumn('id', 'custom_item_id_lower', false, false, 'CASCADE')
+            ->addJoinColumn('id', 'custom_item_id_higher', false, false, 'CASCADE')
             ->mappedBy('customItem')
             ->fetchExtraLazy()
             ->build();
@@ -211,14 +227,6 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param ArrayCollection $customFieldValues
-     */
-    public function setCustomFieldValues($customFieldValues)
-    {
-        $this->customFieldValues = $customFieldValues;
-    }
-
-    /**
      * Called when the custom field values are loaded from the database.
      */
     public function createFieldValuesSnapshot()
@@ -275,7 +283,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param CustomItemXrefContact $reference
+     * @param CustomItemXrefInterface $reference
      */
     public function addContactReference($reference)
     {
@@ -291,7 +299,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param CustomItemXrefCompany $reference
+     * @param CustomItemXrefInterface $reference
      */
     public function addCompanyReference($reference)
     {
@@ -304,5 +312,21 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     public function getCompanyReferences()
     {
         return $this->companyReferences;
+    }
+
+    /**
+     * @param CustomItemXrefInterface $reference
+     */
+    public function addCustomItemReference($reference)
+    {
+        $this->customItemReferences->add($reference);
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getCustomItemReferences()
+    {
+        return $this->customItemReferences;
     }
 }

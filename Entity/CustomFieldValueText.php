@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class CustomFieldValueText extends CustomFieldValueStandard
+class CustomFieldValueText extends AbstractCustomFieldValue
 {
     /**
      * @var string|null

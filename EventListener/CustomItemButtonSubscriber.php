@@ -73,14 +73,15 @@ class CustomItemButtonSubscriber extends CommonSubscriber
         switch ($event->getRoute()) {
             case CustomItemRouteProvider::ROUTE_LIST:
                 try {
-                    $customObjectId      = $this->getCustomObjectIdFromEvent($event);
-                    $contactId           = $event->getRequest()->query->get('contactId', false);
-                    $onContactDetailPage = (bool) $contactId;
-                    if ($onContactDetailPage) {
+                    $customObjectId   = $this->getCustomObjectIdFromEvent($event);
+                    $filterEntityId   = $event->getRequest()->query->get('filterEntityId', false);
+                    $filterEntityType = $event->getRequest()->query->get('filterEntityType', false);
+                    $loadedInTab      = (bool) $filterEntityId;
+                    if ($loadedInTab && in_array($filterEntityType, ['contact', 'customItem'], true)) {
                         $customItem = $event->getItem();
                         if ($customItem && $customItem instanceof CustomItem) {
                             $event->addButton(
-                                $this->defineUnlinkContactButton($customObjectId, $customItem->getId(), (int) $contactId),
+                                $this->defineUnlinkButton($customObjectId, $customItem->getId(), $filterEntityType, (int) $filterEntityId),
                                 ButtonHelper::LOCATION_LIST_ACTIONS,
                                 $event->getRoute()
                             );
@@ -257,23 +258,24 @@ class CustomItemButtonSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param int $customObjectId
-     * @param int $customItemId
-     * @param int $contactId
+     * @param int    $customObjectId
+     * @param int    $customItemId
+     * @param string $entityType
+     * @param int    $entityId
      *
      * @return mixed[]
      *
      * @throws ForbiddenException
      */
-    private function defineUnlinkContactButton(int $customObjectId, int $customItemId, int $contactId): array
+    private function defineUnlinkButton(int $customObjectId, int $customItemId, string $entityType, int $entityId): array
     {
         $this->permissionProvider->canCreate($customObjectId);
 
         return [
             'attr' => [
                 'href'        => '#',
-                'onclick'     => "CustomObjects.unlinkFromContact(this, event, ${customObjectId}, ${contactId});",
-                'data-action' => $this->routeProvider->buildUnlinkContactRoute($customItemId, $contactId),
+                'onclick'     => "CustomObjects.unlinkCustomItemFromEntity(this, event, ${customObjectId}, '${entityType}', ${entityId}, 'custom-object-${customObjectId}');",
+                'data-action' => $this->routeProvider->buildUnlinkRoute($customItemId, $entityType, $entityId),
                 'data-toggle' => '',
             ],
             'btnText'   => $this->translator->trans('custom.item.unlink'),

@@ -20,9 +20,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Mautic\CoreBundle\Helper\InputHelper;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Controller\JsonController;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Mautic\CoreBundle\Service\FlashBag;
 
@@ -78,22 +76,18 @@ class LookupController extends JsonController
         } catch (ForbiddenException $e) {
             $this->flashBag->add($e->getMessage(), [], FlashBag::LEVEL_ERROR);
 
-            return $this->renderJson([]);
+            return $this->renderJson();
         }
 
-        $request     = $this->requestStack->getCurrentRequest();
-        $nameFilter  = InputHelper::clean($request->get('filter'));
-        $contactId   = (int) InputHelper::clean($request->get('contactId'));
-        $tableConfig = new TableConfig(10, 1, CustomItemRepository::TABLE_ALIAS.'.name', 'ASC');
-        $tableConfig->addFilter(CustomItem::class, 'customObject', $objectId);
-        $tableConfig->addFilterIfNotEmpty(CustomItem::class, 'name', "%{$nameFilter}%", 'like');
-
-        if ($contactId) {
-            $notContact = $tableConfig->createFilter(CustomItemXrefContact::class, 'contact', $contactId, 'neq');
-            $isNull     = $tableConfig->createFilter(CustomItemXrefContact::class, 'contact', null, 'isNull');
-            $orX        = $tableConfig->createFilter(CustomItemXrefContact::class, 'contact', [$notContact, $isNull], 'orX');
-            $tableConfig->addFilterDTO($orX);
-        }
+        $request          = $this->requestStack->getCurrentRequest();
+        $search           = InputHelper::clean($request->get('filter'));
+        $filterEntityId   = (int) $request->get('filterEntityId');
+        $filterEntityType = InputHelper::clean($request->get('filterEntityType'));
+        $tableConfig      = new TableConfig(10, 1, CustomItem::TABLE_ALIAS.'.name', 'ASC');
+        $tableConfig->addParameter('search', $search);
+        $tableConfig->addParameter('customObjectId', $objectId);
+        $tableConfig->addParameter('filterEntityType', $filterEntityType);
+        $tableConfig->addParameter('filterEntityId', $filterEntityId);
 
         return $this->renderJson(['items' => $this->customItemModel->getLookupData($tableConfig)]);
     }

@@ -10,7 +10,7 @@
 */
 
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 
 if ('index' === $tmpl) {
     $view->extend('CustomObjectsBundle:CustomItem:index.html.php');
@@ -19,9 +19,10 @@ if ('index' === $tmpl) {
 $routeSelf = $view['router']->path(
     CustomItemRouteProvider::ROUTE_LIST,
     [
-        'objectId'  => $customObject->getId(),
-        'contactId' => $contactId,
-        'tmpl'      => 'list',
+        'objectId'         => $customObject->getId(),
+        'filterEntityId'   => $filterEntityId,
+        'filterEntityType' => $filterEntityType,
+        'tmpl'             => 'list',
     ]
 );
 ?>
@@ -46,7 +47,7 @@ $routeSelf = $view['router']->path(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
                         'sessionVar' => 'custom.item',
-                        'orderBy'    => CustomItemRepository::TABLE_ALIAS.'.name',
+                        'orderBy'    => CustomItem::TABLE_ALIAS.'.name',
                         'text'       => 'mautic.core.name',
                         'class'      => 'col-custom_item_name',
                         'baseUrl'    => $routeSelf,
@@ -57,7 +58,7 @@ $routeSelf = $view['router']->path(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
                         'sessionVar' => 'custom.item',
-                        'orderBy'    => CustomItemRepository::TABLE_ALIAS.'.id',
+                        'orderBy'    => CustomItem::TABLE_ALIAS.'.id',
                         'text'       => 'mautic.core.id',
                         'class'      => 'visible-md visible-lg col-asset-id',
                         'default'    => true,
@@ -75,7 +76,7 @@ $routeSelf = $view['router']->path(
                     </td>
                     <td>
                         <div>
-                            <?php echo empty($contactId) ? $view->render(
+                            <?php echo empty($filterEntityId) ? $view->render(
                                 'MauticCoreBundle:Helper:publishstatus_icon.html.php',
                                 [
                                     'item'  => $item,
@@ -101,7 +102,7 @@ $routeSelf = $view['router']->path(
                 'page'        => $page,
                 'limit'       => $limit,
                 'baseUrl'     => $routeSelf = $view['router']->path(CustomItemRouteProvider::ROUTE_LIST, ['objectId'  => $customObject->getId()]),
-                'queryString' => "&contactId={$contactId}",
+                'queryString' => "&filterEntityId={$filterEntityId}&filterEntityType={$filterEntityType}",
                 'sessionVar'  => 'custom.item',
                 'routeBase'   => CustomItemRouteProvider::ROUTE_LIST,
             ]

@@ -21,7 +21,7 @@ use DateTimeInterface;
 use DateTimeImmutable;
 use DateTimeZone;
 
-class CustomItemXrefContact
+class CustomItemXrefContact implements CustomItemXrefInterface
 {
     /**
      * @var Lead
@@ -91,6 +91,14 @@ class CustomItemXrefContact
     public function getContact()
     {
         return $this->contact;
+    }
+
+    /**
+     * @return Lead
+     */
+    public function getLinkedEntity()
+    {
+        return $this->getContact();
     }
 
     /**

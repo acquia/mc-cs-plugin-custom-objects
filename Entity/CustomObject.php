@@ -27,6 +27,9 @@ use Mautic\CoreBundle\Helper\ArrayHelper;
 
 class CustomObject extends FormEntity implements UniqueEntityInterface
 {
+    const TABLE_NAME  = 'custom_object';
+    const TABLE_ALIAS = 'CustomObject';
+
     /**
      * @var int|null
      */
@@ -85,7 +88,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('custom_object')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(CustomObjectRepository::class);
 
         $builder->createOneToMany('customFields', CustomField::class)

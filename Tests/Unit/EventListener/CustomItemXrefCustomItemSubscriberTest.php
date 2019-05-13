@@ -13,15 +13,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
-use MauticPlugin\CustomObjectsBundle\EventListener\CustomItemXrefContactSubscriber;
+use MauticPlugin\CustomObjectsBundle\EventListener\CustomItemXrefCustomItemSubscriber;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
 use Doctrine\ORM\EntityManager;
-use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\UserBundle\Entity\User;
-use Mautic\LeadBundle\Entity\LeadEventLog;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use Doctrine\ORM\QueryBuilder;
@@ -29,24 +24,20 @@ use Doctrine\ORM\Query\Expr;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\NoResultException;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
+use Doctrine\ORM\Query\Expr\Join;
 
-class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
+class CustomItemXrefCustomItemSubscriberTest extends \PHPUnit_Framework_TestCase
 {
-    private const ITEM_ID = 90;
+    private const ITEM_A_ID = 90;
 
-    private const ENTITY_ID = 123;
-
-    private const USER_ID = 4;
-
-    private const USER_NAME = 'Joe';
-
-    private $userHelper;
-
-    private $user;
+    private const ITEM_B_ID = 123;
 
     private $entityManager;
 
     private $queryBuilder;
+
+    private $expr;
 
     private $query;
 
@@ -56,14 +47,14 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
 
     private $discoveryEvent;
 
-    private $contact;
+    private $customItemA;
 
-    private $customItem;
+    private $customItemB;
 
     private $xref;
 
     /**
-     * @var CustomItemXrefContactSubscriber
+     * @var CustomItemXrefCustomItemSubscriber
      */
     private $xrefSubscriber;
 
@@ -74,27 +65,24 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->entityManager  = $this->createMock(EntityManager::class);
         $this->queryBuilder   = $this->createMock(QueryBuilder::class);
         $this->query          = $this->createMock(AbstractQuery::class);
-        $this->userHelper     = $this->createMock(UserHelper::class);
-        $this->user           = $this->createMock(User::class);
+        $this->expr           = $this->createMock(Expr::class);
         $this->event          = $this->createMock(CustomItemXrefEntityEvent::class);
         $this->listEvent      = $this->createMock(CustomItemListQueryEvent::class);
         $this->discoveryEvent = $this->createMock(CustomItemXrefEntityDiscoveryEvent::class);
-        $this->contact        = $this->createMock(Lead::class);
-        $this->customItem     = $this->createMock(CustomItem::class);
-        $this->xref           = $this->createMock(CustomItemXrefContact::class);
-        $this->xrefSubscriber = new CustomItemXrefContactSubscriber(
-            $this->entityManager,
-            $this->userHelper
+        $this->customItemA    = $this->createMock(CustomItem::class);
+        $this->customItemB    = $this->createMock(CustomItem::class);
+        $this->xref           = $this->createMock(CustomItemXrefCustomItem::class);
+        $this->xrefSubscriber = new CustomItemXrefCustomItemSubscriber(
+            $this->entityManager
         );
 
         $this->event->method('getXref')->willReturn($this->xref);
-        $this->xref->method('getContact')->willReturn($this->contact);
-        $this->xref->method('getCustomItem')->willReturn($this->customItem);
-        $this->customItem->method('getId')->willReturn(self::ITEM_ID);
-        $this->userHelper->method('getUser')->willReturn($this->user);
-        $this->user->method('getId')->willReturn(self::USER_ID);
-        $this->user->method('getName')->willReturn(self::USER_NAME);
+        $this->xref->method('getCustomItemLower')->willReturn($this->customItemA);
+        $this->xref->method('getCustomItemHigher')->willReturn($this->customItemB);
+        $this->customItemA->method('getId')->willReturn(self::ITEM_A_ID);
+        $this->customItemB->method('getId')->willReturn(self::ITEM_B_ID);
         $this->entityManager->method('createQueryBuilder')->willReturn($this->queryBuilder);
+        $this->queryBuilder->method('expr')->willReturn($this->expr);
     }
 
     public function testOnListQueryWhenNoEntity(): void
@@ -115,8 +103,8 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
     public function testOnListQuery(): void
     {
         $tableConfig = new TableConfig(10, 1, 'id');
-        $tableConfig->addParameter('filterEntityType', 'contact');
-        $tableConfig->addParameter('filterEntityId', self::ENTITY_ID);
+        $tableConfig->addParameter('filterEntityType', 'customItem');
+        $tableConfig->addParameter('filterEntityId', self::ITEM_B_ID);
 
         $this->listEvent->expects($this->once())
             ->method('getTableConfig')
@@ -128,15 +116,32 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->queryBuilder->expects($this->once())
             ->method('leftJoin')
-            ->with('CustomItem.contactReferences', 'CustomItemXrefContact');
+            ->with(
+                CustomItemXrefCustomItem::class,
+                'CustomItemXrefCustomItem',
+                Join::WITH,
+                'CustomItem.id = CustomItemXrefCustomItem.customItemLower OR CustomItem.id = CustomItemXrefCustomItem.customItemHigher'
+            );
 
-        $this->queryBuilder->expects($this->once())
+        $this->queryBuilder->expects($this->exactly(2))
             ->method('andWhere')
-            ->with('CustomItemXrefContact.contact = :contactId');
+            ->withConsecutive(
+                ['CustomItem.id != :customItemId'],
+                [null] // Whatever Expr returns, don't care really.
+            );
+
+        $this->expr->expects($this->once())->method('orX');
+
+        $this->expr->expects($this->exactly(2))
+            ->method('eq')
+            ->withConsecutive(
+                ['CustomItemXrefCustomItem.customItemLower', ':customItemId'],
+                ['CustomItemXrefCustomItem.customItemHigher', ':customItemId']
+            );
 
         $this->queryBuilder->expects($this->once())
             ->method('setParameter')
-            ->with('contactId', self::ENTITY_ID);
+            ->with('customItemId', self::ITEM_B_ID);
 
         $this->xrefSubscriber->onListQuery($this->listEvent);
     }
@@ -158,10 +163,9 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testOnLookupQuery(): void
     {
-        $expr        = $this->createMock(Expr::class);
         $tableConfig = new TableConfig(10, 1, 'id');
-        $tableConfig->addParameter('filterEntityType', 'contact');
-        $tableConfig->addParameter('filterEntityId', self::ENTITY_ID);
+        $tableConfig->addParameter('filterEntityType', 'customItem');
+        $tableConfig->addParameter('filterEntityId', self::ITEM_B_ID);
 
         $this->listEvent->expects($this->once())
             ->method('getTableConfig')
@@ -173,21 +177,39 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->queryBuilder->expects($this->once())
             ->method('leftJoin')
-            ->with('CustomItem.contactReferences', 'CustomItemXrefContact');
+            ->with(
+                CustomItemXrefCustomItem::class,
+                'CustomItemXrefCustomItem',
+                Join::WITH,
+                'CustomItem.id = CustomItemXrefCustomItem.customItemLower OR CustomItem.id = CustomItemXrefCustomItem.customItemHigher'
+            );
 
-        $this->queryBuilder->expects($this->once())->method('andWhere');
+        $this->queryBuilder->expects($this->exactly(2))
+            ->method('andWhere')
+            ->withConsecutive(
+                ['CustomItem.id != :customItemId'],
+                [null] // Whatever Expr returns, don't care really.
+            );
 
-        $this->queryBuilder->method('expr')->willReturn($expr);
+        $this->expr->expects($this->once())->method('orX');
 
-        $expr->expects($this->once())->method('orX');
-
-        $expr->expects($this->once())
+        $this->expr->expects($this->exactly(2))
             ->method('neq')
-            ->with('CustomItemXrefContact.contact', self::ENTITY_ID);
+            ->withConsecutive(
+                ['CustomItemXrefCustomItem.customItemLower', ':customItemId'],
+                ['CustomItemXrefCustomItem.customItemHigher', ':customItemId']
+            );
 
-        $expr->expects($this->once())
+        $this->expr->expects($this->exactly(2))
             ->method('isNull')
-            ->with('CustomItemXrefContact.contact');
+            ->withConsecutive(
+                ['CustomItemXrefCustomItem.customItemLower'],
+                ['CustomItemXrefCustomItem.customItemHigher']
+            );
+
+        $this->queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('customItemId', self::ITEM_B_ID);
 
         $this->xrefSubscriber->onLookupQuery($this->listEvent);
     }
@@ -208,21 +230,21 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         $this->discoveryEvent->expects($this->once())
             ->method('getEntityType')
-            ->willReturn('contact');
+            ->willReturn('customItem');
 
         $this->discoveryEvent->expects($this->once())
             ->method('getEntityId')
-            ->willReturn(self::ENTITY_ID);
+            ->willReturn(self::ITEM_B_ID);
 
         $this->discoveryEvent->expects($this->once())
             ->method('getCustomItem')
-            ->willReturn($this->customItem);
+            ->willReturn($this->customItemA);
 
-        $this->customItem->expects($this->once())
+        $this->customItemA->expects($this->once())
             ->method('getId')
-            ->willReturn(self::ITEM_ID);
+            ->willReturn(self::ITEM_A_ID);
 
-        $this->assertGetContactXrefEntity();
+        $this->assertGetXrefEntity();
 
         $this->discoveryEvent->expects($this->once())
             ->method('stopPropagation');
@@ -236,23 +258,21 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testOnEntityLinkDiscoveryWhenXrefNotFound(): void
     {
-        $contact = new Lead();
-
         $this->discoveryEvent->expects($this->once())
             ->method('getEntityType')
-            ->willReturn('contact');
+            ->willReturn('customItem');
 
         $this->discoveryEvent->expects($this->exactly(2))
             ->method('getEntityId')
-            ->willReturn(self::ENTITY_ID);
+            ->willReturn(self::ITEM_B_ID);
 
         $this->discoveryEvent->expects($this->exactly(2))
             ->method('getCustomItem')
-            ->willReturn($this->customItem);
+            ->willReturn($this->customItemA);
 
-        $this->customItem->expects($this->once())
+        $this->customItemA->expects($this->any())
             ->method('getId')
-            ->willReturn(self::ITEM_ID);
+            ->willReturn(self::ITEM_A_ID);
 
         $this->queryBuilder->expects($this->once())
             ->method('getQuery')
@@ -264,18 +284,18 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->entityManager->expects($this->once())
             ->method('getReference')
-            ->with(Lead::class, self::ENTITY_ID)
-            ->willReturn($contact);
+            ->with(CustomItem::class, self::ITEM_B_ID)
+            ->willReturn($this->customItemB);
 
         $this->discoveryEvent->expects($this->once())
             ->method('stopPropagation');
 
         $this->discoveryEvent->expects($this->once())
             ->method('setXrefEntity')
-            ->with($this->callback(function (CustomItemXrefContact $xref) use ($contact) {
+            ->with($this->callback(function (CustomItemXrefCustomItem $xref) {
                 // newly created Xref entity.
-                $this->assertSame($this->customItem, $xref->getCustomItem());
-                $this->assertSame($contact, $xref->getContact());
+                $this->assertSame($this->customItemA, $xref->getCustomItemLower());
+                $this->assertSame($this->customItemB, $xref->getCustomItemHigher());
 
                 return true;
             }));
@@ -304,16 +324,11 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->xrefSubscriber->saveLink($this->event);
     }
 
-    public function testCreateNewEventLogForLinkedContact(): void
+    public function testCreateNewEvenLogForLinkedCustomItem(): void
     {
-        $this->entityManager->expects($this->once())
-            ->method('persist')
-            ->with($this->callback($this->makePersistCallback('link')));
+        // @todo once the method is implemented.
 
-        $this->entityManager->expects($this->once())
-            ->method('flush');
-
-        $this->xrefSubscriber->createNewEventLogForLinkedContact($this->event);
+        $this->xrefSubscriber->createNewEvenLogForLinkedCustomItem($this->event);
     }
 
     public function testDeleteLink(): void
@@ -337,64 +352,39 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->xrefSubscriber->deleteLink($this->event);
     }
 
-    public function testCreateNewEventLogForUnlinkedContact(): void
+    public function testCreateNewEvenLogForUnlinkedCustomItem(): void
     {
-        $this->entityManager->expects($this->once())
-            ->method('persist')
-            ->with($this->callback($this->makePersistCallback('unlink')));
+        // @todo once the method is implemented.
 
-        $this->entityManager->expects($this->once())
-            ->method('flush');
-
-        $this->xrefSubscriber->createNewEventLogForUnlinkedContact($this->event);
+        $this->xrefSubscriber->createNewEvenLogForUnlinkedCustomItem($this->event);
     }
 
     /**
-     * @param string $action
-     *
-     * @return callable
+     * Tests CustomItemXrefContactSubscriber::getXrefEntity.
      */
-    private function makePersistCallback(string $action): callable
-    {
-        return function (LeadEventLog $eventLog) use ($action) {
-            $this->assertSame(self::USER_ID, $eventLog->getUserId());
-            $this->assertSame(self::USER_NAME, $eventLog->getUserName());
-            $this->assertSame('CustomObject', $eventLog->getBundle());
-            $this->assertSame('CustomItem', $eventLog->getObject());
-            $this->assertSame(self::ITEM_ID, $eventLog->getObjectId());
-            $this->assertSame($action, $eventLog->getAction());
-            $this->assertSame($this->contact, $eventLog->getLead());
-
-            return true;
-        };
-    }
-
-    /**
-     * Tests CustomItemXrefContactSubscriber::getContactXrefEntity.
-     */
-    private function assertGetContactXrefEntity(): void
+    private function assertGetXrefEntity(): void
     {
         $this->queryBuilder->expects($this->once())
             ->method('select')
-            ->with('cixcont');
+            ->with('cixci');
 
         $this->queryBuilder->expects($this->once())
             ->method('from')
-            ->with(CustomItemXrefContact::class, 'cixcont');
+            ->with(CustomItemXrefCustomItem::class, 'cixci');
 
         $this->queryBuilder->expects($this->once())
             ->method('where')
-            ->with('cixcont.customItem = :customItemId');
+            ->with('cixci.customItemLower = :customItemLower');
 
         $this->queryBuilder->expects($this->once())
             ->method('andWhere')
-            ->with('cixcont.contact = :contactId');
+            ->with('cixci.customItemHigher = :customItemHigher');
 
         $this->queryBuilder->expects($this->exactly(2))
             ->method('setParameter')
             ->withConsecutive(
-                ['customItemId', self::ITEM_ID, null],
-                ['contactId', self::ENTITY_ID, null]
+                ['customItemLower', self::ITEM_A_ID, null],
+                ['customItemHigher', self::ITEM_B_ID, null]
             );
 
         $this->queryBuilder->expects($this->once())
