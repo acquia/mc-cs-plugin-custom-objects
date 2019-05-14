@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Segment\Query\Filter;
 
+use Doctrine\DBAL\DBALException;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -93,7 +94,7 @@ class CustomItemFilterQueryBuilder extends BaseFilterQueryBuilder
      * @return QueryBuilder
      *
      * @throws InvalidArgumentException
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     public function applyQueryOrig(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {

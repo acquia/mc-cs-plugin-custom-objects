@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Segment\Query\Filter;
 
+use Doctrine\DBAL\DBALException;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 
 class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
@@ -48,13 +50,13 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
      *
      * @return QueryBuilder
      *
-     * @throws \Doctrine\DBAL\DBALException
-     * @throws \MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException
+     * @throws DBALException
+     * @throws InvalidArgumentException
      */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
-        $filterOperator   = $filter->getOperator();
-        $filterFieldId    = $filter->getField();
+        $filterOperator = $filter->getOperator();
+        $filterFieldId  = $filter->getField();
 
         $tableAlias = 'cfwq_'.(int) $filter->getField();
 
