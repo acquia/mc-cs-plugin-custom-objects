@@ -18,41 +18,40 @@ use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemFilterQueryBuilder;
 use Monolog\Logger;
-use PHPUnit_Framework_MockObject_MockObject;
 use PHPUnit_Framework_MockObject_Stub_ConsecutiveCalls;
 use PHPUnit_Framework_TestCase;
 use UnexpectedValueException;
 
 class DynamicContentSubscriberTest extends PHPUnit_Framework_TestCase
 {
-    /** @var ConfigProvider|PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
     private $configProviderMock;
 
-    /** @var ContactSegmentFilterFactory|PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContactSegmentFilterFactory|\PHPUnit_Framework_MockObject_MockObject */
     private $segmentFilterFactoryMock;
 
-    /** @var QueryFilterHelper|PHPUnit_Framework_MockObject_MockObject */
+    /** @var QueryFilterHelper|\PHPUnit_Framework_MockObject_MockObject */
     private $queryFilterHelperMock;
 
-    /** @var EntityManager|PHPUnit_Framework_MockObject_MockObject */
+    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
     private $entityManagerMock;
 
-    /** @var ContactFiltersEvaluateEvent|PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContactFiltersEvaluateEvent|\PHPUnit_Framework_MockObject_MockObject */
     private $evaluateEvent;
 
-    /** @var Lead|PHPUnit_Framework_MockObject_MockObject */
+    /** @var Lead|\PHPUnit_Framework_MockObject_MockObject */
     private $leadMock;
 
-    /** @var Logger|PHPUnit_Framework_MockObject_MockObject */
+    /** @var Logger|\PHPUnit_Framework_MockObject_MockObject */
     private $loggerMock;
 
-    /** @var QueryBuilder|PHPUnit_Framework_MockObject_MockObject */
+    /** @var QueryBuilder|\PHPUnit_Framework_MockObject_MockObject */
     private $queryBuilderMock;
 
     /** @var DynamicContentSubscriber */
     private $dynamicContentSubscriber;
 
-    /** @var Statement|PHPUnit_Framework_MockObject_MockObject */
+    /** @var Statement|\PHPUnit_Framework_MockObject_MockObject */
     private $statementMock;
 
     protected function setUp(): void
