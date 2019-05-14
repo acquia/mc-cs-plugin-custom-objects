@@ -24,7 +24,7 @@ use UnexpectedValueException;
 
 class DynamicContentSubscriberTest extends PHPUnit_Framework_TestCase
 {
-    /** @var ConfigProvider|PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject */
     private $configProviderMock;
 
     /** @var ContactSegmentFilterFactory|\PHPUnit_Framework_MockObject_MockObject */
