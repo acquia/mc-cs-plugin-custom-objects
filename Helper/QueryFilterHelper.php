@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Helper;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -21,7 +22,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 
-final class QueryFilterHelper
+class QueryFilterHelper
 {
     use DbalQueryTrait;
 
@@ -233,7 +234,7 @@ final class QueryFilterHelper
      * @param string       $glue
      * @param string       $operator
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     public function addValueExpressionFromQueryBuilder(
         QueryBuilder $queryBuilder,
@@ -282,7 +283,7 @@ final class QueryFilterHelper
      * @param string       $tableAlias
      * @param string       $operator
      *
-     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|string
+     * @return CompositeExpression|string
      */
     private function getCustomValueValueExpression(QueryBuilder $customQuery, string $tableAlias, string $operator)
     {
@@ -350,7 +351,7 @@ final class QueryFilterHelper
      * @param string       $tableAlias
      * @param string       $operator
      *
-     * @return \Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression|string
+     * @return CompositeExpression|string
      */
     private function getCustomObjectNameExpression(QueryBuilder $customQuery, string $tableAlias, string $operator)
     {
