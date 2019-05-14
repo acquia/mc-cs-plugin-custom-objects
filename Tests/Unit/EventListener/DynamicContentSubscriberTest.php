@@ -107,7 +107,7 @@ class DynamicContentSubscriberTest extends PHPUnit_Framework_TestCase
 
     public function testFiltersInsertedIntoEvent(): void
     {
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', 'test');
+        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
         $connectionMock = $this->createMock(Connection::class);
         $filterObject   = [
