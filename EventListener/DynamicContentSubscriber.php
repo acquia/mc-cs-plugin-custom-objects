@@ -140,8 +140,7 @@ class DynamicContentSubscriber extends CommonSubscriber
                 } else {
                     $event->setIsEvaluated(true);
                 }
-            }
-            catch (PDOException $e) {  // just to be a little more descriptive
+            } catch (PDOException $e) {  // just to be a little more descriptive
                 $this->logger->addError('Failed to evaluate dynamic content for custom object '.$e->getMessage());
 
                 throw $e;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\CustomObjectsBundle\Tests\EventListener;
 
 use Doctrine\DBAL\Connection;
@@ -53,7 +55,7 @@ class DynamicContentSubscriberTest extends PHPUnit_Framework_TestCase
     /** @var Statement|PHPUnit_Framework_MockObject_MockObject */
     private $statementMock;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -82,7 +84,6 @@ class DynamicContentSubscriberTest extends PHPUnit_Framework_TestCase
 
     public function testOnCampaignBuildWhenPluginDisabled(): void
     {
-
         $this->configProviderMock->expects($this->once())
             ->method('pluginIsEnabled')
             ->willReturn(false);
@@ -94,14 +95,12 @@ class DynamicContentSubscriberTest extends PHPUnit_Framework_TestCase
 
     public function testFiltersNotEvaluatedIfEventMarkedEvaluated(): void
     {
-
         $this->entityManagerMock->expects($this->never())->method('getConnection');
 
         $this->configProviderMock->expects($this->once())->method('pluginIsEnabled')->willReturn(true);
 
         $this->evaluateEvent->expects($this->once())->method('getFilters')->willReturn([]);
         $this->evaluateEvent->expects($this->once())->method('isEvaluated')->willReturn(true);
-
 
         $this->dynamicContentSubscriber->evaluateFilters($this->evaluateEvent);
     }
@@ -175,10 +174,7 @@ class DynamicContentSubscriberTest extends PHPUnit_Framework_TestCase
 
         try {
             $this->dynamicContentSubscriber->evaluateFilters($this->evaluateEvent);
-        }
-        catch (UnexpectedValueException $e) {
+        } catch (UnexpectedValueException $e) {
         }
     }
 }
-
-
