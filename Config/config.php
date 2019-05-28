@@ -325,6 +325,7 @@ return [
                 'arguments' => [
                     'custom_item.session.provider',
                     'custom_item.route.provider',
+                    'mautic.custom.model.item',
                 ],
                 'methodCalls' => [
                     'setContainer' => [

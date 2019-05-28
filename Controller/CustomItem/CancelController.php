@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Controller\CommonController;
@@ -56,6 +57,8 @@ class CancelController extends CommonController
      * @param int|null $itemId
      *
      * @return Response
+     *
+     * @throws NotFoundException
      */
     public function cancelAction(int $objectId, ?int $itemId = null): Response
     {
