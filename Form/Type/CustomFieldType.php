@@ -258,8 +258,6 @@ class CustomFieldType extends AbstractType
                 $customField->getTypeObject()->getSymfonyFormFieldType(),
                 $customField->getFormFieldOptions($fieldOptions)
             );
-
-//            $builder->add('defaultValue', HiddenType::class);
         });
 
         $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event): void {
