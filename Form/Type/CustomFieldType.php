@@ -260,14 +260,6 @@ class CustomFieldType extends AbstractType
                 $customField->getFormFieldOptions($fieldOptions)
             );
 
-            if ($customField->getDefaultValue() instanceof \DateTime) {
-                // @todo default value needs to be string because of DB column type
-                // @see CustomObjectsBundle/EventListener/CustomFieldPostLoadSubscriber.php:71
-                $customField->setDefaultValue(
-                    $customField->getDefaultValue()->format('Y-m-d H:i:s')
-                );
-            }
-
             $builder->add('defaultValue', HiddenType::class);
         });
 

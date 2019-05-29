@@ -16,6 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
+use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -104,4 +105,9 @@ interface CustomFieldTypeInterface
      * @return bool
      */
     public function useEmptyValue(): bool;
+
+    /**
+     * @return DataTransformerInterface
+     */
+    public function createDefaultValueTransformer(): DataTransformerInterface;
 }

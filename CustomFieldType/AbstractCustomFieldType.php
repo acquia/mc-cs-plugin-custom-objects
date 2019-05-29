@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
 use Mautic\LeadBundle\Segment\OperatorOptions;
+use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
+use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -140,5 +142,13 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     public function useEmptyValue(): bool
     {
         return $this->hasChoices() && (!$this instanceof AbstractMultivalueType);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createDefaultValueTransformer(): DataTransformerInterface
+    {
+        throw new UndefinedTransformerException();
     }
 }
