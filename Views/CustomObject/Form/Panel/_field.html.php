@@ -45,7 +45,7 @@ $deleted                    = !empty($_POST['custom_object']['customFields'][$or
     <div class="row ml-0 mr-0">
         <div class="mauticform-row">
             <div class="col-xs-10">
-                <?php echo $view['form']->row($customField['field']); ?>
+                <?php echo $view['form']->row($customField['defaultValue']); ?>
             </div>
         </div>
     </div>

@@ -241,7 +241,6 @@ class CustomFieldType extends AbstractType
             }
 
             $fieldOptions = [
-                'mapped'     => false,
                 'required'   => false,
                 'data'       => $customField->getDefaultValue(),
                 'attr'       => [
@@ -255,12 +254,12 @@ class CustomFieldType extends AbstractType
 
             // Demo field in panel
             $builder->add(
-                'field',
+                'defaultValue',
                 $customField->getTypeObject()->getSymfonyFormFieldType(),
                 $customField->getFormFieldOptions($fieldOptions)
             );
 
-            $builder->add('defaultValue', HiddenType::class);
+//            $builder->add('defaultValue', HiddenType::class);
         });
 
         $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event): void {
