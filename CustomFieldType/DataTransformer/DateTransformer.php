@@ -23,6 +23,8 @@ class DateTransformer implements DataTransformerInterface
      */
     public function transform($value)
     {
+        $value = ($value) ? $value : '';
+
         return new DateTime($value);
     }
 
