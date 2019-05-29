@@ -49,7 +49,7 @@ class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
         $this->formType         = new CustomFieldValueType();
     }
 
-    public function testBuildFormForNewItem()
+    public function testBuildFormForNewItem(): void
     {
         $options = ['customItem' => $this->customItem];
 
@@ -61,7 +61,7 @@ class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
             ->method('findCustomFieldValueForFieldId')
             ->with(123)
             ->willReturn($this->customFieldValue);
-        
+
         $this->customFieldValue->expects($this->once())
             ->method('getCustomField')
             ->willReturn($this->customField);
@@ -94,7 +94,7 @@ class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
         $this->formType->buildForm($this->formBuilder, $options);
     }
 
-    public function testBuildFormForExistingItem()
+    public function testBuildFormForExistingItem(): void
     {
         $options = ['customItem' => $this->customItem];
 
@@ -110,7 +110,7 @@ class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
         $this->customItem->expects($this->once())
             ->method('getId')
             ->willReturn(456);
-        
+
         $this->customFieldValue->expects($this->once())
             ->method('getCustomField')
             ->willReturn($this->customField);
@@ -142,7 +142,7 @@ class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
         $this->formType->buildForm($this->formBuilder, $options);
     }
 
-    public function testSetDefaultOptions()
+    public function testSetDefaultOptions(): void
     {
         $this->optionsResolver->expects($this->once())
             ->method('setDefaults')
