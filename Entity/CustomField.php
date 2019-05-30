@@ -331,7 +331,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
                     return $transformer->transform($this->defaultValue);
                 }
             } catch (UndefinedTransformerException $e) {
-                // Nothing to do
+                // Nothing to transform, return string below
             }
         }
 
@@ -353,7 +353,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
                     return;
                 }
             } catch (UndefinedTransformerException $e) {
-                // Nothing to do
+                // Nothing to transform, use string below
             }
         }
 
