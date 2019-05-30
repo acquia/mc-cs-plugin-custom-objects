@@ -28,6 +28,5 @@ class InvalidValueExceptionTest extends \PHPUnit_Framework_TestCase
         $exception->setCustomField($customField);
 
         $this->assertSame($customField, $exception->getCustomField());
-
     }
 }
