@@ -78,7 +78,7 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
         $customField->setCustomObject($customObject);
         $customField->setOrder(4);
         $customField->setRequired(true);
-        $customField->setDefaultValue('2019-04-04');
+        $customField->setDefaultValue(new \DateTime('2019-04-04'));
         $customField->setParams(['some' => 'param']);
 
         // Test new values
@@ -90,7 +90,7 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($customObject, $customField->getCustomObject());
         $this->assertSame(4, $customField->getOrder());
         $this->assertTrue($customField->isRequired());
-        $this->assertSame('2019-04-04', $customField->getDefaultValue());
+        $this->assertSame('2019-04-04', $customField->getDefaultValue()->format('Y-m-d'));
         $this->assertSame(['some' => 'param'], $customField->getParams());
     }
 
