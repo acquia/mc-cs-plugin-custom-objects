@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -15,19 +17,18 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\DateTransfo
 
 class DateTransformerTest extends \PHPUnit_Framework_TestCase
 {
-
-    public function test()
+    public function test(): void
     {
-        $date = '2019-05-30';
+        $date     = '2019-05-30';
         $datetime = new \DateTime($date);
-        $format = 'Y-m-d';
+        $format   = 'Y-m-d';
 
         $transformer = new DateTransformer();
 
         $this->assertNull($transformer->transform(null));
-        $this->assertEquals($date, $transformer->transform($date)->format($format));
+        $this->assertSame($date, $transformer->transform($date)->format($format));
 
         $this->assertNull($transformer->reverseTransform(null));
-        $this->assertEquals($date, $transformer->reverseTransform($datetime));
+        $this->assertSame($date, $transformer->reverseTransform($datetime));
     }
 }

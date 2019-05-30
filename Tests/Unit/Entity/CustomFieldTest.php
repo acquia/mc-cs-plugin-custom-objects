@@ -195,13 +195,13 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
         $typeObject = $this->createMock(DateType::class);
         $typeObject->expects($this->exactly(2))
             ->method('createDefaultValueTransformer')
-            ->willThrowException(new UndefinedTransformerException);
+            ->willThrowException(new UndefinedTransformerException());
         $customField->setTypeObject($typeObject);
         $customField->setDefaultValue($string);
         $this->assertSame($string, $customField->getDefaultValue());
 
         // Type object defined with transformer
-        $value = 'value';
+        $value            = 'value';
         $transformedValue = 'transformedValue';
 
         $transformer = $this->createMock(DataTransformerInterface::class);
