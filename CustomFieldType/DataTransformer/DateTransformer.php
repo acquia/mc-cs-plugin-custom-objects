@@ -23,9 +23,9 @@ class DateTransformer implements DataTransformerInterface
      */
     public function transform($value)
     {
-        $value = $value ?: '';
-
-        return new DateTime($value);
+        if ($value) {
+            return new DateTime($value);
+        }
     }
 
     /**
@@ -33,6 +33,8 @@ class DateTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        return $value->format('Y-m-d');
+        if ($value) {
+            return $value->format('Y-m-d');
+        }
     }
 }
