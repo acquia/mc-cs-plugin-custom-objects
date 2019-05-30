@@ -31,6 +31,9 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\ClickableInterface;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use Symfony\Component\Form\FormError;
 
 class SaveControllerTest extends ControllerTestCase
 {
@@ -261,5 +264,84 @@ class SaveControllerTest extends ControllerTestCase
             ->method('save');
 
         $this->saveController->saveAction(self::OBJECT_ID);
+    }
+
+    public function testSaveActionForNewCustomItemWithInvalidCustomFieldValue(): void
+    {
+        $this->customItemModel->expects($this->once())
+            ->method('fetchEntity')
+            ->willReturn($this->customItem);
+
+        $this->permissionProvider->expects($this->once())
+            ->method('canEdit');
+
+        $this->permissionProvider->expects($this->never())
+            ->method('canCreate');
+
+        $this->customObjectModel->expects($this->once())
+            ->method('isLocked')
+            ->with($this->customItem)
+            ->willReturn(false);
+
+        $this->routeProvider->expects($this->once())
+            ->method('buildEditRoute')
+            ->with(self::OBJECT_ID, self::ITEM_ID)
+            ->willReturn('https://edit.item');
+
+        $this->routeProvider->expects($this->once())
+            ->method('buildSaveRoute')
+            ->with(self::OBJECT_ID, self::ITEM_ID)
+            ->willReturn('https://save.item');
+
+        $this->formFactory->expects($this->once())
+            ->method('create')
+            ->with(
+                CustomItemType::class,
+                $this->customItem,
+                [
+                    'action'   => 'https://save.item',
+                    'objectId' => self::OBJECT_ID,
+                ]
+            )
+            ->willReturn($this->form);
+
+        $this->form->expects($this->at(0))
+            ->method('handleRequest')
+            ->with($this->request);
+
+        $this->form->expects($this->at(1))
+            ->method('isValid')
+            ->willReturn(true);
+
+        $customField      = $this->createMock(CustomField::class);
+        $CFValueException = new InvalidValueException('This field is invalid');
+        $CFValueException->setCustomField($customField);
+
+        $customField->expects($this->once())
+            ->method('getId')
+            ->willReturn(567);
+
+        $this->customItemModel->expects($this->once())
+            ->method('save')
+            ->with($this->customItem)
+            ->will($this->throwException($CFValueException));
+
+        $this->form->expects($this->exactly(3))
+            ->method('get')
+            ->withConsecutive(
+                ['custom_field_values'],
+                [567],
+                ['value']
+            )->willReturnSelf();
+
+        $this->form->expects($this->once())
+            ->method('addError')
+            ->with($this->callback(function (FormError $formError) {
+                $this->assertSame('This field is invalid', $formError->getMessage());
+
+                return true;
+            }));
+
+        $this->saveController->saveAction(self::OBJECT_ID, self::ITEM_ID);
     }
 }
