@@ -261,7 +261,7 @@ class SaveController extends BaseFormController
      *
      * @return Response
      */
-    public function redirectWithCompletePageRefresh(Request $request, string $url): Response
+    private function redirectWithCompletePageRefresh(Request $request, string $url): Response
     {
         return $request->isXmlHttpRequest() ? JsonResponse(['redirect' => $url]) : $this->redirect($url);
     }
