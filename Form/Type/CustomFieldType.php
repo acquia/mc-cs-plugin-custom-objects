@@ -240,13 +240,16 @@ class CustomFieldType extends AbstractType
                 return;
             }
 
-            $fieldOptions = [
-                'required'   => false,
-                'data'       => $customField->getDefaultValue(),
-                'attr'       => [
-                    'readonly' => true,
-                ],
-            ];
+            $fieldOptions = array_merge_recursive(
+                $customField->getFormFieldOptions(),
+                [ // Force this preview settings
+                    'required'   => false,
+                    'data'       => $customField->getDefaultValue(),
+                    'attr'       => [
+                        'readonly' => true,
+                    ],
+                ]
+            );
 
             if ($customField->getTypeObject()->useEmptyValue() && $customField->getParams()->getEmptyValue()) {
                 $fieldOptions['placeholder'] = $customField->getParams()->getEmptyValue();
@@ -256,7 +259,7 @@ class CustomFieldType extends AbstractType
             $builder->add(
                 'defaultValue',
                 $customField->getTypeObject()->getSymfonyFormFieldType(),
-                $customField->getFormFieldOptions($fieldOptions)
+                $fieldOptions
             );
         });
 
