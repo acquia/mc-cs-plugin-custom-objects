@@ -28,6 +28,8 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Mautic\CoreBundle\Service\FlashBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Form\FormError;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
 
 class SaveController extends BaseFormController
 {
@@ -145,30 +147,37 @@ class SaveController extends BaseFormController
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $this->customItemModel->save($customItem);
+            try {
+                $this->customItemModel->save($customItem);
 
-            $this->flashBag->add(
-                $message,
-                [
-                    '%name%' => $customItem->getName(),
-                    '%url%'  => $this->routeProvider->buildEditRoute($objectId, $customItem->getId()),
-                ]
-            );
+                $this->flashBag->add(
+                    $message,
+                    [
+                        '%name%' => $customItem->getName(),
+                        '%url%'  => $this->routeProvider->buildEditRoute($objectId, $customItem->getId()),
+                    ]
+                );
 
-            $saveClicked = $form->get('buttons')->get('save')->isClicked();
-            $detailView  = 'CustomObjectsBundle:CustomItem\View:view';
-            $formView    = 'CustomObjectsBundle:CustomItem\Form:edit';
+                $saveClicked = $form->get('buttons')->get('save')->isClicked();
+                $detailView  = 'CustomObjectsBundle:CustomItem\View:view';
+                $formView    = 'CustomObjectsBundle:CustomItem\Form:edit';
 
-            $request->setMethod(Request::METHOD_GET);
+                $request->setMethod(Request::METHOD_GET);
 
-            if ($saveClicked) {
-                $this->customItemModel->unlockEntity($customItem);
+                if ($saveClicked) {
+                    $this->customItemModel->unlockEntity($customItem);
+                }
+
+                return $this->forward(
+                    $saveClicked ? $detailView : $formView,
+                    ['objectId' => $objectId, 'itemId' => $customItem->getId()]
+                );
+            } catch (InvalidValueException $e) {
+                $form->get('custom_field_values')
+                    ->get($e->getCustomField()->getId())
+                    ->get('value')
+                    ->addError(new FormError($e->getMessage()));
             }
-
-            return $this->forward(
-                $saveClicked ? $detailView : $formView,
-                ['objectId' => $objectId, 'itemId' => $customItem->getId()]
-            );
         }
 
         return $this->delegateView(

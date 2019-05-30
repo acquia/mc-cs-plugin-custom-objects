@@ -40,10 +40,10 @@ class CustomFieldOptionModel
      */
     public function deleteByCustomFieldId(int $customFieldId): void
     {
-        $this->entityManager->getConnection()->createQueryBuilder()
-            ->delete(MAUTIC_TABLE_PREFIX.'custom_field_option')
-            ->where('custom_field_id = :customFieldId')
-            ->setParameter('customFieldId', $customFieldId)
-            ->execute();
+        $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
+        $queryBuilder->delete(MAUTIC_TABLE_PREFIX.'custom_field_option');
+        $queryBuilder->where('custom_field_id = :customFieldId');
+        $queryBuilder->setParameter('customFieldId', $customFieldId);
+        $queryBuilder->execute();
     }
 }
