@@ -11,7 +11,7 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\DTO;
+namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Exception;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
