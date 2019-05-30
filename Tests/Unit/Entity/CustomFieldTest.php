@@ -19,6 +19,8 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\SelectType;
+use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
+use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomFieldTest extends \PHPUnit_Framework_TestCase
@@ -174,5 +176,48 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
             'option_a' => 'Option A',
             'option_b' => 'Option B',
         ], $customField->getChoices());
+    }
+
+    public function testDefaultValueTransformation()
+    {
+        $string = 'string';
+
+        $customField = new CustomField();
+
+        // NULL
+        $this->assertNull($customField->getDefaultValue());
+
+        // String without type object defined
+        $customField->setDefaultValue($string);
+        $this->assertSame($string, $customField->getDefaultValue());
+
+        // TYpe object defined without transformer
+        $typeObject = $this->createMock(DateType::class);
+        $typeObject->expects($this->exactly(2))
+            ->method('createDefaultValueTransformer')
+            ->willThrowException(new UndefinedTransformerException);
+        $customField->setTypeObject($typeObject);
+        $customField->setDefaultValue($string);
+        $this->assertSame($string, $customField->getDefaultValue());
+
+        // Type object defined with transformer
+        $value = 'value';
+        $transformedValue = 'transformedValue';
+
+        $transformer = $this->createMock(DataTransformerInterface::class);
+        $transformer->expects($this->once())
+            ->method('transform')
+            ->willReturn($transformedValue);
+        $transformer->expects($this->once())
+            ->method('reverseTransform')
+            ->willReturn($value);
+        $typeObject = $this->createMock(DateType::class);
+        $typeObject->expects($this->exactly(2))
+            ->method('createDefaultValueTransformer')
+            ->willReturn($transformer);
+        $customField->setTypeObject($typeObject);
+
+        $customField->setDefaultValue($value);
+        $this->assertSame($transformedValue, $customField->getDefaultValue());
     }
 }
