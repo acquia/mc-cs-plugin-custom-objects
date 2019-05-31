@@ -13,11 +13,13 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\DateTimeTransformer;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueDateTime;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
+use Symfony\Component\Form\DataTransformerInterface;
 
 class DateTimeType extends AbstractCustomFieldType
 {
@@ -91,5 +93,13 @@ class DateTimeType extends AbstractCustomFieldType
         $allowedOperators = array_flip(['=', '!=', 'gt', 'gte', 'lt', 'lte', 'empty', '!empty']);
 
         return array_intersect_key($allOperators, $allowedOperators);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createDefaultValueTransformer(): DataTransformerInterface
+    {
+        return new DateTimeTransformer();
     }
 }
