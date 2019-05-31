@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\MultivalueTransformer;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption;
+use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 abstract class AbstractMultivalueType extends AbstractCustomFieldType
@@ -60,5 +62,13 @@ abstract class AbstractMultivalueType extends AbstractCustomFieldType
         $allowedOperators = array_flip(['empty', '!empty', 'in', '!in']);
 
         return array_intersect_key($allOperators, $allowedOperators);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createDefaultValueTransformer(): DataTransformerInterface
+    {
+        return new MultivalueTransformer();
     }
 }
