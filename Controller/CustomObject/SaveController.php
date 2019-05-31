@@ -32,6 +32,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use Mautic\CoreBundle\Service\FlashBag;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class SaveController extends BaseFormController
 {
@@ -186,7 +187,7 @@ class SaveController extends BaseFormController
                 return $this->forwardToDetail($request, $customObject);
             }
 
-            return $this->redirect($this->routeProvider->buildEditRoute($customObject->getId()));
+            return $this->redirectWithCompletePageRefresh($request, $this->routeProvider->buildEditRoute($customObject->getId()));
         }
 
         return $this->delegateView(
@@ -252,5 +253,16 @@ class SaveController extends BaseFormController
         $this->customObjectModel->unlockEntity($customObject);
 
         return $this->forward('CustomObjectsBundle:CustomObject\View:view', $params);
+    }
+
+    /**
+     * @param Request $request
+     * @param string  $url
+     *
+     * @return Response
+     */
+    private function redirectWithCompletePageRefresh(Request $request, string $url): Response
+    {
+        return $request->isXmlHttpRequest() ? new JsonResponse(['redirect' => $url]) : $this->redirect($url);
     }
 }
