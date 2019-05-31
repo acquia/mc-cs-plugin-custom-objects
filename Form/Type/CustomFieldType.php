@@ -243,8 +243,6 @@ class CustomFieldType extends AbstractType
             $fieldOptions = array_merge_recursive(
                 $customField->getFormFieldOptions(),
                 [ // Force this preview settings
-                    'required'   => false,
-                    'disabled'   => true,
                     'data'       => $customField->getDefaultValue(),
                     'attr'       => [
                         'readonly' => true,
