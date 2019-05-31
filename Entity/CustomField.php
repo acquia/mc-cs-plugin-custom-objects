@@ -323,16 +323,10 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      */
     public function getDefaultValue()
     {
-        $typeObject = $this->getTypeObject();
-        if ($typeObject) {
-            try {
-                $transformer = $typeObject->createDefaultValueTransformer();
-                if ($transformer) {
-                    return $transformer->transform($this->defaultValue);
-                }
-            } catch (UndefinedTransformerException $e) {
-                // Nothing to transform, return string below
-            }
+        try {
+            return $this->getTypeObject()->createDefaultValueTransformer()->transform($this->defaultValue);
+        } catch (UndefinedTransformerException $e) {
+            // Nothing to transform, return string below
         }
 
         return $this->defaultValue;
@@ -343,18 +337,12 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      */
     public function setDefaultValue($defaultValue): void
     {
-        $typeObject = $this->getTypeObject();
-        if ($typeObject) {
-            try {
-                $transformer = $typeObject->createDefaultValueTransformer();
-                if ($transformer) {
-                    $this->defaultValue = $transformer->reverseTransform($defaultValue);
+        try {
+            $this->defaultValue = $this->getTypeObject()->createDefaultValueTransformer()->reverseTransform($defaultValue);
 
-                    return;
-                }
-            } catch (UndefinedTransformerException $e) {
-                // Nothing to transform, use string below
-            }
+            return;
+        } catch (UndefinedTransformerException $e) {
+            // Nothing to transform, use string below
         }
 
         $this->defaultValue = $defaultValue;
