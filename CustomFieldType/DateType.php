@@ -96,7 +96,7 @@ class DateType extends AbstractCustomFieldType
     }
 
     /**
-     * @return DataTransformerInterface
+     * @inheritDoc
      */
     public function createDefaultValueTransformer(): DataTransformerInterface
     {
