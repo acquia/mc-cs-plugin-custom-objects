@@ -420,7 +420,7 @@ class QueryFilterHelper
 
         $customFieldQueryBuilder->leftJoin(
             $alias.'_item',
-            MAUTIC_TABLE_PREFIX.$dataTable,
+            $dataTable,
             $alias.'_value',
             $alias.'_value.custom_item_id = '.$alias.'_item.id');
 
