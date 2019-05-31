@@ -576,6 +576,14 @@ return [
             ],
         ],
         'events' => [
+            'custom_object.api.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\ApiSubscriber::class,
+                'arguments' => [
+                    'custom_object.config.provider',
+                    'mautic.custom.model.object',
+                    'mautic.custom.model.item',
+                ],
+            ],
             'custom_object.assets.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\AssetsSubscriber::class,
                 'arguments' => [

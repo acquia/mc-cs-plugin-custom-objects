@@ -93,7 +93,7 @@ class CustomItemImportModel extends FormModel
             try {
                 $customFieldValue = $customItem->findCustomFieldValueForFieldId((int) $customFieldId);
             } catch (NotFoundException $e) {
-                $customFieldValue = $this->createNewCustomFieldValue($customObject, $customItem, (int) $customFieldId, $csvValue);
+                $customFieldValue = $customItem->createNewCustomFieldValueByFieldId((int) $customFieldId, $csvValue);
             }
 
             $customFieldValue->setValue($csvValue);
@@ -104,29 +104,6 @@ class CustomItemImportModel extends FormModel
         $this->linkContacts($customItem, $contactIds);
 
         return $merged;
-    }
-
-    /**
-     * @param CustomObject $customObject
-     * @param CustomItem   $customItem
-     * @param int          $customFieldId
-     * @param mixed        $csvValue
-     *
-     * @return CustomFieldValueInterface
-     */
-    private function createNewCustomFieldValue(CustomObject $customObject, CustomItem $customItem, int $customFieldId, $csvValue): CustomFieldValueInterface
-    {
-        foreach ($customObject->getCustomFields() as $customField) {
-            if ($customField->getId() === (int) $customFieldId) {
-                $fieldType        = $customField->getTypeObject();
-                $customFieldValue = $fieldType->createValueEntity($customField, $customItem, $csvValue);
-                $customItem->addCustomFieldValue($customFieldValue);
-
-                return $customFieldValue;
-            }
-        }
-
-        throw new NotFoundException("Custom field field {$customFieldId} was not found.");
     }
 
     /**

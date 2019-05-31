@@ -25,6 +25,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use Mautic\CoreBundle\Helper\ArrayHelper;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 
 class CustomItem extends FormEntity implements UniqueEntityInterface
 {
@@ -280,6 +281,28 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         }
 
         return $customFieldValue;
+    }
+
+    /**
+     * @param int   $customFieldId
+     * @param mixed $value
+     *
+     * @return CustomFieldValueInterface
+     */
+    public function createNewCustomFieldValueByFieldId(int $customFieldId, $value): CustomFieldValueInterface
+    {
+        /** @var $customField CustomField */
+        foreach ($this->getCustomObject()->getCustomFields() as $customField) {
+            if ($customField->getId() === (int) $customFieldId) {
+                $fieldType        = $customField->getTypeObject();
+                $customFieldValue = $fieldType->createValueEntity($customField, $this, $value);
+                $this->addCustomFieldValue($customFieldValue);
+
+                return $customFieldValue;
+            }
+        }
+
+        throw new NotFoundException("Custom field field {$customFieldId} was not found.");
     }
 
     /**
