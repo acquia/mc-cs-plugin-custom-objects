@@ -38,6 +38,11 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @var string|null
      */
+    private $alias;
+
+    /**
+     * @var string|null
+     */
     private $nameSingular;
 
     /**
@@ -77,8 +82,9 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
 
     public function __clone()
     {
-        $this->id  = null;
-        $this->new = true;
+        $this->id    = null;
+        $this->new   = true;
+        $this->alias = null;
     }
 
     /**
@@ -89,7 +95,8 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(CustomObjectRepository::class);
+            ->setCustomRepositoryClass(CustomObjectRepository::class)
+            ->addIndex(['alias'], 'alias');
 
         $builder->createOneToMany('customFields', CustomField::class)
             ->setOrderBy(['order' => 'ASC'])
@@ -101,6 +108,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
 
         $builder->addId();
         $builder->addCategory();
+        $builder->addField('alias', Type::STRING);
         $builder->addNamedField('nameSingular', Type::STRING, 'name_singular');
         $builder->addNamedField('namePlural', Type::STRING, 'name_plural');
         $builder->addNullableField('description', Type::STRING, 'description');
@@ -112,6 +120,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
      */
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
+        $metadata->addPropertyConstraint('alias', new Assert\Length(['max' => 255]));
         $metadata->addPropertyConstraint('nameSingular', new Assert\NotBlank());
         $metadata->addPropertyConstraint('nameSingular', new Assert\Length(['max' => 255]));
         $metadata->addPropertyConstraint('namePlural', new Assert\NotBlank());
@@ -135,6 +144,22 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     public function getName()
     {
         return $this->getNamePlural();
+    }
+    /**
+     * @param string|null $alias
+     */
+    public function setAlias($alias)
+    {
+        $this->isChanged('alias', $alias);
+        $this->alias = $alias;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getAlias()
+    {
+        return $this->alias;
     }
 
     /**

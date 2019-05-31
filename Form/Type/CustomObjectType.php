@@ -50,6 +50,20 @@ class CustomObjectType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
+            'alias',
+            TextType::class,
+            [
+                'label'      => 'custom.object.alias.label',
+                'required'   => false,
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class' => 'form-control',
+                    'tooltip' => 'custom.field.help.alias',
+                ],
+            ]
+        );
+
+        $builder->add(
             'nameSingular',
             TextType::class,
             [

@@ -42,6 +42,11 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @var string|null
      */
+    private $alias;
+
+    /**
+     * @var string|null
+     */
     private $type;
 
     /**
@@ -87,6 +92,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     public function __clone()
     {
         $this->id = null;
+        $this->alias = null;
     }
 
     public function __toString()
@@ -116,7 +122,8 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('custom_field')
-            ->setCustomRepositoryClass(CustomFieldRepository::class);
+            ->setCustomRepositoryClass(CustomFieldRepository::class)
+            ->addIndex(['alias'], 'alias');;
 
         $builder->createManyToOne('customObject', CustomObject::class)
             ->addJoinColumn('custom_object_id', 'id', false, false, 'CASCADE')
@@ -127,6 +134,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
         $builder->addId();
         $builder->addField('label', Type::STRING);
+        $builder->addField('alias', Type::STRING);
         $builder->addField('type', Type::STRING);
         $builder->createField('order', 'integer')
             ->columnName('field_order')
@@ -161,6 +169,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     {
         $metadata->addPropertyConstraint('label', new Assert\NotBlank());
         $metadata->addPropertyConstraint('label', new Assert\Length(['max' => 255]));
+        $metadata->addPropertyConstraint('alias', new Assert\Length(['max' => 255]));
         $metadata->addPropertyConstraint('type', new Assert\NotBlank());
         $metadata->addPropertyConstraint('type', new Assert\Length(['max' => 255]));
         $metadata->addPropertyConstraint('customObject', new Assert\NotBlank());
@@ -208,6 +217,22 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     public function getName(): ?string
     {
         return $this->getLabel();
+    }
+
+    /**
+     * @param string|null $alias
+     */
+    public function setAlias($alias)
+    {
+        $this->isChanged('alias', $alias);
+        $this->alias = $alias;
+    }
+    /**
+     * @return string|null
+     */
+    public function getAlias()
+    {
+        return $this->alias;
     }
 
     /**

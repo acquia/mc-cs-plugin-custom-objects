@@ -52,6 +52,12 @@ $title = $customField->getId() ? $customField->getLabel() : $customField->getTyp
 
                 <div class="row">
                     <div class="col-md-6">
+                        <?php echo $view['form']->row($form['alias']); ?>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
                         <?php echo $view['form']->row($form['defaultValue']); ?>
                     </div>
                 </div>

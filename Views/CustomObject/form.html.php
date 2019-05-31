@@ -49,6 +49,7 @@ $view['slots']->set('headerTitle', $header);
                             <div class="col-md-4">
                                 <?php echo $view['form']->row($form['nameSingular']); ?>
                                 <?php echo $view['form']->row($form['namePlural']); ?>
+                                <?php echo $view['form']->row($form['alias']); ?>
                                 <?php echo $view['form']->row($form['description']); ?>
                             </div>
                         </div>
