@@ -19,6 +19,7 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
+use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
 use Mautic\CoreBundle\Entity\FormEntity;
@@ -322,6 +323,12 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      */
     public function getDefaultValue()
     {
+        try {
+            return $this->getTypeObject()->createDefaultValueTransformer()->transform($this->defaultValue);
+        } catch (UndefinedTransformerException $e) {
+            // Nothing to transform, return string below
+        }
+
         return $this->defaultValue;
     }
 
@@ -330,6 +337,14 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      */
     public function setDefaultValue($defaultValue): void
     {
+        try {
+            $this->defaultValue = $this->getTypeObject()->createDefaultValueTransformer()->reverseTransform($defaultValue);
+
+            return;
+        } catch (UndefinedTransformerException $e) {
+            // Nothing to transform, use string below
+        }
+
         $this->defaultValue = $defaultValue;
     }
 

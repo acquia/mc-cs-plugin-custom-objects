@@ -240,14 +240,15 @@ class CustomFieldType extends AbstractType
                 return;
             }
 
-            $fieldOptions = [
-                'mapped'     => false,
-                'required'   => false,
-                'data'       => $customField->getDefaultValue(),
-                'attr'       => [
-                    'readonly' => true,
-                ],
-            ];
+            $fieldOptions = array_merge_recursive(
+                $customField->getFormFieldOptions(),
+                [ // Force this preview settings
+                    'data'       => $customField->getDefaultValue(),
+                    'attr'       => [
+                        'readonly' => true,
+                    ],
+                ]
+            );
 
             if ($customField->getTypeObject()->useEmptyValue() && $customField->getParams()->getEmptyValue()) {
                 $fieldOptions['placeholder'] = $customField->getParams()->getEmptyValue();
@@ -255,20 +256,10 @@ class CustomFieldType extends AbstractType
 
             // Demo field in panel
             $builder->add(
-                'field',
+                'defaultValue',
                 $customField->getTypeObject()->getSymfonyFormFieldType(),
-                $customField->getFormFieldOptions($fieldOptions)
+                $fieldOptions
             );
-
-            if ($customField->getDefaultValue() instanceof \DateTime) {
-                // @todo default value needs to be string because of DB column type
-                // @see CustomObjectsBundle/EventListener/CustomFieldPostLoadSubscriber.php:71
-                $customField->setDefaultValue(
-                    $customField->getDefaultValue()->format('Y-m-d H:i:s')
-                );
-            }
-
-            $builder->add('defaultValue', HiddenType::class);
         });
 
         $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event): void {
@@ -303,36 +294,6 @@ class CustomFieldType extends AbstractType
 
         // Possibility to mark field as deleted in POST data
         $builder->add('deleted', HiddenType::class, ['mapped' => false]);
-
-        $this->fixValidationBeforeSubmit($builder);
-    }
-
-    /**
-     * Fix possible collision of value with validator for custom field demo in panel.
-     *
-     * @param FormBuilderInterface $builder
-     */
-    private function fixValidationBeforeSubmit(FormBuilderInterface $builder): void
-    {
-        $builder->addEventListener(
-            FormEvents::PRE_SUBMIT,
-            function (FormEvent $event): void {
-                $form = $event->getForm();
-
-                // Fix invalid value for integer field
-                if ($form->has('field')) {
-                    $form->remove('field');
-                    $form->add(
-                        'field',
-                        'text',
-                        [
-                            'required' => false,
-                            'mapped'   => false,
-                        ]
-                    );
-                }
-            }
-        );
     }
 
     /**

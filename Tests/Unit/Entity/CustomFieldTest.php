@@ -19,6 +19,8 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\SelectType;
+use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
+use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomFieldTest extends \PHPUnit_Framework_TestCase
@@ -67,6 +69,8 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($customField->getCustomObject());
         $this->assertNull($customField->getOrder());
         $this->assertFalse($customField->isRequired());
+
+        $customField->setTypeObject($typeObject);
         $this->assertNull($customField->getDefaultValue());
         $this->isInstanceOf(Params::class);
 
@@ -74,11 +78,10 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
         $customField->setId(55);
         $customField->setLabel('Start Date');
         $customField->setType('date');
-        $customField->setTypeObject($typeObject);
         $customField->setCustomObject($customObject);
         $customField->setOrder(4);
         $customField->setRequired(true);
-        $customField->setDefaultValue('2019-04-04');
+        $customField->setDefaultValue(new \DateTime('2019-04-04'));
         $customField->setParams(['some' => 'param']);
 
         // Test new values
@@ -90,7 +93,7 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($customObject, $customField->getCustomObject());
         $this->assertSame(4, $customField->getOrder());
         $this->assertTrue($customField->isRequired());
-        $this->assertSame('2019-04-04', $customField->getDefaultValue());
+        $this->assertSame('2019-04-04', $customField->getDefaultValue()->format('Y-m-d'));
         $this->assertSame(['some' => 'param'], $customField->getParams());
     }
 
@@ -174,5 +177,49 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
             'option_a' => 'Option A',
             'option_b' => 'Option B',
         ], $customField->getChoices());
+    }
+
+    public function testDefaultValueTransformation()
+    {
+        $string = 'string';
+
+        $customField = new CustomField();
+
+        // Type object defined without transformer
+        $typeObject = $this->createMock(DateType::class);
+        $typeObject->expects($this->exactly(5))
+            ->method('createDefaultValueTransformer')
+            ->willThrowException(new UndefinedTransformerException());
+        $customField->setTypeObject($typeObject);
+
+        // NULL
+        $this->assertNull($customField->getDefaultValue());
+
+        // String without type object defined
+        $customField->setDefaultValue($string);
+        $this->assertSame($string, $customField->getDefaultValue());
+
+        $customField->setDefaultValue($string);
+        $this->assertSame($string, $customField->getDefaultValue());
+
+        // Type object defined with transformer
+        $value            = 'value';
+        $transformedValue = 'transformedValue';
+
+        $transformer = $this->createMock(DataTransformerInterface::class);
+        $transformer->expects($this->once())
+            ->method('transform')
+            ->willReturn($transformedValue);
+        $transformer->expects($this->once())
+            ->method('reverseTransform')
+            ->willReturn($value);
+        $typeObject = $this->createMock(DateType::class);
+        $typeObject->expects($this->exactly(2))
+            ->method('createDefaultValueTransformer')
+            ->willReturn($transformer);
+        $customField->setTypeObject($typeObject);
+
+        $customField->setDefaultValue($value);
+        $this->assertSame($transformedValue, $customField->getDefaultValue());
     }
 }

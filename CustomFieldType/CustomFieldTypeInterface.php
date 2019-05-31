@@ -13,9 +13,11 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\DateTransformer;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
+use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -104,4 +106,14 @@ interface CustomFieldTypeInterface
      * @return bool
      */
     public function useEmptyValue(): bool;
+
+    /**
+     * Create transformer for transformation default value type from string to custom type.
+     *
+     * @see CustomField::getDefaultValue()
+     * @see DateTransformer
+     *
+     * @return DataTransformerInterface
+     */
+    public function createDefaultValueTransformer(): DataTransformerInterface;
 }

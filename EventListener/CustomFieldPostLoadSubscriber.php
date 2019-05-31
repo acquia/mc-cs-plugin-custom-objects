@@ -17,6 +17,7 @@ use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 
 /**
@@ -50,7 +51,7 @@ class CustomFieldPostLoadSubscriber implements EventSubscriber
     /**
      * @param LifecycleEventArgs $args
      *
-     * @throws \MauticPlugin\CustomObjectsBundle\Exception\NotFoundException
+     * @throws NotFoundException
      */
     public function postLoad(LifecycleEventArgs $args): void
     {
@@ -66,13 +67,6 @@ class CustomFieldPostLoadSubscriber implements EventSubscriber
 
         if (is_array($customField->getParams())) {
             $customField->setParams(new CustomField\Params($customField->getParams()));
-        }
-
-        // @todo Overthink transformation of DateTime text value to object
-        // @see CustomObjectsBundle/Form/Type/CustomFieldType.php:232
-        $defaultValue = $customField->getDefaultValue();
-        if ($defaultValue && ('date' === $type || 'datetime' === $type)) {
-            $customField->setDefaultValue(new \DateTime($defaultValue));
         }
     }
 }
