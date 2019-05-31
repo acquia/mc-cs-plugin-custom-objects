@@ -14,3 +14,7 @@ input[type=checkbox].form-control {
 .drop-here input {
     width: 100% !important;
 }
+
+.drop-here input[type="radio"] {
+    width: initial !important;
+}
