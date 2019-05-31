@@ -52,7 +52,6 @@ class CustomItemType extends AbstractType
                     'customItem' => $builder->getData(),
                 ],
                 'label'      => false,
-                'required'   => false,
             ]
         );
 
