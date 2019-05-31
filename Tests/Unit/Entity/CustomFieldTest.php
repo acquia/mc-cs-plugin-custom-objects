@@ -69,6 +69,8 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($customField->getCustomObject());
         $this->assertNull($customField->getOrder());
         $this->assertFalse($customField->isRequired());
+
+        $customField->setTypeObject($typeObject);
         $this->assertNull($customField->getDefaultValue());
         $this->isInstanceOf(Params::class);
 
@@ -76,7 +78,6 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
         $customField->setId(55);
         $customField->setLabel('Start Date');
         $customField->setType('date');
-        $customField->setTypeObject($typeObject);
         $customField->setCustomObject($customObject);
         $customField->setOrder(4);
         $customField->setRequired(true);
@@ -184,6 +185,13 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
 
         $customField = new CustomField();
 
+        // Type object defined without transformer
+        $typeObject = $this->createMock(DateType::class);
+        $typeObject->expects($this->exactly(5))
+            ->method('createDefaultValueTransformer')
+            ->willThrowException(new UndefinedTransformerException());
+        $customField->setTypeObject($typeObject);
+
         // NULL
         $this->assertNull($customField->getDefaultValue());
 
@@ -191,12 +199,6 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
         $customField->setDefaultValue($string);
         $this->assertSame($string, $customField->getDefaultValue());
 
-        // TYpe object defined without transformer
-        $typeObject = $this->createMock(DateType::class);
-        $typeObject->expects($this->exactly(2))
-            ->method('createDefaultValueTransformer')
-            ->willThrowException(new UndefinedTransformerException());
-        $customField->setTypeObject($typeObject);
         $customField->setDefaultValue($string);
         $this->assertSame($string, $customField->getDefaultValue());
 
