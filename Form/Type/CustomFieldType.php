@@ -306,7 +306,6 @@ class CustomFieldType extends AbstractType
                 ->addModelTransformer($this->paramsToStringTransformer)
         );
 
-        // @todo This breaks saving of CO
         $builder->add(
             $builder->create(
                 'options',
