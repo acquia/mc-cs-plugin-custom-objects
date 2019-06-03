@@ -168,10 +168,14 @@ class SaveController extends BaseFormController
             $customObject,
             ['action' => $action]
         );
-        $form->handleRequest($request);
+
+        $postData = $request->get('custom_object');
+
+        // just because empty fields are deleted from post data by default
+        $form->submit($postData, false);
 
         if ($form->isValid()) {
-            $this->handleRawPost($customObject, $request->get('custom_object'));
+            $this->handleRawPost($customObject, $postData);
 
             $this->customObjectModel->save($customObject);
 
