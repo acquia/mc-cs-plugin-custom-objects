@@ -37,5 +37,7 @@ class MultivalueTransformer implements DataTransformerInterface
         if ($value) {
             return json_encode($value);
         }
+
+        return null;
     }
 }

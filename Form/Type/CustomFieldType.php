@@ -213,7 +213,7 @@ class CustomFieldType extends AbstractType
             $form = $event->getForm();
             $hasChoices = $customField->getTypeObject()->hasChoices();
 
-            $this->createDefaultValueInputForModal($form, $customField);
+            $this->createDefaultValueInput($form, $customField);
 
             $form->add(
                 'params',
@@ -262,26 +262,7 @@ class CustomFieldType extends AbstractType
                 return;
             }
 
-            $fieldOptions = array_merge_recursive(
-                $customField->getFormFieldOptions(),
-                [ // Force this preview settings
-                    'data'       => $customField->getDefaultValue(),
-                    'attr'       => [
-                        'readonly' => true,
-                    ],
-                ]
-            );
-
-            if ($customField->getTypeObject()->useEmptyValue() && $customField->getParams()->getEmptyValue()) {
-                $fieldOptions['placeholder'] = $customField->getParams()->getEmptyValue();
-            }
-
-            // Demo field in panel
-            $form->add(
-                'defaultValue',
-                $customField->getTypeObject()->getSymfonyFormFieldType(),
-                $fieldOptions
-            );
+            $this->createDefaultValueInput($form, $customField);
         });
 
         $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event): void {
@@ -325,40 +306,25 @@ class CustomFieldType extends AbstractType
      * @param FormInterface $form
      * @param CustomField   $customField
      */
-    private function createDefaultValueInputForModal(FormInterface $form, CustomField $customField): void
+    private function createDefaultValueInput(FormInterface $form, CustomField $customField): void
     {
-        $handledTypes = [
-            CountryListType::class,
-            DateType::class,
-            DateTimeType::class,
-        ];
+        $fieldOptions = array_merge_recursive(
+            $customField->getFormFieldOptions(),
+            [ // Force this preview settings
+                'data' => $customField->getDefaultValue(),
+                'mapped' => true,
+            ]
+        );
 
-        if (in_array(get_class($customField->getTypeObject()), $handledTypes, true)) {
-            $form->add(
-                'defaultValue',
-                $customField->getTypeObject()->getSymfonyFormFieldType(),
-                $customField->getTypeObject()->createFormTypeOptions(
-                    [
-                        'label'      => 'custom.field.label.default_value',
-                        'required'   => false,
-                        'attr'       => [
-                            'class' => 'form-control',
-                        ],
-                    ]
-                )
-            );
-        } else {
-            $form->add(
-                'defaultValue',
-                TextType::class,
-                [
-                    'label'      => 'custom.field.label.default_value',
-                    'required'   => false,
-                    'attr'       => [
-                        'class' => 'form-control',
-                    ],
-                ]
-            );
+        if ($customField->getTypeObject()->useEmptyValue() && $customField->getParams()->getEmptyValue()) {
+            $fieldOptions['placeholder'] = $customField->getParams()->getEmptyValue();
         }
+
+        // Demo field in panel
+        $form->add(
+            'defaultValue',
+            $customField->getTypeObject()->getSymfonyFormFieldType(),
+            $fieldOptions
+        );
     }
 }
