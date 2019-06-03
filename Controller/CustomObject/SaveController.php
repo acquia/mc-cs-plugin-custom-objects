@@ -235,6 +235,7 @@ class SaveController extends BaseFormController
                 $customField = $customObject->getCustomFields()->get($key);
                 $customField->setParams($params);
                 $customField->setOptions($options);
+                $customField->setDefaultValue($rawCustomField['defaultValue']);
             }
         }
     }
