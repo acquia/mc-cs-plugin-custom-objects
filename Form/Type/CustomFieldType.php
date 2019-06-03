@@ -300,7 +300,7 @@ class CustomFieldType extends AbstractType
     }
 
     /**
-     * Create default value input for modal.
+     * Create default value input for CO form and modal.
      * Dynamically options managed in modal are not supported so for them leave default value input as text for now.
      *
      * @param FormInterface $form
@@ -310,9 +310,9 @@ class CustomFieldType extends AbstractType
     {
         $fieldOptions = array_merge_recursive(
             $customField->getFormFieldOptions(),
-            [ // Force this preview settings
+            [
+                // Force this preview settings
                 'data' => $customField->getDefaultValue(),
-                'mapped' => true,
             ]
         );
 
