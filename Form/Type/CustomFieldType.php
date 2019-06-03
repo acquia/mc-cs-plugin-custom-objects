@@ -255,7 +255,7 @@ class CustomFieldType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
             /** @var CustomField $customField */
             $customField = $event->getData();
-            $builder = $event->getForm();
+            $form = $event->getForm();
 
             if (!$customField) {
                 // Custom field is new without data fetched from DB
@@ -277,7 +277,7 @@ class CustomFieldType extends AbstractType
             }
 
             // Demo field in panel
-            $builder->add(
+            $form->add(
                 'defaultValue',
                 $customField->getTypeObject()->getSymfonyFormFieldType(),
                 $fieldOptions
