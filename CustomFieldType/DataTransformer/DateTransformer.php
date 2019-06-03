@@ -33,14 +33,6 @@ class DateTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        IF (!$value) {
-            return null;
-        }
-
-        if (is_string($value)) {
-            return $value;
-        }
-
-        return $value->format('Y-m-d');
+        return $value ?: null;
     }
 }
