@@ -304,6 +304,7 @@ class CustomFieldType extends AbstractType
         });
 
         $builder->add('label', HiddenType::class);
+        $builder->add('alias', HiddenType::class);
         $builder->add('required', HiddenType::class);
 
         $builder->add(

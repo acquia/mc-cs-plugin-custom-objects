@@ -145,6 +145,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     {
         return $this->getNamePlural();
     }
+
     /**
      * @param string|null $alias
      */

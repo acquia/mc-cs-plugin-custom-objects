@@ -126,7 +126,6 @@ class SaveController extends CommonController
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $this->customFieldModel->save($customField);
             return $this->buildSuccessForm($customObject, $form->getData());
         }
 
@@ -163,6 +162,8 @@ class SaveController extends CommonController
             // Custom field relationship is missing when creating new options
             $option->setCustomField($customField);
         }
+
+        $this->customFieldModel->setAlias($customField);
 
         $customFieldForm = $this->formFactory->create(
             CustomFieldType::class,

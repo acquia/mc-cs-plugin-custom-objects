@@ -227,6 +227,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
     }
+
     /**
      * @return string|null
      */

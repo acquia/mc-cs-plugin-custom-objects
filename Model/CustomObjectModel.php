@@ -85,9 +85,10 @@ class CustomObjectModel extends FormModel
      */
     public function save(CustomObject $customObject): CustomObject
     {
-        $user  = $this->userHelper->getUser();
+        $user         = $this->userHelper->getUser();
         $customObject = $this->sanitizeAlias($customObject);
         $customObject = $this->ensureUniqueAlias($customObject);
+
         $now   = new DateTimeHelper();
         $event = new CustomObjectEvent($customObject, $customObject->isNew());
 
@@ -102,6 +103,8 @@ class CustomObjectModel extends FormModel
         $customObject->setDateModified($now->getUtcDateTime());
 
         $customObject->recordCustomFieldChanges();
+
+        $this->setCustomFieldsMetadata($customObject);
 
         $this->dispatcher->dispatch(CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_SAVE, $event);
 
@@ -370,5 +373,19 @@ class CustomObjectModel extends FormModel
         }
 
         return $queryBuilder;
+    }
+
+    /**
+     * @param CustomObject $customObject
+     *
+     * @return CustomObject
+     */
+    private function setCustomFieldsMetadata(CustomObject $customObject): CustomObject
+    {
+        foreach($customObject->getCustomFields() as $customField) {
+            $this->customFieldModel->setMetadata($customField);
+        }
+
+        return $customObject;
     }
 }

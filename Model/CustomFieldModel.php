@@ -66,12 +66,10 @@ class CustomFieldModel extends FormModel
      *
      * @return CustomField
      */
-    public function save(CustomField $entity): CustomField
+    public function setMetadata(CustomField $entity): CustomField
     {
-        $user = $this->userHelper->getUser();
-        $entity = $this->sanitizeAlias($entity);
-        $entity = $this->ensureUniqueAlias($entity);
-        $now  = new DateTimeHelper();
+        $user   = $this->userHelper->getUser();
+        $now    = new DateTimeHelper();
 
         if ($entity->isNew()) {
             $entity->setCreatedBy($user);
@@ -83,8 +81,18 @@ class CustomFieldModel extends FormModel
         $entity->setModifiedByUser($user->getName());
         $entity->setDateModified($now->getUtcDateTime());
 
-        $this->entityManager->persist($entity);
-        $this->entityManager->flush();
+        return $entity;
+    }
+
+    /**
+     * @param CustomField $entity
+     *
+     * @return CustomField
+     */
+    public function setAlias(CustomField $entity): CustomField
+    {
+        $entity = $this->sanitizeAlias($entity);
+        $entity = $this->ensureUniqueAlias($entity);
 
         return $entity;
     }
