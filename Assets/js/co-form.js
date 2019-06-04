@@ -211,37 +211,6 @@ CustomObjectsForm = {
     },
 
     /**
-     * Create/edit custom field from modal
-     * \MauticPlugin\CustomObjectsFormBundle\Controller\CustomField\SaveController::saveAction
-     */
-    saveToPanel: function(response, target) {
-        let content = mQuery(response.content);
-
-        let fieldOrderNo = mQuery(content).find('[id*=order]').val();
-
-        if (fieldOrderNo !== "") {
-            // Custom field has order defined, this was edit
-            fieldOrderNo = mQuery(content).find('[id*=order]').val();
-            content = CustomObjectsForm.convertDataFromModal(content, fieldOrderNo);
-            mQuery('form[name="custom_object"] [id*=order][value="' + fieldOrderNo +'"]').parent().replaceWith(content);
-        } else {
-            // New custom field without id
-            fieldOrderNo = mQuery('.panel').length - 2;
-            content = CustomObjectsForm.convertDataFromModal(content, fieldOrderNo);
-            mQuery('.drop-here').prepend(content);
-            CustomObjectsForm.recalculateOrder();
-            fieldOrderNo = 0;
-        }
-
-        mQuery(target).modal('hide');
-        mQuery('body').removeClass('modal-open');
-        mQuery('.modal-backdrop').remove();
-
-        let panel = mQuery('#customField_' + fieldOrderNo);
-        CustomObjectsForm.initPanel(panel);
-    },
-
-    /**
      * Load modal wit stuff from response
      * @param response
      * @param target
@@ -317,6 +286,37 @@ CustomObjectsForm = {
                 }
             }
         });
+    },
+
+    /**
+     * Create/edit custom field from modal
+     * \MauticPlugin\CustomObjectsFormBundle\Controller\CustomField\SaveController::saveAction
+     */
+    saveToPanel: function(response, target) {
+        let content = mQuery(response.content);
+
+        let fieldOrderNo = mQuery(content).find('[id*=order]').val();
+
+        if (fieldOrderNo !== "") {
+            // Custom field has order defined, this was edit
+            fieldOrderNo = mQuery(content).find('[id*=order]').val();
+            content = CustomObjectsForm.convertDataFromModal(content, fieldOrderNo);
+            mQuery('form[name="custom_object"] [id*=order][value="' + fieldOrderNo +'"]').parent().replaceWith(content);
+        } else {
+            // New custom field without id
+            fieldOrderNo = mQuery('.panel').length - 2;
+            content = CustomObjectsForm.convertDataFromModal(content, fieldOrderNo);
+            mQuery('.drop-here').prepend(content);
+            CustomObjectsForm.recalculateOrder();
+            fieldOrderNo = 0;
+        }
+
+        mQuery(target).modal('hide');
+        mQuery('body').removeClass('modal-open');
+        mQuery('.modal-backdrop').remove();
+
+        let panel = mQuery('#customField_' + fieldOrderNo);
+        CustomObjectsForm.initPanel(panel);
     },
 
     /**
