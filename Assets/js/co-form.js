@@ -211,7 +211,7 @@ CustomObjectsForm = {
     },
 
     /**
-     * Create custom field from
+     * Create/edit custom field from modal
      * \MauticPlugin\CustomObjectsFormBundle\Controller\CustomField\SaveController::saveAction
      */
     saveToPanel: function(response, target) {
