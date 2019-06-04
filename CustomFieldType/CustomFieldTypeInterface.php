@@ -20,6 +20,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Constraint;
 
 interface CustomFieldTypeInterface
 {
@@ -116,4 +117,9 @@ interface CustomFieldTypeInterface
      * @return DataTransformerInterface
      */
     public function createDefaultValueTransformer(): DataTransformerInterface;
+
+    /**
+     * @return Constraint[]
+     */
+    public function getSymfonyFormConstraints(): array;
 }

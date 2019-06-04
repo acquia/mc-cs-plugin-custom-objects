@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Exception\UndefinedConstraintsException;
 
 class CustomFieldValueType extends AbstractType
 {
@@ -32,13 +33,17 @@ class CustomFieldValueType extends AbstractType
         $customFieldId    = (int) $builder->getName();
         $customFieldValue = $customItem->findCustomFieldValueForFieldId($customFieldId);
         $customField      = $customFieldValue->getCustomField();
+        $options          = ['empty_data'  => $customItem->getId() ? null : $customField->getDefaultValue()];
+
+        try {
+            $options['constraints'] = $customField->getTypeObject()->getSymfonyFormConstraints();
+        } catch (UndefinedConstraintsException $e) {
+        }
 
         $builder->add(
             'value',
             $customField->getTypeObject()->getSymfonyFormFieldType(),
-            $customField->getFormFieldOptions([
-                'empty_data' => $customItem->getId() ? null : $customField->getDefaultValue(),
-            ])
+            $customField->getFormFieldOptions($options)
         );
     }
 
