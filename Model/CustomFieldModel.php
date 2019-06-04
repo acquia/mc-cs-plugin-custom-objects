@@ -66,6 +66,7 @@ class CustomFieldModel extends FormModel
             $entity->setCreatedBy($user);
             $entity->setCreatedByUser($user->getName());
             $entity->setDateAdded($now->getUtcDateTime());
+            $this->setAlias($entity);
         }
 
         $entity->setModifiedBy($user);
