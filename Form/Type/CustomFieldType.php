@@ -213,7 +213,7 @@ class CustomFieldType extends AbstractType
             $form = $event->getForm();
             $hasChoices = $customField->getTypeObject()->hasChoices();
 
-            $this->createDefaultValueInput($form, $customField);
+            $this->createDefaultValueInput($form, $customField, true);
 
             $form->add(
                 'params',
@@ -262,7 +262,7 @@ class CustomFieldType extends AbstractType
                 return;
             }
 
-            $this->createDefaultValueInput($form, $customField);
+            $this->createDefaultValueInput($form, $customField, false);
         });
 
         $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event): void {
@@ -305,8 +305,9 @@ class CustomFieldType extends AbstractType
      *
      * @param FormInterface $form
      * @param CustomField   $customField
+     * @param bool          $isModal Id definition used for modal
      */
-    private function createDefaultValueInput(FormInterface $form, CustomField $customField): void
+    private function createDefaultValueInput(FormInterface $form, CustomField $customField, $isModal): void
     {
         $fieldOptions = array_merge_recursive(
             $customField->getFormFieldOptions(),
@@ -320,10 +321,10 @@ class CustomFieldType extends AbstractType
             $fieldOptions['placeholder'] = $customField->getParams()->getEmptyValue();
         }
 
-        if ($customField->getType() === 'hidden') {
+        $symfonyFormFieldType = $customField->getTypeObject()->getSymfonyFormFieldType();
+
+        if ($isModal && $symfonyFormFieldType === HiddenType::class) {
             $symfonyFormFieldType = TextType::class;
-        } else {
-            $symfonyFormFieldType = $customField->getTypeObject()->getSymfonyFormFieldType();
         }
 
         // Demo field in panel
