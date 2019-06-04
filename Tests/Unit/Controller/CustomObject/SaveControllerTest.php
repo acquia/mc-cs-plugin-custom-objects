@@ -314,7 +314,7 @@ class SaveControllerTest extends ControllerTestCase
 
         /** @var JsonResponse $jsonResponse */
         $jsonResponse = $this->saveController->saveAction(self::OBJECT_ID);
-        
+
         $this->assertRegExp('/Redirecting to https:\/\/view.object/', $jsonResponse->getContent());
     }
 
