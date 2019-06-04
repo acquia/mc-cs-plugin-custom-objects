@@ -91,7 +91,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
     public function __clone()
     {
-        $this->id = null;
+        $this->id    = null;
         $this->alias = null;
     }
 
@@ -123,7 +123,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
         $builder->setTable('custom_field')
             ->setCustomRepositoryClass(CustomFieldRepository::class)
-            ->addIndex(['alias'], 'alias');;
+            ->addIndex(['alias'], 'alias');
 
         $builder->createManyToOne('customObject', CustomObject::class)
             ->addJoinColumn('custom_object_id', 'id', false, false, 'CASCADE')

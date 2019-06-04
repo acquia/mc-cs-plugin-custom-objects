@@ -83,9 +83,8 @@ class CustomFieldModel extends FormModel
     public function setAlias(CustomField $entity): CustomField
     {
         $entity = $this->sanitizeAlias($entity);
-        $entity = $this->ensureUniqueAlias($entity);
 
-        return $entity;
+        return $this->ensureUniqueAlias($entity);
     }
 
     /**
@@ -166,11 +165,12 @@ class CustomFieldModel extends FormModel
     }
 
     /**
-    **
-    * @param CustomField $entity
-    *
-    * @return CustomField
-    */
+     **.
+     *
+     * @param CustomField $entity
+     *
+     * @return CustomField
+     */
     private function sanitizeAlias(CustomField $entity): CustomField
     {
         $dirtyAlias = $entity->getAlias();
@@ -179,6 +179,7 @@ class CustomFieldModel extends FormModel
         }
         $cleanAlias = $this->cleanAlias($dirtyAlias, '', false, '-');
         $entity->setAlias($cleanAlias);
+
         return $entity;
     }
 
@@ -195,13 +196,14 @@ class CustomFieldModel extends FormModel
         $isUnique  = $this->customFieldRepository->isAliasUnique($testAlias, $entity->getId());
         $counter   = 1;
         while ($isUnique) {
-            $testAlias = $testAlias.$counter;
+            $testAlias .= $counter;
             $isUnique  = $this->customFieldRepository->isAliasUnique($testAlias, $entity->getId());
             ++$counter;
         }
         if ($testAlias !== $entity->getAlias()) {
             $entity->setAlias($testAlias);
         }
+
         return $entity;
     }
 

@@ -297,6 +297,7 @@ class CustomObjectModel extends FormModel
         }
         $cleanAlias = $this->cleanAlias($dirtyAlias, '', false, '-');
         $entity->setAlias($cleanAlias);
+
         return $entity;
     }
 
@@ -313,13 +314,14 @@ class CustomObjectModel extends FormModel
         $isUnique  = $this->customObjectRepository->isAliasUnique($testAlias, $entity->getId());
         $counter   = 1;
         while ($isUnique) {
-            $testAlias = $testAlias.$counter;
+            $testAlias .= $counter;
             $isUnique  = $this->customObjectRepository->isAliasUnique($testAlias, $entity->getId());
             ++$counter;
         }
         if ($testAlias !== $entity->getAlias()) {
             $entity->setAlias($testAlias);
         }
+
         return $entity;
     }
 
@@ -382,7 +384,7 @@ class CustomObjectModel extends FormModel
      */
     private function setCustomFieldsMetadata(CustomObject $customObject): CustomObject
     {
-        foreach($customObject->getCustomFields() as $customField) {
+        foreach ($customObject->getCustomFields() as $customField) {
             $this->customFieldModel->setMetadata($customField);
         }
 

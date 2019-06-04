@@ -24,7 +24,7 @@ class CustomObjectRepository extends CommonRepository
      *
      * @return bool
      */
-    public function isAliasUnique(string $alias, int $id = null): bool
+    public function isAliasUnique(string $alias, ?int $id = null): bool
     {
         $q = $this->createQueryBuilder('e');
         $q->select('count(e.id) as alias_count');
@@ -34,6 +34,7 @@ class CustomObjectRepository extends CommonRepository
             $q->andWhere($q->expr()->neq('e.id', ':ignoreId'));
             $q->setParameter('ignoreId', $id);
         }
+
         return (bool) $q->getQuery()->getSingleResult()['alias_count'];
     }
 
