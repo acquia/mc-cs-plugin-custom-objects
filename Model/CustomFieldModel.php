@@ -28,11 +28,6 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 class CustomFieldModel extends FormModel
 {
     /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
      * @var CustomFieldRepository
      */
     private $customFieldRepository;
