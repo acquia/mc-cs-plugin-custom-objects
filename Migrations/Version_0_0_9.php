@@ -46,7 +46,7 @@ class Version_0_0_9 extends AbstractMigration
      */
     protected function up(): void
     {
-        $tableCustomObject = $this->concatPrefix($this->tableCustomObject)
+        $tableCustomObject = $this->concatPrefix($this->tableCustomObject);
         $this->addSql("ALTER TABLE {$tableCustomObject} ADD alias VARCHAR(255) NOT NULL, ADD INDEX (alias)");
 
         $tableCustomField = $this->concatPrefix($this->tableCustomField);
