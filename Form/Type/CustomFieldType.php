@@ -320,10 +320,16 @@ class CustomFieldType extends AbstractType
             $fieldOptions['placeholder'] = $customField->getParams()->getEmptyValue();
         }
 
+        if ($customField->getType() === 'hidden') {
+            $symfonyFormFieldType = TextType::class;
+        } else {
+            $symfonyFormFieldType = $customField->getTypeObject()->getSymfonyFormFieldType();
+        }
+
         // Demo field in panel
         $form->add(
             'defaultValue',
-            $customField->getTypeObject()->getSymfonyFormFieldType(),
+            $symfonyFormFieldType,
             $fieldOptions
         );
     }
