@@ -309,14 +309,6 @@ class CustomFieldType extends AbstractType
      */
     private function createDefaultValueInput(FormInterface $form, CustomField $customField, $isModal): void
     {
-        $fieldOptions = array_merge_recursive(
-            $customField->getFormFieldOptions(),
-            [
-                // Force this preview settings
-                'data' => $customField->getDefaultValue(),
-            ]
-        );
-
         if ($customField->getTypeObject()->useEmptyValue() && $customField->getParams()->getEmptyValue()) {
             $fieldOptions['placeholder'] = $customField->getParams()->getEmptyValue();
         }
@@ -331,7 +323,7 @@ class CustomFieldType extends AbstractType
         $form->add(
             'defaultValue',
             $symfonyFormFieldType,
-            $fieldOptions
+            $customField->getFormFieldOptions(['empty_data' => null])
         );
     }
 }
