@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Model\FormModel;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -44,18 +43,15 @@ class CustomFieldModel extends FormModel
     private $permissionProvider;
 
     /**
-     * @param EntityManager                 $entityManager
      * @param CustomFieldRepository         $customFieldRepository
      * @param CustomFieldPermissionProvider $permissionProvider
      * @param UserHelper                    $userHelper
      */
     public function __construct(
-        EntityManager $entityManager,
         CustomFieldRepository $customFieldRepository,
         CustomFieldPermissionProvider $permissionProvider,
         UserHelper $userHelper
     ) {
-        $this->entityManager          = $entityManager;
         $this->customFieldRepository  = $customFieldRepository;
         $this->permissionProvider     = $permissionProvider;
         $this->userHelper             = $userHelper;
