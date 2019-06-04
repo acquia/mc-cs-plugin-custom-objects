@@ -22,12 +22,12 @@ class Version_0_0_9 extends AbstractMigration
     /**
      * @var string
      */
-    private $tableObject = 'custom_object';
+    private $tableCustomObject = 'custom_object';
 
     /**
      * @var string
      */
-    private $tableField = 'custom_field';
+    private $tableCustomField = 'custom_field';
 
     /**
      * {@inheritdoc}
@@ -35,7 +35,7 @@ class Version_0_0_9 extends AbstractMigration
     protected function isApplicable(Schema $schema): bool
     {
         try {
-            return !$schema->getTable($this->concatPrefix($this->tableObject))->hasColumn('alias');
+            return !$schema->getTable($this->concatPrefix($this->tableCustomObject))->hasColumn('alias');
         } catch (SchemaException $e) {
             return false;
         }
@@ -46,8 +46,8 @@ class Version_0_0_9 extends AbstractMigration
      */
     protected function up(): void
     {
-        $this->addSql("ALTER TABLE {$this->concatPrefix($this->tableObject)} ADD alias VARCHAR(255) NOT NULL, ADD INDEX (alias)");
+        $this->addSql("ALTER TABLE {$this->concatPrefix($this->tableCustomObject)} ADD alias VARCHAR(255) NOT NULL, ADD INDEX (alias)");
 
-        $this->addSql("ALTER TABLE {$this->concatPrefix($this->tableField)} ADD alias VARCHAR(255) NOT NULL, ADD INDEX (alias)");
+        $this->addSql("ALTER TABLE {$this->concatPrefix($this->tableCustomField)} ADD alias VARCHAR(255) NOT NULL, ADD INDEX (alias)");
     }
 }
