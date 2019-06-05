@@ -299,12 +299,12 @@ CustomObjectsForm = {
 
         if (orderNo !== "") {
             // Custom field has order defined, this was edit
-            content = CustomObjectsForm.convertDataFromModal(content, orderNo);
+            [content, defaultValue] = CustomObjectsForm.convertDataFromModal(content, orderNo);
             mQuery('form[name="custom_object"] [id*=order][value="' + orderNo +'"]').parent().replaceWith(content);
         } else {
             // New custom field without id
             orderNo = mQuery('.panel').length - 2;
-            content = CustomObjectsForm.convertDataFromModal(content, orderNo);
+            [content, defaultValue] = CustomObjectsForm.convertDataFromModal(content, orderNo);
             mQuery('.drop-here').prepend(content);
             CustomObjectsForm.recalculateOrder();
             orderNo = 0;
@@ -340,7 +340,7 @@ CustomObjectsForm = {
             let id = 'custom_object_custom_fields_' + fieldIndex + '_' + propertyName;
             mQuery(input).attr('id', id);
 
-            if (propertyName === 'defaultValue') {
+            if (propertyName === '') {
                 defaultValueId = id;
             }
 
@@ -349,24 +349,8 @@ CustomObjectsForm = {
             }
         });
 
-        this.initializeDefaultValueField(defaultValueId, type);
+        let defaultValue = mQuery(panel).find('#custom_field_defaultValue').val();
 
-        return panel;
+        return [panel, defaultValue];
     },
-
-    /**
-     * Initialize js of custom field type - default value representation
-     *
-     * @param id
-     * @param type
-     */
-    initializeDefaultValueField(id, type)
-    {
-        switch(type) {
-            default:
-                console.log(id);
-                console.log(type);
-                break;
-        }
-    }
 };
