@@ -293,18 +293,19 @@ CustomObjectsForm = {
      * \MauticPlugin\CustomObjectsFormBundle\Controller\CustomField\SaveController::saveAction
      */
     saveToPanel: function(response, target) {
-        let content = mQuery(response.content);
-
-        let orderNo = mQuery(content).find('[id*=order]').val();
+        let orderNo = mQuery(response.content).find('[id*=order]').val();
 
         if (orderNo !== "") {
             // Custom field has order defined, this was edit
-            [content, defaultValue] = CustomObjectsForm.convertDataFromModal(content, orderNo);
-            mQuery('form[name="custom_object"] [id*=order][value="' + orderNo +'"]').parent().replaceWith(content);
+            let panel = mQuery('.drop-here .panel[id*="_' + orderNo + '"]'); // target
+            let hiddens  = CustomObjectsForm.convertDataFromModal(response.content, orderNo);
+            mQuery(panel).find('.hidden-fields').replaceWith(hiddens); // all attributes except
+            let defaultValue = mQuery(response.content).find('#custom_field_defaultValue').val(); // set default value
+            mQuery('#custom_object_customFields_' + orderNo + '_defaultValue').val(defaultValue);
         } else {
             // New custom field without id
             orderNo = mQuery('.panel').length - 2;
-            [content, defaultValue] = CustomObjectsForm.convertDataFromModal(content, orderNo);
+            let content = CustomObjectsForm.convertDataFromModal(response.content, orderNo);
             mQuery('.drop-here').prepend(content);
             CustomObjectsForm.recalculateOrder();
             orderNo = 0;
@@ -319,14 +320,17 @@ CustomObjectsForm = {
     },
 
     /**
-     * Transfer modal data to CO form
-     * @param panel CF panel content
+     * Transfer modal data to CO form.
+     * Returned form from CustomField/SaveController:save is translated to panel form field and his config
+     * @param responseContent CF panel content
      * @param fieldIndex numeric index of CF in form
      * @returns html content of panel
      */
-    convertDataFromModal: function (panel, fieldIndex) {
+    convertDataFromModal: function (responseContent, fieldIndex) {
 
-        mQuery(panel).find('input').each(function(i, input) {
+        let hiddens = mQuery(responseContent).find('.hidden-fields');
+
+        mQuery(hiddens).find('input').each(function(i, input) {
             // Property name of hidden field represented as string
             let propertyName = mQuery(input).attr('id');
             propertyName = propertyName.slice(propertyName.lastIndexOf('_') + 1, propertyName.length);
@@ -334,12 +338,10 @@ CustomObjectsForm = {
             let name = 'custom_object[customFields][' + fieldIndex + '][' + propertyName + ']';
             mQuery(input).attr('name', name);
             // Property ID
-            let id = 'custom_object_custom_fields_' + fieldIndex + '_' + propertyName;
+            let id = 'custom_object_customFields_' + fieldIndex + '_' + propertyName;
             mQuery(input).attr('id', id);
         });
 
-        let defaultValue = mQuery(panel).find('#custom_field_defaultValue').val();
-
-        return [panel, defaultValue];
+        return hiddens;
     },
 };
