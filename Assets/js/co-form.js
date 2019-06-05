@@ -295,27 +295,26 @@ CustomObjectsForm = {
     saveToPanel: function(response, target) {
         let content = mQuery(response.content);
 
-        let fieldOrderNo = mQuery(content).find('[id*=order]').val();
+        let orderNo = mQuery(content).find('[id*=order]').val();
 
-        if (fieldOrderNo !== "") {
+        if (orderNo !== "") {
             // Custom field has order defined, this was edit
-            fieldOrderNo = mQuery(content).find('[id*=order]').val();
-            content = CustomObjectsForm.convertDataFromModal(content, fieldOrderNo);
-            mQuery('form[name="custom_object"] [id*=order][value="' + fieldOrderNo +'"]').parent().replaceWith(content);
+            content = CustomObjectsForm.convertDataFromModal(content, orderNo);
+            mQuery('form[name="custom_object"] [id*=order][value="' + orderNo +'"]').parent().replaceWith(content);
         } else {
             // New custom field without id
-            fieldOrderNo = mQuery('.panel').length - 2;
-            content = CustomObjectsForm.convertDataFromModal(content, fieldOrderNo);
+            orderNo = mQuery('.panel').length - 2;
+            content = CustomObjectsForm.convertDataFromModal(content, orderNo);
             mQuery('.drop-here').prepend(content);
             CustomObjectsForm.recalculateOrder();
-            fieldOrderNo = 0;
+            orderNo = 0;
         }
 
         mQuery(target).modal('hide');
         mQuery('body').removeClass('modal-open');
         mQuery('.modal-backdrop').remove();
 
-        let panel = mQuery('#customField_' + fieldOrderNo);
+        let panel = mQuery('#customField_' + orderNo);
         CustomObjectsForm.initPanel(panel);
     },
 
