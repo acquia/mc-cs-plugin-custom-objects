@@ -302,6 +302,8 @@ CustomObjectsForm = {
             mQuery(panel).find('.hidden-fields').replaceWith(hiddens); // all attributes except
             let defaultValue = mQuery(response.content).find('#custom_field_defaultValue').val(); // set default value
             mQuery('#custom_object_customFields_' + orderNo + '_defaultValue').val(defaultValue);
+            let label = mQuery(response.content).find('#custom_field_label').val();
+            mQuery(panel).find('label').html(label);
         } else {
             // New custom field without id
             orderNo = mQuery('.panel').length - 2;
