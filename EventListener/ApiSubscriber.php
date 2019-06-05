@@ -22,6 +22,8 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Mautic\LeadBundle\Entity\Lead;
+use InvalidArgumentException;
+use Symfony\Component\HttpFoundation\Request;
 
 class ApiSubscriber extends CommonSubscriber
 {
@@ -60,25 +62,38 @@ class ApiSubscriber extends CommonSubscriber
      */
     public static function getSubscribedEvents(): array
     {
-        return [
-            ApiEvents::API_ON_ENTITY_POST_SAVE => 'onEntityPostSave',
-        ];
+        // This check can be removed once https://github.com/mautic-inc/mautic-cloud/pull/555 is merged to deployed.
+        if (defined('\Mautic\ApiBundle\ApiEvents::API_ON_ENTITY_PRE_SAVE')) {
+            return [
+                 ApiEvents::API_ON_ENTITY_PRE_SAVE => 'validateCustomObjectsInContactRequest',
+                 ApiEvents::API_ON_ENTITY_POST_SAVE => 'saveCustomObjectsInContactRequest',
+            ];
+        }
+
+        return [];
     }
 
     /**
      * @param ApiEntityEvent $event
      */
-    public function onEntityPostSave(ApiEntityEvent $event): void
+    public function validateCustomObjectsInContactRequest(ApiEntityEvent $event): void
     {
-        $request = $event->getRequest();
+        $this->saveCustomItems($event, true);
+    }
 
-        if (!$this->configProvider->pluginIsEnabled() || !'/api/contacts/new' === $request->getPathInfo() || !$request->isMethod('POST') || !$request->request->has('customObjects')) {
-            return;
-        }
+    /**
+     * @param ApiEntityEvent $event
+     */
+    public function saveCustomObjectsInContactRequest(ApiEntityEvent $event): void
+    {
+        $this->saveCustomItems($event);
+    }
 
-        $customObjects = $request->request->get('customObjects');
-
-        if (!is_array($customObjects)) {
+    private function saveCustomItems(ApiEntityEvent $event, $dryRun = false)
+    {
+        try {
+            $customObjects = $this->getCustomObjectsFromContactCreateRequest($event->getRequest());
+        } catch (InvalidArgumentException $e) {
             return;
         }
 
@@ -111,9 +126,34 @@ class ApiSubscriber extends CommonSubscriber
                     $customFieldValue->setValue($value);
                 }
 
-                $this->customItemModel->save($customItem);
-                $this->customItemModel->linkEntity($customItem, 'contact', (int) $contact->getId());
+                $this->customItemModel->save($customItem, $dryRun);
+
+                if (!$dryRun) {
+                    $this->customItemModel->linkEntity($customItem, 'contact', (int) $contact->getId());
+                }
             }
         }
+    }
+
+    /**
+     * @param Request $request
+     * 
+     * @return mixed[]
+     * 
+     * @throws InvalidArgumentException
+     */
+    private function getCustomObjectsFromContactCreateRequest(Request $request): array
+    {
+        if (!$this->configProvider->pluginIsEnabled() || !'/api/contacts/new' === $request->getPathInfo() || !$request->request->has('customObjects')) {
+            throw new InvalidArgumentException("not a API request we care about");
+        }
+
+        $customObjects = $request->request->get('customObjects');
+
+        if (!is_array($customObjects)) {
+            throw new InvalidArgumentException("customObjects param in the request is not an array");
+        }
+
+        return $customObjects;
     }
 }
