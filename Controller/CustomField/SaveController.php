@@ -190,7 +190,7 @@ class SaveController extends CommonController
         // Replace order indexes witch free one to prevent duplicates in panel list
         $templateContent = str_replace(
             ['_0_', '[0]'],
-            ['_' . $customField->getOrder() . '_', '[' . $customField->getOrder() . ']'],
+            ['_'.$customField->getOrder().'_', '['.$customField->getOrder().']'],
             $templateContent
         );
 
