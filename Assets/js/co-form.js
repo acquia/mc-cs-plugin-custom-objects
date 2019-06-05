@@ -120,7 +120,8 @@ CustomObjectsForm = {
             var route = element.attr('href');
             var edit = true;
         } else {
-            var route = element.attr('data-href');
+            // Tell backend how many fields are present in the form
+            var route = element.attr('data-href') + '&fieldCount=' + mQuery('.drop-here').children().length;
             var edit = false;
         }
 
@@ -296,10 +297,12 @@ CustomObjectsForm = {
      */
     saveToPanel: function(response, target) {
 
-        if (mQuery('.drop-here').children().length) {
-            mQuery('#customField_' + response.order).replaceWith(response.content);
+        let panelToReplace = mQuery('#customField_' + response.order);
+
+        if (panelToReplace.length) {
+            panelToReplace.replaceWith(response.content);
         } else {
-            mQuery('.drop-here').html(response.content);
+            mQuery('.drop-here').prepend(response.content);
         }
 
         mQuery(target).modal('hide');
@@ -308,5 +311,6 @@ CustomObjectsForm = {
 
         let panel = mQuery('#customField_' + response.order);
         CustomObjectsForm.initPanel(panel);
+        CustomObjectsForm.recalculateOrder();
     },
 };

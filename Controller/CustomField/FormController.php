@@ -116,6 +116,7 @@ class FormController extends CommonController
             } else {
                 $this->permissionProvider->canCreate();
                 $customField = $this->customFieldFactory->create($fieldType, $customObject);
+                $customField->setOrder((int) $request->query->get('fieldCount'));
             }
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());

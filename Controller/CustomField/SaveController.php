@@ -186,8 +186,16 @@ class SaveController extends CommonController
             ]
         );
 
+        $templateContent = $template->getContent();
+        // Replace order indexes witch free one to prevent duplicates in panel list
+        $templateContent = str_replace(
+            ['_0_', '[0]'],
+            ['_' . $customField->getOrder() . '_', '[' . $customField->getOrder() . ']'],
+            $templateContent
+        );
+
         return new JsonResponse([
-            'content'    => $template->getContent(),
+            'content'    => $templateContent,
             'order'      => $customField->getOrder(),
             'closeModal' => 1,
         ]);
