@@ -57,6 +57,7 @@ class EmailType extends AbstractTextType
         }
 
         $emailValidator = new EmailValidator();
+        $emailValidator->initialize($context);
 
         try {
             $emailValidator->validate($value, $this->getSymfonyFormConstraints()[0]);
