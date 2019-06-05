@@ -302,9 +302,9 @@ class CustomFieldType extends AbstractType
      *
      * @param FormInterface $form
      * @param CustomField   $customField
-     * @param bool          $isModal Id definition used for modal
+     * @param bool          $isModal     Id definition used for modal
      */
-    private function createDefaultValueInput(FormInterface $form, CustomField $customField, $isModal): void
+    private function createDefaultValueInput(FormInterface $form, CustomField $customField, bool $isModal): void
     {
         if ($customField->getTypeObject()->useEmptyValue() && $customField->getParams()->getEmptyValue()) {
             $fieldOptions['placeholder'] = $customField->getParams()->getEmptyValue();
@@ -312,7 +312,7 @@ class CustomFieldType extends AbstractType
 
         $symfonyFormFieldType = $customField->getTypeObject()->getSymfonyFormFieldType();
 
-        if ($isModal && $symfonyFormFieldType === HiddenType::class) {
+        if ($isModal && HiddenType::class === $symfonyFormFieldType) {
             $symfonyFormFieldType = TextType::class;
         }
 

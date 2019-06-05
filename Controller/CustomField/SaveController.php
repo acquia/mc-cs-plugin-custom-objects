@@ -13,8 +13,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
@@ -149,7 +151,7 @@ class SaveController extends CommonController
     }
 
     /**
-     * Build custom field form to be used in custom object form.
+     * Build custom field form PART to be used in custom object form.
      *
      * @param CustomObject $customObject
      * @param CustomField  $customField
@@ -165,23 +167,28 @@ class SaveController extends CommonController
 
         $this->customFieldModel->setAlias($customField);
 
-        $customFieldForm = $this->formFactory->create(
-            CustomFieldType::class,
-            $customField,
-            ['custom_object_form' => true]
+        $customFields = new ArrayCollection([$customField]);
+        $customObject->setCustomFields($customFields);
+
+        $form = $this->formFactory->create(
+            CustomObjectType::class,
+            $customObject
         );
 
         $template = $this->render(
-            "CustomObjectsBundle:CustomObject:Form\\Panel\\{$customField->getType()}.html.php",
+            'CustomObjectsBundle:CustomObject:_form-fields.html.php',
             [
-                'customObject'      => $customObject,
-                'customFieldEntity' => $customField,
-                'customField'       => $customFieldForm->createView(),
+                'form'          => $form->createView(),
+                'customField'   => $customField,
+                'customFields'  => $customFields,
+                'customObject'  => $customObject,
+                'deletedFields' => [],
             ]
         );
 
         return new JsonResponse([
             'content'    => $template->getContent(),
+            'order'      => $customField->getOrder(),
             'closeModal' => 1,
         ]);
     }

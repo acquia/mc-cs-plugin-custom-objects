@@ -33,7 +33,7 @@ class DateTimeTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        IF (!$value) {
+        if (!$value) {
             return null;
         }
 

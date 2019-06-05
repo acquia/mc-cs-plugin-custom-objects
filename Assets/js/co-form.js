@@ -293,72 +293,18 @@ CustomObjectsForm = {
      * \MauticPlugin\CustomObjectsFormBundle\Controller\CustomField\SaveController::saveAction
      */
     saveToPanel: function(response, target) {
-        let orderNo = mQuery(response.content).find('[id*=order]').val();
 
-        if (orderNo !== "") {
-            // Custom field has order defined, this was edit
-            let panel = mQuery('.drop-here .panel[id*="_' + orderNo + '"]'); // target
-            let hiddens  = CustomObjectsForm.convertDataFromModal(response.content, orderNo);
-            mQuery(panel).find('.hidden-fields').replaceWith(hiddens); // all attributes except
-            let label = mQuery(response.content).find('#custom_field_label').val();
-            mQuery(panel).find('label.control-label').html(label);
-
-            let defaultValue = mQuery(response.content).find('#custom_field_defaultValue').val();
-            let defaultValueTarget = mQuery('#custom_object_customFields_' + orderNo + '_defaultValue');
-            this.updateField(defaultValueTarget, defaultValue);
+        if (mQuery('.drop-here').children().length) {
+            mQuery('#customField_' + response.order).replaceWith(response.content);
         } else {
-            // New custom field without id
-            orderNo = mQuery('.panel').length - 2;
-            let content = CustomObjectsForm.convertDataFromModal(response.content, orderNo);
-            mQuery('.drop-here').prepend(content);
-            CustomObjectsForm.recalculateOrder();
-            orderNo = 0;
+            mQuery('.drop-here').html(response.content);
         }
 
         mQuery(target).modal('hide');
         mQuery('body').removeClass('modal-open');
         mQuery('.modal-backdrop').remove();
 
-        let panel = mQuery('#customField_' + orderNo);
+        let panel = mQuery('#customField_' + response.order);
         CustomObjectsForm.initPanel(panel);
     },
-
-    /**
-     * Transfer modal data to CO form.
-     * Returned form from CustomField/SaveController:save is translated to panel form field and his config
-     * @param responseContent CF panel content
-     * @param fieldIndex numeric index of CF in form
-     * @returns html content of panel
-     */
-    convertDataFromModal: function (responseContent, fieldIndex) {
-
-        let hiddens = mQuery(responseContent).find('.hidden-fields');
-
-        mQuery(hiddens).find('input').each(function(i, input) {
-            // Property name of hidden field represented as string
-            let propertyName = mQuery(input).attr('id');
-            propertyName = propertyName.slice(propertyName.lastIndexOf('_') + 1, propertyName.length);
-            // Full array path to the value represented as string
-            let name = 'custom_object[customFields][' + fieldIndex + '][' + propertyName + ']';
-            mQuery(input).attr('name', name);
-            // Property ID
-            let id = 'custom_object_customFields_' + fieldIndex + '_' + propertyName;
-            mQuery(input).attr('id', id);
-        });
-
-        return hiddens;
-    },
-
-    /**
-     * Update field value based on type
-     * @param target
-     * @param value
-     */
-    updateField: function(target, value) {
-        target.val(value);
-
-        if (target.prop('type') === 'select-one') {
-            target.trigger("chosen:updated");
-        }
-    }
 };
