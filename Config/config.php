@@ -718,13 +718,25 @@ return [
                     'custom_object.config.provider',
                 ],
             ],
-            'custom_object'                                        => [
+            'custom_object.dynamic_content.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\DynamicContentSubscriber::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.lead.model.lead_segment_filter_factory',
                     'custom_object.query.filter.helper',
                     'custom_object.config.provider'
+                ],
+            ],
+            'custom_object.serializer.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\SerializerSubscriber::class,
+                'arguments' => [
+                    'custom_object.config.provider',
+                    'mautic.custom.model.object',
+                    'mautic.custom.model.item',
+                ],
+                'tag' => 'jms_serializer.event_subscriber',
+                'tagArguments' => [
+                    'event' => \JMS\Serializer\EventDispatcher\Events::POST_SERIALIZE,
                 ],
             ],
         ],
