@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Model\FormModel;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use Mautic\CoreBundle\Entity\CommonRepository;
@@ -29,11 +28,6 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 class CustomFieldModel extends FormModel
 {
     /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
      * @var CustomFieldRepository
      */
     private $customFieldRepository;
@@ -44,18 +38,15 @@ class CustomFieldModel extends FormModel
     private $permissionProvider;
 
     /**
-     * @param EntityManager                 $entityManager
      * @param CustomFieldRepository         $customFieldRepository
      * @param CustomFieldPermissionProvider $permissionProvider
      * @param UserHelper                    $userHelper
      */
     public function __construct(
-        EntityManager $entityManager,
         CustomFieldRepository $customFieldRepository,
         CustomFieldPermissionProvider $permissionProvider,
         UserHelper $userHelper
     ) {
-        $this->entityManager          = $entityManager;
         $this->customFieldRepository  = $customFieldRepository;
         $this->permissionProvider     = $permissionProvider;
         $this->userHelper             = $userHelper;
@@ -66,25 +57,35 @@ class CustomFieldModel extends FormModel
      *
      * @return CustomField
      */
-    public function save(CustomField $entity): CustomField
+    public function setMetadata(CustomField $entity): CustomField
     {
-        $user = $this->userHelper->getUser();
-        $now  = new DateTimeHelper();
+        $user   = $this->userHelper->getUser();
+        $now    = new DateTimeHelper();
 
         if ($entity->isNew()) {
             $entity->setCreatedBy($user);
             $entity->setCreatedByUser($user->getName());
             $entity->setDateAdded($now->getUtcDateTime());
+            $this->setAlias($entity);
         }
 
         $entity->setModifiedBy($user);
         $entity->setModifiedByUser($user->getName());
         $entity->setDateModified($now->getUtcDateTime());
 
-        $this->entityManager->persist($entity);
-        $this->entityManager->flush();
-
         return $entity;
+    }
+
+    /**
+     * @param CustomField $entity
+     *
+     * @return CustomField
+     */
+    public function setAlias(CustomField $entity): CustomField
+    {
+        $entity = $this->sanitizeAlias($entity);
+
+        return $this->ensureUniqueAlias($entity);
     }
 
     /**
@@ -162,6 +163,49 @@ class CustomFieldModel extends FormModel
     public function getPermissionBase(): string
     {
         return 'custom_fields:custom_fields';
+    }
+
+    /**
+     **.
+     *
+     * @param CustomField $entity
+     *
+     * @return CustomField
+     */
+    private function sanitizeAlias(CustomField $entity): CustomField
+    {
+        $dirtyAlias = $entity->getAlias();
+        if (empty($dirtyAlias)) {
+            $dirtyAlias = $entity->getName();
+        }
+        $cleanAlias = $this->cleanAlias($dirtyAlias, '', false, '-');
+        $entity->setAlias($cleanAlias);
+
+        return $entity;
+    }
+
+    /**
+     * Make sure alias is not already taken.
+     *
+     * @param CustomField $entity
+     *
+     * @return CustomField
+     */
+    private function ensureUniqueAlias(CustomField $entity): CustomField
+    {
+        $testAlias = $entity->getAlias();
+        $isUnique  = $this->customFieldRepository->isAliasUnique($testAlias, $entity->getId());
+        $counter   = 1;
+        while ($isUnique) {
+            $testAlias .= $counter;
+            $isUnique  = $this->customFieldRepository->isAliasUnique($testAlias, $entity->getId());
+            ++$counter;
+        }
+        if ($testAlias !== $entity->getAlias()) {
+            $entity->setAlias($testAlias);
+        }
+
+        return $entity;
     }
 
     /**

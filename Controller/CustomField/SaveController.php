@@ -163,6 +163,8 @@ class SaveController extends CommonController
             $option->setCustomField($customField);
         }
 
+        $this->customFieldModel->setAlias($customField);
+
         $customFieldForm = $this->formFactory->create(
             CustomFieldType::class,
             $customField,
