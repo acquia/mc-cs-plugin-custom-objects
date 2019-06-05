@@ -96,7 +96,7 @@ class CustomItemModel extends FormModel
      *
      * @return CustomItem
      */
-    public function save(CustomItem $customItem): CustomItem
+    public function save(CustomItem $customItem, $dryRun = false): CustomItem
     {
         $user  = $this->userHelper->getUser();
         $now   = new DateTimeHelper();
@@ -112,10 +112,12 @@ class CustomItemModel extends FormModel
         $customItem->setModifiedByUser($user->getName());
         $customItem->setDateModified($now->getUtcDateTime());
 
-        $this->entityManager->persist($customItem);
+        if (!$dryRun) {
+            $this->entityManager->persist($customItem);
+        }
 
         $customItem->getCustomFieldValues()->map(function (CustomFieldValueInterface $customFieldValue): void {
-            $this->customFieldValueModel->save($customFieldValue);
+            $this->customFieldValueModel->save($customFieldValue, $dryRun);
         });
 
         $errors = $this->validator->validate($customItem);
@@ -127,8 +129,11 @@ class CustomItemModel extends FormModel
         $customItem->recordCustomFieldValueChanges();
 
         $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, $event);
-        $this->entityManager->flush($customItem);
-        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $event);
+
+        if (!$dryRun) {
+            $this->entityManager->flush($customItem);
+            $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $event);
+        }
 
         return $customItem;
     }
