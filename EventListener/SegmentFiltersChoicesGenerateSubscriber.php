@@ -99,12 +99,19 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
                     $allowedOperators = $customField->getTypeObject()->getOperators();
                     $operators = array_intersect_key($availableOperator, $allowedOperators);
 
+                    $properties = ['type' => $customField->getType()];
+                    $choices    = $customField->getChoices();
+
+                    if (!empty($choices)) {
+                        $properties['list'] = $choices;
+                    }
+
                     $event->addChoice(
                         'custom_object',
                         'cmf_'.$customField->getId(),
                         [
                             'label'      => $customField->getCustomObject()->getName().' : '.$customField->getLabel(),
-                            'properties' => ['type' => $customField->getType()],
+                            'properties' => $properties,
                             'operators'  => $operators,
                             'object'     => $customField->getId(),
                         ]
