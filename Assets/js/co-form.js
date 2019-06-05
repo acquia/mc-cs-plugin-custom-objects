@@ -281,6 +281,8 @@ CustomObjectsForm = {
                         order = order + 1;
                     }
 
+                } else if (propertyName === 'defaultValue') {
+                    mQuery('#custom_field_defaultValue').val(value);
                 } else {
                     mQuery('#objectFieldModal').find(target).val(value);
                 }
