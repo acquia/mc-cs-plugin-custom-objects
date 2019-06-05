@@ -326,6 +326,9 @@ CustomObjectsForm = {
      */
     convertDataFromModal: function (panel, fieldIndex) {
 
+        let defaultValueId = null;
+        let type = null;
+
         mQuery(panel).find('input').each(function(i, input) {
             // Property name of hidden field represented as string
             let propertyName = mQuery(input).attr('id');
@@ -336,8 +339,34 @@ CustomObjectsForm = {
             // Property ID
             let id = 'custom_object_custom_fields_' + fieldIndex + '_' + propertyName;
             mQuery(input).attr('id', id);
+
+            if (propertyName === 'defaultValue') {
+                defaultValueId = id;
+            }
+
+            if (propertyName === 'type') {
+                type = mQuery(input).val();
+            }
         });
+
+        this.initializeDefaultValueField(defaultValueId, type);
 
         return panel;
     },
+
+    /**
+     * Initialize js of custom field type - default value representation
+     *
+     * @param id
+     * @param type
+     */
+    initializeDefaultValueField(id, type)
+    {
+        switch(type) {
+            default:
+                console.log(id);
+                console.log(type);
+                break;
+        }
+    }
 };
