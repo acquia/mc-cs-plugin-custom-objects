@@ -14,9 +14,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\CountryListType;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateTimeType;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\CustomObjectHiddenTransformer;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsToStringTransformer;
