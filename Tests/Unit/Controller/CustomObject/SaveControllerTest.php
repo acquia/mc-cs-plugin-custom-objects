@@ -169,10 +169,6 @@ class SaveControllerTest extends ControllerTestCase
             )
             ->willReturn($this->form);
 
-        $this->form->expects($this->at(0))
-            ->method('handleRequest')
-            ->with($this->request);
-
         $this->form->expects($this->at(1))
             ->method('isValid')
             ->willReturn(true);
@@ -239,9 +235,10 @@ class SaveControllerTest extends ControllerTestCase
             )
             ->willReturn($this->form);
 
-        $this->form->expects($this->at(0))
-            ->method('handleRequest')
-            ->with($this->request);
+        $this->request->expects($this->once())
+            ->method('get')
+            ->with('custom_object')
+            ->willReturn([]);
 
         $this->form->expects($this->at(1))
             ->method('isValid')
