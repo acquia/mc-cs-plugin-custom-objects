@@ -301,7 +301,7 @@ CustomObjectsForm = {
             let hiddens  = CustomObjectsForm.convertDataFromModal(response.content, orderNo);
             mQuery(panel).find('.hidden-fields').replaceWith(hiddens); // all attributes except
             let label = mQuery(response.content).find('#custom_field_label').val();
-            mQuery(panel).find('label').html(label);
+            mQuery(panel).find('label.control-label').html(label);
 
             let defaultValue = mQuery(response.content).find('#custom_field_defaultValue').val();
             let defaultValueTarget = mQuery('#custom_object_customFields_' + orderNo + '_defaultValue');
