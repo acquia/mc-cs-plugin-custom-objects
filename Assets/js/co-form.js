@@ -300,10 +300,12 @@ CustomObjectsForm = {
             let panel = mQuery('.drop-here .panel[id*="_' + orderNo + '"]'); // target
             let hiddens  = CustomObjectsForm.convertDataFromModal(response.content, orderNo);
             mQuery(panel).find('.hidden-fields').replaceWith(hiddens); // all attributes except
-            let defaultValue = mQuery(response.content).find('#custom_field_defaultValue').val(); // set default value
-            mQuery('#custom_object_customFields_' + orderNo + '_defaultValue').val(defaultValue);
             let label = mQuery(response.content).find('#custom_field_label').val();
             mQuery(panel).find('label').html(label);
+
+            let defaultValue = mQuery(response.content).find('#custom_field_defaultValue').val();
+            let defaultValueTarget = mQuery('#custom_object_customFields_' + orderNo + '_defaultValue');
+            this.updateField(defaultValueTarget, defaultValue);
         } else {
             // New custom field without id
             orderNo = mQuery('.panel').length - 2;
@@ -346,4 +348,17 @@ CustomObjectsForm = {
 
         return hiddens;
     },
+
+    /**
+     * Update field value based on type
+     * @param target
+     * @param value
+     */
+    updateField: function(target, value) {
+        target.val(value);
+
+        if (target.prop('type') === 'select-one') {
+            target.trigger("chosen:updated");
+        }
+    }
 };
