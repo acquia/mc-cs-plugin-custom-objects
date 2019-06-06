@@ -85,7 +85,7 @@ class CustomFieldModel extends FormModel
     {
         $entity = $this->sanitizeAlias($entity);
 
-        return $this->ensureUniqueAlwias($entity);
+        return $this->ensureUniqueAlias($entity);
     }
 
     /**
