@@ -99,10 +99,11 @@ class FormController extends CommonController
      */
     public function renderFormAction(Request $request): Response
     {
-        $objectId  = (int) $request->get('objectId');
-        $fieldId   = (int) $request->get('fieldId');
-        $fieldType = $request->get('fieldType');
-        $panelId   = is_numeric($request->get('panelId')) ? (int) $request->get('panelId') : null; // Is edit of existing panel in view
+        $objectId   = (int) $request->get('objectId');
+        $fieldId    = (int) $request->get('fieldId');
+        $fieldType  = $request->get('fieldType');
+        $panelId    = is_numeric($request->get('panelId')) ? (int) $request->get('panelId') : null; // Is edit of existing panel in view
+        $panelCount = is_numeric($request->get('panelCount')) ? (int) $request->get('panelCount') : null;
 
         if ($objectId) {
             $customObject = $this->customObjectModel->fetchEntity($objectId);
@@ -117,7 +118,6 @@ class FormController extends CommonController
             } else {
                 $this->permissionProvider->canCreate();
                 $customField = $this->customFieldFactory->create($fieldType, $customObject);
-                $customField->setOrder((int) $request->query->get('fieldCount'));
             }
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
@@ -126,7 +126,7 @@ class FormController extends CommonController
         }
 
         $route  = $this->fieldRouteProvider->buildFormRoute($customField->getId());
-        $action = $this->fieldRouteProvider->buildSaveRoute($fieldType, $fieldId, $customObject->getId(), $panelId);
+        $action = $this->fieldRouteProvider->buildSaveRoute($fieldType, $fieldId, $customObject->getId(), $panelCount, $panelId);
         $form   = $this->formFactory->create(CustomFieldType::class, $customField, ['action' => $action]);
 
         return $this->delegateView(

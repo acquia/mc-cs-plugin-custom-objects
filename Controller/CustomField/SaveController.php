@@ -98,10 +98,12 @@ class SaveController extends CommonController
      */
     public function saveAction(Request $request)
     {
-        $objectId  = (int) $request->get('objectId');
-        $fieldId   = (int) $request->get('fieldId');
-        $fieldType = $request->get('fieldType');
-        $panelId   = is_numeric($request->get('panelId')) ? (int) $request->get('panelId') : null; // Is edit of existing panel in view
+        $objectId   = (int) $request->get('objectId');
+        $fieldId    = (int) $request->get('fieldId');
+        $fieldType  = $request->get('fieldType');
+        $panelId    = is_numeric($request->get('panelId')) ? (int) $request->get('panelId') : null; // Is edit of existing panel in view
+        $panelCount = is_numeric($request->get('panelCount')) ? (int) $request->get('panelCount') : null;
+
 
         if ($objectId) {
             $customObject = $this->customObjectModel->fetchEntity($objectId);
@@ -123,7 +125,7 @@ class SaveController extends CommonController
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        $action = $this->fieldRouteProvider->buildSaveRoute($fieldType, $fieldId, $customObject->getId(), $panelId);
+        $action = $this->fieldRouteProvider->buildSaveRoute($fieldType, $fieldId, $customObject->getId(), $panelCount, $panelId);
         $form   = $this->formFactory->create(CustomFieldType::class, $customField, ['action' => $action]);
 
         $form->handleRequest($request);
@@ -166,6 +168,8 @@ class SaveController extends CommonController
 
         if (!$panelId) {
             $customField->setOrder(0); // Append new panel to top
+            $panelId = $request->get('panelCount');
+            $isNew = true;
         }
 
         foreach ($customField->getOptions() as $option) {
@@ -182,8 +186,6 @@ class SaveController extends CommonController
             CustomObjectType::class,
             $customObject
         );
-
-        $panelId = $panelId > -1 ? $panelId : $customField->getOrder();
 
         $template = $this->render(
             'CustomObjectsBundle:CustomObject:_form-fields.html.php',
@@ -207,7 +209,7 @@ class SaveController extends CommonController
 
         return new JsonResponse([
             'content'    => $templateContent,
-            'panelId'    => $panelId,
+            'isNew'      => isset($isNew),
             'closeModal' => 1,
         ]);
     }

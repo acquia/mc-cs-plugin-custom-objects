@@ -117,16 +117,16 @@ CustomObjectsForm = {
     showModal: function(element) {
         let panel = element.closest('.panel');
         let target = element.attr('data-target');
+        let panelCount = mQuery('.drop-here').children().length;
         if (element.attr('href')) {
             // Panel id in format customField_1
             let panelId = panel.attr('id');
             panelId = panelId.slice(panelId.lastIndexOf('_') + 1, panelId.length);
-            var route = element.attr('href') + '&panelId=' + panelId;
+            var route = element.attr('href') + '&panelId=' + panelId + '&panelCount=' + panelCount;
             var edit = true;
         } else {
             // Tell backend how many fields are present in the form
-            let panelCount = mQuery('.drop-here').children().length;
-            var route = element.attr('data-href') + '&fieldCount=' + panelCount;
+            var route = element.attr('data-href') + '&panelCount=' + panelCount;
             var edit = false;
         }
 
@@ -307,10 +307,10 @@ CustomObjectsForm = {
 
         let panelToReplace = mQuery('#customField_' + response.panelId);
 
-        if (panelToReplace.length) {
-            mQuery(panelToReplace).replaceWith(response.content);
-        } else {
+        if (response.isNew) {
             mQuery('.drop-here').prepend(response.content);
+        } else {
+            mQuery(panelToReplace).replaceWith(response.content);
         }
 
         mQuery(target).modal('hide');
