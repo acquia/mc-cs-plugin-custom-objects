@@ -27,8 +27,8 @@ class CustomItemRepository extends CommonRepository
     use DbalQueryTrait;
 
     /**
-     * @param Lead         $contact
      * @param CustomObject $customObject
+     * @param Lead         $contact
      *
      * @return int
      */
@@ -46,8 +46,8 @@ class CustomItemRepository extends CommonRepository
     }
 
     /**
-     * @param CustomItem   $customItem
      * @param CustomObject $customObject
+     * @param CustomItem   $customItem
      *
      * @return int
      */
