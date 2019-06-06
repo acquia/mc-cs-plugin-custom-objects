@@ -16,9 +16,9 @@ foreach ($form->children['customFields']->getIterator() as $customField):
         echo $view->render(
             "CustomObjectsBundle:CustomObject:Form\\Panel\\{$customFieldEntity->getType()}.html.php",
             [
-                'customField' => $customField,
+                'customField'  => $customField,
                 'customObject' => $customObject,
-                'panelId' => isset($panelId) ? $panelId : null,
+                'panelId'      => $panelId ?? null,
             ]
         );
     endif;
