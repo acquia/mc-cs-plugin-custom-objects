@@ -104,7 +104,6 @@ class SaveController extends CommonController
         $panelId    = is_numeric($request->get('panelId')) ? (int) $request->get('panelId') : null; // Is edit of existing panel in view
         $panelCount = is_numeric($request->get('panelCount')) ? (int) $request->get('panelCount') : null;
 
-
         if ($objectId) {
             $customObject = $this->customObjectModel->fetchEntity($objectId);
         } else {
@@ -168,8 +167,8 @@ class SaveController extends CommonController
 
         if (!$panelId) {
             $customField->setOrder(0); // Append new panel to top
-            $panelId = $request->get('panelCount');
-            $isNew = true;
+            $panelId = (int) $request->get('panelCount');
+            $isNew   = true;
         }
 
         foreach ($customField->getOptions() as $option) {
@@ -210,6 +209,7 @@ class SaveController extends CommonController
         return new JsonResponse([
             'content'    => $templateContent,
             'isNew'      => isset($isNew),
+            'panelId'    => $panelId,
             'closeModal' => 1,
         ]);
     }

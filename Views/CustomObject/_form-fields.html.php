@@ -15,7 +15,11 @@ foreach ($form->children['customFields']->getIterator() as $customField):
     if (!in_array($customFieldEntity->getId(), $deletedFields, true)) :
         echo $view->render(
             "CustomObjectsBundle:CustomObject:Form\\Panel\\{$customFieldEntity->getType()}.html.php",
-            ['customField' => $customField, 'customObject' => $customObject]
+            [
+                'customField' => $customField,
+                'customObject' => $customObject,
+                'panelId' => isset($panelId) ? $panelId : null,
+            ]
         );
     endif;
 endforeach;
