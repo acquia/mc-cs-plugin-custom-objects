@@ -371,7 +371,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
             // Nothing to transform, use string below
         }
 
-        $this->defaultValue = $defaultValue ?: null;
+        $this->defaultValue = $defaultValue === '' ? null : $defaultValue;
     }
 
     /**
