@@ -333,11 +333,19 @@ class CustomItemModel extends FormModel
      * @param TableConfig $tableConfig
      *
      * @return QueryBuilder
+     * 
+     * @throws UnexpectedValueException
      */
     private function createListQueryBuilder(TableConfig $tableConfig): QueryBuilder
     {
         $customObjectId = $tableConfig->getParameter('customObjectId');
+        $search         = $tableConfig->getParameter('search');
         $queryBuilder   = $this->entityManager->createQueryBuilder();
+
+        if (empty($customObjectId)) {
+            throw new UnexpectedValueException("customObjectId cannot be empty. It's required for permission management");
+        }
+
         $queryBuilder->select(CustomItem::TABLE_ALIAS);
         $queryBuilder->from(CustomItem::class, CustomItem::TABLE_ALIAS);
         $queryBuilder->setMaxResults($tableConfig->getLimit());
@@ -345,8 +353,6 @@ class CustomItemModel extends FormModel
         $queryBuilder->orderBy($tableConfig->getOrderBy(), $tableConfig->getOrderDirection());
         $queryBuilder->where(CustomItem::TABLE_ALIAS.'.customObject = :customObjectId');
         $queryBuilder->setParameter('customObjectId', $customObjectId);
-
-        $search = $tableConfig->getParameter('search');
 
         if ($search) {
             $queryBuilder->andWhere(CustomItem::TABLE_ALIAS.'.name LIKE :search');
