@@ -165,7 +165,7 @@ class SaveController extends CommonController
     {
         $panelId = is_numeric($request->get('panelId')) ? (int) $request->get('panelId') : null; // Is edit of existing panel in view
 
-        if (!$panelId) {
+        if ($panelId === null) {
             $customField->setOrder(0); // Append new panel to top
             $panelId = (int) $request->get('panelCount');
             $isNew   = true;

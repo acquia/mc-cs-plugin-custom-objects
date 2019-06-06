@@ -65,7 +65,7 @@ class CustomFieldRouteProvider
             $params['panelCount'] = $panelCount;
         }
 
-        if ($panelId) {
+        if ($panelId !== null) {
             $params['panelId'] = $panelId;
         }
 
