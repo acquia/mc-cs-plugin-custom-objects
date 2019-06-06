@@ -31,9 +31,6 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemType;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\ClickableInterface;
-use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use Symfony\Component\Form\FormError;
 
 class SaveControllerTest extends ControllerTestCase
 {
