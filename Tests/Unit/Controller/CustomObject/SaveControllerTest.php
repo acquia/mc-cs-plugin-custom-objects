@@ -235,7 +235,7 @@ class SaveControllerTest extends ControllerTestCase
             )
             ->willReturn($this->form);
 
-        $this->request->expects($this->once())
+        $this->request->expects($this->at(0))
             ->method('get')
             ->with('custom_object')
             ->willReturn([]);
