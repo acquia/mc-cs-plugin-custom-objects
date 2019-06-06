@@ -14,9 +14,8 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-use Mautic\EmailBundle\Helper\EmailValidator;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
+use Symfony\Component\Validator\Constraints\EmailValidator;
 
 class EmailType extends AbstractTextType
 {
@@ -29,21 +28,6 @@ class EmailType extends AbstractTextType
      * @var string
      */
     protected $key = 'email';
-    /**
-     * @var EmailValidator
-     */
-    private $emailValidator;
-
-    /**
-     * @param TranslatorInterface $translator
-     * @param EmailValidator      $emailValidator
-     */
-    public function __construct(TranslatorInterface $translator, EmailValidator $emailValidator)
-    {
-        parent::__construct($translator);
-
-        $this->emailValidator = $emailValidator;
-    }
 
     /**
      * @return string
@@ -56,14 +40,27 @@ class EmailType extends AbstractTextType
     /**
      * {@inheritdoc}
      */
+    public function getSymfonyFormConstraints(): array
+    {
+        return [
+            new \Symfony\Component\Validator\Constraints\Email(),
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function validateValue($value = null, ExecutionContextInterface $context): void
     {
         if (empty($value)) {
             return;
         }
 
+        $emailValidator = new EmailValidator();
+        $emailValidator->initialize($context);
+
         try {
-            $this->emailValidator->validate($value);
+            $emailValidator->validate($value, $this->getSymfonyFormConstraints()[0]);
         } catch (InvalidEmailException $e) {
             $context->buildViolation($e->getMessage())
                 ->atPath('value')

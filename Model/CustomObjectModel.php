@@ -85,7 +85,10 @@ class CustomObjectModel extends FormModel
      */
     public function save(CustomObject $customObject): CustomObject
     {
-        $user  = $this->userHelper->getUser();
+        $user         = $this->userHelper->getUser();
+        $customObject = $this->sanitizeAlias($customObject);
+        $customObject = $this->ensureUniqueAlias($customObject);
+
         $now   = new DateTimeHelper();
         $event = new CustomObjectEvent($customObject, $customObject->isNew());
 
@@ -100,6 +103,8 @@ class CustomObjectModel extends FormModel
         $customObject->setDateModified($now->getUtcDateTime());
 
         $customObject->recordCustomFieldChanges();
+
+        $this->setCustomFieldsMetadata($customObject);
 
         $this->dispatcher->dispatch(CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_SAVE, $event);
 
@@ -280,6 +285,47 @@ class CustomObjectModel extends FormModel
     }
 
     /**
+     * @param CustomObject $entity
+     *
+     * @return CustomObject
+     */
+    private function sanitizeAlias(CustomObject $entity): CustomObject
+    {
+        $dirtyAlias = $entity->getAlias();
+        if (empty($dirtyAlias)) {
+            $dirtyAlias = $entity->getName();
+        }
+        $cleanAlias = $this->cleanAlias($dirtyAlias, '', false, '-');
+        $entity->setAlias($cleanAlias);
+
+        return $entity;
+    }
+
+    /**
+     * Make sure alias is not already taken.
+     *
+     * @param CustomObject $entity
+     *
+     * @return CustomObject
+     */
+    private function ensureUniqueAlias(CustomObject $entity): CustomObject
+    {
+        $testAlias = $entity->getAlias();
+        $isUnique  = $this->customObjectRepository->isAliasUnique($testAlias, $entity->getId());
+        $counter   = 1;
+        while ($isUnique) {
+            $testAlias .= $counter;
+            $isUnique  = $this->customObjectRepository->isAliasUnique($testAlias, $entity->getId());
+            ++$counter;
+        }
+        if ($testAlias !== $entity->getAlias()) {
+            $entity->setAlias($testAlias);
+        }
+
+        return $entity;
+    }
+
+    /**
      * Adds condition for creator if the user doesn't have permissions to view other.
      *
      * @param mixed[] $args
@@ -329,5 +375,19 @@ class CustomObjectModel extends FormModel
         }
 
         return $queryBuilder;
+    }
+
+    /**
+     * @param CustomObject $customObject
+     *
+     * @return CustomObject
+     */
+    private function setCustomFieldsMetadata(CustomObject $customObject): CustomObject
+    {
+        foreach ($customObject->getCustomFields() as $customField) {
+            $this->customFieldModel->setMetadata($customField);
+        }
+
+        return $customObject;
     }
 }

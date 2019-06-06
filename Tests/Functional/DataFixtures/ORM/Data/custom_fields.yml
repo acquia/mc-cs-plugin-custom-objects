@@ -4,71 +4,82 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomField:
     is_published: true
     date_added: '<date()>'
     label: '<word()> Text'
+    alias: 'text_1'
     type: 'tect'
   custom_field2:
     custom_object: '@custom_object1'
     is_published: true
     date_added: '<date()>'
     label: '<word()> Integer'
+    alias: 'integer_2'
     type: 'int'
   custom_field3:
     custom_object: '@custom_object1'
     is_published: true
     date_added: '<date()>'
     label: '<word()> Date'
+    alias: 'date_3'
     type: 'date'
   custom_field4:
     custom_object: '@custom_object1'
     is_published: true
     date_added: '<datetime()>'
     label: '<word()> DateTime'
+    alias: 'datetime_4'
     type: 'datetime'
   custom_field5:
     custom_object: '@custom_object1'
     is_published: true
     date_added: '<datetime()>'
     label: '<word()> Text'
+    alias: 'text_5'
     type: 'text'
   custom_field6:
     custom_object: '@custom_object1'
     is_published: true
     date_added: '<datetime()>'
     label: '<word()> Select'
+    alias: 'select_6'
     type: 'select'
   custom_field7:
     custom_object: '@custom_object1'
     is_published: true
     date_added: '<datetime()>'
     label: '<word()> Radio'
+    alias: 'radio_7'
     type: 'radio_group'
   custom_field8:
     custom_object: '@custom_object1'
     is_published: true
     date_added: '<datetime()>'
     label: '<word()> Phone'
+    alias: 'phone_8'
     type: 'phone'
   custom_field9:
     custom_object: '@custom_object1'
     is_published: true
     date_added: '<datetime()>'
     label: '<word()> Hidden'
+    alias: 'hidden_9'
     type: 'hidden'
   custom_field10:
     custom_object: '@custom_object1'
     is_published: true
     date_added: '<datetime()>'
     label: '<word()> Email'
+    alias: 'email_10'
     type: 'email'
   custom_field11:
     custom_object: '@custom_object1'
     is_published: true
     date_added: '<datetime()>'
     label: '<word()> Country'
+    alias: 'country_11'
     type: 'country'
   custom_field12:
     custom_object: '@custom_object1'
     is_published: true
     date_added: '<datetime()>'
     label: '<word()> CheckBox'
+    alias: 'checkbox_12'
     type: 'checkbox_group'
-

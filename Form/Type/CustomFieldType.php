@@ -164,6 +164,8 @@ class CustomFieldType extends AbstractType
      */
     private function buildModalFormFields(FormBuilderInterface $builder, array $options): void
     {
+        $customField = $options['data'];
+
         $builder->add(
             'label',
             TextType::class,
@@ -174,6 +176,26 @@ class CustomFieldType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
+            ]
+        );
+
+        $attr = [
+            'class'   => 'form-control',
+            'tooltip' => 'custom.field.help.alias',
+        ];
+
+        if ($customField->getId() > 0) {
+            $attr['readonly'] = true;
+        }
+
+        $builder->add(
+            'alias',
+            TextType::class,
+            [
+                'label'      => 'custom.field.alias.label',
+                'required'   => false,
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => $attr,
             ]
         );
 
@@ -273,6 +295,7 @@ class CustomFieldType extends AbstractType
         });
 
         $builder->add('label', HiddenType::class);
+        $builder->add('alias', HiddenType::class);
         $builder->add('required', HiddenType::class);
 
         $builder->add(

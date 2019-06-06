@@ -13,9 +13,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
-use libphonenumber\PhoneNumberUtil;
-use libphonenumber\NumberParseException;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Mautic\FormBundle\Validator\Constraint\PhoneNumberConstraint;
+use Symfony\Component\Validator\Exception\InvalidOptionsException;
+use Mautic\FormBundle\Validator\Constraint\PhoneNumberConstraintValidator;
 
 class PhoneType extends AbstractTextType
 {
@@ -32,26 +33,30 @@ class PhoneType extends AbstractTextType
     /**
      * {@inheritdoc}
      */
+    public function getSymfonyFormConstraints(): array
+    {
+        $phoneNumberConstraint          = new PhoneNumberConstraint();
+        $phoneNumberConstraint->message = $this->translator->trans('mautic.form.submission.phone.invalid');
+
+        return [
+            $phoneNumberConstraint,
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws InvalidOptionsException
+     */
     public function validateValue($value = null, ExecutionContextInterface $context): void
     {
         if (empty($value)) {
             return;
         }
 
-        $phoneUtil = PhoneNumberUtil::getInstance();
+        $validator = new PhoneNumberConstraintValidator();
 
-        try {
-            $phoneNumber = $phoneUtil->parse($value, PhoneNumberUtil::UNKNOWN_REGION);
-
-            if (false === $phoneUtil->isValidNumber($phoneNumber)) {
-                $context->buildViolation("'{$value} is not valid phone number'")
-                    ->atPath('value')
-                    ->addViolation();
-            }
-        } catch (NumberParseException $e) {
-            $context->buildViolation($e->getMessage())
-                ->atPath('value')
-                ->addViolation();
-        }
+        $validator->initialize($context);
+        $validator->validate($value, $this->getSymfonyFormConstraints()[0]);
     }
 }

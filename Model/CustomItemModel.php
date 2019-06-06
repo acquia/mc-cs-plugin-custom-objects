@@ -121,7 +121,7 @@ class CustomItemModel extends FormModel
         $errors = $this->validator->validate($customItem);
 
         if ($errors->count() > 0) {
-            throw new InvalidValueException((string) $errors);
+            throw new InvalidValueException($errors->get(0)->getMessage());
         }
 
         $customItem->recordCustomFieldValueChanges();

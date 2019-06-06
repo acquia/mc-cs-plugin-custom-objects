@@ -214,7 +214,7 @@ class ImportSubscriberTest extends KernelTestCase
         try {
             $this->importCsvRow($customObject, $csvRow);
         } catch (InvalidValueException $e) {
-            $this->assertContains('bogus.@email is invalid', $e->getMessage());
+            $this->assertSame('This value is not a valid email address.', $e->getMessage());
         }
     }
 
@@ -231,7 +231,7 @@ class ImportSubscriberTest extends KernelTestCase
         try {
             $this->importCsvRow($customObject, $csvRow);
         } catch (InvalidValueException $e) {
-            $this->assertContains('+420111222333 is not valid phone number', $e->getMessage());
+            $this->assertContains('Please use the following international phone number format [+][country code][subscriber number] for this field (eg: ‪+14028650000).', $e->getMessage());
         }
     }
 
