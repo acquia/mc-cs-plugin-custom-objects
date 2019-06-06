@@ -248,6 +248,12 @@ CustomObjectsForm = {
      */
     convertDataToModal: function (panel) {
 
+        // Value could be different kind of type (input/textarea/..)
+        let panelId = CustomObjectsForm.getPanelId(panel);
+        let defaultValueIdSelector = '#custom_object_customFields_' + panelId + '_defaultValue';
+
+        mQuery('#custom_field_defaultValue').val(mQuery(defaultValueIdSelector).val());
+
         mQuery(panel).find('input').each(function (i, input) {
 
             let value = mQuery(input).val();
@@ -285,8 +291,6 @@ CustomObjectsForm = {
                         order = order + 1;
                     }
 
-                } else if (propertyName === 'defaultValue') {
-                    mQuery('#custom_field_defaultValue').val(value);
                 } else {
                     mQuery('#objectFieldModal').find(target).val(value);
                 }
@@ -316,4 +320,18 @@ CustomObjectsForm = {
         CustomObjectsForm.initPanel(panel);
         CustomObjectsForm.recalculateOrder();
     },
+
+
+    /**
+     * Find closest panel and get his id
+     *
+     * @returns {*}
+     * @param panel
+     */
+    getPanelId: function (panel) {
+        let panelId = panel.attr('id');
+        panelId = panelId.slice(panelId.lastIndexOf('_') + 1, panelId.length);
+
+        return panelId;
+    }
 };
