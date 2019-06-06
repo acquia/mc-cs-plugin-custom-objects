@@ -17,9 +17,13 @@ use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\Events;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use Mautic\LeadBundle\Entity\Lead;
+use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
+use Doctrine\Common\Collections\Collection;
 
 class SerializerSubscriber implements EventSubscriberInterface
 {
@@ -29,9 +33,9 @@ class SerializerSubscriber implements EventSubscriberInterface
     private $configProvider;
 
     /**
-     * @var CustomObjectModel
+     * @var CustomItemXrefContactRepository
      */
-    private $customObjectModel;
+    private $customItemXrefContactRepository;
 
     /**
      * @var CustomItemModel
@@ -39,18 +43,18 @@ class SerializerSubscriber implements EventSubscriberInterface
     private $customItemModel;
 
     /**
-     * @param ConfigProvider    $configProvider
-     * @param CustomObjectModel $customObjectModel
-     * @param CustomItemModel   $customItemModel
+     * @param ConfigProvider                  $configProvider
+     * @param CustomItemXrefContactRepository $customItemXrefContactRepository
+     * @param CustomItemModel                 $customItemModel
      */
     public function __construct(
         ConfigProvider $configProvider,
-        CustomObjectModel $customObjectModel,
+        CustomItemXrefContactRepository $customItemXrefContactRepository,
         CustomItemModel $customItemModel
     ) {
-        $this->configProvider    = $configProvider;
-        $this->customObjectModel = $customObjectModel;
-        $this->customItemModel   = $customItemModel;
+        $this->configProvider                  = $configProvider;
+        $this->customItemXrefContactRepository = $customItemXrefContactRepository;
+        $this->customItemModel                 = $customItemModel;
     }
 
     /**
@@ -71,13 +75,73 @@ class SerializerSubscriber implements EventSubscriberInterface
      */
     public function onPostSerialize(ObjectEvent $event): void
     {
-        $object = $event->getObject();
+        /** @var Lead $contact */
+        $contact = $event->getObject();
 
-        if (!$object instanceof Lead) {
+        if (!$contact instanceof Lead) {
             return;
         }
 
-        // This is how we add custom items that belong to the contact to the API response.
-        $event->getContext()->getVisitor()->addData('customObjects', ['hell' => 'o']);
+        if (!$this->configProvider->pluginIsEnabled()) {
+            return;
+        }
+
+        $customObjects = $this->customItemXrefContactRepository->getCustomObjectsRelatedToContact($contact);
+
+        if (!empty($customObjects)) {
+            return;
+        }
+
+        $payload = [];
+        foreach ($customObjects as $customObject) {
+            $tableConfig = new TableConfig(100, 1, CustomItem::TABLE_ALIAS.'.dateAdded', 'DESC');
+            $tableConfig->addParameter('customObjectId', $customObject['id']);
+            $tableConfig->addParameter('filterEntityId', $contact->getId());
+            $tableConfig->addParameter('filterEntityType', 'contact');
+            $customItems = $this->customItemModel->getTableData($tableConfig);
+
+            if (count($customItems)) {
+                $payload[$customObject['alias']] = [];
+                foreach ($customItems as $customItem) {
+                    $this->customItemModel->populateCustomFields($customItem);
+                    $payload[$customObject['alias']][] = $this->serializeCustomItem($customItem);
+                }
+            }
+        };
+
+        $event->getContext()->getVisitor()->addData('customObjects', $payload);
+    }
+
+    /**
+     * @param CustomItem $customItem
+     * 
+     * @return array
+     */
+    private function serializeCustomItem(CustomItem $customItem): array
+    {
+        return [
+            'id'           => $customItem->getId(),
+            'name'         => $customItem->getName(),
+            'language'     => $customItem->getLanguage(),
+            'category'     => $customItem->getCategory(),
+            'isPublished'  => $customItem->getIsPublished(),
+            'dateAdded'    => $customItem->getDateAdded()->format(DATE_ATOM),
+            'dateModified' => $customItem->getDateModified()->format(DATE_ATOM),
+            'createdBy'    => $customItem->getCreatedBy(),
+            'modifiedBy'   => $customItem->getModifiedBy(),
+            'fields'       => $this->serializeCustomFieldValues($customItem->getCustomFieldValues()),
+        ];
+    }
+
+    private function serializeCustomFieldValues(Collection $customFieldValues): array
+    {
+        $serializedValues = [];
+
+        /** @var CustomFieldValueInterface $customFieldValue */
+        foreach ($customFieldValues as $customFieldValue) {
+            $serializedValues[$customFieldValue->getCustomField()->getAlias()] = $customFieldValue->getValue();
+        }
+
+        return $serializedValues;
     }
 }

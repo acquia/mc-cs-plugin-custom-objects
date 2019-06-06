@@ -574,6 +574,13 @@ return [
                     \MauticPlugin\CustomObjectsBundle\Entity\CustomObject::class,
                 ],
             ],
+            'custom_item.xref.contact.repository' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact::class,
+                ],
+            ],
         ],
         'events' => [
             'custom_object.api.subscriber' => [
@@ -731,7 +738,7 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\SerializerSubscriber::class,
                 'arguments' => [
                     'custom_object.config.provider',
-                    'mautic.custom.model.object',
+                    'custom_item.xref.contact.repository',
                     'mautic.custom.model.item',
                 ],
                 'tag' => 'jms_serializer.event_subscriber',
