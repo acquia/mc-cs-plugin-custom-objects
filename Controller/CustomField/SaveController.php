@@ -101,6 +101,7 @@ class SaveController extends CommonController
         $objectId  = (int) $request->get('objectId');
         $fieldId   = (int) $request->get('fieldId');
         $fieldType = $request->get('fieldType');
+        $panelId   = is_numeric($request->get('panelId')) ? (int) $request->get('panelId') : null; // Is edit of existing panel in view
 
         if ($objectId) {
             $customObject = $this->customObjectModel->fetchEntity($objectId);
@@ -122,13 +123,13 @@ class SaveController extends CommonController
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        $action = $this->fieldRouteProvider->buildSaveRoute($fieldType, $fieldId, $customObject->getId());
+        $action = $this->fieldRouteProvider->buildSaveRoute($fieldType, $fieldId, $customObject->getId(), $panelId);
         $form   = $this->formFactory->create(CustomFieldType::class, $customField, ['action' => $action]);
 
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            return $this->buildSuccessForm($customObject, $form->getData());
+            return $this->buildSuccessForm($customObject, $form->getData(), $request);
         }
 
         $route = $fieldId ? $this->fieldRouteProvider->buildFormRoute($fieldId) : '';
@@ -155,11 +156,14 @@ class SaveController extends CommonController
      *
      * @param CustomObject $customObject
      * @param CustomField  $customField
+     * @param Request      $request
      *
      * @return JsonResponse
      */
-    private function buildSuccessForm(CustomObject $customObject, CustomField $customField): JsonResponse
+    private function buildSuccessForm(CustomObject $customObject, CustomField $customField, Request $request): JsonResponse
     {
+        $panelId = is_numeric($request->get('panelId')) ? (int) $request->get('panelId') : null; // Is edit of existing panel in view
+
         foreach ($customField->getOptions() as $option) {
             // Custom field relationship is missing when creating new options
             $option->setCustomField($customField);
@@ -175,10 +179,13 @@ class SaveController extends CommonController
             $customObject
         );
 
+        $panelId = $panelId > -1 ? $panelId : $customField->getOrder();
+
         $template = $this->render(
             'CustomObjectsBundle:CustomObject:_form-fields.html.php',
             [
                 'form'          => $form->createView(),
+                'panelId'       => $panelId, // Panel id to me replaced if edit
                 'customField'   => $customField,
                 'customFields'  => $customFields,
                 'customObject'  => $customObject,
@@ -190,13 +197,13 @@ class SaveController extends CommonController
         // Replace order indexes witch free one to prevent duplicates in panel list
         $templateContent = str_replace(
             ['_0_', '[0]'],
-            ['_'.$customField->getOrder().'_', '['.$customField->getOrder().']'],
+            ['_'.$panelId.'_', '['.$panelId.']'],
             $templateContent
         );
 
         return new JsonResponse([
             'content'    => $templateContent,
-            'order'      => $customField->getOrder(),
+            'panelId'    => $panelId,
             'closeModal' => 1,
         ]);
     }

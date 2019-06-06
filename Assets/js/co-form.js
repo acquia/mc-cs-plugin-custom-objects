@@ -115,9 +115,13 @@ CustomObjectsForm = {
     },
 
     showModal: function(element) {
+        let panel = element.closest('.panel');
         let target = element.attr('data-target');
         if (element.attr('href')) {
-            var route = element.attr('href');
+            // Panel id in format customField_1
+            let panelId = panel.attr('id');
+            panelId = panelId.slice(panelId.lastIndexOf('_') + 1, panelId.length);
+            var route = element.attr('href') + '&panelId=' + panelId;
             var edit = true;
         } else {
             // Tell backend how many fields are present in the form
@@ -142,7 +146,6 @@ CustomObjectsForm = {
                     if (response) {
                         CustomObjectsForm.refreshModalContent(response, target);
                         if (edit) {
-                            let panel = element.closest('.panel');
                             CustomObjectsForm.convertDataToModal(panel);
                         }
                     }
@@ -297,10 +300,10 @@ CustomObjectsForm = {
      */
     saveToPanel: function(response, target) {
 
-        let panelToReplace = mQuery('#customField_' + response.order);
+        let panelToReplace = mQuery('#customField_' + response.panelId);
 
         if (panelToReplace.length) {
-            panelToReplace.replaceWith(response.content);
+            mQuery(panelToReplace).replaceWith(response.content);
         } else {
             mQuery('.drop-here').prepend(response.content);
         }
