@@ -99,19 +99,12 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
                     $allowedOperators = $customField->getTypeObject()->getOperators();
                     $operators = array_intersect_key($availableOperator, $allowedOperators);
 
-                    $properties = ['type' => $customField->getType()];
-                    $choices    = $customField->getChoices();
-
-                    if (!empty($choices)) {
-                        $properties['list'] = $choices;
-                    }
-
                     $event->addChoice(
                         'custom_object',
                         'cmf_'.$customField->getId(),
                         [
                             'label'      => $customField->getCustomObject()->getName().' : '.$customField->getLabel(),
-                            'properties' => $properties,
+                            'properties' => $this->getFieldProperties($customField),
                             'operators'  => $operators,
                             'object'     => $customField->getId(),
                         ]
@@ -119,5 +112,27 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
                 }
             }
         );
+    }
+
+    /**
+     * @param CustomField $customField
+     *
+     * @return mixed[]
+     */
+    private function getFieldProperties(CustomField $customField): array
+    {
+        $type = $customField->getType();
+
+        $properties = ['type' => $type];
+
+        switch ($type) {
+            case 'select':
+            case 'multiselect':
+                $properties['list'] = $customField->getChoices();
+
+                break;
+        }
+
+        return $properties;
     }
 }

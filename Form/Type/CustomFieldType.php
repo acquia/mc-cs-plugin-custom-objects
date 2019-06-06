@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\CountryListType;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\CountryType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateTimeType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
@@ -306,7 +306,7 @@ class CustomFieldType extends AbstractType
     private function createDefaultValueInputForModal(FormInterface $form, CustomField $customField): void
     {
         $handledTypes = [
-            CountryListType::class,
+            CountryType::class,
             DateType::class,
             DateTimeType::class,
         ];

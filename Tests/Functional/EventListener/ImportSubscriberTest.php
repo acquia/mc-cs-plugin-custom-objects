@@ -82,7 +82,7 @@ class ImportSubscriberTest extends KernelTestCase
             'contacts'       => "{$jane->getId()},{$john->getId()}",
             'text'           => 'Some text value',
             'checkbox_group' => 'option_b',
-            'country_list'   => 'Czech Republic',
+            'country'        => 'Czech Republic',
             'datetime'       => '2019-03-04 12:35:09',
             'date'           => '2019-03-04',
             'email'          => 'info@doe.corp',
