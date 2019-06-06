@@ -57,7 +57,6 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
     public function testGettersSetters(): void
     {
         $customObject = new CustomObject();
-        $typeObject   = new DateType($this->createMock(TranslatorInterface::class));
         $customField  = new CustomField();
 
         // Test Initial values
@@ -69,6 +68,13 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($customField->getCustomObject());
         $this->assertNull($customField->getOrder());
         $this->assertFalse($customField->isRequired());
+
+        // Type object defined without transformer
+        $typeObject = $this->createMock(DateType::class);
+        $typeObject->expects($this->exactly(3))
+            ->method('createDefaultValueTransformer')
+            ->willThrowException(new UndefinedTransformerException());
+        $customField->setTypeObject($typeObject);
 
         $customField->setTypeObject($typeObject);
         $this->assertNull($customField->getDefaultValue());

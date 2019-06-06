@@ -18,8 +18,10 @@ $customFieldEntity          = $customField->vars['data'];
 $customField->vars['index'] = $customField->vars['name'];
 $order                      = (int) $customField->vars['value']->getOrder();
 $deleted                    = !empty($_POST['custom_object']['customFields'][$order]['deleted']) ? 'style="display:none;"' : '';
+
+$panelId = !empty($panelId) ? $panelId : (int) $customField->vars['value']->getOrder();
 ?>
-<div class="panel form-field-wrapper ui-sortable-handle" id="customField_<?php echo (int) $customField->vars['value']->getOrder(); ?>" <?php echo $deleted; ?>>
+<div class="panel form-field-wrapper ui-sortable-handle" id="customField_<?php echo $panelId; ?>" <?php echo $deleted; ?>>
 
     <div class="form-buttons btn-group" role="group" aria-label="Field options" style="width: 77px;">
 
@@ -49,7 +51,9 @@ $deleted                    = !empty($_POST['custom_object']['customFields'][$or
             </div>
         </div>
     </div>
-    <?php echo $view['form']->rest($customField); ?>
+    <div class="hidden-fields">
+        <?php echo $view['form']->rest($customField); ?>
+    </div>
     <div class="panel-footer">
         <i class="fa fa-cog" aria-hidden="true"></i>
         <span class="inline-spacer"><?php echo $customFieldEntity->getTypeObject()->getName(); ?></span>

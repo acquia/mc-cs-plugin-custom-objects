@@ -174,7 +174,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         $metadata->addPropertyConstraint('type', new Assert\NotBlank());
         $metadata->addPropertyConstraint('type', new Assert\Length(['max' => 255]));
         $metadata->addPropertyConstraint('customObject', new Assert\NotBlank());
-//        $metadata->addPropertyConstraint('defaultValue', new Assert\Length(['max' => 255]));
+        $metadata->addPropertyConstraint('defaultValue', new Assert\Length(['max' => 255]));
     }
 
     /**
@@ -371,7 +371,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
             // Nothing to transform, use string below
         }
 
-        $this->defaultValue = $defaultValue;
+        $this->defaultValue = '' === $defaultValue ? null : $defaultValue;
     }
 
     /**

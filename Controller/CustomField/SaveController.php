@@ -13,8 +13,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
@@ -96,9 +98,11 @@ class SaveController extends CommonController
      */
     public function saveAction(Request $request)
     {
-        $objectId  = (int) $request->get('objectId');
-        $fieldId   = (int) $request->get('fieldId');
-        $fieldType = $request->get('fieldType');
+        $objectId   = (int) $request->get('objectId');
+        $fieldId    = (int) $request->get('fieldId');
+        $fieldType  = $request->get('fieldType');
+        $panelId    = is_numeric($request->get('panelId')) ? (int) $request->get('panelId') : null; // Is edit of existing panel in view
+        $panelCount = is_numeric($request->get('panelCount')) ? (int) $request->get('panelCount') : null;
 
         if ($objectId) {
             $customObject = $this->customObjectModel->fetchEntity($objectId);
@@ -120,13 +124,13 @@ class SaveController extends CommonController
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        $action = $this->fieldRouteProvider->buildSaveRoute($fieldType, $fieldId, $customObject->getId());
+        $action = $this->fieldRouteProvider->buildSaveRoute($fieldType, $fieldId, $customObject->getId(), $panelCount, $panelId);
         $form   = $this->formFactory->create(CustomFieldType::class, $customField, ['action' => $action]);
 
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            return $this->buildSuccessForm($customObject, $form->getData());
+            return $this->buildSuccessForm($customObject, $form->getData(), $request);
         }
 
         $route = $fieldId ? $this->fieldRouteProvider->buildFormRoute($fieldId) : '';
@@ -149,15 +153,24 @@ class SaveController extends CommonController
     }
 
     /**
-     * Build custom field form to be used in custom object form.
+     * Build custom field form PART to be used in custom object form.
      *
      * @param CustomObject $customObject
      * @param CustomField  $customField
+     * @param Request      $request
      *
      * @return JsonResponse
      */
-    private function buildSuccessForm(CustomObject $customObject, CustomField $customField): JsonResponse
+    private function buildSuccessForm(CustomObject $customObject, CustomField $customField, Request $request): JsonResponse
     {
+        $panelId = is_numeric($request->get('panelId')) ? (int) $request->get('panelId') : null; // Is edit of existing panel in view
+
+        if (null === $panelId) {
+            $customField->setOrder(0); // Append new panel to top
+            $panelId = (int) $request->get('panelCount');
+            $isNew   = true;
+        }
+
         foreach ($customField->getOptions() as $option) {
             // Custom field relationship is missing when creating new options
             $option->setCustomField($customField);
@@ -165,23 +178,38 @@ class SaveController extends CommonController
 
         $this->customFieldModel->setAlias($customField);
 
-        $customFieldForm = $this->formFactory->create(
-            CustomFieldType::class,
-            $customField,
-            ['custom_object_form' => true]
+        $customFields = new ArrayCollection([$customField]);
+        $customObject->setCustomFields($customFields);
+
+        $form = $this->formFactory->create(
+            CustomObjectType::class,
+            $customObject
         );
 
         $template = $this->render(
-            "CustomObjectsBundle:CustomObject:Form\\Panel\\{$customField->getType()}.html.php",
+            'CustomObjectsBundle:CustomObject:_form-fields.html.php',
             [
-                'customObject'      => $customObject,
-                'customFieldEntity' => $customField,
-                'customField'       => $customFieldForm->createView(),
+                'form'          => $form->createView(),
+                'panelId'       => $panelId, // Panel id to me replaced if edit
+                'customField'   => $customField,
+                'customFields'  => $customFields,
+                'customObject'  => $customObject,
+                'deletedFields' => [],
             ]
         );
 
+        $templateContent = $template->getContent();
+        // Replace order indexes witch free one to prevent duplicates in panel list
+        $templateContent = str_replace(
+            ['_0_', '[0]'],
+            ['_'.$panelId.'_', '['.$panelId.']'],
+            $templateContent
+        );
+
         return new JsonResponse([
-            'content'    => $template->getContent(),
+            'content'    => $templateContent,
+            'isNew'      => isset($isNew),
+            'panelId'    => $panelId,
             'closeModal' => 1,
         ]);
     }
