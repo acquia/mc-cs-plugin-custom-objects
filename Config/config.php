@@ -810,7 +810,7 @@ return [
             ],
             'custom.field.type.email' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\EmailType::class,
-                'arguments' => ['translator', 'mautic.validator.email'],
+                'arguments' => ['translator'],
                 'tag'       => 'custom.field.type',
             ],
             'custom.field.type.hidden' => [

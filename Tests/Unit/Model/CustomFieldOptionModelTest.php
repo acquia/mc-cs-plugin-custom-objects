@@ -1,0 +1,66 @@
+<?php
+
+declare(strict_types=1);
+
+/*
+ * @copyright   2019 Mautic Contributors. All rights reserved
+ * @author      Mautic, Inc
+ *
+ * @link        https://mautic.com
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
+namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Model;
+
+use Doctrine\ORM\EntityManager;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\QueryBuilder;
+use MauticPlugin\CustomObjectsBundle\Model\CustomFieldOptionModel;
+
+class CustomFieldOptionModelTest extends \PHPUnit_Framework_TestCase
+{
+    private $entityManager;
+    private $connection;
+    private $queryBuilder;
+
+    /**
+     * @var CustomFieldOptionModel
+     */
+    private $customFieldOptionModel;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
+
+        $this->entityManager          = $this->createMock(EntityManager::class);
+        $this->connection             = $this->createMock(Connection::class);
+        $this->queryBuilder           = $this->createMock(QueryBuilder::class);
+        $this->customFieldOptionModel = new CustomFieldOptionModel($this->entityManager);
+
+        $this->entityManager->method('getConnection')->willReturn($this->connection);
+        $this->connection->method('createQueryBuilder')->willReturn($this->queryBuilder);
+    }
+
+    public function testDeleteByCustomFieldId(): void
+    {
+        $this->queryBuilder->expects($this->once())
+            ->method('delete')
+            ->with(MAUTIC_TABLE_PREFIX.'custom_field_option');
+
+        $this->queryBuilder->expects($this->once())
+            ->method('where')
+            ->with('custom_field_id = :customFieldId');
+
+        $this->queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('customFieldId', 123);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('execute');
+
+        $this->customFieldOptionModel->deleteByCustomFieldId(123);
+    }
+}

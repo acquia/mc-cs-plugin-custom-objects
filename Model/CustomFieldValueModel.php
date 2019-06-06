@@ -88,7 +88,10 @@ class CustomFieldValueModel
                 $errors = $this->validator->validate($optionValue);
 
                 if ($errors->count() > 0) {
-                    throw new InvalidValueException((string) $errors);
+                    $exception = new InvalidValueException($errors->get(0)->getMessage());
+                    $exception->setCustomField($customFieldValue->getCustomField());
+
+                    throw $exception;
                 }
 
                 $this->entityManager->persist($optionValue);
@@ -100,7 +103,10 @@ class CustomFieldValueModel
         $errors = $this->validator->validate($customFieldValue);
 
         if ($errors->count() > 0) {
-            throw new InvalidValueException((string) $errors);
+            $exception = new InvalidValueException($errors->get(0)->getMessage());
+            $exception->setCustomField($customFieldValue->getCustomField());
+
+            throw $exception;
         }
 
         if ($customFieldValue->getCustomItem()->getId()) {
