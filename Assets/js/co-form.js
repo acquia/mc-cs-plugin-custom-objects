@@ -125,7 +125,8 @@ CustomObjectsForm = {
             var edit = true;
         } else {
             // Tell backend how many fields are present in the form
-            var route = element.attr('data-href') + '&fieldCount=' + mQuery('.drop-here').children().length;
+            let panelCount = mQuery('.drop-here').children().length;
+            var route = element.attr('data-href') + '&fieldCount=' + panelCount;
             var edit = false;
         }
 
