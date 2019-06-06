@@ -184,10 +184,13 @@ class SaveController extends BaseFormController
             );
 
             if ($form->get('buttons')->get('save')->isClicked()) {
-                return $this->forwardToDetail($request, $customObject);
+                $this->customObjectModel->unlockEntity($customObject);
+                $route = $this->routeProvider->buildViewRoute($customObject->getId());
+            } else {
+                $route = $this->routeProvider->buildEditRoute($customObject->getId());
             }
 
-            return $this->redirectWithCompletePageRefresh($request, $this->routeProvider->buildEditRoute($customObject->getId()));
+            return $this->redirectWithCompletePageRefresh($request, $route);
         }
 
         return $this->delegateView(
@@ -237,22 +240,6 @@ class SaveController extends BaseFormController
                 $customField->setOptions($options);
             }
         }
-    }
-
-    /**
-     * @param Request      $request
-     * @param CustomObject $customObject
-     *
-     * @return Response
-     */
-    private function forwardToDetail(Request $request, CustomObject $customObject): Response
-    {
-        $request->setMethod('GET');
-        $params = ['objectId' => $customObject->getId()];
-
-        $this->customObjectModel->unlockEntity($customObject);
-
-        return $this->forward('CustomObjectsBundle:CustomObject\View:view', $params);
     }
 
     /**
