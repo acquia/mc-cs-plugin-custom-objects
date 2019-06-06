@@ -44,12 +44,12 @@ class CustomFieldRouteProvider
      * @param string   $fieldType
      * @param int|null $id
      * @param int|null $objectId
-     * @param int      $panelCount
+     * @param int|null $panelCount
      * @param int|null $panelId
      *
      * @return string
      */
-    public function buildSaveRoute(string $fieldType, ?int $id = null, ?int $objectId = null, ?int $panelCount, ?int $panelId): string
+    public function buildSaveRoute(string $fieldType, ?int $id = null, ?int $objectId = null, ?int $panelCount = null, ?int $panelId = null): string
     {
         $params['fieldType'] = $fieldType;
 
