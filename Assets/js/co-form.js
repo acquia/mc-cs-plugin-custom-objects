@@ -326,7 +326,6 @@ CustomObjectsForm = {
     /**
      * Find closest panel and get his id
      *
-     * @returns {*}
      * @param panel
      */
     getPanelId: function (panel) {
