@@ -125,12 +125,8 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
 
         $properties = ['type' => $type];
 
-        switch ($type) {
-            case 'select':
-            case 'multiselect':
-                $properties['list'] = $customField->getChoices();
-
-                break;
+        if ($customField->isChoiceType()) {
+            $properties['list'] = $customField->getChoices();
         }
 
         return $properties;
