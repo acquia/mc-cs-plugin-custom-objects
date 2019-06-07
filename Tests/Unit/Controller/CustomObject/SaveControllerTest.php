@@ -259,8 +259,8 @@ class SaveControllerTest extends ControllerTestCase
             ->willReturn($this->form);
 
         $this->form->expects($this->at(0))
-            ->method('handleRequest')
-            ->with($this->request);
+            ->method('submit')
+            ->with([]);
 
         $this->form->expects($this->at(1))
             ->method('isValid')
