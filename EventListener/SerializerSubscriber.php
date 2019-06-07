@@ -88,7 +88,7 @@ class SerializerSubscriber implements EventSubscriberInterface
 
         $customObjects = $this->customItemXrefContactRepository->getCustomObjectsRelatedToContact($contact);
 
-        if (!empty($customObjects)) {
+        if (empty($customObjects)) {
             return;
         }
 
@@ -101,10 +101,15 @@ class SerializerSubscriber implements EventSubscriberInterface
             $customItems = $this->customItemModel->getTableData($tableConfig);
 
             if (count($customItems)) {
-                $payload[$customObject['alias']] = [];
+                $payload[$customObject['alias']] = [
+                    'id'          => $customObject['id'],
+                    'customItems' => [],
+                ];
+
+                /** @var CustomItem $customItem */
                 foreach ($customItems as $customItem) {
                     $this->customItemModel->populateCustomFields($customItem);
-                    $payload[$customObject['alias']][] = $this->serializeCustomItem($customItem);
+                    $payload[$customObject['alias']]['customItems'][$customItem->getId()] = $this->serializeCustomItem($customItem);
                 }
             }
         };
@@ -115,7 +120,7 @@ class SerializerSubscriber implements EventSubscriberInterface
     /**
      * @param CustomItem $customItem
      * 
-     * @return array
+     * @return mixed[]
      */
     private function serializeCustomItem(CustomItem $customItem): array
     {
@@ -129,10 +134,15 @@ class SerializerSubscriber implements EventSubscriberInterface
             'dateModified' => $customItem->getDateModified()->format(DATE_ATOM),
             'createdBy'    => $customItem->getCreatedBy(),
             'modifiedBy'   => $customItem->getModifiedBy(),
-            'fields'       => $this->serializeCustomFieldValues($customItem->getCustomFieldValues()),
+            'customFields' => $this->serializeCustomFieldValues($customItem->getCustomFieldValues()),
         ];
     }
 
+    /**
+     * @param Collection|CustomFieldValueInterface[] $customFieldValues
+     * 
+     * @return mixed[]
+     */
     private function serializeCustomFieldValues(Collection $customFieldValues): array
     {
         $serializedValues = [];

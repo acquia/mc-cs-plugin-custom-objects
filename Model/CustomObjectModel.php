@@ -156,6 +156,27 @@ class CustomObjectModel extends FormModel
     }
 
     /**
+     * @param int $id
+     *
+     * @return CustomObject
+     *
+     * @throws NotFoundException
+     */
+    public function fetchEntityByAlias(string $alias): CustomObject
+    {
+        /** @var CustomObject|null */
+        $customObject = $this->customObjectRepository->findOneBy(['alias' => $alias]);
+
+        if (null === $customObject) {
+            throw new NotFoundException("Custom Object with alias = {$alias} was not found");
+        }
+
+        $customObject->createFieldsSnapshot();
+
+        return $customObject;
+    }
+
+    /**
      * @param mixed[] $args
      *
      * @return Paginator|CustomObject[]

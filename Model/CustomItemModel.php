@@ -116,7 +116,7 @@ class CustomItemModel extends FormModel
             $this->entityManager->persist($customItem);
         }
 
-        $customItem->getCustomFieldValues()->map(function (CustomFieldValueInterface $customFieldValue): void {
+        $customItem->getCustomFieldValues()->map(function (CustomFieldValueInterface $customFieldValue) use ($dryRun): void {
             $this->customFieldValueModel->save($customFieldValue, $dryRun);
         });
 

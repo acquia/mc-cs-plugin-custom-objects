@@ -176,7 +176,7 @@ class ImportSubscriberTest extends KernelTestCase
      */
     private function validateSelectOptionValueExists(CustomObject $customObject, array $csvRow): void
     {
-        $csvRow['multiselect']    = 'unicorn';
+        $csvRow['multiselect'] = 'unicorn';
 
         try {
             $this->importCsvRow($customObject, $csvRow);

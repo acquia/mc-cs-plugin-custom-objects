@@ -89,7 +89,11 @@ class ApiSubscriber extends CommonSubscriber
         $this->saveCustomItems($event);
     }
 
-    private function saveCustomItems(ApiEntityEvent $event, $dryRun = false)
+    /**
+     * @param ApiEntityEvent $event
+     * @param bool           $dryRun
+     */
+    private function saveCustomItems(ApiEntityEvent $event, $dryRun = false): void
     {
         try {
             $customObjects = $this->getCustomObjectsFromContactCreateRequest($event->getRequest());
@@ -101,29 +105,29 @@ class ApiSubscriber extends CommonSubscriber
         $contact = $event->getEntity();
 
         foreach ($customObjects as $customObjectAlias => $customItems) {
-            $customObject = $this->customObjectModel->fetchEntity((int) $customObjectAlias); // @todo change this to fetch by alias.
+            $customObject = $this->customObjectModel->fetchEntityByAlias($customObjectAlias);
 
             foreach ($customItems as $customItemData) {
                 if (empty($customItemData['id'])) {
                     $customItem = new CustomItem($customObject);
-                    unset($customItemData['id']);
                 } else {
                     $customItem = $this->customItemModel->fetchEntity((int) $customItemData['id']);
                 }
 
-                if (!(empty($customItemData['name']))) {
+                if (!empty($customItemData['name'])) {
                     $customItem->setName($customItemData['name']);
-                    unset($customItemData['name']);
                 }
 
-                foreach ($customItemData as $fieldAlias => $value) {
-                    try {
-                        $customFieldValue = $customItem->findCustomFieldValueForFieldId((int) $fieldAlias); // @todo change this to field alias instead of id.
-                    } catch (NotFoundException $e) {
-                        $customFieldValue = $customItem->createNewCustomFieldValueByFieldId((int) $fieldAlias, $value); // @todo change this to field alias instead of id.
+                if (!empty($customItemData['customFields']) && is_array($customItemData['customFields'])) {
+                    foreach ($customItemData['customFields'] as $fieldAlias => $value) {
+                        try {
+                            $customFieldValue = $customItem->findCustomFieldValueForFieldAlias($fieldAlias);
+                        } catch (NotFoundException $e) {
+                            $customFieldValue = $customItem->createNewCustomFieldValueByFieldAlias($fieldAlias, $value);
+                        }
+            
+                        $customFieldValue->setValue($value);
                     }
-        
-                    $customFieldValue->setValue($value);
                 }
 
                 $this->customItemModel->save($customItem, $dryRun);
