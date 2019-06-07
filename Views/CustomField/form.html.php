@@ -11,6 +11,8 @@
 
 /** @var \MauticPlugin\CustomObjectsBundle\Entity\CustomField $customField */
 $title = $customField->getId() ? $customField->getLabel() : $customField->getTypeObject()->getName();
+
+$showProperties = isset($form['options']) || $customField->getTypeObject()->useEmptyValue();
 ?>
 
 <div class="bundle-form">
@@ -34,11 +36,13 @@ $title = $customField->getId() ? $customField->getLabel() : $customField->getTyp
                     Validation
                 </a>
             </li>
+<?php if ($showProperties): ?>
             <li role="presentation">
                 <a href="#properties" aria-controls="properties" role="tab" data-toggle="tab">
                     Properties
                 </a>
             </li>
+<?php endif; ?>
         </ul>
 
         <div class="tab-content pa-lg">
@@ -75,6 +79,7 @@ $title = $customField->getId() ? $customField->getLabel() : $customField->getTyp
                 </div>
             </div>
 
+<?php if ($showProperties): ?>
             <div role="tabpanel" class="tab-pane" id="properties">
                 <div class="row">
 <?php if (isset($form['options'])): ?>
@@ -91,6 +96,7 @@ $title = $customField->getId() ? $customField->getLabel() : $customField->getTyp
 <?php endif; ?>
                 </div>
             </div>
+<?php endif; ?>
 
         </div>
 
