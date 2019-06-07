@@ -115,12 +115,18 @@ CustomObjectsForm = {
     },
 
     showModal: function(element) {
+        let panel = element.closest('.panel');
         let target = element.attr('data-target');
+        let panelCount = mQuery('.drop-here').children().length;
         if (element.attr('href')) {
-            var route = element.attr('href');
+            // Panel id in format customField_1
+            let panelId = panel.attr('id');
+            panelId = panelId.slice(panelId.lastIndexOf('_') + 1, panelId.length);
+            var route = element.attr('href') + '&panelId=' + panelId + '&panelCount=' + panelCount;
             var edit = true;
         } else {
-            var route = element.attr('data-href');
+            // Tell backend how many fields are present in the form
+            var route = element.attr('data-href') + '&panelCount=' + panelCount;
             var edit = false;
         }
 
@@ -141,7 +147,6 @@ CustomObjectsForm = {
                     if (response) {
                         CustomObjectsForm.refreshModalContent(response, target);
                         if (edit) {
-                            let panel = element.closest('.panel');
                             CustomObjectsForm.convertDataToModal(panel);
                         }
                     }
@@ -211,37 +216,6 @@ CustomObjectsForm = {
     },
 
     /**
-     * Create custom field from
-     * \MauticPlugin\CustomObjectsFormBundle\Controller\CustomField\SaveController::saveAction
-     */
-    saveToPanel: function(response, target) {
-        let content = mQuery(response.content);
-
-        fieldOrderNo = mQuery(content).find('[id*=order]').val();
-
-        if (fieldOrderNo !== "") {
-            // Custom field has order defined, this was edit
-            fieldOrderNo = mQuery(content).find('[id*=order]').val();
-            content = CustomObjectsForm.convertDataFromModal(content, fieldOrderNo);
-            mQuery('form[name="custom_object"] [id*=order][value="' + fieldOrderNo +'"]').parent().replaceWith(content);
-        } else {
-            // New custom field without id
-            fieldOrderNo = mQuery('.panel').length - 2;
-            content = CustomObjectsForm.convertDataFromModal(content, fieldOrderNo);
-            mQuery('.drop-here').prepend(content);
-            CustomObjectsForm.recalculateOrder();
-            fieldOrderNo = 0;
-        }
-
-        mQuery(target).modal('hide');
-        mQuery('body').removeClass('modal-open');
-        mQuery('.modal-backdrop').remove();
-
-        let panel = mQuery('#customField_' + fieldOrderNo);
-        CustomObjectsForm.initPanel(panel);
-    },
-
-    /**
      * Load modal wit stuff from response
      * @param response
      * @param target
@@ -274,6 +248,12 @@ CustomObjectsForm = {
      * @param panel DOM element with .panel class
      */
     convertDataToModal: function (panel) {
+
+        // Value could be different kind of type (input/textarea/..)
+        let panelId = CustomObjectsForm.getPanelId(panel);
+        let defaultValueIdSelector = '#custom_object_customFields_' + panelId + '_defaultValue';
+
+        mQuery('#custom_field_defaultValue').val(mQuery(defaultValueIdSelector).val());
 
         mQuery(panel).find('input').each(function (i, input) {
 
@@ -320,24 +300,38 @@ CustomObjectsForm = {
     },
 
     /**
-     * Transfer modal data to CO form
-     * @param panel CF panel content
-     * @param fieldIndex numeric index of CF in form
-     * @returns html content of panel
+     * Create/edit custom field from modal
+     * \MauticPlugin\CustomObjectsFormBundle\Controller\CustomField\SaveController::saveAction
      */
-    convertDataFromModal: function (panel, fieldIndex) {
+    saveToPanel: function(response, target) {
 
-        mQuery(panel).find('input').each(function(i, input) {
-            // Property name of hidden field represented as string
-            let propertyName = mQuery(input).attr('id');
-            propertyName = propertyName.slice(propertyName.lastIndexOf('_') + 1, propertyName.length);
-            // Full array path to the value represented as string
-            let name = 'custom_object[customFields][' + fieldIndex + '][' + propertyName + ']';
-            mQuery(input).attr('name', name);
-            // Property ID
-            let id = 'custom_object_custom_fields_' + fieldIndex + '_' + propertyName;
-            mQuery(input).attr('id', id);
-        });
-        return panel;
+        let panelToReplace = mQuery('#customField_' + response.panelId);
+
+        if (response.isNew) {
+            mQuery('.drop-here').prepend(response.content);
+        } else {
+            mQuery(panelToReplace).replaceWith(response.content);
+        }
+
+        mQuery(target).modal('hide');
+        mQuery('body').removeClass('modal-open');
+        mQuery('.modal-backdrop').remove();
+
+        let panel = mQuery('#customField_' + response.order);
+        CustomObjectsForm.initPanel(panel);
+        CustomObjectsForm.recalculateOrder();
     },
+
+
+    /**
+     * Find closest panel and get his id
+     *
+     * @param panel
+     */
+    getPanelId: function (panel) {
+        let panelId = panel.attr('id');
+        panelId = panelId.slice(panelId.lastIndexOf('_') + 1, panelId.length);
+
+        return panelId;
+    }
 };

@@ -34,6 +34,7 @@ use Symfony\Component\Form\ClickableInterface;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 class SaveControllerTest extends ControllerTestCase
 {
@@ -125,7 +126,7 @@ class SaveControllerTest extends ControllerTestCase
         $this->saveController->saveAction(self::OBJECT_ID);
     }
 
-    public function testSaveActionForExistingCustomObjectWithValidForm(): void
+    public function testSaveActionForExistingCustomObjectWithValidFormClickingApply(): void
     {
         $this->customObject->expects($this->once())
             ->method('getName')
@@ -169,10 +170,6 @@ class SaveControllerTest extends ControllerTestCase
             )
             ->willReturn($this->form);
 
-        $this->form->expects($this->at(0))
-            ->method('handleRequest')
-            ->with($this->request);
-
         $this->form->expects($this->at(1))
             ->method('isValid')
             ->willReturn(true);
@@ -212,6 +209,111 @@ class SaveControllerTest extends ControllerTestCase
         $this->saveController->saveAction(self::OBJECT_ID);
     }
 
+    public function testSaveActionForExistingCustomObjectWithValidFormClickingSaveAndAjax(): void
+    {
+        $this->customObject->expects($this->once())
+            ->method('getName')
+            ->willReturn('Umpalumpa');
+
+        $this->customObject->expects($this->once())
+            ->method('getId')
+            ->willReturn(self::OBJECT_ID);
+
+        $this->customObjectModel->expects($this->once())
+            ->method('fetchEntity')
+            ->willReturn($this->customObject);
+
+        $this->permissionProvider->expects($this->once())
+            ->method('canEdit');
+
+        $this->permissionProvider->expects($this->never())
+            ->method('canCreate');
+
+        $this->customObjectModel->expects($this->once())
+            ->method('isLocked')
+            ->with($this->customObject)
+            ->willReturn(false);
+
+        $this->routeProvider->expects($this->once())
+            ->method('buildEditRoute')
+            ->with(self::OBJECT_ID)
+            ->willReturn('https://edit.object');
+
+        $this->routeProvider->expects($this->once())
+            ->method('buildViewRoute')
+            ->with(self::OBJECT_ID)
+            ->willReturn('https://view.object');
+
+        $this->routeProvider->expects($this->once())
+            ->method('buildSaveRoute')
+            ->with(self::OBJECT_ID)
+            ->willReturn('https://save.object');
+
+        $this->formFactory->expects($this->once())
+            ->method('create')
+            ->with(
+                CustomObjectType::class,
+                $this->customObject,
+                ['action' => 'https://save.object']
+            )
+            ->willReturn($this->form);
+
+        $this->form->expects($this->at(0))
+            ->method('submit')
+            ->with([]);
+
+        $this->form->expects($this->at(1))
+            ->method('isValid')
+            ->willReturn(true);
+
+        $this->form->expects($this->at(2))
+            ->method('get')
+            ->with('buttons')
+            ->willReturnSelf();
+
+        $click = $this->createMock(ClickableInterface::class);
+
+        $click->expects($this->once())
+            ->method('isClicked')
+            ->willReturn(true);
+
+        $this->customObjectModel->expects($this->once())
+            ->method('unlockEntity')
+            ->with($this->customObject);
+
+        $this->form->expects($this->at(3))
+            ->method('get')
+            ->with('save')
+            ->willReturn($click);
+
+        $this->customObjectModel->expects($this->once())
+            ->method('save')
+            ->with($this->customObject);
+
+        $this->flashBag->expects($this->once())
+            ->method('add')
+            ->with(
+                'mautic.core.notice.updated',
+                [
+                    '%name%' => 'Umpalumpa',
+                    '%url%'  => 'https://edit.object',
+                ]
+            );
+
+        $this->customFieldModel->expects($this->never())
+            ->method('fetchCustomFieldsForObject');
+
+        $this->request->expects($this->once())
+            ->method('get')
+            ->with('custom_object')
+            ->willReturn([]);
+
+        /** @var JsonResponse $jsonResponse */
+        $jsonResponse = $this->saveController->saveAction(self::OBJECT_ID);
+
+        $this->assertRegExp('/Redirecting to https:\/\/view.object/', $jsonResponse->getContent());
+    }
+
     public function testSaveActionForNewCustomObjectWithInvalidForm(): void
     {
         $this->permissionProvider->expects($this->never())
@@ -239,9 +341,10 @@ class SaveControllerTest extends ControllerTestCase
             )
             ->willReturn($this->form);
 
-        $this->form->expects($this->at(0))
-            ->method('handleRequest')
-            ->with($this->request);
+        $this->request->expects($this->at(0))
+            ->method('get')
+            ->with('custom_object')
+            ->willReturn([]);
 
         $this->form->expects($this->at(1))
             ->method('isValid')

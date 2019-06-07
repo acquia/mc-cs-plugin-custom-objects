@@ -14,9 +14,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\CountryType;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateTimeType;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\CustomObjectHiddenTransformer;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsToStringTransformer;
@@ -213,7 +210,7 @@ class CustomFieldType extends AbstractType
             $form = $event->getForm();
             $hasChoices = $customField->getTypeObject()->hasChoices();
 
-            $this->createDefaultValueInputForModal($form, $customField);
+            $this->createDefaultValueInput($form, $customField, true);
 
             $form->add(
                 'params',
@@ -255,33 +252,14 @@ class CustomFieldType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
             /** @var CustomField $customField */
             $customField = $event->getData();
-            $builder = $event->getForm();
+            $form = $event->getForm();
 
             if (!$customField) {
                 // Custom field is new without data fetched from DB
                 return;
             }
 
-            $fieldOptions = array_merge_recursive(
-                $customField->getFormFieldOptions(),
-                [ // Force this preview settings
-                    'data'       => $customField->getDefaultValue(),
-                    'attr'       => [
-                        'readonly' => true,
-                    ],
-                ]
-            );
-
-            if ($customField->getTypeObject()->useEmptyValue() && $customField->getParams()->getEmptyValue()) {
-                $fieldOptions['placeholder'] = $customField->getParams()->getEmptyValue();
-            }
-
-            // Demo field in panel
-            $builder->add(
-                'defaultValue',
-                $customField->getTypeObject()->getSymfonyFormFieldType(),
-                $fieldOptions
-            );
+            $this->createDefaultValueInput($form, $customField, false);
         });
 
         $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event): void {
@@ -306,7 +284,6 @@ class CustomFieldType extends AbstractType
                 ->addModelTransformer($this->paramsToStringTransformer)
         );
 
-        // @todo This breaks saving of CO
         $builder->add(
             $builder->create(
                 'options',
@@ -320,46 +297,30 @@ class CustomFieldType extends AbstractType
     }
 
     /**
-     * Create default value input for modal.
+     * Create default value input for CO form and modal.
      * Dynamically options managed in modal are not supported so for them leave default value input as text for now.
      *
      * @param FormInterface $form
      * @param CustomField   $customField
+     * @param bool          $isModal     Id definition used for modal
      */
-    private function createDefaultValueInputForModal(FormInterface $form, CustomField $customField): void
+    private function createDefaultValueInput(FormInterface $form, CustomField $customField, bool $isModal): void
     {
-        $handledTypes = [
-            CountryType::class,
-            DateType::class,
-            DateTimeType::class,
-        ];
-
-        if (in_array(get_class($customField->getTypeObject()), $handledTypes, true)) {
-            $form->add(
-                'defaultValue',
-                $customField->getTypeObject()->getSymfonyFormFieldType(),
-                $customField->getTypeObject()->createFormTypeOptions(
-                    [
-                        'label'      => 'custom.field.label.default_value',
-                        'required'   => false,
-                        'attr'       => [
-                            'class' => 'form-control',
-                        ],
-                    ]
-                )
-            );
-        } else {
-            $form->add(
-                'defaultValue',
-                TextType::class,
-                [
-                    'label'      => 'custom.field.label.default_value',
-                    'required'   => false,
-                    'attr'       => [
-                        'class' => 'form-control',
-                    ],
-                ]
-            );
+        if ($customField->getTypeObject()->useEmptyValue() && $customField->getParams()->getEmptyValue()) {
+            $fieldOptions['placeholder'] = $customField->getParams()->getEmptyValue();
         }
+
+        $symfonyFormFieldType = $customField->getTypeObject()->getSymfonyFormFieldType();
+
+        if ($isModal && HiddenType::class === $symfonyFormFieldType) {
+            $symfonyFormFieldType = TextType::class;
+        }
+
+        // Demo field in panel
+        $form->add(
+            'defaultValue',
+            $symfonyFormFieldType,
+            $customField->getFormFieldOptions(['empty_data' => null])
+        );
     }
 }

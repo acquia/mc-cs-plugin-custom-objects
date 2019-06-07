@@ -168,10 +168,14 @@ class SaveController extends BaseFormController
             $customObject,
             ['action' => $action]
         );
-        $form->handleRequest($request);
+
+        $postData = $request->get('custom_object');
+
+        // just because empty fields are deleted from post data by default
+        $form->submit($postData, false);
 
         if ($form->isValid()) {
-            $this->handleRawPost($customObject, $request->get('custom_object'));
+            $this->handleRawPost($customObject, $postData);
 
             $this->customObjectModel->save($customObject);
 
@@ -184,10 +188,13 @@ class SaveController extends BaseFormController
             );
 
             if ($form->get('buttons')->get('save')->isClicked()) {
-                return $this->forwardToDetail($request, $customObject);
+                $this->customObjectModel->unlockEntity($customObject);
+                $route = $this->routeProvider->buildViewRoute($customObject->getId());
+            } else {
+                $route = $this->routeProvider->buildEditRoute($customObject->getId());
             }
 
-            return $this->redirectWithCompletePageRefresh($request, $this->routeProvider->buildEditRoute($customObject->getId()));
+            return $this->redirectWithCompletePageRefresh($request, $route);
         }
 
         return $this->delegateView(
@@ -235,24 +242,9 @@ class SaveController extends BaseFormController
                 $customField = $customObject->getCustomFields()->get($key);
                 $customField->setParams($params);
                 $customField->setOptions($options);
+                $customField->setDefaultValue(!empty($rawCustomField['defaultValue']) ? $rawCustomField['defaultValue'] : null);
             }
         }
-    }
-
-    /**
-     * @param Request      $request
-     * @param CustomObject $customObject
-     *
-     * @return Response
-     */
-    private function forwardToDetail(Request $request, CustomObject $customObject): Response
-    {
-        $request->setMethod('GET');
-        $params = ['objectId' => $customObject->getId()];
-
-        $this->customObjectModel->unlockEntity($customObject);
-
-        return $this->forward('CustomObjectsBundle:CustomObject\View:view', $params);
     }
 
     /**

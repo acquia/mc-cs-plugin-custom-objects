@@ -41,13 +41,15 @@ class CustomFieldRouteProvider
     }
 
     /**
+     * @param string   $fieldType
      * @param int|null $id
      * @param int|null $objectId
-     * @param string   $fieldType
+     * @param int|null $panelCount
+     * @param int|null $panelId
      *
      * @return string
      */
-    public function buildSaveRoute(string $fieldType, ?int $id = null, ?int $objectId = null): string
+    public function buildSaveRoute(string $fieldType, ?int $id = null, ?int $objectId = null, ?int $panelCount = null, ?int $panelId = null): string
     {
         $params['fieldType'] = $fieldType;
 
@@ -57,6 +59,14 @@ class CustomFieldRouteProvider
 
         if ($objectId) {
             $params['objectId'] = $objectId;
+        }
+
+        if ($panelCount) {
+            $params['panelCount'] = $panelCount;
+        }
+
+        if (null !== $panelId) {
+            $params['panelId'] = $panelId;
         }
 
         return $this->router->generate(static::ROUTE_SAVE, $params);

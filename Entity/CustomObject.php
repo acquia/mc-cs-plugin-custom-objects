@@ -257,6 +257,14 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     }
 
     /**
+     * @param ArrayCollection $customFields
+     */
+    public function setCustomFields(ArrayCollection $customFields)
+    {
+        $this->customFields = $customFields;
+    }
+
+    /**
      * @param CustomField $customField
      */
     public function removeCustomField(CustomField $customField)
