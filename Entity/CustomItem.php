@@ -300,7 +300,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
             throw new NotFoundException("Custom Field Value for alias = {$customFieldAlias} was not found.");
         }
 
-        return $filteredValues->next();
+        return $filteredValues->first();
     }
 
     /**
