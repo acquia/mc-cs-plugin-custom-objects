@@ -279,11 +279,11 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         $fieldTypeOptions = $this->getTypeObject()->createFormTypeOptions();
         $choices          = $this->getChoices();
         $fieldOptions     = [
-            'label'      => $this->getLabel(),
-            'required'   => $this->isRequired(),
-            'empty_data' => $this->getDefaultValue(),
-            'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control'],
+            'label'       => $this->getLabel(),
+            'required'    => $this->isRequired(),
+            'empty_data'  => $this->getDefaultValue(),
+            'label_attr'  => ['class' => 'control-label'],
+            'attr'        => ['class' => 'form-control'],
         ];
 
         if ($choices) {
