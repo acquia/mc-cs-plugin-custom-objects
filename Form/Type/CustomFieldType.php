@@ -15,6 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
+use MauticPlugin\CustomObjectsBundle\Exception\UndefinedConstraintsException;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\CustomObjectHiddenTransformer;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsToStringTransformer;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransformer;
@@ -316,11 +317,19 @@ class CustomFieldType extends AbstractType
             $symfonyFormFieldType = TextType::class;
         }
 
+        $options = $customField->getFormFieldOptions(['empty_data' => null]);
+
+        try {
+            $options['constraints'] = $customField->getTypeObject()->getSymfonyFormConstraints();
+        } catch (UndefinedConstraintsException $e) {
+            // Nothing to do
+        }
+
         // Demo field in panel
         $form->add(
             'defaultValue',
             $symfonyFormFieldType,
-            $customField->getFormFieldOptions(['empty_data' => null])
+            $options
         );
     }
 }

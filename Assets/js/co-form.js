@@ -203,6 +203,7 @@ CustomObjectsForm = {
                         } else {
                             // Rerender invalid form
                             CustomObjectsForm.refreshModalContent(response, target);
+                            CustomObjectsForm.initSaveModal(target);
                         }
                     },
                     error: function (request, textStatus, errorThrown) {
@@ -210,6 +211,7 @@ CustomObjectsForm = {
                         Mautic.stopIconSpinPostEvent();
                         mQuery(target).find('button.btn-save').removeAttr('disabled');
                         mQuery(target).find('button.btn-cancel').removeAttr('disabled');
+                        CustomObjectsForm.initSaveModal(target);
                     },
                 });
             });
