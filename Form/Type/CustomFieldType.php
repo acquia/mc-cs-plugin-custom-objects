@@ -325,6 +325,11 @@ class CustomFieldType extends AbstractType
             // Nothing to do
         }
 
+        if ($isModal) {
+            // Do not use defined label in modal form
+            $options['label'] = 'custom.field.label.default_value';
+        }
+
         // Demo field in panel
         $form->add(
             'defaultValue',
