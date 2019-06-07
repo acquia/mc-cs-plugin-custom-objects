@@ -75,7 +75,7 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomField:
     date_added: '<datetime()>'
     label: '<word()> Country'
     alias: 'country_11'
-    type: 'country_list'
+    type: 'country'
   custom_field12:
     custom_object: '@custom_object1'
     is_published: true

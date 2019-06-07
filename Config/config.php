@@ -794,7 +794,7 @@ return [
                 'tag'       => 'custom.field.type',
             ],
             'custom.field.type.country' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\CountryListType::class,
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\CountryType::class,
                 'arguments' => ['translator'],
                 'tag'       => 'custom.field.type',
             ],

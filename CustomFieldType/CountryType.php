@@ -13,25 +13,25 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
-use Symfony\Component\Form\Extension\Core\Type\CountryType;
+use Symfony\Component\Form\Extension\Core\Type\CountryType as SymfonyCountryType;
 
-class CountryListType extends SelectType
+class CountryType extends SelectType
 {
     /**
      * @var string
      */
-    public const NAME = 'custom.field.type.country_list';
+    public const NAME = 'custom.field.type.country';
 
     /**
      * @var string
      */
-    protected $key = 'country_list';
+    protected $key = 'country';
 
     /**
      * @return string
      */
     public function getSymfonyFormFieldType(): string
     {
-        return CountryType::class;
+        return SymfonyCountryType::class;
     }
 }

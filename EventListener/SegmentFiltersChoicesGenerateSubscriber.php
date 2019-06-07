@@ -104,7 +104,7 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
                         'cmf_'.$customField->getId(),
                         [
                             'label'      => $customField->getCustomObject()->getName().' : '.$customField->getLabel(),
-                            'properties' => ['type' => $customField->getType()],
+                            'properties' => $this->getFieldProperties($customField),
                             'operators'  => $operators,
                             'object'     => $customField->getId(),
                         ]
@@ -112,5 +112,23 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
                 }
             }
         );
+    }
+
+    /**
+     * @param CustomField $customField
+     *
+     * @return mixed[]
+     */
+    private function getFieldProperties(CustomField $customField): array
+    {
+        $type = $customField->getType();
+
+        $properties = ['type' => $type];
+
+        if ($customField->isChoiceType()) {
+            $properties['list'] = $customField->getChoices();
+        }
+
+        return $properties;
     }
 }
