@@ -288,6 +288,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $this->assertSame(1, $responseData['contact']['id']);
         $this->assertSame('contact1@api.test', $responseData['contact']['fields']['all']['email']);
         $this->assertSame('Contact1', $responseData['contact']['fields']['all']['firstname']);
+        $this->assertFalse(empty($responseData['contact']['customObjects'][$customObject->getAlias()]['data']), 'The contact does not contain the `customObjects.[co_alias].data` parameter containg custom objects');
         $this->assertCount(1, $responseData['contact']['customObjects'][$customObject->getAlias()]['data']);
 
         $customItemFromResponse = $responseData['contact']['customObjects'][$customObject->getAlias()]['data'][1];
@@ -338,8 +339,13 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         ];
 
         $this->client->request('POST', 'api/contacts/batch/new?includeCustomObjects=true', $contacts);
-        $response           = $this->client->getResponse();
-        $responseData       = json_decode($response->getContent(), true);
+        $response     = $this->client->getResponse();
+        $responseData = json_decode($response->getContent(), true);
+
+        $this->assertFalse(empty($responseData['contacts']), 'The payload must contain the "contacts" param');
+        $this->assertFalse(empty($responseData['contacts'][0]), 'The payload must contain the "contacts[0]" param');
+        $this->assertFalse(empty($responseData['contacts'][0]), 'The payload must contain the "contacts[1]" param');
+
         $contact3           = $responseData['contacts'][0];
         $contact4           = $responseData['contacts'][1];
         $contact3CustomItem = $contact3['customObjects'][$customObject->getAlias()]['data'][1];
