@@ -153,7 +153,7 @@ class ApiSubscriber extends CommonSubscriber
             throw new InvalidArgumentException('Custom Object Plugin is disabled');
         }
 
-        if (!in_array($request->getPathInfo(), ['/api/contacts/new', '/api/contacts/edit', '/api/contacts/batch/new', '/api/contacts/batch/edit'], true)) {
+        if (1 !== preg_match('/^\/api\/contacts\/.*(new|edit)/', $request->getPathInfo())) {
             throw new InvalidArgumentException('Not a API request we care about');
         }
 
