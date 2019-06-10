@@ -141,6 +141,7 @@ class ApiSubscriber extends CommonSubscriber
 
     /**
      * @param Request $request
+     * @param mixed[] $entityRequestParameters
      *
      * @return mixed[]
      *

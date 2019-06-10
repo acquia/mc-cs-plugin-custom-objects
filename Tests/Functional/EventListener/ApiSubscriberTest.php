@@ -189,14 +189,14 @@ class ApiSubscriberTest extends MauticMysqlTestCase
                         ],
                     ],
                 ],
-            ]
+            ],
         ];
 
         $this->client->request('POST', 'api/contacts/batch/new', $contacts);
-        $response     = $this->client->getResponse();
-        $responseData = json_decode($response->getContent(), true);
-        $contact3 = $responseData['contacts'][0];
-        $contact4 = $responseData['contacts'][1];
+        $response           = $this->client->getResponse();
+        $responseData       = json_decode($response->getContent(), true);
+        $contact3           = $responseData['contacts'][0];
+        $contact4           = $responseData['contacts'][1];
         $contact3CustomItem = $contact3['customObjects'][$customObject->getAlias()]['data'][1];
         $contact4CustomItem = $contact4['customObjects'][$customObject->getAlias()]['data'][2];
 

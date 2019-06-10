@@ -97,7 +97,7 @@ class CustomItemModel extends FormModel
      *
      * @return CustomItem
      */
-    public function save(CustomItem $customItem, $dryRun = false): CustomItem
+    public function save(CustomItem $customItem, bool $dryRun = false): CustomItem
     {
         $user  = $this->userHelper->getUser();
         $now   = new DateTimeHelper();

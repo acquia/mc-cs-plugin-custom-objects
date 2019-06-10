@@ -70,7 +70,7 @@ class CustomFieldValueModel
      * @param CustomFieldValueInterface $customFieldValue
      * @param bool                      $dryRun
      */
-    public function save(CustomFieldValueInterface $customFieldValue, $dryRun = false): void
+    public function save(CustomFieldValueInterface $customFieldValue, bool $dryRun = false): void
     {
         if ($customFieldValue->getCustomField()->canHaveMultipleValues()) {
             $this->deleteOptionsForField($customFieldValue);
