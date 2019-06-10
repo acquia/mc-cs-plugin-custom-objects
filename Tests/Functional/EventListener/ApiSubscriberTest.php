@@ -77,7 +77,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
                             'phone-number-test-field' => '+420775308002',
                             'number-test-field'       => 123,
                             'hidden-test-field'       => 'secret',
-                            'e-mail-test-field'       => 'john@doe.email',
+                            'email-test-field'        => 'john@doe.email',
                         ],
                     ],
                 ],
@@ -106,7 +106,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $this->assertSame('+420775308002', $customItemFromResponse['attributes']['phone-number-test-field']);
         $this->assertSame(123, $customItemFromResponse['attributes']['number-test-field']);
         $this->assertSame('secret', $customItemFromResponse['attributes']['hidden-test-field']);
-        $this->assertSame('john@doe.email', $customItemFromResponse['attributes']['e-mail-test-field']);
+        $this->assertSame('john@doe.email', $customItemFromResponse['attributes']['email-test-field']);
 
         // Let's try to update the contact and the custom item.
 
@@ -128,7 +128,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
                             'phone-number-test-field' => '+420775308003',
                             'number-test-field'       => 123456,
                             'hidden-test-field'       => 'secret sauce',
-                            'e-mail-test-field'       => 'john@doe.com',
+                            'email-test-field'        => 'john@doe.com',
                         ],
                     ],
                 ],
@@ -138,7 +138,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $this->client->request('POST', 'new', $contact); // For some reason the api/contacts path is stored in the client.
         $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
-        // dump($responseData/*, $this->client->getRequest()*/);die;
+
         $this->assertSame(Codes::HTTP_OK, $response->getStatusCode());
         $this->assertSame(1, $responseData['contact']['id']);
         $this->assertSame('contact1@api.test', $responseData['contact']['fields']['all']['email']);
@@ -157,6 +157,62 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $this->assertSame('+420775308003', $customItemFromResponse['attributes']['phone-number-test-field']);
         $this->assertSame(123456, $customItemFromResponse['attributes']['number-test-field']);
         $this->assertSame('secret sauce', $customItemFromResponse['attributes']['hidden-test-field']);
-        $this->assertSame('john@doe.com', $customItemFromResponse['attributes']['e-mail-test-field']);
+        $this->assertSame('john@doe.com', $customItemFromResponse['attributes']['email-test-field']);
+    }
+
+    public function testBatchCreatingContactWithCustomItems(): void
+    {
+        $customObject = $this->createCustomObjectWithAllFields($this->container, 'Product');
+        $contacts     = [
+            [
+                'email'         => 'contact3@api.test',
+                'customObjects' => [
+                    $customObject->getAlias() => [
+                        [
+                            'name'       => 'Custom Item Created Via Contact API 3',
+                            'attributes' => [
+                                'text-test-field' => 'Take a brake',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'email'         => 'contact4@api.test',
+                'customObjects' => [
+                    $customObject->getAlias() => [
+                        [
+                            'name'       => 'Custom Item Created Via Contact API 4',
+                            'attributes' => [
+                                'text-test-field' => 'Make a milkshake',
+                            ],
+                        ],
+                    ],
+                ],
+            ]
+        ];
+
+        $this->client->request('POST', 'api/contacts/batch/new', $contacts);
+        $response     = $this->client->getResponse();
+        $responseData = json_decode($response->getContent(), true);
+        $contact3 = $responseData['contacts'][0];
+        $contact4 = $responseData['contacts'][1];
+        $contact3CustomItem = $contact3['customObjects'][$customObject->getAlias()]['data'][1];
+        $contact4CustomItem = $contact4['customObjects'][$customObject->getAlias()]['data'][2];
+
+        $this->assertSame(Codes::HTTP_CREATED, $response->getStatusCode());
+        $this->assertSame(1, $contact3['id']);
+        $this->assertSame(2, $contact4['id']);
+        $this->assertSame('contact3@api.test', $contact3['fields']['all']['email']);
+        $this->assertSame('contact4@api.test', $contact4['fields']['all']['email']);
+        $this->assertCount(1, $contact3['customObjects']);
+        $this->assertCount(1, $contact4['customObjects']);
+
+        $this->assertSame(1, $contact3CustomItem['id']);
+        $this->assertSame(2, $contact4CustomItem['id']);
+        $this->assertSame('Custom Item Created Via Contact API 3', $contact3CustomItem['name']);
+        $this->assertSame('Custom Item Created Via Contact API 4', $contact4CustomItem['name']);
+        $this->assertSame('Take a brake', $contact3CustomItem['attributes']['text-test-field']);
+        $this->assertSame('Make a milkshake', $contact4CustomItem['attributes']['text-test-field']);
     }
 }

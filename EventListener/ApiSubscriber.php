@@ -96,7 +96,7 @@ class ApiSubscriber extends CommonSubscriber
     private function saveCustomItems(ApiEntityEvent $event, bool $dryRun = false): void
     {
         try {
-            $customObjects = $this->getCustomObjectsFromContactCreateRequest($event->getRequest());
+            $customObjects = $this->getCustomObjectsFromContactCreateRequest($event->getEntityRequestParameters(), $event->getRequest());
         } catch (InvalidArgumentException $e) {
             return;
         }
@@ -146,18 +146,20 @@ class ApiSubscriber extends CommonSubscriber
      *
      * @throws InvalidArgumentException
      */
-    private function getCustomObjectsFromContactCreateRequest(Request $request): array
+    private function getCustomObjectsFromContactCreateRequest(array $entityRequestParameters, Request $request): array
     {
-        if (!$this->configProvider->pluginIsEnabled() || !'/api/contacts/new' === $request->getPathInfo() || !$request->request->has('customObjects')) {
-            throw new InvalidArgumentException('not a API request we care about');
+        if (!$this->configProvider->pluginIsEnabled()) {
+            throw new InvalidArgumentException('Custom Object Plugin is disabled');
         }
 
-        $customObjects = $request->request->get('customObjects');
-
-        if (!is_array($customObjects)) {
-            throw new InvalidArgumentException('customObjects param in the request is not an array');
+        if (!in_array($request->getPathInfo(), ['/api/contacts/new', '/api/contacts/edit', '/api/contacts/batch/new', '/api/contacts/batch/edit'], true)) {
+            throw new InvalidArgumentException('Not a API request we care about');
         }
 
-        return $customObjects;
+        if (empty($entityRequestParameters['customObjects']) || !is_array($entityRequestParameters['customObjects'])) {
+            throw new InvalidArgumentException('The request payload does not contain any custom items in the customObjects attribute.');
+        }
+
+        return $entityRequestParameters['customObjects'];
     }
 }
