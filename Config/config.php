@@ -740,6 +740,7 @@ return [
                     'custom_object.config.provider',
                     'custom_item.xref.contact.repository',
                     'mautic.custom.model.item',
+                    'request_stack',
                 ],
                 'tag'          => 'jms_serializer.event_subscriber',
                 'tagArguments' => [

@@ -24,6 +24,7 @@ use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class SerializerSubscriber implements EventSubscriberInterface
 {
@@ -43,18 +44,26 @@ class SerializerSubscriber implements EventSubscriberInterface
     private $customItemModel;
 
     /**
+     * @var RequestStack
+     */
+    private $requestStack;
+
+    /**
      * @param ConfigProvider                  $configProvider
      * @param CustomItemXrefContactRepository $customItemXrefContactRepository
      * @param CustomItemModel                 $customItemModel
+     * @param RequestStack                    $requestStack
      */
     public function __construct(
         ConfigProvider $configProvider,
         CustomItemXrefContactRepository $customItemXrefContactRepository,
-        CustomItemModel $customItemModel
+        CustomItemModel $customItemModel,
+        RequestStack $requestStack
     ) {
         $this->configProvider                  = $configProvider;
         $this->customItemXrefContactRepository = $customItemXrefContactRepository;
         $this->customItemModel                 = $customItemModel;
+        $this->requestStack                    = $requestStack;
     }
 
     /**
@@ -75,6 +84,16 @@ class SerializerSubscriber implements EventSubscriberInterface
      */
     public function addCustomItemsIntoContactResponse(ObjectEvent $event): void
     {
+        $request = $this->requestStack->getCurrentRequest();
+
+        if (null === $request) {
+            return;
+        }
+
+        if (!$request->get('includeCustomObjects', false)) {
+            return;
+        }
+
         /** @var Lead $contact */
         $contact = $event->getObject();
 
