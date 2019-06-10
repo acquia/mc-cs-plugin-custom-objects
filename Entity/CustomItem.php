@@ -25,7 +25,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use Mautic\CoreBundle\Helper\ArrayHelper;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 
 class CustomItem extends FormEntity implements UniqueEntityInterface
 {
@@ -292,7 +291,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     public function findCustomFieldValueForFieldAlias($customFieldAlias)
     {
-        $filteredValues = $this->customFieldValues->filter(function(CustomFieldValueInterface $customFieldValue) use ($customFieldAlias) {
+        $filteredValues = $this->customFieldValues->filter(function (CustomFieldValueInterface $customFieldValue) use ($customFieldAlias) {
             return $customFieldValue->getCustomField()->getAlias() === $customFieldAlias;
         });
 
@@ -311,7 +310,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     public function createNewCustomFieldValueByFieldId(int $customFieldId, $value): CustomFieldValueInterface
     {
-        /** @var $customField CustomField */
+        /** @var CustomField $customField */
         foreach ($this->getCustomObject()->getCustomFields() as $customField) {
             if ($customField->getId() === (int) $customFieldId) {
                 $fieldType        = $customField->getTypeObject();
@@ -333,7 +332,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     public function createNewCustomFieldValueByFieldAlias(string $customFieldAlias, $value): CustomFieldValueInterface
     {
-        /** @var $customField CustomField */
+        /** @var CustomField $customField */
         foreach ($this->getCustomObject()->getCustomFields() as $customField) {
             if ($customField->getAlias() === $customFieldAlias) {
                 $fieldType        = $customField->getTypeObject();

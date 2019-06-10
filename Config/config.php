@@ -741,7 +741,7 @@ return [
                     'custom_item.xref.contact.repository',
                     'mautic.custom.model.item',
                 ],
-                'tag' => 'jms_serializer.event_subscriber',
+                'tag'          => 'jms_serializer.event_subscriber',
                 'tagArguments' => [
                     'event' => \JMS\Serializer\EventDispatcher\Events::POST_SERIALIZE,
                 ],

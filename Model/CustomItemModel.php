@@ -93,6 +93,7 @@ class CustomItemModel extends FormModel
 
     /**
      * @param CustomItem $customItem
+     * @param bool       $dryRun
      *
      * @return CustomItem
      */
@@ -333,7 +334,7 @@ class CustomItemModel extends FormModel
      * @param TableConfig $tableConfig
      *
      * @return QueryBuilder
-     * 
+     *
      * @throws UnexpectedValueException
      */
     private function createListQueryBuilder(TableConfig $tableConfig): QueryBuilder

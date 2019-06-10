@@ -156,7 +156,7 @@ class CustomObjectModel extends FormModel
     }
 
     /**
-     * @param int $id
+     * @param string $alias
      *
      * @return CustomObject
      *

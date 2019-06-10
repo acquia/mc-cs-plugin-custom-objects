@@ -65,8 +65,8 @@ class ApiSubscriber extends CommonSubscriber
         // This check can be removed once https://github.com/mautic-inc/mautic-cloud/pull/555 is merged to deployed.
         if (defined('\Mautic\ApiBundle\ApiEvents::API_ON_ENTITY_PRE_SAVE')) {
             return [
-                 ApiEvents::API_ON_ENTITY_PRE_SAVE => 'validateCustomObjectsInContactRequest',
-                 ApiEvents::API_ON_ENTITY_POST_SAVE => 'saveCustomObjectsInContactRequest',
+                ApiEvents::API_ON_ENTITY_PRE_SAVE  => 'validateCustomObjectsInContactRequest',
+                ApiEvents::API_ON_ENTITY_POST_SAVE => 'saveCustomObjectsInContactRequest',
             ];
         }
 
@@ -93,7 +93,7 @@ class ApiSubscriber extends CommonSubscriber
      * @param ApiEntityEvent $event
      * @param bool           $dryRun
      */
-    private function saveCustomItems(ApiEntityEvent $event, $dryRun = false): void
+    private function saveCustomItems(ApiEntityEvent $event, bool $dryRun = false): void
     {
         try {
             $customObjects = $this->getCustomObjectsFromContactCreateRequest($event->getRequest());
@@ -118,14 +118,14 @@ class ApiSubscriber extends CommonSubscriber
                     $customItem->setName($customItemData['name']);
                 }
 
-                if (!empty($customItemData['customFields']) && is_array($customItemData['customFields'])) {
-                    foreach ($customItemData['customFields'] as $fieldAlias => $value) {
+                if (!empty($customItemData['attributes']) && is_array($customItemData['attributes'])) {
+                    foreach ($customItemData['attributes'] as $fieldAlias => $value) {
                         try {
                             $customFieldValue = $customItem->findCustomFieldValueForFieldAlias($fieldAlias);
                         } catch (NotFoundException $e) {
                             $customFieldValue = $customItem->createNewCustomFieldValueByFieldAlias($fieldAlias, $value);
                         }
-            
+
                         $customFieldValue->setValue($value);
                     }
                 }
@@ -141,21 +141,21 @@ class ApiSubscriber extends CommonSubscriber
 
     /**
      * @param Request $request
-     * 
+     *
      * @return mixed[]
-     * 
+     *
      * @throws InvalidArgumentException
      */
     private function getCustomObjectsFromContactCreateRequest(Request $request): array
     {
         if (!$this->configProvider->pluginIsEnabled() || !'/api/contacts/new' === $request->getPathInfo() || !$request->request->has('customObjects')) {
-            throw new InvalidArgumentException("not a API request we care about");
+            throw new InvalidArgumentException('not a API request we care about');
         }
 
         $customObjects = $request->request->get('customObjects');
 
         if (!is_array($customObjects)) {
-            throw new InvalidArgumentException("customObjects param in the request is not an array");
+            throw new InvalidArgumentException('customObjects param in the request is not an array');
         }
 
         return $customObjects;

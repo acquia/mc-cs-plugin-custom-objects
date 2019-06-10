@@ -20,7 +20,6 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use Mautic\UserBundle\Entity\User;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
 class CustomItemImportModel extends FormModel

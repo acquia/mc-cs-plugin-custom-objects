@@ -68,6 +68,7 @@ class CustomFieldValueModel
      * New entities are just persisted. Call flush after.
      *
      * @param CustomFieldValueInterface $customFieldValue
+     * @param bool                      $dryRun
      */
     public function save(CustomFieldValueInterface $customFieldValue, $dryRun = false): void
     {

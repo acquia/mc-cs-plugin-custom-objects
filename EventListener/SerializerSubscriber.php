@@ -65,15 +65,15 @@ class SerializerSubscriber implements EventSubscriberInterface
         return [
             [
                 'event'  => Events::POST_SERIALIZE,
-                'method' => 'onPostSerialize',
-            ]
+                'method' => 'addCustomItemsIntoContactResponse',
+            ],
         ];
     }
 
     /**
      * @param ObjectEvent $event
      */
-    public function onPostSerialize(ObjectEvent $event): void
+    public function addCustomItemsIntoContactResponse(ObjectEvent $event): void
     {
         /** @var Lead $contact */
         $contact = $event->getObject();
@@ -102,24 +102,24 @@ class SerializerSubscriber implements EventSubscriberInterface
 
             if (count($customItems)) {
                 $payload[$customObject['alias']] = [
-                    'id'          => $customObject['id'],
-                    'customItems' => [],
+                    'id'   => $customObject['id'],
+                    'data' => [],
                 ];
 
                 /** @var CustomItem $customItem */
                 foreach ($customItems as $customItem) {
                     $this->customItemModel->populateCustomFields($customItem);
-                    $payload[$customObject['alias']]['customItems'][$customItem->getId()] = $this->serializeCustomItem($customItem);
+                    $payload[$customObject['alias']]['data'][$customItem->getId()] = $this->serializeCustomItem($customItem);
                 }
             }
-        };
+        }
 
         $event->getContext()->getVisitor()->addData('customObjects', $payload);
     }
 
     /**
      * @param CustomItem $customItem
-     * 
+     *
      * @return mixed[]
      */
     private function serializeCustomItem(CustomItem $customItem): array
@@ -134,13 +134,13 @@ class SerializerSubscriber implements EventSubscriberInterface
             'dateModified' => $customItem->getDateModified()->format(DATE_ATOM),
             'createdBy'    => $customItem->getCreatedBy(),
             'modifiedBy'   => $customItem->getModifiedBy(),
-            'customFields' => $this->serializeCustomFieldValues($customItem->getCustomFieldValues()),
+            'attributes'   => $this->serializeCustomFieldValues($customItem->getCustomFieldValues()),
         ];
     }
 
     /**
      * @param Collection|CustomFieldValueInterface[] $customFieldValues
-     * 
+     *
      * @return mixed[]
      */
     private function serializeCustomFieldValues(Collection $customFieldValues): array
