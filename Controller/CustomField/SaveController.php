@@ -106,11 +106,12 @@ class SaveController extends CommonController
      */
     public function saveAction(Request $request)
     {
-        $objectId   = (int) $request->get('objectId');
-        $fieldId    = (int) $request->get('fieldId');
-        $fieldType  = $request->get('fieldType');
-        $panelId    = is_numeric($request->get('panelId')) ? (int) $request->get('panelId') : null; // Is edit of existing panel in view
-        $panelCount = is_numeric($request->get('panelCount')) ? (int) $request->get('panelCount') : null;
+        $objectId       = (int) $request->get('objectId');
+        $fieldId        = (int) $request->get('fieldId');
+        $fieldType      = $request->get('fieldType');
+        $panelId        = is_numeric($request->get('panelId')) ? (int) $request->get('panelId') : null; // Is edit of existing panel in view
+        $panelCount     = is_numeric($request->get('panelCount')) ? (int) $request->get('panelCount') : null;
+        $forceModalForm = (bool) $request->get('forceModalForm'); // Use post data to build new default values from options
 
         if ($objectId) {
             $customObject = $this->customObjectModel->fetchEntity($objectId);
@@ -137,7 +138,7 @@ class SaveController extends CommonController
 
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if ($form->isValid() && !$forceModalForm) {
             // Render Custom Field form RAT for Custom Object form.
             return $this->buildSuccessForm($customObject, $form->getData(), $request);
         }

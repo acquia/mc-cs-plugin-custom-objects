@@ -230,6 +230,23 @@ class CustomFieldType extends AbstractType
             }
         });
 
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event): void {
+            /** @var array $customField */
+            $customField = $event->getData();
+            if (empty($customField['options']['list'])) {
+                return;
+            }
+
+            $choices = [];
+            foreach ($customField['options']['list'] as $choice) {
+                $choices[$choice['value']] = $choice['label'];
+            }
+
+            $form = $event->getForm();
+            $form->remove('defaultValue');
+            $this->createDefaultValueInput($form, $form->getData(), true, $choices);
+        });
+
         $builder->add(
             'buttons',
             FormButtonsType::class,
@@ -304,8 +321,9 @@ class CustomFieldType extends AbstractType
      * @param FormInterface $form
      * @param CustomField   $customField
      * @param bool          $isModal     Id definition used for modal
+     * @param string[]|null $choices     Choices defined and use only in modal
      */
-    private function createDefaultValueInput(FormInterface $form, CustomField $customField, bool $isModal): void
+    private function createDefaultValueInput(FormInterface $form, CustomField $customField, bool $isModal, array $choices = []): void
     {
         if ($customField->getTypeObject()->useEmptyValue() && $customField->getParams()->getEmptyValue()) {
             $fieldOptions['placeholder'] = $customField->getParams()->getEmptyValue();
@@ -328,6 +346,9 @@ class CustomFieldType extends AbstractType
         if ($isModal) {
             // Do not use defined label in modal form
             $options['label'] = 'custom.field.label.default_value';
+            if ($choices) {
+                $options['choices'] = $choices;
+            }
         }
 
         // Demo field in panel
