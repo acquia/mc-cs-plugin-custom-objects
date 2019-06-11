@@ -44,7 +44,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
 
-        $this->assertSame(Codes::HTTP_NOT_FOUND, $response->getStatusCode());
+        $this->assertSame(Codes::HTTP_NOT_FOUND, $response->getStatusCode(), $response->getContent());
         $this->assertSame('Custom Object with alias = unicorn was not found', $responseData['errors'][0]['message']);
 
         /** @var CustomItemRepository $customItemRepository */
@@ -91,7 +91,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
 
-        $this->assertSame(Codes::HTTP_CREATED, $response->getStatusCode());
+        $this->assertSame(Codes::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
         $this->assertSame(1, $responseData['contact']['id']);
         $this->assertSame('contact1@api.test', $responseData['contact']['fields']['all']['email']);
         $this->assertTrue(empty($responseData['contact']['customObjects']));
@@ -128,10 +128,11 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
 
-        $this->assertSame(Codes::HTTP_CREATED, $response->getStatusCode());
+        $this->assertSame(Codes::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
         $this->assertSame(1, $responseData['contact']['id']);
         $this->assertSame('contact1@api.test', $responseData['contact']['fields']['all']['email']);
         $this->assertNull($responseData['contact']['fields']['all']['firstname']);
+        $this->assertFalse(empty($responseData['contact']['customObjects']), 'Contact response does not contain the customObjects property. '.$response->getContent());
         $this->assertCount(1, $responseData['contact']['customObjects']);
 
         $customItemFromResponse = $responseData['contact']['customObjects'][$customObject->getAlias()]['data'][1];
@@ -180,7 +181,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
 
-        $this->assertSame(Codes::HTTP_OK, $response->getStatusCode());
+        $this->assertSame(Codes::HTTP_OK, $response->getStatusCode(), $response->getContent());
         $this->assertSame(1, $responseData['contact']['id']);
         $this->assertSame('contact1@api.test', $responseData['contact']['fields']['all']['email']);
         $this->assertSame('Contact1', $responseData['contact']['fields']['all']['firstname']);
@@ -233,10 +234,11 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
 
-        $this->assertSame(Codes::HTTP_CREATED, $response->getStatusCode());
+        $this->assertSame(Codes::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
         $this->assertSame(1, $responseData['contact']['id']);
         $this->assertSame('contact1@api.test', $responseData['contact']['fields']['all']['email']);
         $this->assertSame('Contact', $responseData['contact']['fields']['all']['firstname']);
+        $this->assertFalse(empty($responseData['contact']['customObjects']), 'Contact response does not contain the customObjects property. '.$response->getContent());
         $this->assertCount(1, $responseData['contact']['customObjects']);
 
         $customItemFromResponse = $responseData['contact']['customObjects'][$customObject->getAlias()]['data'][1];
@@ -284,7 +286,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
 
-        $this->assertSame(Codes::HTTP_OK, $response->getStatusCode());
+        $this->assertSame(Codes::HTTP_OK, $response->getStatusCode(), $response->getContent());
         $this->assertSame(1, $responseData['contact']['id']);
         $this->assertSame('contact1@api.test', $responseData['contact']['fields']['all']['email']);
         $this->assertSame('Contact1', $responseData['contact']['fields']['all']['firstname']);
@@ -342,16 +344,18 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $response     = $this->client->getResponse();
         $responseData = json_decode($response->getContent(), true);
 
-        $this->assertFalse(empty($responseData['contacts']), 'The payload must contain the "contacts" param');
-        $this->assertFalse(empty($responseData['contacts'][0]), 'The payload must contain the "contacts[0]" param');
-        $this->assertFalse(empty($responseData['contacts'][0]), 'The payload must contain the "contacts[1]" param');
+        $this->assertSame(Codes::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
+        $this->assertFalse(empty($responseData['contacts']), 'The payload must contain the "contacts" param. '.$response->getContent());
+        $this->assertFalse(empty($responseData['contacts'][0]), 'The payload must contain the "contacts[0]" param. '.$response->getContent());
+        $this->assertFalse(empty($responseData['contacts'][1]), 'The payload must contain the "contacts[1]" param. '.$response->getContent());
+        $this->assertFalse(empty($responseData['contacts'][0]['customObjects']), 'Contact3 response does not contain the customObjects property. '.$response->getContent());
+        $this->assertFalse(empty($responseData['contacts'][1]['customObjects']), 'Contact4 response does not contain the customObjects property. '.$response->getContent());
 
         $contact3           = $responseData['contacts'][0];
         $contact4           = $responseData['contacts'][1];
         $contact3CustomItem = $contact3['customObjects'][$customObject->getAlias()]['data'][1];
         $contact4CustomItem = $contact4['customObjects'][$customObject->getAlias()]['data'][2];
 
-        $this->assertSame(Codes::HTTP_CREATED, $response->getStatusCode());
         $this->assertSame(1, $contact3['id']);
         $this->assertSame(2, $contact4['id']);
         $this->assertSame('contact3@api.test', $contact3['fields']['all']['email']);
