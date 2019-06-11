@@ -24,6 +24,8 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Mautic\LeadBundle\Entity\Lead;
 use InvalidArgumentException;
 use Symfony\Component\HttpFoundation\Request;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use Symfony\Component\HttpFoundation\Response;
 
 class ApiSubscriber extends CommonSubscriber
 {
@@ -96,7 +98,10 @@ class ApiSubscriber extends CommonSubscriber
     private function saveCustomItems(ApiEntityEvent $event, bool $dryRun = false): void
     {
         try {
-            $customObjects = $this->getCustomObjectsFromContactCreateRequest($event->getEntityRequestParameters(), $event->getRequest());
+            $customObjects = $this->getCustomObjectsFromContactCreateRequest(
+                $event->getEntityRequestParameters(),
+                $event->getRequest()
+            );
         } catch (InvalidArgumentException $e) {
             return;
         }
@@ -104,31 +109,12 @@ class ApiSubscriber extends CommonSubscriber
         /** @var Lead $contact */
         $contact = $event->getEntity();
 
-        foreach ($customObjects as $customObjectAlias => $customItems) {
-            $customObject = $this->customObjectModel->fetchEntityByAlias($customObjectAlias);
+        foreach ($customObjects as $customObjectAlias => $customObjectData) {
+            $customObject = $this->getCustomObject($customObjectAlias);
 
-            foreach ($customItems as $customItemData) {
-                if (empty($customItemData['id'])) {
-                    $customItem = new CustomItem($customObject);
-                } else {
-                    $customItem = $this->customItemModel->fetchEntity((int) $customItemData['id']);
-                }
-
-                if (!empty($customItemData['name'])) {
-                    $customItem->setName($customItemData['name']);
-                }
-
-                if (!empty($customItemData['attributes']) && is_array($customItemData['attributes'])) {
-                    foreach ($customItemData['attributes'] as $fieldAlias => $value) {
-                        try {
-                            $customFieldValue = $customItem->findCustomFieldValueForFieldAlias($fieldAlias);
-                        } catch (NotFoundException $e) {
-                            $customFieldValue = $customItem->createNewCustomFieldValueByFieldAlias($fieldAlias, $value);
-                        }
-
-                        $customFieldValue->setValue($value);
-                    }
-                }
+            foreach ($customObjectData['data'] as $customItemData) {
+                $customItem = $this->getCustomItem($customObject, $customItemData);
+                $customItem = $this->populateCustomItem($customItem, $customItemData);
 
                 $this->customItemModel->save($customItem, $dryRun);
 
@@ -162,5 +148,66 @@ class ApiSubscriber extends CommonSubscriber
         }
 
         return $entityRequestParameters['customObjects'];
+    }
+
+    /**
+     * @param string $customObjectAlias
+     *
+     * @return CustomObject
+     *
+     * @throws NotFoundException
+     */
+    private function getCustomObject(string $customObjectAlias): CustomObject
+    {
+        try {
+            return $this->customObjectModel->fetchEntityByAlias($customObjectAlias);
+        } catch (NotFoundException $e) {
+            throw new NotFoundException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
+        }
+    }
+
+    /**
+     * @param CustomObject $customObject
+     * @param mixed[]      $customItemData
+     *
+     * @return CustomItem
+     */
+    private function getCustomItem(CustomObject $customObject, array $customItemData): CustomItem
+    {
+        if (empty($customItemData['id'])) {
+            return new CustomItem($customObject);
+        }
+
+        try {
+            return $this->customItemModel->fetchEntity((int) $customItemData['id']);
+        } catch (NotFoundException $e) {
+            throw new NotFoundException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
+        }
+    }
+
+    /**
+     * @param CustomItem $customItem
+     * @param mixed[]    $customItemData
+     *
+     * @return CustomItem
+     */
+    private function populateCustomItem(CustomItem $customItem, array $customItemData): CustomItem
+    {
+        if (!empty($customItemData['name'])) {
+            $customItem->setName($customItemData['name']);
+        }
+
+        if (!empty($customItemData['attributes']) && is_array($customItemData['attributes'])) {
+            foreach ($customItemData['attributes'] as $fieldAlias => $value) {
+                try {
+                    $customFieldValue = $customItem->findCustomFieldValueForFieldAlias($fieldAlias);
+                    $customFieldValue->setValue($value);
+                } catch (NotFoundException $e) {
+                    $customItem->createNewCustomFieldValueByFieldAlias($fieldAlias, $value);
+                }
+            }
+        }
+
+        return $customItem;
     }
 }
