@@ -237,6 +237,17 @@ CustomObjectsForm = {
 
         // Transfer options
         let i = 0;
+
+        // Empty value param actually working for radio_group
+        let emptyValue = mQuery('#custom_field_params_emptyValue');
+        if (emptyValue !== undefined) {
+            emptyValue = emptyValue.val(); // This is label, but defined as empty value
+            options = options + '<label for="custom_field_defaultValue_' + i + '">' + emptyValue + '</label>' +
+                '<input type="radio" id="custom_field_defaultValue_' +
+                i + '" name="custom_field[defaultValue]" autocomplete="false" value="">';
+            i = i + 1;
+        }
+
         choiceDefinition.find('.sortable').each(function() {
             let row = mQuery(this).find('input');
             let label = mQuery(row[0]).val();
