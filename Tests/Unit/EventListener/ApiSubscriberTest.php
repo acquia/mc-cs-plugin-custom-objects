@@ -131,7 +131,7 @@ class ApiSubscriberTest extends \PHPUnit_Framework_TestCase
                 'email'         => 'john@doe.email',
                 'customObjects' => [
                     'object-1-alias' => [
-                        'data' => [],
+                        'data' => [[]],
                     ],
                 ],
             ]);
