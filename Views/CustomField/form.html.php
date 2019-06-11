@@ -60,7 +60,7 @@ $showProperties = isset($form['options']) || $customField->getTypeObject()->useE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row default-value">
                     <div class="col-md-6">
                         <?php echo $view['form']->row($form['defaultValue']); ?>
                     </div>

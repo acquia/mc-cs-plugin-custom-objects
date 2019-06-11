@@ -242,24 +242,33 @@ CustomObjectsForm = {
             let label = mQuery(row[0]).val();
             let value = mQuery(row[1]).val();
 
-            if (type === 'checkbox_group') {
-                options = options + '<label>' +
-                    '<input type="checkbox" id="custom_field_defaultValue_' + i + '" name="custom_field[defaultValue][]" class="form-control" autocomplete="false" value="' + value + '">' + label + '</label>'
-            }
-
-            if (type === 'multiselect') {
-                options = options + '<option value="' + value + '">' + label + '</option>';
-            }
-
-            if (type === 'radio_group') {
-                options = options + '<label for="custom_field_defaultValue_' + i + '">' + label + '</label>' +
-                '<input type="radio" id="custom_field_defaultValue_' + i + '" name="custom_field[defaultValue]" autocomplete="false" value="' + value + '">'
+            switch (type) {
+                case 'checkbox_group':
+                    options = options + '<div class="checkbox"><label><input type="checkbox" id="custom_field_defaultValue_' +
+                        i + '" name="custom_field[defaultValue][]" class="form-control" autocomplete="false" value="' +
+                        value + '">' + label + '</label></div>';
+                    break;
+                case 'multiselect':
+                    options = options + '<option value="' + value + '">' + label + '</option>';
+                    break;
+                case 'radio_group':
+                    options = options + '<label for="custom_field_defaultValue_' + i + '">' + label + '</label>' +
+                        '<input type="radio" id="custom_field_defaultValue_' +
+                        i + '" name="custom_field[defaultValue]" autocomplete="false" value="' + value + '">';
+                    break;
             }
 
             i = i + 1;
         });
 
-        mQuery('#custom_field_defaultValue').html(options).trigger('chosen:updated');
+        // Put it to thee right DOM node
+        let target = mQuery('#custom_field_defaultValue');
+
+        if (type === 'checkbox_group') {
+            target = mQuery('#objectFieldModal .default-value .choice-wrapper')
+        }
+
+        target.html(options).trigger('chosen:updated');
     },
 
     /**
