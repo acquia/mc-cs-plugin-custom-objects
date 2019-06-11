@@ -110,6 +110,10 @@ class ApiSubscriber extends CommonSubscriber
         $contact = $event->getEntity();
 
         foreach ($customObjects as $customObjectAlias => $customObjectData) {
+            if (empty($customObjectData['data']) || !is_array($customObjectData['data'])) {
+                continue;
+            }
+
             $customObject = $this->getCustomObject($customObjectAlias);
 
             foreach ($customObjectData['data'] as $customItemData) {
