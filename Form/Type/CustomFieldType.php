@@ -305,7 +305,8 @@ class CustomFieldType extends AbstractType
         $builder->add(
             $builder->create(
                 'options',
-                HiddenType::class
+                HiddenType::class,
+                ['attr' => ['data-changed' => false]]
             )
                 ->addModelTransformer($this->optionsToStringTransformer)
         );

@@ -218,6 +218,30 @@ CustomObjectsForm = {
     },
 
     /**
+     * Update default value options when needed
+     */
+    handleModalDefaultValueOptions: function()
+    {
+        let choiceDefinition = mQuery('#objectFieldModal').find('#sortable-custom_field_options');
+        if (choiceDefinition === undefined) {
+            return; // No options
+        }
+
+        let target = mQuery('#custom_field_defaultValue');
+
+        let options = '';
+
+        choiceDefinition.find('.sortable').each(function() {
+            let row = mQuery(this).find('input');
+            let label = mQuery(row[0]).val();
+            let value = mQuery(row[1]).val();
+            options = options + '<option value="' + value + '">' + label + '</option>';
+        });
+
+        target.html(options).trigger('chosen:updated');
+    },
+
+    /**
      * Load modal wit stuff from response
      * @param response
      * @param target
