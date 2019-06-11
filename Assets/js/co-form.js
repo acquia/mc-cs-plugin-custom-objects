@@ -222,6 +222,12 @@ CustomObjectsForm = {
      */
     handleModalDefaultValueOptions: function()
     {
+        let type = mQuery('#custom_field_type').val();
+
+        if (type !== 'multiselect') {
+            return;
+        }
+
         let choiceDefinition = mQuery('#objectFieldModal').find('#sortable-custom_field_options');
         if (choiceDefinition === undefined) {
             return; // No options
