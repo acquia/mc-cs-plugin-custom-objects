@@ -107,7 +107,7 @@ class CustomItemTest extends \PHPUnit_Framework_TestCase
         $object->addCustomField($field2);
         $item->addCustomFieldValue($value1);
         $item->addCustomFieldValue($value2);
-        
+
         $this->assertSame($value2, $item->findCustomFieldValueForFieldAlias('field-alias-2'));
         $this->assertSame($value1, $item->findCustomFieldValueForFieldAlias('field-alias-1'));
 
@@ -127,7 +127,7 @@ class CustomItemTest extends \PHPUnit_Framework_TestCase
         );
 
         $object->addCustomField($field);
-        
+
         $value = $item->createNewCustomFieldValueByFieldId(1, 'value1');
         $this->assertSame($field, $value->getCustomField());
         $this->assertSame($item, $value->getCustomItem());
@@ -151,7 +151,7 @@ class CustomItemTest extends \PHPUnit_Framework_TestCase
         );
 
         $object->addCustomField($field);
-        
+
         $value = $item->createNewCustomFieldValueByFieldAlias('field-alias-1', 'value1');
         $this->assertSame($field, $value->getCustomField());
         $this->assertSame($item, $value->getCustomItem());
