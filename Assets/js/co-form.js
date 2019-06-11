@@ -224,7 +224,7 @@ CustomObjectsForm = {
     {
         let type = mQuery('#custom_field_type').val();
 
-        if (type !== 'multiselect') {
+        if (type !== 'multiselect' && type !== 'radio_group') {
             return;
         }
 
@@ -233,18 +233,28 @@ CustomObjectsForm = {
             return; // No options
         }
 
-        let target = mQuery('#custom_field_defaultValue');
-
         let options = '';
 
+        // Transfer options
+        let i = 0;
         choiceDefinition.find('.sortable').each(function() {
             let row = mQuery(this).find('input');
             let label = mQuery(row[0]).val();
             let value = mQuery(row[1]).val();
-            options = options + '<option value="' + value + '">' + label + '</option>';
+
+            if (type === 'multiselect') {
+                options = options + '<option value="' + value + '">' + label + '</option>';
+            }
+
+            if (type === 'radio_group') {
+                options = options + '<label for="custom_field_defaultValue_' + i + '">' + label + '</label>' +
+                '<input type="radio" id="custom_field_defaultValue_' + i + '" name="custom_field[defaultValue]" autocomplete="false" value="' + value + '">'
+            }
+
+            i = i + 1;
         });
 
-        target.html(options).trigger('chosen:updated');
+        mQuery('#custom_field_defaultValue').html(options).trigger('chosen:updated');
     },
 
     /**
