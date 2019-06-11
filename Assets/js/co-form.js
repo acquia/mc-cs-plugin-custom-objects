@@ -238,13 +238,11 @@ CustomObjectsForm = {
         // Transfer options
         let i = 0;
 
-        // Empty value param actually working for radio_group
-        let emptyValue = mQuery('#custom_field_params_emptyValue');
-        if (emptyValue !== undefined) {
-            emptyValue = emptyValue.val(); // This is label, but defined as empty value
+        // Empty value add for radio_group, same behavior as in Symfony form
+        if (type === 'radio_group') {
             options = options + '<input type="radio" id="custom_field_defaultValue_' +
                 i + '" name="custom_field[defaultValue]" autocomplete="false" value="">' +
-                '<label for="custom_field_defaultValue_' + i + '">' + emptyValue + '</label>';
+                '<label for="custom_field_defaultValue_' + i + '">None</label>';
             i = i + 1;
         }
 
