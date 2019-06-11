@@ -307,6 +307,8 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      * @param mixed $value
      *
      * @return CustomFieldValueInterface
+     * 
+     * @throws NotFoundException
      */
     public function createNewCustomFieldValueByFieldId(int $customFieldId, $value): CustomFieldValueInterface
     {
@@ -329,6 +331,8 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      * @param mixed  $value
      *
      * @return CustomFieldValueInterface
+     * 
+     * @throws NotFoundException
      */
     public function createNewCustomFieldValueByFieldAlias(string $customFieldAlias, $value): CustomFieldValueInterface
     {

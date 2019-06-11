@@ -21,6 +21,9 @@ use Mautic\CategoryBundle\Entity\Category;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCompany;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
 use Mautic\LeadBundle\Entity\Company;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomItemTest extends \PHPUnit_Framework_TestCase
 {
@@ -84,5 +87,78 @@ class CustomItemTest extends \PHPUnit_Framework_TestCase
                 'a value B',
             ],
         ], $item->getChanges());
+    }
+
+    public function testFindCustomFieldValueForFieldAlias(): void
+    {
+        $object = new CustomObject();
+        $item   = new CustomItem($object);
+        $field1 = $this->createMock(CustomField::class);
+        $field2 = $this->createMock(CustomField::class);
+        $value1 = new CustomFieldValueText($field1, $item, 'value1');
+        $value2 = new CustomFieldValueText($field2, $item, 'value2');
+
+        $field1->method('getAlias')->willReturn('field-alias-1');
+        $field2->method('getAlias')->willReturn('field-alias-2');
+        $field1->method('getId')->willReturn(1);
+        $field2->method('getId')->willReturn(2);
+
+        $object->addCustomField($field1);
+        $object->addCustomField($field2);
+        $item->addCustomFieldValue($value1);
+        $item->addCustomFieldValue($value2);
+        
+        $this->assertSame($value2, $item->findCustomFieldValueForFieldAlias('field-alias-2'));
+        $this->assertSame($value1, $item->findCustomFieldValueForFieldAlias('field-alias-1'));
+
+        $this->expectException(NotFoundException::class);
+        $item->findCustomFieldValueForFieldAlias('unicorn');
+    }
+
+    public function testCreateNewCustomFieldValueByFieldId(): void
+    {
+        $object = new CustomObject();
+        $item   = new CustomItem($object);
+        $field  = $this->createMock(CustomField::class);
+
+        $field->method('getId')->willReturn(1);
+        $field->method('getTypeObject')->willReturn(
+            new TextType($this->createMock(TranslatorInterface::class))
+        );
+
+        $object->addCustomField($field);
+        
+        $value = $item->createNewCustomFieldValueByFieldId(1, 'value1');
+        $this->assertSame($field, $value->getCustomField());
+        $this->assertSame($item, $value->getCustomItem());
+        $this->assertSame('value1', $value->getValue());
+        $this->assertSame(1, $value->getId());
+
+        $this->expectException(NotFoundException::class);
+        $item->createNewCustomFieldValueByFieldId(2, 'unicorn');
+    }
+
+    public function testCreateNewCustomFieldValueByFieldAlias(): void
+    {
+        $object = new CustomObject();
+        $item   = new CustomItem($object);
+        $field  = $this->createMock(CustomField::class);
+
+        $field->method('getAlias')->willReturn('field-alias-1');
+        $field->method('getId')->willReturn(1);
+        $field->method('getTypeObject')->willReturn(
+            new TextType($this->createMock(TranslatorInterface::class))
+        );
+
+        $object->addCustomField($field);
+        
+        $value = $item->createNewCustomFieldValueByFieldAlias('field-alias-1', 'value1');
+        $this->assertSame($field, $value->getCustomField());
+        $this->assertSame($item, $value->getCustomItem());
+        $this->assertSame('value1', $value->getValue());
+        $this->assertSame(1, $value->getId());
+
+        $this->expectException(NotFoundException::class);
+        $item->createNewCustomFieldValueByFieldAlias('field-alias-2', 'unicorn');
     }
 }
