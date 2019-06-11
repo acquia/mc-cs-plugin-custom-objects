@@ -242,9 +242,9 @@ CustomObjectsForm = {
         let emptyValue = mQuery('#custom_field_params_emptyValue');
         if (emptyValue !== undefined) {
             emptyValue = emptyValue.val(); // This is label, but defined as empty value
-            options = options + '<label for="custom_field_defaultValue_' + i + '">' + emptyValue + '</label>' +
-                '<input type="radio" id="custom_field_defaultValue_' +
-                i + '" name="custom_field[defaultValue]" autocomplete="false" value="">';
+            options = options + '<input type="radio" id="custom_field_defaultValue_' +
+                i + '" name="custom_field[defaultValue]" autocomplete="false" value="">' +
+                '<label for="custom_field_defaultValue_' + i + '">' + emptyValue + '</label>';
             i = i + 1;
         }
 
@@ -263,9 +263,9 @@ CustomObjectsForm = {
                     options = options + '<option value="' + value + '">' + label + '</option>';
                     break;
                 case 'radio_group':
-                    options = options + '<label for="custom_field_defaultValue_' + i + '">' + label + '</label>' +
-                        '<input type="radio" id="custom_field_defaultValue_' +
-                        i + '" name="custom_field[defaultValue]" autocomplete="false" value="' + value + '">';
+                    options = options + '<input type="radio" id="custom_field_defaultValue_' +
+                        i + '" name="custom_field[defaultValue]" autocomplete="false" value="' + value + '">' +
+                        '<label for="custom_field_defaultValue_' + i + '">' + label + '</label>';
                     break;
             }
 
