@@ -224,7 +224,7 @@ CustomObjectsForm = {
     {
         let type = mQuery('#custom_field_type').val();
 
-        if (type !== 'multiselect' && type !== 'radio_group') {
+        if (type !== 'checkbox_group' && type !== 'multiselect' && type !== 'radio_group') {
             return;
         }
 
@@ -241,6 +241,11 @@ CustomObjectsForm = {
             let row = mQuery(this).find('input');
             let label = mQuery(row[0]).val();
             let value = mQuery(row[1]).val();
+
+            if (type === 'checkbox_group') {
+                options = options + '<label>' +
+                    '<input type="checkbox" id="custom_field_defaultValue_' + i + '" name="custom_field[defaultValue][]" class="form-control" autocomplete="false" value="' + value + '">' + label + '</label>'
+            }
 
             if (type === 'multiselect') {
                 options = options + '<option value="' + value + '">' + label + '</option>';
