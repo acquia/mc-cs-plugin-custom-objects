@@ -130,8 +130,11 @@ class ApiSubscriberTest extends \PHPUnit_Framework_TestCase
             ->willReturn([
                 'email'         => 'john@doe.email',
                 'customObjects' => [
-                    'object-1-alias' => [
-                        'data' => [[]],
+                    'data' => [
+                        [
+                            'alias' => 'object-1-alias',
+                            'data'  => [[]],
+                        ],
                     ],
                 ],
             ]);
@@ -162,10 +165,13 @@ class ApiSubscriberTest extends \PHPUnit_Framework_TestCase
             ->willReturn([
                 'email'         => 'john@doe.email',
                 'customObjects' => [
-                    'object-1-alias' => [
-                        'data' => [
-                            [
-                                'id' => 123,
+                    'data' => [
+                        [
+                            'alias' => 'object-1-alias',
+                            'data'  => [
+                                [
+                                    'id' => 123,
+                                ],
                             ],
                         ],
                     ],
@@ -202,14 +208,17 @@ class ApiSubscriberTest extends \PHPUnit_Framework_TestCase
             ->willReturn([
                 'email'         => 'john@doe.email',
                 'customObjects' => [
-                    'object-1-alias' => [
-                        'data' => [
-                            [
-                                'id'         => 123,
-                                'name'       => 'Test Item',
-                                'attributes' => [
-                                    'sku'   => 'd2345f',
-                                    'price' => 237,
+                    'data' => [
+                        [
+                            'alias' => 'object-1-alias',
+                            'data'  => [
+                                [
+                                    'id'         => 123,
+                                    'name'       => 'Test Item',
+                                    'attributes' => [
+                                        'sku'   => 'd2345f',
+                                        'price' => 237,
+                                    ],
                                 ],
                             ],
                         ],
@@ -272,13 +281,16 @@ class ApiSubscriberTest extends \PHPUnit_Framework_TestCase
             ->willReturn([
                 'email'         => 'john@doe.email',
                 'customObjects' => [
-                    'object-1-alias' => [
-                        'data' => [
-                            [
-                                'name'       => 'Test Item',
-                                'attributes' => [
-                                    'sku'   => 'd2345f',
-                                    'price' => 237,
+                    'data' => [
+                        [
+                            'alias' => 'object-1-alias',
+                            'data'  => [
+                                [
+                                    'name'       => 'Test Item',
+                                    'attributes' => [
+                                        'sku'   => 'd2345f',
+                                        'price' => 237,
+                                    ],
                                 ],
                             ],
                         ],

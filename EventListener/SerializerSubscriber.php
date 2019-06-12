@@ -25,6 +25,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\HttpFoundation\RequestStack;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 class SerializerSubscriber implements EventSubscriberInterface
 {
@@ -84,7 +85,10 @@ class SerializerSubscriber implements EventSubscriberInterface
      */
     public function addCustomItemsIntoContactResponse(ObjectEvent $event): void
     {
-        $request = $this->requestStack->getCurrentRequest();
+        $limit    = 50;
+        $page     = 1;
+        $orderDir = 'DESC';
+        $request  = $this->requestStack->getCurrentRequest();
 
         if (null === $request) {
             return;
@@ -105,32 +109,50 @@ class SerializerSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $customObjects = $this->customItemXrefContactRepository->getCustomObjectsRelatedToContact($contact);
+        $tableConfig   = new TableConfig($limit, $page, CustomObject::TABLE_ALIAS.'.dateAdded', $orderDir);
+        $customObjects = $this->customItemXrefContactRepository->getCustomObjectsRelatedToContact($contact, $tableConfig);
 
         if (empty($customObjects)) {
             return;
         }
 
-        $payload = [];
+        $payload = [
+            'data' => [],
+            'meta' => [
+                'limit'          => $limit,
+                'page'           => $page,
+                'order'          => CustomObject::TABLE_ALIAS.'.dateAdded',
+                'orderDirection' => $orderDir,
+            ],
+        ];
         foreach ($customObjects as $customObject) {
-            $tableConfig = new TableConfig(100, 1, CustomItem::TABLE_ALIAS.'.dateAdded', 'DESC');
+            $tableConfig = new TableConfig($limit, $page, CustomItem::TABLE_ALIAS.'.dateAdded', $orderDir);
             $tableConfig->addParameter('customObjectId', $customObject['id']);
             $tableConfig->addParameter('filterEntityId', $contact->getId());
             $tableConfig->addParameter('filterEntityType', 'contact');
             $customItems = $this->customItemModel->getTableData($tableConfig);
 
             if (count($customItems)) {
-                $payload[$customObject['alias']] = [
-                    'id'   => $customObject['id'],
-                    'data' => [],
-                ];
+                $itemsPayload = [];
 
                 /** @var CustomItem $customItem */
                 foreach ($customItems as $customItem) {
                     $this->customItemModel->populateCustomFields($customItem);
-                    $payload[$customObject['alias']]['data'][$customItem->getId()] = $this->serializeCustomItem($customItem);
+                    $itemsPayload[] = $this->serializeCustomItem($customItem);
                 }
             }
+
+            $payload['data'][] = [
+                'id'    => $customObject['id'],
+                'alias' => $customObject['alias'],
+                'data'  => $itemsPayload,
+                'meta'  => [
+                    'limit'          => $limit,
+                    'page'           => $page,
+                    'order'          => CustomItem::TABLE_ALIAS.'.dateAdded',
+                    'orderDirection' => $orderDir,
+                ],
+            ];
         }
 
         $event->getContext()->getVisitor()->addData('customObjects', $payload);

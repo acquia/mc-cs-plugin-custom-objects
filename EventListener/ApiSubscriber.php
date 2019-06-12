@@ -98,7 +98,7 @@ class ApiSubscriber extends CommonSubscriber
     private function saveCustomItems(ApiEntityEvent $event, bool $dryRun = false): void
     {
         try {
-            $customObjects = $this->getCustomObjectsFromContactCreateRequest(
+            $customObjectsPayload = $this->getCustomObjectsFromContactCreateRequest(
                 $event->getEntityRequestParameters(),
                 $event->getRequest()
             );
@@ -109,12 +109,12 @@ class ApiSubscriber extends CommonSubscriber
         /** @var Lead $contact */
         $contact = $event->getEntity();
 
-        foreach ($customObjects as $customObjectAlias => $customObjectData) {
+        foreach ($customObjectsPayload['data'] as $customObjectData) {
             if (empty($customObjectData['data']) || !is_array($customObjectData['data'])) {
                 continue;
             }
 
-            $customObject = $this->getCustomObject($customObjectAlias);
+            $customObject = $this->getCustomObject($customObjectData);
 
             foreach ($customObjectData['data'] as $customItemData) {
                 $customItem = $this->getCustomItem($customObject, $customItemData);
@@ -147,7 +147,7 @@ class ApiSubscriber extends CommonSubscriber
             throw new InvalidArgumentException('Not a API request we care about');
         }
 
-        if (empty($entityRequestParameters['customObjects']) || !is_array($entityRequestParameters['customObjects'])) {
+        if (empty($entityRequestParameters['customObjects']['data']) || !is_array($entityRequestParameters['customObjects']['data'])) {
             throw new InvalidArgumentException('The request payload does not contain any custom items in the customObjects attribute.');
         }
 
@@ -155,16 +155,22 @@ class ApiSubscriber extends CommonSubscriber
     }
 
     /**
-     * @param string $customObjectAlias
+     * @param mixed[] $customObjectData
      *
      * @return CustomObject
      *
-     * @throws NotFoundException
+     * @throws NotFoundException|InvalidArgumentException
      */
-    private function getCustomObject(string $customObjectAlias): CustomObject
+    private function getCustomObject(array $customObjectData): CustomObject
     {
         try {
-            return $this->customObjectModel->fetchEntityByAlias($customObjectAlias);
+            if (isset($customObjectData['id'])) {
+                return $this->customObjectModel->fetchEntity((int) $customObjectData['id']);
+            } elseif (isset($customObjectData['alias'])) {
+                return $this->customObjectModel->fetchEntityByAlias($customObjectData['alias']);
+            }
+
+            throw new InvalidArgumentException('customObject[data][][id] or customObject[data][][alias] must exist in the request to identify a Custom Object.', Response::HTTP_BAD_REQUEST);
         } catch (NotFoundException $e) {
             throw new NotFoundException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
         }

@@ -18,15 +18,17 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
+use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 
 class CustomItemXrefContactRepository extends CommonRepository
 {
     /**
-     * @param Lead $contact
+     * @param Lead        $contact
+     * @param TableConfig $tableConfig
      *
      * @return int[]
      */
-    public function getCustomObjectsRelatedToContact(Lead $contact): array
+    public function getCustomObjectsRelatedToContact(Lead $contact, TableConfig $tableConfig): array
     {
         $q = $this->createQueryBuilder(CustomItemXrefContact::TABLE_ALIAS);
         $q->select(CustomObject::TABLE_ALIAS.'.id');
@@ -37,6 +39,10 @@ class CustomItemXrefContactRepository extends CommonRepository
         $q->groupBy(CustomObject::TABLE_ALIAS.'.id');
         $q->andWhere(CustomObject::TABLE_ALIAS.'.isPublished = 1');
         $q->setParameter('contactId', $contact->getId());
+
+        $q->setMaxResults($tableConfig->getLimit());
+        $q->setFirstResult($tableConfig->getOffset());
+        $q->orderBy($tableConfig->getOrderBy(), $tableConfig->getOrderDirection());
 
         return $q->getQuery()->getResult();
     }

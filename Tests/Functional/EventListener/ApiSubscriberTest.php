@@ -31,10 +31,13 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $contact = [
             'email'         => 'contact1@api.test',
             'customObjects' => [
-                'unicorn' => [
-                    'data' => [
-                        [
-                            'name' => 'Custom Item Created Via Contact API',
+                'data' => [
+                    [
+                        'alias' => 'unicorn',
+                        'data'  => [
+                            [
+                                'name' => 'Custom Item Created Via Contact API',
+                            ],
                         ],
                     ],
                 ],
@@ -69,21 +72,24 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $contact = [
             'email'         => 'contact1@api.test',
             'customObjects' => [
-                $customObject->getAlias() => [
-                    'data' => [
-                        [
-                            'name'       => 'Custom Item Created Via Contact API 2',
-                            'attributes' => [
-                                'text-test-field'         => 'Yellow snake',
-                                'textarea-test-field'     => "Multi\nline\nvalue",
-                                'url-test-field'          => 'https://mautic.org',
-                                'multiselect-test-field'  => ['option_b'],
-                                'select-test-field'       => 'option_a',
-                                'radio-group-test-field'  => 'option_b',
-                                'phone-number-test-field' => '+420775308002',
-                                'number-test-field'       => 123,
-                                'hidden-test-field'       => 'secret',
-                                'email-test-field'        => 'john@doe.email',
+                'data' => [
+                    [
+                        'alias' => $customObject->getAlias(),
+                        'data'  => [
+                            [
+                                'name'       => 'Custom Item Created Via Contact API 2',
+                                'attributes' => [
+                                    'text-test-field'         => 'Yellow snake',
+                                    'textarea-test-field'     => "Multi\nline\nvalue",
+                                    'url-test-field'          => 'https://mautic.org',
+                                    'multiselect-test-field'  => ['option_b'],
+                                    'select-test-field'       => 'option_a',
+                                    'radio-group-test-field'  => 'option_b',
+                                    'phone-number-test-field' => '+420775308002',
+                                    'number-test-field'       => 123,
+                                    'hidden-test-field'       => 'secret',
+                                    'email-test-field'        => 'john@doe.email',
+                                ],
                             ],
                         ],
                     ],
@@ -104,25 +110,27 @@ class ApiSubscriberTest extends MauticMysqlTestCase
     public function testCreatingContactWithCustomItems(): void
     {
         $customObject = $this->createCustomObjectWithAllFields($this->container, 'Product');
-
-        $contact = [
+        $contact      = [
             'email'         => 'contact1@api.test',
             'customObjects' => [
-                $customObject->getAlias() => [
-                    'data' => [
-                        [
-                            'name'       => 'Custom Item Created Via Contact API 2',
-                            'attributes' => [
-                                'text-test-field'         => 'Yellow snake',
-                                'textarea-test-field'     => "Multi\nline\nvalue",
-                                'url-test-field'          => 'https://mautic.org',
-                                'multiselect-test-field'  => ['option_b'],
-                                'select-test-field'       => 'option_a',
-                                'radio-group-test-field'  => 'option_b',
-                                'phone-number-test-field' => '+420775308002',
-                                'number-test-field'       => 123,
-                                'hidden-test-field'       => 'secret',
-                                'email-test-field'        => 'john@doe.email',
+                'data' => [
+                    [
+                        'id'   => $customObject->getId(),
+                        'data' => [
+                            [
+                                'name'       => 'Custom Item Created Via Contact API 2',
+                                'attributes' => [
+                                    'text-test-field'         => 'Yellow snake',
+                                    'textarea-test-field'     => "Multi\nline\nvalue",
+                                    'url-test-field'          => 'https://mautic.org',
+                                    'multiselect-test-field'  => ['option_b'],
+                                    'select-test-field'       => 'option_a',
+                                    'radio-group-test-field'  => 'option_b',
+                                    'phone-number-test-field' => '+420775308002',
+                                    'number-test-field'       => 123,
+                                    'hidden-test-field'       => 'secret',
+                                    'email-test-field'        => 'john@doe.email',
+                                ],
                             ],
                         ],
                     ],
@@ -137,11 +145,17 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
         $this->assertSame(1, $responseData['contact']['id']);
         $this->assertSame('contact1@api.test', $responseData['contact']['fields']['all']['email']);
+        $this->assertSame($customObject->getAlias(), $responseData['contact']['customObjects']['data'][0]['alias']);
+        $this->assertSame($customObject->getId(), $responseData['contact']['customObjects']['data'][0]['id']);
+        $this->assertSame(50, $responseData['contact']['customObjects']['meta']['limit']);
+        $this->assertSame(1, $responseData['contact']['customObjects']['meta']['page']);
+        $this->assertSame('CustomObject.dateAdded', $responseData['contact']['customObjects']['meta']['order']);
+        $this->assertSame('DESC', $responseData['contact']['customObjects']['meta']['orderDirection']);
         $this->assertNull($responseData['contact']['fields']['all']['firstname']);
-        $this->assertFalse(empty($responseData['contact']['customObjects']), 'Contact response does not contain the customObjects property. '.$response->getContent());
-        $this->assertCount(1, $responseData['contact']['customObjects']);
+        $this->assertFalse(empty($responseData['contact']['customObjects']['data']), 'Contact response does not contain the customObjects property. '.$response->getContent());
+        $this->assertCount(1, $responseData['contact']['customObjects']['data']);
 
-        $customItemFromResponse = $responseData['contact']['customObjects'][$customObject->getAlias()]['data'][1];
+        $customItemFromResponse = $responseData['contact']['customObjects']['data'][0]['data'][0];
         $this->assertSame(1, $customItemFromResponse['id']);
         $this->assertSame('Custom Item Created Via Contact API 2', $customItemFromResponse['name']);
         $this->assertSame('Yellow snake', $customItemFromResponse['attributes']['text-test-field']);
@@ -161,22 +175,25 @@ class ApiSubscriberTest extends MauticMysqlTestCase
             'email'         => 'contact1@api.test',
             'firstname'     => 'Contact1',
             'customObjects' => [
-                $customObject->getAlias() => [
-                    'data' => [
-                        [
-                            'id'         => 1,
-                            'name'       => 'Custom Item Modified Via Contact API 2',
-                            'attributes' => [
-                                'text-test-field'         => 'Yellow cake',
-                                'textarea-test-field'     => "Multi\nnine\nvalue",
-                                'url-test-field'          => 'https://mautic.com',
-                                'multiselect-test-field'  => ['option_a'],
-                                'select-test-field'       => 'option_b',
-                                'radio-group-test-field'  => 'option_a',
-                                'phone-number-test-field' => '+420775308003',
-                                'number-test-field'       => 123456,
-                                'hidden-test-field'       => 'secret sauce',
-                                'email-test-field'        => 'john@doe.com',
+                'data' => [
+                    [
+                        'alias' => $customObject->getAlias(),
+                        'data'  => [
+                            [
+                                'id'         => 1,
+                                'name'       => 'Custom Item Modified Via Contact API 2',
+                                'attributes' => [
+                                    'text-test-field'         => 'Yellow cake',
+                                    'textarea-test-field'     => "Multi\nnine\nvalue",
+                                    'url-test-field'          => 'https://mautic.com',
+                                    'multiselect-test-field'  => ['option_a'],
+                                    'select-test-field'       => 'option_b',
+                                    'radio-group-test-field'  => 'option_a',
+                                    'phone-number-test-field' => '+420775308003',
+                                    'number-test-field'       => 123456,
+                                    'hidden-test-field'       => 'secret sauce',
+                                    'email-test-field'        => 'john@doe.com',
+                                ],
                             ],
                         ],
                     ],
@@ -193,9 +210,9 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $this->assertSame(1, $responseData['contact']['id']);
         $this->assertSame('contact1@api.test', $responseData['contact']['fields']['all']['email']);
         $this->assertSame('Contact1', $responseData['contact']['fields']['all']['firstname']);
-        $this->assertCount(1, $responseData['contact']['customObjects'][$customObject->getAlias()]['data']);
+        $this->assertCount(1, $responseData['contact']['customObjects']['data'][0]['data'], 'Contact response does not contain the customObjects array. '.$response->getContent());
 
-        $customItemFromResponse = $responseData['contact']['customObjects'][$customObject->getAlias()]['data'][1];
+        $customItemFromResponse = $responseData['contact']['customObjects']['data'][0]['data'][0];
         $this->assertSame(1, $customItemFromResponse['id']);
         $this->assertSame('Custom Item Modified Via Contact API 2', $customItemFromResponse['name']);
         $this->assertSame('Yellow cake', $customItemFromResponse['attributes']['text-test-field']);
@@ -218,21 +235,24 @@ class ApiSubscriberTest extends MauticMysqlTestCase
             'email'         => 'contact1@api.test',
             'firstname'     => 'Contact',
             'customObjects' => [
-                $customObject->getAlias() => [
-                    'data' => [
-                        [
-                            'name'       => 'Custom Item Created Via Contact API 2',
-                            'attributes' => [
-                                'text-test-field'         => 'Yellow snake',
-                                'textarea-test-field'     => "Multi\nline\nvalue",
-                                'url-test-field'          => 'https://mautic.org',
-                                'multiselect-test-field'  => ['option_b'],
-                                'select-test-field'       => 'option_a',
-                                'radio-group-test-field'  => 'option_b',
-                                'phone-number-test-field' => '+420775308002',
-                                'number-test-field'       => 123,
-                                'hidden-test-field'       => 'secret',
-                                'email-test-field'        => 'john@doe.email',
+                'data' => [
+                    [
+                        'alias' => $customObject->getAlias(),
+                        'data'  => [
+                            [
+                                'name'       => 'Custom Item Created Via Contact API 2',
+                                'attributes' => [
+                                    'text-test-field'         => 'Yellow snake',
+                                    'textarea-test-field'     => "Multi\nline\nvalue",
+                                    'url-test-field'          => 'https://mautic.org',
+                                    'multiselect-test-field'  => ['option_b'],
+                                    'select-test-field'       => 'option_a',
+                                    'radio-group-test-field'  => 'option_b',
+                                    'phone-number-test-field' => '+420775308002',
+                                    'number-test-field'       => 123,
+                                    'hidden-test-field'       => 'secret',
+                                    'email-test-field'        => 'john@doe.email',
+                                ],
                             ],
                         ],
                     ],
@@ -248,10 +268,10 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $this->assertSame(1, $responseData['contact']['id']);
         $this->assertSame('contact1@api.test', $responseData['contact']['fields']['all']['email']);
         $this->assertSame('Contact', $responseData['contact']['fields']['all']['firstname']);
-        $this->assertFalse(empty($responseData['contact']['customObjects']), 'Contact response does not contain the customObjects property. '.$response->getContent());
-        $this->assertCount(1, $responseData['contact']['customObjects']);
+        $this->assertFalse(empty($responseData['contact']['customObjects']['data']), 'Contact response does not contain the customObjects property. '.$response->getContent());
+        $this->assertCount(1, $responseData['contact']['customObjects']['data']);
 
-        $customItemFromResponse = $responseData['contact']['customObjects'][$customObject->getAlias()]['data'][1];
+        $customItemFromResponse = $responseData['contact']['customObjects']['data'][0]['data'][0];
         $this->assertSame(1, $customItemFromResponse['id']);
         $this->assertSame('Custom Item Created Via Contact API 2', $customItemFromResponse['name']);
         $this->assertSame('Yellow snake', $customItemFromResponse['attributes']['text-test-field']);
@@ -270,22 +290,25 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $contact = [
             'firstname'     => 'Contact1',
             'customObjects' => [
-                $customObject->getAlias() => [
-                    'data' => [
-                        [
-                            'id'         => 1,
-                            'name'       => 'Custom Item Modified Via Contact API 2',
-                            'attributes' => [
-                                'text-test-field'         => 'Yellow cake',
-                                'textarea-test-field'     => "Multi\nnine\nvalue",
-                                'url-test-field'          => 'https://mautic.com',
-                                'multiselect-test-field'  => ['option_a'],
-                                'select-test-field'       => 'option_b',
-                                'radio-group-test-field'  => 'option_a',
-                                'phone-number-test-field' => '+420775308003',
-                                'number-test-field'       => 123456,
-                                'hidden-test-field'       => 'secret sauce',
-                                'email-test-field'        => 'john@doe.com',
+                'data' => [
+                    [
+                        'alias' => $customObject->getAlias(),
+                        'data'  => [
+                            [
+                                'id'         => 1,
+                                'name'       => 'Custom Item Modified Via Contact API 2',
+                                'attributes' => [
+                                    'text-test-field'         => 'Yellow cake',
+                                    'textarea-test-field'     => "Multi\nnine\nvalue",
+                                    'url-test-field'          => 'https://mautic.com',
+                                    'multiselect-test-field'  => ['option_a'],
+                                    'select-test-field'       => 'option_b',
+                                    'radio-group-test-field'  => 'option_a',
+                                    'phone-number-test-field' => '+420775308003',
+                                    'number-test-field'       => 123456,
+                                    'hidden-test-field'       => 'secret sauce',
+                                    'email-test-field'        => 'john@doe.com',
+                                ],
                             ],
                         ],
                     ],
@@ -302,10 +325,10 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $this->assertSame(1, $responseData['contact']['id']);
         $this->assertSame('contact1@api.test', $responseData['contact']['fields']['all']['email']);
         $this->assertSame('Contact1', $responseData['contact']['fields']['all']['firstname']);
-        $this->assertFalse(empty($responseData['contact']['customObjects'][$customObject->getAlias()]['data']), 'The contact does not contain the `customObjects.[co_alias].data` parameter containg custom objects');
-        $this->assertCount(1, $responseData['contact']['customObjects'][$customObject->getAlias()]['data']);
+        $this->assertFalse(empty($responseData['contact']['customObjects']['data'][0]['data']), 'The contact does not contain the `customObjects[data][0][data]` parameter containg custom objects');
+        $this->assertCount(1, $responseData['contact']['customObjects']['data'][0]['data']);
 
-        $customItemFromResponse = $responseData['contact']['customObjects'][$customObject->getAlias()]['data'][1];
+        $customItemFromResponse = $responseData['contact']['customObjects']['data'][0]['data'][0];
         $this->assertSame(1, $customItemFromResponse['id']);
         $this->assertSame('Custom Item Modified Via Contact API 2', $customItemFromResponse['name']);
         $this->assertSame('Yellow cake', $customItemFromResponse['attributes']['text-test-field']);
@@ -327,12 +350,15 @@ class ApiSubscriberTest extends MauticMysqlTestCase
             [
                 'email'         => 'contact3@api.test',
                 'customObjects' => [
-                    $customObject->getAlias() => [
-                        'data' => [
-                            [
-                                'name'       => 'Custom Item Created Via Contact API 3',
-                                'attributes' => [
-                                    'text-test-field' => 'Take a brake',
+                    'data' => [
+                        [
+                            'alias' => $customObject->getAlias(),
+                            'data'  => [
+                                [
+                                    'name'       => 'Custom Item Created Via Contact API 3',
+                                    'attributes' => [
+                                        'text-test-field' => 'Take a brake',
+                                    ],
                                 ],
                             ],
                         ],
@@ -342,12 +368,15 @@ class ApiSubscriberTest extends MauticMysqlTestCase
             [
                 'email'         => 'contact4@api.test',
                 'customObjects' => [
-                    $customObject->getAlias() => [
-                        'data' => [
-                            [
-                                'name'       => 'Custom Item Created Via Contact API 4',
-                                'attributes' => [
-                                    'text-test-field' => 'Make a milkshake',
+                    'data' => [
+                        [
+                            'alias' => $customObject->getAlias(),
+                            'data'  => [
+                                [
+                                    'name'       => 'Custom Item Created Via Contact API 4',
+                                    'attributes' => [
+                                        'text-test-field' => 'Make a milkshake',
+                                    ],
                                 ],
                             ],
                         ],
@@ -364,20 +393,20 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $this->assertFalse(empty($responseData['contacts']), 'The payload must contain the "contacts" param. '.$response->getContent());
         $this->assertFalse(empty($responseData['contacts'][0]), 'The payload must contain the "contacts[0]" param. '.$response->getContent());
         $this->assertFalse(empty($responseData['contacts'][1]), 'The payload must contain the "contacts[1]" param. '.$response->getContent());
-        $this->assertFalse(empty($responseData['contacts'][0]['customObjects']), 'Contact3 response does not contain the customObjects property. '.$response->getContent());
-        $this->assertFalse(empty($responseData['contacts'][1]['customObjects']), 'Contact4 response does not contain the customObjects property. '.$response->getContent());
+        $this->assertFalse(empty($responseData['contacts'][0]['customObjects']['data']), 'Contact3 response does not contain the customObjects property. '.$response->getContent());
+        $this->assertFalse(empty($responseData['contacts'][1]['customObjects']['data']), 'Contact4 response does not contain the customObjects property. '.$response->getContent());
 
         $contact3           = $responseData['contacts'][0];
         $contact4           = $responseData['contacts'][1];
-        $contact3CustomItem = $contact3['customObjects'][$customObject->getAlias()]['data'][1];
-        $contact4CustomItem = $contact4['customObjects'][$customObject->getAlias()]['data'][2];
+        $contact3CustomItem = $contact3['customObjects']['data'][0]['data'][0];
+        $contact4CustomItem = $contact4['customObjects']['data'][0]['data'][0];
 
         $this->assertSame(1, $contact3['id']);
         $this->assertSame(2, $contact4['id']);
         $this->assertSame('contact3@api.test', $contact3['fields']['all']['email']);
         $this->assertSame('contact4@api.test', $contact4['fields']['all']['email']);
-        $this->assertCount(1, $contact3['customObjects']);
-        $this->assertCount(1, $contact4['customObjects']);
+        $this->assertCount(1, $contact3['customObjects']['data']);
+        $this->assertCount(1, $contact4['customObjects']['data']);
 
         $this->assertSame(1, $contact3CustomItem['id']);
         $this->assertSame(2, $contact4CustomItem['id']);
