@@ -29,6 +29,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
 use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType;
+use InvalidArgumentException;
 
 class ApiSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -117,7 +118,7 @@ class ApiSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->apiSubscriber->validateCustomObjectsInContactRequest($this->apiEntityEvent);
     }
 
-    public function testValidateCustomObjectsInContactRequestWhenCustomObjectNotFound(): void
+    public function testValidateCustomObjectsInContactRequestWhenCustomObjectNotFoundByAlias(): void
     {
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
@@ -145,9 +146,76 @@ class ApiSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->customObjectModel->expects($this->once())
             ->method('fetchEntityByAlias')
+            ->with('object-1-alias')
             ->will($this->throwException(new NotFoundException('Custom Object not found')));
 
         $this->expectException(NotFoundException::class);
+        $this->expectExceptionCode(Response::HTTP_BAD_REQUEST);
+        $this->apiSubscriber->validateCustomObjectsInContactRequest($this->apiEntityEvent);
+    }
+
+    public function testValidateCustomObjectsInContactRequestWhenCustomObjectNotFoundById(): void
+    {
+        $this->configProvider->expects($this->once())
+            ->method('pluginIsEnabled')
+            ->willReturn(true);
+
+        $this->request->method('getPathInfo')->willReturn('/api/contacts/new');
+
+        $this->apiEntityEvent->expects($this->once())
+            ->method('getEntityRequestParameters')
+            ->willReturn([
+                'email'         => 'john@doe.email',
+                'customObjects' => [
+                    'data' => [
+                        [
+                            'id'   => 123,
+                            'data' => [[]],
+                        ],
+                    ],
+                ],
+            ]);
+
+        $this->apiEntityEvent->expects($this->once())
+            ->method('getEntity')
+            ->willReturn(new Lead());
+
+        $this->customObjectModel->expects($this->once())
+            ->method('fetchEntity')
+            ->with(123)
+            ->will($this->throwException(new NotFoundException('Custom Object not found')));
+
+        $this->expectException(NotFoundException::class);
+        $this->expectExceptionCode(Response::HTTP_BAD_REQUEST);
+        $this->apiSubscriber->validateCustomObjectsInContactRequest($this->apiEntityEvent);
+    }
+
+    public function testValidateCustomObjectsInContactRequestWhenCustomObjectDoesNotHaveAnyIdentifier(): void
+    {
+        $this->configProvider->expects($this->once())
+            ->method('pluginIsEnabled')
+            ->willReturn(true);
+
+        $this->request->method('getPathInfo')->willReturn('/api/contacts/new');
+
+        $this->apiEntityEvent->expects($this->once())
+            ->method('getEntityRequestParameters')
+            ->willReturn([
+                'email'         => 'john@doe.email',
+                'customObjects' => [
+                    'data' => [
+                        [
+                            'data' => [[]],
+                        ],
+                    ],
+                ],
+            ]);
+
+        $this->apiEntityEvent->expects($this->once())
+            ->method('getEntity')
+            ->willReturn(new Lead());
+
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(Response::HTTP_BAD_REQUEST);
         $this->apiSubscriber->validateCustomObjectsInContactRequest($this->apiEntityEvent);
     }
@@ -293,6 +361,9 @@ class ApiSubscriberTest extends \PHPUnit_Framework_TestCase
                                     ],
                                 ],
                             ],
+                        ],
+                        [
+                            'alias' => 'no-data-is-ignored',
                         ],
                     ],
                 ],
