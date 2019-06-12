@@ -29,8 +29,8 @@ class RadioGroupType extends SelectType
      * {@inheritdoc}
      */
     protected $formTypeOptions = [
-        'expanded' => true,
-        'multiple' => false,
+        'expanded'    => true,
+        'multiple'    => false,
         'placeholder' => null, // Empty value in form presented as `None` radio hidden
     ];
 }
