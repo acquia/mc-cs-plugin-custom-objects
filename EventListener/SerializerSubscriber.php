@@ -125,34 +125,34 @@ class SerializerSubscriber implements EventSubscriberInterface
                 'orderDirection' => $orderDir,
             ],
         ];
+
         foreach ($customObjects as $customObject) {
             $tableConfig = new TableConfig($limit, $page, CustomItem::TABLE_ALIAS.'.dateAdded', $orderDir);
             $tableConfig->addParameter('customObjectId', $customObject['id']);
             $tableConfig->addParameter('filterEntityId', $contact->getId());
             $tableConfig->addParameter('filterEntityType', 'contact');
-            $customItems = $this->customItemModel->getTableData($tableConfig);
+            $customItems  = $this->customItemModel->getTableData($tableConfig);
+            $itemsPayload = [];
 
             if (count($customItems)) {
-                $itemsPayload = [];
-
                 /** @var CustomItem $customItem */
                 foreach ($customItems as $customItem) {
                     $this->customItemModel->populateCustomFields($customItem);
                     $itemsPayload[] = $this->serializeCustomItem($customItem);
                 }
-            }
 
-            $payload['data'][] = [
-                'id'    => $customObject['id'],
-                'alias' => $customObject['alias'],
-                'data'  => $itemsPayload,
-                'meta'  => [
-                    'limit'          => $limit,
-                    'page'           => $page,
-                    'order'          => CustomItem::TABLE_ALIAS.'.dateAdded',
-                    'orderDirection' => $orderDir,
-                ],
-            ];
+                $payload['data'][] = [
+                    'id'    => $customObject['id'],
+                    'alias' => $customObject['alias'],
+                    'data'  => $itemsPayload,
+                    'meta'  => [
+                        'limit'          => $limit,
+                        'page'           => $page,
+                        'order'          => CustomItem::TABLE_ALIAS.'.dateAdded',
+                        'orderDirection' => $orderDir,
+                    ],
+                ];
+            }
         }
 
         $event->getContext()->getVisitor()->addData('customObjects', $payload);
