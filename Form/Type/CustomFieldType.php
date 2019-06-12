@@ -317,7 +317,8 @@ class CustomFieldType extends AbstractType
         $options = $customField->getFormFieldOptions(['empty_data' => null]);
 
         if ($customField->getTypeObject()->useEmptyValue() && $customField->getParams()->getEmptyValue()) {
-            $options['attr']['placeholder'] = $customField->getParams()->getEmptyValue();
+            // This works for multiselect chosen plugin. Can be extended for
+            $options['attr']['data-placeholder'] = $customField->getParams()->getEmptyValue();
         }
 
         try {
