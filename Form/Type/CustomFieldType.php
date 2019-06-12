@@ -308,10 +308,6 @@ class CustomFieldType extends AbstractType
      */
     private function createDefaultValueInput(FormInterface $form, CustomField $customField, bool $isModal): void
     {
-        if ($customField->getTypeObject()->useEmptyValue() && $customField->getParams()->getEmptyValue()) {
-            $fieldOptions['placeholder'] = $customField->getParams()->getEmptyValue();
-        }
-
         $symfonyFormFieldType = $customField->getTypeObject()->getSymfonyFormFieldType();
 
         if ($isModal && HiddenType::class === $symfonyFormFieldType) {
@@ -319,6 +315,10 @@ class CustomFieldType extends AbstractType
         }
 
         $options = $customField->getFormFieldOptions(['empty_data' => null]);
+
+        if ($customField->getTypeObject()->useEmptyValue() && $customField->getParams()->getEmptyValue()) {
+            $options['placeholder'] = $customField->getParams()->getEmptyValue();
+        }
 
         try {
             $options['constraints'] = $customField->getTypeObject()->getSymfonyFormConstraints();
