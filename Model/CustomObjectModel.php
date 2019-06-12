@@ -88,9 +88,8 @@ class CustomObjectModel extends FormModel
         $user         = $this->userHelper->getUser();
         $customObject = $this->sanitizeAlias($customObject);
         $customObject = $this->ensureUniqueAlias($customObject);
-
-        $now   = new DateTimeHelper();
-        $event = new CustomObjectEvent($customObject, $customObject->isNew());
+        $now          = new DateTimeHelper();
+        $event        = new CustomObjectEvent($customObject, $customObject->isNew());
 
         if ($customObject->isNew()) {
             $customObject->setCreatedBy($user);
@@ -121,7 +120,7 @@ class CustomObjectModel extends FormModel
      */
     public function delete(CustomObject $customObject): void
     {
-        //take note of ID before doctrine wipes it out
+        // Take note of ID before doctrine wipes it out
         $id    = $customObject->getId();
         $event = new CustomObjectEvent($customObject);
         $this->dispatcher->dispatch(CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_DELETE, $event);
@@ -129,7 +128,7 @@ class CustomObjectModel extends FormModel
         $this->entityManager->remove($customObject);
         $this->entityManager->flush();
 
-        //set the id for use in events
+        // Set the id for use in events
         $customObject->deletedId = $id;
         $this->dispatcher->dispatch(CustomObjectEvents::ON_CUSTOM_OBJECT_POST_DELETE, $event);
     }
@@ -331,12 +330,12 @@ class CustomObjectModel extends FormModel
      */
     private function ensureUniqueAlias(CustomObject $entity): CustomObject
     {
-        $testAlias = $entity->getAlias();
-        $isUnique  = $this->customObjectRepository->isAliasUnique($testAlias, $entity->getId());
-        $counter   = 1;
-        while ($isUnique) {
+        $testAlias   = $entity->getAlias();
+        $aliasExists = $this->customObjectRepository->checkAliasExists($testAlias, $entity->getId());
+        $counter     = 1;
+        while ($aliasExists) {
             $testAlias .= $counter;
-            $isUnique  = $this->customObjectRepository->isAliasUnique($testAlias, $entity->getId());
+            $aliasExists = $this->customObjectRepository->checkAliasExists($testAlias, $entity->getId());
             ++$counter;
         }
         if ($testAlias !== $entity->getAlias()) {
@@ -366,15 +365,11 @@ class CustomObjectModel extends FormModel
                 $args['filter']['force'] = [];
             }
 
-            $limitOwnerFilter = [
-                [
-                    'column' => CustomObject::TABLE_ALIAS.'.createdBy',
-                    'expr'   => 'eq',
-                    'value'  => $this->userHelper->getUser()->getId(),
-                ],
+            $args['filter']['force'][] = [
+                'column' => CustomObject::TABLE_ALIAS.'.createdBy',
+                'expr'   => 'eq',
+                'value'  => $this->userHelper->getUser()->getId(),
             ];
-
-            $args['filter']['force'] += $limitOwnerFilter;
         }
 
         return $args;
