@@ -293,6 +293,25 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
         $this->customItemModel->fetchEntity(44);
     }
 
+    public function testGetTableDataWithoutCustomObjectId(): void
+    {
+        $tableConfig = $this->createMock(TableConfig::class);
+
+        $tableConfig->expects($this->exactly(2))
+            ->method('getParameter')
+            ->withConsecutive(
+                ['customObjectId'],
+                ['search']
+            )->will($this->onConsecutiveCalls(
+                null,
+                null
+            ));
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage("customObjectId cannot be empty. It's required for permission management");
+        $this->customItemModel->getTableData($tableConfig);
+    }
+
     public function testGetTableData(): void
     {
         $tableConfig = $this->createMock(TableConfig::class);
