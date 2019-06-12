@@ -220,6 +220,7 @@ class SaveController extends CommonController
             'content'    => $templateContent,
             'isNew'      => isset($isNew),
             'panelId'    => $panelId,
+            'type'       => $customField->getType(),
             'closeModal' => 1,
         ]);
     }

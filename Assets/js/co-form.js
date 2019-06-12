@@ -199,7 +199,7 @@ CustomObjectsForm = {
                     success: function (response) {
                         if (response.closeModal) {
                             // Valid post, lets create panel
-                            CustomObjectsForm.saveToPanel(response, target);
+                            CustomObjectsForm.saveToPanel(response);
                         } else {
                             // Rerender invalid form
                             CustomObjectsForm.refreshModalContent(response, target);
@@ -368,21 +368,31 @@ CustomObjectsForm = {
      * Create/edit custom field from modal
      * \MauticPlugin\CustomObjectsFormBundle\Controller\CustomField\SaveController::saveAction
      */
-    saveToPanel: function(response, target) {
+    saveToPanel: function(response) {
 
-        let panelToReplace = mQuery('#customField_' + response.panelId);
+        let panelSelector = '#customField_' + response.panelId;
+
+        let panel = mQuery(panelSelector);
 
         if (response.isNew) {
             mQuery('.drop-here').prepend(response.content);
+            panel = mQuery('.drop-here').children().first();
         } else {
-            mQuery(panelToReplace).replaceWith(response.content);
+            mQuery(panel).replaceWith(response.content);
+            panel = mQuery(panelSelector);
         }
 
-        mQuery(target).modal('hide');
+        if (response.type === 'multiselect') {
+            let select = panel.find('select');
+            select.chosen({
+                'placeholder_text_single' : select.attr('data-placeholder')
+            });
+        }
+
+        mQuery('#objectFieldModal').modal('hide');
         mQuery('body').removeClass('modal-open');
         mQuery('.modal-backdrop').remove();
 
-        let panel = mQuery('#customField_' + response.order);
         CustomObjectsForm.initPanel(panel);
         CustomObjectsForm.recalculateOrder();
     },
