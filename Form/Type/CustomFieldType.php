@@ -317,7 +317,7 @@ class CustomFieldType extends AbstractType
         $options = $customField->getFormFieldOptions(['empty_data' => null]);
 
         if ($customField->getTypeObject()->useEmptyValue() && $customField->getParams()->getEmptyValue()) {
-            $options['placeholder'] = $customField->getParams()->getEmptyValue();
+            $options['attr']['placeholder'] = $customField->getParams()->getEmptyValue();
         }
 
         try {
