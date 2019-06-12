@@ -238,14 +238,6 @@ CustomObjectsForm = {
         // Transfer options
         let i = 0;
 
-        // Empty value add for radio_group, same behavior as in Symfony form
-        if (type === 'radio_group') {
-            options = options + '<input type="radio" id="custom_field_defaultValue_' +
-                i + '" name="custom_field[defaultValue]" autocomplete="false" value="">' +
-                '<label for="custom_field_defaultValue_' + i + '">None</label>';
-            i = i + 1;
-        }
-
         choiceDefinition.find('.sortable').each(function() {
             let row = mQuery(this).find('input');
             let label = mQuery(row[0]).val();
@@ -396,7 +388,6 @@ CustomObjectsForm = {
         CustomObjectsForm.initPanel(panel);
         CustomObjectsForm.recalculateOrder();
     },
-
 
     /**
      * Find closest panel and get his id
