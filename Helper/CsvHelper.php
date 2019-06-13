@@ -17,10 +17,13 @@ class CsvHelper
 {
     /**
      * @param mixed[] $row
+     * @param string  $delimiter
+     * @param string  $enclosure
+     * @param string  $escapeChar
      *
      * @return string
      */
-    public function arrayToCsvLine(array $row, $delimiter = ',', $enclosure = '"', $escapeChar = '\\'): string
+    public function arrayToCsvLine(array $row, string $delimiter = ',', string $enclosure = '"', string $escapeChar = '\\'): string
     {
         $resource = fopen('php://memory', 'r+');
 
