@@ -16,6 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Mautic\EmailBundle\Exception\InvalidEmailException;
 use Symfony\Component\Validator\Constraints\EmailValidator;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 
 class EmailType extends AbstractTextType
 {
@@ -50,8 +51,12 @@ class EmailType extends AbstractTextType
     /**
      * {@inheritdoc}
      */
-    public function validateValue($value = null, ExecutionContextInterface $context): void
+    public function validateValue(CustomFieldValueInterface $valueEntity, ExecutionContextInterface $context): void
     {
+        parent::validateValue($valueEntity, $context);
+
+        $value = $valueEntity->getValue();
+        
         if (empty($value)) {
             return;
         }

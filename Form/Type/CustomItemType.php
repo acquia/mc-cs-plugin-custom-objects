@@ -22,6 +22,7 @@ use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Validator\Constraints\Valid;
 
 class CustomItemType extends AbstractType
 {
@@ -47,11 +48,12 @@ class CustomItemType extends AbstractType
             CollectionType::class,
             [
                 'entry_type'    => CustomFieldValueType::class,
+                'label'         => false,
+                'constraints'   => [new Valid()],
                 'entry_options' => [
                     'label'      => false,
                     'customItem' => $builder->getData(),
                 ],
-                'label'      => false,
             ]
         );
 

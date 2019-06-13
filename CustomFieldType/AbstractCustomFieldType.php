@@ -20,6 +20,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\UndefinedConstraintsException;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 
 abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
 {
@@ -133,8 +134,37 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function validateValue($value = null, ExecutionContextInterface $context): void
+    public function validateValue(CustomFieldValueInterface $valueEntity, ExecutionContextInterface $context): void
     {
+        $this->validateEmptyIfRequired($valueEntity, $context);
+    }
+
+    /**
+     * @param CustomFieldValueInterface $valueEntity
+     * @param ExecutionContextInterface $context
+     */
+    public function validateEmptyIfRequired(CustomFieldValueInterface $valueEntity, ExecutionContextInterface $context): void
+    {
+        if (!$valueEntity->getCustomField()->isRequired()) {
+            return;
+        }
+
+        $value        = $valueEntity->getValue();
+        $valueIsEmpty = false === $value || (empty($value) && '0' != $value);
+
+        if (!$valueIsEmpty) {
+            return;
+        }
+
+        $context->buildViolation(
+            $this->translator->trans(
+                    'custom.object.required',
+                    ['%fieldName%' => "{$valueEntity->getCustomField()->getLabel()} ({$valueEntity->getCustomField()->getAlias()})"],
+                    'validators'
+                )
+            )
+            ->atPath('value')
+            ->addViolation();
     }
 
     /**

@@ -67,10 +67,10 @@ interface CustomFieldTypeInterface
     public function createValueEntity(CustomField $customField, CustomItem $customItem, $value = null): CustomFieldValueInterface;
 
     /**
-     * @param mixed                     $value
+     * @param CustomFieldValueInterface $valueEntity
      * @param ExecutionContextInterface $context
      */
-    public function validateValue($value = null, ExecutionContextInterface $context): void;
+    public function validateValue(CustomFieldValueInterface $valueEntity, ExecutionContextInterface $context): void;
 
     /**
      * @return string

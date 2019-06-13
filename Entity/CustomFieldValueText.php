@@ -16,9 +16,6 @@ namespace MauticPlugin\CustomObjectsBundle\Entity;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Constraints as Assert;
 
 class CustomFieldValueText extends AbstractCustomFieldValue
 {
@@ -52,24 +49,6 @@ class CustomFieldValueText extends AbstractCustomFieldValue
         $builder->addNullableField('value', Type::TEXT);
 
         parent::addReferenceColumns($builder);
-    }
-
-    /**
-     * @param ClassMetadata $metadata
-     */
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addConstraint(new Assert\Callback('validateValue'));
-    }
-
-    /**
-     * Allow different field types to validate the value.
-     *
-     * @param ExecutionContextInterface $context
-     */
-    public function validateValue(ExecutionContextInterface $context): void
-    {
-        $this->getCustomField()->getTypeObject()->validateValue($this->getValue(), $context);
     }
 
     /**

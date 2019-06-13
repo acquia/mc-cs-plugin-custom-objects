@@ -72,6 +72,10 @@ class CustomFieldValueOption extends AbstractCustomFieldValue
      */
     public function validateOptionValueExists(ExecutionContextInterface $context): void
     {
+        if (empty($this->getValue())) {
+            return;
+        }
+
         $customField = $this->getCustomField();
         $valueExists = $customField->getOptions()->exists(function (int $key, CustomFieldOption $option) {
             return $this->getValue() === $option->getValue();
@@ -81,7 +85,8 @@ class CustomFieldValueOption extends AbstractCustomFieldValue
             $possibleValues = implode(', ', $customField->getOptions()->map(function (CustomFieldOption $option) {
                 return $option->getValue();
             })->getValues());
-            $context->buildViolation("Value '{$this->getValue()}' does not exist in the list of options of field '{$customField->getLabel()}' ({$customField->getId()}). Possible values: {$possibleValues}")
+            $selectedValues = implode(', ', $this->getValue());
+            $context->buildViolation("Value '{$selectedValues}' does not exist in the list of options of field '{$customField->getLabel()}' ({$customField->getId()}). Possible values: {$possibleValues}")
                 ->atPath('value')
                 ->addViolation();
         }

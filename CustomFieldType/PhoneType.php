@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Mautic\FormBundle\Validator\Constraint\PhoneNumberConstraint;
 use Symfony\Component\Validator\Exception\InvalidOptionsException;
 use Mautic\FormBundle\Validator\Constraint\PhoneNumberConstraintValidator;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 
 class PhoneType extends AbstractTextType
 {
@@ -48,8 +49,12 @@ class PhoneType extends AbstractTextType
      *
      * @throws InvalidOptionsException
      */
-    public function validateValue($value = null, ExecutionContextInterface $context): void
+    public function validateValue(CustomFieldValueInterface $valueEntity, ExecutionContextInterface $context): void
     {
+        parent::validateValue($valueEntity, $context);
+        
+        $value = $valueEntity->getValue();
+        
         if (empty($value)) {
             return;
         }
