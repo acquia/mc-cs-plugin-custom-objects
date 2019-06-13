@@ -32,4 +32,12 @@ class MultiselectType extends AbstractMultivalueType
         'expanded' => false,
         'multiple' => true,
     ];
+
+    /**
+     * {@inheritdoc}
+     */
+    public function useEmptyValue(): bool
+    {
+        return true;
+    }
 }

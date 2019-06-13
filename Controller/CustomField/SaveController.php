@@ -32,6 +32,12 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
 
+/**
+ * This controller is not used for saving to database, it is used only to generate forms and data validation.
+ * Persisting is handled in:.
+ *
+ * @see \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\SaveController::saveAction
+ */
 class SaveController extends CommonController
 {
     /**
@@ -92,6 +98,8 @@ class SaveController extends CommonController
     }
 
     /**
+     * Not save but validate Custom Field data and return proper response. Check class description.
+     *
      * @param Request $request
      *
      * @return Response|JsonResponse
@@ -130,11 +138,13 @@ class SaveController extends CommonController
         $form->handleRequest($request);
 
         if ($form->isValid()) {
+            // Render Custom Field form RAT for Custom Object form.
             return $this->buildSuccessForm($customObject, $form->getData(), $request);
         }
 
         $route = $fieldId ? $this->fieldRouteProvider->buildFormRoute($fieldId) : '';
 
+        // Render Custom Field form for modal.
         return $this->delegateView(
             [
                 'returnUrl'      => $route,
@@ -153,7 +163,7 @@ class SaveController extends CommonController
     }
 
     /**
-     * Build custom field form PART to be used in custom object form.
+     * Build custom field form PART to be used in custom object form as panel and close modal via ajax response.
      *
      * @param CustomObject $customObject
      * @param CustomField  $customField
@@ -210,6 +220,7 @@ class SaveController extends CommonController
             'content'    => $templateContent,
             'isNew'      => isset($isNew),
             'panelId'    => $panelId,
+            'type'       => $customField->getType(),
             'closeModal' => 1,
         ]);
     }

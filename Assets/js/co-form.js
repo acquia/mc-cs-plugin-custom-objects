@@ -199,7 +199,7 @@ CustomObjectsForm = {
                     success: function (response) {
                         if (response.closeModal) {
                             // Valid post, lets create panel
-                            CustomObjectsForm.saveToPanel(response, target);
+                            CustomObjectsForm.saveToPanel(response);
                         } else {
                             // Rerender invalid form
                             CustomObjectsForm.refreshModalContent(response, target);
@@ -218,7 +218,97 @@ CustomObjectsForm = {
     },
 
     /**
-     * Load modal wit stuff from response
+     * Update default value options when needed
+     */
+    handleModalDefaultValueOptions: function() {
+        let type = mQuery('#custom_field_type').val();
+
+        if (!CustomObjectsForm.isMultiValueField(type)) {
+            return;
+        }
+
+        let choiceDefinition = mQuery('#objectFieldModal').find('#sortable-custom_field_options');
+        if (choiceDefinition === undefined) {
+            return; // No options
+        }
+
+        let options = '';
+
+        let selectedValues = CustomObjectsForm.getMultiDefaultValuesFromModal(type);
+
+        // Transfer options
+        let i = 0;
+
+        choiceDefinition.find('.sortable').each(function() {
+            let row = mQuery(this).find('input');
+            let label = mQuery(row[0]).val();
+            let value = mQuery(row[1]).val();
+
+            let checked = selectedValues.indexOf(value) > -1 ? ' checked="checked"' : '';
+            let selected = selectedValues.indexOf(value) > -1 ? ' selected="selected"' : '';
+            switch (type) {
+                case 'checkbox_group':
+                    options = options + '<div class="checkbox"><label><input type="checkbox" id="custom_field_defaultValue_' +
+                        i + '" name="custom_field[defaultValue][]" class="form-control" autocomplete="false" value="' +
+                        value + '"' + checked + '>' + label + '</label></div>';
+                    break;
+                case 'multiselect':
+                    options = options + '<option value="' + value + '"' + selected + '>' + label + '</option>';
+                    break;
+                case 'radio_group':
+                    options = options + '<input type="radio" id="custom_field_defaultValue_' +
+                        i + '" name="custom_field[defaultValue]" autocomplete="false" value="' + value + '"' + checked + '>' +
+                        '<label for="custom_field_defaultValue_' + i + '">' + label + '</label>';
+                    break;
+            }
+
+            i = i + 1;
+        });
+
+        // Put it to thee right DOM node
+        let target = mQuery('#custom_field_defaultValue');
+
+        if (type === 'checkbox_group') {
+            target = mQuery('#objectFieldModal .default-value .choice-wrapper')
+        }
+
+        target.html(options).trigger('chosen:updated');
+    },
+
+    /**
+     * @param type
+     * @returns {boolean}
+     */
+    isMultiValueField: function(type) {
+        return type === 'checkbox_group' || type === 'multiselect' || type === 'radio_group';
+    },
+
+    /**
+     * Get selected default values from multiselects in modal
+     * @param type
+     * @returns {Array}
+     */
+    getMultiDefaultValuesFromModal: function(type) {
+
+        let selector = '';
+
+        if (type === 'multiselect') {
+            selector = '#custom_field_defaultValue option:selected';
+        } else {
+            selector = 'input[id*="custom_field_defaultValue_"]:checked'
+        }
+
+        let selectedValues = [];
+
+        mQuery(selector).each(function() {
+            selectedValues.push(mQuery(this).val());
+        });
+
+        return selectedValues;
+    },
+
+    /**
+     * Load modal with stuff from response
      * @param response
      * @param target
      */
@@ -226,12 +316,10 @@ CustomObjectsForm = {
         Mautic.stopIconSpinPostEvent();
 
         if (response.target) {
+            // Replace content
             mQuery(response.target).html(response.newContent);
-
-            //activate content specific stuff
-            Mautic.onPageLoad(response.target, response, true);
         } else if (response.newContent) {
-            //load the content
+            // Load the content
             if (mQuery(target + ' .loading-placeholder').length) {
                 mQuery(target + ' .loading-placeholder').addClass('hide');
                 mQuery(target + ' .modal-body-content').html(response.newContent);
@@ -241,7 +329,7 @@ CustomObjectsForm = {
             }
         }
 
-        //activate content specific stuff
+        // Activate content specific stuff
         Mautic.onPageLoad(target, response, true);
     },
 
@@ -254,8 +342,8 @@ CustomObjectsForm = {
         // Value could be different kind of type (input/textarea/..)
         let panelId = CustomObjectsForm.getPanelId(panel);
         let defaultValueIdSelector = '#custom_object_customFields_' + panelId + '_defaultValue';
+        let type = mQuery('#custom_object_customFields_' + panelId + '_type').val();
 
-        mQuery('#custom_field_defaultValue').val(mQuery(defaultValueIdSelector).val());
 
         mQuery(panel).find('input').each(function (i, input) {
 
@@ -299,31 +387,79 @@ CustomObjectsForm = {
                 }
             }
         });
+
+        if (CustomObjectsForm.isMultiValueField(type)) {
+            CustomObjectsForm.convertMultivalueDataToModal(panel, type);
+        } else {
+            mQuery('#custom_field_defaultValue').val(mQuery(defaultValueIdSelector).val());
+        }
+    },
+
+    convertMultivalueDataToModal: function(panel, type) {
+
+        let options = '';
+        switch(type){
+            case 'checkbox_group':
+                options = mQuery(panel).find('.choice-wrapper').clone();
+                mQuery(options).find('input').each(function(){
+                        mQuery(this)
+                            .attr('id', 'custom_field_defaultValue_' + mQuery(this).val())
+                            .attr('name', 'custom_field[defaultValue]');
+                    }
+                );
+                mQuery('#objectFieldModal #general .choice-wrapper').replaceWith(options);
+                break;
+            case 'multiselect':
+                options = mQuery(panel).find('[id*=_defaultValue] option').clone();
+                mQuery('#objectFieldModal #general #custom_field_defaultValue')
+                    .html('').prepend(options).trigger("chosen:updated");
+                break;
+            case 'radio_group':
+                options = mQuery(panel).find('.choice-wrapper').clone();
+                mQuery(options).children().first().attr('id', 'custom_field_defaultValue')
+                    .children('input').each(function(){
+                        mQuery(this)
+                            .attr('id', 'custom_field_defaultValue_' + mQuery(this).val())
+                            .attr('name', 'custom_field[defaultValue]');
+                    }
+                );
+                mQuery('#objectFieldModal #general .choice-wrapper').replaceWith(options);
+                break;
+        }
     },
 
     /**
      * Create/edit custom field from modal
      * \MauticPlugin\CustomObjectsFormBundle\Controller\CustomField\SaveController::saveAction
      */
-    saveToPanel: function(response, target) {
+    saveToPanel: function(response) {
 
-        let panelToReplace = mQuery('#customField_' + response.panelId);
+        let panelSelector = '#customField_' + response.panelId;
+
+        let panel = mQuery(panelSelector);
 
         if (response.isNew) {
             mQuery('.drop-here').prepend(response.content);
+            panel = mQuery('.drop-here').children().first();
         } else {
-            mQuery(panelToReplace).replaceWith(response.content);
+            mQuery(panel).replaceWith(response.content);
+            panel = mQuery(panelSelector);
         }
 
-        mQuery(target).modal('hide');
+        if (response.type === 'multiselect') {
+            let select = panel.find('select');
+            select.chosen({
+                'placeholder_text_single' : select.attr('data-placeholder')
+            });
+        }
+
+        mQuery('#objectFieldModal').modal('hide');
         mQuery('body').removeClass('modal-open');
         mQuery('.modal-backdrop').remove();
 
-        let panel = mQuery('#customField_' + response.order);
         CustomObjectsForm.initPanel(panel);
         CustomObjectsForm.recalculateOrder();
     },
-
 
     /**
      * Find closest panel and get his id

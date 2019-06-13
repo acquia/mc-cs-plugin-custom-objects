@@ -142,7 +142,7 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
      */
     public function useEmptyValue(): bool
     {
-        return $this->hasChoices() && (!$this instanceof AbstractMultivalueType);
+        return false;
     }
 
     /**

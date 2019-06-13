@@ -230,6 +230,8 @@ class CustomFieldType extends AbstractType
             }
         });
 
+        $this->recreateDefaultValueBeforePost($builder);
+
         $builder->add(
             'buttons',
             FormButtonsType::class,
@@ -263,15 +265,7 @@ class CustomFieldType extends AbstractType
             $this->createDefaultValueInput($form, $customField, false);
         });
 
-        $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event): void {
-            // Set proper type object when creating new custom field
-            /** @var CustomField $customField */
-            $customField = $event->getData();
-
-            if (!$customField->getTypeObject() && $customField->getType()) {
-                $customField->setTypeObject($this->customFieldTypeProvider->getType($customField->getType()));
-            }
-        });
+        $this->recreateDefaultValueBeforePost($builder);
 
         $builder->add('label', HiddenType::class);
         $builder->add('alias', HiddenType::class);
@@ -288,7 +282,8 @@ class CustomFieldType extends AbstractType
         $builder->add(
             $builder->create(
                 'options',
-                HiddenType::class
+                HiddenType::class,
+                ['attr' => ['data-changed' => false]]
             )
                 ->addModelTransformer($this->optionsToStringTransformer)
         );
@@ -307,10 +302,6 @@ class CustomFieldType extends AbstractType
      */
     private function createDefaultValueInput(FormInterface $form, CustomField $customField, bool $isModal): void
     {
-        if ($customField->getTypeObject()->useEmptyValue() && $customField->getParams()->getEmptyValue()) {
-            $fieldOptions['placeholder'] = $customField->getParams()->getEmptyValue();
-        }
-
         $symfonyFormFieldType = $customField->getTypeObject()->getSymfonyFormFieldType();
 
         if ($isModal && HiddenType::class === $symfonyFormFieldType) {
@@ -318,6 +309,11 @@ class CustomFieldType extends AbstractType
         }
 
         $options = $customField->getFormFieldOptions(['empty_data' => null]);
+
+        if ($customField->getTypeObject()->useEmptyValue() && $customField->getParams()->getEmptyValue()) {
+            // This works for multiselect chosen plugin. Can be extended for
+            $options['attr']['data-placeholder'] = $customField->getParams()->getEmptyValue();
+        }
 
         try {
             $options['constraints'] = $customField->getTypeObject()->getSymfonyFormConstraints();
@@ -336,5 +332,27 @@ class CustomFieldType extends AbstractType
             $symfonyFormFieldType,
             $options
         );
+    }
+
+    /**
+     * Recreate default vale before post based on send data. To be able validate new and un saved options selection.
+     *
+     * @param FormBuilderInterface $builder
+     */
+    private function recreateDefaultValueBeforePost(FormBuilderInterface $builder): void
+    {
+        $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event): void {
+            // Set proper type object when creating new custom field
+            /** @var CustomField $customField */
+            $customField = $event->getData();
+            $form = $event->getForm();
+
+            if (!$customField->getTypeObject() && $customField->getType()) {
+                $customField->setTypeObject($this->customFieldTypeProvider->getType($customField->getType()));
+            }
+
+            $form->remove('defaultValue');
+            $this->createDefaultValueInput($form, $customField, false);
+        });
     }
 }

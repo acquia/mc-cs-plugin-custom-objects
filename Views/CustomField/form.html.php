@@ -27,7 +27,7 @@ $showProperties = isset($form['options']) || $customField->getTypeObject()->useE
 
         <ul class="nav nav-tabs" role="tablist">
             <li role="presentation" class="active">
-                <a href="#general" aria-controls="general" role="tab" data-toggle="tab">
+                <a href="#general" aria-controls="general" role="tab" data-toggle="tab" onclick="CustomObjectsForm.handleModalDefaultValueOptions();">
                     General
                 </a>
             </li>
@@ -49,7 +49,7 @@ $showProperties = isset($form['options']) || $customField->getTypeObject()->useE
             <div role="tabpanel" class="tab-pane active" id="general">
 
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-6" >
                         <?php echo $view['form']->row($form['label']); ?>
                     </div>
                 </div>
@@ -60,7 +60,7 @@ $showProperties = isset($form['options']) || $customField->getTypeObject()->useE
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row default-value">
                     <div class="col-md-6">
                         <?php echo $view['form']->row($form['defaultValue']); ?>
                     </div>
