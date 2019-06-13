@@ -52,9 +52,9 @@ class PhoneType extends AbstractTextType
     public function validateValue(CustomFieldValueInterface $valueEntity, ExecutionContextInterface $context): void
     {
         parent::validateValue($valueEntity, $context);
-        
+
         $value = $valueEntity->getValue();
-        
+
         if (empty($value)) {
             return;
         }

@@ -150,7 +150,7 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
         }
 
         $value        = $valueEntity->getValue();
-        $valueIsEmpty = false === $value || (empty($value) && '0' != $value);
+        $valueIsEmpty = false === $value || (empty($value) && '0' !== $value && 0 !== $value);
 
         if (!$valueIsEmpty) {
             return;
@@ -158,7 +158,7 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
 
         $context->buildViolation(
             $this->translator->trans(
-                    'custom.object.required',
+                    'custom.field.required',
                     ['%fieldName%' => "{$valueEntity->getCustomField()->getLabel()} ({$valueEntity->getCustomField()->getAlias()})"],
                     'validators'
                 )

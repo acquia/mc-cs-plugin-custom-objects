@@ -58,41 +58,6 @@ class CustomFieldValueOption extends AbstractCustomFieldValue
     }
 
     /**
-     * @param ClassMetadata $metadata
-     */
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addConstraint(new Assert\Callback('validateOptionValueExists'));
-    }
-
-    /**
-     * Validate whether the value exists also as the option value.
-     *
-     * @param ExecutionContextInterface $context
-     */
-    public function validateOptionValueExists(ExecutionContextInterface $context): void
-    {
-        if (empty($this->getValue())) {
-            return;
-        }
-
-        $customField = $this->getCustomField();
-        $valueExists = $customField->getOptions()->exists(function (int $key, CustomFieldOption $option) {
-            return $this->getValue() === $option->getValue();
-        });
-
-        if (!$valueExists) {
-            $possibleValues = implode(', ', $customField->getOptions()->map(function (CustomFieldOption $option) {
-                return $option->getValue();
-            })->getValues());
-            $selectedValues = implode(', ', $this->getValue());
-            $context->buildViolation("Value '{$selectedValues}' does not exist in the list of options of field '{$customField->getLabel()}' ({$customField->getId()}). Possible values: {$possibleValues}")
-                ->atPath('value')
-                ->addViolation();
-        }
-    }
-
-    /**
      * @param mixed $value
      */
     public function addValue($value = null)

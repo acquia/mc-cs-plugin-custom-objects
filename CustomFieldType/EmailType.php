@@ -56,7 +56,7 @@ class EmailType extends AbstractTextType
         parent::validateValue($valueEntity, $context);
 
         $value = $valueEntity->getValue();
-        
+
         if (empty($value)) {
             return;
         }

@@ -20,10 +20,30 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Translation\TranslatorInterface;
+use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 
 abstract class AbstractMultivalueType extends AbstractCustomFieldType
 {
     public const TABLE_NAME = 'custom_field_value_option';
+
+    /**
+     * @var CsvHelper
+     */
+    private $csvHelper;
+
+    /**
+     * @param TranslatorInterface $translator
+     * @param CsvHelper           $csvHelper
+     */
+    public function __construct(TranslatorInterface $translator, CsvHelper $csvHelper)
+    {
+        parent::__construct($translator);
+
+        $this->csvHelper = $csvHelper;
+    }
 
     /**
      * @param CustomField $customField
@@ -70,5 +90,52 @@ abstract class AbstractMultivalueType extends AbstractCustomFieldType
     public function createDefaultValueTransformer(): DataTransformerInterface
     {
         return new MultivalueTransformer();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function validateValue(CustomFieldValueInterface $valueEntity, ExecutionContextInterface $context): void
+    {
+        parent::validateValue($valueEntity, $context);
+
+        $values = $valueEntity->getValue();
+
+        if (empty($values)) {
+            return;
+        }
+
+        if (is_string($values)) {
+            $values = [$values];
+        }
+
+        $customField    = $valueEntity->getCustomField();
+        $options        = $customField->getOptions();
+        $possibleValues = $options->map(function (CustomFieldOption $option) {
+            return $option->getValue();
+        })->getValues();
+
+        try {
+            foreach ($values as $value) {
+                if (!in_array($value, $possibleValues, true)) {
+                    throw new \UnexpectedValueException(
+                        $this->translator->trans(
+                            'custom.field.option.invalid',
+                            [
+                                '%value%'          => $value,
+                                '%fieldLabel%'     => $customField->getLabel(),
+                                '%fieldAlias%'     => $customField->getAlias(),
+                                '%possibleValues%' => $this->csvHelper->arrayToCsvLine($possibleValues),
+                            ],
+                            'validators'
+                        )
+                    );
+                }
+            }
+        } catch (\UnexpectedValueException $e) {
+            $context->buildViolation($e->getMessage())
+                ->atPath('value')
+                ->addViolation();
+        }
     }
 }
