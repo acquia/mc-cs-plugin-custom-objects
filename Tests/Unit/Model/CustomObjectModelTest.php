@@ -575,4 +575,26 @@ class CustomObjectModelTest extends \PHPUnit_Framework_TestCase
         $this->assertCount(32, $chartData['datasets'][0]['data']);
         $this->assertSame('Items Created', $chartData['datasets'][0]['label']);
     }
+
+    public function testRemoveCustomFieldById(): void
+    {
+        $customField5 = $this->createMock(CustomField::class);
+        $customField6 = $this->createMock(CustomField::class);
+        $customField5->method('getId')->willReturn(5);
+        $customField6->method('getId')->willReturn(6);
+
+        $this->customObject->expects($this->once())
+            ->method('getCustomFields')
+            ->willReturn(new ArrayCollection([$customField5, $customField6]));
+
+        $this->customObject->expects($this->once())
+            ->method('removeCustomField')
+            ->with($customField5);
+
+        $this->customFieldModel->expects($this->once())
+            ->method('deleteEntity')
+            ->with($customField5);
+
+        $this->customObjectModel->removeCustomFieldById($this->customObject, 5);
+    }
 }
