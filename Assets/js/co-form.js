@@ -342,8 +342,13 @@ CustomObjectsForm = {
         // Value could be different kind of type (input/textarea/..)
         let panelId = CustomObjectsForm.getPanelId(panel);
         let defaultValueIdSelector = '#custom_object_customFields_' + panelId + '_defaultValue';
+        let type = mQuery('#custom_object_customFields_' + panelId + '_type').val();
 
-        mQuery('#custom_field_defaultValue').val(mQuery(defaultValueIdSelector).val());
+        if (CustomObjectsForm.isMultiValueField(type)) {
+            console.log('Not able to transfer options and values yet');
+        } else {
+            mQuery('#custom_field_defaultValue').val(mQuery(defaultValueIdSelector).val());
+        }
 
         mQuery(panel).find('input').each(function (i, input) {
 
