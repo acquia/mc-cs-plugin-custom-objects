@@ -62,7 +62,7 @@ class PhoneType extends AbstractTextType
     }
 
     /**
-     * @param string $value
+     * @param string                    $value
      * @param ExecutionContextInterface $context
      */
     private function addViolation(string $value, ExecutionContextInterface $context): void

@@ -20,17 +20,16 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 class UrlType extends AbstractTextType
 {
     /**
+     * @var string
+     */
+    public const NAME = 'custom.field.type.url';
+    /**
      * Set default protocol to null so the Symfony URL field won't prefix with http:// automatically
      * as it will pass validations then.
      *
      * @var array
      */
     protected $formTypeOptions = ['default_protocol' => null];
-
-    /**
-     * @var string
-     */
-    public const NAME = 'custom.field.type.url';
 
     /**
      * @var string
@@ -44,7 +43,7 @@ class UrlType extends AbstractTextType
     {
         return \Symfony\Component\Form\Extension\Core\Type\UrlType::class;
     }
-    
+
     /**
      * {@inheritdoc}
      */

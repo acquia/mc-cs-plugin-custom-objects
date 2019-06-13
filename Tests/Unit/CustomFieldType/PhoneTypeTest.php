@@ -34,16 +34,16 @@ class PhoneTypeTest extends \PHPUnit_Framework_TestCase
      */
     private $fieldType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->translator  = $this->createMock(TranslatorInterface::class);
         $this->customField = $this->createMock(CustomField::class);
-        $this->customItem = $this->createMock(CustomItem::class);
-        $this->context = $this->createMock(ExecutionContextInterface::class);
-        $this->violation = $this->createMock(ConstraintViolationBuilderInterface::class);
-        $this->fieldType = new PhoneType($this->translator);
+        $this->customItem  = $this->createMock(CustomItem::class);
+        $this->context     = $this->createMock(ExecutionContextInterface::class);
+        $this->violation   = $this->createMock(ConstraintViolationBuilderInterface::class);
+        $this->fieldType   = new PhoneType($this->translator);
 
         $this->context->method('buildViolation')->willReturn($this->violation);
     }

@@ -16,9 +16,6 @@ namespace MauticPlugin\CustomObjectsBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Doctrine\DBAL\Types\Type;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Table for multiselect/checkbox option values.
