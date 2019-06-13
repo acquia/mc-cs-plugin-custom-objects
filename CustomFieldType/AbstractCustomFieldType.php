@@ -19,7 +19,6 @@ use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use MauticPlugin\CustomObjectsBundle\Exception\UndefinedConstraintsException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 
 abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
@@ -181,13 +180,5 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     public function createDefaultValueTransformer(): DataTransformerInterface
     {
         throw new UndefinedTransformerException();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSymfonyFormConstraints(): array
-    {
-        throw new UndefinedConstraintsException();
     }
 }

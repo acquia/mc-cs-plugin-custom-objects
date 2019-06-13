@@ -315,11 +315,7 @@ class CustomFieldType extends AbstractType
             $options['attr']['data-placeholder'] = $customField->getParams()->getEmptyValue();
         }
 
-        try {
-            $options['constraints'] = $customField->getTypeObject()->getSymfonyFormConstraints();
-        } catch (UndefinedConstraintsException $e) {
-            // Nothing to do
-        }
+        // @todo validate default values
 
         if ($isModal) {
             // Do not use defined label in modal form
