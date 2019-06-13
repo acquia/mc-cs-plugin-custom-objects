@@ -308,12 +308,10 @@ CustomObjectsForm = {
         Mautic.stopIconSpinPostEvent();
 
         if (response.target) {
+            // Replace content
             mQuery(response.target).html(response.newContent);
-
-            //activate content specific stuff
-            Mautic.onPageLoad(response.target, response, true);
         } else if (response.newContent) {
-            //load the content
+            // Load the content
             if (mQuery(target + ' .loading-placeholder').length) {
                 mQuery(target + ' .loading-placeholder').addClass('hide');
                 mQuery(target + ' .modal-body-content').html(response.newContent);
