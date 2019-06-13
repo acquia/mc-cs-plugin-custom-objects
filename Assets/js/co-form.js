@@ -220,8 +220,7 @@ CustomObjectsForm = {
     /**
      * Update default value options when needed
      */
-    handleModalDefaultValueOptions: function()
-    {
+    handleModalDefaultValueOptions: function() {
         let type = mQuery('#custom_field_type').val();
 
         if (type !== 'checkbox_group' && type !== 'multiselect' && type !== 'radio_group') {
