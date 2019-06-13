@@ -76,7 +76,7 @@ class CampaignConditionFieldValueType extends AbstractType
                 ],
                 'choice_attr' => function ($fieldId) use ($fields) {
                     $field     = $fields[$fieldId];
-                    $operators = $field->getTypeObject()->getOperatorOptions($this->translator);
+                    $operators = $field->getTypeObject()->getOperatorOptions();
                     $options   = $field->getOptions()->map(function (CustomFieldOption $option) {
                         return ['value' => $option->getValue(), 'label' => $option->getLabel()];
                     });
@@ -96,7 +96,7 @@ class CampaignConditionFieldValueType extends AbstractType
             $selectedField = array_values($fields)[0];
         }
 
-        $operators = $selectedField->getTypeObject()->getOperatorOptions($this->translator);
+        $operators = $selectedField->getTypeObject()->getOperatorOptions();
 
         $builder->add(
             'operator',

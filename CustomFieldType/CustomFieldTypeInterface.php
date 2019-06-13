@@ -18,7 +18,6 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 interface CustomFieldTypeInterface
@@ -87,11 +86,9 @@ interface CustomFieldTypeInterface
     public function getOperators(): array;
 
     /**
-     * @param TranslatorInterface $translator
-     *
      * @return mixed[]
      */
-    public function getOperatorOptions(TranslatorInterface $translator): array;
+    public function getOperatorOptions(): array;
 
     /**
      * @param mixed[] $options

@@ -95,17 +95,15 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     }
 
     /**
-     * @param TranslatorInterface $translator
-     *
      * @return string[]
      */
-    public function getOperatorOptions(TranslatorInterface $translator): array
+    public function getOperatorOptions(): array
     {
         $operators = $this->getOperators();
         $options   = [];
 
         foreach ($operators as $key => $operator) {
-            $options[$key] = $translator->trans($operator['label']);
+            $options[$key] = $this->translator->trans($operator['label']);
         }
 
         return $options;
@@ -139,10 +137,26 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function useEmptyValue(): bool
+    {
+        return $this->hasChoices() && (!$this instanceof AbstractMultivalueType);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createDefaultValueTransformer(): DataTransformerInterface
+    {
+        throw new UndefinedTransformerException();
+    }
+
+    /**
      * @param CustomFieldValueInterface $valueEntity
      * @param ExecutionContextInterface $context
      */
-    public function validateEmptyIfRequired(CustomFieldValueInterface $valueEntity, ExecutionContextInterface $context): void
+    protected function validateEmptyIfRequired(CustomFieldValueInterface $valueEntity, ExecutionContextInterface $context): void
     {
         if (!$valueEntity->getCustomField()->isRequired()) {
             return;
@@ -164,21 +178,5 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
             )
             ->atPath('value')
             ->addViolation();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function useEmptyValue(): bool
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createDefaultValueTransformer(): DataTransformerInterface
-    {
-        throw new UndefinedTransformerException();
     }
 }
