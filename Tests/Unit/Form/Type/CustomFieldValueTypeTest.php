@@ -66,7 +66,7 @@ class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
             ->method('getCustomField')
             ->willReturn($this->customField);
 
-        $this->customField->expects($this->exactly(2))
+        $this->customField->expects($this->once())
             ->method('getTypeObject')
             ->willReturn($this->customFieldType);
 
@@ -80,7 +80,7 @@ class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
 
         $this->customField->expects($this->once())
             ->method('getFormFieldOptions')
-            ->with(['empty_data' => 'The default value', 'constraints' => []]) // The default value is set.
+            ->with(['empty_data' => 'The default value']) // The default value is set.
             ->willReturn(['the' => 'options']);
 
         $this->formBuilder->expects($this->once())
@@ -115,7 +115,7 @@ class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
             ->method('getCustomField')
             ->willReturn($this->customField);
 
-        $this->customField->expects($this->exactly(2))
+        $this->customField->expects($this->once())
             ->method('getTypeObject')
             ->willReturn($this->customFieldType);
 
@@ -128,7 +128,7 @@ class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
 
         $this->customField->expects($this->once())
             ->method('getFormFieldOptions')
-            ->with(['empty_data' => null, 'constraints' => []]) // The default value is null.
+            ->with(['empty_data' => null]) // The default value is null.
             ->willReturn(['the' => 'options']);
 
         $this->formBuilder->expects($this->once())
