@@ -321,7 +321,7 @@ CustomObjectsForm = {
             }
         }
 
-        //activate content specific stuff
+        // Activate content specific stuff
         Mautic.onPageLoad(target, response, true);
     },
 
