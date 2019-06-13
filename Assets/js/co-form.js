@@ -300,7 +300,7 @@ CustomObjectsForm = {
     },
 
     /**
-     * Load modal wit stuff from response
+     * Load modal with stuff from response
      * @param response
      * @param target
      */
