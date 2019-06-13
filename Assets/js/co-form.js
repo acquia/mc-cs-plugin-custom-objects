@@ -223,7 +223,7 @@ CustomObjectsForm = {
     handleModalDefaultValueOptions: function() {
         let type = mQuery('#custom_field_type').val();
 
-        if (type !== 'checkbox_group' && type !== 'multiselect' && type !== 'radio_group') {
+        if (!CustomObjectsForm.isMultiValueField(type)) {
             return;
         }
 
@@ -273,6 +273,14 @@ CustomObjectsForm = {
         }
 
         target.html(options).trigger('chosen:updated');
+    },
+
+    /**
+     * @param type
+     * @returns {boolean}
+     */
+    isMultiValueField: function(type) {
+        return type === 'checkbox_group' || type === 'multiselect' || type === 'radio_group';
     },
 
     /**
