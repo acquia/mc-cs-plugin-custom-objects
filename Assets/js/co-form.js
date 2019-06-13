@@ -344,11 +344,6 @@ CustomObjectsForm = {
         let defaultValueIdSelector = '#custom_object_customFields_' + panelId + '_defaultValue';
         let type = mQuery('#custom_object_customFields_' + panelId + '_type').val();
 
-        if (CustomObjectsForm.isMultiValueField(type)) {
-            console.log('Not able to transfer options and values yet');
-        } else {
-            mQuery('#custom_field_defaultValue').val(mQuery(defaultValueIdSelector).val());
-        }
 
         mQuery(panel).find('input').each(function (i, input) {
 
@@ -392,6 +387,45 @@ CustomObjectsForm = {
                 }
             }
         });
+
+        if (CustomObjectsForm.isMultiValueField(type)) {
+            CustomObjectsForm.convertMultivalueDataToModal(panel, type);
+        } else {
+            mQuery('#custom_field_defaultValue').val(mQuery(defaultValueIdSelector).val());
+        }
+    },
+
+    convertMultivalueDataToModal: function(panel, type) {
+
+        let options = '';
+        switch(type){
+            case 'checkbox_group':
+                options = mQuery(panel).find('.choice-wrapper').clone();
+                mQuery(options).find('input').each(function(){
+                        mQuery(this)
+                            .attr('id', 'custom_field_defaultValue_' + mQuery(this).val())
+                            .attr('name', 'custom_field[defaultValue]');
+                    }
+                );
+                mQuery('#objectFieldModal #general .choice-wrapper').replaceWith(options);
+                break;
+            case 'multiselect':
+                options = mQuery(panel).find('[id*=_defaultValue] option').clone();
+                mQuery('#objectFieldModal #general #custom_field_defaultValue')
+                    .html('').prepend(options).trigger("chosen:updated");
+                break;
+            case 'radio_group':
+                options = mQuery(panel).find('.choice-wrapper').clone();
+                mQuery(options).children().first().attr('id', 'custom_field_defaultValue')
+                    .children('input').each(function(){
+                        mQuery(this)
+                            .attr('id', 'custom_field_defaultValue_' + mQuery(this).val())
+                            .attr('name', 'custom_field[defaultValue]');
+                    }
+                );
+                mQuery('#objectFieldModal #general .choice-wrapper').replaceWith(options);
+                break;
+        }
     },
 
     /**
