@@ -20,6 +20,14 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 class UrlType extends AbstractTextType
 {
     /**
+     * Set default protocol to null so the Symfony URL field won't prefix with http:// automatically
+     * as it will pass validations then.
+     *
+     * @var array
+     */
+    protected $formTypeOptions = ['default_protocol' => null];
+
+    /**
      * @var string
      */
     public const NAME = 'custom.field.type.url';
@@ -36,17 +44,7 @@ class UrlType extends AbstractTextType
     {
         return \Symfony\Component\Form\Extension\Core\Type\UrlType::class;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getSymfonyFormConstraints(): array
-    {
-        return [
-            new \Symfony\Component\Validator\Constraints\Url(),
-        ];
-    }
-
+    
     /**
      * {@inheritdoc}
      */
@@ -60,8 +58,13 @@ class UrlType extends AbstractTextType
             return;
         }
 
-        $validator = new UrlValidator();
-        $validator->initialize($context);
-        $validator->validate($value, $this->getSymfonyFormConstraints()[0]);
+        $constraint = new \Symfony\Component\Validator\Constraints\Url();
+        $pattern    = sprintf(UrlValidator::PATTERN, implode('|', $constraint->protocols));
+
+        if (!preg_match($pattern, $value)) {
+            $context->buildViolation($this->translator->trans('custom.field.url.invalid', ['%value%' => $value], 'validators'))
+                ->atPath('value')
+                ->addViolation();
+        }
     }
 }
