@@ -20,18 +20,13 @@ class CsvHelper
      *
      * @return string
      */
-    public function arrayToCsvLine(array $row): string
+    public function arrayToCsvLine(array $row, $delimiter = ',', $enclosure = '"', $escapeChar = '\\'): string
     {
         $resource = fopen('php://memory', 'r+');
 
-        if (false === fputcsv($resource, $row)) {
-            throw new \RuntimeException('Not able to convert the array to CSV. '.print_r($row, true));
-        }
-
+        fputcsv($resource, $row, $delimiter, $enclosure, $escapeChar);
         rewind($resource);
-
         $csvLine = stream_get_contents($resource);
-
         fclose($resource);
 
         return rtrim($csvLine);
@@ -44,6 +39,10 @@ class CsvHelper
      */
     public static function csvLineToArray(string $row): array
     {
+        if (empty($row)) {
+            return [];
+        }
+
         return str_getcsv($row);
     }
 }
