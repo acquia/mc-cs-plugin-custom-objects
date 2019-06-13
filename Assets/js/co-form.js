@@ -235,6 +235,8 @@ CustomObjectsForm = {
 
         let options = '';
 
+        let selected = CustomObjectsForm.getMultiDefaultValuesFromModal(type);
+
         // Transfer options
         let i = 0;
 
@@ -270,6 +272,30 @@ CustomObjectsForm = {
         }
 
         target.html(options).trigger('chosen:updated');
+    },
+
+    /**
+     * Get selected default values from multiselects in modal
+     * @param type
+     * @returns {Array}
+     */
+    getMultiDefaultValuesFromModal: function(type) {
+
+        let selector = '';
+
+        if (type === 'multiselect') {
+            selector = '#custom_field_defaultValue option:selected';
+        } else {
+            selector = 'input[id*="custom_field_defaultValue_"]:checked'
+        }
+
+        let selectedValues = [];
+
+        mQuery(selector).each(function() {
+            selectedValues.push(mQuery(this).val());
+        });
+
+        return selectedValues;
     },
 
     /**
