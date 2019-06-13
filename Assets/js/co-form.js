@@ -235,7 +235,7 @@ CustomObjectsForm = {
 
         let options = '';
 
-        let selected = CustomObjectsForm.getMultiDefaultValuesFromModal(type);
+        let selectedValues = CustomObjectsForm.getMultiDefaultValuesFromModal(type);
 
         // Transfer options
         let i = 0;
@@ -245,18 +245,20 @@ CustomObjectsForm = {
             let label = mQuery(row[0]).val();
             let value = mQuery(row[1]).val();
 
+            let checked = selectedValues.indexOf(value) > -1 ? ' checked="checked"' : '';
+            let selected = selectedValues.indexOf(value) > -1 ? ' selected="selected"' : '';
             switch (type) {
                 case 'checkbox_group':
                     options = options + '<div class="checkbox"><label><input type="checkbox" id="custom_field_defaultValue_' +
                         i + '" name="custom_field[defaultValue][]" class="form-control" autocomplete="false" value="' +
-                        value + '">' + label + '</label></div>';
+                        value + '"' + checked + '>' + label + '</label></div>';
                     break;
                 case 'multiselect':
-                    options = options + '<option value="' + value + '">' + label + '</option>';
+                    options = options + '<option value="' + value + '"' + selected + '>' + label + '</option>';
                     break;
                 case 'radio_group':
                     options = options + '<input type="radio" id="custom_field_defaultValue_' +
-                        i + '" name="custom_field[defaultValue]" autocomplete="false" value="' + value + '">' +
+                        i + '" name="custom_field[defaultValue]" autocomplete="false" value="' + value + '"' + checked + '>' +
                         '<label for="custom_field_defaultValue_' + i + '">' + label + '</label>';
                     break;
             }
