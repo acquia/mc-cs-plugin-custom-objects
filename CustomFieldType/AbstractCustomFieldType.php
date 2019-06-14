@@ -18,8 +18,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 
 abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
 {
@@ -131,9 +130,9 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function validateValue(CustomFieldValueInterface $valueEntity, ExecutionContextInterface $context): void
+    public function validateValue(CustomField $customField, $value): void
     {
-        $this->validateEmptyIfRequired($valueEntity, $context);
+        $this->validateEmptyIfRequired($customField, $value);
     }
 
     /**
@@ -153,30 +152,29 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     }
 
     /**
-     * @param CustomFieldValueInterface $valueEntity
-     * @param ExecutionContextInterface $context
+     * @param CustomField $customField
+     * @param mixed       $value
+     *
+     * @throws \UnexpectedValueException
      */
-    protected function validateEmptyIfRequired(CustomFieldValueInterface $valueEntity, ExecutionContextInterface $context): void
+    protected function validateEmptyIfRequired(CustomField $customField, $value): void
     {
-        if (!$valueEntity->getCustomField()->isRequired()) {
+        if (!$customField->isRequired()) {
             return;
         }
 
-        $value        = $valueEntity->getValue();
         $valueIsEmpty = false === $value || (empty($value) && '0' !== $value && 0 !== $value);
 
         if (!$valueIsEmpty) {
             return;
         }
 
-        $context->buildViolation(
+        throw new \UnexpectedValueException(
             $this->translator->trans(
-                    'custom.field.required',
-                    ['%fieldName%' => "{$valueEntity->getCustomField()->getLabel()} ({$valueEntity->getCustomField()->getAlias()})"],
-                    'validators'
-                )
+                'custom.field.required',
+                ['%fieldName%' => "{$customField->getLabel()} ({$customField->getAlias()})"],
+                'validators'
             )
-            ->atPath('value')
-            ->addViolation();
+        );
     }
 }

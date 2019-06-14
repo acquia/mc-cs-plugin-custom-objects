@@ -57,7 +57,13 @@ abstract class AbstractCustomFieldValue implements CustomFieldValueInterface
      */
     public function validateValue(ExecutionContextInterface $context): void
     {
-        $this->getCustomField()->getTypeObject()->validateValue($this, $context);
+        try {
+            $this->getCustomField()->getTypeObject()->validateValue($this->getCustomField(), $this->getValue());
+        } catch (\UnexpectedValueException $e) {
+            $context->buildViolation($e->getMessage())
+                ->atPath('value')
+                ->addViolation();
+        }
     }
 
     /**

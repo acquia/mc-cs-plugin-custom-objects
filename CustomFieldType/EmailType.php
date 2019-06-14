@@ -13,8 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 
 class EmailType extends AbstractTextType
 {
@@ -39,20 +38,18 @@ class EmailType extends AbstractTextType
     /**
      * {@inheritdoc}
      */
-    public function validateValue(CustomFieldValueInterface $valueEntity, ExecutionContextInterface $context): void
+    public function validateValue(CustomField $customField, $value): void
     {
-        parent::validateValue($valueEntity, $context);
-
-        $value = $valueEntity->getValue();
+        parent::validateValue($customField, $value);
 
         if (empty($value)) {
             return;
         }
 
         if (!preg_match('/^.+\@\S+\.\S+$/', $value)) {
-            $context->buildViolation($this->translator->trans('custom.field.email.invalid', ['%value%' => $value], 'validators'))
-                ->atPath('value')
-                ->addViolation();
+            throw new \UnexpectedValueException(
+                $this->translator->trans('custom.field.email.invalid', ['%value%' => $value], 'validators')
+            );
         }
     }
 }

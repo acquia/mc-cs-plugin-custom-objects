@@ -18,7 +18,6 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 interface CustomFieldTypeInterface
 {
@@ -65,10 +64,12 @@ interface CustomFieldTypeInterface
     public function createValueEntity(CustomField $customField, CustomItem $customItem, $value = null): CustomFieldValueInterface;
 
     /**
-     * @param CustomFieldValueInterface $valueEntity
-     * @param ExecutionContextInterface $context
+     * @param CustomField $customField
+     * @param mixed       $value
+     *
+     * @throws \UnexpectedValueException
      */
-    public function validateValue(CustomFieldValueInterface $valueEntity, ExecutionContextInterface $context): void;
+    public function validateValue(CustomField $customField, $value): void;
 
     /**
      * @return string

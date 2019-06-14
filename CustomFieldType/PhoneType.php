@@ -13,11 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Exception\InvalidOptionsException;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use libphonenumber\PhoneNumberUtil;
 use libphonenumber\NumberParseException;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 
 class PhoneType extends AbstractTextType
 {
@@ -33,42 +31,28 @@ class PhoneType extends AbstractTextType
 
     /**
      * {@inheritdoc}
-     *
-     * @throws InvalidOptionsException
      */
-    public function validateValue(CustomFieldValueInterface $valueEntity, ExecutionContextInterface $context): void
+    public function validateValue(CustomField $customField, $value): void
     {
-        parent::validateValue($valueEntity, $context);
-
-        $value = $valueEntity->getValue();
+        parent::validateValue($customField, $value);
 
         if (empty($value)) {
             return;
         }
 
         $phoneUtil = PhoneNumberUtil::getInstance();
+        $message   = $this->translator->trans('custom.field.phone.invalid', ['%value%' => $value], 'validators');
 
         try {
             $phoneNumber = $phoneUtil->parse($value, PhoneNumberUtil::UNKNOWN_REGION);
         } catch (NumberParseException $e) {
-            $this->addViolation($value, $context);
+            throw new \UnexpectedValueException($message);
 
             return;
         }
 
         if (false === $phoneUtil->isValidNumber($phoneNumber)) {
-            $this->addViolation($value, $context);
+            throw new \UnexpectedValueException($message);
         }
-    }
-
-    /**
-     * @param string                    $value
-     * @param ExecutionContextInterface $context
-     */
-    private function addViolation(string $value, ExecutionContextInterface $context): void
-    {
-        $context->buildViolation($this->translator->trans('custom.field.phone.invalid', ['%value%' => $value], 'validators'))
-            ->atPath('value')
-            ->addViolation();
     }
 }
