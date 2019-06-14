@@ -205,7 +205,6 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
 
         $customField->setDefaultValue($string);
         $this->assertSame($string, $customField->getDefaultValue());
-//
         // Type object defined with transformer
         $value            = 'value';
         $transformedValue = 'transformedValue';
