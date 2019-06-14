@@ -15,19 +15,12 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\CustomFieldType;
 
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\UrlType;
 use Symfony\Component\Translation\TranslatorInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
 class UrlTypeTest extends \PHPUnit_Framework_TestCase
 {
     private $translator;
     private $customField;
-    private $customItem;
-    private $context;
-    private $violation;
 
     /**
      * @var UrlType
@@ -40,52 +33,27 @@ class UrlTypeTest extends \PHPUnit_Framework_TestCase
 
         $this->translator  = $this->createMock(TranslatorInterface::class);
         $this->customField = $this->createMock(CustomField::class);
-        $this->customItem  = $this->createMock(CustomItem::class);
-        $this->context     = $this->createMock(ExecutionContextInterface::class);
-        $this->violation   = $this->createMock(ConstraintViolationBuilderInterface::class);
         $this->fieldType   = new UrlType($this->translator);
-
-        $this->context->method('buildViolation')->willReturn($this->violation);
     }
 
     public function testValidateValueWithBogusString(): void
     {
-        $valueEntity = new CustomFieldValueText($this->customField, $this->customItem, 'unicorn');
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with('custom.field.url.invalid', ['%value%' => 'unicorn'], 'validators')
+            ->willReturn('Translated message');
 
-        $this->violation->expects($this->once())
-            ->method('atPath')
-            ->with('value')
-            ->willReturnSelf();
-
-        $this->violation->expects($this->once())
-            ->method('addViolation');
-
-        $this->fieldType->validateValue($valueEntity, $this->context);
+        $this->expectException(\UnexpectedValueException::class);
+        $this->fieldType->validateValue($this->customField, 'unicorn');
     }
 
     public function testValidateValueWithEmptyString(): void
     {
-        $valueEntity = new CustomFieldValueText($this->customField, $this->customItem, '');
-
-        $this->violation->expects($this->never())
-            ->method('atPath');
-
-        $this->violation->expects($this->never())
-            ->method('addViolation');
-
-        $this->fieldType->validateValue($valueEntity, $this->context);
+        $this->fieldType->validateValue($this->customField, '');
     }
 
     public function testValidateValueWithValidUrl(): void
     {
-        $valueEntity = new CustomFieldValueText($this->customField, $this->customItem, 'https://mautic.org');
-
-        $this->violation->expects($this->never())
-            ->method('atPath');
-
-        $this->violation->expects($this->never())
-            ->method('addViolation');
-
-        $this->fieldType->validateValue($valueEntity, $this->context);
+        $this->fieldType->validateValue($this->customField, 'https://mautic.org');
     }
 }
