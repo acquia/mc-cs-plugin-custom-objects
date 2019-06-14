@@ -37,7 +37,7 @@ class IntType extends AbstractCustomFieldType
      */
     public function getSymfonyFormFieldType(): string
     {
-        return \Symfony\Component\Form\Extension\Core\Type\NumberType::class;
+        return \MauticPlugin\CustomObjectsBundle\Form\Type\CustomField\NumberType::class;
     }
 
     /**
