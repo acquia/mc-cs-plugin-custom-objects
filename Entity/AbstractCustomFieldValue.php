@@ -16,6 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Entity;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 abstract class AbstractCustomFieldValue implements CustomFieldValueInterface
 {
@@ -46,6 +47,23 @@ abstract class AbstractCustomFieldValue implements CustomFieldValueInterface
     {
         $metadata->addPropertyConstraint('customField', new Assert\NotBlank());
         $metadata->addPropertyConstraint('customItem', new Assert\NotBlank());
+        $metadata->addConstraint(new Assert\Callback('validateValue'));
+    }
+
+    /**
+     * Allow different field types to validate the value.
+     *
+     * @param ExecutionContextInterface $context
+     */
+    public function validateValue(ExecutionContextInterface $context): void
+    {
+        try {
+            $this->getCustomField()->getTypeObject()->validateValue($this->getCustomField(), $this->getValue());
+        } catch (\UnexpectedValueException $e) {
+            $context->buildViolation($e->getMessage())
+                ->atPath('value')
+                ->addViolation();
+        }
     }
 
     /**

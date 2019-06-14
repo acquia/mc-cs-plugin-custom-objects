@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Mautic\EmailBundle\Exception\InvalidEmailException;
-use Symfony\Component\Validator\Constraints\EmailValidator;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 
 class EmailType extends AbstractTextType
 {
@@ -40,31 +38,18 @@ class EmailType extends AbstractTextType
     /**
      * {@inheritdoc}
      */
-    public function getSymfonyFormConstraints(): array
+    public function validateValue(CustomField $customField, $value): void
     {
-        return [
-            new \Symfony\Component\Validator\Constraints\Email(),
-        ];
-    }
+        parent::validateValue($customField, $value);
 
-    /**
-     * {@inheritdoc}
-     */
-    public function validateValue($value = null, ExecutionContextInterface $context): void
-    {
         if (empty($value)) {
             return;
         }
 
-        $emailValidator = new EmailValidator();
-        $emailValidator->initialize($context);
-
-        try {
-            $emailValidator->validate($value, $this->getSymfonyFormConstraints()[0]);
-        } catch (InvalidEmailException $e) {
-            $context->buildViolation($e->getMessage())
-                ->atPath('value')
-                ->addViolation();
+        if (!preg_match('/^.+\@\S+\.\S+$/', $value)) {
+            throw new \UnexpectedValueException(
+                $this->translator->trans('custom.field.email.invalid', ['%value%' => $value], 'validators')
+            );
         }
     }
 }

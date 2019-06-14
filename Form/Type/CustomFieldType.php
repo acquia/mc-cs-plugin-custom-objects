@@ -15,7 +15,6 @@ namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
-use MauticPlugin\CustomObjectsBundle\Exception\UndefinedConstraintsException;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\CustomObjectHiddenTransformer;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsToStringTransformer;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransformer;
@@ -315,11 +314,7 @@ class CustomFieldType extends AbstractType
             $options['attr']['data-placeholder'] = $customField->getParams()->getEmptyValue();
         }
 
-        try {
-            $options['constraints'] = $customField->getTypeObject()->getSymfonyFormConstraints();
-        } catch (UndefinedConstraintsException $e) {
-            // Nothing to do
-        }
+        // @todo validate default values
 
         if ($isModal) {
             // Do not use defined label in modal form

@@ -13,10 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Mautic\FormBundle\Validator\Constraint\PhoneNumberConstraint;
-use Symfony\Component\Validator\Exception\InvalidOptionsException;
-use Mautic\FormBundle\Validator\Constraint\PhoneNumberConstraintValidator;
+use libphonenumber\PhoneNumberUtil;
+use libphonenumber\NumberParseException;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 
 class PhoneType extends AbstractTextType
 {
@@ -33,30 +32,27 @@ class PhoneType extends AbstractTextType
     /**
      * {@inheritdoc}
      */
-    public function getSymfonyFormConstraints(): array
+    public function validateValue(CustomField $customField, $value): void
     {
-        $phoneNumberConstraint          = new PhoneNumberConstraint();
-        $phoneNumberConstraint->message = $this->translator->trans('mautic.form.submission.phone.invalid');
+        parent::validateValue($customField, $value);
 
-        return [
-            $phoneNumberConstraint,
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @throws InvalidOptionsException
-     */
-    public function validateValue($value = null, ExecutionContextInterface $context): void
-    {
         if (empty($value)) {
             return;
         }
 
-        $validator = new PhoneNumberConstraintValidator();
+        $phoneUtil = PhoneNumberUtil::getInstance();
+        $message   = $this->translator->trans('custom.field.phone.invalid', ['%value%' => $value], 'validators');
 
-        $validator->initialize($context);
-        $validator->validate($value, $this->getSymfonyFormConstraints()[0]);
+        try {
+            $phoneNumber = $phoneUtil->parse($value, PhoneNumberUtil::UNKNOWN_REGION);
+        } catch (NumberParseException $e) {
+            throw new \UnexpectedValueException($message);
+
+            return;
+        }
+
+        if (false === $phoneUtil->isValidNumber($phoneNumber)) {
+            throw new \UnexpectedValueException($message);
+        }
     }
 }

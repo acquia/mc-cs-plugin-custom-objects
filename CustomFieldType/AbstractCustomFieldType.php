@@ -18,8 +18,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use MauticPlugin\CustomObjectsBundle\Exception\UndefinedConstraintsException;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 
 abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
 {
@@ -95,17 +94,15 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     }
 
     /**
-     * @param TranslatorInterface $translator
-     *
      * @return string[]
      */
-    public function getOperatorOptions(TranslatorInterface $translator): array
+    public function getOperatorOptions(): array
     {
         $operators = $this->getOperators();
         $options   = [];
 
         foreach ($operators as $key => $operator) {
-            $options[$key] = $translator->trans($operator['label']);
+            $options[$key] = $this->translator->trans($operator['label']);
         }
 
         return $options;
@@ -133,8 +130,9 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function validateValue($value = null, ExecutionContextInterface $context): void
+    public function validateValue(CustomField $customField, $value): void
     {
+        $this->validateEmptyIfRequired($customField, $value);
     }
 
     /**
@@ -142,7 +140,7 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
      */
     public function useEmptyValue(): bool
     {
-        return false;
+        return $this->hasChoices() && (!$this instanceof AbstractMultivalueType);
     }
 
     /**
@@ -154,10 +152,29 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param CustomField $customField
+     * @param mixed       $value
+     *
+     * @throws \UnexpectedValueException
      */
-    public function getSymfonyFormConstraints(): array
+    protected function validateEmptyIfRequired(CustomField $customField, $value): void
     {
-        throw new UndefinedConstraintsException();
+        if (!$customField->isRequired()) {
+            return;
+        }
+
+        $valueIsEmpty = false === $value || (empty($value) && '0' !== $value && 0 !== $value);
+
+        if (!$valueIsEmpty) {
+            return;
+        }
+
+        throw new \UnexpectedValueException(
+            $this->translator->trans(
+                'custom.field.required',
+                ['%fieldName%' => "{$customField->getLabel()} ({$customField->getAlias()})"],
+                'validators'
+            )
+        );
     }
 }

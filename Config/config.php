@@ -818,7 +818,7 @@ return [
         'fieldTypes' => [
             'custom.field.type.checkbox_group' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\CheckboxGroupType::class,
-                'arguments' => ['translator'],
+                'arguments' => ['translator', 'custom_object.csv.helper'],
                 'tag'       => 'custom.field.type',
             ],
             'custom.field.type.country' => [
@@ -868,7 +868,7 @@ return [
             ],
             'custom.field.type.multiselect' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\MultiselectType::class,
-                'arguments' => ['translator'],
+                'arguments' => ['translator', 'custom_object.csv.helper'],
                 'tag'       => 'custom.field.type',
             ],
             'custom.field.type.text' => [
@@ -958,6 +958,9 @@ return [
                     'mautic.core.service.flashbag',
                     'router',
                 ]
+            ],
+            'custom_object.csv.helper'                  => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Helper\CsvHelper::class,
             ],
             'custom_object.random.helper'                  => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Helper\RandomHelper::class,

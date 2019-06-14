@@ -33,6 +33,7 @@ class CustomItemXrefContactTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($customItem, $xref->getCustomItem());
         $this->assertSame($contact, $xref->getContact());
+        $this->assertSame($contact, $xref->getLinkedEntity());
         $this->assertSame($dateAdded, $xref->getDateAdded());
     }
 }

@@ -27,6 +27,7 @@ use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\AbstractMultivalueType;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class CustomField extends FormEntity implements UniqueEntityInterface
 {
@@ -175,6 +176,23 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         $metadata->addPropertyConstraint('type', new Assert\Length(['max' => 255]));
         $metadata->addPropertyConstraint('customObject', new Assert\NotBlank());
         $metadata->addPropertyConstraint('defaultValue', new Assert\Length(['max' => 255]));
+        $metadata->addConstraint(new Assert\Callback('validateDefaultValue'));
+    }
+
+    /**
+     * Allow different field types to validate the value.
+     *
+     * @param ExecutionContextInterface $context
+     */
+    public function validateDefaultValue(ExecutionContextInterface $context): void
+    {
+        try {
+            $this->getTypeObject()->validateValue($this, $this->defaultValue, $context);
+        } catch (\UnexpectedValueException $e) {
+            $context->buildViolation($e->getMessage())
+                // ->atPath('defaultValue') // Somehow doesn't validate when we set the path...
+                ->addViolation();
+        }
     }
 
     /**

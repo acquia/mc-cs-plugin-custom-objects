@@ -36,7 +36,9 @@ class CustomItemXrefCustomItemTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertSame($customItemA, $xref->getCustomItemLower());
+        $this->assertSame($customItemA, $xref->getCustomItem());
         $this->assertSame($customItemB, $xref->getCustomItemHigher());
+        $this->assertSame($customItemB, $xref->getLinkedEntity());
         $this->assertSame($dateAdded, $xref->getDateAdded());
     }
 

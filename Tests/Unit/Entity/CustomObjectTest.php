@@ -15,9 +15,37 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Entity;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use Mautic\CategoryBundle\Entity\Category;
+use Doctrine\Common\Collections\ArrayCollection;
 
 class CustomObjectTest extends \PHPUnit_Framework_TestCase
 {
+    public function testClone(): void
+    {
+        $object = new CustomObject();
+        $object->setAlias('object-a');
+        $object->setNameSingular('Object A');
+        $clone = clone $object;
+
+        $this->assertNull($clone->getAlias());
+        $this->assertSame('Object A', $clone->getNameSingular());
+    }
+
+    public function testGettersSetters(): void
+    {
+        $category = new Category();
+        $object   = new CustomObject();
+        $fields   = new ArrayCollection();
+
+        $object->setCategory($category);
+        $object->setLanguage('sk');
+        $object->setCustomFields($fields);
+
+        $this->assertSame($category, $object->getCategory());
+        $this->assertSame('sk', $object->getLanguage());
+        $this->assertSame($fields, $object->getCustomFields());
+    }
+
     public function testCustomFieldChanges(): void
     {
         $object        = new CustomObject();

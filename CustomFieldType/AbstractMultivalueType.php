@@ -20,10 +20,29 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Translation\TranslatorInterface;
+use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 
 abstract class AbstractMultivalueType extends AbstractCustomFieldType
 {
     public const TABLE_NAME = 'custom_field_value_option';
+
+    /**
+     * @var CsvHelper
+     */
+    private $csvHelper;
+
+    /**
+     * @param TranslatorInterface $translator
+     * @param CsvHelper           $csvHelper
+     */
+    public function __construct(TranslatorInterface $translator, CsvHelper $csvHelper)
+    {
+        parent::__construct($translator);
+
+        $this->csvHelper = $csvHelper;
+    }
 
     /**
      * @param CustomField $customField
@@ -70,5 +89,43 @@ abstract class AbstractMultivalueType extends AbstractCustomFieldType
     public function createDefaultValueTransformer(): DataTransformerInterface
     {
         return new MultivalueTransformer();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function validateValue(CustomField $customField, $value): void
+    {
+        parent::validateValue($customField, $value);
+
+        if (empty($value)) {
+            return;
+        }
+
+        if (is_string($value)) {
+            $value = [$value];
+        }
+
+        $options        = $customField->getOptions();
+        $possibleValues = $options->map(function (CustomFieldOption $option) {
+            return $option->getValue();
+        })->getValues();
+
+        foreach ($value as $singleValue) {
+            if (!in_array($singleValue, $possibleValues, true)) {
+                throw new \UnexpectedValueException(
+                    $this->translator->trans(
+                        'custom.field.option.invalid',
+                        [
+                            '%value%'          => $singleValue,
+                            '%fieldLabel%'     => $customField->getLabel(),
+                            '%fieldAlias%'     => $customField->getAlias(),
+                            '%possibleValues%' => $this->csvHelper->arrayToCsvLine($possibleValues),
+                        ],
+                        'validators'
+                    )
+                );
+            }
+        }
     }
 }

@@ -18,9 +18,6 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Constraint;
 
 interface CustomFieldTypeInterface
 {
@@ -67,10 +64,12 @@ interface CustomFieldTypeInterface
     public function createValueEntity(CustomField $customField, CustomItem $customItem, $value = null): CustomFieldValueInterface;
 
     /**
-     * @param mixed                     $value
-     * @param ExecutionContextInterface $context
+     * @param CustomField $customField
+     * @param mixed       $value
+     *
+     * @throws \UnexpectedValueException
      */
-    public function validateValue($value = null, ExecutionContextInterface $context): void;
+    public function validateValue(CustomField $customField, $value): void;
 
     /**
      * @return string
@@ -88,11 +87,9 @@ interface CustomFieldTypeInterface
     public function getOperators(): array;
 
     /**
-     * @param TranslatorInterface $translator
-     *
      * @return mixed[]
      */
-    public function getOperatorOptions(TranslatorInterface $translator): array;
+    public function getOperatorOptions(): array;
 
     /**
      * @param mixed[] $options
@@ -117,9 +114,4 @@ interface CustomFieldTypeInterface
      * @return DataTransformerInterface
      */
     public function createDefaultValueTransformer(): DataTransformerInterface;
-
-    /**
-     * @return Constraint[]
-     */
-    public function getSymfonyFormConstraints(): array;
 }

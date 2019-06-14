@@ -16,9 +16,6 @@ namespace MauticPlugin\CustomObjectsBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Doctrine\DBAL\Types\Type;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Table for multiselect/checkbox option values.
@@ -58,42 +55,16 @@ class CustomFieldValueOption extends AbstractCustomFieldValue
     }
 
     /**
-     * @param ClassMetadata $metadata
-     */
-    public static function loadValidatorMetadata(ClassMetadata $metadata): void
-    {
-        $metadata->addConstraint(new Assert\Callback('validateOptionValueExists'));
-    }
-
-    /**
-     * Validate whether the value exists also as the option value.
-     *
-     * @param ExecutionContextInterface $context
-     */
-    public function validateOptionValueExists(ExecutionContextInterface $context): void
-    {
-        $customField = $this->getCustomField();
-        $valueExists = $customField->getOptions()->exists(function (int $key, CustomFieldOption $option) {
-            return $this->getValue() === $option->getValue();
-        });
-
-        if (!$valueExists) {
-            $possibleValues = implode(', ', $customField->getOptions()->map(function (CustomFieldOption $option) {
-                return $option->getValue();
-            })->getValues());
-            $context->buildViolation("Value '{$this->getValue()}' does not exist in the list of options of field '{$customField->getLabel()}' ({$customField->getId()}). Possible values: {$possibleValues}")
-                ->atPath('value')
-                ->addViolation();
-        }
-    }
-
-    /**
      * @param mixed $value
      */
     public function addValue($value = null)
     {
         if (!$this->value) {
             $this->value = [];
+        }
+
+        if (in_array($value, $this->value, true)) {
+            return;
         }
 
         $this->value[] = $value;
@@ -104,6 +75,10 @@ class CustomFieldValueOption extends AbstractCustomFieldValue
      */
     public function setValue($value = null)
     {
+        if (is_array($value)) {
+            $value = array_unique($value);
+        }
+
         $this->value = $value;
     }
 
