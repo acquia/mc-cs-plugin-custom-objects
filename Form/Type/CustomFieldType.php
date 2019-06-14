@@ -308,7 +308,7 @@ class CustomFieldType extends AbstractType
             $symfonyFormFieldType = TextType::class;
         }
 
-        $options = $customField->getFormFieldOptions(['empty_data' => null]);
+        $options = $customField->getFormFieldOptions();
 
         if ($customField->getTypeObject()->useEmptyValue() && $customField->getParams()->getEmptyValue()) {
             // This works for multiselect chosen plugin. Can be extended for
