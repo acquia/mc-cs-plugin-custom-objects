@@ -15,7 +15,6 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\CustomFieldType;
 
 use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\EmailType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\AbstractCustomFieldType;
 use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
@@ -24,7 +23,6 @@ class AbstractCustomFieldTypeTest extends \PHPUnit_Framework_TestCase
 {
     private $translator;
     private $customField;
-    private $customItem;
 
     /**
      * @var EmailType
@@ -39,7 +37,6 @@ class AbstractCustomFieldTypeTest extends \PHPUnit_Framework_TestCase
 
         $this->translator  = $this->createMock(TranslatorInterface::class);
         $this->customField = $this->createMock(CustomField::class);
-        $this->customItem  = $this->createMock(CustomItem::class);
         $this->fieldType   = $this->getMockForAbstractClass(
             AbstractCustomFieldType::class,
             [$this->translator]
