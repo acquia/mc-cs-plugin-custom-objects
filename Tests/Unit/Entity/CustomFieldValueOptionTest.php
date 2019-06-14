@@ -40,8 +40,21 @@ class CustomFieldValueOptionTest extends \PHPUnit_Framework_TestCase
         $optionValue = new CustomFieldValueOption($customField, $customItem);
 
         $optionValue->addValue($value1);
+        $optionValue->addValue($value1); // Test uniqueness.
         $optionValue->addValue($value2);
 
         $this->assertSame([$value1, $value2], $optionValue->getValue());
+    }
+
+    public function testSetValueMustHaveUniqueOptions(): void
+    {
+        $optionValue = new CustomFieldValueOption(
+            new CustomField(),
+            new CustomItem(new CustomObject())
+        );
+
+        $optionValue->setValue(['red', 'blue', 'red']);
+
+        $this->assertSame(['red', 'blue'], $optionValue->getValue());
     }
 }
