@@ -15,14 +15,9 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\CustomFieldType;
 
 use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\EmailType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\AbstractCustomFieldType;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInt;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption;
 use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
 
 class AbstractCustomFieldTypeTest extends \PHPUnit_Framework_TestCase
@@ -30,8 +25,6 @@ class AbstractCustomFieldTypeTest extends \PHPUnit_Framework_TestCase
     private $translator;
     private $customField;
     private $customItem;
-    private $context;
-    private $violation;
 
     /**
      * @var EmailType
@@ -47,14 +40,10 @@ class AbstractCustomFieldTypeTest extends \PHPUnit_Framework_TestCase
         $this->translator  = $this->createMock(TranslatorInterface::class);
         $this->customField = $this->createMock(CustomField::class);
         $this->customItem  = $this->createMock(CustomItem::class);
-        $this->context     = $this->createMock(ExecutionContextInterface::class);
-        $this->violation   = $this->createMock(ConstraintViolationBuilderInterface::class);
         $this->fieldType   = $this->getMockForAbstractClass(
             AbstractCustomFieldType::class,
             [$this->translator]
         );
-
-        $this->context->method('buildViolation')->willReturn($this->violation);
     }
 
     public function testToString(): void
@@ -108,88 +97,73 @@ class AbstractCustomFieldTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testValidateValueWhenFieldIsNotRequired(): void
     {
-        $valueEntity = new CustomFieldValueText($this->customField, $this->customItem, '');
-
         $this->customField->expects($this->once())
             ->method('isRequired')
             ->willReturn(false);
 
-        $this->context->expects($this->never())
-            ->method('buildViolation');
-
-        $this->fieldType->validateValue($valueEntity, $this->context);
+        $this->fieldType->validateValue($this->customField, '');
     }
 
     public function testValidateValueWhenFieldIsRequiredAndNotEmptyString(): void
     {
-        $valueEntity = new CustomFieldValueText($this->customField, $this->customItem, 'unicorn');
-
         $this->customField->expects($this->once())
             ->method('isRequired')
             ->willReturn(true);
 
-        $this->context->expects($this->never())
-            ->method('buildViolation');
-
-        $this->fieldType->validateValue($valueEntity, $this->context);
+        $this->fieldType->validateValue($this->customField, 'unicorn');
     }
 
     public function testValidateValueWhenFieldIsRequiredAndNotZero(): void
     {
-        $valueEntity = new CustomFieldValueInt($this->customField, $this->customItem, 0);
-
         $this->customField->expects($this->once())
             ->method('isRequired')
             ->willReturn(true);
 
-        $this->context->expects($this->never())
-            ->method('buildViolation');
-
-        $this->fieldType->validateValue($valueEntity, $this->context);
+        $this->fieldType->validateValue($this->customField, 0);
     }
 
     public function testValidateValueWhenFieldIsRequiredAndNotEmptyArray(): void
     {
-        $valueEntity = new CustomFieldValueOption($this->customField, $this->customItem, []);
-
         $this->customField->expects($this->once())
             ->method('isRequired')
             ->willReturn(true);
 
-        $this->context->expects($this->once())
-            ->method('buildViolation');
+        $this->customField->method('getLabel')->willReturn('Field A');
+        $this->customField->method('getAlias')->willReturn('field-a');
 
-        $this->violation->expects($this->once())
-            ->method('atPath')
-            ->with('value')
-            ->willReturnSelf();
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with(
+                'custom.field.required',
+                ['%fieldName%' => 'Field A (field-a)'],
+                'validators'
+            )
+            ->willReturn('Translated message');
 
-        $this->violation->expects($this->once())
-            ->method('addViolation');
-
-        $this->fieldType->validateValue($valueEntity, $this->context);
+        $this->expectException(\UnexpectedValueException::class);
+        $this->fieldType->validateValue($this->customField, []);
     }
 
     public function testValidateValueWhenFieldIsRequiredAndEmptyString(): void
     {
-        $valueEntity = new CustomFieldValueText($this->customField, $this->customItem, '');
-
         $this->customField->expects($this->once())
             ->method('isRequired')
             ->willReturn(true);
 
-        $this->context->expects($this->once())
-            ->method('buildViolation');
+        $this->customField->method('getLabel')->willReturn('Field A');
+        $this->customField->method('getAlias')->willReturn('field-a');
 
-        $this->violation->expects($this->once())
-            ->method('atPath')
-            ->with('value')
-            ->willReturnSelf();
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with(
+                'custom.field.required',
+                ['%fieldName%' => 'Field A (field-a)'],
+                'validators'
+            )
+            ->willReturn('Translated message');
 
-        $this->violation->expects($this->once())
-            ->method('addViolation');
-
-        $this->fieldType->validateValue($valueEntity, $this->context);
+        $this->expectException(\UnexpectedValueException::class);
+        $this->fieldType->validateValue($this->customField, '');
     }
 
     public function testUseEmptyValue(): void
