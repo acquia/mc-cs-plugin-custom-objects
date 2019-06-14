@@ -29,6 +29,7 @@ class DateTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($date, $transformer->transform($date)->format($format));
 
         $this->assertNull($transformer->reverseTransform(null));
-        $this->assertSame($date, $transformer->reverseTransform($datetime));
+        $this->assertSame($date, $transformer->reverseTransform($date)); // Transform string
+        $this->assertSame($date, $transformer->reverseTransform($datetime)); // Transform DateTime object
     }
 }
