@@ -63,6 +63,10 @@ class CustomFieldValueOption extends AbstractCustomFieldValue
             $this->value = [];
         }
 
+        if (in_array($value, $this->value, true)) {
+            return;
+        }
+
         $this->value[] = $value;
     }
 
@@ -71,6 +75,10 @@ class CustomFieldValueOption extends AbstractCustomFieldValue
      */
     public function setValue($value = null)
     {
+        if (is_array($value)) {
+            $value = array_unique($value);
+        }
+
         $this->value = $value;
     }
 
