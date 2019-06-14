@@ -14,20 +14,13 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\CustomFieldType;
 
 use Symfony\Component\Translation\TranslatorInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\PhoneType;
 
 class PhoneTypeTest extends \PHPUnit_Framework_TestCase
 {
     private $translator;
     private $customField;
-    private $customItem;
-    private $context;
-    private $violation;
 
     /**
      * @var PhoneType
@@ -40,82 +33,49 @@ class PhoneTypeTest extends \PHPUnit_Framework_TestCase
 
         $this->translator  = $this->createMock(TranslatorInterface::class);
         $this->customField = $this->createMock(CustomField::class);
-        $this->customItem  = $this->createMock(CustomItem::class);
-        $this->context     = $this->createMock(ExecutionContextInterface::class);
-        $this->violation   = $this->createMock(ConstraintViolationBuilderInterface::class);
         $this->fieldType   = new PhoneType($this->translator);
-
-        $this->context->method('buildViolation')->willReturn($this->violation);
     }
 
     public function testValidateValueWithBogusString(): void
     {
-        $valueEntity = new CustomFieldValueText($this->customField, $this->customItem, 'unicorn');
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with('custom.field.phone.invalid', ['%value%' => 'unicorn'], 'validators')
+            ->willReturn('Translated message');
 
-        $this->violation->expects($this->once())
-            ->method('atPath')
-            ->with('value')
-            ->willReturnSelf();
-
-        $this->violation->expects($this->once())
-            ->method('addViolation');
-
-        $this->fieldType->validateValue($valueEntity, $this->context);
+        $this->expectException(\UnexpectedValueException::class);
+        $this->fieldType->validateValue($this->customField, 'unicorn');
     }
 
     public function testValidateValueWithEmptyString(): void
     {
-        $valueEntity = new CustomFieldValueText($this->customField, $this->customItem, '');
-
-        $this->violation->expects($this->never())
-            ->method('atPath');
-
-        $this->violation->expects($this->never())
-            ->method('addViolation');
-
-        $this->fieldType->validateValue($valueEntity, $this->context);
+        $this->fieldType->validateValue($this->customField, '');
     }
 
     public function testValidateValueWithInvalidPhoneNumberFormat(): void
     {
-        $valueEntity = new CustomFieldValueText($this->customField, $this->customItem, '8889227842');
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with('custom.field.phone.invalid', ['%value%' => '8889227842'], 'validators')
+            ->willReturn('Translated message');
 
-        $this->violation->expects($this->once())
-            ->method('atPath')
-            ->with('value')
-            ->willReturnSelf();
-
-        $this->violation->expects($this->once())
-            ->method('addViolation');
-
-        $this->fieldType->validateValue($valueEntity, $this->context);
+        $this->expectException(\UnexpectedValueException::class);
+        $this->fieldType->validateValue($this->customField, '8889227842');
     }
 
     public function testValidateValueWithWrongRegionPrefix(): void
     {
-        $valueEntity = new CustomFieldValueText($this->customField, $this->customItem, '+42 (0) 78 927 2696');
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with('custom.field.phone.invalid', ['%value%' => '+42 (0) 78 927 2696'], 'validators')
+            ->willReturn('Translated message');
 
-        $this->violation->expects($this->once())
-            ->method('atPath')
-            ->with('value')
-            ->willReturnSelf();
-
-        $this->violation->expects($this->once())
-            ->method('addViolation');
-
-        $this->fieldType->validateValue($valueEntity, $this->context);
+        $this->expectException(\UnexpectedValueException::class);
+        $this->fieldType->validateValue($this->customField, '+42 (0) 78 927 2696');
     }
 
     public function testValidateValueWithValidPhoneNumber(): void
     {
-        $valueEntity = new CustomFieldValueText($this->customField, $this->customItem, '+1 888 922 7842');
-
-        $this->violation->expects($this->never())
-            ->method('atPath');
-
-        $this->violation->expects($this->never())
-            ->method('addViolation');
-
-        $this->fieldType->validateValue($valueEntity, $this->context);
+        $this->fieldType->validateValue($this->customField, '+1 888 922 7842');
     }
 }
