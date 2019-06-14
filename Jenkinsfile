@@ -68,7 +68,8 @@ pipeline {
                   'db_user' => 'travis',
                   'db_password' => '',
                   'db_table_prefix' => '',
-                  'hosted_plan' => 'pro'
+                  'hosted_plan' => 'pro',
+                  'custom_objects_enabled' => true
               );" > app/config/local.php
               export SYMFONY_ENV="test"
               bin/phpunit -d memory_limit=2048M --bootstrap vendor/autoload.php --configuration plugins/CustomObjectsBundle/phpunit.xml --fail-on-warning  --testsuite=all

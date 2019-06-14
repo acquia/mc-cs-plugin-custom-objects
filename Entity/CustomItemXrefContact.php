@@ -20,9 +20,13 @@ use Mautic\LeadBundle\Entity\Lead;
 use DateTimeInterface;
 use DateTimeImmutable;
 use DateTimeZone;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
 
 class CustomItemXrefContact implements CustomItemXrefInterface
 {
+    public const TABLE_NAME  = 'custom_item_xref_contact';
+    public const TABLE_ALIAS = 'CustomItemXrefContact';
+
     /**
      * @var Lead
      */
@@ -57,7 +61,8 @@ class CustomItemXrefContact implements CustomItemXrefInterface
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('custom_item_xref_contact');
+        $builder->setTable(self::TABLE_NAME);
+        $builder->setCustomRepositoryClass(CustomItemXrefContactRepository::class);
 
         $builder->createManyToOne('customItem', CustomItem::class)
             ->addJoinColumn('custom_item_id', 'id', false, false, 'CASCADE')

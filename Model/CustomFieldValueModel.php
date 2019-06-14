@@ -68,8 +68,9 @@ class CustomFieldValueModel
      * New entities are just persisted. Call flush after.
      *
      * @param CustomFieldValueInterface $customFieldValue
+     * @param bool                      $dryRun
      */
-    public function save(CustomFieldValueInterface $customFieldValue): void
+    public function save(CustomFieldValueInterface $customFieldValue, bool $dryRun = false): void
     {
         if ($customFieldValue->getCustomField()->canHaveMultipleValues()) {
             $this->deleteOptionsForField($customFieldValue);
@@ -94,7 +95,9 @@ class CustomFieldValueModel
                     throw $exception;
                 }
 
-                $this->entityManager->persist($optionValue);
+                if (!$dryRun) {
+                    $this->entityManager->persist($optionValue);
+                }
             }
 
             return;
@@ -109,11 +112,13 @@ class CustomFieldValueModel
             throw $exception;
         }
 
-        if ($customFieldValue->getCustomItem()->getId()) {
-            $customFieldValue = $this->entityManager->merge($customFieldValue);
-            $this->entityManager->flush($customFieldValue);
-        } else {
-            $this->entityManager->persist($customFieldValue);
+        if (!$dryRun) {
+            if ($customFieldValue->getCustomItem()->getId()) {
+                $customFieldValue = $this->entityManager->merge($customFieldValue);
+                $this->entityManager->flush($customFieldValue);
+            } else {
+                $this->entityManager->persist($customFieldValue);
+            }
         }
     }
 

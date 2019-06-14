@@ -574,8 +574,23 @@ return [
                     \MauticPlugin\CustomObjectsBundle\Entity\CustomObject::class,
                 ],
             ],
+            'custom_item.xref.contact.repository' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact::class,
+                ],
+            ],
         ],
         'events' => [
+            'custom_object.api.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\ApiSubscriber::class,
+                'arguments' => [
+                    'custom_object.config.provider',
+                    'mautic.custom.model.object',
+                    'mautic.custom.model.item',
+                ],
+            ],
             'custom_object.assets.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\AssetsSubscriber::class,
                 'arguments' => [
@@ -710,13 +725,26 @@ return [
                     'custom_object.config.provider',
                 ],
             ],
-            'custom_object'                                        => [
+            'custom_object.dynamic_content.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\DynamicContentSubscriber::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.lead.model.lead_segment_filter_factory',
                     'custom_object.query.filter.helper',
                     'custom_object.config.provider'
+                ],
+            ],
+            'custom_object.serializer.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\SerializerSubscriber::class,
+                'arguments' => [
+                    'custom_object.config.provider',
+                    'custom_item.xref.contact.repository',
+                    'mautic.custom.model.item',
+                    'request_stack',
+                ],
+                'tag'          => 'jms_serializer.event_subscriber',
+                'tagArguments' => [
+                    'event' => \JMS\Serializer\EventDispatcher\Events::POST_SERIALIZE,
                 ],
             ],
         ],

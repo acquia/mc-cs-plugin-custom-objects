@@ -17,7 +17,6 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
 use Doctrine\ORM\EntityManager;
@@ -28,17 +27,18 @@ use Mautic\LeadBundle\Entity\LeadEventLog;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemImportModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
+use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\CustomObjectsTrait;
 
 class ImportSubscriberTest extends KernelTestCase
 {
     use DatabaseSchemaTrait;
+    use CustomObjectsTrait;
 
     /**
      * @var ContainerInterface
@@ -76,7 +76,7 @@ class ImportSubscriberTest extends KernelTestCase
     {
         $jane         = $this->createContact('jane@doe.email');
         $john         = $this->createContact('john@doe.email');
-        $customObject = $this->createCustomObjectWithAllFields('Import CI all fields test Custom Object');
+        $customObject = $this->createCustomObjectWithAllFields($this->container, 'Import CI all fields test Custom Object');
         $csvRow       = [
             'name'           => 'Import CI all fields test Custom Item',
             'contacts'       => "{$jane->getId()},{$john->getId()}",
@@ -174,7 +174,7 @@ class ImportSubscriberTest extends KernelTestCase
      */
     private function validateSelectOptionValueExists(CustomObject $customObject, array $csvRow): void
     {
-        $csvRow['multiselect']    = 'unicorn';
+        $csvRow['multiselect'] = 'unicorn';
 
         try {
             $this->importCsvRow($customObject, $csvRow);
@@ -338,20 +338,6 @@ class ImportSubscriberTest extends KernelTestCase
     }
 
     /**
-     * @param CustomField $customField
-     * @param string      $label
-     * @param string      $value
-     */
-    private function addFieldOption(CustomField $customField, string $label, string $value): void
-    {
-        $option = new CustomFieldOption();
-        $option->setCustomField($customField);
-        $option->setLabel($label);
-        $option->setValue($value);
-        $customField->addOption($option);
-    }
-
-    /**
      * @param string $name
      *
      * @return CustomItem|mixed
@@ -388,42 +374,5 @@ class ImportSubscriberTest extends KernelTestCase
         $contactModel->saveEntity($contact);
 
         return $contact;
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return CustomObject
-     */
-    private function createCustomObjectWithAllFields(string $name): CustomObject
-    {
-        /** @var CustomObjectModel $customObjectModel */
-        $customObjectModel = $this->container->get('mautic.custom.model.object');
-        $customObject      = new CustomObject();
-
-        /** @var CustomFieldTypeProvider $customFieldTypeProvider */
-        $customFieldTypeProvider = $this->container->get('custom_field.type.provider');
-        $customFieldTypes        = $customFieldTypeProvider->getTypes();
-
-        $customObject->setNameSingular($name);
-        $customObject->setNamePlural("{$name}s");
-
-        foreach ($customFieldTypes as $customFieldType) {
-            $customField = new CustomField();
-            $customField->setTypeObject($customFieldType);
-            $customField->setType($customFieldType->getKey());
-            $customField->setLabel("{$customFieldType->getName()} Test Field");
-
-            if ($customField->isChoiceType()) {
-                $this->addFieldOption($customField, 'Option A', 'option_a');
-                $this->addFieldOption($customField, 'Option B', 'option_b');
-            }
-
-            $customObject->addCustomField($customField);
-        }
-
-        $customObjectModel->save($customObject);
-
-        return $customObject;
     }
 }

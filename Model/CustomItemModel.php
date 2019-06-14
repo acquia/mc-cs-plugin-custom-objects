@@ -93,10 +93,11 @@ class CustomItemModel extends FormModel
 
     /**
      * @param CustomItem $customItem
+     * @param bool       $dryRun
      *
      * @return CustomItem
      */
-    public function save(CustomItem $customItem): CustomItem
+    public function save(CustomItem $customItem, bool $dryRun = false): CustomItem
     {
         $user  = $this->userHelper->getUser();
         $now   = new DateTimeHelper();
@@ -112,10 +113,12 @@ class CustomItemModel extends FormModel
         $customItem->setModifiedByUser($user->getName());
         $customItem->setDateModified($now->getUtcDateTime());
 
-        $this->entityManager->persist($customItem);
+        if (!$dryRun) {
+            $this->entityManager->persist($customItem);
+        }
 
-        $customItem->getCustomFieldValues()->map(function (CustomFieldValueInterface $customFieldValue): void {
-            $this->customFieldValueModel->save($customFieldValue);
+        $customItem->getCustomFieldValues()->map(function (CustomFieldValueInterface $customFieldValue) use ($dryRun): void {
+            $this->customFieldValueModel->save($customFieldValue, $dryRun);
         });
 
         $errors = $this->validator->validate($customItem);
@@ -127,8 +130,11 @@ class CustomItemModel extends FormModel
         $customItem->recordCustomFieldValueChanges();
 
         $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, $event);
-        $this->entityManager->flush($customItem);
-        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $event);
+
+        if (!$dryRun) {
+            $this->entityManager->flush($customItem);
+            $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $event);
+        }
 
         return $customItem;
     }
@@ -328,11 +334,19 @@ class CustomItemModel extends FormModel
      * @param TableConfig $tableConfig
      *
      * @return QueryBuilder
+     *
+     * @throws UnexpectedValueException
      */
     private function createListQueryBuilder(TableConfig $tableConfig): QueryBuilder
     {
         $customObjectId = $tableConfig->getParameter('customObjectId');
+        $search         = $tableConfig->getParameter('search');
         $queryBuilder   = $this->entityManager->createQueryBuilder();
+
+        if (empty($customObjectId)) {
+            throw new UnexpectedValueException("customObjectId cannot be empty. It's required for permission management");
+        }
+
         $queryBuilder->select(CustomItem::TABLE_ALIAS);
         $queryBuilder->from(CustomItem::class, CustomItem::TABLE_ALIAS);
         $queryBuilder->setMaxResults($tableConfig->getLimit());
@@ -340,8 +354,6 @@ class CustomItemModel extends FormModel
         $queryBuilder->orderBy($tableConfig->getOrderBy(), $tableConfig->getOrderDirection());
         $queryBuilder->where(CustomItem::TABLE_ALIAS.'.customObject = :customObjectId');
         $queryBuilder->setParameter('customObjectId', $customObjectId);
-
-        $search = $tableConfig->getParameter('search');
 
         if ($search) {
             $queryBuilder->andWhere(CustomItem::TABLE_ALIAS.'.name LIKE :search');

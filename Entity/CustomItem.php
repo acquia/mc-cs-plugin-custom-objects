@@ -283,6 +283,74 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     }
 
     /**
+     * @param string $customFieldAlias
+     *
+     * @return CustomFieldValueInterface
+     *
+     * @throws NotFoundException
+     */
+    public function findCustomFieldValueForFieldAlias($customFieldAlias)
+    {
+        $filteredValues = $this->customFieldValues->filter(function (CustomFieldValueInterface $customFieldValue) use ($customFieldAlias) {
+            return $customFieldValue->getCustomField()->getAlias() === $customFieldAlias;
+        });
+
+        if (!$filteredValues->count()) {
+            throw new NotFoundException("Custom Field Value for alias = {$customFieldAlias} was not found.");
+        }
+
+        return $filteredValues->first();
+    }
+
+    /**
+     * @param int   $customFieldId
+     * @param mixed $value
+     *
+     * @return CustomFieldValueInterface
+     *
+     * @throws NotFoundException
+     */
+    public function createNewCustomFieldValueByFieldId(int $customFieldId, $value): CustomFieldValueInterface
+    {
+        /** @var CustomField $customField */
+        foreach ($this->getCustomObject()->getCustomFields() as $customField) {
+            if ($customField->getId() === (int) $customFieldId) {
+                $fieldType        = $customField->getTypeObject();
+                $customFieldValue = $fieldType->createValueEntity($customField, $this, $value);
+                $this->addCustomFieldValue($customFieldValue);
+
+                return $customFieldValue;
+            }
+        }
+
+        throw new NotFoundException("Custom field with ID {$customFieldId} was not found.");
+    }
+
+    /**
+     * @param string $customFieldAlias
+     * @param mixed  $value
+     *
+     * @return CustomFieldValueInterface
+     *
+     * @throws NotFoundException
+     */
+    public function createNewCustomFieldValueByFieldAlias(string $customFieldAlias, $value): CustomFieldValueInterface
+    {
+        /** @var CustomField $customField */
+        foreach ($this->getCustomObject()->getCustomFields() as $customField) {
+            if ($customField->getAlias() === $customFieldAlias) {
+                $fieldType        = $customField->getTypeObject();
+                $customFieldValue = $fieldType->createValueEntity($customField, $this, $value);
+                $this->addCustomFieldValue($customFieldValue);
+
+                return $customFieldValue;
+            }
+        }
+
+        throw new NotFoundException("Custom field with alias {$customFieldAlias} was not found.");
+    }
+
+    /**
      * @param CustomItemXrefInterface $reference
      */
     public function addContactReference($reference)
