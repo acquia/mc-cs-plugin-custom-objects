@@ -223,7 +223,7 @@ CustomObjectsForm = {
     handleModalDefaultValueOptions: function() {
         let type = mQuery('#custom_field_type').val();
 
-        if (!CustomObjectsForm.isMultiValueField(type)) {
+        if (!CustomObjectsForm.isSelectableField(type)) {
             return;
         }
 
@@ -279,8 +279,8 @@ CustomObjectsForm = {
      * @param type
      * @returns {boolean}
      */
-    isMultiValueField: function(type) {
-        return type === 'checkbox_group' || type === 'multiselect' || type === 'radio_group';
+    isSelectableField: function(type) {
+        return type === 'checkbox_group' || type === 'multiselect' || type === 'radio_group' || type === 'country';
     },
 
     /**
@@ -388,17 +388,27 @@ CustomObjectsForm = {
             }
         });
 
-        if (CustomObjectsForm.isMultiValueField(type)) {
-            CustomObjectsForm.convertMultivalueDataToModal(panel, type);
+        if (CustomObjectsForm.isSelectableField(type)) {
+            CustomObjectsForm.convertSelectableDataToModal(panel, type);
         } else {
             mQuery('#custom_field_defaultValue').val(mQuery(defaultValueIdSelector).val());
         }
     },
 
-    convertMultivalueDataToModal: function(panel, type) {
+    /**
+     * Convert selectable default values to modal
+     * @param panel
+     * @param type
+     */
+    convertSelectableDataToModal: function(panel, type) {
 
         let options = '';
         switch(type){
+            case 'country':
+                let val = mQuery(panel).find('.choice-wrapper option:selected').val();
+                mQuery('#objectFieldModal #general .choice-wrapper option[value=' + val + ']').attr('selected', 'selected');
+                mQuery('#objectFieldModal #general .choice-wrapper select').trigger('chosen:updated');
+                break;
             case 'checkbox_group':
                 options = mQuery(panel).find('.choice-wrapper').clone();
                 mQuery(options).find('input').each(function(){
