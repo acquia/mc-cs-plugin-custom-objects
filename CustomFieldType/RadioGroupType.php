@@ -31,6 +31,5 @@ class RadioGroupType extends SelectType
     protected $formTypeOptions = [
         'expanded'    => true,
         'multiple'    => false,
-        'placeholder' => null, // Empty value in form presented as `None` radio hidden
     ];
 }
