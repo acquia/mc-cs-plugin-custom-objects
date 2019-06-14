@@ -121,7 +121,6 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
             ],
             'label'      => 'Start Date',
             'required'   => false,
-            'empty_data' => null,
             'label_attr' => [
                 'class' => 'control-label',
             ],
