@@ -179,7 +179,7 @@ class ImportSubscriberTest extends KernelTestCase
         try {
             $this->importCsvRow($customObject, $csvRow);
         } catch (InvalidValueException $e) {
-            $this->assertContains("Value 'unicorn' does not exist in the list of options of field 'Multiselect Test Field' (11). Possible values: option_a, option_b", $e->getMessage());
+            $this->assertContains("Value 'unicorn' does not exist in the list of options of field 'Multiselect Test Field' (multiselect-test-field). Possible values: option_a,option_b", $e->getMessage());
         }
     }
 
@@ -214,7 +214,7 @@ class ImportSubscriberTest extends KernelTestCase
         try {
             $this->importCsvRow($customObject, $csvRow);
         } catch (InvalidValueException $e) {
-            $this->assertSame('This value is not a valid email address.', $e->getMessage());
+            $this->assertSame('\'bogus.@email\' is not a valid email address.', $e->getMessage());
         }
     }
 
@@ -231,7 +231,7 @@ class ImportSubscriberTest extends KernelTestCase
         try {
             $this->importCsvRow($customObject, $csvRow);
         } catch (InvalidValueException $e) {
-            $this->assertContains('Please use the following international phone number format [+][country code][subscriber number] for this field (eg: ‪+14028650000).', $e->getMessage());
+            $this->assertContains('\'+420111222333\' is not a valid phone number. Use the following international phone number format [+][country code][subscriber number] for this field (eg: ‪+14028650000)', $e->getMessage());
         }
     }
 
@@ -248,7 +248,7 @@ class ImportSubscriberTest extends KernelTestCase
         try {
             $this->importCsvRow($customObject, $csvRow);
         } catch (InvalidValueException $e) {
-            $this->assertContains('This value is not a valid URL', $e->getMessage());
+            $this->assertContains('\'unicorn\' is not a valid URL address. Maybe you forgot to add the protocol like https://?', $e->getMessage());
         }
     }
 
