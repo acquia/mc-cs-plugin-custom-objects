@@ -33,6 +33,7 @@ class CustomItemXrefCompanyTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($customItem, $xref->getCustomItem());
         $this->assertSame($company, $xref->getCompany());
+        $this->assertSame($company, $xref->getLinkedEntity());
         $this->assertSame($dateAdded, $xref->getDateAdded());
     }
 }
