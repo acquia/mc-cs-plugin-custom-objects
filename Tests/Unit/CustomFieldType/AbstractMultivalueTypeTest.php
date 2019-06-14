@@ -15,10 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\CustomFieldType;
 
 use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\EmailType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\AbstractMultivalueType;
 use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
@@ -32,11 +29,9 @@ class AbstractMultivalueTypeTest extends \PHPUnit_Framework_TestCase
     private $translator;
     private $customField;
     private $customItem;
-    private $context;
-    private $violation;
 
     /**
-     * @var EmailType
+     * @var AbstractMultivalueType
      */
     private $fieldType;
 
@@ -47,14 +42,10 @@ class AbstractMultivalueTypeTest extends \PHPUnit_Framework_TestCase
         $this->translator  = $this->createMock(TranslatorInterface::class);
         $this->customField = $this->createMock(CustomField::class);
         $this->customItem  = $this->createMock(CustomItem::class);
-        $this->context     = $this->createMock(ExecutionContextInterface::class);
-        $this->violation   = $this->createMock(ConstraintViolationBuilderInterface::class);
         $this->fieldType   = $this->getMockForAbstractClass(
             AbstractMultivalueType::class,
             [$this->translator, new CsvHelper()]
         );
-
-        $this->context->method('buildViolation')->willReturn($this->violation);
     }
 
     public function testCreateValueEntity(): void
@@ -104,19 +95,16 @@ class AbstractMultivalueTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testValidateValueWithEmptyArray(): void
     {
-        $valueEntity = new CustomFieldValueOption($this->customField, $this->customItem, []);
-
         $this->customField->expects($this->never())
             ->method('getOptions');
 
-        $this->fieldType->validateValue($valueEntity, $this->context);
+        $this->fieldType->validateValue($this->customField, []);
     }
 
     public function testValidateValueWithValidSingleOptionString(): void
     {
-        $valueEntity = new CustomFieldValueOption($this->customField, $this->customItem, 'two');
-        $option1     = new CustomFieldOption();
-        $option2     = new CustomFieldOption();
+        $option1 = new CustomFieldOption();
+        $option2 = new CustomFieldOption();
         $option1->setValue('one');
         $option2->setValue('two');
 
@@ -124,17 +112,13 @@ class AbstractMultivalueTypeTest extends \PHPUnit_Framework_TestCase
             ->method('getOptions')
             ->willReturn(new ArrayCollection([$option1, $option2]));
 
-        $this->violation->expects($this->never())
-            ->method('atPath');
-
-        $this->fieldType->validateValue($valueEntity, $this->context);
+        $this->fieldType->validateValue($this->customField, 'two');
     }
 
     public function testValidateValueWithValidTwoOption(): void
     {
-        $valueEntity = new CustomFieldValueOption($this->customField, $this->customItem, ['one', 'two']);
-        $option1     = new CustomFieldOption();
-        $option2     = new CustomFieldOption();
+        $option1 = new CustomFieldOption();
+        $option2 = new CustomFieldOption();
         $option1->setValue('one');
         $option2->setValue('two');
 
@@ -142,17 +126,13 @@ class AbstractMultivalueTypeTest extends \PHPUnit_Framework_TestCase
             ->method('getOptions')
             ->willReturn(new ArrayCollection([$option1, $option2]));
 
-        $this->violation->expects($this->never())
-            ->method('atPath');
-
-        $this->fieldType->validateValue($valueEntity, $this->context);
+        $this->fieldType->validateValue($this->customField, ['one', 'two']);
     }
 
     public function testValidateValueWithInvalidSingleOptionString(): void
     {
-        $valueEntity = new CustomFieldValueOption($this->customField, $this->customItem, 'unicorn');
-        $option1     = new CustomFieldOption();
-        $option2     = new CustomFieldOption();
+        $option1 = new CustomFieldOption();
+        $option2 = new CustomFieldOption();
         $option1->setValue('one');
         $option2->setValue('two');
 
@@ -174,22 +154,14 @@ class AbstractMultivalueTypeTest extends \PHPUnit_Framework_TestCase
             )
             ->willReturn('Translated message');
 
-        $this->violation->expects($this->once())
-            ->method('atPath')
-            ->with('value')
-            ->willReturnSelf();
-
-        $this->violation->expects($this->once())
-            ->method('addViolation');
-
-        $this->fieldType->validateValue($valueEntity, $this->context);
+        $this->expectException(\UnexpectedValueException::class);
+        $this->fieldType->validateValue($this->customField, 'unicorn');
     }
 
     public function testValidateValueWithInvalidOptions(): void
     {
-        $valueEntity = new CustomFieldValueOption($this->customField, $this->customItem, ['one', 'unicorn']);
-        $option1     = new CustomFieldOption();
-        $option2     = new CustomFieldOption();
+        $option1 = new CustomFieldOption();
+        $option2 = new CustomFieldOption();
         $option1->setValue('one');
         $option2->setValue('two');
 
@@ -211,14 +183,7 @@ class AbstractMultivalueTypeTest extends \PHPUnit_Framework_TestCase
             )
             ->willReturn('Translated message');
 
-        $this->violation->expects($this->once())
-            ->method('atPath')
-            ->with('value')
-            ->willReturnSelf();
-
-        $this->violation->expects($this->once())
-            ->method('addViolation');
-
-        $this->fieldType->validateValue($valueEntity, $this->context);
+        $this->expectException(\UnexpectedValueException::class);
+        $this->fieldType->validateValue($this->customField, ['one', 'unicorn']);
     }
 }
