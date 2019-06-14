@@ -176,7 +176,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         $metadata->addPropertyConstraint('type', new Assert\Length(['max' => 255]));
         $metadata->addPropertyConstraint('customObject', new Assert\NotBlank());
         $metadata->addPropertyConstraint('defaultValue', new Assert\Length(['max' => 255]));
-        $metadata->addConstraint(new Assert\Callback('validateValue'));
+        $metadata->addConstraint(new Assert\Callback('validateDefaultValue'));
     }
 
     /**
@@ -184,13 +184,13 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      *
      * @param ExecutionContextInterface $context
      */
-    public function validateValue(ExecutionContextInterface $context): void
+    public function validateDefaultValue(ExecutionContextInterface $context): void
     {
         try {
             $this->getTypeObject()->validateValue($this, $this->defaultValue, $context);
         } catch (\UnexpectedValueException $e) {
             $context->buildViolation($e->getMessage())
-                // ->atPath('defaultValue') // The default value field disappears after submit.
+                // ->atPath('defaultValue') // Somehow doesn't validate when we set the path...
                 ->addViolation();
         }
     }

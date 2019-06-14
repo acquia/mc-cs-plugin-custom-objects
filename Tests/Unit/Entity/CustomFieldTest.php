@@ -22,9 +22,55 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldType\SelectType;
 use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\EmailType;
+use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
 class CustomFieldTest extends \PHPUnit_Framework_TestCase
 {
+    public function testClone(): void
+    {
+        $customField = new CustomField();
+        $customField->setAlias('field-a');
+
+        $clone = clone $customField;
+
+        $this->assertNull($clone->getAlias());
+    }
+
+    public function testValidateValueWhenValid(): void
+    {
+        $context     = $this->createMock(ExecutionContextInterface::class);
+        $translator  = $this->createMock(TranslatorInterface::class);
+        $customField = new CustomField();
+
+        $customField->setTypeObject(new EmailType($translator));
+        $customField->setDefaultValue('valid@email.address');
+        $customField->validateDefaultValue($context);
+    }
+
+    public function testValidateValueWhenInvalid(): void
+    {
+        $context     = $this->createMock(ExecutionContextInterface::class);
+        $translator  = $this->createMock(TranslatorInterface::class);
+        $violation   = $this->createMock(ConstraintViolationBuilderInterface::class);
+        $customField = new CustomField();
+
+        $translator->method('trans')->willReturn('a validation message');
+
+        $context->expects($this->once())
+            ->method('buildViolation')
+            ->with('a validation message')
+            ->willReturn($violation);
+
+        $violation->expects($this->once())
+            ->method('addViolation');
+
+        $customField->setTypeObject(new EmailType($translator));
+        $customField->setDefaultValue('invalid.email.address');
+        $customField->validateDefaultValue($context);
+    }
+
     public function testToString(): void
     {
         $customField = new CustomField();
