@@ -17,11 +17,6 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
-use Symfony\Component\Translation\TranslatorInterface;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\SelectType;
-use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
 class CustomFieldValueOptionTest extends \PHPUnit_Framework_TestCase
 {
