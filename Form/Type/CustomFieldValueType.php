@@ -13,7 +13,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\ViewDateTransformer;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
@@ -33,12 +36,23 @@ class CustomFieldValueType extends AbstractType
         $customFieldValue = $customItem->findCustomFieldValueForFieldId($customFieldId);
         $customField      = $customFieldValue->getCustomField();
         $options          = ['empty_data'  => $customItem->getId() ? null : $customField->getDefaultValue()];
+        $symfonyFormType  =  $customField->getTypeObject()->getSymfonyFormFieldType();
 
-        $builder->add(
-            'value',
-            $customField->getTypeObject()->getSymfonyFormFieldType(),
-            $customField->getFormFieldOptions($options)
-        );
+        if (DateType::class === $symfonyFormType || DateTimeType::class === $symfonyFormType) {
+            $builder->add(
+                $builder->create(
+                    'value',
+                    $customField->getTypeObject()->getSymfonyFormFieldType(),
+                    $customField->getFormFieldOptions($options)
+                )->addViewTransformer(new ViewDateTransformer())
+            );
+        } else {
+            $builder->add(
+                'value',
+                $customField->getTypeObject()->getSymfonyFormFieldType(),
+                $customField->getFormFieldOptions($options)
+            );
+        }
     }
 
     /**
