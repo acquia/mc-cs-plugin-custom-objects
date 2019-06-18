@@ -171,6 +171,12 @@ class AbstractCustomFieldTypeTest extends \PHPUnit_Framework_TestCase
     public function testCreateDefaultValueTransformer(): void
     {
         $this->expectException(UndefinedTransformerException::class);
-        $this->assertFalse($this->fieldType->createDefaultValueTransformer());
+        $this->fieldType->createDefaultValueTransformer();
+    }
+
+    public function testCreateViewTransformer(): void
+    {
+        $this->expectException(UndefinedTransformerException::class);
+        $this->fieldType->createViewTransformer();
     }
 }

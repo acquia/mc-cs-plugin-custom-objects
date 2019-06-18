@@ -20,6 +20,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueDate;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\DateTransformer;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\ViewDateTransformer;
 
 class DateTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -107,6 +108,14 @@ class DateTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(
             DateTransformer::class,
             $this->fieldType->createDefaultValueTransformer()
+        );
+    }
+
+    public function testCreateViewTransformer(): void
+    {
+        $this->assertInstanceOf(
+            ViewDateTransformer::class,
+            $this->fieldType->createViewTransformer()
         );
     }
 }
