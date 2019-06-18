@@ -84,12 +84,17 @@ class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
             ->willReturn(['the' => 'options']);
 
         $this->formBuilder->expects($this->once())
-            ->method('add')
+            ->method('create')
             ->with(
                 'value',
                 TextType::class,
                 ['the' => 'options']
-            );
+            )
+            ->willReturn('whatever the create method returns');
+
+        $this->formBuilder->expects($this->once())
+            ->method('add')
+            ->with('whatever the create method returns');
 
         $this->formType->buildForm($this->formBuilder, $options);
     }
@@ -132,12 +137,17 @@ class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
             ->willReturn(['the' => 'options']);
 
         $this->formBuilder->expects($this->once())
-            ->method('add')
+            ->method('create')
             ->with(
                 'value',
                 TextType::class,
                 ['the' => 'options']
-            );
+            )
+            ->willReturn('whatever the create method returns');
+
+        $this->formBuilder->expects($this->once())
+            ->method('add')
+            ->with('whatever the create method returns');
 
         $this->formType->buildForm($this->formBuilder, $options);
     }

@@ -35,7 +35,7 @@ class CustomFieldValueType extends AbstractType
         $customFieldId    = (int) $builder->getName();
         $customFieldValue = $customItem->findCustomFieldValueForFieldId($customFieldId);
         $customField      = $customFieldValue->getCustomField();
-        $symfonyFormType  =  $customField->getTypeObject()->getSymfonyFormFieldType();
+        $symfonyFormType  = $customField->getTypeObject()->getSymfonyFormFieldType();
         $options          = $customItem->getId() ? [] : ['empty_data' =>  $customField->getDefaultValue()];
         $options          = $customField->getFormFieldOptions($options);
         $formField        = $builder->create('value', $symfonyFormType, $options);
@@ -43,7 +43,7 @@ class CustomFieldValueType extends AbstractType
         if (DateType::class === $symfonyFormType || DateTimeType::class === $symfonyFormType) {
             $formField->addViewTransformer(new ViewDateTransformer());
         }
-        
+
         $builder->add($formField);
     }
 
