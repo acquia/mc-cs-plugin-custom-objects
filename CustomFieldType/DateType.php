@@ -42,6 +42,7 @@ class DateType extends AbstractCustomFieldType
     protected $formTypeOptions = [
         'widget' => 'single_text',
         'format' => 'yyyy-MM-dd',
+        'html5'  => false,
         'attr'   => [
             'data-toggle' => 'date',
         ],
