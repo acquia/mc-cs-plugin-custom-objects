@@ -21,6 +21,8 @@ use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldValueType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Form\DataTransformerInterface;
+use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
 
 class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -91,6 +93,16 @@ class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
             )
             ->willReturnSelf();
 
+        $viewTransformer = $this->createMock(DataTransformerInterface::class);
+
+        $this->customFieldType->expects($this->once())
+            ->method('createViewTransformer')
+            ->willReturn($viewTransformer);
+
+        $this->formBuilder->expects($this->once())
+            ->method('addViewTransformer')
+            ->with($viewTransformer);
+
         $this->formBuilder->expects($this->once())
             ->method('add')
             ->with($this->formBuilder);
@@ -133,6 +145,13 @@ class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
             ->method('getFormFieldOptions')
             ->with([]) // The default value is not set.
             ->willReturn(['the' => 'options']);
+
+        $this->customFieldType->expects($this->once())
+            ->method('createViewTransformer')
+            ->will($this->throwException(new UndefinedTransformerException()));
+
+        $this->formBuilder->expects($this->never())
+            ->method('addViewTransformer');
 
         $this->formBuilder->expects($this->once())
             ->method('create')
