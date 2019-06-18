@@ -34,7 +34,7 @@ class CustomFieldValueDate extends AbstractCustomFieldValue
     {
         parent::__construct($customField, $customItem);
 
-        $this->value = $value;
+        $this->setValue($value);
     }
 
     /**
@@ -55,7 +55,7 @@ class CustomFieldValueDate extends AbstractCustomFieldValue
      */
     public function setValue($value = null): void
     {
-        if (null !== $value && !$value instanceof DateTimeInterface) {
+        if ($value && !$value instanceof DateTimeInterface) {
             $value = new \DateTimeImmutable($value);
         }
 

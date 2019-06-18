@@ -57,7 +57,9 @@ class DateType extends AbstractCustomFieldType
      */
     public function createValueEntity(CustomField $customField, CustomItem $customItem, $value = null): CustomFieldValueInterface
     {
-        if (null !== $value) {
+        if (empty($value)) {
+            $value = null;
+        } else {
             try {
                 $value = new \DateTimeImmutable($value);
             } catch (\Throwable $e) {
