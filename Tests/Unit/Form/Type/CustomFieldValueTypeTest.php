@@ -66,8 +66,7 @@ class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
             ->method('getCustomField')
             ->willReturn($this->customField);
 
-        $this->customField->expects($this->once())
-            ->method('getTypeObject')
+        $this->customField->method('getTypeObject')
             ->willReturn($this->customFieldType);
 
         $this->customFieldType->expects($this->once())
@@ -90,11 +89,11 @@ class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
                 TextType::class,
                 ['the' => 'options']
             )
-            ->willReturn('whatever the create method returns');
+            ->willReturnSelf();
 
         $this->formBuilder->expects($this->once())
             ->method('add')
-            ->with('whatever the create method returns');
+            ->with($this->formBuilder);
 
         $this->formType->buildForm($this->formBuilder, $options);
     }
@@ -120,8 +119,7 @@ class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
             ->method('getCustomField')
             ->willReturn($this->customField);
 
-        $this->customField->expects($this->once())
-            ->method('getTypeObject')
+        $this->customField->method('getTypeObject')
             ->willReturn($this->customFieldType);
 
         $this->customFieldType->expects($this->once())
@@ -143,11 +141,11 @@ class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
                 TextType::class,
                 ['the' => 'options']
             )
-            ->willReturn('whatever the create method returns');
+            ->willReturnSelf();
 
         $this->formBuilder->expects($this->once())
             ->method('add')
-            ->with('whatever the create method returns');
+            ->with($this->formBuilder);
 
         $this->formType->buildForm($this->formBuilder, $options);
     }
