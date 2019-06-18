@@ -26,6 +26,8 @@ class DateTimeTransformer implements DataTransformerInterface
         if ($value) {
             return new DateTime($value);
         }
+
+        return '';
     }
 
     /**
@@ -34,7 +36,7 @@ class DateTimeTransformer implements DataTransformerInterface
     public function reverseTransform($value)
     {
         if (!$value) {
-            return null;
+            return '';
         }
 
         if (is_string($value)) {
