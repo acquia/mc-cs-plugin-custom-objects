@@ -114,4 +114,9 @@ interface CustomFieldTypeInterface
      * @return DataTransformerInterface
      */
     public function createDefaultValueTransformer(): DataTransformerInterface;
+
+    /**
+     * @return DataTransformerInterface
+     */
+    public function createViewTransformer(): DataTransformerInterface;
 }

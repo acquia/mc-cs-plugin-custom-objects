@@ -152,6 +152,14 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function createViewTransformer(): DataTransformerInterface
+    {
+        throw new UndefinedTransformerException();
+    }
+
+    /**
      * @param CustomField $customField
      * @param mixed       $value
      *

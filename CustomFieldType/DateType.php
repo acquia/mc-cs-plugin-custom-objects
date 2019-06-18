@@ -20,6 +20,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
 use Symfony\Component\Form\DataTransformerInterface;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\ViewDateTransformer;
 
 class DateType extends AbstractCustomFieldType
 {
@@ -103,5 +104,13 @@ class DateType extends AbstractCustomFieldType
     public function createDefaultValueTransformer(): DataTransformerInterface
     {
         return new DateTransformer();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createViewTransformer(): DataTransformerInterface
+    {
+        return new ViewDateTransformer();
     }
 }
