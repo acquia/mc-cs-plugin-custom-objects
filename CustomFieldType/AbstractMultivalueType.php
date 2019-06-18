@@ -103,7 +103,11 @@ abstract class AbstractMultivalueType extends AbstractCustomFieldType
         }
 
         if (is_string($value)) {
-            $value = [$value];
+            if ($this->isJson($value)) {
+                $value = json_decode($value, true);
+            } else {
+                $value = [$value];
+            }
         }
 
         $options        = $customField->getOptions();
@@ -127,5 +131,17 @@ abstract class AbstractMultivalueType extends AbstractCustomFieldType
                 );
             }
         }
+    }
+
+    /**
+     * @param string $string
+     *
+     * @return bool
+     */
+    private function isJson(string $string): bool
+    {
+        json_decode($string);
+
+        return JSON_ERROR_NONE === json_last_error();
     }
 }
