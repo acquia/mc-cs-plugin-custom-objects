@@ -41,7 +41,8 @@ class CustomFieldValueType extends AbstractType
         try {
             $viewTransformer = $customField->getTypeObject()->createViewTransformer();
             $formField->addViewTransformer($viewTransformer);
-        } catch (UndefinedTransformerException $e) {}
+        } catch (UndefinedTransformerException $e) {
+        }
 
         $builder->add($formField);
     }
