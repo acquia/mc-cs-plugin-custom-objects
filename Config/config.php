@@ -747,6 +747,14 @@ return [
                     'event' => \JMS\Serializer\EventDispatcher\Events::POST_SERIALIZE,
                 ],
             ],
+            'custom_object.emailtoken.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\TokenSubscriber::class,
+                'arguments' => [
+                    'custom_object.config.provider',
+                    'mautic.custom.model.object',
+                    'mautic.custom.model.item',
+                ],
+            ],
         ],
         'forms' => [
             'custom_item.item.form' => [
