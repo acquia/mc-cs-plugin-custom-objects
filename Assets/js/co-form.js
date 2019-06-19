@@ -218,7 +218,8 @@ CustomObjectsForm = {
     },
 
     /**
-     * Update default value options when needed
+     * Update default value options from Modal properties panel to general tab default value settings.
+     * Everything happens in modal
      */
     handleModalDefaultValueOptions: function() {
         let type = mQuery('#custom_field_type').val();
