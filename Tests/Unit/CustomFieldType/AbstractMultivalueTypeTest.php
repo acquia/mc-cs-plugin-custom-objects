@@ -158,6 +158,20 @@ class AbstractMultivalueTypeTest extends \PHPUnit_Framework_TestCase
         $this->fieldType->validateValue($this->customField, 'unicorn');
     }
 
+    public function testValidateValueWithValidSingleOptionJsonString(): void
+    {
+        $option1 = new CustomFieldOption();
+        $option2 = new CustomFieldOption();
+        $option1->setValue('one');
+        $option2->setValue('two');
+
+        $this->customField->expects($this->once())
+            ->method('getOptions')
+            ->willReturn(new ArrayCollection([$option1, $option2]));
+
+        $this->fieldType->validateValue($this->customField, '["one","two"]');
+    }
+
     public function testValidateValueWithInvalidOptions(): void
     {
         $option1 = new CustomFieldOption();

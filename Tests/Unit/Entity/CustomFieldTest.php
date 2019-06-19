@@ -158,19 +158,21 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
         $customField->setLabel('Start Date');
         $customField->setRequired(true);
 
-        $this->assertSame([
-            'widget' => 'single_text',
-            'format' => 'yyyy-MM-dd',
-            'attr'   => [
-                'data-toggle' => 'date',
-                'class'       => 'form-control',
+        $this->assertSame(
+            [
+                'widget' => 'single_text',
+                'format' => 'yyyy-MM-dd',
+                'html5'  => false,
+                'attr'   => [
+                    'data-toggle' => 'date',
+                    'class'       => 'form-control',
+                ],
+                'label'      => 'Start Date',
+                'required'   => false,
+                'label_attr' => [
+                    'class' => 'control-label',
+                ],
             ],
-            'label'      => 'Start Date',
-            'required'   => false,
-            'label_attr' => [
-                'class' => 'control-label',
-            ],
-        ],
             $customField->getFormFieldOptions(['required' => false])
         );
     }

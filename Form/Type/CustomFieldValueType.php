@@ -18,6 +18,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
 
 class CustomFieldValueType extends AbstractType
 {
@@ -32,13 +33,18 @@ class CustomFieldValueType extends AbstractType
         $customFieldId    = (int) $builder->getName();
         $customFieldValue = $customItem->findCustomFieldValueForFieldId($customFieldId);
         $customField      = $customFieldValue->getCustomField();
-        $options          = ['empty_data'  => $customItem->getId() ? null : $customField->getDefaultValue()];
+        $symfonyFormType  = $customField->getTypeObject()->getSymfonyFormFieldType();
+        $options          = $customItem->getId() ? [] : ['empty_data' => $customField->getDefaultValue()];
+        $options          = $customField->getFormFieldOptions($options);
+        $formField        = $builder->create('value', $symfonyFormType, $options);
 
-        $builder->add(
-            'value',
-            $customField->getTypeObject()->getSymfonyFormFieldType(),
-            $customField->getFormFieldOptions($options)
-        );
+        try {
+            $viewTransformer = $customField->getTypeObject()->createViewTransformer();
+            $formField->addViewTransformer($viewTransformer);
+        } catch (UndefinedTransformerException $e) {
+        }
+
+        $builder->add($formField);
     }
 
     /**

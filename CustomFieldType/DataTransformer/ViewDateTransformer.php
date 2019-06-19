@@ -13,21 +13,20 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer;
 
-use DateTime;
 use Symfony\Component\Form\DataTransformerInterface;
 
-class DateTransformer implements DataTransformerInterface
+class ViewDateTransformer implements DataTransformerInterface
 {
     /**
      * {@inheritdoc}
      */
     public function transform($value)
     {
-        if ($value) {
-            return new DateTime($value);
+        if ('' === $value) {
+            return null;
         }
 
-        return null;
+        return $value;
     }
 
     /**
@@ -35,14 +34,10 @@ class DateTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value)
     {
-        if (!$value) {
-            return null;
+        if (null === $value) {
+            return '';
         }
 
-        if (is_string($value)) {
-            $value = new DateTime($value);
-        }
-
-        return $value->format('Y-m-d');
+        return $value;
     }
 }

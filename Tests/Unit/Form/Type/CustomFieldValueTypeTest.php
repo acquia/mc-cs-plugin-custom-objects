@@ -21,6 +21,8 @@ use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldValueType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Form\DataTransformerInterface;
+use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
 
 class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -66,8 +68,7 @@ class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
             ->method('getCustomField')
             ->willReturn($this->customField);
 
-        $this->customField->expects($this->once())
-            ->method('getTypeObject')
+        $this->customField->method('getTypeObject')
             ->willReturn($this->customFieldType);
 
         $this->customFieldType->expects($this->once())
@@ -84,12 +85,27 @@ class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
             ->willReturn(['the' => 'options']);
 
         $this->formBuilder->expects($this->once())
-            ->method('add')
+            ->method('create')
             ->with(
                 'value',
                 TextType::class,
                 ['the' => 'options']
-            );
+            )
+            ->willReturnSelf();
+
+        $viewTransformer = $this->createMock(DataTransformerInterface::class);
+
+        $this->customFieldType->expects($this->once())
+            ->method('createViewTransformer')
+            ->willReturn($viewTransformer);
+
+        $this->formBuilder->expects($this->once())
+            ->method('addViewTransformer')
+            ->with($viewTransformer);
+
+        $this->formBuilder->expects($this->once())
+            ->method('add')
+            ->with($this->formBuilder);
 
         $this->formType->buildForm($this->formBuilder, $options);
     }
@@ -115,8 +131,7 @@ class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
             ->method('getCustomField')
             ->willReturn($this->customField);
 
-        $this->customField->expects($this->once())
-            ->method('getTypeObject')
+        $this->customField->method('getTypeObject')
             ->willReturn($this->customFieldType);
 
         $this->customFieldType->expects($this->once())
@@ -128,16 +143,28 @@ class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
 
         $this->customField->expects($this->once())
             ->method('getFormFieldOptions')
-            ->with(['empty_data' => null]) // The default value is null.
+            ->with([]) // The default value is not set.
             ->willReturn(['the' => 'options']);
 
+        $this->customFieldType->expects($this->once())
+            ->method('createViewTransformer')
+            ->will($this->throwException(new UndefinedTransformerException()));
+
+        $this->formBuilder->expects($this->never())
+            ->method('addViewTransformer');
+
         $this->formBuilder->expects($this->once())
-            ->method('add')
+            ->method('create')
             ->with(
                 'value',
                 TextType::class,
                 ['the' => 'options']
-            );
+            )
+            ->willReturnSelf();
+
+        $this->formBuilder->expects($this->once())
+            ->method('add')
+            ->with($this->formBuilder);
 
         $this->formType->buildForm($this->formBuilder, $options);
     }

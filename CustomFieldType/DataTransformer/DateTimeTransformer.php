@@ -26,6 +26,8 @@ class DateTimeTransformer implements DataTransformerInterface
         if ($value) {
             return new DateTime($value);
         }
+
+        return null;
     }
 
     /**
