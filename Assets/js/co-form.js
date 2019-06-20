@@ -110,7 +110,13 @@ CustomObjectsForm = {
                 e.preventDefault();
                 let panel = mQuery(this).closest('.panel');
                 panel.hide('fast');
-                panel.find('[id*=deleted]').val(1);
+                if (panel.find('input[type="hidden"][id*=_id]').val() === '') {
+                    // New unsaved custom field.
+                    panel.remove();
+                    CustomObjectsForm.recalculateOrder();
+                } else {
+                    panel.find('[id*=deleted]').val(1);
+                }
             });
     },
 
