@@ -243,6 +243,14 @@ CustomObjectsForm = {
 
         let selectedValues = CustomObjectsForm.getMultiDefaultValuesFromModal(type);
 
+        switch (type) {
+            // Add empty value option
+            case 'select' :
+            case 'multiselect':
+                options = options + '<option value=""></option>';
+                break;
+        }
+
         // Transfer options
         let i = 0;
 
@@ -259,6 +267,7 @@ CustomObjectsForm = {
                         i + '" name="custom_field[defaultValue][]" class="form-control" autocomplete="false" value="' +
                         value + '"' + checked + '>' + label + '</label></div>';
                     break;
+                case 'select' :
                 case 'multiselect':
                     options = options + '<option value="' + value + '"' + selected + '>' + label + '</option>';
                     break;
@@ -287,7 +296,11 @@ CustomObjectsForm = {
      * @returns {boolean}
      */
     isSelectableField: function(type) {
-        return type === 'checkbox_group' || type === 'multiselect' || type === 'radio_group' || type === 'country';
+        return type === 'checkbox_group' ||
+            type === 'select' ||
+            type === 'multiselect' ||
+            type === 'radio_group' ||
+            type === 'country';
     },
 
     /**
