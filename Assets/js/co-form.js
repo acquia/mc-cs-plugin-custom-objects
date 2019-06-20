@@ -230,7 +230,7 @@ CustomObjectsForm = {
     handleModalDefaultValueOptions: function() {
         let type = mQuery('#custom_field_type').val();
 
-        if (!CustomObjectsForm.isSelectableField(type)) {
+        if (!CustomObjectsForm.isSelectableField(type) || type === 'country') {
             return;
         }
 
