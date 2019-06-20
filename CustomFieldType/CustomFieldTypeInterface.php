@@ -72,6 +72,14 @@ interface CustomFieldTypeInterface
     public function validateValue(CustomField $customField, $value): void;
 
     /**
+     * @param CustomField $customField
+     * @param mixed       $value
+     *
+     * @throws \UnexpectedValueException
+     */
+    public function validateRequired(CustomField $customField, $value): void;
+
+    /**
      * @return string
      */
     public function getTableName(): string;

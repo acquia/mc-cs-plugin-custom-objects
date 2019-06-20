@@ -132,7 +132,6 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
      */
     public function validateValue(CustomField $customField, $value): void
     {
-        $this->validateEmptyIfRequired($customField, $value);
     }
 
     /**
@@ -165,7 +164,7 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
      *
      * @throws \UnexpectedValueException
      */
-    protected function validateEmptyIfRequired(CustomField $customField, $value): void
+    public function validateRequired(CustomField $customField, $value): void
     {
         if (!$customField->isRequired()) {
             return;
