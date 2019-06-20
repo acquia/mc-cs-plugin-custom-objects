@@ -88,4 +88,12 @@ class CustomObjectTest extends \PHPUnit_Framework_TestCase
             ],
         ], $object->getChanges());
     }
+
+    public function testDisableDefaultValueRequirement()
+    {
+        $customObject = new CustomObject();
+        $this->assertSame(false, $customObject->isDisabledDefaultValueRequirement());
+        $customObject->disableDefaultValueRequirement();
+        $this->assertSame(true, $customObject->isDisabledDefaultValueRequirement());
+    }
 }

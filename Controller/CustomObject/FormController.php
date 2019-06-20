@@ -165,6 +165,8 @@ class FormController extends BaseFormController
      */
     private function renderForm(CustomObject $customObject, string $route): Response
     {
+        $customObject->disableDefaultValueRequirement();
+
         $form = $this->formFactory->create(
             CustomObjectType::class,
             $customObject,

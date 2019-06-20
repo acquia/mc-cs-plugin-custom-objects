@@ -273,4 +273,23 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
         $customField->setDefaultValue($value);
         $this->assertSame($transformedValue, $customField->getDefaultValue());
     }
+
+    public function testDisableDefaultValueRequirement()
+    {
+        $customField = new CustomField();
+
+        $customField->setRequired(true);
+        $this->assertSame(true, $customField->isRequired());
+
+        $customField->disableDefaultValueRequirement();
+        $this->assertSame(true, $customField->isDisabledDefaultValueRequirement());
+        $this->assertSame(false, $customField->isRequired());
+
+        $customObject = new CustomObject();
+        $customField  = new CustomField();
+        $customField->setCustomObject($customObject);
+        $customField->setRequired(true);
+        $customObject->disableDefaultValueRequirement();
+        $this->assertSame(false, $customField->isRequired());
+    }
 }

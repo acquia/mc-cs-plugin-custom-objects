@@ -161,6 +161,7 @@ class SaveController extends BaseFormController
             return $this->redirect($this->routeProvider->buildViewRoute($objectId));
         }
 
+        $customObject->disableDefaultValueRequirement();
         $request = $this->requestStack->getCurrentRequest();
         $action  = $this->routeProvider->buildSaveRoute($objectId);
         $form    = $this->formFactory->create(

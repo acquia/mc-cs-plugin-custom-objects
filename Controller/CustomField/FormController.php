@@ -125,6 +125,7 @@ class FormController extends CommonController
             return $this->accessDenied(false, $e->getMessage());
         }
 
+        $customField->disableDefaultValueRequirement();
         $route  = $this->fieldRouteProvider->buildFormRoute($customField->getId());
         $action = $this->fieldRouteProvider->buildSaveRoute($fieldType, $fieldId, $customObject->getId(), $panelCount, $panelId);
         $form   = $this->formFactory->create(CustomFieldType::class, $customField, ['action' => $action]);

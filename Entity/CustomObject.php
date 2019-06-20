@@ -75,6 +75,11 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
      */
     private $initialCustomFields = [];
 
+    /**
+     * @var bool
+     */
+    private $disableDefaultValueRequirement = false;
+
     public function __construct()
     {
         $this->customFields = new ArrayCollection();
@@ -334,5 +339,18 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         foreach ($deletedFields as $deletedField) {
             $this->addChange("customfield:{$deletedField['id']}", [null, 'deleted']);
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDisabledDefaultValueRequirement(): bool
+    {
+        return $this->disableDefaultValueRequirement;
+    }
+
+    public function disableDefaultValueRequirement(): void
+    {
+        $this->disableDefaultValueRequirement = true;
     }
 }

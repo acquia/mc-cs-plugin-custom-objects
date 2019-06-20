@@ -86,6 +86,11 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      */
     private $params;
 
+    /**
+     * @var bool
+     */
+    private $disableDefaultValueRequirement = false;
+
     public function __construct()
     {
         $this->options = new ArrayCollection();
@@ -350,6 +355,10 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      */
     public function isRequired(): bool
     {
+        if ($this->isDisabledDefaultValueRequirement()) {
+            return false;
+        }
+
         return $this->required;
     }
 
@@ -492,5 +501,22 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     public function canHaveMultipleValues(): bool
     {
         return $this->getTypeObject() instanceof AbstractMultivalueType;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDisabledDefaultValueRequirement(): bool
+    {
+        if ($this->customObject && $this->customObject->isDisabledDefaultValueRequirement()) {
+            return true;
+        }
+
+        return $this->disableDefaultValueRequirement;
+    }
+
+    public function disableDefaultValueRequirement(): void
+    {
+        $this->disableDefaultValueRequirement = true;
     }
 }

@@ -132,6 +132,7 @@ class SaveController extends CommonController
             return $this->accessDenied(false, $e->getMessage());
         }
 
+        $customField->disableDefaultValueRequirement();
         $action = $this->fieldRouteProvider->buildSaveRoute($fieldType, $fieldId, $customObject->getId(), $panelCount, $panelId);
         $form   = $this->formFactory->create(CustomFieldType::class, $customField, ['action' => $action]);
 
@@ -189,6 +190,7 @@ class SaveController extends CommonController
         $this->customFieldModel->setAlias($customField);
 
         $customFields = new ArrayCollection([$customField]);
+        $customField->disableDefaultValueRequirement();
         $customObject->setCustomFields($customFields);
 
         $form = $this->formFactory->create(
