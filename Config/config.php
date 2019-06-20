@@ -753,6 +753,8 @@ return [
                     'custom_object.config.provider',
                     'mautic.custom.model.object',
                     'mautic.custom.model.item',
+                    'security.token_storage',
+                    'mautic.user.model.user',
                 ],
             ],
         ],

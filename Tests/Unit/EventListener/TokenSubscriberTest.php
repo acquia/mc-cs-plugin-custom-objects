@@ -24,6 +24,7 @@ use Doctrine\ORM\PersistentCollection;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\Lead;
 use Doctrine\Common\Collections\ArrayCollection;
+use Mautic\CoreBundle\Event\BuilderEvent;
 
 class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -35,7 +36,7 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
 
     private $emailSendEvent;
 
-    private $tokenReplacementEvent;
+    private $builderEvent;
 
     /**
      * @var TokenSubscriber
@@ -50,7 +51,7 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->customObjectModel = $this->createMock(CustomObjectModel::class);
         $this->customItemModel   = $this->createMock(CustomItemModel::class);
         $this->emailSendEvent    = $this->createMock(EmailSendEvent::class);
-        $this->tokenReplacementEvent = $this->createMock(TokenReplacementEvent::class);
+        $this->builderEvent = $this->createMock(BuilderEvent::class);
         $this->subscriber     = new TokenSubscriber(
             $this->configProvider,
             $this->customObjectModel,
@@ -58,31 +59,32 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testDecodeTokensWhenPluginDisabled(): void
-    {
-        $this->configProvider->expects($this->once())
-            ->method('pluginIsEnabled')
-            ->willReturn(false);
+    // public function testDecodeTokensWhenPluginDisabled(): void
+    // {
+    //     $this->configProvider->expects($this->once())
+    //         ->method('pluginIsEnabled')
+    //         ->willReturn(false);
 
-        $this->emailSendEvent->expects($this->never())
-            ->method('isDynamicContentParsing');
+    //     $this->emailSendEvent->expects($this->never())
+    //         ->method('isDynamicContentParsing');
 
-        $this->subscriber->decodeTokens($this->emailSendEvent);
-    }
+    //     $this->subscriber->decodeTokens($this->emailSendEvent);
+    // }
 
     public function testDecodeTokens(): void
     {
-        $html = '<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" style="" class=" js flexbox flexboxlegacy canvas canvastext webgl no-touch geolocation postmessage websqldatabase indexeddb hashchange history draganddrop websockets rgba hsla multiplebgs backgroundsize borderimage borderradius boxshadow textshadow opacity cssanimations csscolumns cssgradients cssreflections csstransforms csstransforms3d csstransitions fontface generatedcontent video audio localstorage sessionstorage webworkers no-applicationcache svg inlinesvg smil svgclippaths js csstransforms csstransforms3d csstransitions responsejs "><head>
+        $html = '<!DOCTYPE html>
+        <html>
+        <head>
         <title>{subject}</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <style type="text/css" media="only screen and (max-width: 480px)">
-            /* Mobile styles */
-            @media only screen and (max-width: 480px) {
-                [class="w320"] {
-                    width: 320px !important;
-                }
-                [class="mobile-block"] {';
-        $contact = $this->createMock(Lead::class);
+        </head>
+        <body>
+        Hello, here is the thing:
+        {custom-object=product:sku | where=segment-filter |order=latest|limit=1 | default=No thing} 
+        Regards
+        </body>
+        </html>
+        ';
         $segment = new LeadList();
         $segment->setName('CO test');
         $segment->setFilters([
@@ -111,28 +113,26 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
         $email->setCustomHtml($html);
         $email->setEmailType('list');
         $email->setLists([2 => $segment]);
-        $event = new EmailSendEvent(
+        $emailSendEvent = new EmailSendEvent(
             null,
             [
                 'subject' => 'CO segment test',
-                'content' => 'Default Dynamic Content',
+                'content' => $html,
                 'conplainTexttent' => '',
                 'email' => $email,
-                'lead' => $contact,
+                'lead' => ['id' => 2345, 'email' => 'john@doe.email'],
                 'source' => null
             ]
         );
+        
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
-            ->willReturn(false);
+            ->willReturn(true);
 
-        $this->emailSendEvent->expects($this->never())
-            ->method('isDynamicContentParsing');
-
-        $this->subscriber->decodeTokens($this->emailSendEvent);
+        $this->subscriber->decodeTokens($emailSendEvent);
     }
 
-    public function testOnTokenReplacementWhenPluginDisabled(): void
+    public function testOnBuilderBuildWhenPluginDisabled(): void
     {
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
@@ -141,29 +141,27 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->tokenReplacementEvent->expects($this->never())
             ->method('getClickthrough');
 
-        $this->subscriber->onTokenReplacement($this->tokenReplacementEvent);
+        $this->subscriber->onBuilderBuild($this->builderEvent);
     }
 
-    public function testOnTokenReplacement(): void
+    public function testOnBuilderBuild(): void
     {
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
             ->willReturn(true);
-    
 
+        // $contact = $this->createMock(Lead::class);
+        // $clickthrough = [
+        //     'tokens' => [],
+        //     'lead' => '12',
+        //     'dynamicContent' => [[]],
+        //     'idHash' => '5d0a1498e2489825662819',
+        // ];
+        // $event = new TokenReplacementEvent(null, $contact, $clickthrough, new Email());
 
-        $contact = $this->createMock(Lead::class);
-        $clickthrough = [
-            'tokens' => [],
-            'lead' => '12',
-            'dynamicContent' => [[]],
-            'idHash' => '5d0a1498e2489825662819',
-        ];
-        $event = new TokenReplacementEvent(null, $contact, $clickthrough, new Email());
+        // $this->tokenReplacementEvent->expects($this->never())
+        //     ->method('getClickthrough');
 
-        $this->tokenReplacementEvent->expects($this->never())
-            ->method('getClickthrough');
-
-        $this->subscriber->onTokenReplacement($this->tokenReplacementEvent);
+        $this->subscriber->onBuilderBuild($this->builderEvent);
     }
 }

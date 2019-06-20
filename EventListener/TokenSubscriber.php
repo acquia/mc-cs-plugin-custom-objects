@@ -27,6 +27,12 @@ use Mautic\CoreBundle\Helper\BuilderTokenHelper;
 use Mautic\CoreBundle\Event\BuilderEvent;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use Mautic\UserBundle\Entity\User;
+use Mautic\UserBundle\Model\UserModel;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class TokenSubscriber implements EventSubscriberInterface
 {
@@ -50,19 +56,35 @@ class TokenSubscriber implements EventSubscriberInterface
     private $customItemModel;
 
     /**
+     * @var TokenStorageInterface
+     */
+    private $tokenStorage;
+
+    /**
+     * @var UserModel
+     */
+    private $userModel;
+
+    /**
      * @param ConfigProvider    $configProvider
      * @param CustomObjectModel $customObjectModel
      * @param CustomItemModel   $customItemModel
+     * @param TokenStorageInterface   $customItemModel
+     * @param UserModel   $userModel
      */
     public function __construct(
         ConfigProvider $configProvider, 
         CustomObjectModel $customObjectModel, 
-        CustomItemModel $customItemModel
+        CustomItemModel $customItemModel,
+        TokenStorageInterface $tokenStorage,
+        UserModel $userModel
     )
     {
         $this->configProvider    = $configProvider;
         $this->customObjectModel = $customObjectModel;
         $this->customItemModel   = $customItemModel;
+        $this->tokenStorage      = $tokenStorage;
+        $this->userModel      = $userModel;
     }
 
     /**
@@ -74,7 +96,6 @@ class TokenSubscriber implements EventSubscriberInterface
             EmailEvents::EMAIL_ON_BUILD    => ['onBuilderBuild', 0],
             EmailEvents::EMAIL_ON_SEND     => ['decodeTokens', 0],
             EmailEvents::EMAIL_ON_DISPLAY  => ['decodeTokens', 0],
-            EmailEvents::TOKEN_REPLACEMENT => ['onTokenReplacement', 0],
         ];
     }
 
@@ -105,34 +126,6 @@ class TokenSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param $content
-     * @param $clickthrough
-     *
-     * @return array
-     */
-    private function findTokens($content)
-    {
-        $tokens = [];
-        $tokenRegex = self::TOKEN;
-
-        preg_match_all("/{$tokenRegex}/", $content, $matches);
-        if (!empty($matches[1])) {
-            foreach ($matches[1] as $key => $assetId) {
-                $token = $matches[0][$key];
-
-                if (isset($tokens[$token])) {
-                    continue;
-                }
-
-                $asset          = $this->model->getEntity($assetId);
-                $tokens[$token] = ($asset !== null) ? $this->model->generateUrl($asset, true, $clickthrough) : '';
-            }
-        }
-
-        return $tokens;
-    }
-
-    /**
      * @param EmailSendEvent $event
      */
     public function decodeTokens(EmailSendEvent $event)
@@ -141,61 +134,113 @@ class TokenSubscriber implements EventSubscriberInterface
             return;
         }
 
-        
+        preg_match_all('/'.self::TOKEN.'/', $event->getContent(), $matches);
+
+        if (!empty($matches[1])) {
+            $contact = $event->getLead();
+            $email = $event->getEmail();
+            // $this->setActiveUser($this->userModel->getEntity($email->getCreatedBy())); // Do we care about CO permissions at this point?
+            $segments = $email->getLists(); // take the where conditions from this.
+            foreach ($matches[1] as $key => $tokenDataRaw) {
+                $token = $matches[0][$key];
+                $parts = $this->trimArrayElements(explode('|', $tokenDataRaw));
+
+                if (empty($parts[0])) {
+                    continue;
+                }
+
+                $aliases = $this->trimArrayElements(explode(':', $parts[0]));
+                unset($parts[0]);
+
+                if (2 !== count($aliases)) {
+                    continue;
+                }
+
+                $customObjectAlias = $aliases[0];
+                $customFieldAlias = $aliases[1];
+                $orderBy = CustomItem::TABLE_ALIAS.'.dateAdded';
+                $orderDir = 'DESC';
+                $limit = 1;
+                $defaultValue = '';
+                $where = '';
+                
+                try {
+                    $customObject = $this->customObjectModel->fetchEntityByAlias($customObjectAlias);
+                } catch (NotFoundException $e) {
+                    continue;
+                }
+                // custom-object=product:sku | where=segment-filter |order=latest|limit=1 | default=No thing
+                foreach ($parts as $part) {
+                    $options = $this->trimArrayElements(explode('=', $part));
+                    
+                    if (2 !== count($options)) {
+                        continue;
+                    }
+                    
+                    $keyword = $options[0];
+                    $value = $options[1];
+                    
+                    if ('limit' === $keyword) {
+                        $limit = (int) $value;
+                    }
+
+                    if ('order' === $keyword) {
+                        // "latest" is the default value but more will come in the future.
+                    }
+
+                    if ('where' === $keyword) {
+                        $where = $value;
+                    }
+
+                    if ('default' === $keyword) {
+                        $defaultValue = $value;
+                    }
+                }
+                
+                $tableConfig = new TableConfig($limit, 1, $orderBy, $orderDir);
+                $tableConfig->addParameter('customObjectId', $customObject->getId());
+                $tableConfig->addParameter('filterEntityType', 'contact');
+                $tableConfig->addParameter('filterEntityId', (int) $contact['id']);
+                $customItems = $this->customItemModel->getTableData($tableConfig);
+                $fieldValues = [];
+
+                /** @var CustomItem $customItem */
+                foreach ($customItems as $customItem) {
+                    $customItem = $this->customItemModel->populateCustomFields($customItem);
+                    try {
+                        $fieldValues[] = $customItem->findCustomFieldValueForFieldAlias($customFieldAlias)->getValue();
+                    } catch (NotFoundException $e) {
+                        // Custom field not found.
+                    }
+                }
+
+                $result = empty($fieldValues) ? $defaultValue : implode(', ', $fieldValues);
+
+                $event->addToken($token, $result);
+            }
+        }
     }
 
-    /**
-     * @param TokenReplacementEvent $event
-     */
-    public function onTokenReplacement(TokenReplacementEvent $event)
+    private function trimArrayElements(array $array): array
     {
-        if (!$this->configProvider->pluginIsEnabled()) {
-            return;
-        }
+        return array_map(function ($part) {
+            return trim($part);
+        }, $array);
+    }
 
-        $clickthrough = $event->getClickthrough();
+    private function setActiveUser(User $user): void
+    {
+        $token = $this->tokenStorage->getToken();
+        // $user  = $token->getUser();
 
-        if (!array_key_exists('dynamicContent', $clickthrough)) {
-            return;
-        }
+        // if (!$user->isAdmin() && empty($user->getActivePermissions())) {
+        //     $activePermissions = $this->permissionRepository->getPermissionsByRole($user->getRole());
 
-        $lead      = $event->getLead();
-        $tokens    = $clickthrough['tokens'];
-        $tokenData = $clickthrough['dynamicContent'];
-
-        // if ($lead instanceof Lead) {
-        //     $lead = $this->primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($lead);
-        // } else {
-        //     $lead = $this->primaryCompanyHelper->mergePrimaryCompanyWithProfileFields($lead['id'], $lead);
+        //     $user->setActivePermissions($activePermissions);
         // }
 
-        foreach ($tokenData as $data) {
-            // Default content
-            $filterContent = $data['content'];
+        $token->setUser($user);
 
-            foreach ($data['filters'] as $filter) {
-                // if ($this->matchFilterForLead($filter['filters'], $lead)) {
-                //     $filterContent = $filter['content'];
-                // }
-            }
-
-            // Replace lead tokens in dynamic content (but no recurrence on dynamic content to avoid infinite loop)
-            $emailSendEvent = new EmailSendEvent(
-                null,
-                [
-                    'content' => $filterContent,
-                    'email'   => $event->getPassthrough(),
-                    'idHash'  => !empty($clickthrough['idHash']) ? $clickthrough['idHash'] : null,
-                    'tokens'  => $tokens,
-                    'lead'    => $lead,
-                ],
-                true
-            );
-
-            $this->dispatcher->dispatch(EmailEvents::EMAIL_ON_DISPLAY, $emailSendEvent);
-            $untokenizedContent = $emailSendEvent->getContent(true);
-
-            $event->addToken('{dynamiccontent="'.$data['tokenName'].'"}', $untokenizedContent);
-        }
+        $this->tokenStorage->setToken($token);
     }
 }

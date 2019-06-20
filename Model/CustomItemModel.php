@@ -372,10 +372,17 @@ class CustomItemModel extends FormModel
      */
     private function applyOwnerFilter(QueryBuilder $queryBuilder, int $customObjectId): QueryBuilder
     {
+        $user = $this->userHelper->getUser();
+
+        if (null === $user || !$user->getId()) {
+            // The code is run from CLI.
+            return $queryBuilder;
+        }
+
         try {
             $this->permissionProvider->isGranted('viewother', $customObjectId);
         } catch (ForbiddenException $e) {
-            $queryBuilder->andWhere(CustomItem::TABLE_ALIAS.'.createdBy', $this->userHelper->getUser()->getId());
+            $queryBuilder->andWhere(CustomItem::TABLE_ALIAS.'.createdBy', $user->getId());
         }
 
         return $queryBuilder;
