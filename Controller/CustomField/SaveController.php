@@ -178,8 +178,8 @@ class SaveController extends CommonController
         if (null === $panelId) {
             // New panel
             $customField->setOrder(0); // Append new panel to top
-            $panelId = (int) $request->get('panelCount');
-            $isNew   = true;
+            $panelId        = (int) $request->get('panelCount');
+            $isNew          = true;
             $rawCustomField = $request->get('custom_field');
             $customField->setDefaultValue($rawCustomField['defaultValue']);
         }
