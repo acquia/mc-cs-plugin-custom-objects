@@ -92,56 +92,34 @@ class AbstractCustomFieldTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->fieldType->hasChoices());
     }
 
-    public function testValidateValueWhenFieldIsNotRequired(): void
+    public function testvalidateRequiredWhenIsNotRequired(): void
     {
         $this->customField->expects($this->once())
             ->method('isRequired')
             ->willReturn(false);
 
-        $this->fieldType->validateValue($this->customField, '');
+        $this->fieldType->validateRequired($this->customField, '');
     }
 
-    public function testValidateValueWhenFieldIsRequiredAndNotEmptyString(): void
+    public function testValidateRequiredAndNotEmptyString(): void
     {
         $this->customField->expects($this->once())
             ->method('isRequired')
             ->willReturn(true);
 
-        $this->fieldType->validateValue($this->customField, 'unicorn');
+        $this->fieldType->validateRequired($this->customField, 'unicorn');
     }
 
-    public function testValidateValueWhenFieldIsRequiredAndNotZero(): void
+    public function testValidateVRequiredAndNotZero(): void
     {
         $this->customField->expects($this->once())
             ->method('isRequired')
             ->willReturn(true);
 
-        $this->fieldType->validateValue($this->customField, 0);
+        $this->fieldType->validateRequired($this->customField, 0);
     }
 
-    public function testValidateValueWhenFieldIsRequiredAndNotEmptyArray(): void
-    {
-        $this->customField->expects($this->once())
-            ->method('isRequired')
-            ->willReturn(true);
-
-        $this->customField->method('getLabel')->willReturn('Field A');
-        $this->customField->method('getAlias')->willReturn('field-a');
-
-        $this->translator->expects($this->once())
-            ->method('trans')
-            ->with(
-                'custom.field.required',
-                ['%fieldName%' => 'Field A (field-a)'],
-                'validators'
-            )
-            ->willReturn('Translated message');
-
-        $this->expectException(\UnexpectedValueException::class);
-        $this->fieldType->validateValue($this->customField, []);
-    }
-
-    public function testValidateValueWhenFieldIsRequiredAndEmptyString(): void
+    public function testValidateRequiredAndNotEmptyArray(): void
     {
         $this->customField->expects($this->once())
             ->method('isRequired')
@@ -160,7 +138,29 @@ class AbstractCustomFieldTypeTest extends \PHPUnit_Framework_TestCase
             ->willReturn('Translated message');
 
         $this->expectException(\UnexpectedValueException::class);
-        $this->fieldType->validateValue($this->customField, '');
+        $this->fieldType->validateRequired($this->customField, []);
+    }
+
+    public function testValidateRequiredAndEmptyString(): void
+    {
+        $this->customField->expects($this->once())
+            ->method('isRequired')
+            ->willReturn(true);
+
+        $this->customField->method('getLabel')->willReturn('Field A');
+        $this->customField->method('getAlias')->willReturn('field-a');
+
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with(
+                'custom.field.required',
+                ['%fieldName%' => 'Field A (field-a)'],
+                'validators'
+            )
+            ->willReturn('Translated message');
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->fieldType->validateRequired($this->customField, '');
     }
 
     public function testUseEmptyValue(): void
