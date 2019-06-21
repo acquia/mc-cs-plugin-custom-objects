@@ -111,6 +111,14 @@ class DateTypeTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testCreateApiValueTransformer(): void
+    {
+        $this->assertInstanceOf(
+            DateTransformer::class,
+            $this->fieldType->createApiValueTransformer()
+        );
+    }
+
     public function testCreateViewTransformer(): void
     {
         $this->assertInstanceOf(

@@ -21,6 +21,7 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateTimeType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueDateTime;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\DateTimeTransformer;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\ViewDateTransformer;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\DateTimeAtomTransformer;
 
 class DateTimeTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -108,6 +109,14 @@ class DateTimeTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(
             DateTimeTransformer::class,
             $this->fieldType->createDefaultValueTransformer()
+        );
+    }
+
+    public function testCreateApiValueTransformer(): void
+    {
+        $this->assertInstanceOf(
+            DateTimeAtomTransformer::class,
+            $this->fieldType->createApiValueTransformer()
         );
     }
 
