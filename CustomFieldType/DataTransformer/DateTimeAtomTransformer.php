@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer;
 
-use DateTimeInterface;
 use DateTimeImmutable;
 use Symfony\Component\Form\DataTransformerInterface;
 
@@ -44,6 +43,6 @@ class DateTimeAtomTransformer implements DataTransformerInterface
             return $value;
         }
 
-        return $value->format(DateTimeInterface::ATOM);
+        return $value->format(DATE_ATOM);
     }
 }
