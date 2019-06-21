@@ -25,6 +25,12 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\EmailType;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\Callback;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\CheckboxGroupType;
+use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 
 class CustomFieldTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,6 +42,30 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
         $clone = clone $customField;
 
         $this->assertNull($clone->getAlias());
+    }
+
+    public function testLoadValidatorMetadata(): void
+    {
+        $metadata = $this->createMock(ClassMetadata::class);
+        $object   = new CustomField();
+
+        $metadata->expects($this->exactly(7))
+            ->method('addPropertyConstraint')
+            ->withConsecutive(
+                ['label', $this->isInstanceOf(NotBlank::class)],
+                ['label', $this->isInstanceOf(Length::class)],
+                ['alias', $this->isInstanceOf(Length::class)],
+                ['type', $this->isInstanceOf(NotBlank::class)],
+                ['type', $this->isInstanceOf(Length::class)],
+                ['customObject', $this->isInstanceOf(NotBlank::class)],
+                ['defaultValue', $this->isInstanceOf(Length::class)]
+            );
+
+        $metadata->expects($this->once())
+            ->method('addConstraint')
+            ->with($this->isInstanceOf(Callback::class));
+
+        $object->loadValidatorMetadata($metadata);
     }
 
     public function testValidateValueWhenValid(): void
@@ -272,5 +302,26 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
 
         $customField->setDefaultValue($value);
         $this->assertSame($transformedValue, $customField->getDefaultValue());
+    }
+
+    public function testCanHaveMultipleValuesForDateType()
+    {
+        $typeObject  = new DateType($this->createMock(TranslatorInterface::class));
+        $customField = new CustomField();
+        $customField->setTypeObject($typeObject);
+
+        $this->assertFalse($customField->canHaveMultipleValues());
+    }
+
+    public function testCanHaveMultipleValuesForCheckboxType()
+    {
+        $typeObject = new CheckboxGroupType(
+            $this->createMock(TranslatorInterface::class),
+            $this->createMock(CsvHelper::class)
+        );
+        $customField = new CustomField();
+        $customField->setTypeObject($typeObject);
+
+        $this->assertTrue($customField->canHaveMultipleValues());
     }
 }

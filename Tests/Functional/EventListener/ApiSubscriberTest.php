@@ -249,7 +249,6 @@ class ApiSubscriberTest extends MauticMysqlTestCase
                                 'id'         => 1,
                                 'name'       => 'Custom Item Modified Via Contact API 2',
                                 'attributes' => [
-                                    
                                     'text-test-field'         => null,
                                     'textarea-test-field'     => null,
                                     'url-test-field'          => null,
