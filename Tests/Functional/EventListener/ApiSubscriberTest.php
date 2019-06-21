@@ -195,6 +195,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
                                     'hidden-test-field'       => 'secret sauce',
                                     'email-test-field'        => 'john@doe.com',
                                     'date-test-field'         => '2019-06-21',
+                                    'datetime-test-field'     => '2019-06-21T11:29:34+00:00',
                                 ],
                             ],
                         ],
@@ -228,6 +229,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $this->assertSame('secret sauce', $customItemFromResponse['attributes']['hidden-test-field']);
         $this->assertSame('john@doe.com', $customItemFromResponse['attributes']['email-test-field']);
         $this->assertSame('2019-06-21', $customItemFromResponse['attributes']['date-test-field']);
+        $this->assertSame('2019-06-21T11:29:34+00:00', $customItemFromResponse['attributes']['datetime-test-field']);
     }
 
     public function testCreatingContactWithCustomItemsWithDefaultDateButEmptyValue(): void
@@ -235,6 +237,9 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $configureFieldCallback = function (CustomField $customField): void {
             if ('date' === $customField->getType()) {
                 $customField->setDefaultValue('2019-06-21');
+            }
+            if ('datetime' === $customField->getType()) {
+                $customField->setDefaultValue('2019-06-21 11:29:34');
             }
         };
 
@@ -249,7 +254,8 @@ class ApiSubscriberTest extends MauticMysqlTestCase
                             [
                                 'name'       => 'Custom Item Created Via Contact API for Date field test',
                                 'attributes' => [
-                                    // 'date-test-field' => '',
+                                    // 'date-test-field' => '', // Intentionally not provided in the request.
+                                    // 'datetime-test-field' => '', // Intentionally not provided in the request.
                                 ],
                             ],
                         ],
@@ -267,6 +273,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $customItemFromResponse = $responseData['contact']['customObjects']['data'][0]['data'][0];
         $this->assertSame(1, $customItemFromResponse['id']);
         $this->assertSame('2019-06-21', $customItemFromResponse['attributes']['date-test-field']);
+        $this->assertSame('2019-06-21T11:29:34+00:00', $customItemFromResponse['attributes']['datetime-test-field']);
     }
 
     public function testEditingContactWithCustomItems(): void

@@ -21,6 +21,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
 use Symfony\Component\Form\DataTransformerInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\ViewDateTransformer;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\DateTimeAtomTransformer;
 
 class DateTimeType extends AbstractCustomFieldType
 {
@@ -58,14 +59,14 @@ class DateTimeType extends AbstractCustomFieldType
      */
     public function createValueEntity(CustomField $customField, CustomItem $customItem, $value = null): CustomFieldValueInterface
     {
-        if ($value) {
+        if (empty($value)) {
+            $value = null;
+        } elseif (is_string($value)) {
             try {
                 $value = new \DateTimeImmutable($value);
             } catch (\Throwable $e) {
                 throw new InvalidValueException($e->getMessage());
             }
-        } else {
-            $value = null;
         }
 
         return new CustomFieldValueDateTime($customField, $customItem, $value);
@@ -104,6 +105,14 @@ class DateTimeType extends AbstractCustomFieldType
     public function createDefaultValueTransformer(): DataTransformerInterface
     {
         return new DateTimeTransformer();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createApiValueTransformer(): DataTransformerInterface
+    {
+        return new DateTimeAtomTransformer();
     }
 
     /**
