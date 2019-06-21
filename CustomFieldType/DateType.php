@@ -61,7 +61,7 @@ class DateType extends AbstractCustomFieldType
     {
         if (empty($value)) {
             $value = null;
-        } else {
+        } elseif (is_string($value)) {
             try {
                 $value = new \DateTimeImmutable($value);
             } catch (\Throwable $e) {
@@ -103,6 +103,14 @@ class DateType extends AbstractCustomFieldType
      * {@inheritdoc}
      */
     public function createDefaultValueTransformer(): DataTransformerInterface
+    {
+        return new DateTransformer();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createApiValueTransformer(): DataTransformerInterface
     {
         return new DateTransformer();
     }

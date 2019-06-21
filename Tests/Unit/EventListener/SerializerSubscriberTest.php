@@ -30,6 +30,8 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use JMS\Serializer\Context;
 use JMS\Serializer\JsonSerializationVisitor;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class SerializerSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -189,6 +191,7 @@ class SerializerSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $contact->method('getId')->willReturn(345);
         $customField->method('getAlias')->willReturn('text-field-1');
+        $customField->method('getTypeObject')->willReturn(new TextType($this->createMock(TranslatorInterface::class)));
         $customItem->method('getId')->willReturn(567);
         $customItem->method('getName')->willReturn('Test Item');
         $customItem->method('getDateAdded')->willReturn(new \DateTimeImmutable('2019-06-12T13:24:00+00:00'));

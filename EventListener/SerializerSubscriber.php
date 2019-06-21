@@ -26,6 +26,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\HttpFoundation\RequestStack;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
 
 class SerializerSubscriber implements EventSubscriberInterface
 {
@@ -190,7 +191,14 @@ class SerializerSubscriber implements EventSubscriberInterface
 
         /** @var CustomFieldValueInterface $customFieldValue */
         foreach ($customFieldValues as $customFieldValue) {
-            $serializedValues[$customFieldValue->getCustomField()->getAlias()] = $customFieldValue->getValue();
+            try {
+                $transformer = $customFieldValue->getCustomField()->getTypeObject()->createApiValueTransformer();
+                $value       = $transformer->reverseTransform($customFieldValue->getValue());
+            } catch (UndefinedTransformerException $e) {
+                $value = $customFieldValue->getValue();
+            }
+
+            $serializedValues[$customFieldValue->getCustomField()->getAlias()] = $value;
         }
 
         return $serializedValues;

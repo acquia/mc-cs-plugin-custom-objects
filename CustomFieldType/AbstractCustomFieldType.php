@@ -154,6 +154,14 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     /**
      * {@inheritdoc}
      */
+    public function createApiValueTransformer(): DataTransformerInterface
+    {
+        throw new UndefinedTransformerException();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createViewTransformer(): DataTransformerInterface
     {
         throw new UndefinedTransformerException();

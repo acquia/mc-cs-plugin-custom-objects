@@ -17,6 +17,7 @@ use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\Custom
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Model\LeadModel;
 use Symfony\Component\HttpFoundation\Response;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 
 class ApiSubscriberTest extends MauticMysqlTestCase
 {
@@ -193,6 +194,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
                                     'number-test-field'       => 123456,
                                     'hidden-test-field'       => 'secret sauce',
                                     'email-test-field'        => 'john@doe.com',
+                                    'date-test-field'         => '2019-06-21',
                                 ],
                             ],
                         ],
@@ -225,6 +227,46 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $this->assertSame(123456, $customItemFromResponse['attributes']['number-test-field']);
         $this->assertSame('secret sauce', $customItemFromResponse['attributes']['hidden-test-field']);
         $this->assertSame('john@doe.com', $customItemFromResponse['attributes']['email-test-field']);
+        $this->assertSame('2019-06-21', $customItemFromResponse['attributes']['date-test-field']);
+    }
+
+    public function testCreatingContactWithCustomItemsWithDefaultDateButEmptyValue(): void
+    {
+        $configureFieldCallback = function (CustomField $customField): void {
+            if ('date' === $customField->getType()) {
+                $customField->setDefaultValue('2019-06-21');
+            }
+        };
+
+        $customObject = $this->createCustomObjectWithAllFields($this->container, 'Product', $configureFieldCallback);
+        $contact      = [
+            'email'         => 'contact1@api.test',
+            'customObjects' => [
+                'data' => [
+                    [
+                        'id'   => $customObject->getId(),
+                        'data' => [
+                            [
+                                'name'       => 'Custom Item Created Via Contact API for Date field test',
+                                'attributes' => [
+                                    // 'date-test-field' => '',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->client->request('POST', 'api/contacts/new?includeCustomObjects=true', $contact);
+        $response     = $this->client->getResponse();
+        $responseData = json_decode($response->getContent(), true);
+
+        $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
+
+        $customItemFromResponse = $responseData['contact']['customObjects']['data'][0]['data'][0];
+        $this->assertSame(1, $customItemFromResponse['id']);
+        $this->assertSame('2019-06-21', $customItemFromResponse['attributes']['date-test-field']);
     }
 
     public function testEditingContactWithCustomItems(): void

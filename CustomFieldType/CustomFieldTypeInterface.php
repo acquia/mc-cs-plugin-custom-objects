@@ -116,6 +116,13 @@ interface CustomFieldTypeInterface
     public function createDefaultValueTransformer(): DataTransformerInterface;
 
     /**
+     * Transformer used for API requests and responses.
+     *
+     * @return DataTransformerInterface
+     */
+    public function createApiValueTransformer(): DataTransformerInterface;
+
+    /**
      * @return DataTransformerInterface
      */
     public function createViewTransformer(): DataTransformerInterface;
