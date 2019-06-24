@@ -241,7 +241,7 @@ CustomObjectsForm = {
 
         let options = '';
 
-        let selectedValues = CustomObjectsForm.getMultiDefaultValuesFromModal(type);
+        let selectedValues = CustomObjectsForm.getSelectableValuesFromModal(type);
 
         switch (type) {
             // Add empty value option
@@ -308,11 +308,11 @@ CustomObjectsForm = {
      * @param type
      * @returns {Array}
      */
-    getMultiDefaultValuesFromModal: function(type) {
+    getSelectableValuesFromModal: function(type) {
 
         let selector = '';
 
-        if (type === 'multiselect') {
+        if (type === 'multiselect' || type === 'select') {
             selector = '#custom_field_defaultValue option:selected';
         } else {
             selector = 'input[id*="custom_field_defaultValue_"]:checked'
