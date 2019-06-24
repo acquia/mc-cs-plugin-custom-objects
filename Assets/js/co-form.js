@@ -424,11 +424,6 @@ CustomObjectsForm = {
 
         let options = '';
         switch(type){
-            case 'country':
-                let val = mQuery(panel).find('.choice-wrapper option:selected').val();
-                mQuery('#objectFieldModal #general .choice-wrapper option[value=' + val + ']').attr('selected', 'selected');
-                mQuery('#objectFieldModal #general .choice-wrapper select').trigger('chosen:updated');
-                break;
             case 'checkbox_group':
                 options = mQuery(panel).find('.choice-wrapper').clone();
                 mQuery(options).find('input').each(function(){
@@ -439,6 +434,7 @@ CustomObjectsForm = {
                 );
                 mQuery('#objectFieldModal #general .choice-wrapper').replaceWith(options);
                 break;
+            case 'country':
             case 'select':
             case 'multiselect':
                 options = mQuery(panel).find('[id*=_defaultValue] option').clone();
