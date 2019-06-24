@@ -187,7 +187,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     public function validateDefaultValue(ExecutionContextInterface $context): void
     {
         try {
-            $this->getTypeObject()->validateValue($this, $this->defaultValue, $context);
+            $this->getTypeObject()->validateValue($this, $this->defaultValue);
         } catch (\UnexpectedValueException $e) {
             $context->buildViolation($e->getMessage())
                 // ->atPath('defaultValue') // Somehow doesn't validate when we set the path...
