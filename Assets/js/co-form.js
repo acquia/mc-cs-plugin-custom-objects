@@ -439,6 +439,7 @@ CustomObjectsForm = {
                 );
                 mQuery('#objectFieldModal #general .choice-wrapper').replaceWith(options);
                 break;
+            case 'select':
             case 'multiselect':
                 options = mQuery(panel).find('[id*=_defaultValue] option').clone();
                 mQuery('#objectFieldModal #general #custom_field_defaultValue')
