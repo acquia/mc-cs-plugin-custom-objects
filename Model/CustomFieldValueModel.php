@@ -81,6 +81,8 @@ class CustomFieldValueModel
                 } else {
                     $options = [$options];
                 }
+            } elseif (empty($options)) {
+                $options = [];
             }
             foreach ($options as $optionKey) {
                 $optionValue = clone $customFieldValue;

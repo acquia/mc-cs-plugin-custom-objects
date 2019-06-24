@@ -15,9 +15,31 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Entity;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
+use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Length;
 
 class CustomFieldOptionTest extends \PHPUnit_Framework_TestCase
 {
+    public function testLoadValidatorMetadata(): void
+    {
+        $metadata = $this->createMock(ClassMetadata::class);
+        $object   = new CustomFieldOption();
+
+        $metadata->expects($this->exactly(5))
+            ->method('addPropertyConstraint')
+            ->withConsecutive(
+                ['label', $this->isInstanceOf(NotBlank::class)],
+                ['label', $this->isInstanceOf(Length::class)],
+                ['value', $this->isInstanceOf(NotNull::class)],
+                ['value', $this->isInstanceOf(Length::class)],
+                ['order', $this->isInstanceOf(NotNull::class)]
+            );
+
+        $object->loadValidatorMetadata($metadata);
+    }
+
     public function testConstructorAndToArray()
     {
         $customField = new CustomField();

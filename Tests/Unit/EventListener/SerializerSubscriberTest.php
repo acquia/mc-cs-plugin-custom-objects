@@ -30,6 +30,11 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use JMS\Serializer\Context;
 use JMS\Serializer\JsonSerializationVisitor;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
+use Symfony\Component\Translation\TranslatorInterface;
+use JMS\Serializer\EventDispatcher\Events;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateType;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueDate;
 
 class SerializerSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -65,6 +70,19 @@ class SerializerSubscriberTest extends \PHPUnit_Framework_TestCase
             $this->customItemXrefContactRepository,
             $this->customItemModel,
             $this->requestStack
+        );
+    }
+
+    public function testGetSubscribedEvents(): void
+    {
+        $this->assertSame(
+            [
+                [
+                    'event'  => Events::POST_SERIALIZE,
+                    'method' => 'addCustomItemsIntoContactResponse',
+                ],
+            ],
+            $this->serializerSubscriber->getSubscribedEvents()
         );
     }
 
@@ -181,20 +199,25 @@ class SerializerSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testAddCustomItemsIntoContactResponse(): void
     {
-        $contact     = $this->createMock(Lead::class);
-        $customItem  = $this->createMock(CustomItem::class);
-        $customField = $this->createMock(CustomField::class);
-        $context     = $this->createMock(Context::class);
-        $visitor     = $this->createMock(JsonSerializationVisitor::class);
+        $contact         = $this->createMock(Lead::class);
+        $customItem      = $this->createMock(CustomItem::class);
+        $customFieldText = $this->createMock(CustomField::class);
+        $customFieldDate = $this->createMock(CustomField::class);
+        $context         = $this->createMock(Context::class);
+        $visitor         = $this->createMock(JsonSerializationVisitor::class);
 
         $contact->method('getId')->willReturn(345);
-        $customField->method('getAlias')->willReturn('text-field-1');
+        $customFieldDate->method('getAlias')->willReturn('text-field-1');
+        $customFieldText->method('getAlias')->willReturn('text-field-2');
+        $customFieldDate->method('getTypeObject')->willReturn(new DateType($this->createMock(TranslatorInterface::class)));
+        $customFieldText->method('getTypeObject')->willReturn(new TextType($this->createMock(TranslatorInterface::class)));
         $customItem->method('getId')->willReturn(567);
         $customItem->method('getName')->willReturn('Test Item');
         $customItem->method('getDateAdded')->willReturn(new \DateTimeImmutable('2019-06-12T13:24:00+00:00'));
         $customItem->method('getDateModified')->willReturn(new \DateTimeImmutable('2019-06-12T13:24:00+00:00'));
         $customItem->method('getCustomFieldValues')->willReturn(new ArrayCollection([
-            new CustomFieldValueText($customField, $customItem, 'a text value'),
+            new CustomFieldValueDate($customFieldDate, $customItem, new \DateTimeImmutable('2019-06-12T00:00:00+00:00')),
+            new CustomFieldValueText($customFieldText, $customItem, 'a text value'),
         ]));
 
         $this->requestStack->expects($this->once())
@@ -270,7 +293,8 @@ class SerializerSubscriberTest extends \PHPUnit_Framework_TestCase
                             'createdBy'    => null,
                             'modifiedBy'   => null,
                             'attributes'   => [
-                                'text-field-1' => 'a text value',
+                                'text-field-1' => '2019-06-12',
+                                'text-field-2' => 'a text value',
                             ],
                         ],
                     ],

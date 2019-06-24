@@ -24,11 +24,12 @@ trait CustomObjectsTrait
 {
     /**
      * @param ContainerInterface $container
-     * @param string             $name
+     * @param string             $customObjectName
+     * @param callable|null      $configureFieldCallback
      *
      * @return CustomObject
      */
-    private function createCustomObjectWithAllFields(ContainerInterface $container, string $name): CustomObject
+    private function createCustomObjectWithAllFields(ContainerInterface $container, string $customObjectName, ?callable $configureFieldCallback = null): CustomObject
     {
         /** @var CustomObjectModel $customObjectModel */
         $customObjectModel = $container->get('mautic.custom.model.object');
@@ -38,8 +39,8 @@ trait CustomObjectsTrait
         $customFieldTypeProvider = $container->get('custom_field.type.provider');
         $customFieldTypes        = $customFieldTypeProvider->getTypes();
 
-        $customObject->setNameSingular($name);
-        $customObject->setNamePlural("{$name}s");
+        $customObject->setNameSingular($customObjectName);
+        $customObject->setNamePlural("{$customObjectName}s");
 
         foreach ($customFieldTypes as $customFieldType) {
             $customField = new CustomField();
@@ -50,6 +51,10 @@ trait CustomObjectsTrait
             if ($customField->isChoiceType()) {
                 $this->addFieldOption($customField, 'Option A', 'option_a');
                 $this->addFieldOption($customField, 'Option B', 'option_b');
+            }
+
+            if (null !== $configureFieldCallback) {
+                $configureFieldCallback($customField);
             }
 
             $customObject->addCustomField($customField);

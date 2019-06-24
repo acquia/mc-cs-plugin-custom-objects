@@ -17,6 +17,9 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Mautic\CategoryBundle\Entity\Category;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class CustomObjectTest extends \PHPUnit_Framework_TestCase
 {
@@ -29,6 +32,25 @@ class CustomObjectTest extends \PHPUnit_Framework_TestCase
 
         $this->assertNull($clone->getAlias());
         $this->assertSame('Object A', $clone->getNameSingular());
+    }
+
+    public function testLoadValidatorMetadata(): void
+    {
+        $metadata = $this->createMock(ClassMetadata::class);
+        $object   = new CustomObject();
+
+        $metadata->expects($this->exactly(6))
+            ->method('addPropertyConstraint')
+            ->withConsecutive(
+                ['alias', $this->isInstanceOf(Length::class)],
+                ['nameSingular', $this->isInstanceOf(NotBlank::class)],
+                ['nameSingular', $this->isInstanceOf(Length::class)],
+                ['namePlural', $this->isInstanceOf(NotBlank::class)],
+                ['namePlural', $this->isInstanceOf(Length::class)],
+                ['description', $this->isInstanceOf(Length::class)]
+            );
+
+        $object->loadValidatorMetadata($metadata);
     }
 
     public function testGettersSetters(): void
@@ -87,5 +109,23 @@ class CustomObjectTest extends \PHPUnit_Framework_TestCase
                 'deleted',
             ],
         ], $object->getChanges());
+    }
+
+    public function testGetPublishedFields(): void
+    {
+        $object           = new CustomObject();
+        $publishedField   = $this->createMock(CustomField::class);
+        $unpublishedField = $this->createMock(CustomField::class);
+
+        $publishedField->method('isPublished')->willReturn(true);
+        $unpublishedField->method('isPublished')->willReturn(false);
+
+        $object->addCustomField($publishedField);
+        $object->addCustomField($unpublishedField);
+
+        $publishedFields = $object->getPublishedFields();
+
+        $this->assertCount(1, $publishedFields);
+        $this->assertSame($publishedField, $publishedFields->current());
     }
 }
