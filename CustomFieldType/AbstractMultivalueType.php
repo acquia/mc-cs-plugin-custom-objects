@@ -116,7 +116,7 @@ abstract class AbstractMultivalueType extends AbstractCustomFieldType
         })->getValues();
 
         foreach ($value as $singleValue) {
-            if (!in_array($singleValue, $possibleValues, true)) {
+            if (!in_array($singleValue, $possibleValues)) {
                 throw new \UnexpectedValueException(
                     $this->translator->trans(
                         'custom.field.option.invalid',

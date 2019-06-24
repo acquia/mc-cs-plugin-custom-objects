@@ -176,10 +176,13 @@ class SaveController extends CommonController
         $panelId = is_numeric($request->get('panelId')) ? (int) $request->get('panelId') : null; // Is edit of existing panel in view
 
         if (null === $panelId) {
+            // New panel
             $customField->setOrder(0); // Append new panel to top
-            $panelId = (int) $request->get('panelCount');
-            $isNew   = true;
+            $panelId        = (int) $request->get('panelCount');
+            $isNew          = true;
         }
+        $rawCustomField = $request->get('custom_field');
+        $customField->setDefaultValue($rawCustomField['defaultValue']);
 
         foreach ($customField->getOptions() as $option) {
             // Custom field relationship is missing when creating new options

@@ -39,3 +39,5 @@ parameters:
       - 'Segment/Query/Filter/CustomItemFilterQueryBuilder.php'
     PhpCsFixer\Fixer\PhpUnit\PhpUnitStrictFixer:
       - 'Tests/Functional/EventListener/ImportSubscriberTest.php'
+    PhpCsFixer\Fixer\Strict\StrictParamFixer:
+    - 'CustomFieldType/AbstractMultivalueType.php'

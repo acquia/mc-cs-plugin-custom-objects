@@ -110,7 +110,13 @@ CustomObjectsForm = {
                 e.preventDefault();
                 let panel = mQuery(this).closest('.panel');
                 panel.hide('fast');
-                panel.find('[id*=deleted]').val(1);
+                if (panel.find('input[type="hidden"][id*=_id]').val() === '') {
+                    // New unsaved custom field.
+                    panel.remove();
+                    CustomObjectsForm.recalculateOrder();
+                } else {
+                    panel.find('[id*=deleted]').val(1);
+                }
             });
     },
 
@@ -218,12 +224,13 @@ CustomObjectsForm = {
     },
 
     /**
-     * Update default value options when needed
+     * Update default value options from Modal properties panel to general tab default value settings.
+     * Everything happens in modal
      */
     handleModalDefaultValueOptions: function() {
         let type = mQuery('#custom_field_type').val();
 
-        if (!CustomObjectsForm.isSelectableField(type)) {
+        if (!CustomObjectsForm.isSelectableField(type) || type === 'country') {
             return;
         }
 
@@ -234,7 +241,15 @@ CustomObjectsForm = {
 
         let options = '';
 
-        let selectedValues = CustomObjectsForm.getMultiDefaultValuesFromModal(type);
+        let selectedValues = CustomObjectsForm.getSelectableValuesFromModal(type);
+
+        switch (type) {
+            // Add empty value option
+            case 'select' :
+            case 'multiselect':
+                options = options + '<option value=""></option>';
+                break;
+        }
 
         // Transfer options
         let i = 0;
@@ -252,6 +267,7 @@ CustomObjectsForm = {
                         i + '" name="custom_field[defaultValue][]" class="form-control" autocomplete="false" value="' +
                         value + '"' + checked + '>' + label + '</label></div>';
                     break;
+                case 'select' :
                 case 'multiselect':
                     options = options + '<option value="' + value + '"' + selected + '>' + label + '</option>';
                     break;
@@ -280,7 +296,11 @@ CustomObjectsForm = {
      * @returns {boolean}
      */
     isSelectableField: function(type) {
-        return type === 'checkbox_group' || type === 'multiselect' || type === 'radio_group' || type === 'country';
+        return type === 'checkbox_group' ||
+            type === 'select' ||
+            type === 'multiselect' ||
+            type === 'radio_group' ||
+            type === 'country';
     },
 
     /**
@@ -288,11 +308,11 @@ CustomObjectsForm = {
      * @param type
      * @returns {Array}
      */
-    getMultiDefaultValuesFromModal: function(type) {
+    getSelectableValuesFromModal: function(type) {
 
         let selector = '';
 
-        if (type === 'multiselect') {
+        if (type === 'multiselect' || type === 'select') {
             selector = '#custom_field_defaultValue option:selected';
         } else {
             selector = 'input[id*="custom_field_defaultValue_"]:checked'
@@ -404,11 +424,6 @@ CustomObjectsForm = {
 
         let options = '';
         switch(type){
-            case 'country':
-                let val = mQuery(panel).find('.choice-wrapper option:selected').val();
-                mQuery('#objectFieldModal #general .choice-wrapper option[value=' + val + ']').attr('selected', 'selected');
-                mQuery('#objectFieldModal #general .choice-wrapper select').trigger('chosen:updated');
-                break;
             case 'checkbox_group':
                 options = mQuery(panel).find('.choice-wrapper').clone();
                 mQuery(options).find('input').each(function(){
@@ -419,6 +434,8 @@ CustomObjectsForm = {
                 );
                 mQuery('#objectFieldModal #general .choice-wrapper').replaceWith(options);
                 break;
+            case 'country':
+            case 'select':
             case 'multiselect':
                 options = mQuery(panel).find('[id*=_defaultValue] option').clone();
                 mQuery('#objectFieldModal #general #custom_field_defaultValue')
