@@ -33,7 +33,14 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
+use Mautic\LeadBundle\Entity\LeadList;
+use Doctrine\ORM\Query\Expr;
 
+/**
+ * Handles Custom Object token replacements with the correct value in emails.
+ */
 class TokenSubscriber implements EventSubscriberInterface
 {
     use MatchFilterForLeadTrait;
@@ -75,16 +82,16 @@ class TokenSubscriber implements EventSubscriberInterface
     public function __construct(
         ConfigProvider $configProvider, 
         CustomObjectModel $customObjectModel, 
-        CustomItemModel $customItemModel,
-        TokenStorageInterface $tokenStorage,
-        UserModel $userModel
+        CustomItemModel $customItemModel//,
+        // TokenStorageInterface $tokenStorage,
+        // UserModel $userModel
     )
     {
         $this->configProvider    = $configProvider;
         $this->customObjectModel = $customObjectModel;
         $this->customItemModel   = $customItemModel;
-        $this->tokenStorage      = $tokenStorage;
-        $this->userModel      = $userModel;
+        // $this->tokenStorage      = $tokenStorage;
+        // $this->userModel      = $userModel;
     }
 
     /**
@@ -96,6 +103,7 @@ class TokenSubscriber implements EventSubscriberInterface
             EmailEvents::EMAIL_ON_BUILD    => ['onBuilderBuild', 0],
             EmailEvents::EMAIL_ON_SEND     => ['decodeTokens', 0],
             EmailEvents::EMAIL_ON_DISPLAY  => ['decodeTokens', 0],
+            CustomItemEvents::ON_CUSTOM_ITEM_LIST_QUERY            => 'onListQuery',
         ];
     }
 
@@ -196,11 +204,27 @@ class TokenSubscriber implements EventSubscriberInterface
                         $defaultValue = $value;
                     }
                 }
+
+                if ('segment-filter' === $where) {
+                    $where = [];
+                    if ('list' === $email->getEmailType()) {
+                        /** @var LeadList $segment */
+                        foreach ($email->getLists() as $segment) {
+                            foreach ($segment->getFilters() as $filter) {
+                                if ($filter['object'] === 'custom_object') {
+                                    $where[] = $filter;
+                                }
+                            }
+                        }
+                    }
+                    // @todo implement also campaign emails.
+                }
                 
                 $tableConfig = new TableConfig($limit, 1, $orderBy, $orderDir);
                 $tableConfig->addParameter('customObjectId', $customObject->getId());
                 $tableConfig->addParameter('filterEntityType', 'contact');
                 $tableConfig->addParameter('filterEntityId', (int) $contact['id']);
+                $tableConfig->addParameter('tokenWhere', $where);
                 $customItems = $this->customItemModel->getTableData($tableConfig);
                 $fieldValues = [];
 
@@ -219,6 +243,24 @@ class TokenSubscriber implements EventSubscriberInterface
                 $event->addToken($token, $result);
             }
         }
+    }
+
+    /**
+     * @param CustomItemListQueryEvent $event
+     */
+    public function onListQuery(CustomItemListQueryEvent $event): void
+    {
+        $tableConfig = $event->getTableConfig();
+        $contactId = $tableConfig->getParameter('filterEntityId');
+        $tokenWhere = $tableConfig->getParameter('tokenWhere');
+        if ('contact' === $tableConfig->getParameter('filterEntityType') && $contactId && $tokenWhere && is_array($tokenWhere)) {
+            $queryBuilder = $event->getQueryBuilder();
+            $queryBuilder->leftJoin(\MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInt::class, 'cfvi', Expr\Join::WITH, 'CustomItem.id = cfvi.customItem AND cfvi.CustomField = 3');
+            $queryBuilder->andWhere('CustomItemXrefContact.contact = :contactId');
+            $queryBuilder->setParameter('contactId', $tableConfig->getParameter('filterEntityId'));
+        }
+
+        // dump($queryBuilder->getQuery()->getSQL());die;
     }
 
     private function trimArrayElements(array $array): array

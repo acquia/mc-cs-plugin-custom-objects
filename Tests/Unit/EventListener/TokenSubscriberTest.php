@@ -25,6 +25,9 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\Lead;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Event\BuilderEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
+use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
+use Doctrine\ORM\QueryBuilder;
 
 class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -130,6 +133,39 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
             ->willReturn(true);
 
         $this->subscriber->decodeTokens($emailSendEvent);
+    }
+
+    public function testOnListQuery(): void
+    {
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $tableConfig = new TableConfig(10, 1, 'CustomItem.dateAdded', 'DESC');
+        $tableConfig->addParameter('customObjectId', 123);
+        $tableConfig->addParameter('filterEntityType', 'contact');
+        $tableConfig->addParameter('filterEntityId', 345);
+        $tableConfig->addParameter('tokenWhere', [
+            [
+                'glue' => 'and',
+                'field' => 'cmf_1',
+                'object' => 'custom_object',
+                'type' => 'text',
+                'filter' => '23',
+                'display' => null,
+                'operator' => '=',
+            ],
+            [
+                'glue' => 'and',
+                'field' => 'cmf_10',
+                'object' => 'custom_object',
+                'type' => 'int',
+                'filter' => '4',
+                'display' => null,
+                'operator' => '=',
+            ],
+        ]);
+
+        $event = new CustomItemListQueryEvent($queryBuilder, $tableConfig);
+
+        $this->subscriber->onListQuery($event);
     }
 
     public function testOnBuilderBuildWhenPluginDisabled(): void
