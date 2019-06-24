@@ -37,6 +37,8 @@ use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
 use Mautic\LeadBundle\Entity\LeadList;
 use Doctrine\ORM\Query\Expr;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
+use Mautic\LeadBundle\Segment\RandomParameterName;
 
 /**
  * Handles Custom Object token replacements with the correct value in emails.
@@ -51,6 +53,16 @@ class TokenSubscriber implements EventSubscriberInterface
      * @var ConfigProvider
      */
     private $configProvider;
+
+    /**
+     * @var CustomFieldTypeProvider
+     */
+    private $customFieldTypeProvider;
+
+    /**
+     * @var RandomParameterName
+     */
+    private $randomParameterNameService;
 
     /**
      * @var CustomObjectModel
@@ -74,13 +86,17 @@ class TokenSubscriber implements EventSubscriberInterface
 
     /**
      * @param ConfigProvider    $configProvider
+     * @param CustomFieldTypeProvider    $customFieldTypeProvider
+     * @param RandomParameterName $randomParameterNameService
      * @param CustomObjectModel $customObjectModel
      * @param CustomItemModel   $customItemModel
      * @param TokenStorageInterface   $customItemModel
      * @param UserModel   $userModel
      */
     public function __construct(
-        ConfigProvider $configProvider, 
+        ConfigProvider $configProvider,
+        CustomFieldTypeProvider $customFieldTypeProvider,
+        RandomParameterName $randomParameterNameService,
         CustomObjectModel $customObjectModel, 
         CustomItemModel $customItemModel//,
         // TokenStorageInterface $tokenStorage,
@@ -88,6 +104,8 @@ class TokenSubscriber implements EventSubscriberInterface
     )
     {
         $this->configProvider    = $configProvider;
+        $this->customFieldTypeProvider    = $customFieldTypeProvider;
+        $this->randomParameterNameService    = $randomParameterNameService;
         $this->customObjectModel = $customObjectModel;
         $this->customItemModel   = $customItemModel;
         // $this->tokenStorage      = $tokenStorage;
@@ -103,7 +121,7 @@ class TokenSubscriber implements EventSubscriberInterface
             EmailEvents::EMAIL_ON_BUILD    => ['onBuilderBuild', 0],
             EmailEvents::EMAIL_ON_SEND     => ['decodeTokens', 0],
             EmailEvents::EMAIL_ON_DISPLAY  => ['decodeTokens', 0],
-            CustomItemEvents::ON_CUSTOM_ITEM_LIST_QUERY            => 'onListQuery',
+            CustomItemEvents::ON_CUSTOM_ITEM_LIST_QUERY => 'onListQuery',
         ];
     }
 
@@ -206,13 +224,13 @@ class TokenSubscriber implements EventSubscriberInterface
                 }
 
                 if ('segment-filter' === $where) {
-                    $where = [];
+                    $segmentConditions = [];
                     if ('list' === $email->getEmailType()) {
                         /** @var LeadList $segment */
                         foreach ($email->getLists() as $segment) {
                             foreach ($segment->getFilters() as $filter) {
                                 if ($filter['object'] === 'custom_object') {
-                                    $where[] = $filter;
+                                    $segmentConditions[] = $filter;
                                 }
                             }
                         }
@@ -225,6 +243,7 @@ class TokenSubscriber implements EventSubscriberInterface
                 $tableConfig->addParameter('filterEntityType', 'contact');
                 $tableConfig->addParameter('filterEntityId', (int) $contact['id']);
                 $tableConfig->addParameter('tokenWhere', $where);
+                $tableConfig->addParameter('segmentConditions', $segmentConditions);
                 $customItems = $this->customItemModel->getTableData($tableConfig);
                 $fieldValues = [];
 
@@ -252,15 +271,30 @@ class TokenSubscriber implements EventSubscriberInterface
     {
         $tableConfig = $event->getTableConfig();
         $contactId = $tableConfig->getParameter('filterEntityId');
-        $tokenWhere = $tableConfig->getParameter('tokenWhere');
-        if ('contact' === $tableConfig->getParameter('filterEntityType') && $contactId && $tokenWhere && is_array($tokenWhere)) {
+        $segmentConditions = $tableConfig->getParameter('segmentConditions');
+        if ('contact' === $tableConfig->getParameter('filterEntityType') && $contactId && $segmentConditions && is_array($segmentConditions)) {
             $queryBuilder = $event->getQueryBuilder();
-            $queryBuilder->leftJoin(\MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInt::class, 'cfvi', Expr\Join::WITH, 'CustomItem.id = cfvi.customItem AND cfvi.CustomField = 3');
-            $queryBuilder->andWhere('CustomItemXrefContact.contact = :contactId');
-            $queryBuilder->setParameter('contactId', $tableConfig->getParameter('filterEntityId'));
+
+            foreach ($segmentConditions as $condition) {
+                $customFieldType = $this->customFieldTypeProvider->getType($condition['type']);
+                $fieldData = explode('_', $condition['field']);
+                $customFieldId = (int) $fieldData[1];
+                $randomHash = $this->randomParameterNameService->generateRandomParameterName();
+                $tableAlias = "{$customFieldType->getTableAlias()}_{$randomHash}";
+                $queryBuilder->leftJoin(
+                    $customFieldType->getEntityClass(),
+                    $tableAlias,
+                    Expr\Join::WITH,
+                    "CustomItem.id = {$tableAlias}.customItem AND {$tableAlias}.customField = {$customFieldId}");
+                // @todo deal with AND and OR.
+                // @todo deal with different operators.
+                $queryBuilder->andWhere("{$tableAlias}.value = :{$randomHash}");
+                $queryBuilder->setParameter($randomHash, $condition['filter']);
+            }
+            // dump($queryBuilder->getQuery()->getSQL());
+            // dump($queryBuilder->getQuery()->getParameters());
         }
 
-        // dump($queryBuilder->getQuery()->getSQL());die;
     }
 
     private function trimArrayElements(array $array): array
