@@ -314,8 +314,6 @@ class CustomFieldType extends AbstractType
             $options['attr']['data-placeholder'] = $customField->getParams()->getEmptyValue();
         }
 
-        // @todo validate default values
-
         if ($isModal) {
             // Do not use defined label in modal form
             $options['label'] = 'custom.field.label.default_value';
