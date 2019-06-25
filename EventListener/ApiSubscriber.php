@@ -213,7 +213,11 @@ class ApiSubscriber extends CommonSubscriber
                     $customFieldValue = $customItem->findCustomFieldValueForFieldAlias($fieldAlias);
                     $customFieldValue->setValue($value);
                 } catch (NotFoundException $e) {
-                    $customItem->createNewCustomFieldValueByFieldAlias($fieldAlias, $value);
+                    try {
+                        $customItem->createNewCustomFieldValueByFieldAlias($fieldAlias, $value);
+                    } catch (NotFoundException $e) {
+                        throw new NotFoundException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
+                    }
                 }
             }
         }
