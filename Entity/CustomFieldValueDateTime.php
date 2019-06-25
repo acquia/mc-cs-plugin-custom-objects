@@ -57,7 +57,7 @@ class CustomFieldValueDateTime extends AbstractCustomFieldValue
     {
         if (empty($value)) {
             $this->value = null;
-            
+
             return;
         }
 
