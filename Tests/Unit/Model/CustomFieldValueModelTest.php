@@ -325,4 +325,62 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
 
         $this->customFieldValueModel->save($customFieldValue);
     }
+
+    public function testSaveForMultivalueFieldWithNoOptionsProvided(): void
+    {
+        $customFieldValue = $this->createMock(CustomFieldValueInterface::class);
+        $query            = $this->createMock(AbstractQuery::class);
+
+        $customFieldValue->expects($this->exactly(2))
+            ->method('getCustomField')
+            ->willReturn($this->customField);
+
+        $customFieldValue->expects($this->once())
+            ->method('getCustomItem')
+            ->willReturn($this->customItem);
+
+        $customFieldValue->expects($this->once())
+            ->method('getValue')
+            ->willReturn('');
+
+        $customFieldValue->expects($this->exactly(1))
+            ->method('setValue')
+            ->with('');
+
+        $this->customItem->expects($this->once())
+            ->method('getId')
+            ->willReturn(99);
+
+        $this->customField->expects($this->any())
+            ->method('getId')
+            ->willReturn(44);
+
+        $this->customField->expects($this->once())
+            ->method('canHaveMultipleValues')
+            ->willReturn(true);
+
+        $this->entityManager->expects($this->once())
+            ->method('createQuery')
+            ->with('
+            delete from MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption cfvo  
+            where cfvo.customField = 44
+            and cfvo.customItem = 99
+        ')
+            ->willReturn($query);
+
+        $query->expects($this->once())
+            ->method('execute')
+            ->willReturn(2);
+
+        $this->entityManager->expects($this->exactly(1))
+            ->method('persist')
+            ->with($customFieldValue);
+
+        $this->validator->expects($this->exactly(1))
+            ->method('validate')
+            ->with($customFieldValue)
+            ->willReturn($this->violationList);
+
+        $this->customFieldValueModel->save($customFieldValue);
+    }
 }
