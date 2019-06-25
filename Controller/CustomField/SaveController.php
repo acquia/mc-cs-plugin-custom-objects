@@ -135,7 +135,7 @@ class SaveController extends CommonController
         $action = $this->fieldRouteProvider->buildSaveRoute($fieldType, $fieldId, $customObject->getId(), $panelCount, $panelId);
         $form   = $this->formFactory->create(CustomFieldType::class, $customField, ['action' => $action]);
 
-        $form->handleRequest($request);
+        $form->submit($request->get('custom_field'), false);
 
         if ($form->isValid()) {
             // Render Custom Field form RAT for Custom Object form.
@@ -180,9 +180,9 @@ class SaveController extends CommonController
             $customField->setOrder(0); // Append new panel to top
             $panelId        = (int) $request->get('panelCount');
             $isNew          = true;
+            $rawCustomField = $request->get('custom_field');
+            $customField->setDefaultValue($rawCustomField['defaultValue']);
         }
-        $rawCustomField = $request->get('custom_field');
-        $customField->setDefaultValue($rawCustomField['defaultValue']);
 
         foreach ($customField->getOptions() as $option) {
             // Custom field relationship is missing when creating new options
