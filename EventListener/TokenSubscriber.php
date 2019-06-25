@@ -39,6 +39,8 @@ use Mautic\LeadBundle\Entity\LeadList;
 use Doctrine\ORM\Query\Expr;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use Mautic\LeadBundle\Segment\RandomParameterName;
+use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
+use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 
 /**
  * Handles Custom Object token replacements with the correct value in emails.
@@ -58,6 +60,11 @@ class TokenSubscriber implements EventSubscriberInterface
      * @var CustomFieldTypeProvider
      */
     private $customFieldTypeProvider;
+
+    /**
+     * @var ContactSegmentFilterFactory
+     */
+    private $contactSegmentFilterFactory;
 
     /**
      * @var RandomParameterName
@@ -87,6 +94,7 @@ class TokenSubscriber implements EventSubscriberInterface
     /**
      * @param ConfigProvider    $configProvider
      * @param CustomFieldTypeProvider    $customFieldTypeProvider
+     * @param ContactSegmentFilterFactory    $contactSegmentFilterFactory
      * @param RandomParameterName $randomParameterNameService
      * @param CustomObjectModel $customObjectModel
      * @param CustomItemModel   $customItemModel
@@ -96,6 +104,7 @@ class TokenSubscriber implements EventSubscriberInterface
     public function __construct(
         ConfigProvider $configProvider,
         CustomFieldTypeProvider $customFieldTypeProvider,
+        ContactSegmentFilterFactory $contactSegmentFilterFactory,
         RandomParameterName $randomParameterNameService,
         CustomObjectModel $customObjectModel, 
         CustomItemModel $customItemModel//,
@@ -105,6 +114,7 @@ class TokenSubscriber implements EventSubscriberInterface
     {
         $this->configProvider    = $configProvider;
         $this->customFieldTypeProvider    = $customFieldTypeProvider;
+        $this->contactSegmentFilterFactory    = $contactSegmentFilterFactory;
         $this->randomParameterNameService    = $randomParameterNameService;
         $this->customObjectModel = $customObjectModel;
         $this->customItemModel   = $customItemModel;
@@ -228,8 +238,10 @@ class TokenSubscriber implements EventSubscriberInterface
                     if ('list' === $email->getEmailType()) {
                         /** @var LeadList $segment */
                         foreach ($email->getLists() as $segment) {
-                            foreach ($segment->getFilters() as $filter) {
-                                if ($filter['object'] === 'custom_object') {
+                            $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
+                            /** @var ContactSegmentFilter $filter */
+                            foreach ($segmentFilters as $filter) {
+                                if ($filter->ob === 'custom_object') {// there is no way how to get the object.
                                     $segmentConditions[] = $filter;
                                 }
                             }
