@@ -343,9 +343,8 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
             ->method('getValue')
             ->willReturn('');
 
-        $customFieldValue->expects($this->exactly(1))
-            ->method('setValue')
-            ->with('');
+        $customFieldValue->expects($this->never())
+            ->method('setValue');
 
         $this->customItem->expects($this->once())
             ->method('getId')
@@ -372,14 +371,11 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
             ->method('execute')
             ->willReturn(2);
 
-        $this->entityManager->expects($this->exactly(1))
-            ->method('persist')
-            ->with($customFieldValue);
+        $this->entityManager->expects($this->never())
+            ->method('persist');
 
-        $this->validator->expects($this->exactly(1))
-            ->method('validate')
-            ->with($customFieldValue)
-            ->willReturn($this->violationList);
+        $this->validator->expects($this->never())
+            ->method('validate');
 
         $this->customFieldValueModel->save($customFieldValue);
     }
