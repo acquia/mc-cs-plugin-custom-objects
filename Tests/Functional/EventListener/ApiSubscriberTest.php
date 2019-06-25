@@ -108,7 +108,38 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $this->assertTrue(empty($responseData['contact']['customObjects']));
     }
 
-    public function testCreatingContactWithCustomItems(): void
+    public function testCreatingContactWithCustomItemsButFieldDoesNotExist(): void
+    {
+        $customObject = $this->createCustomObjectWithAllFields($this->container, 'Product');
+        $contact      = [
+            'email'         => 'contact1@api.test',
+            'customObjects' => [
+                'data' => [
+                    [
+                        'id'   => $customObject->getId(),
+                        'data' => [
+                            [
+                                'name'       => 'Custom Item Created Via Contact API 2',
+                                'attributes' => [
+                                    'unicorn'         => 'Yellow snake',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->client->request('POST', 'api/contacts/new?includeCustomObjects=true', $contact);
+        $response     = $this->client->getResponse();
+        $responseData = json_decode($response->getContent(), true);
+
+        $this->assertSame(Response::HTTP_BAD_REQUEST, $response->getStatusCode(), $response->getContent());
+        $this->assertSame(Response::HTTP_BAD_REQUEST, $responseData['errors'][0]['code']);
+        $this->assertSame('Custom field with alias unicorn was not found.', $responseData['errors'][0]['message']);
+    }
+
+    public function testCreatingContactWithCustomItemsAndEditAndClearValues(): void
     {
         $customObject = $this->createCustomObjectWithAllFields($this->container, 'Product');
         $contact      = [
@@ -261,7 +292,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
                                     'email-test-field'        => null,
                                     'date-test-field'         => null,
                                     'datetime-test-field'     => null,
-                                    'date-test-field'         => null,
+                                    'date-test-field'         => '',
                                     'datetime-test-field'     => null,
                                 ],
                             ],

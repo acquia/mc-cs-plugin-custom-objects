@@ -75,14 +75,14 @@ class CustomFieldValueModel
         if ($customFieldValue->getCustomField()->canHaveMultipleValues()) {
             $this->deleteOptionsForField($customFieldValue);
             $options = $customFieldValue->getValue();
-            if (is_string($options)) {
+            if (empty($options)) {
+                $options = [];
+            } elseif (is_string($options)) {
                 if (false !== mb_strpos($options, ',')) {
                     $options = explode(',', $options);
                 } else {
                     $options = [$options];
                 }
-            } elseif (empty($options)) {
-                $options = [];
             }
             foreach ($options as $optionKey) {
                 $optionValue = clone $customFieldValue;
