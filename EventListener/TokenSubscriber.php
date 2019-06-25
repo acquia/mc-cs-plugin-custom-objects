@@ -41,6 +41,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
+use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 
 /**
  * Handles Custom Object token replacements with the correct value in emails.
@@ -65,6 +66,11 @@ class TokenSubscriber implements EventSubscriberInterface
      * @var ContactSegmentFilterFactory
      */
     private $contactSegmentFilterFactory;
+
+    /**
+     * @var QueryFilterHelper
+     */
+    private $queryFilterHelper;
 
     /**
      * @var RandomParameterName
@@ -95,6 +101,7 @@ class TokenSubscriber implements EventSubscriberInterface
      * @param ConfigProvider    $configProvider
      * @param CustomFieldTypeProvider    $customFieldTypeProvider
      * @param ContactSegmentFilterFactory    $contactSegmentFilterFactory
+     * @param QueryFilterHelper    $queryFilterHelper
      * @param RandomParameterName $randomParameterNameService
      * @param CustomObjectModel $customObjectModel
      * @param CustomItemModel   $customItemModel
@@ -105,6 +112,7 @@ class TokenSubscriber implements EventSubscriberInterface
         ConfigProvider $configProvider,
         CustomFieldTypeProvider $customFieldTypeProvider,
         ContactSegmentFilterFactory $contactSegmentFilterFactory,
+        QueryFilterHelper $queryFilterHelper,
         RandomParameterName $randomParameterNameService,
         CustomObjectModel $customObjectModel, 
         CustomItemModel $customItemModel//,
@@ -115,6 +123,7 @@ class TokenSubscriber implements EventSubscriberInterface
         $this->configProvider    = $configProvider;
         $this->customFieldTypeProvider    = $customFieldTypeProvider;
         $this->contactSegmentFilterFactory    = $contactSegmentFilterFactory;
+        $this->queryFilterHelper    = $queryFilterHelper;
         $this->randomParameterNameService    = $randomParameterNameService;
         $this->customObjectModel = $customObjectModel;
         $this->customItemModel   = $customItemModel;
@@ -237,14 +246,17 @@ class TokenSubscriber implements EventSubscriberInterface
                     $segmentConditions = [];
                     if ('list' === $email->getEmailType()) {
                         /** @var LeadList $segment */
-                        foreach ($email->getLists() as $segment) {
-                            $segmentFilters = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
+                        foreach ($email->getLists() as $segmentOrigin) {
+                            $segment = clone $segmentOrigin;
+                            $filters = [];
                             /** @var ContactSegmentFilter $filter */
-                            foreach ($segmentFilters as $filter) {
-                                if ($filter->ob === 'custom_object') {// there is no way how to get the object.
-                                    $segmentConditions[] = $filter;
+                            foreach ($segment->getFilters() as $filter) {
+                                if ('custom_object' === $filter['object']) {
+                                    $filters[] = $filter;
                                 }
                             }
+                            $segment->setFilters($filters);
+                            $segmentConditions[$segmentOrigin->getId()] = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
                         }
                     }
                     // @todo implement also campaign emails.
@@ -283,28 +295,39 @@ class TokenSubscriber implements EventSubscriberInterface
     {
         $tableConfig = $event->getTableConfig();
         $contactId = $tableConfig->getParameter('filterEntityId');
-        $segmentConditions = $tableConfig->getParameter('segmentConditions');
-        if ('contact' === $tableConfig->getParameter('filterEntityType') && $contactId && $segmentConditions && is_array($segmentConditions)) {
+        $segmentsConditions = $tableConfig->getParameter('segmentConditions');
+        if ('contact' === $tableConfig->getParameter('filterEntityType') && $contactId && $segmentsConditions && is_array($segmentsConditions)) {
             $queryBuilder = $event->getQueryBuilder();
 
-            foreach ($segmentConditions as $condition) {
-                $customFieldType = $this->customFieldTypeProvider->getType($condition['type']);
-                $fieldData = explode('_', $condition['field']);
-                $customFieldId = (int) $fieldData[1];
-                $randomHash = $this->randomParameterNameService->generateRandomParameterName();
-                $tableAlias = "{$customFieldType->getTableAlias()}_{$randomHash}";
-                $queryBuilder->leftJoin(
-                    $customFieldType->getEntityClass(),
-                    $tableAlias,
-                    Expr\Join::WITH,
-                    "CustomItem.id = {$tableAlias}.customItem AND {$tableAlias}.customField = {$customFieldId}");
-                // @todo deal with AND and OR.
-                // @todo deal with different operators.
-                $queryBuilder->andWhere("{$tableAlias}.value = :{$randomHash}");
-                $queryBuilder->setParameter($randomHash, $condition['filter']);
+            foreach ($segmentsConditions as $segmentConditions) {
+                /** @var ContactSegmentFilter $condition */
+                foreach ($segmentConditions as $condition) {
+                    $customFieldType = $this->customFieldTypeProvider->getType($condition->getType());
+                    // $fieldData = explode('_', $condition->getField());
+                    // $customFieldId = (int) $fieldData[1];
+                    $customFieldId = (int) $condition->getField();
+                    $innerQueryBuilder = $this->queryFilterHelper->createValueQueryBuilder($queryBuilder->getEntityManager()->getConnection(), 'queryAlias', $customFieldId, $condition->getType());
+                    $innerQueryBuilder->select('queryAlias_contact.custom_item_id');
+                    $this->queryFilterHelper->addCustomFieldValueExpressionFromSegmentFilter($innerQueryBuilder, 'tableAlias', $condition);
+                    $this->queryFilterHelper->addContactIdRestriction($innerQueryBuilder, 'queryAlias', $tableConfig->getParameter('filterEntityId'));
+                    dump($innerQueryBuilder->getSql());
+                    dump($innerQueryBuilder->getParameters());die;
+                    $queryBuilder->andWhere($queryBuilder->expr()->exists($innerQueryBuilder->getSQL()), 'OR');
+                    // $randomHash = $this->randomParameterNameService->generateRandomParameterName();
+                    // $tableAlias = "{$customFieldType->getTableAlias()}_{$randomHash}";
+                    // $queryBuilder->leftJoin(
+                    //     $customFieldType->getEntityClass(),
+                    //     $tableAlias,
+                    //     Expr\Join::WITH,
+                    //     "CustomItem.id = {$tableAlias}.customItem AND {$tableAlias}.customField = {$customFieldId}");
+                    // // @todo deal with AND and OR.
+                    // // @todo deal with different operators.
+                    // $queryBuilder->andWhere("{$tableAlias}.value = :{$randomHash}");
+                    // $queryBuilder->setParameter($randomHash, $condition['filter']);
+                }
             }
-            // dump($queryBuilder->getQuery()->getSQL());
-            // dump($queryBuilder->getQuery()->getParameters());
+            dump($queryBuilder->getQuery()->getSQL());
+            dump($queryBuilder->getQuery()->getParameters());
         }
 
     }
