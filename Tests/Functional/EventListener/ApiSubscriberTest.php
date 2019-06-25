@@ -139,7 +139,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $this->assertSame('Custom field with alias unicorn was not found.', $responseData['errors'][0]['message']);
     }
 
-    public function testCreatingContactWithCustomItems(): void
+    public function testCreatingContactWithCustomItemsAndEditAndClearValues(): void
     {
         $customObject = $this->createCustomObjectWithAllFields($this->container, 'Product');
         $contact      = [
@@ -292,7 +292,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
                                     'email-test-field'        => null,
                                     'date-test-field'         => null,
                                     'datetime-test-field'     => null,
-                                    'date-test-field'         => null,
+                                    'date-test-field'         => '',
                                     'datetime-test-field'     => null,
                                 ],
                             ],

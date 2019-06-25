@@ -55,7 +55,13 @@ class CustomFieldValueDate extends AbstractCustomFieldValue
      */
     public function setValue($value = null): void
     {
-        if ($value && !$value instanceof DateTimeInterface) {
+        if (empty($value)) {
+            $this->value = null;
+
+            return;
+        }
+
+        if (!$value instanceof DateTimeInterface) {
             $value = new \DateTimeImmutable($value);
         }
 
