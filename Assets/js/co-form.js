@@ -166,6 +166,9 @@ CustomObjectsForm = {
                     Mautic.stopModalLoadingBar(target);
                     CustomObjectsForm.initSaveModal(target);
                     CustomObjectsForm.initCancelModal();
+                    mQuery('#objectFieldModal [role="tabpanel"] [role="presentation"]').click(function() {
+                        CustomObjectsForm.handleModalDefaultValueOptions();
+                    });
                 }
             });
         });
@@ -191,6 +194,8 @@ CustomObjectsForm = {
         mQuery(target).find('button.btn-save')
             .unbind('click')
             .bind('click', function() {
+                CustomObjectsForm.handleModalDefaultValueOptions();
+
                 let form = mQuery('form[name="custom_field"]');
                 let route = form.attr('action');
 
