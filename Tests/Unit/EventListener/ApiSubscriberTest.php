@@ -329,6 +329,9 @@ class ApiSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('createNewCustomFieldValueByFieldAlias')
             ->with('price', 237);
 
+        $customItem->expects($this->once())
+            ->method('setDefaultValuesForMissingFields');
+
         $this->customItemModel->expects($this->once())
             ->method('save')
             ->with($customItem, true);
