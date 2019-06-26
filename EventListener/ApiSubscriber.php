@@ -119,6 +119,7 @@ class ApiSubscriber extends CommonSubscriber
             foreach ($customObjectData['data'] as $customItemData) {
                 $customItem = $this->getCustomItem($customObject, $customItemData);
                 $customItem = $this->populateCustomItem($customItem, $customItemData);
+                $customItem->setDefaultValuesForMissingFields();
 
                 $this->customItemModel->save($customItem, $dryRun);
 
