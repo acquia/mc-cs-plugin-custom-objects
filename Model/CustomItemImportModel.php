@@ -71,6 +71,10 @@ class CustomItemImportModel extends FormModel
         $this->setOwner($import, $customItem);
 
         foreach ($matchedFields as $csvField => $customFieldId) {
+            if (!isset($rowData[$csvField])) {
+                continue;
+            }
+
             $csvValue = $rowData[$csvField];
 
             if (0 === strcasecmp('linkedContactIds', $customFieldId)) {
@@ -97,6 +101,8 @@ class CustomItemImportModel extends FormModel
 
             $customFieldValue->setValue($csvValue);
         }
+
+        $customItem->setDefaultValuesForMissingFields();
 
         $customItem = $this->customItemModel->save($customItem);
 
@@ -161,6 +167,7 @@ class CustomItemImportModel extends FormModel
         if (false !== $idKey) {
             try {
                 $customItem = $this->customItemModel->fetchEntity((int) $rowData[$idKey]);
+                $customItem = $this->customItemModel->populateCustomFields($customItem);
             } catch (NotFoundException $e) {
             }
         }

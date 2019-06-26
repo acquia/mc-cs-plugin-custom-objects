@@ -27,6 +27,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
+use Doctrine\Common\Collections\ArrayCollection;
 
 class CustomItemImportModelTest extends \PHPUnit_Framework_TestCase
 {
@@ -100,9 +101,9 @@ class CustomItemImportModelTest extends \PHPUnit_Framework_TestCase
             ->with('3262739,3262738,3262737')
             ->willReturn([3262739, 3262738, 3262737]);
 
-        $this->customObject->expects($this->exactly(2))
+        $this->customObject->expects($this->exactly(3))
             ->method('getCustomFields')
-            ->willReturn([$this->descriptionField, $this->dateField]);
+            ->willReturn(new ArrayCollection([$this->descriptionField, $this->dateField]));
 
         $customItem = $this->createMock(CustomItem::class);
 
@@ -177,6 +178,11 @@ class CustomItemImportModelTest extends \PHPUnit_Framework_TestCase
             ->with(555)
             ->willReturn($customItem);
 
+        $this->customItemModel->expects($this->once())
+            ->method('populateCustomFields')
+            ->with($customItem)
+            ->willReturn($customItem);
+
         $this->import->expects($this->exactly(1))
             ->method('getDefault')
             ->with('owner')
@@ -220,9 +226,9 @@ class CustomItemImportModelTest extends \PHPUnit_Framework_TestCase
             ->method('getMatchedFields')
             ->willReturn($mappedFields);
 
-        $this->customObject->expects($this->exactly(2))
+        $this->customObject->expects($this->exactly(3))
             ->method('getCustomFields')
-            ->willReturn([$this->descriptionField, $this->dateField]);
+            ->willReturn(new ArrayCollection([$this->descriptionField, $this->dateField]));
 
         $this->customItemModel->expects($this->once())
             ->method('fetchEntity')

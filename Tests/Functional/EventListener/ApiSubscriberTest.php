@@ -167,7 +167,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
 
         $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
-        
+
         $responseData           = json_decode($response->getContent(), true);
         $customItemFromResponse = $responseData['contact']['customObjects']['data'][0]['data'][0];
 
@@ -415,7 +415,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $response = $this->client->getResponse();
 
         $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
-        
+
         $responseData           = json_decode($response->getContent(), true);
         $customItemFromResponse = $responseData['contact']['customObjects']['data'][0]['data'][0];
 
