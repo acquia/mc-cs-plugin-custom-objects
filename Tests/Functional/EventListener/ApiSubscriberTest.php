@@ -263,7 +263,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
                                     'radio-group-test-field'    => 'option_a',
                                     'phone-number-test-field'   => '+420775308003',
                                     'number-test-field'         => 123456,
-                                    'hidden-test-field'         => 'secret sauce',
+                                    // 'hidden-test-field'         => 'secret sauce', // Test the value stick if not in the request.
                                     'email-test-field'          => 'john@doe.com',
                                     'date-test-field'           => '2019-06-23',
                                     'datetime-test-field'       => '2019-06-23T11:29:34+00:00',
@@ -298,7 +298,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $this->assertSame('option_a', $customItemFromResponse['attributes']['radio-group-test-field']);
         $this->assertSame('+420775308003', $customItemFromResponse['attributes']['phone-number-test-field']);
         $this->assertSame(123456, $customItemFromResponse['attributes']['number-test-field']);
-        $this->assertSame('secret sauce', $customItemFromResponse['attributes']['hidden-test-field']);
+        $this->assertSame('secret', $customItemFromResponse['attributes']['hidden-test-field']);
         $this->assertSame('john@doe.com', $customItemFromResponse['attributes']['email-test-field']);
         $this->assertSame('2019-06-23', $customItemFromResponse['attributes']['date-test-field']);
         $this->assertSame('2019-06-23T11:29:34+00:00', $customItemFromResponse['attributes']['datetime-test-field']);
