@@ -118,7 +118,7 @@ class ApiSubscriber extends CommonSubscriber
 
             foreach ($customObjectData['data'] as $customItemData) {
                 $customItem = $this->getCustomItem($customObject, $customItemData);
-                $customItem = $this->populateCustomItem($customItem, $customItemData);
+                $customItem = $this->populateCustomItemWithRequestData($customItem, $customItemData);
                 $customItem->setDefaultValuesForMissingFields();
 
                 $this->customItemModel->save($customItem, $dryRun);
@@ -190,7 +190,9 @@ class ApiSubscriber extends CommonSubscriber
         }
 
         try {
-            return $this->customItemModel->fetchEntity((int) $customItemData['id']);
+            $customItem = $this->customItemModel->fetchEntity((int) $customItemData['id']);
+
+            return $this->customItemModel->populateCustomFields($customItem);
         } catch (NotFoundException $e) {
             throw new NotFoundException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
         }
@@ -202,7 +204,7 @@ class ApiSubscriber extends CommonSubscriber
      *
      * @return CustomItem
      */
-    private function populateCustomItem(CustomItem $customItem, array $customItemData): CustomItem
+    private function populateCustomItemWithRequestData(CustomItem $customItem, array $customItemData): CustomItem
     {
         if (!empty($customItemData['name'])) {
             $customItem->setName($customItemData['name']);
