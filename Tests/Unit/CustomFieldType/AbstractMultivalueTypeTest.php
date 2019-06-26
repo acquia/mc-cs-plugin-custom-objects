@@ -23,6 +23,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\MultivalueTransformer;
 use Doctrine\Common\Collections\ArrayCollection;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\CsvTransformer;
 
 class AbstractMultivalueTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -90,6 +91,14 @@ class AbstractMultivalueTypeTest extends \PHPUnit_Framework_TestCase
         $this->isInstanceOf(
             MultivalueTransformer::class,
             $this->fieldType->createDefaultValueTransformer()
+        );
+    }
+
+    public function testCreateApiValueTransformer(): void
+    {
+        $this->isInstanceOf(
+            CsvTransformer::class,
+            $this->fieldType->createApiValueTransformer()
         );
     }
 
