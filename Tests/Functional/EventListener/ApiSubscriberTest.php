@@ -369,6 +369,112 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $this->assertSame(null, $customItemFromResponse['attributes']['datetime-test-field']);
     }
 
+    public function testCreatingContactWithCustomItemsWithDefaultValue(): void
+    {
+        $configureFieldCallback = function (CustomField $customField): void {
+            if ('date' === $customField->getType()) {
+                $customField->setDefaultValue('2019-06-21');
+            }
+            if ('text' === $customField->getType()) {
+                $customField->setDefaultValue('A default value');
+            }
+            if ('multiselect' === $customField->getType()) {
+                $customField->setDefaultValue(['option_b']);
+            }
+        };
+
+        $customObject = $this->createCustomObjectWithAllFields($this->container, 'Product', $configureFieldCallback);
+        $contact      = [
+            'email'         => 'contact1@api.test',
+            'customObjects' => [
+                'data' => [
+                    [
+                        'id'   => $customObject->getId(),
+                        'data' => [
+                            [
+                                'name'       => 'Custom Item Created Via Contact API for default value field test',
+                                'attributes' => [
+                                    'datetime-test-field'       => '2019-06-26 13:29:43',
+                                    'checkbox-group-test-field' => ['option_a'],
+                                    // 'date-test-field' => '', // Intentionally not provided in the request.
+                                    // 'text-test-field' => '', // Intentionally not provided in the request.
+                                    // 'multiselect-test-field' => '', // Intentionally not provided in the request.
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->client->request('POST', 'api/contacts/new?includeCustomObjects=true', $contact);
+        $response               = $this->client->getResponse();
+        $responseData           = json_decode($response->getContent(), true);
+        $customItemFromResponse = $responseData['contact']['customObjects']['data'][0]['data'][0];
+
+        $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
+        $this->assertSame(1, $customItemFromResponse['id']);
+        $this->assertSame('2019-06-21', $customItemFromResponse['attributes']['date-test-field']);
+        $this->assertSame('2019-06-26T13:29:43+00:00', $customItemFromResponse['attributes']['datetime-test-field']);
+        $this->assertSame('A default value', $customItemFromResponse['attributes']['text-test-field']);
+        $this->assertSame(['option_a'], $customItemFromResponse['attributes']['checkbox-group-test-field']);
+        $this->assertSame(['option_b'], $customItemFromResponse['attributes']['multiselect-test-field']);
+        $this->assertSame('', $customItemFromResponse['attributes']['url-test-field']);
+    }
+
+    public function testCreatingContactWithCustomItemsWithOverwrittenDefaultValue(): void
+    {
+        $configureFieldCallback = function (CustomField $customField): void {
+            if ('date' === $customField->getType()) {
+                $customField->setDefaultValue('2019-06-21');
+            }
+            if ('text' === $customField->getType()) {
+                $customField->setDefaultValue('A default value');
+            }
+            if ('multiselect' === $customField->getType()) {
+                $customField->setDefaultValue(['option_b']);
+            }
+        };
+
+        $customObject = $this->createCustomObjectWithAllFields($this->container, 'Product', $configureFieldCallback);
+        $contact      = [
+            'email'         => 'contact1@api.test',
+            'customObjects' => [
+                'data' => [
+                    [
+                        'id'   => $customObject->getId(),
+                        'data' => [
+                            [
+                                'name'       => 'Custom Item Created Via Contact API for default value field test',
+                                'attributes' => [
+                                    'datetime-test-field'       => '2019-06-26 13:29:43',
+                                    'checkbox-group-test-field' => ['option_a'],
+                                    'date-test-field'           => '',
+                                    'text-test-field'           => '',
+                                    'multiselect-test-field'    => '',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->client->request('POST', 'api/contacts/new?includeCustomObjects=true', $contact);
+        $response               = $this->client->getResponse();
+        $responseData           = json_decode($response->getContent(), true);
+        $customItemFromResponse = $responseData['contact']['customObjects']['data'][0]['data'][0];
+
+        $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
+        $this->assertSame(1, $customItemFromResponse['id']);
+        $this->assertSame(null, $customItemFromResponse['attributes']['date-test-field']);
+        $this->assertSame('2019-06-26T13:29:43+00:00', $customItemFromResponse['attributes']['datetime-test-field']);
+        $this->assertSame('', $customItemFromResponse['attributes']['text-test-field']);
+        $this->assertSame(['option_a'], $customItemFromResponse['attributes']['checkbox-group-test-field']);
+        $this->assertSame([], $customItemFromResponse['attributes']['multiselect-test-field']);
+        $this->assertSame('', $customItemFromResponse['attributes']['url-test-field']);
+    }
+
     public function testCreatingContactWithCustomItemsWithDefaultDateButEmptyValue(): void
     {
         $configureFieldCallback = function (CustomField $customField): void {
