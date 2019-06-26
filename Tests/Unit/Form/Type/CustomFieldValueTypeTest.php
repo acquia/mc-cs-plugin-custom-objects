@@ -81,7 +81,7 @@ class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
 
         $this->customField->expects($this->once())
             ->method('getFormFieldOptions')
-            ->with(['empty_data' => 'The default value']) // The default value is set.
+            ->with(['data' => 'The default value']) // The default value is set.
             ->willReturn(['the' => 'options']);
 
         $this->formBuilder->expects($this->once())
