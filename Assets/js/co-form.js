@@ -461,7 +461,7 @@ CustomObjectsForm = {
     },
 
     /**
-     * Create/edit custom field from modal
+     * Create/edit custom field from modal and transfer data to CO panel hidden fields
      * \MauticPlugin\CustomObjectsFormBundle\Controller\CustomField\SaveController::saveAction
      */
     saveToPanel: function(response) {
