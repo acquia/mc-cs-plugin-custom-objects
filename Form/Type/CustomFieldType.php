@@ -346,6 +346,10 @@ class CustomFieldType extends AbstractType
             $customField = $event->getData();
             $form = $event->getForm();
 
+            if ($customField->getTypeObject()->hasChoices()) {
+                throw new \Exception('not implemented');
+            }
+
             if (!$customField->getTypeObject() && $customField->getType()) {
                 $customField->setTypeObject($this->customFieldTypeProvider->getType($customField->getType()));
             }
