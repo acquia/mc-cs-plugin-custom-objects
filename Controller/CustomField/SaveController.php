@@ -135,7 +135,7 @@ class SaveController extends CommonController
         $action = $this->fieldRouteProvider->buildSaveRoute($fieldType, $fieldId, $customObject->getId(), $panelCount, $panelId);
         $form   = $this->formFactory->create(CustomFieldType::class, $customField, ['action' => $action]);
 
-        $form->submit($request->get('custom_field'), false);
+        $form->handleRequest($request);
 
         if ($form->isValid()) {
             // Render Custom Field form RAT for Custom Object form.
@@ -163,7 +163,7 @@ class SaveController extends CommonController
     }
 
     /**
-     * Build custom field form PART to be used in custom object form as panel and close modal via ajax response.
+     * Here is CO form panel part build and injected in the frontend as part of existing CO form.
      *
      * @param CustomObject $customObject
      * @param CustomField  $customField
