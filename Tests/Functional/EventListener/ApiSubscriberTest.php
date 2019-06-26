@@ -163,11 +163,14 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         ];
 
         $this->client->request('POST', 'api/contacts/new?includeCustomObjects=true', $contact);
-        $response               = $this->client->getResponse();
+
+        $response = $this->client->getResponse();
+
+        $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
+        
         $responseData           = json_decode($response->getContent(), true);
         $customItemFromResponse = $responseData['contact']['customObjects']['data'][0]['data'][0];
 
-        $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
         $this->assertSame(['option_a'], $customItemFromResponse['attributes']['multiselect-test-field']);
         $this->assertSame(['option_b'], $customItemFromResponse['attributes']['checkbox-group-test-field']);
     }
@@ -408,11 +411,14 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         ];
 
         $this->client->request('POST', 'api/contacts/new?includeCustomObjects=true', $contact);
-        $response               = $this->client->getResponse();
+
+        $response = $this->client->getResponse();
+
+        $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
+        
         $responseData           = json_decode($response->getContent(), true);
         $customItemFromResponse = $responseData['contact']['customObjects']['data'][0]['data'][0];
 
-        $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
         $this->assertSame(1, $customItemFromResponse['id']);
         $this->assertSame('2019-06-21', $customItemFromResponse['attributes']['date-test-field']);
         $this->assertSame('2019-06-26T13:29:43+00:00', $customItemFromResponse['attributes']['datetime-test-field']);
