@@ -201,9 +201,9 @@ class CustomFieldType extends AbstractType
             YesNoButtonGroupType::class,
             [
                 'label' => 'custom.field.label.required',
-                'attr' => [
+                'attr'  => [
                     // Need for JS call of method used for changing values dynamically in the frontend. Check co-form.js
-                    'data-toggle-button' => true
+                    'data-toggle-button' => true,
                 ],
             ]
         );
