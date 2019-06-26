@@ -23,6 +23,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\CsvTransformer;
 
 abstract class AbstractMultivalueType extends AbstractCustomFieldType
 {
@@ -131,6 +132,14 @@ abstract class AbstractMultivalueType extends AbstractCustomFieldType
                 );
             }
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createApiValueTransformer(): DataTransformerInterface
+    {
+        return new CsvTransformer();
     }
 
     /**
