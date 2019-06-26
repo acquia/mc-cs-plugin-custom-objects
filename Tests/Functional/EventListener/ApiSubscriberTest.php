@@ -152,7 +152,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
                             [
                                 'name'       => 'Custom Item Created Via Contact API 2',
                                 'attributes' => [
-                                    'multiselect-test-field' => 'option_a',
+                                    'multiselect-test-field'    => 'option_a',
                                     'checkbox-group-test-field' => ['option_b'],
                                 ],
                             ],
@@ -163,8 +163,8 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         ];
 
         $this->client->request('POST', 'api/contacts/new?includeCustomObjects=true', $contact);
-        $response     = $this->client->getResponse();
-        $responseData = json_decode($response->getContent(), true);
+        $response               = $this->client->getResponse();
+        $responseData           = json_decode($response->getContent(), true);
         $customItemFromResponse = $responseData['contact']['customObjects']['data'][0]['data'][0];
 
         $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
