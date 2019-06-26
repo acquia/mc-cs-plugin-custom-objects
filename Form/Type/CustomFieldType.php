@@ -323,6 +323,8 @@ class CustomFieldType extends AbstractType
             $options['label'] = 'custom.field.label.default_value';
         }
 
+        $options['required'] = false;
+
         // Demo field in panel
         $form->add(
             'defaultValue',
