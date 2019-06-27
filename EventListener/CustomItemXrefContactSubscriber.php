@@ -24,6 +24,8 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
 use Doctrine\ORM\NoResultException;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 
 class CustomItemXrefContactSubscriber extends CommonSubscriber
 {
@@ -56,7 +58,8 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
     {
         return [
             CustomItemEvents::ON_CUSTOM_ITEM_LOOKUP_QUERY          => 'onLookupQuery',
-            CustomItemEvents::ON_CUSTOM_ITEM_LIST_QUERY            => 'onListQuery',
+            CustomItemEvents::ON_CUSTOM_ITEM_LIST_ORM_QUERY        => 'onListOrmQuery',
+            CustomItemEvents::ON_CUSTOM_ITEM_LIST_DBAL_QUERY       => 'onListDbalQuery',
             CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY => 'onEntityLinkDiscovery',
             CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY           => [
                 ['saveLink', 1000],
@@ -72,14 +75,33 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
     /**
      * @param CustomItemListQueryEvent $event
      */
-    public function onListQuery(CustomItemListQueryEvent $event): void
+    public function onListDbalQuery(CustomItemListDbalQueryEvent $event): void
     {
         $tableConfig = $event->getTableConfig();
         if ('contact' === $tableConfig->getParameter('filterEntityType') && $tableConfig->getParameter('filterEntityId')) {
             $queryBuilder = $event->getQueryBuilder();
-            $queryBuilder->leftJoin('CustomItem.contactReferences', 'CustomItemXrefContact');
-            $queryBuilder->andWhere('CustomItemXrefContact.contact = :contactId');
-            $queryBuilder->setParameter('contactId', $tableConfig->getParameter('filterEntityId'));
+            $queryBuilder->leftJoin(
+                CustomItem::TABLE_ALIAS,
+                MAUTIC_TABLE_PREFIX.CustomItemXrefContact::TABLE_NAME,
+                CustomItemXrefContact::TABLE_ALIAS,
+                CustomItem::TABLE_ALIAS.'.id = '.CustomItemXrefContact::TABLE_ALIAS.'.custom_item_id'
+            );
+            $queryBuilder->andWhere(CustomItemXrefContact::TABLE_ALIAS.'.contact_id = :contactId');
+            $queryBuilder->setParameter('contactId', (int) $tableConfig->getParameter('filterEntityId'));
+        }
+    }
+
+    /**
+     * @param CustomItemListQueryEvent $event
+     */
+    public function onListOrmQuery(CustomItemListQueryEvent $event): void
+    {
+        $tableConfig = $event->getTableConfig();
+        if ('contact' === $tableConfig->getParameter('filterEntityType') && $tableConfig->getParameter('filterEntityId')) {
+            $queryBuilder = $event->getQueryBuilder();
+            $queryBuilder->leftJoin(CustomItem::TABLE_ALIAS.'.contactReferences', CustomItemXrefContact::TABLE_ALIAS);
+            $queryBuilder->andWhere(CustomItemXrefContact::TABLE_ALIAS.'.contact = :contactId');
+            $queryBuilder->setParameter('contactId', (int) $tableConfig->getParameter('filterEntityId'));
         }
     }
 
@@ -91,10 +113,10 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
         $tableConfig = $event->getTableConfig();
         if ('contact' === $tableConfig->getParameter('filterEntityType') && $tableConfig->getParameter('filterEntityId')) {
             $queryBuilder = $event->getQueryBuilder();
-            $queryBuilder->leftJoin('CustomItem.contactReferences', 'CustomItemXrefContact');
+            $queryBuilder->leftJoin(CustomItem::TABLE_ALIAS.'.contactReferences', CustomItemXrefContact::TABLE_ALIAS);
             $queryBuilder->andWhere($queryBuilder->expr()->orX(
-                $queryBuilder->expr()->neq('CustomItemXrefContact.contact', $tableConfig->getParameter('filterEntityId')),
-                $queryBuilder->expr()->isNull('CustomItemXrefContact.contact')
+                $queryBuilder->expr()->neq(CustomItemXrefContact::TABLE_ALIAS.'.contact', $tableConfig->getParameter('filterEntityId')),
+                $queryBuilder->expr()->isNull(CustomItemXrefContact::TABLE_ALIAS.'.contact')
             ));
         }
     }
