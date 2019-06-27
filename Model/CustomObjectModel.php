@@ -288,7 +288,7 @@ class CustomObjectModel extends FormModel
     private function createListQueryBuilder(TableConfig $tableConfig): QueryBuilder
     {
         $queryBuilder = $this->entityManager->createQueryBuilder();
-        $queryBuilder= $tableConfig->configureOrmQueryBuilder($queryBuilder);
+        $queryBuilder = $tableConfig->configureOrmQueryBuilder($queryBuilder);
         $queryBuilder->select(CustomObject::TABLE_ALIAS);
         $queryBuilder->from(CustomObject::class, CustomObject::TABLE_ALIAS);
 

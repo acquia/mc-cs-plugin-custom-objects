@@ -228,7 +228,7 @@ class CustomItemModel extends FormModel
 
     /**
      * Returns a list of entities (ORM).
-     * 
+     *
      * @param TableConfig $tableConfig
      *
      * @return CustomItem[]
@@ -247,7 +247,7 @@ class CustomItemModel extends FormModel
 
     /**
      * Returns a list of arrays representing custom items (DBAL).
-     * 
+     *
      * @param TableConfig $tableConfig
      *
      * @return CustomItem[]

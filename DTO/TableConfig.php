@@ -114,7 +114,7 @@ class TableConfig
 
     /**
      * @param OrmQueryBuilder $queryBuilder
-     * 
+     *
      * @return OrmQueryBuilder
      */
     public function configureOrmQueryBuilder(OrmQueryBuilder $queryBuilder): OrmQueryBuilder
@@ -124,7 +124,7 @@ class TableConfig
 
     /**
      * @param DbalQueryBuilder $queryBuilder
-     * 
+     *
      * @return DbalQueryBuilder
      */
     public function configureDbalQueryBuilder(DbalQueryBuilder $queryBuilder): DbalQueryBuilder
@@ -134,9 +134,9 @@ class TableConfig
 
     /**
      * Both builders can be configured exactly the same way. Let's do it in one method then.
-     * 
+     *
      * @param DbalQueryBuilder|OrmQueryBuilder $queryBuilder
-     * 
+     *
      * @return DbalQueryBuilder|OrmQueryBuilder
      */
     private function configureQueryBuilder($queryBuilder)

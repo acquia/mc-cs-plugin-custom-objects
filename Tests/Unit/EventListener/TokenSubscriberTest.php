@@ -20,10 +20,8 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use MauticPlugin\CustomObjectsBundle\EventListener\TokenSubscriber;
 use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\EmailBundle\Entity\Email;
-use Doctrine\ORM\PersistentCollection;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\Lead;
-use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Event\BuilderEvent;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
@@ -54,8 +52,8 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->customObjectModel = $this->createMock(CustomObjectModel::class);
         $this->customItemModel   = $this->createMock(CustomItemModel::class);
         $this->emailSendEvent    = $this->createMock(EmailSendEvent::class);
-        $this->builderEvent = $this->createMock(BuilderEvent::class);
-        $this->subscriber     = new TokenSubscriber(
+        $this->builderEvent      = $this->createMock(BuilderEvent::class);
+        $this->subscriber        = new TokenSubscriber(
             $this->configProvider,
             $this->customObjectModel,
             $this->customItemModel
@@ -92,21 +90,21 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
         $segment->setName('CO test');
         $segment->setFilters([
             [
-                'glue' => 'and',
-                'field' => 'cmf_1',
-                'object' => 'custom_object',
-                'type' => 'text',
-                'filter' => '23',
-                'display' => null,
+                'glue'     => 'and',
+                'field'    => 'cmf_1',
+                'object'   => 'custom_object',
+                'type'     => 'text',
+                'filter'   => '23',
+                'display'  => null,
                 'operator' => '=',
             ],
             [
-                'glue' => 'and',
-                'field' => 'cmf_10',
-                'object' => 'custom_object',
-                'type' => 'int',
-                'filter' => '4',
-                'display' => null,
+                'glue'     => 'and',
+                'field'    => 'cmf_10',
+                'object'   => 'custom_object',
+                'type'     => 'int',
+                'filter'   => '4',
+                'display'  => null,
                 'operator' => '=',
             ],
         ]);
@@ -119,15 +117,15 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
         $emailSendEvent = new EmailSendEvent(
             null,
             [
-                'subject' => 'CO segment test',
-                'content' => $html,
+                'subject'          => 'CO segment test',
+                'content'          => $html,
                 'conplainTexttent' => '',
-                'email' => $email,
-                'lead' => ['id' => 2345, 'email' => 'john@doe.email'],
-                'source' => null
+                'email'            => $email,
+                'lead'             => ['id' => 2345, 'email' => 'john@doe.email'],
+                'source'           => null,
             ]
         );
-        
+
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
             ->willReturn(true);
@@ -138,27 +136,27 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
     public function testOnListQuery(): void
     {
         $queryBuilder = $this->createMock(QueryBuilder::class);
-        $tableConfig = new TableConfig(10, 1, 'CustomItem.dateAdded', 'DESC');
+        $tableConfig  = new TableConfig(10, 1, 'CustomItem.dateAdded', 'DESC');
         $tableConfig->addParameter('customObjectId', 123);
         $tableConfig->addParameter('filterEntityType', 'contact');
         $tableConfig->addParameter('filterEntityId', 345);
         $tableConfig->addParameter('tokenWhere', [
             [
-                'glue' => 'and',
-                'field' => 'cmf_1',
-                'object' => 'custom_object',
-                'type' => 'text',
-                'filter' => '23',
-                'display' => null,
+                'glue'     => 'and',
+                'field'    => 'cmf_1',
+                'object'   => 'custom_object',
+                'type'     => 'text',
+                'filter'   => '23',
+                'display'  => null,
                 'operator' => '=',
             ],
             [
-                'glue' => 'and',
-                'field' => 'cmf_10',
-                'object' => 'custom_object',
-                'type' => 'int',
-                'filter' => '4',
-                'display' => null,
+                'glue'     => 'and',
+                'field'    => 'cmf_10',
+                'object'   => 'custom_object',
+                'type'     => 'int',
+                'filter'   => '4',
+                'display'  => null,
                 'operator' => '=',
             ],
         ]);
