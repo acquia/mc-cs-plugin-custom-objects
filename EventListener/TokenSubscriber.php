@@ -26,8 +26,6 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use Mautic\UserBundle\Model\UserModel;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
@@ -76,8 +74,6 @@ class TokenSubscriber implements EventSubscriberInterface
      * @param QueryFilterHelper           $queryFilterHelper
      * @param CustomObjectModel           $customObjectModel
      * @param CustomItemModel             $customItemModel
-     * @param TokenStorageInterface       $customItemModel
-     * @param UserModel                   $userModel
      */
     public function __construct(
         ConfigProvider $configProvider,
