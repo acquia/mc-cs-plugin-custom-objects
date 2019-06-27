@@ -755,8 +755,6 @@ return [
                     'custom_object.query.filter.helper',
                     'mautic.custom.model.object',
                     'mautic.custom.model.item',
-                    'security.token_storage',
-                    'mautic.user.model.user',
                 ],
             ],
         ],
