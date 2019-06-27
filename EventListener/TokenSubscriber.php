@@ -42,6 +42,8 @@ use Mautic\LeadBundle\Segment\RandomParameterName;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
+use Mautic\LeadBundle\Segment\ContactSegmentFilters;
 
 /**
  * Handles Custom Object token replacements with the correct value in emails.
@@ -140,7 +142,7 @@ class TokenSubscriber implements EventSubscriberInterface
             EmailEvents::EMAIL_ON_BUILD    => ['onBuilderBuild', 0],
             EmailEvents::EMAIL_ON_SEND     => ['decodeTokens', 0],
             EmailEvents::EMAIL_ON_DISPLAY  => ['decodeTokens', 0],
-            CustomItemEvents::ON_CUSTOM_ITEM_LIST_QUERY => 'onListQuery',
+            CustomItemEvents::ON_CUSTOM_ITEM_LIST_DBAL_QUERY => ['onListQuery', -1],
         ];
     }
 
@@ -203,7 +205,7 @@ class TokenSubscriber implements EventSubscriberInterface
 
                 $customObjectAlias = $aliases[0];
                 $customFieldAlias = $aliases[1];
-                $orderBy = CustomItem::TABLE_ALIAS.'.dateAdded';
+                $orderBy = CustomItem::TABLE_ALIAS.'.date_added';
                 $orderDir = 'DESC';
                 $limit = 1;
                 $defaultValue = '';
@@ -242,22 +244,22 @@ class TokenSubscriber implements EventSubscriberInterface
                     }
                 }
 
+                $segmentConditions = null;
+
                 if ('segment-filter' === $where) {
-                    $segmentConditions = [];
                     if ('list' === $email->getEmailType()) {
+                        // Validation check that all segments have the same CO filters, so let's take the first one.
                         /** @var LeadList $segment */
-                        foreach ($email->getLists() as $segmentOrigin) {
-                            $segment = clone $segmentOrigin;
-                            $filters = [];
-                            /** @var ContactSegmentFilter $filter */
-                            foreach ($segment->getFilters() as $filter) {
-                                if ('custom_object' === $filter['object']) {
-                                    $filters[] = $filter;
-                                }
+                        $segment = clone $email->getLists()->first();
+                        $filters = [];
+                        /** @var ContactSegmentFilter $filter */
+                        foreach ($segment->getFilters() as $filter) {
+                            if ('custom_object' === $filter['object']) {
+                                $filters[] = $filter;
                             }
-                            $segment->setFilters($filters);
-                            $segmentConditions[$segmentOrigin->getId()] = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
                         }
+                        $segment->setFilters($filters);
+                        $segmentConditions = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
                     }
                     // @todo implement also campaign emails.
                 }
@@ -268,11 +270,12 @@ class TokenSubscriber implements EventSubscriberInterface
                 $tableConfig->addParameter('filterEntityId', (int) $contact['id']);
                 $tableConfig->addParameter('tokenWhere', $where);
                 $tableConfig->addParameter('segmentConditions', $segmentConditions);
-                $customItems = $this->customItemModel->getTableData($tableConfig);
+                $customItems = $this->customItemModel->getArrayTableData($tableConfig);
                 $fieldValues = [];
 
-                /** @var CustomItem $customItem */
-                foreach ($customItems as $customItem) {
+                foreach ($customItems as $customItemData) {
+                    $customItem = new CustomItem($customObject);
+                    $customItem->populateFromArray($customItemData);
                     $customItem = $this->customItemModel->populateCustomFields($customItem);
                     try {
                         $fieldValues[] = $customItem->findCustomFieldValueForFieldAlias($customFieldAlias)->getValue();
@@ -289,47 +292,29 @@ class TokenSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param CustomItemListQueryEvent $event
+     * @param CustomItemListDbalQueryEvent $event
      */
-    public function onListQuery(CustomItemListQueryEvent $event): void
+    public function onListQuery(CustomItemListDbalQueryEvent $event): void
     {
         $tableConfig = $event->getTableConfig();
         $contactId = $tableConfig->getParameter('filterEntityId');
-        $segmentsConditions = $tableConfig->getParameter('segmentConditions');
-        if ('contact' === $tableConfig->getParameter('filterEntityType') && $contactId && $segmentsConditions && is_array($segmentsConditions)) {
+        $segmentConditions = $tableConfig->getParameter('segmentConditions');
+        if ('contact' === $tableConfig->getParameter('filterEntityType') && $contactId && $segmentConditions && $segmentConditions instanceof ContactSegmentFilters) {
             $queryBuilder = $event->getQueryBuilder();
 
-            foreach ($segmentsConditions as $segmentConditions) {
-                /** @var ContactSegmentFilter $condition */
-                foreach ($segmentConditions as $condition) {
-                    $customFieldType = $this->customFieldTypeProvider->getType($condition->getType());
-                    // $fieldData = explode('_', $condition->getField());
-                    // $customFieldId = (int) $fieldData[1];
-                    $customFieldId = (int) $condition->getField();
-                    $innerQueryBuilder = $this->queryFilterHelper->createValueQueryBuilder($queryBuilder->getEntityManager()->getConnection(), 'queryAlias', $customFieldId, $condition->getType());
-                    $innerQueryBuilder->select('queryAlias_contact.custom_item_id');
-                    $this->queryFilterHelper->addCustomFieldValueExpressionFromSegmentFilter($innerQueryBuilder, 'tableAlias', $condition);
-                    $this->queryFilterHelper->addContactIdRestriction($innerQueryBuilder, 'queryAlias', $tableConfig->getParameter('filterEntityId'));
-                    dump($innerQueryBuilder->getSql());
-                    dump($innerQueryBuilder->getParameters());die;
-                    $queryBuilder->andWhere($queryBuilder->expr()->exists($innerQueryBuilder->getSQL()), 'OR');
-                    // $randomHash = $this->randomParameterNameService->generateRandomParameterName();
-                    // $tableAlias = "{$customFieldType->getTableAlias()}_{$randomHash}";
-                    // $queryBuilder->leftJoin(
-                    //     $customFieldType->getEntityClass(),
-                    //     $tableAlias,
-                    //     Expr\Join::WITH,
-                    //     "CustomItem.id = {$tableAlias}.customItem AND {$tableAlias}.customField = {$customFieldId}");
-                    // // @todo deal with AND and OR.
-                    // // @todo deal with different operators.
-                    // $queryBuilder->andWhere("{$tableAlias}.value = :{$randomHash}");
-                    // $queryBuilder->setParameter($randomHash, $condition['filter']);
+            /** @var ContactSegmentFilter $condition */
+            foreach ($segmentConditions as $segmentId => $condition) {
+                $queryAlias = 'filter_'.$segmentId;
+                $customFieldId = (int) $condition->getField();
+                $innerQueryBuilder = $this->queryFilterHelper->createValueQueryBuilder($queryBuilder->getConnection(), $queryAlias, $customFieldId, $condition->getType());
+                $innerQueryBuilder->select($queryAlias.'_contact.custom_item_id');
+                $this->queryFilterHelper->addCustomFieldValueExpressionFromSegmentFilter($innerQueryBuilder, $queryAlias, $condition);
+                foreach ($innerQueryBuilder->getParameters() as $key => $value) {
+                    $queryBuilder->setParameter($key, $value);
                 }
+                $queryBuilder->andWhere($innerQueryBuilder->expr()->exists($innerQueryBuilder->getSQL()));
             }
-            dump($queryBuilder->getQuery()->getSQL());
-            dump($queryBuilder->getQuery()->getParameters());
         }
-
     }
 
     private function trimArrayElements(array $array): array
