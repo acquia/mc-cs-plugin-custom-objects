@@ -254,6 +254,10 @@ CustomObjectsForm = {
             case 'multiselect':
                 options = options + '<option value=""></option>';
                 break;
+            case `radio_group` :
+                options = options + mQuery('#custom_field_defaultValue input:eq(0)').get(0).outerHTML
+                    + mQuery('#custom_field_defaultValue label:eq(0)').get(0).outerHTML;
+                break;
         }
 
         // Transfer options
