@@ -161,4 +161,41 @@ class CustomItemTest extends \PHPUnit_Framework_TestCase
         $this->expectException(NotFoundException::class);
         $item->createNewCustomFieldValueByFieldAlias('field-alias-2', 'unicorn');
     }
+
+    public function testSetDefaultValuesForMissingFields(): void
+    {
+        $object = new CustomObject();
+        $item   = new CustomItem($object);
+        $fieldA = $this->createMock(CustomField::class);
+        $fieldB = $this->createMock(CustomField::class);
+        $fieldC = $this->createMock(CustomField::class);
+
+        $fieldA->method('getId')->willReturn(1);
+        $fieldA->expects($this->never())->method('getDefaultValue');
+        $fieldA->method('getTypeObject')->willReturn(
+            new TextType($this->createMock(TranslatorInterface::class))
+        );
+
+        $fieldB->method('getId')->willReturn(2);
+        $fieldB->expects($this->once())->method('getDefaultValue')->willReturn('Default B');
+        $fieldB->method('getTypeObject')->willReturn(
+            new TextType($this->createMock(TranslatorInterface::class))
+        );
+
+        $fieldC->method('getId')->willReturn(3);
+        $fieldB->expects($this->once())->method('getDefaultValue')->willReturn(null);
+        $fieldC->method('getTypeObject')->willReturn(
+            new TextType($this->createMock(TranslatorInterface::class))
+        );
+
+        $object->addCustomField($fieldA);
+        $object->addCustomField($fieldB);
+        $object->addCustomField($fieldC);
+
+        $item->addCustomFieldValue($item->createNewCustomFieldValueByFieldId(1, 'Value A'));
+
+        $item->setDefaultValuesForMissingFields();
+
+        $this->assertCount(3, $item->getCustomFieldValues());
+    }
 }

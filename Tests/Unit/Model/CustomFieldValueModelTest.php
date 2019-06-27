@@ -127,10 +127,6 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
             ->method('getId')
             ->willReturn(66);
 
-        $noValueField->expects($this->once())
-            ->method('getDefaultValue')
-            ->willReturn(1000);
-
         $this->customField->expects($this->any())
             ->method('getId')
             ->willReturn(44);
@@ -207,7 +203,7 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->customField, $storedValue->getCustomField());
         $this->assertSame($customItem, $storedValue->getCustomItem());
 
-        $this->assertSame(1000, $newValue->getValue());
+        $this->assertSame(0, $newValue->getValue());
         $this->assertSame($noValueField, $newValue->getCustomField());
         $this->assertSame($customItem, $newValue->getCustomItem());
     }

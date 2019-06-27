@@ -166,6 +166,72 @@ class ImportSubscriberTest extends KernelTestCase
         $this->validateNameCannotBeEmpty($customObject, $csvRow);
     }
 
+    public function testImportWithDefaultValues(): void
+    {
+        $configureFieldCallback = function (CustomField $customField): void {
+            if ('date' === $customField->getType()) {
+                $customField->setDefaultValue('2019-06-21');
+            }
+            if ('text' === $customField->getType()) {
+                $customField->setDefaultValue('A default value');
+            }
+            if ('multiselect' === $customField->getType()) {
+                $customField->setDefaultValue(['option_b']);
+            }
+            if ('hidden' === $customField->getType()) {
+                $customField->setDefaultValue('Secret default');
+            }
+        };
+
+        $jane         = $this->createContact('jane@doe.email');
+        $john         = $this->createContact('john@doe.email');
+        $customObject = $this->createCustomObjectWithAllFields($this->container, 'Import CI all fields test Custom Object', $configureFieldCallback);
+        $csvRow       = [
+            'name'           => 'Import CI all fields test Custom Item',
+            'contacts'       => "{$jane->getId()},{$john->getId()}",
+            // 'text'           => '', // Missing on puprose so the default value could kick in.
+            'checkbox_group' => 'option_b',
+            // 'multiselect'    => '', // Missing on puprose so the default value could kick in.
+            'country'        => 'Czech Republic',
+            // 'date'           => '', // Missing on puprose so the default value could kick in.
+            'datetime'       => '2019-03-04 12:35:09',
+            'email'          => 'info@doe.corp',
+            'hidden'         => 'secret hidden text', // Ensure the default value can be overwritten when provided.
+            'int'            => '3453562',
+            'phone'          => '+420775603019',
+            'radio_group'    => 'option_a',
+            'select'         => 'option_b',
+            'textarea'       => "Some looong\ntext\n\nhere",
+            'url'            => 'https://mautic.org',
+        ];
+
+        $expectedValues                   = $csvRow;
+        $expectedValues['datetime']       = new \DateTimeImmutable('2019-03-04 12:35:09');
+        $expectedValues['date']           = new \DateTimeImmutable('2019-06-21 00:00:00');
+        $expectedValues['checkbox_group'] = ['option_b'];
+        $expectedValues['multiselect']    = ['option_b'];
+        $expectedValues['text']           = 'A default value';
+
+        // Import the custom item
+        $insertStatus = $this->importCsvRow($customObject, $csvRow);
+
+        $this->assertFalse($insertStatus);
+
+        $this->entityManager->clear();
+
+        // Fetch the imported custom item
+        $insertedCustomItem = $this->getCustomItemByName($csvRow['name']);
+
+        $this->assertInstanceOf(CustomItem::class, $insertedCustomItem);
+        $this->assertSame($customObject->getCustomFields()->count(), $insertedCustomItem->getCustomFieldValues()->count());
+        $this->assertSame(2, $insertedCustomItem->getContactReferences()->count());
+
+        $customObject->getCustomFields()->map(function (CustomField $customField) use ($insertedCustomItem, $expectedValues): void {
+            $valueEntity = $insertedCustomItem->getCustomFieldValues()->get($customField->getId());
+            $this->assertEquals($expectedValues[$customField->getType()], $valueEntity->getValue(), "For field {$customField->getAlias()}");
+        });
+    }
+
     /**
      * Try to save a multiselect option that does not exist.
      *
@@ -298,7 +364,9 @@ class ImportSubscriberTest extends KernelTestCase
         $customObject->getCustomFields()->map(function (CustomField $customField) use (&$mappedFields, &$rowData, $csvRow): void {
             $key                = $customField->getTypeObject()->getKey();
             $mappedFields[$key] = (string) $customField->getId();
-            $rowData[$key]      = $csvRow[$customField->getType()];
+            if (array_key_exists($customField->getType(), $csvRow)) {
+                $rowData[$key]      = $csvRow[$customField->getType()];
+            }
         });
 
         /** @var CustomObjectModel $customObjectModel */

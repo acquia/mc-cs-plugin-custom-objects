@@ -155,8 +155,7 @@ class CustomFieldValueModel
             $customItem->addCustomFieldValue(
                 $customField->getTypeObject()->createValueEntity(
                     $customField,
-                    $customItem,
-                    $customField->getDefaultValue()
+                    $customItem
                 )
             );
         });

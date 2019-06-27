@@ -313,6 +313,11 @@ class ApiSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('fetchEntity')
             ->willReturn($customItem);
 
+        $this->customItemModel->expects($this->once())
+            ->method('populateCustomFields')
+            ->with($customItem)
+            ->willReturn($customItem);
+
         $customItem->expects($this->once())
             ->method('setName')
             ->with('Test Item');
@@ -328,6 +333,9 @@ class ApiSubscriberTest extends \PHPUnit_Framework_TestCase
         $customItem->expects($this->once())
             ->method('createNewCustomFieldValueByFieldAlias')
             ->with('price', 237);
+
+        $customItem->expects($this->once())
+            ->method('setDefaultValuesForMissingFields');
 
         $this->customItemModel->expects($this->once())
             ->method('save')

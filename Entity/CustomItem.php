@@ -350,6 +350,19 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         throw new NotFoundException("Custom field with alias {$customFieldAlias} was not found.");
     }
 
+    public function setDefaultValuesForMissingFields(): void
+    {
+        $this->getCustomObject()->getCustomFields()->map(function (CustomField $customField) {
+            try {
+                $this->findCustomFieldValueForFieldId($customField->getId());
+            } catch (NotFoundException $e) {
+                $this->addCustomFieldValue(
+                    $customField->getTypeObject()->createValueEntity($customField, $this, $customField->getDefaultValue())
+                );
+            }
+        });
+    }
+
     /**
      * @param CustomItemXrefInterface $reference
      */
