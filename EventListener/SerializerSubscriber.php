@@ -86,7 +86,7 @@ class SerializerSubscriber implements EventSubscriberInterface
      */
     public function addCustomItemsIntoContactResponse(ObjectEvent $event): void
     {
-        $limit    = 50;
+        $limit    = 10;
         $page     = 1;
         $orderDir = 'DESC';
         $request  = $this->requestStack->getCurrentRequest();
@@ -120,10 +120,11 @@ class SerializerSubscriber implements EventSubscriberInterface
         $payload = [
             'data' => [],
             'meta' => [
-                'limit'          => $limit,
-                'page'           => $page,
-                'order'          => CustomObject::TABLE_ALIAS.'.dateAdded',
-                'orderDirection' => $orderDir,
+                'sort' => '-dateAdded',
+                'page' => [
+                    'number' => $page,
+                    'size'   => $limit,
+                ],
             ],
         ];
 
@@ -147,10 +148,11 @@ class SerializerSubscriber implements EventSubscriberInterface
                     'alias' => $customObject['alias'],
                     'data'  => $itemsPayload,
                     'meta'  => [
-                        'limit'          => $limit,
-                        'page'           => $page,
-                        'order'          => CustomItem::TABLE_ALIAS.'.dateAdded',
-                        'orderDirection' => $orderDir,
+                        'sort' => '-dateAdded',
+                        'page' => [
+                            'number' => $page,
+                            'size'   => $limit,
+                        ],
                     ],
                 ];
             }
