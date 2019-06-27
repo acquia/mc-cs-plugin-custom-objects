@@ -751,10 +751,8 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\TokenSubscriber::class,
                 'arguments' => [
                     'custom_object.config.provider',
-                    'custom_field.type.provider',
                     'mautic.lead.model.lead_segment_filter_factory',
                     'custom_object.query.filter.helper',
-                    'mautic.lead.model.random_parameter_name',
                     'mautic.custom.model.object',
                     'mautic.custom.model.item',
                     'security.token_storage',

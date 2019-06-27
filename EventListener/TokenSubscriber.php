@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Mautic\EmailBundle\EmailEvents;
-use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
@@ -27,13 +26,10 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use Mautic\UserBundle\Entity\User;
 use Mautic\UserBundle\Model\UserModel;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use Mautic\LeadBundle\Entity\LeadList;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
-use Mautic\LeadBundle\Segment\RandomParameterName;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
@@ -55,11 +51,6 @@ class TokenSubscriber implements EventSubscriberInterface
     private $configProvider;
 
     /**
-     * @var CustomFieldTypeProvider
-     */
-    private $customFieldTypeProvider;
-
-    /**
      * @var ContactSegmentFilterFactory
      */
     private $contactSegmentFilterFactory;
@@ -68,11 +59,6 @@ class TokenSubscriber implements EventSubscriberInterface
      * @var QueryFilterHelper
      */
     private $queryFilterHelper;
-
-    /**
-     * @var RandomParameterName
-     */
-    private $randomParameterNameService;
 
     /**
      * @var CustomObjectModel
@@ -85,21 +71,9 @@ class TokenSubscriber implements EventSubscriberInterface
     private $customItemModel;
 
     /**
-     * @var TokenStorageInterface
-     */
-    private $tokenStorage;
-
-    /**
-     * @var UserModel
-     */
-    private $userModel;
-
-    /**
      * @param ConfigProvider              $configProvider
-     * @param CustomFieldTypeProvider     $customFieldTypeProvider
      * @param ContactSegmentFilterFactory $contactSegmentFilterFactory
      * @param QueryFilterHelper           $queryFilterHelper
-     * @param RandomParameterName         $randomParameterNameService
      * @param CustomObjectModel           $customObjectModel
      * @param CustomItemModel             $customItemModel
      * @param TokenStorageInterface       $customItemModel
@@ -107,24 +81,16 @@ class TokenSubscriber implements EventSubscriberInterface
      */
     public function __construct(
         ConfigProvider $configProvider,
-        CustomFieldTypeProvider $customFieldTypeProvider,
         ContactSegmentFilterFactory $contactSegmentFilterFactory,
         QueryFilterHelper $queryFilterHelper,
-        RandomParameterName $randomParameterNameService,
         CustomObjectModel $customObjectModel,
-        CustomItemModel $customItemModel//,
-        // TokenStorageInterface $tokenStorage,
-        // UserModel $userModel
+        CustomItemModel $customItemModel
     ) {
         $this->configProvider                 = $configProvider;
-        $this->customFieldTypeProvider        = $customFieldTypeProvider;
         $this->contactSegmentFilterFactory    = $contactSegmentFilterFactory;
         $this->queryFilterHelper              = $queryFilterHelper;
-        $this->randomParameterNameService     = $randomParameterNameService;
         $this->customObjectModel              = $customObjectModel;
         $this->customItemModel                = $customItemModel;
-        // $this->tokenStorage      = $tokenStorage;
-        // $this->userModel      = $userModel;
     }
 
     /**
@@ -180,7 +146,6 @@ class TokenSubscriber implements EventSubscriberInterface
         if (!empty($matches[1])) {
             $contact = $event->getLead();
             $email   = $event->getEmail();
-            // $this->setActiveUser($this->userModel->getEntity($email->getCreatedBy())); // Do we care about CO permissions at this point?
             foreach ($matches[1] as $key => $tokenDataRaw) {
                 $token = $matches[0][$key];
                 $parts = $this->trimArrayElements(explode('|', $tokenDataRaw));
@@ -321,24 +286,5 @@ class TokenSubscriber implements EventSubscriberInterface
         return array_map(function ($part) {
             return trim($part);
         }, $array);
-    }
-
-    /**
-     * @param User $user
-     */
-    private function setActiveUser(User $user): void
-    {
-        $token = $this->tokenStorage->getToken();
-        // $user  = $token->getUser();
-
-        // if (!$user->isAdmin() && empty($user->getActivePermissions())) {
-        //     $activePermissions = $this->permissionRepository->getPermissionsByRole($user->getRole());
-
-        //     $user->setActivePermissions($activePermissions);
-        // }
-
-        $token->setUser($user);
-
-        $this->tokenStorage->setToken($token);
     }
 }
