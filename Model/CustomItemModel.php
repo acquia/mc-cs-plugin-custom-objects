@@ -36,6 +36,8 @@ use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
 use UnexpectedValueException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefInterface;
+use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
 
 class CustomItemModel extends FormModel
 {
@@ -225,20 +227,41 @@ class CustomItemModel extends FormModel
     }
 
     /**
+     * Returns a list of entities (ORM).
+     * 
      * @param TableConfig $tableConfig
      *
      * @return CustomItem[]
      */
     public function getTableData(TableConfig $tableConfig): array
     {
-        $queryBuilder = $this->createListQueryBuilder($tableConfig);
+        $queryBuilder = $this->createListOrmQueryBuilder($tableConfig);
 
         $this->dispatcher->dispatch(
-            CustomItemEvents::ON_CUSTOM_ITEM_LIST_QUERY,
+            CustomItemEvents::ON_CUSTOM_ITEM_LIST_ORM_QUERY,
             new CustomItemListQueryEvent($queryBuilder, $tableConfig)
         );
 
         return $queryBuilder->getQuery()->getResult();
+    }
+
+    /**
+     * Returns a list of arrays representing custom items (DBAL).
+     * 
+     * @param TableConfig $tableConfig
+     *
+     * @return CustomItem[]
+     */
+    public function getArrayTableData(TableConfig $tableConfig): array
+    {
+        $queryBuilder = $this->createListDbalQueryBuilder($tableConfig);
+
+        $this->dispatcher->dispatch(
+            CustomItemEvents::ON_CUSTOM_ITEM_LIST_DBAL_QUERY,
+            new CustomItemListDbalQueryEvent($queryBuilder, $tableConfig)
+        );
+
+        return $queryBuilder->execute()->fetchAll();
     }
 
     /**
@@ -248,11 +271,11 @@ class CustomItemModel extends FormModel
      */
     public function getCountForTable(TableConfig $tableConfig): int
     {
-        $queryBuilder = $this->createListQueryBuilder($tableConfig);
+        $queryBuilder = $this->createListOrmQueryBuilder($tableConfig);
         $queryBuilder->select($queryBuilder->expr()->countDistinct(CustomItem::TABLE_ALIAS));
 
         $this->dispatcher->dispatch(
-            CustomItemEvents::ON_CUSTOM_ITEM_LIST_QUERY,
+            CustomItemEvents::ON_CUSTOM_ITEM_LIST_ORM_QUERY,
             new CustomItemListQueryEvent($queryBuilder, $tableConfig)
         );
 
@@ -266,7 +289,7 @@ class CustomItemModel extends FormModel
      */
     public function getLookupData(TableConfig $tableConfig): array
     {
-        $queryBuilder = $this->createListQueryBuilder($tableConfig);
+        $queryBuilder = $this->createListOrmQueryBuilder($tableConfig);
         $rootAlias    = CustomItem::TABLE_ALIAS;
         $queryBuilder->select("{$rootAlias}.name as value, {$rootAlias}.id");
 
@@ -337,7 +360,7 @@ class CustomItemModel extends FormModel
      *
      * @throws UnexpectedValueException
      */
-    private function createListQueryBuilder(TableConfig $tableConfig): QueryBuilder
+    private function createListOrmQueryBuilder(TableConfig $tableConfig): QueryBuilder
     {
         $customObjectId = $tableConfig->getParameter('customObjectId');
         $search         = $tableConfig->getParameter('search');
@@ -362,13 +385,44 @@ class CustomItemModel extends FormModel
     }
 
     /**
+     * @param TableConfig $tableConfig
+     *
+     * @return DbalQueryBuilder
+     *
+     * @throws UnexpectedValueException
+     */
+    private function createListDbalQueryBuilder(TableConfig $tableConfig): DbalQueryBuilder
+    {
+        $customObjectId = $tableConfig->getParameter('customObjectId');
+        $search         = $tableConfig->getParameter('search');
+        $queryBuilder   = $this->entityManager->getConnection()->createQueryBuilder();
+        $queryBuilder   = $tableConfig->configureDbalQueryBuilder($queryBuilder);
+
+        if (empty($customObjectId)) {
+            throw new UnexpectedValueException("customObjectId cannot be empty. It's required for permission management");
+        }
+
+        $queryBuilder->select(CustomItem::TABLE_ALIAS.'.*');
+        $queryBuilder->from(MAUTIC_TABLE_PREFIX.CustomItem::TABLE_NAME, CustomItem::TABLE_ALIAS);
+        $queryBuilder->where(CustomItem::TABLE_ALIAS.'.custom_object_id = :customObjectId');
+        $queryBuilder->setParameter('customObjectId', $customObjectId);
+
+        if ($search) {
+            $queryBuilder->andWhere(CustomItem::TABLE_ALIAS.'.name LIKE :search');
+            $queryBuilder->setParameter('search', "%{$search}%");
+        }
+
+        return $this->applyOwnerFilter($queryBuilder, $customObjectId);
+    }
+
+    /**
      * Adds condition for owner if the user doesn't have permissions to view other.
      *
-     * @param QueryBuilder $queryBuilder
+     * @param QueryBuilder|DbalQueryBuilder $queryBuilder
      *
-     * @return QueryBuilder
+     * @return QueryBuilder|DbalQueryBuilder
      */
-    private function applyOwnerFilter(QueryBuilder $queryBuilder, int $customObjectId): QueryBuilder
+    private function applyOwnerFilter($queryBuilder, int $customObjectId)
     {
         $user = $this->userHelper->getUser();
 

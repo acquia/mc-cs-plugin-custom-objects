@@ -59,14 +59,24 @@ final class CustomItemEvents
     public const ON_CUSTOM_ITEM_POST_DELETE = 'custom.item.on_post_delete';
 
     /**
-     * The custom.item.on_item_list_query event is fired when custom items list query is being build.
+     * The custom.item.on_item_dbal_list_query event is fired when custom items list DBAL query is being build.
      *
      * The event listener receives a
      * MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent
      *
      * @var string
      */
-    public const ON_CUSTOM_ITEM_LIST_QUERY = 'custom.item.on_item_list_query';
+    public const ON_CUSTOM_ITEM_LIST_DBAL_QUERY = 'custom.item.on_item_dbal_list_query';
+
+    /**
+     * The custom.item.on_item_orm_list_query event is fired when custom items list ORM query is being build.
+     *
+     * The event listener receives a
+     * MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent
+     *
+     * @var string
+     */
+    public const ON_CUSTOM_ITEM_LIST_ORM_QUERY = 'custom.item.on_item_orm_list_query';
 
     /**
      * The custom.item.on_item_lookup_query event is fired when custom items lookup query is being build.
