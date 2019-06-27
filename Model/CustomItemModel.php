@@ -342,6 +342,7 @@ class CustomItemModel extends FormModel
         $customObjectId = $tableConfig->getParameter('customObjectId');
         $search         = $tableConfig->getParameter('search');
         $queryBuilder   = $this->entityManager->createQueryBuilder();
+        $queryBuilder   = $tableConfig->configureOrmQueryBuilder($queryBuilder);
 
         if (empty($customObjectId)) {
             throw new UnexpectedValueException("customObjectId cannot be empty. It's required for permission management");
@@ -349,9 +350,6 @@ class CustomItemModel extends FormModel
 
         $queryBuilder->select(CustomItem::TABLE_ALIAS);
         $queryBuilder->from(CustomItem::class, CustomItem::TABLE_ALIAS);
-        $queryBuilder->setMaxResults($tableConfig->getLimit());
-        $queryBuilder->setFirstResult($tableConfig->getOffset());
-        $queryBuilder->orderBy($tableConfig->getOrderBy(), $tableConfig->getOrderDirection());
         $queryBuilder->where(CustomItem::TABLE_ALIAS.'.customObject = :customObjectId');
         $queryBuilder->setParameter('customObjectId', $customObjectId);
 
