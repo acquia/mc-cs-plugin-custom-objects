@@ -148,6 +148,17 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     }
 
     /**
+     * @param array $data
+     */
+    public function populateFromArray(array $data): void
+    {
+        foreach ($data as $property => $value) {
+            $camelCaseProperty = lcfirst(ucwords($property, '_'));
+            $this->{$camelCaseProperty} = $value;
+        }
+    }
+
+    /**
      * @return int|null
      */
     public function getId()
