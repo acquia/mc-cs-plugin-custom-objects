@@ -755,6 +755,7 @@ return [
                     'custom_object.query.filter.helper',
                     'mautic.custom.model.object',
                     'mautic.custom.model.item',
+                    'custom_object.token.parser',
                 ],
             ],
         ],
@@ -971,6 +972,9 @@ return [
             ],
             'custom_object.csv.helper'                  => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Helper\CsvHelper::class,
+            ],
+            'custom_object.token.parser'                  => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Helper\TokenParser::class,
             ],
             'custom_object.random.helper'                  => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Helper\RandomHelper::class,
