@@ -109,7 +109,7 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getQueryBuilder')
             ->willReturn($tableConfig);
 
-        $this->xrefSubscriber->onListQuery($this->listEvent);
+        $this->xrefSubscriber->onListOrmQuery($this->listEvent);
     }
 
     public function testOnListQuery(): void
@@ -138,7 +138,7 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('setParameter')
             ->with('contactId', self::ENTITY_ID);
 
-        $this->xrefSubscriber->onListQuery($this->listEvent);
+        $this->xrefSubscriber->onListOrmQuery($this->listEvent);
     }
 
     public function testOnLookupQueryyWhenNoEntity(): void
