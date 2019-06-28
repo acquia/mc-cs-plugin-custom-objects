@@ -132,6 +132,8 @@ class SaveController extends CommonController
             return $this->accessDenied(false, $e->getMessage());
         }
 
+        $this->recreateOptionsFromPost($request->get('custom_field'), $customField);
+
         $action = $this->fieldRouteProvider->buildSaveRoute($fieldType, $fieldId, $customObject->getId(), $panelCount, $panelId);
         $form   = $this->formFactory->create(CustomFieldType::class, $customField, ['action' => $action]);
 
@@ -226,5 +228,27 @@ class SaveController extends CommonController
             'type'       => $customField->getType(),
             'closeModal' => 1,
         ]);
+    }
+
+    /**
+     * Hack for Symfony form adding logic used in options which does not work as expected.
+     * It was failing when new option was added and used as default with.
+     *
+     * @see \Symfony\Component\Form\Exception\TransformationFailedException
+     *
+     * @param string[]    $customFieldPost
+     * @param CustomField $customField
+     */
+    private function recreateOptionsFromPost(array $customFieldPost, CustomField $customField): void
+    {
+        foreach ($customField->getOptions() as $option) {
+            $customField->removeOption($option);
+        }
+
+        $optionsFromPost = $customFieldPost['options']['list'];
+
+        foreach ($optionsFromPost as $optionFromPost) {
+            $customField->addOption($optionFromPost);
+        }
     }
 }
