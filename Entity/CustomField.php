@@ -398,11 +398,11 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     {
         if (is_array($option)) {
             $option = new CustomFieldOption($option);
-            $option->setCustomField($this);
         }
 
         $option->setOrder($this->options->count());
         $this->options->add($option);
+        $option->setCustomField($this);
     }
 
     /**
