@@ -18,7 +18,7 @@ use MauticPlugin\CustomObjectsBundle\DTO\Token;
 
 class TokenParser
 {
-    private const TOKEN = '{custom-object=(.*?)}';
+    public const TOKEN = '{custom-object=(.*?)}';
 
     /**
      * @param string $content
