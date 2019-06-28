@@ -32,9 +32,9 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
-use Mautic\LeadBundle\Segment\ContactSegmentFilters;
 use MauticPlugin\CustomObjectsBundle\Helper\TokenParser;
 use MauticPlugin\CustomObjectsBundle\DTO\Token;
+use Mautic\EmailBundle\Entity\Email;
 
 /**
  * Handles Custom Object token replacements with the correct value in emails.
@@ -151,80 +151,62 @@ class TokenSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $tokens->map(function (Token $token) use ($event) {
-            $orderBy = CustomItem::TABLE_ALIAS.'.date_added';
-            $orderDir = 'DESC';
+        $tokens->map(function (Token $token) use ($event): void {
             try {
                 $customObject = $this->customObjectModel->fetchEntityByAlias($token->getCustomObjectAlias());
             } catch (NotFoundException $e) {
                 return;
             }
 
-            $segmentConditions = null;
-
-            if ('segment-filter' === $token->getWhere()) {
-                if ('list' === $event->getEmail()->getEmailType()) {
-                    // Validation check that all segments have the same CO filters, so let's take the first one.
-                    /** @var LeadList $segment */
-                    $segment = clone $event->getEmail()->getLists()->first();
-                    $filters = [];
-                    /** @var ContactSegmentFilter $filter */
-                    foreach ($segment->getFilters() as $filter) {
-                        if ('custom_object' === $filter['object']) {
-                            $filters[] = $filter;
-                        }
-                    }
-                    $segment->setFilters($filters);
-                    $segmentConditions = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
-                }
-                // @todo implement also campaign emails.
-            }
-
-            if ('latest' === $token->getOrder()) {
-                // Use the default order and direction.
-            }
-
-            $tableConfig = new TableConfig($token->getLimit(), 1, $orderBy, $orderDir);
-            $tableConfig->addParameter('customObjectId', $customObject->getId());
-            $tableConfig->addParameter('filterEntityType', 'contact');
-            $tableConfig->addParameter('filterEntityId', (int) $event->getLead()['id']);
-            $tableConfig->addParameter('tokenWhere', $token->getWhere());
-            $tableConfig->addParameter('segmentConditions', $segmentConditions);
-            $customItems = $this->customItemModel->getArrayTableData($tableConfig);
-            $fieldValues = [];
-
-            foreach ($customItems as $customItemData) {
-                $customItem = new CustomItem($customObject);
-                $customItem->populateFromArray($customItemData);
-                $customItem = $this->customItemModel->populateCustomFields($customItem);
-
-                try {
-                    $fieldValues[] = $customItem->findCustomFieldValueForFieldAlias($token->getCustomFieldAlias())->getValue();
-                } catch (NotFoundException $e) {
-                    // Custom field not found.
-                }
-            }
-
-            $result = empty($fieldValues) ? $token->getDefaultValue() : implode(', ', $fieldValues);
+            $fieldValues = $this->getCustomFieldValues($customObject, $token, $event->getEmail(), (int) $event->getLead()['id']);
+            $result      = empty($fieldValues) ? $token->getDefaultValue() : implode(', ', $fieldValues);
 
             $event->addToken($token->getToken(), $result);
         });
     }
 
     /**
+     * Add some where conditions to the query requesting the right custom items for the token replacement.
+     *
      * @param CustomItemListDbalQueryEvent $event
      */
     public function onListQuery(CustomItemListDbalQueryEvent $event): void
     {
-        $tableConfig       = $event->getTableConfig();
-        $contactId         = $tableConfig->getParameter('filterEntityId');
-        $segmentConditions = $tableConfig->getParameter('segmentConditions');
-        if ('contact' === $tableConfig->getParameter('filterEntityType') && $contactId && $segmentConditions && $segmentConditions instanceof ContactSegmentFilters) {
-            $queryBuilder = $event->getQueryBuilder();
+        $tableConfig = $event->getTableConfig();
+        $contactId   = $tableConfig->getParameter('filterEntityId');
+        $entityType  = $tableConfig->getParameter('filterEntityType');
+        $token       = $tableConfig->getParameter('token');
+        $email       = $tableConfig->getParameter('email');
+
+        if ('contact' !== $entityType || !$contactId || !$email instanceof Email || !$token instanceof Token) {
+            return;
+        }
+
+        $queryBuilder = $event->getQueryBuilder();
+
+        if ('segment-filter' === $token->getWhere()) {
+            $segmentConditions = [];
+
+            if ('list' === $email->getEmailType()) {
+                // Validation check that all segments have the same CO filters, so let's take the first one.
+                /** @var LeadList $segment */
+                $segment = clone $email->getLists()->first();
+                $filters = [];
+                /** @var ContactSegmentFilter $filter */
+                foreach ($segment->getFilters() as $filter) {
+                    if ('custom_object' === $filter['object']) {
+                        $filters[] = $filter;
+                    }
+                }
+                $segment->setFilters($filters);
+                $segmentConditions = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
+            }
+
+            // @todo implement also campaign emails.
 
             /** @var ContactSegmentFilter $condition */
-            foreach ($segmentConditions as $segmentId => $condition) {
-                $queryAlias        = 'filter_'.$segmentId;
+            foreach ($segmentConditions as $id => $condition) {
+                $queryAlias        = 'filter_'.$id;
                 $customFieldId     = (int) $condition->getField();
                 $innerQueryBuilder = $this->queryFilterHelper->createValueQueryBuilder($queryBuilder->getConnection(), $queryAlias, $customFieldId, $condition->getType());
                 $innerQueryBuilder->select($queryAlias.'_contact.custom_item_id');
@@ -235,5 +217,47 @@ class TokenSubscriber implements EventSubscriberInterface
                 $queryBuilder->andWhere($innerQueryBuilder->expr()->exists($innerQueryBuilder->getSQL()));
             }
         }
+    }
+
+    /**
+     * @param CustomObject $customObject
+     * @param Token        $token
+     * @param Email        $email
+     * @param int          $contactId
+     *
+     * @return mixed[]
+     */
+    private function getCustomFieldValues(CustomObject $customObject, Token $token, Email $email, int $contactId): array
+    {
+        $orderBy  = CustomItem::TABLE_ALIAS.'.date_added';
+        $orderDir = 'DESC';
+
+        if ('latest' === $token->getOrder()) {
+            // There is no other ordering option implemented at the moment.
+            // Use the default order and direction.
+        }
+
+        $tableConfig = new TableConfig($token->getLimit(), 1, $orderBy, $orderDir);
+        $tableConfig->addParameter('customObjectId', $customObject->getId());
+        $tableConfig->addParameter('filterEntityType', 'contact');
+        $tableConfig->addParameter('filterEntityId', (int) $contactId);
+        $tableConfig->addParameter('token', $token);
+        $tableConfig->addParameter('email', $email);
+        $customItems = $this->customItemModel->getArrayTableData($tableConfig);
+        $fieldValues = [];
+
+        foreach ($customItems as $customItemData) {
+            $customItem = new CustomItem($customObject);
+            $customItem->populateFromArray($customItemData);
+            $customItem = $this->customItemModel->populateCustomFields($customItem);
+
+            try {
+                $fieldValues[] = $customItem->findCustomFieldValueForFieldAlias($token->getCustomFieldAlias())->getValue();
+            } catch (NotFoundException $e) {
+                // Custom field not found.
+            }
+        }
+
+        return $fieldValues;
     }
 }

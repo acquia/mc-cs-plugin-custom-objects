@@ -102,7 +102,7 @@ class TokenParser
     /**
      * @param string $tokenDataRaw
      *
-     * @return array
+     * @return string[]
      */
     private function getPartsDividedByPipe(string $tokenDataRaw): array
     {
