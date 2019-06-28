@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\DTO;
 
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
+use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
+use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 
 class TableConfigTest extends \PHPUnit_Framework_TestCase
 {
@@ -32,6 +34,7 @@ class TableConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(self::ORDER_BY, $tableConfig->getOrderBy());
         $this->assertSame(self::ORDER_BY_DIR, $tableConfig->getOrderDirection());
         $this->assertSame(self::LIMIT, $tableConfig->getLimit());
+        $this->assertSame(20, $tableConfig->getOffset());
     }
 
     /**
@@ -52,6 +55,46 @@ class TableConfigTest extends \PHPUnit_Framework_TestCase
         $tableConfig = $this->initTableConfig(self::LIMIT, 1);
 
         $this->assertSame(0, $tableConfig->getOffset());
+    }
+
+    public function testConfigureOrmQueryBuilder(): void
+    {
+        $tableConfig = $this->initTableConfig(self::LIMIT, 1);
+        $builder = $this->createMock(OrmQueryBuilder::class);
+
+        $builder->expects($this->once())
+            ->method('setMaxResults')
+            ->with(self::LIMIT);
+
+            $builder->expects($this->once())
+            ->method('setFirstResult')
+            ->with(0);
+
+            $builder->expects($this->once())
+            ->method('orderBy')
+            ->with(self::ORDER_BY, self::ORDER_BY_DIR);
+
+        $tableConfig->configureOrmQueryBuilder($builder);
+    }
+
+    public function testConfigureDbalQueryBuilder(): void
+    {
+        $tableConfig = $this->initTableConfig(self::LIMIT, 1);
+        $builder = $this->createMock(DbalQueryBuilder::class);
+
+        $builder->expects($this->once())
+            ->method('setMaxResults')
+            ->with(self::LIMIT);
+
+            $builder->expects($this->once())
+            ->method('setFirstResult')
+            ->with(0);
+
+            $builder->expects($this->once())
+            ->method('orderBy')
+            ->with(self::ORDER_BY, self::ORDER_BY_DIR);
+
+        $tableConfig->configureDbalQueryBuilder($builder);
     }
 
     /**
