@@ -30,14 +30,6 @@ return [
                 'controller' => 'CustomObjectsBundle:CustomField\Form:renderForm',
                 'method'     => 'GET',
             ],
-            CustomFieldRouteProvider::ROUTE_CANCEL => [
-                'path'       => '/custom/field/cancel/{fieldId}/{fieldType}',
-                'controller' => 'CustomObjectsBundle:CustomField\Cancel:cancel',
-                'method'     => 'GET',
-                'defaults'   => [
-                    'fieldId' => null,
-                ],
-            ],
             CustomFieldRouteProvider::ROUTE_SAVE => [
                 'path'       => '/custom/field/save/{fieldType}',
                 'controller' => 'CustomObjectsBundle:CustomField\Save:save',
@@ -206,14 +198,6 @@ return [
                     'custom_field.route.provider',
                     'mautic.custom.model.object',
                 ],
-                'methodCalls' => [
-                    'setContainer' => [
-                        '@service_container',
-                    ],
-                ],
-            ],
-            'custom_field.cancel_controller' => [
-                'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomField\CancelController::class,
                 'methodCalls' => [
                     'setContainer' => [
                         '@service_container',

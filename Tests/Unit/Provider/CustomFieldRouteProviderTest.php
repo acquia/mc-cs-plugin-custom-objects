@@ -82,24 +82,4 @@ class CustomFieldRouteProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->customFieldRouteProvider->buildFormRoute(45);
     }
-
-    public function testBuildCloneRoute(): void
-    {
-        $this->router->expects($this->once())
-            ->method('generate')
-            ->with(CustomFieldRouteProvider::ROUTE_CLONE, ['fieldId' => 45])
-            ->willReturn('the/generated/route');
-
-        $this->customFieldRouteProvider->buildCloneRoute(45);
-    }
-
-    public function testBuildDeleteRoute(): void
-    {
-        $this->router->expects($this->once())
-            ->method('generate')
-            ->with(CustomFieldRouteProvider::ROUTE_DELETE, ['fieldId' => 45])
-            ->willReturn('the/generated/route');
-
-        $this->customFieldRouteProvider->buildDeleteRoute(45);
-    }
 }
