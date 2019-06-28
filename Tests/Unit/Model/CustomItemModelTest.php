@@ -314,23 +314,14 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
 
     public function testGetTableData(): void
     {
-        $tableConfig = $this->createMock(TableConfig::class);
-
-        $tableConfig->expects($this->exactly(2))
-            ->method('getParameter')
-            ->withConsecutive(
-                ['customObjectId'],
-                ['search']
-            )->will($this->onConsecutiveCalls(
-                44,
-                null
-            ));
+        $tableConfig = new TableConfig(10, 1, 'column');
+        $tableConfig->addParameter('customObjectId', 44);
 
         $this->customItemPermissionProvider->expects($this->once())
             ->method('isGranted')
             ->will($this->throwException(new ForbiddenException('viewother')));
 
-        $this->user->expects($this->once())
+        $this->user->expects($this->any())
             ->method('getId')
             ->willReturn(22);
 
@@ -347,24 +338,15 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCountForTable(): void
     {
-        $tableConfig = $this->createMock(TableConfig::class);
         $expr        = $this->createMock(Expr::class);
-
-        $tableConfig->expects($this->exactly(2))
-            ->method('getParameter')
-            ->withConsecutive(
-                ['customObjectId'],
-                ['search']
-            )->will($this->onConsecutiveCalls(
-                44,
-                null
-            ));
+        $tableConfig = new TableConfig(10, 1, 'column');
+        $tableConfig->addParameter('customObjectId', 44);
 
         $this->customItemPermissionProvider->expects($this->once())
             ->method('isGranted')
             ->will($this->throwException(new ForbiddenException('viewother')));
 
-        $this->user->expects($this->once())
+        $this->user->expects($this->any())
             ->method('getId')
             ->willReturn(22);
 
@@ -413,23 +395,15 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
 
     public function testGetLookupData(): void
     {
-        $tableConfig = $this->createMock(TableConfig::class);
-
-        $tableConfig->expects($this->exactly(2))
-            ->method('getParameter')
-            ->withConsecutive(
-                ['customObjectId'],
-                ['search']
-            )->will($this->onConsecutiveCalls(
-                44,
-                'Item A'
-            ));
+        $tableConfig = new TableConfig(10, 1, 'column');
+        $tableConfig->addParameter('customObjectId', 44);
+        $tableConfig->addParameter('search', 'Item A');
 
         $this->customItemPermissionProvider->expects($this->once())
             ->method('isGranted')
             ->will($this->throwException(new ForbiddenException('viewother')));
 
-        $this->user->expects($this->once())
+        $this->user->expects($this->any())
             ->method('getId')
             ->willReturn(22);
 

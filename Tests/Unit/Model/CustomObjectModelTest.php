@@ -461,11 +461,7 @@ class CustomObjectModelTest extends \PHPUnit_Framework_TestCase
 
     public function testGetTableData(): void
     {
-        $tableConfig = $this->createMock(TableConfig::class);
-
-        $tableConfig->expects($this->once())
-            ->method('getParameter')
-            ->with('search');
+        $tableConfig = new TableConfig(10, 1, 'column');
 
         $this->customObjectPermissionProvider->expects($this->once())
             ->method('isGranted')
@@ -488,13 +484,10 @@ class CustomObjectModelTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCountForTable(): void
     {
-        $tableConfig = $this->createMock(TableConfig::class);
+        $tableConfig = new TableConfig(10, 1, 'column');
         $expr        = $this->createMock(Expr::class);
 
-        $tableConfig->expects($this->once())
-            ->method('getParameter')
-            ->with('search')
-            ->willReturn('Unicorn');
+        $tableConfig->addParameter('search', 'Unicorn');
 
         $this->customObjectPermissionProvider->expects($this->once())
             ->method('isGranted')

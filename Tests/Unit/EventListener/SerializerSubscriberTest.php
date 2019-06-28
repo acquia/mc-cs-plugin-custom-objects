@@ -185,7 +185,7 @@ class SerializerSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->customItemXrefContactRepository->expects($this->once())
             ->method('getCustomObjectsRelatedToContact')
             ->with($contact, $this->callback(function (TableConfig $tableConfig): bool {
-                $this->assertSame(50, $tableConfig->getLimit());
+                $this->assertSame(10, $tableConfig->getLimit());
                 $this->assertSame(0, $tableConfig->getOffset());
                 $this->assertSame(CustomObject::TABLE_ALIAS.'.dateAdded', $tableConfig->getOrderBy());
                 $this->assertSame('DESC', $tableConfig->getOrderDirection());
@@ -240,7 +240,7 @@ class SerializerSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->customItemXrefContactRepository->expects($this->once())
             ->method('getCustomObjectsRelatedToContact')
             ->with($contact, $this->callback(function (TableConfig $tableConfig): bool {
-                $this->assertSame(50, $tableConfig->getLimit());
+                $this->assertSame(10, $tableConfig->getLimit());
                 $this->assertSame(0, $tableConfig->getOffset());
                 $this->assertSame(CustomObject::TABLE_ALIAS.'.dateAdded', $tableConfig->getOrderBy());
                 $this->assertSame('DESC', $tableConfig->getOrderDirection());
@@ -252,7 +252,7 @@ class SerializerSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->customItemModel->expects($this->once())
             ->method('getTableData')
             ->with($this->callback(function (TableConfig $tableConfig): bool {
-                $this->assertSame(50, $tableConfig->getLimit());
+                $this->assertSame(10, $tableConfig->getLimit());
                 $this->assertSame(0, $tableConfig->getOffset());
                 $this->assertSame(CustomItem::TABLE_ALIAS.'.dateAdded', $tableConfig->getOrderBy());
                 $this->assertSame('DESC', $tableConfig->getOrderDirection());
@@ -299,18 +299,20 @@ class SerializerSubscriberTest extends \PHPUnit_Framework_TestCase
                         ],
                     ],
                     'meta' => [
-                        'limit'          => 50,
-                        'page'           => 1,
-                        'order'          => 'CustomItem.dateAdded',
-                        'orderDirection' => 'DESC',
+                        'page' => [
+                            'number' => 1,
+                            'size'   => 10,
+                        ],
+                        'sort' => '-dateAdded',
                     ],
                 ],
             ],
             'meta' => [
-                'limit'          => 50,
-                'page'           => 1,
-                'order'          => 'CustomObject.dateAdded',
-                'orderDirection' => 'DESC',
+                'page' => [
+                    'number' => 1,
+                    'size'   => 10,
+                ],
+                'sort' => '-dateAdded',
             ],
         ];
 
