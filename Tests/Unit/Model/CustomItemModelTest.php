@@ -39,6 +39,9 @@ use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefInterface;
 use UnexpectedValueException;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
+use Doctrine\DBAL\Statement;
 
 class CustomItemModelTest extends \PHPUnit_Framework_TestCase
 {
@@ -49,6 +52,12 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
     private $entityManager;
 
     private $queryBuilder;
+
+    private $dbalQueryBuilder;
+
+    private $statement;
+
+    private $connection;
 
     private $query;
 
@@ -75,10 +84,15 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
+        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
+
         $this->customItem                   = $this->createMock(CustomItem::class);
         $this->user                         = $this->createMock(User::class);
         $this->entityManager                = $this->createMock(EntityManager::class);
         $this->queryBuilder                 = $this->createMock(QueryBuilder::class);
+        $this->dbalQueryBuilder             = $this->createMock(DbalQueryBuilder::class);
+        $this->statement                    = $this->createMock(Statement::class);
+        $this->connection                   = $this->createMock(Connection::class);
         $this->query                        = $this->createMock(AbstractQuery::class);
         $this->customItemRepository         = $this->createMock(CustomItemRepository::class);
         $this->customItemPermissionProvider = $this->createMock(CustomItemPermissionProvider::class);
@@ -98,6 +112,8 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->entityManager->method('createQueryBuilder')->willReturn($this->queryBuilder);
+        $this->entityManager->method('getConnection')->willReturn($this->connection);
+        $this->connection->method('createQueryBuilder')->willReturn($this->dbalQueryBuilder);
         $this->queryBuilder->method('getQuery')->willReturn($this->query);
         $this->userHelper->method('getUser')->willReturn($this->user);
     }
@@ -295,17 +311,7 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
 
     public function testGetTableDataWithoutCustomObjectId(): void
     {
-        $tableConfig = $this->createMock(TableConfig::class);
-
-        $tableConfig->expects($this->exactly(2))
-            ->method('getParameter')
-            ->withConsecutive(
-                ['customObjectId'],
-                ['search']
-            )->will($this->onConsecutiveCalls(
-                null,
-                null
-            ));
+        $tableConfig = new TableConfig(10, 1, 'column');
 
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage("customObjectId cannot be empty. It's required for permission management");
@@ -333,7 +339,52 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
             ->method('getResult')
             ->willReturn([]);
 
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(CustomItemEvents::ON_CUSTOM_ITEM_LIST_ORM_QUERY);
+
         $this->customItemModel->getTableData($tableConfig);
+    }
+
+    public function testGetArrayTableDataWithoutCustomObjectId(): void
+    {
+        $tableConfig = new TableConfig(10, 1, 'column');
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage("customObjectId cannot be empty. It's required for permission management");
+        $this->customItemModel->getArrayTableData($tableConfig);
+    }
+
+    public function testGetArrayTableData(): void
+    {
+        $tableConfig = new TableConfig(10, 1, 'column');
+        $tableConfig->addParameter('customObjectId', 44);
+
+        $this->customItemPermissionProvider->expects($this->never())
+            ->method('isGranted');
+
+        // Model situation when the method is called from a command and user is unknown.
+        $this->user->expects($this->any())
+            ->method('getId')
+            ->willReturn(null);
+
+        $this->dbalQueryBuilder->expects($this->once())
+            ->method('select')
+            ->willReturn(CustomItem::TABLE_ALIAS.'.*');
+
+        $this->dbalQueryBuilder->expects($this->once())
+            ->method('execute')
+            ->willReturn($this->statement);
+
+        $this->statement->expects($this->once())
+            ->method('fetchAll')
+            ->willReturn([]);
+
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(CustomItemEvents::ON_CUSTOM_ITEM_LIST_DBAL_QUERY);
+
+        $this->customItemModel->getArrayTableData($tableConfig);
     }
 
     public function testGetCountForTable(): void
