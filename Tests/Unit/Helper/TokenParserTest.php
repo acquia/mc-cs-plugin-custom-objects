@@ -29,7 +29,9 @@ with lots of HTML tags and JS scripts
 {custom-object=product : sku | where=segment-filter |order=latest|limit=1 | default=Nothing to see here}
 {custom-object= product : sku}
 
+
 Invalid tokens:
+{custom-object= product}
 {custom-object = product : sku}
 (custom-object = product : sku)
 {custom-object = unicorn}
