@@ -362,14 +362,12 @@ class CustomItemModel extends FormModel
      */
     private function createListOrmQueryBuilder(TableConfig $tableConfig): QueryBuilder
     {
+        $this->validateTableConfig($tableConfig);
+
         $customObjectId = $tableConfig->getParameter('customObjectId');
         $search         = $tableConfig->getParameter('search');
         $queryBuilder   = $this->entityManager->createQueryBuilder();
         $queryBuilder   = $tableConfig->configureOrmQueryBuilder($queryBuilder);
-
-        if (empty($customObjectId)) {
-            throw new UnexpectedValueException("customObjectId cannot be empty. It's required for permission management");
-        }
 
         $queryBuilder->select(CustomItem::TABLE_ALIAS);
         $queryBuilder->from(CustomItem::class, CustomItem::TABLE_ALIAS);
@@ -393,14 +391,12 @@ class CustomItemModel extends FormModel
      */
     private function createListDbalQueryBuilder(TableConfig $tableConfig): DbalQueryBuilder
     {
+        $this->validateTableConfig($tableConfig);
+
         $customObjectId = $tableConfig->getParameter('customObjectId');
         $search         = $tableConfig->getParameter('search');
         $queryBuilder   = $this->entityManager->getConnection()->createQueryBuilder();
         $queryBuilder   = $tableConfig->configureDbalQueryBuilder($queryBuilder);
-
-        if (empty($customObjectId)) {
-            throw new UnexpectedValueException("customObjectId cannot be empty. It's required for permission management");
-        }
 
         $queryBuilder->select(CustomItem::TABLE_ALIAS.'.*');
         $queryBuilder->from(MAUTIC_TABLE_PREFIX.CustomItem::TABLE_NAME, CustomItem::TABLE_ALIAS);
@@ -413,6 +409,18 @@ class CustomItemModel extends FormModel
         }
 
         return $this->applyOwnerFilter($queryBuilder, $customObjectId);
+    }
+
+    /**
+     * @param TableConfig $tableConfig
+     *
+     * @throws UnexpectedValueException
+     */
+    private function validateTableConfig(TableConfig $tableConfig): void
+    {
+        if (empty($tableConfig->getParameter('customObjectId'))) {
+            throw new UnexpectedValueException("customObjectId cannot be empty. It's required for permission management");
+        }
     }
 
     /**
