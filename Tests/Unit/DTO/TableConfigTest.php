@@ -60,17 +60,17 @@ class TableConfigTest extends \PHPUnit_Framework_TestCase
     public function testConfigureOrmQueryBuilder(): void
     {
         $tableConfig = $this->initTableConfig(self::LIMIT, 1);
-        $builder = $this->createMock(OrmQueryBuilder::class);
+        $builder     = $this->createMock(OrmQueryBuilder::class);
 
         $builder->expects($this->once())
             ->method('setMaxResults')
             ->with(self::LIMIT);
 
-            $builder->expects($this->once())
+        $builder->expects($this->once())
             ->method('setFirstResult')
             ->with(0);
 
-            $builder->expects($this->once())
+        $builder->expects($this->once())
             ->method('orderBy')
             ->with(self::ORDER_BY, self::ORDER_BY_DIR);
 
@@ -80,17 +80,17 @@ class TableConfigTest extends \PHPUnit_Framework_TestCase
     public function testConfigureDbalQueryBuilder(): void
     {
         $tableConfig = $this->initTableConfig(self::LIMIT, 1);
-        $builder = $this->createMock(DbalQueryBuilder::class);
+        $builder     = $this->createMock(DbalQueryBuilder::class);
 
         $builder->expects($this->once())
             ->method('setMaxResults')
             ->with(self::LIMIT);
 
-            $builder->expects($this->once())
+        $builder->expects($this->once())
             ->method('setFirstResult')
             ->with(0);
 
-            $builder->expects($this->once())
+        $builder->expects($this->once())
             ->method('orderBy')
             ->with(self::ORDER_BY, self::ORDER_BY_DIR);
 
