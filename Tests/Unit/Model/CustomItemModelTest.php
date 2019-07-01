@@ -376,6 +376,50 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
             ->method('execute')
             ->willReturn($this->statement);
 
+        $this->dbalQueryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('customObjectId', 44);
+
+        $this->statement->expects($this->once())
+            ->method('fetchAll')
+            ->willReturn([]);
+
+        $this->dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(CustomItemEvents::ON_CUSTOM_ITEM_LIST_DBAL_QUERY);
+
+        $this->customItemModel->getArrayTableData($tableConfig);
+    }
+
+    public function testGetArrayTableDataWithSearch(): void
+    {
+        $tableConfig = new TableConfig(10, 1, 'column');
+        $tableConfig->addParameter('customObjectId', 44);
+        $tableConfig->addParameter('search', 'term');
+
+        $this->customItemPermissionProvider->expects($this->never())
+            ->method('isGranted');
+
+        // Model situation when the method is called from a command and user is unknown.
+        $this->user->expects($this->any())
+            ->method('getId')
+            ->willReturn(null);
+
+        $this->dbalQueryBuilder->expects($this->once())
+            ->method('select')
+            ->willReturn(CustomItem::TABLE_ALIAS.'.*');
+
+        $this->dbalQueryBuilder->expects($this->once())
+            ->method('execute')
+            ->willReturn($this->statement);
+
+        $this->dbalQueryBuilder->expects($this->exactly(2))
+            ->method('setParameter')
+            ->withConsecutive(
+                ['customObjectId', 44],
+                ['search', '%term%']
+            );
+
         $this->statement->expects($this->once())
             ->method('fetchAll')
             ->willReturn([]);
