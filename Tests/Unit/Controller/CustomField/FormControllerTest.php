@@ -183,13 +183,10 @@ class FormControllerTest extends ControllerTestCase
             ->with($fieldId)
             ->willReturn($customField);
 
-        $objectId = 1;
         $customObject = new CustomObject();
-        $customObject->setId($objectId);
         $this->customFieldFactory->expects($this->once())
             ->method('create')
-            ->with(
-                $fieldType,
+            ->with($fieldType,
                 $this->callback(function($customObject) use ($customField){
                     return $customField;
                 }));
