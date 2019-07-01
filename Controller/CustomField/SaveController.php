@@ -132,9 +132,7 @@ class SaveController extends CommonController
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        if (isset($customFieldPost['options']['list'])) {
-            $this->recreateOptionsFromPost($request->get('custom_field'), $customField);
-        }
+        $this->recreateOptionsFromPost($request->get('custom_field'), $customField);
 
         $action = $this->fieldRouteProvider->buildSaveRoute($fieldType, $fieldId, $customObject->getId(), $panelCount, $panelId);
         $form   = $this->formFactory->create(CustomFieldType::class, $customField, ['action' => $action]);
@@ -245,6 +243,10 @@ class SaveController extends CommonController
      */
     private function recreateOptionsFromPost(array $customFieldPost, CustomField $customField): void
     {
+        if (empty($customFieldPost['options']['list'])) {
+            return;
+        }
+
         foreach ($customField->getOptions() as $option) {
             $customField->removeOption($option);
         }
