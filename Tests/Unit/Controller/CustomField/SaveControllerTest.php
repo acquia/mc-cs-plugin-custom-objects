@@ -77,7 +77,7 @@ class SaveControllerTest extends ControllerTestCase
         $panelCount = null;
 
         $customObject = $this->createMock(CustomObject::class);
-        $customObject->expects($this->exactly(2))
+        $customObject->expects($this->once())
             ->method('getId')
             ->willReturn($objectId);
 
@@ -130,7 +130,7 @@ class SaveControllerTest extends ControllerTestCase
         $action = 'action';
         $this->fieldRouteProvider->expects($this->once())
             ->method('buildSaveRoute')
-            ->with($fieldType, $fieldId, $customObject->getId(), $panelCount, $panelId)
+            ->with($fieldType, $fieldId, $objectId, $panelCount, $panelId)
             ->willReturn($action);
 
         $this->formFactory->expects($this->at(0))
@@ -146,13 +146,18 @@ class SaveControllerTest extends ControllerTestCase
             ->method('isValid')
             ->willReturn(true);
 
-        $this->customFieldModel->expects($this->once())
-            ->method('setAlias')
-            ->with($customField);
-
         $this->form->expects($this->once())
             ->method('getData')
             ->willReturn($customField);
+
+        $request->expects($this->at(6))
+            ->method('get')
+            ->with('panelId')
+            ->willReturn($panelCount);
+
+        $this->customFieldModel->expects($this->once())
+            ->method('setAlias')
+            ->with($customField);
 
         $customField->expects($this->once())
             ->method('getOptions')
@@ -160,6 +165,123 @@ class SaveControllerTest extends ControllerTestCase
 
         $this->customFieldModel->expects($this->once())
             ->method('setAlias');
+
+        $customObject->expects($this->once())
+            ->method('setCustomFields');
+
+        $customObject = $this->createMock(CustomObject::class);
+        $this->formFactory->expects($this->at(1))
+            ->method('create')
+            ->with(CustomObjectType::class, $customObject)
+            ->willReturn($this->form);
+
+        $this->saveController->saveAction($request);
+    }
+
+    public function testSaveActionCreate()
+    {
+        $objectId   = 1;
+        $fieldId    = null;
+        $fieldType  = 'text';
+        $panelId    = null;
+        $panelCount = null;
+
+        $customObject = $this->createMock(CustomObject::class);
+        $customObject->expects($this->once())
+            ->method('getId')
+            ->willReturn($objectId);
+
+        $customField = $this->createMock(CustomField::class);
+
+        $request = $this->createMock(Request::class);
+        $request->expects($this->at(0))
+            ->method('get')
+            ->with('objectId')
+            ->willReturn($objectId);
+        $request->expects($this->at(1))
+            ->method('get')
+            ->with('fieldId')
+            ->willReturn($fieldId);
+        $request->expects($this->at(2))
+            ->method('get')
+            ->with('fieldType')
+            ->willReturn($fieldType);
+        $request->expects($this->at(3))
+            ->method('get')
+            ->with('panelId')
+            ->willReturn($panelId);
+        $request->expects($this->at(4))
+            ->method('get')
+            ->with('panelCount')
+            ->willReturn($panelCount);
+        $request->expects($this->at(5))
+            ->method('get')
+            ->with('custom_field')
+            ->willReturn([]);
+        $request->expects($this->at(5))
+            ->method('get')
+            ->with('custom_field')
+            ->willReturn([]);
+
+        $this->customObjectModel->expects($this->once())
+            ->method('fetchEntity')
+            ->with($objectId)
+            ->willReturn($customObject);
+
+        $this->permissionProvider->expects($this->once())
+            ->method('canCreate')
+            ->with();
+
+        $this->customFieldFactory->expects($this->once())
+            ->method('create')
+            ->with($fieldType, $customObject)
+            ->willReturn($customField);
+
+        $action = 'action';
+        $this->fieldRouteProvider->expects($this->once())
+            ->method('buildSaveRoute')
+            ->with($fieldType, $fieldId, $objectId, $panelCount, $panelId)
+            ->willReturn($action);
+
+        $this->formFactory->expects($this->at(0))
+            ->method('create')
+            ->with(CustomFieldType::class, $customField, ['action' => $action])
+            ->willReturn($this->form);
+
+        $this->form->expects($this->once())
+            ->method('handleRequest')
+            ->with($request);
+
+        $this->form->expects($this->once())
+            ->method('isValid')
+            ->willReturn(true);
+
+        $this->form->expects($this->once())
+            ->method('getData')
+            ->willReturn($customField);
+
+        $request->expects($this->at(6))
+            ->method('get')
+            ->with('panelId')
+            ->willReturn($panelCount);
+
+        $customField->expects($this->once())
+            ->method('setOrder')
+            ->with(0);
+
+        $request->expects($this->at(7))
+            ->method('get')
+            ->with('panelCount')
+            ->willReturn($panelCount);
+
+        $request->expects($this->at(8))
+            ->method('get')
+            ->with('custom_field')
+            ->willReturn([]);
+
+        $customField->expects($this->once())
+            ->method('getOptions')
+            ->willReturn(new ArrayCollection());
 
         $customObject->expects($this->once())
             ->method('setCustomFields');
