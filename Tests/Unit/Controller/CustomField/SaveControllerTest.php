@@ -82,7 +82,6 @@ class SaveControllerTest extends ControllerTestCase
             ->willReturn($objectId);
 
         $customField = $this->createMock(CustomField::class);
-        $customField->setId($fieldId);
 
         $request = $this->createMock(Request::class);
         $request->expects($this->at(0))
@@ -172,10 +171,5 @@ class SaveControllerTest extends ControllerTestCase
             ->willReturn($this->form);
 
         $this->saveController->saveAction($request);
-    }
-
-    public function testSaveActionCreate()
-    {
-
     }
 }
