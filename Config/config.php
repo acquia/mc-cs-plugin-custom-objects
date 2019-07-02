@@ -740,6 +740,7 @@ return [
                     'mautic.custom.model.object',
                     'mautic.custom.model.item',
                     'custom_object.token.parser',
+                    'mautic.campaign.model.event',
                 ],
             ],
         ],
