@@ -24,7 +24,6 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -54,7 +53,7 @@ class FormControllerTest extends ControllerTestCase
         $this->objectRouteProvider = $this->createMock(CustomObjectRouteProvider::class);
 
         $this->form = $this->createMock(FormInterface::class);
-        $view = 'view';
+        $view       = 'view';
         $this->form->expects($this->once())
             ->method('createView')
             ->willReturn($view);
@@ -145,7 +144,7 @@ class FormControllerTest extends ControllerTestCase
         $this->formController->renderFormAction($request);
     }
 
-    public function testRenderFormActionCreateField()
+    public function testRenderFormActionCreateField(): void
     {
         $objectId   = null;
         $fieldId    = null;

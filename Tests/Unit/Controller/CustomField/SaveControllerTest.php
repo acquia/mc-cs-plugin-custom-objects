@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -12,12 +14,9 @@
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomField;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use MauticPlugin\CustomObjectsBundle\Controller\CustomField\FormController;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomField\SaveController;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\SelectType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
@@ -47,14 +46,14 @@ class SaveControllerTest extends ControllerTestCase
     {
         parent::setUp();
 
-        $this->formFactory = $this->createMock(FormFactory::class);
-        $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->customFieldModel = $this->createMock(CustomFieldModel::class);
+        $this->formFactory        = $this->createMock(FormFactory::class);
+        $this->translator         = $this->createMock(TranslatorInterface::class);
+        $this->customFieldModel   = $this->createMock(CustomFieldModel::class);
         $this->customFieldFactory = $this->createMock(CustomFieldFactory::class);
         $this->permissionProvider = $this->createMock(CustomFieldPermissionProvider::class);
         $this->fieldRouteProvider = $this->createMock(CustomFieldRouteProvider::class);
-        $this->customObjectModel = $this->createMock(CustomObjectModel::class);
-        $this->form = $this->createMock(FormInterface::class);
+        $this->customObjectModel  = $this->createMock(CustomObjectModel::class);
+        $this->form               = $this->createMock(FormInterface::class);
 
         $this->saveController = new SaveController(
             $this->formFactory,
@@ -63,12 +62,12 @@ class SaveControllerTest extends ControllerTestCase
             $this->customFieldFactory,
             $this->permissionProvider,
             $this->fieldRouteProvider,
-            $this->customObjectModel        );
+            $this->customObjectModel);
 
         $this->addSymfonyDependencies($this->saveController);
     }
 
-    public function testSaveActionEdit()
+    public function testSaveActionEdit(): void
     {
         $objectId   = 1;
         $fieldId    = 2;
@@ -178,7 +177,7 @@ class SaveControllerTest extends ControllerTestCase
         $this->saveController->saveAction($request);
     }
 
-    public function testSaveActionCreate()
+    public function testSaveActionCreate(): void
     {
         $objectId   = 1;
         $fieldId    = null;
