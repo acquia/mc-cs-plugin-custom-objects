@@ -181,6 +181,7 @@ class FormControllerTest extends ControllerTestCase
         $customObject = new CustomObject();
         $this->customFieldFactory->expects($this->once())
             ->method('create')
+            ->with($fieldType, $customObject)
             ->willReturn($customField);
 
         $route = 'route';
