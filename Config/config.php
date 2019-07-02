@@ -989,7 +989,7 @@ return [
             ],
             'mautic.lead.query.builder.custom_item.value'  => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemFilterQueryBuilder::class,
-                'arguments' => ['mautic.lead.model.random_parameter_name'],
+                'arguments' => ['mautic.lead.model.random_parameter_name', 'custom_object.query.filter.helper'],
             ],
             'custom_object.query.filter.helper'            => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper::class,
