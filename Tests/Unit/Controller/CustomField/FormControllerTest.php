@@ -26,6 +26,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 class FormControllerTest extends ControllerTestCase
@@ -37,6 +38,7 @@ class FormControllerTest extends ControllerTestCase
     private $fieldRouteProvider;
     private $customObjectModel;
     private $objectRouteProvider;
+    private $form;
     private $formController;
 
     protected function setUp(): void
@@ -50,6 +52,12 @@ class FormControllerTest extends ControllerTestCase
         $this->fieldRouteProvider  = $this->createMock(CustomFieldRouteProvider::class);
         $this->customObjectModel   = $this->createMock(CustomObjectModel::class);
         $this->objectRouteProvider = $this->createMock(CustomObjectRouteProvider::class);
+
+        $this->form = $this->createMock(FormInterface::class);
+        $view = 'view';
+        $this->form->expects($this->once())
+            ->method('createView')
+            ->willReturn($view);
 
         $this->formController = new FormController(
             $this->formFactory,
@@ -123,16 +131,10 @@ class FormControllerTest extends ControllerTestCase
             ->with($fieldType, $fieldId, $customObject->getId(), $panelCount, $panelId)
             ->willReturn($action);
 
-        $view = 'view';
-        $form = $this->createMock(Form::class);
-        $form->expects($this->once())
-            ->method('createView')
-            ->willReturn($view);
-
         $this->formFactory->expects($this->once())
             ->method('create')
             ->with(CustomFieldType::class, $customField, ['action' => $action])
-            ->willReturn($form);
+            ->willReturn($this->form);
 
         $returnUrl = 'returnUrl';
         $this->objectRouteProvider->expects($this->once())
@@ -196,16 +198,10 @@ class FormControllerTest extends ControllerTestCase
             ->with($fieldType, $fieldId, $customObject->getId(), $panelCount, $panelId)
             ->willReturn($action);
 
-        $view = 'view';
-        $form = $this->createMock(Form::class);
-        $form->expects($this->once())
-            ->method('createView')
-            ->willReturn($view);
-
         $this->formFactory->expects($this->once())
             ->method('create')
             ->with(CustomFieldType::class, $customField, ['action' => $action])
-            ->willReturn($form);
+            ->willReturn($this->form);
 
         $returnUrl = 'returnUrl';
         $this->objectRouteProvider->expects($this->once())
