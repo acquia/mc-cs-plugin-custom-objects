@@ -427,6 +427,7 @@ class CustomItemModel extends FormModel
      * Adds condition for owner if the user doesn't have permissions to view other.
      *
      * @param QueryBuilder|DbalQueryBuilder $queryBuilder
+     * @param int                           $customObjectId
      *
      * @return QueryBuilder|DbalQueryBuilder
      */
