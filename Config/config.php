@@ -731,6 +731,17 @@ return [
                     'event' => \JMS\Serializer\EventDispatcher\Events::POST_SERIALIZE,
                 ],
             ],
+            'custom_object.emailtoken.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\TokenSubscriber::class,
+                'arguments' => [
+                    'custom_object.config.provider',
+                    'mautic.lead.model.lead_segment_filter_factory',
+                    'custom_object.query.filter.helper',
+                    'mautic.custom.model.object',
+                    'mautic.custom.model.item',
+                    'custom_object.token.parser',
+                ],
+            ],
         ],
         'forms' => [
             'custom_item.item.form' => [
@@ -945,6 +956,9 @@ return [
             ],
             'custom_object.csv.helper'                  => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Helper\CsvHelper::class,
+            ],
+            'custom_object.token.parser'                  => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Helper\TokenParser::class,
             ],
             'custom_object.random.helper'                  => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Helper\RandomHelper::class,

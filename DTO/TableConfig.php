@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\DTO;
 
 use Mautic\CoreBundle\Helper\ArrayHelper;
+use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
+use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 
 class TableConfig
 {
@@ -108,5 +110,41 @@ class TableConfig
     public function getParameter(string $key, $defaultValue = null)
     {
         return ArrayHelper::getValue($key, $this->parameters, $defaultValue);
+    }
+
+    /**
+     * @param OrmQueryBuilder $queryBuilder
+     *
+     * @return OrmQueryBuilder
+     */
+    public function configureOrmQueryBuilder(OrmQueryBuilder $queryBuilder): OrmQueryBuilder
+    {
+        return $this->configureQueryBuilder($queryBuilder);
+    }
+
+    /**
+     * @param DbalQueryBuilder $queryBuilder
+     *
+     * @return DbalQueryBuilder
+     */
+    public function configureDbalQueryBuilder(DbalQueryBuilder $queryBuilder): DbalQueryBuilder
+    {
+        return $this->configureQueryBuilder($queryBuilder);
+    }
+
+    /**
+     * Both builders can be configured exactly the same way. Let's do it in one method then.
+     *
+     * @param DbalQueryBuilder|OrmQueryBuilder $queryBuilder
+     *
+     * @return DbalQueryBuilder|OrmQueryBuilder
+     */
+    private function configureQueryBuilder($queryBuilder)
+    {
+        $queryBuilder->setMaxResults($this->getLimit());
+        $queryBuilder->setFirstResult($this->getOffset());
+        $queryBuilder->orderBy($this->getOrderBy(), $this->getOrderDirection());
+
+        return $queryBuilder;
     }
 }

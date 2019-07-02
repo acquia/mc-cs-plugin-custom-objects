@@ -218,10 +218,9 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $this->assertSame('contact1@api.test', $responseData['contact']['fields']['all']['email']);
         $this->assertSame($customObject->getAlias(), $responseData['contact']['customObjects']['data'][0]['alias']);
         $this->assertSame($customObject->getId(), $responseData['contact']['customObjects']['data'][0]['id']);
-        $this->assertSame(50, $responseData['contact']['customObjects']['meta']['limit']);
-        $this->assertSame(1, $responseData['contact']['customObjects']['meta']['page']);
-        $this->assertSame('CustomObject.dateAdded', $responseData['contact']['customObjects']['meta']['order']);
-        $this->assertSame('DESC', $responseData['contact']['customObjects']['meta']['orderDirection']);
+        $this->assertSame(10, $responseData['contact']['customObjects']['meta']['page']['size']);
+        $this->assertSame(1, $responseData['contact']['customObjects']['meta']['page']['number']);
+        $this->assertSame('-dateAdded', $responseData['contact']['customObjects']['meta']['sort']);
         $this->assertNull($responseData['contact']['fields']['all']['firstname']);
         $this->assertFalse(empty($responseData['contact']['customObjects']['data']), 'Contact response does not contain the customObjects property. '.$response->getContent());
         $this->assertCount(1, $responseData['contact']['customObjects']['data']);

@@ -31,6 +31,7 @@ class CustomItemXrefContactRepository extends CommonRepository
     public function getCustomObjectsRelatedToContact(Lead $contact, TableConfig $tableConfig): array
     {
         $q = $this->createQueryBuilder(CustomItemXrefContact::TABLE_ALIAS);
+        $q = $tableConfig->configureOrmQueryBuilder($q);
         $q->select(CustomObject::TABLE_ALIAS.'.id');
         $q->addSelect(CustomObject::TABLE_ALIAS.'.alias');
         $q->innerJoin(CustomItemXrefContact::TABLE_ALIAS.'.customItem', CustomItem::TABLE_ALIAS);
@@ -39,10 +40,6 @@ class CustomItemXrefContactRepository extends CommonRepository
         $q->groupBy(CustomObject::TABLE_ALIAS.'.id');
         $q->andWhere(CustomObject::TABLE_ALIAS.'.isPublished = 1');
         $q->setParameter('contactId', $contact->getId());
-
-        $q->setMaxResults($tableConfig->getLimit());
-        $q->setFirstResult($tableConfig->getOffset());
-        $q->orderBy($tableConfig->getOrderBy(), $tableConfig->getOrderDirection());
 
         return $q->getQuery()->getResult();
     }
