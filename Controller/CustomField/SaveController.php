@@ -76,7 +76,7 @@ class SaveController extends CommonController
      * @param CustomFieldModel              $customFieldModel
      * @param CustomFieldFactory            $customFieldFactory
      * @param CustomFieldPermissionProvider $permissionProvider
-     * @param CustomFieldRouteProvider      $routeProvider
+     * @param CustomFieldRouteProvider      $fieldRouteProvider
      * @param CustomObjectModel             $customObjectModel
      */
     public function __construct(
@@ -85,7 +85,7 @@ class SaveController extends CommonController
         CustomFieldModel $customFieldModel,
         CustomFieldFactory $customFieldFactory,
         CustomFieldPermissionProvider $permissionProvider,
-        CustomFieldRouteProvider $routeProvider,
+        CustomFieldRouteProvider $fieldRouteProvider,
         CustomObjectModel $customObjectModel
     ) {
         $this->formFactory             = $formFactory;
@@ -93,7 +93,7 @@ class SaveController extends CommonController
         $this->customFieldModel        = $customFieldModel;
         $this->customFieldFactory      = $customFieldFactory;
         $this->permissionProvider      = $permissionProvider;
-        $this->fieldRouteProvider      = $routeProvider;
+        $this->fieldRouteProvider      = $fieldRouteProvider;
         $this->customObjectModel       = $customObjectModel;
     }
 
@@ -183,7 +183,9 @@ class SaveController extends CommonController
             $panelId        = (int) $request->get('panelCount');
             $isNew          = true;
             $rawCustomField = $request->get('custom_field');
-            $customField->setDefaultValue($rawCustomField['defaultValue']);
+            if (isset($rawCustomField['defaultValue'])) {
+                $customField->setDefaultValue($rawCustomField['defaultValue']);
+            }
         }
 
         foreach ($customField->getOptions() as $option) {
@@ -241,6 +243,10 @@ class SaveController extends CommonController
      */
     private function recreateOptionsFromPost(array $customFieldPost, CustomField $customField): void
     {
+        if (empty($customFieldPost['options']['list'])) {
+            return;
+        }
+
         foreach ($customField->getOptions() as $option) {
             $customField->removeOption($option);
         }

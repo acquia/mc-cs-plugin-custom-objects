@@ -19,12 +19,6 @@ class CustomFieldRouteProvider
 {
     public const ROUTE_FORM   = 'mautic_custom_field_form';
 
-    public const ROUTE_CLONE  = 'mautic_custom_field_clone';
-
-    public const ROUTE_DELETE = 'mautic_custom_field_delete';
-
-    public const ROUTE_CANCEL = 'mautic_custom_field_cancel';
-
     public const ROUTE_SAVE   = 'mautic_custom_field_save';
 
     /**
@@ -82,25 +76,5 @@ class CustomFieldRouteProvider
         $params = $id ? ['fieldId' => $id] : [];
 
         return $this->router->generate(static::ROUTE_FORM, $params);
-    }
-
-    /**
-     * @param int $id
-     *
-     * @return string
-     */
-    public function buildCloneRoute(int $id): string
-    {
-        return $this->router->generate(static::ROUTE_CLONE, ['fieldId' => $id]);
-    }
-
-    /**
-     * @param int $id
-     *
-     * @return string
-     */
-    public function buildDeleteRoute(int $id): string
-    {
-        return $this->router->generate(static::ROUTE_DELETE, ['fieldId' => $id]);
     }
 }
