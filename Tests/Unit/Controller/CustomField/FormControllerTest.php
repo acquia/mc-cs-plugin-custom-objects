@@ -143,83 +143,83 @@ class FormControllerTest extends ControllerTestCase
         $this->formController->renderFormAction($request);
     }
 
-    public function testRenderFormActionCreate()
-    {
-        $objectId   = null;
-        $fieldId    = null;
-        $fieldType  = 'text';
-        $panelId    = null;
-        $panelCount = null;
-
-        $request = $this->createMock(Request::class);
-        $request->expects($this->at(0))
-            ->method('get')
-            ->with('objectId')
-            ->willReturn($objectId);
-        $request->expects($this->at(1))
-            ->method('get')
-            ->with('fieldId')
-            ->willReturn($fieldId);
-        $request->expects($this->at(2))
-            ->method('get')
-            ->with('fieldType')
-            ->willReturn($fieldType);
-        $request->expects($this->at(3))
-            ->method('get')
-            ->with('panelId')
-            ->willReturn($panelId);
-        $request->expects($this->at(4))
-            ->method('get')
-            ->with('panelCount')
-            ->willReturn($panelCount);
-
-        $this->permissionProvider->expects($this->once())
-            ->method('canCreate');
-
-        $customField = new CustomField();
-        $customField->setId($fieldId);
-        $this->customFieldModel->expects($this->once())
-            ->method('fetchEntity')
-            ->with($fieldId)
-            ->willReturn($customField);
-
-        $customObject = new CustomObject();
-        $this->customFieldFactory->expects($this->once())
-            ->method('create')
-            ->with($fieldType,
-                $this->callback(function($customObject) use ($customField){
-                    return $customField;
-                }));
-
-        $route = 'route';
-        $this->fieldRouteProvider->expects($this->once())
-            ->method('buildFormRoute')
-            ->with($customField->getId())
-            ->willReturn($route);
-
-        $action = 'action';
-        $this->fieldRouteProvider->expects($this->once())
-            ->method('buildSaveRoute')
-            ->with($fieldType, $fieldId, $customObject->getId(), $panelCount, $panelId)
-            ->willReturn($action);
-
-        $view = 'view';
-        $form = $this->createMock(Form::class);
-        $form->expects($this->once())
-            ->method('createView')
-            ->willReturn($view);
-
-        $this->formFactory->expects($this->once())
-            ->method('create')
-            ->with(CustomFieldType::class, $customField, ['action' => $action])
-            ->willReturn($form);
-
-        $returnUrl = 'returnUrl';
-        $this->objectRouteProvider->expects($this->once())
-            ->method('buildEditRoute')
-            ->with($customObject->getId())
-            ->willReturn($returnUrl);
-
-        $this->formController->renderFormAction($request);
-    }
+//    public function testRenderFormActionCreate()
+//    {
+//        $objectId   = null;
+//        $fieldId    = null;
+//        $fieldType  = 'text';
+//        $panelId    = null;
+//        $panelCount = null;
+//
+//        $request = $this->createMock(Request::class);
+//        $request->expects($this->at(0))
+//            ->method('get')
+//            ->with('objectId')
+//            ->willReturn($objectId);
+//        $request->expects($this->at(1))
+//            ->method('get')
+//            ->with('fieldId')
+//            ->willReturn($fieldId);
+//        $request->expects($this->at(2))
+//            ->method('get')
+//            ->with('fieldType')
+//            ->willReturn($fieldType);
+//        $request->expects($this->at(3))
+//            ->method('get')
+//            ->with('panelId')
+//            ->willReturn($panelId);
+//        $request->expects($this->at(4))
+//            ->method('get')
+//            ->with('panelCount')
+//            ->willReturn($panelCount);
+//
+//        $this->permissionProvider->expects($this->once())
+//            ->method('canCreate');
+//
+//        $customField = new CustomField();
+//        $customField->setId($fieldId);
+//        $this->customFieldModel->expects($this->once())
+//            ->method('fetchEntity')
+//            ->with($fieldId)
+//            ->willReturn($customField);
+//
+//        $customObject = new CustomObject();
+//        $this->customFieldFactory->expects($this->once())
+//            ->method('create')
+//            ->with($fieldType,
+//                $this->callback(function($customObject) use ($customField){
+//                    return $customField;
+//                }));
+//
+//        $route = 'route';
+//        $this->fieldRouteProvider->expects($this->once())
+//            ->method('buildFormRoute')
+//            ->with($customField->getId())
+//            ->willReturn($route);
+//
+//        $action = 'action';
+//        $this->fieldRouteProvider->expects($this->once())
+//            ->method('buildSaveRoute')
+//            ->with($fieldType, $fieldId, $customObject->getId(), $panelCount, $panelId)
+//            ->willReturn($action);
+//
+//        $view = 'view';
+//        $form = $this->createMock(Form::class);
+//        $form->expects($this->once())
+//            ->method('createView')
+//            ->willReturn($view);
+//
+//        $this->formFactory->expects($this->once())
+//            ->method('create')
+//            ->with(CustomFieldType::class, $customField, ['action' => $action])
+//            ->willReturn($form);
+//
+//        $returnUrl = 'returnUrl';
+//        $this->objectRouteProvider->expects($this->once())
+//            ->method('buildEditRoute')
+//            ->with($customObject->getId())
+//            ->willReturn($returnUrl);
+//
+//        $this->formController->renderFormAction($request);
+//    }
 }

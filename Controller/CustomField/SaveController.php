@@ -76,7 +76,7 @@ class SaveController extends CommonController
      * @param CustomFieldModel              $customFieldModel
      * @param CustomFieldFactory            $customFieldFactory
      * @param CustomFieldPermissionProvider $permissionProvider
-     * @param CustomFieldRouteProvider      $routeProvider
+     * @param CustomFieldRouteProvider      $fieldRouteProvider
      * @param CustomObjectModel             $customObjectModel
      */
     public function __construct(
@@ -85,7 +85,7 @@ class SaveController extends CommonController
         CustomFieldModel $customFieldModel,
         CustomFieldFactory $customFieldFactory,
         CustomFieldPermissionProvider $permissionProvider,
-        CustomFieldRouteProvider $routeProvider,
+        CustomFieldRouteProvider $fieldRouteProvider,
         CustomObjectModel $customObjectModel
     ) {
         $this->formFactory             = $formFactory;
@@ -93,7 +93,7 @@ class SaveController extends CommonController
         $this->customFieldModel        = $customFieldModel;
         $this->customFieldFactory      = $customFieldFactory;
         $this->permissionProvider      = $permissionProvider;
-        $this->fieldRouteProvider      = $routeProvider;
+        $this->fieldRouteProvider      = $fieldRouteProvider;
         $this->customObjectModel       = $customObjectModel;
     }
 
