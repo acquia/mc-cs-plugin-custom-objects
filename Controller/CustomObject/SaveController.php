@@ -229,6 +229,7 @@ class SaveController extends BaseFormController
         // $_POST data contains custom fields in reversed order
         $customFields = [];
         foreach ($rawCustomObject['customFields'] as $customField) {
+            // We are using order key as key to access collection of CustomFields below
             $customFields[$customField['order']] = $customField;
         }
 
