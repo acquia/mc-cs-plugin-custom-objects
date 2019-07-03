@@ -29,6 +29,8 @@ use Doctrine\ORM\Query\Expr;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\NoResultException;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
+use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 
 class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -54,6 +56,8 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
 
     private $listEvent;
 
+    private $listDbalEvent;
+
     private $discoveryEvent;
 
     private $contact;
@@ -71,18 +75,22 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->entityManager  = $this->createMock(EntityManager::class);
-        $this->queryBuilder   = $this->createMock(QueryBuilder::class);
-        $this->query          = $this->createMock(AbstractQuery::class);
-        $this->userHelper     = $this->createMock(UserHelper::class);
-        $this->user           = $this->createMock(User::class);
-        $this->event          = $this->createMock(CustomItemXrefEntityEvent::class);
-        $this->listEvent      = $this->createMock(CustomItemListQueryEvent::class);
-        $this->discoveryEvent = $this->createMock(CustomItemXrefEntityDiscoveryEvent::class);
-        $this->contact        = $this->createMock(Lead::class);
-        $this->customItem     = $this->createMock(CustomItem::class);
-        $this->xref           = $this->createMock(CustomItemXrefContact::class);
-        $this->xrefSubscriber = new CustomItemXrefContactSubscriber(
+        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
+
+        $this->entityManager    = $this->createMock(EntityManager::class);
+        $this->queryBuilder     = $this->createMock(QueryBuilder::class);
+        $this->queryBuilderDbal = $this->createMock(DbalQueryBuilder::class);
+        $this->query            = $this->createMock(AbstractQuery::class);
+        $this->userHelper       = $this->createMock(UserHelper::class);
+        $this->user             = $this->createMock(User::class);
+        $this->event            = $this->createMock(CustomItemXrefEntityEvent::class);
+        $this->listEvent        = $this->createMock(CustomItemListQueryEvent::class);
+        $this->listDbalEvent    = $this->createMock(CustomItemListDbalQueryEvent::class);
+        $this->discoveryEvent   = $this->createMock(CustomItemXrefEntityDiscoveryEvent::class);
+        $this->contact          = $this->createMock(Lead::class);
+        $this->customItem       = $this->createMock(CustomItem::class);
+        $this->xref             = $this->createMock(CustomItemXrefContact::class);
+        $this->xrefSubscriber   = new CustomItemXrefContactSubscriber(
             $this->entityManager,
             $this->userHelper
         );
@@ -97,6 +105,54 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->entityManager->method('createQueryBuilder')->willReturn($this->queryBuilder);
     }
 
+    public function testOnListDbalQueryWhenNoEntity(): void
+    {
+        $tableConfig = new TableConfig(10, 1, 'id');
+
+        $this->listDbalEvent->expects($this->once())
+            ->method('getTableConfig')
+            ->willReturn($tableConfig);
+
+        $this->listDbalEvent->expects($this->never())
+            ->method('getQueryBuilder');
+
+        $this->xrefSubscriber->onListDbalQuery($this->listDbalEvent);
+    }
+
+    public function testOnListDbalQuery(): void
+    {
+        $tableConfig = new TableConfig(10, 1, 'id');
+        $tableConfig->addParameter('filterEntityType', 'contact');
+        $tableConfig->addParameter('filterEntityId', self::ENTITY_ID);
+
+        $this->listDbalEvent->expects($this->once())
+            ->method('getTableConfig')
+            ->willReturn($tableConfig);
+
+        $this->listDbalEvent->expects($this->once())
+            ->method('getQueryBuilder')
+            ->willReturn($this->queryBuilderDbal);
+
+        $this->queryBuilderDbal->expects($this->once())
+            ->method('leftJoin')
+            ->with(
+                CustomItem::TABLE_ALIAS,
+                MAUTIC_TABLE_PREFIX.CustomItemXrefContact::TABLE_NAME,
+                CustomItemXrefContact::TABLE_ALIAS,
+                CustomItem::TABLE_ALIAS.'.id = '.CustomItemXrefContact::TABLE_ALIAS.'.custom_item_id'
+            );
+
+        $this->queryBuilderDbal->expects($this->once())
+            ->method('andWhere')
+            ->with(CustomItemXrefContact::TABLE_ALIAS.'.contact_id = :contactId');
+
+        $this->queryBuilderDbal->expects($this->once())
+            ->method('setParameter')
+            ->with('contactId', self::ENTITY_ID);
+
+        $this->xrefSubscriber->onListDbalQuery($this->listDbalEvent);
+    }
+
     public function testOnListQueryWhenNoEntity(): void
     {
         $tableConfig = new TableConfig(10, 1, 'id');
@@ -106,8 +162,7 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
             ->willReturn($tableConfig);
 
         $this->listEvent->expects($this->never())
-            ->method('getQueryBuilder')
-            ->willReturn($tableConfig);
+            ->method('getQueryBuilder');
 
         $this->xrefSubscriber->onListOrmQuery($this->listEvent);
     }
@@ -150,8 +205,7 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
             ->willReturn($tableConfig);
 
         $this->listEvent->expects($this->never())
-            ->method('getQueryBuilder')
-            ->willReturn($tableConfig);
+            ->method('getQueryBuilder');
 
         $this->xrefSubscriber->onLookupQuery($this->listEvent);
     }
