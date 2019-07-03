@@ -39,6 +39,7 @@ use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CampaignBundle\Entity\Event;
 use Doctrine\Common\Collections\Collection;
 use Mautic\LeadBundle\Segment\ContactSegmentFilters;
+use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemFilterQueryBuilder;
 
 /**
  * Handles Custom Object token replacements with the correct value in emails.
@@ -63,6 +64,11 @@ class TokenSubscriber implements EventSubscriberInterface
     private $queryFilterHelper;
 
     /**
+     * @var CustomItemFilterQueryBuilder
+     */
+    private $customItemFilterQueryBuilder;
+
+    /**
      * @var CustomObjectModel
      */
     private $customObjectModel;
@@ -83,30 +89,33 @@ class TokenSubscriber implements EventSubscriberInterface
     private $eventModel;
 
     /**
-     * @param ConfigProvider              $configProvider
-     * @param ContactSegmentFilterFactory $contactSegmentFilterFactory
-     * @param QueryFilterHelper           $queryFilterHelper
-     * @param CustomObjectModel           $customObjectModel
-     * @param CustomItemModel             $customItemModel
-     * @param TokenParser                 $tokenParser
-     * @param EventModel                  $eventModel
+     * @param ConfigProvider               $configProvider
+     * @param ContactSegmentFilterFactory  $contactSegmentFilterFactory
+     * @param QueryFilterHelper            $queryFilterHelper
+     * @param CustomItemFilterQueryBuilder $customItemFilterQueryBuilder
+     * @param CustomObjectModel            $customObjectModel
+     * @param CustomItemModel              $customItemModel
+     * @param TokenParser                  $tokenParser
+     * @param EventModel                   $eventModel
      */
     public function __construct(
         ConfigProvider $configProvider,
         ContactSegmentFilterFactory $contactSegmentFilterFactory,
         QueryFilterHelper $queryFilterHelper,
+        CustomItemFilterQueryBuilder $customItemFilterQueryBuilder,
         CustomObjectModel $customObjectModel,
         CustomItemModel $customItemModel,
         TokenParser $tokenParser,
         EventModel $eventModel
     ) {
-        $this->configProvider              = $configProvider;
-        $this->contactSegmentFilterFactory = $contactSegmentFilterFactory;
-        $this->queryFilterHelper           = $queryFilterHelper;
-        $this->customObjectModel           = $customObjectModel;
-        $this->customItemModel             = $customItemModel;
-        $this->tokenParser                 = $tokenParser;
-        $this->eventModel                  = $eventModel;
+        $this->configProvider               = $configProvider;
+        $this->contactSegmentFilterFactory  = $contactSegmentFilterFactory;
+        $this->queryFilterHelper            = $queryFilterHelper;
+        $this->customItemFilterQueryBuilder = $customItemFilterQueryBuilder;
+        $this->customObjectModel            = $customObjectModel;
+        $this->customItemModel              = $customItemModel;
+        $this->tokenParser                  = $tokenParser;
+        $this->eventModel                   = $eventModel;
     }
 
     /**
@@ -220,6 +229,7 @@ class TokenSubscriber implements EventSubscriberInterface
             foreach ($segmentConditions as $id => $condition) {
                 $queryAlias        = 'filter_'.$id;
                 $customFieldId     = (int) $condition->getField();
+                $queryType         = (int) $condition->getQueryType(); // is 0 in my case. I'd expect mautic.lead.query.builder.custom_item.value'
                 $innerQueryBuilder = $this->queryFilterHelper->createValueQueryBuilder($queryBuilder->getConnection(), $queryAlias, $customFieldId, $condition->getType());
                 $innerQueryBuilder->select($queryAlias.'_contact.custom_item_id');
                 $this->queryFilterHelper->addCustomFieldValueExpressionFromSegmentFilter($innerQueryBuilder, $queryAlias, $condition);
@@ -235,7 +245,7 @@ class TokenSubscriber implements EventSubscriberInterface
      * Validation check that all segments have the same CO filters, so let's take the first one.
      *
      * @param Collection $segments
-     * 
+     *
      * @return ContactSegmentFilters
      */
     private function getSegmentFilters(Collection $segments): ContactSegmentFilters
@@ -259,10 +269,10 @@ class TokenSubscriber implements EventSubscriberInterface
     /**
      * This method searches for the right custom items and the right custom field values.
      * The custom field filters are actually added in the method `onListQuery` above.
-     * 
+     *
      * @param CustomObject $customObject
      * @param Token        $token
-     * @param Email        $email
+     * @param Email        $event
      * @param int          $contactId
      *
      * @return mixed[]

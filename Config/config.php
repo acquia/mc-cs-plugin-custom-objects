@@ -737,6 +737,7 @@ return [
                     'custom_object.config.provider',
                     'mautic.lead.model.lead_segment_filter_factory',
                     'custom_object.query.filter.helper',
+                    'mautic.lead.query.builder.custom_item.value',
                     'mautic.custom.model.object',
                     'mautic.custom.model.item',
                     'custom_object.token.parser',

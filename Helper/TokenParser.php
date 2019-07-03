@@ -82,7 +82,7 @@ class TokenParser
     /**
      * @param string $customObjectAlias
      * @param string $customFieldAlias
-     * 
+     *
      * @return string
      */
     public function buildTokenWithDefaultOptions(string $customObjectAlias, string $customFieldAlias): string
@@ -93,7 +93,7 @@ class TokenParser
     /**
      * @param string $customObjectName
      * @param string $customFieldLabel
-     * 
+     *
      * @return string
      */
     public function buildTokenLabel(string $customObjectName, string $customFieldLabel): string
