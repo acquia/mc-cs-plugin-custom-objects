@@ -14,46 +14,26 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Symfony\Component\HttpFoundation\Response;
 
 class CustomObjectFormTest extends MauticMysqlTestCase
 {
-    public function testCreate(): void
+    /**
+     * @var CustomObjectRepository
+     */
+    private $repo;
+
+    protected function setUp(): void
     {
-        $payload = $this->createPostCheckboxGroup();
+        parent::setUp();
 
-        $this->client->request(
-            'POST',
-            's/custom/object/save',
-            $payload,
-            [],
-            $this->createHeaders()
-        );
-
-        $clientResponse = $this->client->getResponse();
-        $response       = json_decode($clientResponse->getContent(), true);
-
-        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertSame(1, count($response));
-        $this->assertSame('/s/custom/object/edit/1', $response['redirect']);
-
-        $coRepo = $this->client->getContainer()->get('custom_object.repository');
-        /** @var CustomObject $co */
-        $co = $coRepo->findOneById(1);
-        $this->assertEquals(1, $co->getId());
-        $this->assertEquals('singularValue', $co->getNameSingular());
-        $this->assertEquals('pluralValue', $co->getNamePlural());
-        $this->assertEquals('aliasvalue', $co->getAlias());
-        $this->assertEquals('descriptionValue', $co->getDescription());
-
+        $this->repo = $this->client->getContainer()->get('custom_object.repository');
     }
 
-    /**
-     * @return string[]
-     */
-    private function createPostCheckboxGroup(): array
+    public function testCreate(): void
     {
-        return [
+        $payload = [
             'custom_object' => [
                 'nameSingular' => 'singularValue',
                 'namePlural'   => 'pluralValue',
@@ -92,6 +72,42 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                 'buttons'     => ['apply' => ''],
             ],
         ];
+
+        $this->client->request(
+            'POST',
+            's/custom/object/save',
+            $payload,
+            [],
+            $this->createHeaders()
+        );
+
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertSame(1, count($response));
+        $this->assertSame('/s/custom/object/edit/1', $response['redirect']);
+
+        $this->assertCustomObject($payload, 1);
+    }
+
+    /**
+     * @param string[] $expected
+     * @param int      $id
+     */
+    private function assertCustomObject(array $expected, int $id): void
+    {
+        $expected = $expected['custom_object'];
+
+        /** @var CustomObject $co */
+        $co = $this->repo->findOneById($id);
+
+        $this->assertSame($id, $co->getId());
+        $this->assertSame($expected['nameSingular'], $co->getNameSingular());
+        $this->assertSame($expected['namePlural'], $co->getNamePlural());
+        $this->assertSame(strtolower($expected['alias']), $co->getAlias());
+        $this->assertSame($expected['description'], $co->getDescription());
+        $this->assertSame((bool) $expected['isPublished'], $co->isPublished());
     }
 
     /**
