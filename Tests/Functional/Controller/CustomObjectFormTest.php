@@ -24,7 +24,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
      */
     private $repo;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -41,9 +41,6 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                 'description'  => 'descriptionValue',
                 'customFields' => [
                     0 => [
-                        'defaultValue' => [
-                            0 => '2',
-                        ],
                         'id'           => '',
                         'customObject' => '',
                         'isPublished'  => '1',
@@ -65,6 +62,9 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                                     "order": 2
                                 }
                             ]',
+                        'defaultValue' => [
+                            0 => '2',
+                        ],
                     ],
                 ],
                 'category'    => '',
@@ -99,15 +99,32 @@ class CustomObjectFormTest extends MauticMysqlTestCase
     {
         $expected = $expected['custom_object'];
 
-        /** @var CustomObject $co */
-        $co = $this->repo->findOneById($id);
+        /** @var CustomObject $customObject */
+        $customObject = $this->repo->findOneById($id);
 
-        $this->assertSame($id, $co->getId());
-        $this->assertSame($expected['nameSingular'], $co->getNameSingular());
-        $this->assertSame($expected['namePlural'], $co->getNamePlural());
-        $this->assertSame(strtolower($expected['alias']), $co->getAlias());
-        $this->assertSame($expected['description'], $co->getDescription());
-        $this->assertSame((bool) $expected['isPublished'], $co->isPublished());
+        $this->assertSame($id, $customObject->getId());
+        $this->assertSame($expected['nameSingular'], $customObject->getNameSingular());
+        $this->assertSame($expected['namePlural'], $customObject->getNamePlural());
+        $this->assertSame(strtolower($expected['alias']), $customObject->getAlias());
+        $this->assertSame($expected['description'], $customObject->getDescription());
+        $this->assertSame((bool) $expected['isPublished'], $customObject->isPublished());
+
+        $customFields = $customObject->getCustomFields();
+
+        /**
+         * @var int $key
+         * @var CustomField $customField
+         */
+        foreach ($customFields as $key => $customField) {
+            $this->assertSame($customObject, $customField->getCustomObject());
+            $expectedCf = $expected['customFields'][$key];
+            $this->assertSame((bool) $expectedCf['isPublished'], $customField->isPublished());
+            $this->assertSame($expectedCf['type'], $customField->getType());
+            $this->assertSame((int) $expectedCf['order'], $customField->getOrder());
+            $this->assertSame($expectedCf['label'], $customField->getLabel());
+            $this->assertSame($expectedCf['alias'], $customField->getAlias());
+            $this->assertSame((bool) $expectedCf['required'], $customField->isRequired());
+        }
     }
 
     /**
