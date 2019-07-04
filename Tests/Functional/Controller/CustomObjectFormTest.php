@@ -21,19 +21,13 @@ class CustomObjectFormTest extends MauticMysqlTestCase
     public function testCreate(): void
     {
         $payload = $this->createPostCheckboxGroup();
-        $token = $this->getCsrfToken('mautic_ajax_post')->getValue();
 
         $this->client->request(
             'POST',
             's/custom/object/save',
             $payload,
             [],
-            [
-                'HTTP_Content-Type'     => 'application/x-www-form-urlencoded; charset=UTF-8',
-                'HTTP_X-Requested-With' => 'XMLHttpRequest',
-                'HTTP_XDEBUG_SESSION'   => 'XDEBUG_ECLIPSE',
-                'HTTP_X-CSRF-Token'     => $token,
-            ]
+            $this->createHeaders()
         );
 
         $clientResponse = $this->client->getResponse();
@@ -87,6 +81,19 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                 'isPublished' => 1,
                 'buttons'     => ['apply' => ''],
             ],
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
+    private function createHeaders(): array
+    {
+        return [
+            'HTTP_Content-Type'     => 'application/x-www-form-urlencoded; charset=UTF-8',
+            'HTTP_X-Requested-With' => 'XMLHttpRequest',
+            'HTTP_XDEBUG_SESSION'   => 'XDEBUG_ECLIPSE',
+            'HTTP_X-CSRF-Token'     => $this->getCsrfToken('mautic_ajax_post')->getValue(),
         ];
     }
 }
