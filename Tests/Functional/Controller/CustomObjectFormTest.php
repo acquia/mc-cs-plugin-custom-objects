@@ -36,6 +36,16 @@ class CustomObjectFormTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertSame(1, count($response));
         $this->assertSame('/s/custom/object/edit/1', $response['redirect']);
+
+        $coRepo = $this->client->getContainer()->get('custom_object.repository');
+        /** @var CustomObject $co */
+        $co = $coRepo->findOneById(1);
+        $this->assertEquals(1, $co->getId());
+        $this->assertEquals('singularValue', $co->getNameSingular());
+        $this->assertEquals('pluralValue', $co->getNamePlural());
+        $this->assertEquals('aliasvalue', $co->getAlias());
+        $this->assertEquals('descriptionValue', $co->getDescription());
+
     }
 
     /**
@@ -45,10 +55,10 @@ class CustomObjectFormTest extends MauticMysqlTestCase
     {
         return [
             'custom_object' => [
-                'nameSingular' => 'all',
-                'namePlural'   => 'all',
-                'alias'        => 'all',
-                'description'  => '',
+                'nameSingular' => 'singularValue',
+                'namePlural'   => 'pluralValue',
+                'alias'        => 'aliasValue',
+                'description'  => 'descriptionValue',
                 'customFields' => [
                     0 => [
                         'defaultValue' => [
