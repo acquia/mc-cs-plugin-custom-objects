@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -18,7 +20,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
 {
     public function testCreate(): void
     {
-        $_POST = $payload = $this->createPostCheckboxGroup();
+        $payload = $this->createPostCheckboxGroup();
         $token = $this->getCsrfToken('mautic_ajax_post')->getValue();
 
         $this->client->request(
@@ -27,44 +29,47 @@ class CustomObjectFormTest extends MauticMysqlTestCase
             $payload,
             [],
             [
-                'HTTP_Content-Type' => 'application/x-www-form-urlencoded; charset=UTF-8',
+                'HTTP_Content-Type'     => 'application/x-www-form-urlencoded; charset=UTF-8',
                 'HTTP_X-Requested-With' => 'XMLHttpRequest',
-                'HTTP_XDEBUG_SESSION' => 'XDEBUG_ECLIPSE',
-                'HTTP_X-CSRF-Token' => $token,
+                'HTTP_XDEBUG_SESSION'   => 'XDEBUG_ECLIPSE',
+                'HTTP_X-CSRF-Token'     => $token,
             ]
         );
 
         $clientResponse = $this->client->getResponse();
         $response       = json_decode($clientResponse->getContent(), true);
 
-        $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertEquals(1, count($response));
-        $this->assertEquals('/s/custom/object/edit/1', $response['redirect']);
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertSame(1, count($response));
+        $this->assertSame('/s/custom/object/edit/1', $response['redirect']);
     }
 
+    /**
+     * @return string[]
+     */
     private function createPostCheckboxGroup(): array
     {
         return [
-                'custom_object' => [
-                    'nameSingular' => 'all',
-                    'namePlural' => 'all',
-                    'alias' => 'all',
-                    'description' => '',
-                    'customFields' => [
-                        0 => [
-                            'defaultValue' => [
-                                0 => '2',
-                            ],
-                            'id' => '',
-                            'customObject' => '',
-                            'isPublished' => '1',
-                            'type' => 'checkbox_group',
-                            'order' => '0',
-                            'label' => 'CheckboxGroup',
-                            'alias' => '2',
-                            'required' => '',
-                            'params' => '[]',
-                            'options' => '[
+            'custom_object' => [
+                'nameSingular' => 'all',
+                'namePlural'   => 'all',
+                'alias'        => 'all',
+                'description'  => '',
+                'customFields' => [
+                    0 => [
+                        'defaultValue' => [
+                            0 => '2',
+                        ],
+                        'id'           => '',
+                        'customObject' => '',
+                        'isPublished'  => '1',
+                        'type'         => 'checkbox_group',
+                        'order'        => '0',
+                        'label'        => 'CheckboxGroup',
+                        'alias'        => '2',
+                        'required'     => '',
+                        'params'       => '[]',
+                        'options'      => '[
                                 {
                                     "label": "1",
                                     "value": "1",
@@ -76,11 +81,11 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                                     "order": 2
                                 }
                             ]',
-                        ],
                     ],
-                    'category' => '',
-                    'isPublished' => 1,
-                    'buttons' => ['apply' => ''],
+                ],
+                'category'    => '',
+                'isPublished' => 1,
+                'buttons'     => ['apply' => ''],
             ],
         ];
     }
