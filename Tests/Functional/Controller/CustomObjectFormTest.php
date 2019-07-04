@@ -38,7 +38,8 @@ class CustomObjectFormTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
 
         $this->assertEquals(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertTrue(!empty($response['flashes']));
+        $this->assertEquals(1, count($response));
+        $this->assertEquals('/s/custom/object/edit/1', $response['redirect']);
     }
 
     private function createPostCheckboxGroup(): array
@@ -49,37 +50,37 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                     'namePlural' => 'all',
                     'alias' => 'all',
                     'description' => '',
+                    'customFields' => [
+                        0 => [
+                            'defaultValue' => [
+                                0 => '2',
+                            ],
+                            'id' => '',
+                            'customObject' => '',
+                            'isPublished' => '1',
+                            'type' => 'checkbox_group',
+                            'order' => '0',
+                            'label' => 'CheckboxGroup',
+                            'alias' => '2',
+                            'required' => '',
+                            'params' => '[]',
+                            'options' => '[
+                                {
+                                    "label": "1",
+                                    "value": "1",
+                                    "order": 1
+                                },
+                                {
+                                    "label": "2",
+                                    "value": "2",
+                                    "order": 2
+                                }
+                            ]',
+                        ],
+                    ],
                     'category' => '',
                     'isPublished' => 1,
                     'buttons' => ['apply' => ''],
-                    'customFields' => [
-                        'defaultValue' => [
-                            0 => '2',
-                        ],
-                        'id' => '',
-                        'customObject' => '2',
-                        'isPublished' => '1',
-                        'type' => 'checkbox_group',
-                        'order' => '0',
-                        'label' => 'CheckboxGroup',
-                        'alias' => '2',
-                        'required' => '',
-                        'params' => '[]',
-                        'options' => '[
-                            {
-                                "customField": 11,
-                                "label": "1",
-                                "value": "1",
-                                "order": 1
-                            },
-                            {
-                                "customField": 11,
-                                "label": "2",
-                                "value": "2",
-                                "order": 2
-                            }
-                        ]',
-                ],
             ],
         ];
     }
