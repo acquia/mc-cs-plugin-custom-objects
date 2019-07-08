@@ -95,6 +95,271 @@ class CustomObjectFormTest extends MauticMysqlTestCase
         $this->assertCustomObject($payload, 1);
     }
 
+    public function testCreateAll(): void
+    {
+        $payload = [
+            'custom_object' => [
+                'nameSingular' => 'Testing',
+                'namePlural'   => 'All',
+                'alias'        => 'alias4all',
+                'description'  => 'description',
+                'customFields' => [
+                    0 => [
+                        'id'           => '',
+                        'customObject' => '',
+                        'isPublished'  => '1',
+                        'type'         => 'checkbox_group',
+                        'order'        => '0',
+                        'label'        => 'CheckboxGroup',
+                        'alias'        => '10',
+                        'required'     => '',
+                        'params'       => '{
+                            "requiredValidationMessage": "This is required",
+                            "emptyValue": "empty value"
+                        }',
+                        'options'      => '[
+                            {
+                                "label": "aa",
+                                "value": "av",
+                                "order": "1"
+                            },
+                            {
+                                "label": "bb",
+                                "value": "bv",
+                                "order": "2"
+                            }
+                        ]',
+                        'defaultValue' => [
+                            0 => '1',
+                        ],
+                    ],
+                    1 => [
+                        'id'           => '',
+                        'customObject' => '',
+                        'isPublished'  => '1',
+                        'type'         => 'country',
+                        'order'        => '1',
+                        'label'        => 'Country list',
+                        'alias'        => '11',
+                        'required'     => '',
+                        'params'       => '[]',
+                        'options'      => '[]',
+                        'defaultValue' => 'AF',
+                    ],
+                    2 => [
+                        'id'           => '',
+                        'customObject' => '',
+                        'isPublished'  => '1',
+                        'type'         => 'date',
+                        'order'        => '2',
+                        'label'        => 'Date',
+                        'alias'        => '12',
+                        'required'     => '1',
+                        'params'       => '[]',
+                        'options'      => '[]',
+                        'defaultValue' => '2019-07-18',
+                    ],
+                    3 => [
+                        'id'           => '',
+                        'customObject' => '',
+                        'isPublished'  => '1',
+                        'type'         => 'datetime',
+                        'order'        => '3',
+                        'label'        => 'Datetime',
+                        'alias'        => '13',
+                        'required'     => '0',
+                        'params'       => '[]',
+                        'options'      => '[]',
+                        'defaultValue' => '2019-07-18 23:02',
+                    ],
+                    4 => [
+                        'id'           => '',
+                        'customObject' => '',
+                        'isPublished'  => '1',
+                        'type'         => 'email',
+                        'order'        => '4',
+                        'label'        => 'Email',
+                        'alias'        => '14',
+                        'required'     => '0',
+                        'params'       => '[]',
+                        'options'      => '[]',
+                        'defaultValue' => 'test@test.com',
+                    ],
+                    5 => [
+                        'id'           => '',
+                        'customObject' => '',
+                        'isPublished'  => '1',
+                        'type'         => 'hidden',
+                        'order'        => '5',
+                        'label'        => 'Hidden',
+                        'alias'        => '15',
+                        'required'     => '1',
+                        'params'       => '[]',
+                        'options'      => '[]',
+                        'defaultValue' => 'hidden value',
+                    ],
+                    6 => [
+                        'id'           => '',
+                        'customObject' => '',
+                        'isPublished'  => '1',
+                        'type'         => 'int',
+                        'order'        => '6',
+                        'label'        => 'Number',
+                        'alias'        => '16',
+                        'required'     => '1',
+                        'params'       => '[]',
+                        'options'      => '[]',
+                        'defaultValue' => '2',
+                    ],
+                    7 => [
+                        'id'           => '',
+                        'customObject' => '',
+                        'isPublished'  => '0',
+                        'type'         => 'phone',
+                        'order'        => '7',
+                        'label'        => 'Phone',
+                        'alias'        => '17',
+                        'required'     => '1',
+                        'params'       => '[]',
+                        'options'      => '[]',
+                        'defaultValue' => '2',
+                    ],
+                    8 => [
+                        'id'           => '',
+                        'customObject' => '',
+                        'isPublished'  => '0',
+                        'type'         => 'radio_group',
+                        'order'        => '8',
+                        'label'        => 'Radio group',
+                        'alias'        => '18',
+                        'required'     => '1',
+                        'options'      => '[
+                            {
+                                "label": "rl",
+                                "value": "rv",
+                                "order": "1"
+                            },
+                            {
+                                "label": "rl1",
+                                "value": "rl2",
+                                "order": "2"
+                            }
+                        ]',
+                        'params'       => '[]',
+                        'defaultValue' => 'rv1',
+                    ],
+                    9 => [
+                        'id'           => '',
+                        'customObject' => '',
+                        'isPublished'  => '1',
+                        'type'         => 'select',
+                        'order'        => '9',
+                        'label'        => 'Select',
+                        'alias'        => '19',
+                        'required'     => '0',
+                        'options'      => '[
+                            {
+                                "label": "sl",
+                                "value": "sv",
+                                "order": "1"
+                            },
+                            {
+                                "label": "sl1",
+                                "value": "sl2",
+                                "order": "2"
+                            }
+                        ]',
+                        'params'       => '[]',
+                        'defaultValue' => 'sv',
+                    ],
+                    10 => [
+                        'id'           => '',
+                        'customObject' => '',
+                        'isPublished'  => '1',
+                        'type'         => 'multiselect',
+                        'order'        => '10',
+                        'label'        => 'Multiselect',
+                        'alias'        => '110',
+                        'required'     => '0',
+                        'options'      => '[
+                            {
+                                "label": "msl",
+                                "value": "msv",
+                                "order": "1"
+                            },
+                            {
+                                "label": "msl1",
+                                "value": "msl2",
+                                "order": "2"
+                            }
+                        ]',
+                        'params'       => '[]',
+                        'defaultValue' => ['msv'],
+                    ],
+                    11 => [
+                        'id'           => '',
+                        'customObject' => '',
+                        'isPublished'  => '1',
+                        'type'         => 'text',
+                        'order'        => '11',
+                        'label'        => 'Text',
+                        'alias'        => '111',
+                        'required'     => '0',
+                        'options'      => '[]',
+                        'params'       => '[]',
+                        'defaultValue' => 'some text',
+                    ],
+                    12 => [
+                        'id'           => '',
+                        'customObject' => '',
+                        'isPublished'  => '1',
+                        'type'         => 'textarea',
+                        'order'        => '12',
+                        'label'        => 'Textarea',
+                        'alias'        => '112',
+                        'required'     => '0',
+                        'options'      => '[]',
+                        'params'       => '[]',
+                        'defaultValue' => 'some text flkasdfj lfasdf',
+                    ],
+                    13 => [
+                        'id'           => '',
+                        'customObject' => '',
+                        'isPublished'  => '1',
+                        'type'         => 'url',
+                        'order'        => '13',
+                        'label'        => 'Url',
+                        'alias'        => '113',
+                        'required'     => '0',
+                        'options'      => '[]',
+                        'params'       => '[]',
+                        'defaultValue' => 'http://fjdsakfsd.com',
+                    ],
+                ],
+                'category'    => '',
+                'isPublished' => '0',
+                'buttons'     => ['apply' => ''],
+            ],
+        ];
+
+        $this->client->request(
+            'POST',
+            's/custom/object/save',
+            $payload,
+            [],
+            $this->createHeaders()
+        );
+
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertCount(1, $response);
+        $this->assertSame('/s/custom/object/edit/1', $response['redirect']);
+
+        $this->assertCustomObject($payload, 1);
+    }
+
     /**
      * @param string[] $expected
      * @param int      $id
@@ -148,6 +413,24 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                     // It should be Params object but it work fine
                     $this->assertSame($value, $expectedParams[$key]);
                 }
+            }
+
+            $defaultValue = $customField->getDefaultValue();
+            switch ($customField->getType()) {
+                case 'date':
+                    $this->assertInstanceOf(\DateTime::class, $defaultValue);
+                    $this->assertSame($expectedCf['defaultValue'], $defaultValue->format('Y-m-d'));
+
+                    break;
+                case 'datetime':
+                    $this->assertInstanceOf(\DateTime::class, $defaultValue);
+                    $this->assertSame($expectedCf['defaultValue'], $defaultValue->format('Y-m-d H:i'));
+
+                    break;
+                default:
+                    $this->assertSame($expectedCf['defaultValue'], $defaultValue);
+
+                    break;
             }
         }
     }
