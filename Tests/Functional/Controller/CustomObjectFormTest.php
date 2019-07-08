@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -126,10 +127,14 @@ class CustomObjectFormTest extends MauticMysqlTestCase
             $this->assertSame($expectedCf['alias'], $customField->getAlias());
             $this->assertSame((bool) $expectedCf['required'], $customField->isRequired());
 
-            foreach($expectedCf['$options'] as $key => $option) {
+            $expectedOptions = json_decode($expectedCf['options']);
+            foreach($expectedOptions as $key => $expectedOption) {
+                /** @var CustomFieldOption $option */
+                $option = $customField->getOptions()[$key];
 
-                $optionInDb = $customField->
-                $this->assertSame($options['label'])
+                $this->assertSame($option['label'], $option->getLabel());
+                $this->assertSame($option['value'], $option->getValue());
+                $this->assertSame($option['order'], $option->getOrder());
             }
         }
     }
