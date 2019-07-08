@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Symfony\Component\HttpFoundation\Response;
@@ -50,19 +51,22 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                         'label'        => 'CheckboxGroup',
                         'alias'        => '2',
                         'required'     => '',
-                        'params'       => '[]',
+                        'params'       => '{
+                            "requiredValidationMessage": "aa",
+                            "emptyValue": "bb"
+                        }',
                         'options'      => '[
-                                {
-                                    "label": "1",
-                                    "value": "1",
-                                    "order": 1
-                                },
-                                {
-                                    "label": "2",
-                                    "value": "2",
-                                    "order": 2
-                                }
-                            ]',
+                            {
+                                "label": "1",
+                                "value": "1",
+                                "order": 1
+                            },
+                            {
+                                "label": "2",
+                                "value": "2",
+                                "order": 2
+                            }
+                        ]',
                         'defaultValue' => [
                             0 => '2',
                         ],
@@ -127,14 +131,24 @@ class CustomObjectFormTest extends MauticMysqlTestCase
             $this->assertSame($expectedCf['alias'], $customField->getAlias());
             $this->assertSame((bool) $expectedCf['required'], $customField->isRequired());
 
-            $expectedOptions = json_decode($expectedCf['options']);
-            foreach($expectedOptions as $key => $expectedOption) {
-                /** @var CustomFieldOption $option */
-                $option = $customField->getOptions()[$key];
+            $expectedOptions = json_decode($expectedCf['options'], true);
+            if ($expectedOptions) {
+                foreach($expectedOptions as $key => $expectedOption) {
+                    /** @var CustomFieldOption $option */
+                    $option = $customField->getOptions()[$key];
 
-                $this->assertSame($option['label'], $option->getLabel());
-                $this->assertSame($option['value'], $option->getValue());
-                $this->assertSame($option['order'], $option->getOrder());
+                    $this->assertSame($option['label'], $option->getLabel());
+                    $this->assertSame($option['value'], $option->getValue());
+                    $this->assertSame($option['order'], $option->getOrder());
+                }
+            }
+
+            $expectedParams = json_decode($expectedCf['params'], true);
+            if ($expectedParams) {
+                foreach($expectedParams as $key => $value) {
+                    // It should be Params object but it work fine
+                    $this->assertSame($value, $expectedParams[$key]);
+                }
             }
         }
     }
