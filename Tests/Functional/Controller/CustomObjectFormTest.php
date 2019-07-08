@@ -116,7 +116,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
         $customFields = $customObject->getCustomFields();
 
         /**
-         * @var int $key
+         * @var int
          * @var CustomField $customField
          */
         foreach ($customFields as $key => $customField) {
@@ -132,19 +132,19 @@ class CustomObjectFormTest extends MauticMysqlTestCase
 
             $expectedOptions = json_decode($expectedCf['options'], true);
             if ($expectedOptions) {
-                foreach($expectedOptions as $key => $expectedOption) {
+                foreach ($expectedOptions as $key => $expectedOption) {
                     /** @var CustomFieldOption $option */
                     $option = $customField->getOptions()[$key];
 
-                    $this->assertSame($option['label'], $option->getLabel());
-                    $this->assertSame($option['value'], $option->getValue());
-                    $this->assertSame($option['order'], $option->getOrder());
+                    $this->assertSame($expectedOption['label'], $option->getLabel());
+                    $this->assertSame($expectedOption['value'], $option->getValue());
+                    $this->assertSame((int) $expectedOption['order'], $option->getOrder());
                 }
             }
 
             $expectedParams = json_decode($expectedCf['params'], true);
             if ($expectedParams) {
-                foreach($expectedParams as $key => $value) {
+                foreach ($expectedParams as $key => $value) {
                     // It should be Params object but it work fine
                     $this->assertSame($value, $expectedParams[$key]);
                 }
