@@ -115,7 +115,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
 
         $customFields = $customObject->getCustomFields();
 
-        /**
+        /*
          * @var int
          * @var CustomField $customField
          */
