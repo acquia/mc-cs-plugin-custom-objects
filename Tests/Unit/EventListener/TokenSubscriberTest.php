@@ -22,7 +22,6 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\CoreBundle\Event\BuilderEvent;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
-use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Helper\TokenParser;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
@@ -44,8 +43,6 @@ use Mautic\CampaignBundle\Entity\Campaign;
 class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     private $configProvider;
-
-    private $contactSegmentFilterFactory;
 
     private $queryFilterHelper;
 
@@ -78,7 +75,6 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
         parent::setUp();
 
         $this->configProvider               = $this->createMock(ConfigProvider::class);
-        $this->contactSegmentFilterFactory  = $this->createMock(ContactSegmentFilterFactory::class);
         $this->queryFilterHelper            = $this->createMock(QueryFilterHelper::class);
         $this->filterQueryFactory           = $this->createMock(FilterQueryFactory::class);
         $this->customObjectModel            = $this->createMock(CustomObjectModel::class);
@@ -90,7 +86,6 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->customItemListDbalQueryEvent = $this->createMock(CustomItemListDbalQueryEvent::class);
         $this->subscriber                   = new TokenSubscriber(
             $this->configProvider,
-            $this->contactSegmentFilterFactory,
             $this->queryFilterHelper,
             $this->filterQueryFactory,
             $this->customObjectModel,
@@ -303,6 +298,54 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             ['{custom-object=product:sku | where=segment-filter |order=latest|limit=1 | default=No thing}' => 'No thing'],
+            $emailSendEvent->getTokens()
+        );
+    }
+
+    public function testDecodeTokensWithItemName(): void
+    {
+        $html = '<!DOCTYPE html>
+        <html>
+        <head>
+        <title>{subject}</title>
+        </head>
+        <body>
+        Hello, here is the thing:
+        {custom-object=product:name | where=segment-filter |order=latest|limit=1 | default=No thing} 
+        Regards
+        </body>
+        </html>
+        ';
+        $customObject   = $this->createMock(CustomObject::class);
+        $email          = new Email();
+        $emailSendEvent = new EmailSendEvent(
+            null,
+            [
+                'subject'          => 'CO segment test',
+                'content'          => $html,
+                'conplainTexttent' => '',
+                'email'            => $email,
+                'lead'             => ['id' => 2345, 'email' => 'john@doe.email'],
+                'source'           => null,
+            ]
+        );
+
+        $this->configProvider->expects($this->once())
+            ->method('pluginIsEnabled')
+            ->willReturn(true);
+
+        $this->customObjectModel->expects($this->once())
+            ->method('fetchEntityByAlias')
+            ->willReturn($customObject);
+
+        $this->customItemModel->expects($this->once())
+            ->method('getArrayTableData')
+            ->willReturn([['name' => 'Toaster']]);
+
+        $this->subscriber->decodeTokens($emailSendEvent);
+
+        $this->assertSame(
+            ['{custom-object=product:name | where=segment-filter |order=latest|limit=1 | default=No thing}' => 'Toaster'],
             $emailSendEvent->getTokens()
         );
     }
