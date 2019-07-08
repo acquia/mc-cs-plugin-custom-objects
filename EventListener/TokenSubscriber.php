@@ -265,31 +265,6 @@ class TokenSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Validation check that all segments have the same CO filters, so let's take the first one.
-     *
-     * @param Collection $segments
-     *
-     * @return ContactSegmentFilters
-     */
-    private function getSegmentFilters(Collection $segments): ContactSegmentFilters
-    {
-        /** @var LeadList $segment */
-        $segment = clone $segments->first();
-        $filters = [];
-
-        // We care only about custom object filters.
-        foreach ($segment->getFilters() as $filter) {
-            if ('custom_object' === $filter['object']) {
-                $filters[] = $filter;
-            }
-        }
-
-        $segment->setFilters($filters);
-
-        return $this->contactSegmentFilterFactory->getSegmentFilters($segment);
-    }
-
-    /**
      * This method searches for the right custom items and the right custom field values.
      * The custom field filters are actually added in the method `onListQuery` above.
      *
