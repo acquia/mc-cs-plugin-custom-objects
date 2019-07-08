@@ -28,7 +28,6 @@ use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
 use MauticPlugin\CustomObjectsBundle\Helper\TokenParser;
@@ -36,8 +35,6 @@ use MauticPlugin\CustomObjectsBundle\DTO\Token;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CampaignBundle\Entity\Event;
-use Doctrine\Common\Collections\Collection;
-use Mautic\LeadBundle\Segment\ContactSegmentFilters;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\FilterQueryFactory;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
 
@@ -52,11 +49,6 @@ class TokenSubscriber implements EventSubscriberInterface
      * @var ConfigProvider
      */
     private $configProvider;
-
-    /**
-     * @var ContactSegmentFilterFactory
-     */
-    private $contactSegmentFilterFactory;
 
     /**
      * @var QueryFilterHelper
@@ -89,18 +81,16 @@ class TokenSubscriber implements EventSubscriberInterface
     private $eventModel;
 
     /**
-     * @param ConfigProvider              $configProvider
-     * @param ContactSegmentFilterFactory $contactSegmentFilterFactory
-     * @param QueryFilterHelper           $queryFilterHelper
-     * @param FilterQueryFactory          $filterQueryFactory
-     * @param CustomObjectModel           $customObjectModel
-     * @param CustomItemModel             $customItemModel
-     * @param TokenParser                 $tokenParser
-     * @param EventModel                  $eventModel
+     * @param ConfigProvider     $configProvider
+     * @param QueryFilterHelper  $queryFilterHelper
+     * @param FilterQueryFactory $filterQueryFactory
+     * @param CustomObjectModel  $customObjectModel
+     * @param CustomItemModel    $customItemModel
+     * @param TokenParser        $tokenParser
+     * @param EventModel         $eventModel
      */
     public function __construct(
         ConfigProvider $configProvider,
-        ContactSegmentFilterFactory $contactSegmentFilterFactory,
         QueryFilterHelper $queryFilterHelper,
         FilterQueryFactory $filterQueryFactory,
         CustomObjectModel $customObjectModel,
@@ -108,14 +98,13 @@ class TokenSubscriber implements EventSubscriberInterface
         TokenParser $tokenParser,
         EventModel $eventModel
     ) {
-        $this->configProvider               = $configProvider;
-        $this->contactSegmentFilterFactory  = $contactSegmentFilterFactory;
-        $this->queryFilterHelper            = $queryFilterHelper;
-        $this->filterQueryFactory           = $filterQueryFactory;
-        $this->customObjectModel            = $customObjectModel;
-        $this->customItemModel              = $customItemModel;
-        $this->tokenParser                  = $tokenParser;
-        $this->eventModel                   = $eventModel;
+        $this->configProvider     = $configProvider;
+        $this->queryFilterHelper  = $queryFilterHelper;
+        $this->filterQueryFactory = $filterQueryFactory;
+        $this->customObjectModel  = $customObjectModel;
+        $this->customItemModel    = $customItemModel;
+        $this->tokenParser        = $tokenParser;
+        $this->eventModel         = $eventModel;
     }
 
     /**
