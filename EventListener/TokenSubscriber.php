@@ -203,7 +203,7 @@ class TokenSubscriber implements EventSubscriberInterface
         $entityType  = $tableConfig->getParameter('filterEntityType');
         $token       = $tableConfig->getParameter('token');
         $email       = $tableConfig->getParameter('email');
-        $source      = $tableConfig->getParameter('source'); // like ['campaign.event', 11]
+        $source      = $tableConfig->getParameter('source');
 
         if ('contact' !== $entityType || !$contactId || !$email instanceof Email || !$token instanceof Token) {
             return;
@@ -222,10 +222,14 @@ class TokenSubscriber implements EventSubscriberInterface
                 /** @var Event $campaignEvent */
                 $campaignEvent = $this->eventModel->getEntity($campaignEventId);
 
+                if (!$campaignEvent) {
+                    return;
+                }
+
                 /** @var LeadList $segment */
                 $segment = $campaignEvent->getCampaign()->getLists()->first();
 
-                if (!$segment || !$segment->getId()) {
+                if (!$segment) {
                     return;
                 }
 
