@@ -59,12 +59,12 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                             {
                                 "label": "1",
                                 "value": "1",
-                                "order": 1
+                                "order": "1"
                             },
                             {
                                 "label": "2",
                                 "value": "2",
-                                "order": 2
+                                "order": "2"
                             }
                         ]',
                         'defaultValue' => [
@@ -73,7 +73,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                     ],
                 ],
                 'category'    => '',
-                'isPublished' => 1,
+                'isPublished' => '1',
                 'buttons'     => ['apply' => ''],
             ],
         ];
