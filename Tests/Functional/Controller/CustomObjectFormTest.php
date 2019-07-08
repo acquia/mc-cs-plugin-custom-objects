@@ -85,7 +85,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
         $response       = json_decode($clientResponse->getContent(), true);
 
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
-        $this->assertSame(1, count($response));
+        $this->assertCount(1, $response);
         $this->assertSame('/s/custom/object/edit/1', $response['redirect']);
 
         $this->assertCustomObject($payload, 1);
