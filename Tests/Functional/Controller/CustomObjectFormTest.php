@@ -117,6 +117,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
          */
         foreach ($customFields as $key => $customField) {
             $this->assertSame($customObject, $customField->getCustomObject());
+
             $expectedCf = $expected['customFields'][$key];
             $this->assertSame((bool) $expectedCf['isPublished'], $customField->isPublished());
             $this->assertSame($expectedCf['type'], $customField->getType());
@@ -124,6 +125,12 @@ class CustomObjectFormTest extends MauticMysqlTestCase
             $this->assertSame($expectedCf['label'], $customField->getLabel());
             $this->assertSame($expectedCf['alias'], $customField->getAlias());
             $this->assertSame((bool) $expectedCf['required'], $customField->isRequired());
+
+            foreach($expectedCf['$options'] as $key => $option) {
+
+                $optionInDb = $customField->
+                $this->assertSame($options['label'])
+            }
         }
     }
 
