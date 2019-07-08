@@ -39,6 +39,7 @@ use Mautic\CampaignBundle\Entity\Event;
 use Doctrine\Common\Collections\Collection;
 use Mautic\LeadBundle\Segment\ContactSegmentFilters;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\FilterQueryFactory;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
 
 /**
  * Handles Custom Object token replacements with the correct value in emails.

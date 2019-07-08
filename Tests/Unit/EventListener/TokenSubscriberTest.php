@@ -34,10 +34,10 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\Common\Collections\ArrayCollection;
-use Mautic\LeadBundle\Segment\ContactSegmentFilter;
-use Doctrine\DBAL\Connection;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentBuilder;
-use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
+use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\FilterQueryFactory;
+use Mautic\CampaignBundle\Model\EventModel;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
 
 class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -47,9 +47,13 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
 
     private $queryFilterHelper;
 
+    private $filterQueryFactory;
+
     private $customObjectModel;
 
     private $customItemModel;
+
+    private $eventModel;
 
     /**
      * @var TokenParser
@@ -74,8 +78,10 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->configProvider               = $this->createMock(ConfigProvider::class);
         $this->contactSegmentFilterFactory  = $this->createMock(ContactSegmentFilterFactory::class);
         $this->queryFilterHelper            = $this->createMock(QueryFilterHelper::class);
+        $this->filterQueryFactory           = $this->createMock(FilterQueryFactory::class);
         $this->customObjectModel            = $this->createMock(CustomObjectModel::class);
         $this->customItemModel              = $this->createMock(CustomItemModel::class);
+        $this->eventModel                   = $this->createMock(EventModel::class);
         $this->tokenParser                  = new TokenParser();
         $this->builderEvent                 = $this->createMock(BuilderEvent::class);
         $this->emailSendEvent               = $this->createMock(EmailSendEvent::class);
@@ -84,9 +90,11 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
             $this->configProvider,
             $this->contactSegmentFilterFactory,
             $this->queryFilterHelper,
+            $this->filterQueryFactory,
             $this->customObjectModel,
             $this->customItemModel,
-            $this->tokenParser
+            $this->tokenParser,
+            $this->eventModel
         );
     }
 
@@ -146,11 +154,17 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
         $customField->method('getAlias')->willReturn('sku');
         $customField->method('getLabel')->willReturn('SKU');
 
-        $this->builderEvent->expects($this->once())
+        $this->builderEvent->expects($this->exactly(2))
             ->method('addToken')
-            ->with(
-                '{custom-object=product:sku | where=segment-filter | order=latest | limit=1 | default=}',
-                'Product: SKU'
+            ->withConsecutive(
+                [
+                    '{custom-object=product:name | where=segment-filter | order=latest | limit=1 | default=}',
+                    'Product: Name',
+                ],
+                [
+                    '{custom-object=product:sku | where=segment-filter | order=latest | limit=1 | default=}',
+                    'Product: SKU',
+                ]
             );
 
         $this->subscriber->onBuilderBuild($this->builderEvent);
@@ -446,9 +460,7 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
     public function testOnListQueryForSegmentFilterWithSegmentEmail(): void
     {
         $segmentBuilder = $this->createMock(SegmentBuilder::class);
-        $expression     = $this->createMock(ExpressionBuilder::class);
         $queryBuilder   = $this->createMock(QueryBuilder::class);
-        $connection     = $this->createMock(Connection::class);
         $token          = $this->tokenParser->findTokens('{custom-object=product:sku | where=segment-filter |order=latest|limit=1 | default=No thing}')->current();
         $segment        = new LeadList();
         $segment->setName('CO test');
@@ -484,9 +496,6 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
         $tableConfig->addParameter('token', $token);
         $tableConfig->addParameter('email', $email);
 
-        $condition1  = $this->createMock(ContactSegmentFilter::class);
-        $condition10 = $this->createMock(ContactSegmentFilter::class);
-
         $this->customItemListDbalQueryEvent->expects($this->once())
             ->method('getTableConfig')
             ->willReturn($tableConfig);
@@ -495,66 +504,66 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getQueryBuilder')
             ->willReturn($queryBuilder);
 
-        $this->contactSegmentFilterFactory->expects($this->once())
-            ->method('getSegmentFilters')
-            ->willReturn([$condition1, $condition10]);
-
-        $condition1->method('getField')->willReturn('1');
-        $condition1->method('getType')->willReturn('text');
-        $condition10->method('getField')->willReturn('10');
-        $condition10->method('getType')->willReturn('int');
-
-        $queryBuilder->method('getConnection')->willReturn($connection);
-
-        $this->queryFilterHelper->expects($this->exactly(2))
-            ->method('createValueQueryBuilder')
+        $this->filterQueryFactory->expects($this->exactly(2))
+            ->method('configureQueryBuilderFromSegmentFilter')
             ->withConsecutive(
-                [$connection, 'filter_0', 1, 'text'],
-                [$connection, 'filter_1', 10, 'int']
+                [
+                    [
+                        'glue'     => 'and',
+                        'field'    => 'cmf_1',
+                        'object'   => 'custom_object',
+                        'type'     => 'text',
+                        'filter'   => '23',
+                        'display'  => null,
+                        'operator' => '=',
+                    ],
+                    'filter_0',
+                ],
+                [
+                    [
+                        'glue'     => 'and',
+                        'field'    => 'cmf_10',
+                        'object'   => 'custom_object',
+                        'type'     => 'int',
+                        'filter'   => '4',
+                        'display'  => null,
+                        'operator' => '=',
+                    ],
+                    'filter_1',
+                ]
             )
-            ->willReturn($segmentBuilder);
-
-        $segmentBuilder->expects($this->exactly(2))
-            ->method('select')
-            ->withConsecutive(
-                ['filter_0_contact.custom_item_id'],
-                ['filter_1_contact.custom_item_id']
-            );
-
-        $this->queryFilterHelper->expects($this->exactly(2))
-            ->method('addCustomFieldValueExpressionFromSegmentFilter')
-            ->withConsecutive(
-                [$segmentBuilder, 'filter_0', $condition1],
-                [$segmentBuilder, 'filter_1', $condition10]
-            );
-
-        $segmentBuilder->expects($this->exactly(2))
-            ->method('getParameters')
             ->will($this->onConsecutiveCalls(
-                ['queryParam1' => 'queryValue1'],
-                ['queryParam2' => 'queryValue2']
+                $segmentBuilder,
+                $this->throwException(new InvalidSegmentFilterException('Test invalid filter handling here.'))
             ));
 
-        $queryBuilder->expects($this->exactly(2))
+        $segmentBuilder->expects($this->once())
+            ->method('select')
+            ->with('filter_0_item.id');
+
+        $this->queryFilterHelper->expects($this->once())
+            ->method('addContactIdRestriction')
+            ->with($segmentBuilder, 'filter_0', 345);
+
+        $segmentBuilder->expects($this->once())
+            ->method('getParameters')
+            ->willReturn(['queryParam1' => 'queryValue1']);
+
+        $queryBuilder->expects($this->once())
             ->method('setParameter')
-            ->withConsecutive(
-                ['queryParam1', 'queryValue1'],
-                ['queryParam2', 'queryValue2']
-            );
+            ->with('queryParam1', 'queryValue1');
 
-        $segmentBuilder->expects($this->exactly(2))
-            ->method('expr')
-            ->willReturn($expression);
-
-        $segmentBuilder->expects($this->exactly(2))
+        $segmentBuilder->expects($this->once())
             ->method('getSQL')
-            ->will($this->onConsecutiveCalls('SQL QUERY 1', 'SQL QUERY 10'));
+            ->willReturn('SQL QUERY 1');
 
-        $expression->expects($this->exactly(2))
-            ->method('exists')
-            ->withConsecutive(
-                ['SQL QUERY 1'],
-                ['SQL QUERY 10']
+        $queryBuilder->expects($this->once())
+            ->method('innerJoin')
+            ->with(
+                CustomItem::TABLE_ALIAS,
+                '(SQL QUERY 1)',
+                'filter_0',
+                CustomItem::TABLE_ALIAS.'.id = filter_0.id'
             );
 
         $this->subscriber->onListQuery($this->customItemListDbalQueryEvent);
