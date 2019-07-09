@@ -411,23 +411,7 @@ CustomObjectsForm = {
                         order = order + 1;
                     }
                 } else if (propertyName === 'required') {
-                    mQuery('#objectFieldModal [data-toggle-button="data-toggle-button"]').on('change', function(e){
-                        mQuery(this).trigger('Mautic.toggleYesNoButtonClass', mQuery(this));
-                    });
-                    if (value === "1") {
-                        mQuery('#objectFieldModal #custom_field_required_0')
-                            .removeAttr('checked');
-                        mQuery('#objectFieldModal #custom_field_required_1')
-                            .attr('checked', 'checked');
-                        mQuery('#objectFieldModal [data-toggle-button="data-toggle-button"]').each(function() {
-                            Mautic.toggleYesNoButtonClass(mQuery(this).attr('id'));
-                        });
-                    } else {
-                        mQuery('#objectFieldModal #custom_field_required_0')
-                            .attr('checked', 'checked');
-                        mQuery('#objectFieldModal #custom_field_required_1')
-                            .removeAttr('checked');
-                    }
+                    CustomObjectsForm.setChoiceRequiredVal(value);
                 } else {
                     mQuery('#objectFieldModal').find(target).val(value);
                 }
@@ -524,5 +508,27 @@ CustomObjectsForm = {
         panelId = panelId.slice(panelId.lastIndexOf('_') + 1, panelId.length);
 
         return panelId;
+    },
+
+    /**
+     * S
+     * @param value
+     */
+    setChoiceRequiredVal: function(value) {
+        let element = mQuery('#validation .chosen-required .choice-wrapper');
+        let no = element.find('label').eq(0);
+        let yes = element.find('label').eq(1);
+
+        if (value) {
+            yes.removeClass('btn-default').addClass('btn-success active');
+            no.removeClass('btn-danger active').addClass('btn-default');
+            yes.find('input').attr('checked', 'checked');
+            no.find('input').removeAttr('checked');
+        } else {
+            yes.removeClass('btn-success active').addClass('btn-default');
+            no.removeClass('btn-default').addClass('btn-danger active');
+            yes.find('input').removeAttr('checked');
+            no.find('input').attr('checked', 'checked');
+        }
     }
 };

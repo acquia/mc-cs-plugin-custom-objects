@@ -73,7 +73,7 @@ $showProperties = isset($form['options']) || $customField->getTypeObject()->useE
                     <div class="col-md-6">
                         <?php echo $view['form']->row($form['params']['requiredValidationMessage']); ?>
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-6 chosen-required">
                         <?php echo $view['form']->row($form['required']); ?>
                     </div>
                 </div>
