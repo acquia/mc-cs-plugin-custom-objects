@@ -27,7 +27,7 @@ class DynamicContentSubscriberTest extends PHPUnit_Framework_TestCase
     /** @var QueryFilterHelper|\PHPUnit_Framework_MockObject_MockObject */
     private $queryFilterHelperMock;
 
-    /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var QueryFilterFactory|\PHPUnit_Framework_MockObject_MockObject */
     private $queryFilterFactory;
 
     /** @var ContactFiltersEvaluateEvent|\PHPUnit_Framework_MockObject_MockObject */

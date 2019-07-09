@@ -257,10 +257,9 @@ class TokenSubscriber implements EventSubscriberInterface
      * This method searches for the right custom items and the right custom field values.
      * The custom field filters are actually added in the method `onListQuery` above.
      *
-     * @param CustomObject $customObject
-     * @param Token        $token
-     * @param Email        $event
-     * @param int          $contactId
+     * @param CustomObject       $customObject
+     * @param Token              $token
+     * @param EmEmailSendEventil $event
      *
      * @return mixed[]
      */
