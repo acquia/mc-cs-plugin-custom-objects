@@ -35,7 +35,7 @@ use MauticPlugin\CustomObjectsBundle\DTO\Token;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CampaignBundle\Entity\Event;
-use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\FilterQueryFactory;
+use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
 
 /**
@@ -56,9 +56,9 @@ class TokenSubscriber implements EventSubscriberInterface
     private $queryFilterHelper;
 
     /**
-     * @var FilterQueryFactory
+     * @var QueryFilterFactory
      */
-    private $filterQueryFactory;
+    private $queryFilterFactory;
 
     /**
      * @var CustomObjectModel
@@ -83,7 +83,7 @@ class TokenSubscriber implements EventSubscriberInterface
     /**
      * @param ConfigProvider     $configProvider
      * @param QueryFilterHelper  $queryFilterHelper
-     * @param FilterQueryFactory $filterQueryFactory
+     * @param QueryFilterFactory $queryFilterFactory
      * @param CustomObjectModel  $customObjectModel
      * @param CustomItemModel    $customItemModel
      * @param TokenParser        $tokenParser
@@ -92,7 +92,7 @@ class TokenSubscriber implements EventSubscriberInterface
     public function __construct(
         ConfigProvider $configProvider,
         QueryFilterHelper $queryFilterHelper,
-        FilterQueryFactory $filterQueryFactory,
+        QueryFilterFactory $queryFilterFactory,
         CustomObjectModel $customObjectModel,
         CustomItemModel $customItemModel,
         TokenParser $tokenParser,
@@ -100,7 +100,7 @@ class TokenSubscriber implements EventSubscriberInterface
     ) {
         $this->configProvider     = $configProvider;
         $this->queryFilterHelper  = $queryFilterHelper;
-        $this->filterQueryFactory = $filterQueryFactory;
+        $this->queryFilterFactory = $queryFilterFactory;
         $this->customObjectModel  = $customObjectModel;
         $this->customItemModel    = $customItemModel;
         $this->tokenParser        = $tokenParser;
@@ -228,7 +228,7 @@ class TokenSubscriber implements EventSubscriberInterface
             foreach ($segmentFilters as $id => $filter) {
                 try {
                     $queryAlias        = 'filter_'.$id;
-                    $innerQueryBuilder = $this->filterQueryFactory->configureQueryBuilderFromSegmentFilter($filter, $queryAlias);
+                    $innerQueryBuilder = $this->queryFilterFactory->configureQueryBuilderFromSegmentFilter($filter, $queryAlias);
                 } catch (InvalidSegmentFilterException $e) {
                     continue;
                 }

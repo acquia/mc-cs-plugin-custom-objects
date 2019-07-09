@@ -22,7 +22,7 @@ use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use PDOException;
-use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\FilterQueryFactory;
+use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
 
 class DynamicContentSubscriber extends CommonSubscriber
@@ -31,9 +31,9 @@ class DynamicContentSubscriber extends CommonSubscriber
     use DbalQueryTrait;
 
     /**
-     * @var FilterQueryFactory
+     * @var QueryFilterFactory
      */
-    private $filterQueryFactory;
+    private $queryFilterFactory;
 
     /**
      * @var QueryFilterHelper
@@ -46,16 +46,16 @@ class DynamicContentSubscriber extends CommonSubscriber
     private $configProvider;
 
     /**
-     * @param FilterQueryFactory $filterQueryFactory
+     * @param QueryFilterFactory $queryFilterFactory
      * @param QueryFilterHelper  $queryFilterHelper
      * @param ConfigProvider     $configProvider
      */
     public function __construct(
-        FilterQueryFactory $filterQueryFactory,
+        QueryFilterFactory $queryFilterFactory,
         QueryFilterHelper $queryFilterHelper,
         ConfigProvider $configProvider)
     {
-        $this->filterQueryFactory = $filterQueryFactory;
+        $this->queryFilterFactory = $queryFilterFactory;
         $this->queryFilterHelper  = $queryFilterHelper;
         $this->configProvider     = $configProvider;
     }
@@ -91,7 +91,7 @@ class DynamicContentSubscriber extends CommonSubscriber
             $queryAlias = "filter_{$key}";
 
             try {
-                $filterQueryBuilder = $this->filterQueryFactory->configureQueryBuilderFromSegmentFilter($eventFilter, $queryAlias);
+                $filterQueryBuilder = $this->queryFilterFactory->configureQueryBuilderFromSegmentFilter($eventFilter, $queryAlias);
             } catch (InvalidSegmentFilterException $e) {
                 continue;
             }

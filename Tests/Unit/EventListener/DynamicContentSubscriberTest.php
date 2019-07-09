@@ -16,7 +16,7 @@ use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQuery
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemFilterQueryBuilder;
 use Monolog\Logger;
 use PHPUnit_Framework_TestCase;
-use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\FilterQueryFactory;
+use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
 
 class DynamicContentSubscriberTest extends PHPUnit_Framework_TestCase
@@ -28,7 +28,7 @@ class DynamicContentSubscriberTest extends PHPUnit_Framework_TestCase
     private $queryFilterHelperMock;
 
     /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
-    private $filterQueryFactory;
+    private $queryFilterFactory;
 
     /** @var ContactFiltersEvaluateEvent|\PHPUnit_Framework_MockObject_MockObject */
     private $evaluateEvent;
@@ -53,7 +53,7 @@ class DynamicContentSubscriberTest extends PHPUnit_Framework_TestCase
         parent::setUp();
 
         $this->configProviderMock    = $this->createMock(ConfigProvider::class);
-        $this->filterQueryFactory    = $this->createMock(FilterQueryFactory::class);
+        $this->queryFilterFactory    = $this->createMock(QueryFilterFactory::class);
         $this->queryFilterHelperMock = $this->createMock(QueryFilterHelper::class);
         $this->evaluateEvent         = $this->createMock(ContactFiltersEvaluateEvent::class);
         $this->leadMock              = $this->createMock(Lead::class);
@@ -62,7 +62,7 @@ class DynamicContentSubscriberTest extends PHPUnit_Framework_TestCase
         $this->statementMock         = $this->createMock(Statement::class);
 
         $this->dynamicContentSubscriber = new DynamicContentSubscriber(
-            $this->filterQueryFactory,
+            $this->queryFilterFactory,
             $this->queryFilterHelperMock,
             $this->configProviderMock
         );
@@ -87,7 +87,7 @@ class DynamicContentSubscriberTest extends PHPUnit_Framework_TestCase
 
         $this->evaluateEvent->expects($this->once())->method('getFilters')->willReturn([]);
         $this->evaluateEvent->expects($this->once())->method('isEvaluated')->willReturn(true);
-        $this->filterQueryFactory->expects($this->never())->method('configureQueryBuilderFromSegmentFilter');
+        $this->queryFilterFactory->expects($this->never())->method('configureQueryBuilderFromSegmentFilter');
 
         $this->dynamicContentSubscriber->evaluateFilters($this->evaluateEvent);
     }
@@ -113,7 +113,7 @@ class DynamicContentSubscriberTest extends PHPUnit_Framework_TestCase
 
         $this->configProviderMock->expects($this->once())->method('pluginIsEnabled')->willReturn(true);
 
-        $this->filterQueryFactory->expects($this->exactly(2))
+        $this->queryFilterFactory->expects($this->exactly(2))
             ->method('configureQueryBuilderFromSegmentFilter')
             ->withConsecutive(
                 [

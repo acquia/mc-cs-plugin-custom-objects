@@ -34,7 +34,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentBuilder;
-use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\FilterQueryFactory;
+use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
 use Mautic\CampaignBundle\Model\EventModel;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
 use Mautic\CampaignBundle\Event\CampaignEvent;
@@ -46,7 +46,7 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
 
     private $queryFilterHelper;
 
-    private $filterQueryFactory;
+    private $queryFilterFactory;
 
     private $customObjectModel;
 
@@ -76,7 +76,7 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->configProvider               = $this->createMock(ConfigProvider::class);
         $this->queryFilterHelper            = $this->createMock(QueryFilterHelper::class);
-        $this->filterQueryFactory           = $this->createMock(FilterQueryFactory::class);
+        $this->queryFilterFactory           = $this->createMock(QueryFilterFactory::class);
         $this->customObjectModel            = $this->createMock(CustomObjectModel::class);
         $this->customItemModel              = $this->createMock(CustomItemModel::class);
         $this->eventModel                   = $this->createMock(EventModel::class);
@@ -87,7 +87,7 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->subscriber                   = new TokenSubscriber(
             $this->configProvider,
             $this->queryFilterHelper,
-            $this->filterQueryFactory,
+            $this->queryFilterFactory,
             $this->customObjectModel,
             $this->customItemModel,
             $this->tokenParser,
@@ -549,7 +549,7 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getQueryBuilder')
             ->willReturn($queryBuilder);
 
-        $this->filterQueryFactory->expects($this->exactly(2))
+        $this->queryFilterFactory->expects($this->exactly(2))
             ->method('configureQueryBuilderFromSegmentFilter')
             ->withConsecutive(
                 [
@@ -647,7 +647,7 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
         $campaignEvent->expects($this->never())
             ->method('getCampaign');
 
-        $this->filterQueryFactory->expects($this->never())
+        $this->queryFilterFactory->expects($this->never())
             ->method('configureQueryBuilderFromSegmentFilter');
 
         $this->subscriber->onListQuery($this->customItemListDbalQueryEvent);
@@ -689,7 +689,7 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getCampaign')
             ->willReturn($campaign);
 
-        $this->filterQueryFactory->expects($this->never())
+        $this->queryFilterFactory->expects($this->never())
             ->method('configureQueryBuilderFromSegmentFilter');
 
         $this->subscriber->onListQuery($this->customItemListDbalQueryEvent);
@@ -755,7 +755,7 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getCampaign')
             ->willReturn($campaign);
 
-        $this->filterQueryFactory->expects($this->exactly(2))
+        $this->queryFilterFactory->expects($this->exactly(2))
             ->method('configureQueryBuilderFromSegmentFilter')
             ->withConsecutive(
                 [

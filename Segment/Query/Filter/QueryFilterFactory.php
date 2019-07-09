@@ -19,7 +19,7 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use Doctrine\DBAL\Connection;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
 
-class FilterQueryFactory
+class QueryFilterFactory
 {
     /**
      * @var Connection
