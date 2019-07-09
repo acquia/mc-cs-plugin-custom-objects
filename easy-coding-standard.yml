@@ -41,3 +41,5 @@ parameters:
       - 'Tests/Functional/EventListener/ImportSubscriberTest.php'
     PhpCsFixer\Fixer\Strict\StrictParamFixer:
     - 'CustomFieldType/AbstractMultivalueType.php'
+    PhpCsFixer\Fixer\PhpUnit\PhpUnitSetUpTearDownVisibilityFixer:
+    - 'Tests/Functional/Controller/CustomObjectFormTest.php'

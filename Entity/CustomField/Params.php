@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 
 /**
- * Stored in `custom_field.params` column.
+ * Value object handling `custom_field.params` column content stored in JSON.
  */
 class Params
 {
