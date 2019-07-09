@@ -69,6 +69,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                         'defaultValue' => [
                             0 => '2',
                         ],
+                        'deleted' => '',
                     ],
                 ],
                 'category'    => '',
@@ -132,6 +133,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                         'defaultValue' => [
                             0 => '1',
                         ],
+                        'deleted' => '',
                     ],
                     1 => [
                         'id'           => '',
@@ -145,6 +147,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                         'params'       => '[]',
                         'options'      => '[]',
                         'defaultValue' => 'AF',
+                        'deleted'      => '',
                     ],
                     2 => [
                         'id'           => '',
@@ -158,6 +161,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                         'params'       => '[]',
                         'options'      => '[]',
                         'defaultValue' => '2019-07-18',
+                        'deleted'      => '',
                     ],
                     3 => [
                         'id'           => '',
@@ -171,6 +175,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                         'params'       => '[]',
                         'options'      => '[]',
                         'defaultValue' => '2019-07-18 23:02',
+                        'deleted'      => '',
                     ],
                     4 => [
                         'id'           => '',
@@ -184,6 +189,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                         'params'       => '[]',
                         'options'      => '[]',
                         'defaultValue' => 'test@test.com',
+                        'deleted'      => '',
                     ],
                     5 => [
                         'id'           => '',
@@ -197,6 +203,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                         'params'       => '[]',
                         'options'      => '[]',
                         'defaultValue' => 'hidden value',
+                        'deleted'      => '',
                     ],
                     6 => [
                         'id'           => '',
@@ -210,6 +217,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                         'params'       => '[]',
                         'options'      => '[]',
                         'defaultValue' => '2',
+                        'deleted'      => '',
                     ],
                     7 => [
                         'id'           => '',
@@ -223,6 +231,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                         'params'       => '[]',
                         'options'      => '[]',
                         'defaultValue' => '2',
+                        'deleted'      => '',
                     ],
                     8 => [
                         'id'           => '',
@@ -247,6 +256,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                         ]',
                         'params'       => '[]',
                         'defaultValue' => 'rv1',
+                        'deleted'      => '',
                     ],
                     9 => [
                         'id'           => '',
@@ -271,6 +281,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                         ]',
                         'params'       => '[]',
                         'defaultValue' => 'sv',
+                        'deleted'      => '',
                     ],
                     10 => [
                         'id'           => '',
@@ -295,6 +306,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                         ]',
                         'params'       => '[]',
                         'defaultValue' => ['msv'],
+                        'deleted'      => '',
                     ],
                     11 => [
                         'id'           => '',
@@ -308,6 +320,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                         'options'      => '[]',
                         'params'       => '[]',
                         'defaultValue' => 'some text',
+                        'deleted'      => '',
                     ],
                     12 => [
                         'id'           => '',
@@ -321,6 +334,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                         'options'      => '[]',
                         'params'       => '[]',
                         'defaultValue' => 'some text flkasdfj lfasdf',
+                        'deleted'      => '',
                     ],
                     13 => [
                         'id'           => '',
@@ -334,6 +348,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                         'options'      => '[]',
                         'params'       => '[]',
                         'defaultValue' => 'http://fjdsakfsd.com',
+                        'deleted'      => '',
                     ],
                 ],
                 'category'    => '',
