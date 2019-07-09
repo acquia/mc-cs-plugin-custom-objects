@@ -129,14 +129,6 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param int $id
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
-    }
-
-    /**
      * @return int|null
      */
     public function getId()

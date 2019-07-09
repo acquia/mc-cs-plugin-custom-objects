@@ -226,7 +226,14 @@ class SaveController extends BaseFormController
             return;
         }
 
-        foreach ($rawCustomObject['customFields'] as $key => $rawCustomField) {
+        // $_POST data contains custom fields in reversed order
+        $customFields = [];
+        foreach ($rawCustomObject['customFields'] as $customField) {
+            // We are using order key as key to access collection of CustomFields below
+            $customFields[$customField['order']] = $customField;
+        }
+
+        foreach ($customFields as $key => $rawCustomField) {
             if ($rawCustomField['deleted'] && $rawCustomField['id']) {
                 // Remove deleted custom fields
                 $this->customObjectModel->removeCustomFieldById($customObject, (int) $rawCustomField['id']);
