@@ -22,7 +22,6 @@ use Mautic\EmailBundle\Entity\Email;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\CoreBundle\Event\BuilderEvent;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
-use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Helper\TokenParser;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
@@ -34,22 +33,26 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\Common\Collections\ArrayCollection;
-use Mautic\LeadBundle\Segment\ContactSegmentFilter;
-use Doctrine\DBAL\Connection;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentBuilder;
-use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
+use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
+use Mautic\CampaignBundle\Model\EventModel;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
+use Mautic\CampaignBundle\Event\CampaignEvent;
+use Mautic\CampaignBundle\Entity\Campaign;
 
 class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
 {
     private $configProvider;
 
-    private $contactSegmentFilterFactory;
-
     private $queryFilterHelper;
+
+    private $queryFilterFactory;
 
     private $customObjectModel;
 
     private $customItemModel;
+
+    private $eventModel;
 
     /**
      * @var TokenParser
@@ -72,21 +75,23 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
         parent::setUp();
 
         $this->configProvider               = $this->createMock(ConfigProvider::class);
-        $this->contactSegmentFilterFactory  = $this->createMock(ContactSegmentFilterFactory::class);
         $this->queryFilterHelper            = $this->createMock(QueryFilterHelper::class);
+        $this->queryFilterFactory           = $this->createMock(QueryFilterFactory::class);
         $this->customObjectModel            = $this->createMock(CustomObjectModel::class);
         $this->customItemModel              = $this->createMock(CustomItemModel::class);
+        $this->eventModel                   = $this->createMock(EventModel::class);
         $this->tokenParser                  = new TokenParser();
         $this->builderEvent                 = $this->createMock(BuilderEvent::class);
         $this->emailSendEvent               = $this->createMock(EmailSendEvent::class);
         $this->customItemListDbalQueryEvent = $this->createMock(CustomItemListDbalQueryEvent::class);
         $this->subscriber                   = new TokenSubscriber(
             $this->configProvider,
-            $this->contactSegmentFilterFactory,
             $this->queryFilterHelper,
+            $this->queryFilterFactory,
             $this->customObjectModel,
             $this->customItemModel,
-            $this->tokenParser
+            $this->tokenParser,
+            $this->eventModel
         );
     }
 
@@ -146,11 +151,17 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
         $customField->method('getAlias')->willReturn('sku');
         $customField->method('getLabel')->willReturn('SKU');
 
-        $this->builderEvent->expects($this->once())
+        $this->builderEvent->expects($this->exactly(2))
             ->method('addToken')
-            ->with(
-                '{custom-object=product:sku | where=segment-filter | order=latest | limit=1 | default=}',
-                'Product: SKU'
+            ->withConsecutive(
+                [
+                    '{custom-object=product:name | where=segment-filter | order=latest | limit=1 | default=}',
+                    'Product: Name',
+                ],
+                [
+                    '{custom-object=product:sku | where=segment-filter | order=latest | limit=1 | default=}',
+                    'Product: SKU',
+                ]
             );
 
         $this->subscriber->onBuilderBuild($this->builderEvent);
@@ -287,6 +298,54 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             ['{custom-object=product:sku | where=segment-filter |order=latest|limit=1 | default=No thing}' => 'No thing'],
+            $emailSendEvent->getTokens()
+        );
+    }
+
+    public function testDecodeTokensWithItemName(): void
+    {
+        $html = '<!DOCTYPE html>
+        <html>
+        <head>
+        <title>{subject}</title>
+        </head>
+        <body>
+        Hello, here is the thing:
+        {custom-object=product:name | where=segment-filter |order=latest|limit=1 | default=No thing} 
+        Regards
+        </body>
+        </html>
+        ';
+        $customObject   = $this->createMock(CustomObject::class);
+        $email          = new Email();
+        $emailSendEvent = new EmailSendEvent(
+            null,
+            [
+                'subject'          => 'CO segment test',
+                'content'          => $html,
+                'conplainTexttent' => '',
+                'email'            => $email,
+                'lead'             => ['id' => 2345, 'email' => 'john@doe.email'],
+                'source'           => null,
+            ]
+        );
+
+        $this->configProvider->expects($this->once())
+            ->method('pluginIsEnabled')
+            ->willReturn(true);
+
+        $this->customObjectModel->expects($this->once())
+            ->method('fetchEntityByAlias')
+            ->willReturn($customObject);
+
+        $this->customItemModel->expects($this->once())
+            ->method('getArrayTableData')
+            ->willReturn([['name' => 'Toaster']]);
+
+        $this->subscriber->decodeTokens($emailSendEvent);
+
+        $this->assertSame(
+            ['{custom-object=product:name | where=segment-filter |order=latest|limit=1 | default=No thing}' => 'Toaster'],
             $emailSendEvent->getTokens()
         );
     }
@@ -446,9 +505,7 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
     public function testOnListQueryForSegmentFilterWithSegmentEmail(): void
     {
         $segmentBuilder = $this->createMock(SegmentBuilder::class);
-        $expression     = $this->createMock(ExpressionBuilder::class);
         $queryBuilder   = $this->createMock(QueryBuilder::class);
-        $connection     = $this->createMock(Connection::class);
         $token          = $this->tokenParser->findTokens('{custom-object=product:sku | where=segment-filter |order=latest|limit=1 | default=No thing}')->current();
         $segment        = new LeadList();
         $segment->setName('CO test');
@@ -484,8 +541,95 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
         $tableConfig->addParameter('token', $token);
         $tableConfig->addParameter('email', $email);
 
-        $condition1  = $this->createMock(ContactSegmentFilter::class);
-        $condition10 = $this->createMock(ContactSegmentFilter::class);
+        $this->customItemListDbalQueryEvent->expects($this->once())
+            ->method('getTableConfig')
+            ->willReturn($tableConfig);
+
+        $this->customItemListDbalQueryEvent->expects($this->once())
+            ->method('getQueryBuilder')
+            ->willReturn($queryBuilder);
+
+        $this->queryFilterFactory->expects($this->exactly(2))
+            ->method('configureQueryBuilderFromSegmentFilter')
+            ->withConsecutive(
+                [
+                    [
+                        'glue'     => 'and',
+                        'field'    => 'cmf_1',
+                        'object'   => 'custom_object',
+                        'type'     => 'text',
+                        'filter'   => '23',
+                        'display'  => null,
+                        'operator' => '=',
+                    ],
+                    'filter_0',
+                ],
+                [
+                    [
+                        'glue'     => 'and',
+                        'field'    => 'cmf_10',
+                        'object'   => 'custom_object',
+                        'type'     => 'int',
+                        'filter'   => '4',
+                        'display'  => null,
+                        'operator' => '=',
+                    ],
+                    'filter_1',
+                ]
+            )
+            ->will($this->onConsecutiveCalls(
+                $segmentBuilder,
+                $this->throwException(new InvalidSegmentFilterException('Test invalid filter handling here.'))
+            ));
+
+        $segmentBuilder->expects($this->once())
+            ->method('select')
+            ->with('filter_0_item.id');
+
+        $this->queryFilterHelper->expects($this->once())
+            ->method('addContactIdRestriction')
+            ->with($segmentBuilder, 'filter_0', 345);
+
+        $segmentBuilder->expects($this->once())
+            ->method('getParameters')
+            ->willReturn(['queryParam1' => 'queryValue1']);
+
+        $queryBuilder->expects($this->once())
+            ->method('setParameter')
+            ->with('queryParam1', 'queryValue1');
+
+        $segmentBuilder->expects($this->once())
+            ->method('getSQL')
+            ->willReturn('SQL QUERY 1');
+
+        $queryBuilder->expects($this->once())
+            ->method('innerJoin')
+            ->with(
+                CustomItem::TABLE_ALIAS,
+                '(SQL QUERY 1)',
+                'filter_0',
+                CustomItem::TABLE_ALIAS.'.id = filter_0.id'
+            );
+
+        $this->subscriber->onListQuery($this->customItemListDbalQueryEvent);
+    }
+
+    public function testOnListQueryForSegmentFilterWithCampaignEmailWhenEventDoesNotExist(): void
+    {
+        $queryBuilder  = $this->createMock(QueryBuilder::class);
+        $campaignEvent = $this->createMock(CampaignEvent::class);
+        $token         = $this->tokenParser->findTokens('{custom-object=product:sku | where=segment-filter |order=latest|limit=1 | default=No thing}')->current();
+        $email         = $this->createMock(Email::class);
+
+        $email->method('getEmailType')->willReturn('template');
+
+        $tableConfig  = new TableConfig(10, 1, 'CustomItem.dateAdded', 'DESC');
+        $tableConfig->addParameter('customObjectId', 123);
+        $tableConfig->addParameter('filterEntityType', 'contact');
+        $tableConfig->addParameter('filterEntityId', 345);
+        $tableConfig->addParameter('token', $token);
+        $tableConfig->addParameter('email', $email);
+        $tableConfig->addParameter('source', ['campaign.event', 11]);
 
         $this->customItemListDbalQueryEvent->expects($this->once())
             ->method('getTableConfig')
@@ -495,45 +639,177 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getQueryBuilder')
             ->willReturn($queryBuilder);
 
-        $this->contactSegmentFilterFactory->expects($this->once())
-            ->method('getSegmentFilters')
-            ->willReturn([$condition1, $condition10]);
+        $this->eventModel->expects($this->once())
+            ->method('getEntity')
+            ->with(11)
+            ->willReturn(null);
 
-        $condition1->method('getField')->willReturn('1');
-        $condition1->method('getType')->willReturn('text');
-        $condition10->method('getField')->willReturn('10');
-        $condition10->method('getType')->willReturn('int');
+        $campaignEvent->expects($this->never())
+            ->method('getCampaign');
 
-        $queryBuilder->method('getConnection')->willReturn($connection);
+        $this->queryFilterFactory->expects($this->never())
+            ->method('configureQueryBuilderFromSegmentFilter');
 
-        $this->queryFilterHelper->expects($this->exactly(2))
-            ->method('createValueQueryBuilder')
+        $this->subscriber->onListQuery($this->customItemListDbalQueryEvent);
+    }
+
+    public function testOnListQueryForSegmentFilterWithCampaignEmailWhenNoSegmentExists(): void
+    {
+        $queryBuilder  = $this->createMock(QueryBuilder::class);
+        $campaignEvent = $this->createMock(CampaignEvent::class);
+        $token         = $this->tokenParser->findTokens('{custom-object=product:sku | where=segment-filter |order=latest|limit=1 | default=No thing}')->current();
+        $campaign      = $this->createMock(Campaign::class);
+
+        $email = $this->createMock(Email::class);
+        $email->method('getEmailType')->willReturn('template');
+        $campaign->method('getLists')->willReturn(new ArrayCollection([]));
+
+        $tableConfig  = new TableConfig(10, 1, 'CustomItem.dateAdded', 'DESC');
+        $tableConfig->addParameter('customObjectId', 123);
+        $tableConfig->addParameter('filterEntityType', 'contact');
+        $tableConfig->addParameter('filterEntityId', 345);
+        $tableConfig->addParameter('token', $token);
+        $tableConfig->addParameter('email', $email);
+        $tableConfig->addParameter('source', ['campaign.event', 11]);
+
+        $this->customItemListDbalQueryEvent->expects($this->once())
+            ->method('getTableConfig')
+            ->willReturn($tableConfig);
+
+        $this->customItemListDbalQueryEvent->expects($this->once())
+            ->method('getQueryBuilder')
+            ->willReturn($queryBuilder);
+
+        $this->eventModel->expects($this->once())
+            ->method('getEntity')
+            ->with(11)
+            ->willReturn($campaignEvent);
+
+        $campaignEvent->expects($this->once())
+            ->method('getCampaign')
+            ->willReturn($campaign);
+
+        $this->queryFilterFactory->expects($this->never())
+            ->method('configureQueryBuilderFromSegmentFilter');
+
+        $this->subscriber->onListQuery($this->customItemListDbalQueryEvent);
+    }
+
+    public function testOnListQueryForSegmentFilterWithCampaignEmail(): void
+    {
+        $segmentBuilder1 = $this->createMock(SegmentBuilder::class);
+        $segmentBuilder2 = $this->createMock(SegmentBuilder::class);
+        $queryBuilder    = $this->createMock(QueryBuilder::class);
+        $campaign        = $this->createMock(Campaign::class);
+        $campaignEvent   = $this->createMock(CampaignEvent::class);
+        $token           = $this->tokenParser->findTokens('{custom-object=product:sku | where=segment-filter |order=latest|limit=1 | default=No thing}')->current();
+        $segment         = new LeadList();
+        $segment->setName('CO test');
+        $segment->setFilters([
+            [
+                'glue'     => 'and',
+                'field'    => 'cmf_1',
+                'object'   => 'custom_object',
+                'type'     => 'text',
+                'filter'   => '23',
+                'display'  => null,
+                'operator' => '=',
+            ],
+            [
+                'glue'     => 'and',
+                'field'    => 'cmf_10',
+                'object'   => 'custom_object',
+                'type'     => 'int',
+                'filter'   => '4',
+                'display'  => null,
+                'operator' => '=',
+            ],
+        ]);
+
+        $email = $this->createMock(Email::class);
+        $email->method('getEmailType')->willReturn('template');
+        $campaign->method('getLists')->willReturn(new ArrayCollection([2 => $segment]));
+
+        $tableConfig  = new TableConfig(10, 1, 'CustomItem.dateAdded', 'DESC');
+        $tableConfig->addParameter('customObjectId', 123);
+        $tableConfig->addParameter('filterEntityType', 'contact');
+        $tableConfig->addParameter('filterEntityId', 345);
+        $tableConfig->addParameter('token', $token);
+        $tableConfig->addParameter('email', $email);
+        $tableConfig->addParameter('source', ['campaign.event', 11]);
+
+        $this->customItemListDbalQueryEvent->expects($this->once())
+            ->method('getTableConfig')
+            ->willReturn($tableConfig);
+
+        $this->customItemListDbalQueryEvent->expects($this->once())
+            ->method('getQueryBuilder')
+            ->willReturn($queryBuilder);
+
+        $this->eventModel->expects($this->once())
+            ->method('getEntity')
+            ->with(11)
+            ->willReturn($campaignEvent);
+
+        $campaignEvent->expects($this->once())
+            ->method('getCampaign')
+            ->willReturn($campaign);
+
+        $this->queryFilterFactory->expects($this->exactly(2))
+            ->method('configureQueryBuilderFromSegmentFilter')
             ->withConsecutive(
-                [$connection, 'filter_0', 1, 'text'],
-                [$connection, 'filter_1', 10, 'int']
+                [
+                    [
+                        'glue'     => 'and',
+                        'field'    => 'cmf_1',
+                        'object'   => 'custom_object',
+                        'type'     => 'text',
+                        'filter'   => '23',
+                        'display'  => null,
+                        'operator' => '=',
+                    ],
+                    'filter_0',
+                ],
+                [
+                    [
+                        'glue'     => 'and',
+                        'field'    => 'cmf_10',
+                        'object'   => 'custom_object',
+                        'type'     => 'int',
+                        'filter'   => '4',
+                        'display'  => null,
+                        'operator' => '=',
+                    ],
+                    'filter_1',
+                ]
             )
-            ->willReturn($segmentBuilder);
+            ->will($this->onConsecutiveCalls(
+                $segmentBuilder1,
+                $segmentBuilder2
+            ));
 
-        $segmentBuilder->expects($this->exactly(2))
+        $segmentBuilder1->expects($this->once())
             ->method('select')
-            ->withConsecutive(
-                ['filter_0_contact.custom_item_id'],
-                ['filter_1_contact.custom_item_id']
-            );
+            ->with('filter_0_item.id');
+
+        $segmentBuilder2->expects($this->once())
+            ->method('select')
+            ->with('filter_1_item.id');
 
         $this->queryFilterHelper->expects($this->exactly(2))
-            ->method('addCustomFieldValueExpressionFromSegmentFilter')
+            ->method('addContactIdRestriction')
             ->withConsecutive(
-                [$segmentBuilder, 'filter_0', $condition1],
-                [$segmentBuilder, 'filter_1', $condition10]
+                [$segmentBuilder1, 'filter_0', 345],
+                [$segmentBuilder2, 'filter_1', 345]
             );
 
-        $segmentBuilder->expects($this->exactly(2))
+        $segmentBuilder1->expects($this->once())
             ->method('getParameters')
-            ->will($this->onConsecutiveCalls(
-                ['queryParam1' => 'queryValue1'],
-                ['queryParam2' => 'queryValue2']
-            ));
+            ->willReturn(['queryParam1' => 'queryValue1']);
+
+        $segmentBuilder2->expects($this->once())
+            ->method('getParameters')
+            ->willReturn(['queryParam2' => 'queryValue2']);
 
         $queryBuilder->expects($this->exactly(2))
             ->method('setParameter')
@@ -542,19 +818,29 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
                 ['queryParam2', 'queryValue2']
             );
 
-        $segmentBuilder->expects($this->exactly(2))
-            ->method('expr')
-            ->willReturn($expression);
-
-        $segmentBuilder->expects($this->exactly(2))
+        $segmentBuilder1->expects($this->once())
             ->method('getSQL')
-            ->will($this->onConsecutiveCalls('SQL QUERY 1', 'SQL QUERY 10'));
+            ->willReturn('SQL QUERY 1');
 
-        $expression->expects($this->exactly(2))
-            ->method('exists')
+        $segmentBuilder2->expects($this->once())
+            ->method('getSQL')
+            ->willReturn('SQL QUERY 2');
+
+        $queryBuilder->expects($this->exactly(2))
+            ->method('innerJoin')
             ->withConsecutive(
-                ['SQL QUERY 1'],
-                ['SQL QUERY 10']
+                [
+                    CustomItem::TABLE_ALIAS,
+                    '(SQL QUERY 1)',
+                    'filter_0',
+                    CustomItem::TABLE_ALIAS.'.id = filter_0.id',
+                ],
+                [
+                    CustomItem::TABLE_ALIAS,
+                    '(SQL QUERY 2)',
+                    'filter_1',
+                    CustomItem::TABLE_ALIAS.'.id = filter_1.id',
+                ]
             );
 
         $this->subscriber->onListQuery($this->customItemListDbalQueryEvent);

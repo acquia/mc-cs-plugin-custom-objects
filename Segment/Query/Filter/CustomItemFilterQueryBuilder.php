@@ -13,12 +13,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Segment\Query\Filter;
 
-use Doctrine\DBAL\DBALException;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
-use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 
 class CustomItemFilterQueryBuilder extends BaseFilterQueryBuilder
@@ -88,91 +86,6 @@ class CustomItemFilterQueryBuilder extends BaseFilterQueryBuilder
     }
 
     /**
-     * @param QueryBuilder         $queryBuilder
-     * @param ContactSegmentFilter $filter
-     *
-     * @return QueryBuilder
-     *
-     * @throws InvalidArgumentException
-     * @throws DBALException
-     */
-    public function applyQueryOrig(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
-    {
-        $filterOperator   = $filter->getOperator();
-        $filterParameters = $filter->getParameterValue();
-        $filterFieldId    = $filter->getField();
-
-        $parameters             = $this->getParametersAliases($filterParameters);
-        $filterParametersHolder = $filter->getParameterHolder($parameters);
-        $tableAlias             = $this->generateRandomParameterName();
-
-        $customQuery = $this->getCustomFieldJoin($queryBuilder, $tableAlias);
-        $customQuery->select($tableAlias.'_contact.contact_id as lead_id');
-        $queryBuilder->setParameter('customObjectId_'.$tableAlias, (int) $filterFieldId);
-
-        switch ($filterOperator) {
-            case 'empty':
-                $customQuery->andWhere(
-                    $customQuery->expr()->isNotNull($tableAlias.'_item.name')
-                );
-                $queryBuilder->addLogic($queryBuilder->expr()->notExists($customQuery->getSQL()), $filter->getGlue());
-
-                break;
-            case 'notEmpty':
-                $customQuery->andWhere(
-                    $customQuery->expr()->isNotNull($tableAlias.'_item.name')
-                );
-
-                $queryBuilder->addLogic($queryBuilder->expr()->exists($customQuery->getSQL()), $filter->getGlue());
-
-                break;
-            case 'notIn':
-                $expression = $customQuery->expr()->in(
-                    $tableAlias.'_item.name',
-                    $filterParametersHolder
-                );
-                $customQuery->andWhere($expression);
-                $queryBuilder->addLogic($queryBuilder->expr()->exists($customQuery->getSQL()), $filter->getGlue());
-
-                break;
-            case 'neq':
-                $expression = $customQuery->expr()->orX(
-                    $customQuery->expr()->eq($tableAlias.'_item.name', $filterParametersHolder),
-                    $customQuery->expr()->isNull($tableAlias.'_item.name')
-                );
-
-                $customQuery->andWhere($expression);
-
-                $queryBuilder->addLogic($queryBuilder->expr()->notExists($customQuery->getSQL()), $filter->getGlue());
-
-                break;
-            case 'notLike':
-                $expression = $customQuery->expr()->orX(
-                    $customQuery->expr()->isNull($tableAlias.'_item.name'),
-                    $customQuery->expr()->like($tableAlias.'_item.name', $filterParametersHolder)
-                );
-
-                $customQuery->andWhere($expression);
-
-                $queryBuilder->addLogic($queryBuilder->expr()->notExists($customQuery->getSQL()), $filter->getGlue());
-
-                break;
-            default:
-                $expression = $customQuery->expr()->{$filterOperator}(
-                    $tableAlias.'_item.name',
-                    $filterParametersHolder
-                );
-                $customQuery->andWhere($expression);
-
-                $queryBuilder->addLogic($queryBuilder->expr()->exists($customQuery->getSQL()), $filter->getGlue());
-        }
-
-        $queryBuilder->setParametersPairs($filterParametersHolder, $filterParameters);
-
-        return $queryBuilder;
-    }
-
-    /**
      * @param string[]|string $filterParameters
      *
      * @return string[]|string
@@ -186,30 +99,5 @@ class CustomItemFilterQueryBuilder extends BaseFilterQueryBuilder
         }
 
         return $this->generateRandomParameterName();
-    }
-
-    /**
-     * @param QueryBuilder $queryBuilder
-     * @param string       $alias
-     *
-     * @return QueryBuilder
-     */
-    private function getCustomFieldJoin(QueryBuilder $queryBuilder, string $alias): QueryBuilder
-    {
-        $customFieldQueryBuilder = $queryBuilder->createQueryBuilder();
-
-        $customFieldQueryBuilder
-            ->select(null)
-            ->from(MAUTIC_TABLE_PREFIX.'custom_item_xref_contact', $alias.'_contact')
-            ->leftJoin(
-                $alias.'_contact',
-                MAUTIC_TABLE_PREFIX.'custom_item',
-                $alias.'_item',
-                $alias.'_item.id='.$alias.'_contact.custom_item_id')
-            ->where('l.id = '.$alias.'_contact.contact_id');
-
-        $customFieldQueryBuilder->andWhere($customFieldQueryBuilder->expr()->eq($alias.'_item.custom_object_id', ':customObjectId_'.$alias));
-
-        return $customFieldQueryBuilder;
     }
 }

@@ -13,20 +13,17 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
-use Exception;
 use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
-use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
-use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder;
-use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemFilterQueryBuilder;
 use PDOException;
+use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
 
 class DynamicContentSubscriber extends CommonSubscriber
 {
@@ -34,19 +31,14 @@ class DynamicContentSubscriber extends CommonSubscriber
     use DbalQueryTrait;
 
     /**
-     * @var EntityManager
+     * @var QueryFilterFactory
      */
-    private $entityManager;
-
-    /**
-     * @var ContactSegmentFilterFactory
-     */
-    private $filterFactory;
+    private $queryFilterFactory;
 
     /**
      * @var QueryFilterHelper
      */
-    private $queryHelper;
+    private $queryFilterHelper;
 
     /**
      * @var ConfigProvider
@@ -54,21 +46,18 @@ class DynamicContentSubscriber extends CommonSubscriber
     private $configProvider;
 
     /**
-     * @param EntityManager               $entityManager
-     * @param ContactSegmentFilterFactory $filterFactory
-     * @param QueryFilterHelper           $queryHelper
-     * @param ConfigProvider              $configProvider
+     * @param QueryFilterFactory $queryFilterFactory
+     * @param QueryFilterHelper  $queryFilterHelper
+     * @param ConfigProvider     $configProvider
      */
     public function __construct(
-        EntityManager $entityManager,
-        ContactSegmentFilterFactory $filterFactory,
-        QueryFilterHelper $queryHelper,
+        QueryFilterFactory $queryFilterFactory,
+        QueryFilterHelper $queryFilterHelper,
         ConfigProvider $configProvider)
     {
-        $this->entityManager  = $entityManager;
-        $this->filterFactory  = $filterFactory;
-        $this->queryHelper    = $queryHelper;
-        $this->configProvider = $configProvider;
+        $this->queryFilterFactory = $queryFilterFactory;
+        $this->queryFilterHelper  = $queryFilterHelper;
+        $this->configProvider     = $configProvider;
     }
 
     /**
@@ -98,40 +87,16 @@ class DynamicContentSubscriber extends CommonSubscriber
             return;
         }
 
-        $connection = $this->entityManager->getConnection();
+        foreach ($eventFilters as $key => $eventFilter) {
+            $queryAlias = "filter_{$key}";
 
-        foreach ($eventFilters as $eventFilter) {
-            $segmentFilter = $this->filterFactory->factorSegmentFilter($eventFilter);
-
-            if ($segmentFilter->getTable() !== MAUTIC_TABLE_PREFIX.'custom_objects') {
+            try {
+                $filterQueryBuilder = $this->queryFilterFactory->configureQueryBuilderFromSegmentFilter($eventFilter, $queryAlias);
+            } catch (InvalidSegmentFilterException $e) {
                 continue;
             }
 
-            $type = $segmentFilter->getQueryType();
-
-            if (CustomFieldFilterQueryBuilder::getServiceId() === $type) {
-                $tableAlias         = 'cfwq_'.$segmentFilter->getField();
-                $filterQueryBuilder = $this->queryHelper->createValueQueryBuilder(
-                    $connection,
-                    $tableAlias,
-                    (int) $segmentFilter->getField(),
-                    $segmentFilter->getType()
-                );
-                $this->queryHelper->addCustomFieldValueExpressionFromSegmentFilter($filterQueryBuilder, $tableAlias, $segmentFilter);
-            } elseif (CustomItemFilterQueryBuilder::getServiceId() === $type) {
-                $tableAlias         = 'cowq_'.(int) $segmentFilter->getField();
-                $filterQueryBuilder = $this->queryHelper->createItemNameQueryBuilder($connection, $tableAlias);
-                $this->queryHelper->addCustomObjectNameExpression(
-                    $filterQueryBuilder,
-                    $tableAlias,
-                    $segmentFilter->getOperator(),
-                    $segmentFilter->getParameterValue()
-                );
-            } else {
-                throw new Exception('Not implemented');
-            }
-
-            $this->queryHelper->addContactIdRestriction($filterQueryBuilder, $tableAlias, (int) $event->getContact()->getId());
+            $this->queryFilterHelper->addContactIdRestriction($filterQueryBuilder, $queryAlias, (int) $event->getContact()->getId());
 
             try {
                 if ($this->executeSelect($filterQueryBuilder)->rowCount()) {
@@ -140,7 +105,7 @@ class DynamicContentSubscriber extends CommonSubscriber
                 } else {
                     $event->setIsEvaluated(true);
                 }
-            } catch (PDOException $e) {  // just to be a little more descriptive
+            } catch (PDOException $e) {
                 $this->logger->addError('Failed to evaluate dynamic content for custom object '.$e->getMessage());
 
                 throw $e;

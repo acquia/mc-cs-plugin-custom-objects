@@ -712,8 +712,7 @@ return [
             'custom_object.dynamic_content.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\DynamicContentSubscriber::class,
                 'arguments' => [
-                    'doctrine.orm.entity_manager',
-                    'mautic.lead.model.lead_segment_filter_factory',
+                    'custom_object.query.filter.factory',
                     'custom_object.query.filter.helper',
                     'custom_object.config.provider'
                 ],
@@ -735,11 +734,12 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\TokenSubscriber::class,
                 'arguments' => [
                     'custom_object.config.provider',
-                    'mautic.lead.model.lead_segment_filter_factory',
                     'custom_object.query.filter.helper',
+                    'custom_object.query.filter.factory',
                     'mautic.custom.model.object',
                     'mautic.custom.model.item',
                     'custom_object.token.parser',
+                    'mautic.campaign.model.event',
                 ],
             ],
         ],
@@ -974,6 +974,14 @@ return [
             'mautic.lead.query.builder.custom_item.value'  => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemFilterQueryBuilder::class,
                 'arguments' => ['mautic.lead.model.random_parameter_name', 'custom_object.query.filter.helper'],
+            ],
+            'custom_object.query.filter.factory' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory::class,
+                'arguments' => [
+                    'database_connection',
+                    'mautic.lead.model.lead_segment_filter_factory',
+                    'custom_object.query.filter.helper',
+                ],
             ],
             'custom_object.query.filter.helper'            => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper::class,

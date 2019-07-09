@@ -28,13 +28,15 @@ use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
-use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
 use MauticPlugin\CustomObjectsBundle\Helper\TokenParser;
 use MauticPlugin\CustomObjectsBundle\DTO\Token;
 use Mautic\EmailBundle\Entity\Email;
+use Mautic\CampaignBundle\Model\EventModel;
+use Mautic\CampaignBundle\Entity\Event;
+use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
 
 /**
  * Handles Custom Object token replacements with the correct value in emails.
@@ -49,14 +51,14 @@ class TokenSubscriber implements EventSubscriberInterface
     private $configProvider;
 
     /**
-     * @var ContactSegmentFilterFactory
-     */
-    private $contactSegmentFilterFactory;
-
-    /**
      * @var QueryFilterHelper
      */
     private $queryFilterHelper;
+
+    /**
+     * @var QueryFilterFactory
+     */
+    private $queryFilterFactory;
 
     /**
      * @var CustomObjectModel
@@ -74,27 +76,35 @@ class TokenSubscriber implements EventSubscriberInterface
     private $tokenParser;
 
     /**
-     * @param ConfigProvider              $configProvider
-     * @param ContactSegmentFilterFactory $contactSegmentFilterFactory
-     * @param QueryFilterHelper           $queryFilterHelper
-     * @param CustomObjectModel           $customObjectModel
-     * @param CustomItemModel             $customItemModel
-     * @param TokenParser                 $tokenParser
+     * @var EventModel
+     */
+    private $eventModel;
+
+    /**
+     * @param ConfigProvider     $configProvider
+     * @param QueryFilterHelper  $queryFilterHelper
+     * @param QueryFilterFactory $queryFilterFactory
+     * @param CustomObjectModel  $customObjectModel
+     * @param CustomItemModel    $customItemModel
+     * @param TokenParser        $tokenParser
+     * @param EventModel         $eventModel
      */
     public function __construct(
         ConfigProvider $configProvider,
-        ContactSegmentFilterFactory $contactSegmentFilterFactory,
         QueryFilterHelper $queryFilterHelper,
+        QueryFilterFactory $queryFilterFactory,
         CustomObjectModel $customObjectModel,
         CustomItemModel $customItemModel,
-        TokenParser $tokenParser
+        TokenParser $tokenParser,
+        EventModel $eventModel
     ) {
-        $this->configProvider              = $configProvider;
-        $this->contactSegmentFilterFactory = $contactSegmentFilterFactory;
-        $this->queryFilterHelper           = $queryFilterHelper;
-        $this->customObjectModel           = $customObjectModel;
-        $this->customItemModel             = $customItemModel;
-        $this->tokenParser                 = $tokenParser;
+        $this->configProvider     = $configProvider;
+        $this->queryFilterHelper  = $queryFilterHelper;
+        $this->queryFilterFactory = $queryFilterFactory;
+        $this->customObjectModel  = $customObjectModel;
+        $this->customItemModel    = $customItemModel;
+        $this->tokenParser        = $tokenParser;
+        $this->eventModel         = $eventModel;
     }
 
     /**
@@ -127,11 +137,16 @@ class TokenSubscriber implements EventSubscriberInterface
 
         /** @var CustomObject $customObject */
         foreach ($customObjects as $customObject) {
+            $event->addToken(
+                $this->tokenParser->buildTokenWithDefaultOptions($customObject->getAlias(), 'name'),
+                $this->tokenParser->buildTokenLabel($customObject->getName(), 'Name')
+            );
             /** @var CustomField $customField */
             foreach ($customObject->getCustomFields() as $customField) {
-                $token = "{custom-object={$customObject->getAlias()}:{$customField->getAlias()} | where=segment-filter | order=latest | limit=1 | default=}";
-                $label = "{$customObject->getName()}: {$customField->getLabel()}";
-                $event->addToken($token, $label);
+                $event->addToken(
+                    $this->tokenParser->buildTokenWithDefaultOptions($customObject->getAlias(), $customField->getAlias()),
+                    $this->tokenParser->buildTokenLabel($customObject->getName(), $customField->getLabel())
+                );
             }
         }
     }
@@ -158,7 +173,7 @@ class TokenSubscriber implements EventSubscriberInterface
                 return;
             }
 
-            $fieldValues = $this->getCustomFieldValues($customObject, $token, $event->getEmail(), (int) $event->getLead()['id']);
+            $fieldValues = $this->getCustomFieldValues($customObject, $token, $event);
             $result      = empty($fieldValues) ? $token->getDefaultValue() : implode(', ', $fieldValues);
 
             $event->addToken($token->getToken(), $result);
@@ -177,6 +192,7 @@ class TokenSubscriber implements EventSubscriberInterface
         $entityType  = $tableConfig->getParameter('filterEntityType');
         $token       = $tableConfig->getParameter('token');
         $email       = $tableConfig->getParameter('email');
+        $source      = $tableConfig->getParameter('source');
 
         if ('contact' !== $entityType || !$contactId || !$email instanceof Email || !$token instanceof Token) {
             return;
@@ -185,49 +201,69 @@ class TokenSubscriber implements EventSubscriberInterface
         $queryBuilder = $event->getQueryBuilder();
 
         if ('segment-filter' === $token->getWhere()) {
-            $segmentConditions = [];
+            $segmentFilters = [];
 
             if ('list' === $email->getEmailType()) {
-                // Validation check that all segments have the same CO filters, so let's take the first one.
-                /** @var LeadList $segment */
-                $segment = clone $email->getLists()->first();
-                $filters = [];
-                /** @var ContactSegmentFilter $filter */
-                foreach ($segment->getFilters() as $filter) {
-                    if ('custom_object' === $filter['object']) {
-                        $filters[] = $filter;
-                    }
+                $segmentFilters = $email->getLists()->first()->getFilters();
+            } elseif ('template' && isset($source[0]) && 'campaign.event' === $source[0] && !empty($source[1])) {
+                $campaignEventId = (int) $source[1];
+
+                /** @var Event $campaignEvent */
+                $campaignEvent = $this->eventModel->getEntity($campaignEventId);
+
+                if (!$campaignEvent) {
+                    return;
                 }
-                $segment->setFilters($filters);
-                $segmentConditions = $this->contactSegmentFilterFactory->getSegmentFilters($segment);
+
+                /** @var LeadList $segment */
+                $segment = $campaignEvent->getCampaign()->getLists()->first();
+
+                if (!$segment) {
+                    return;
+                }
+
+                $segmentFilters = $segment->getFilters();
             }
 
-            // @todo implement also campaign emails.
+            foreach ($segmentFilters as $id => $filter) {
+                try {
+                    $queryAlias        = 'filter_'.$id;
+                    $innerQueryBuilder = $this->queryFilterFactory->configureQueryBuilderFromSegmentFilter($filter, $queryAlias);
+                } catch (InvalidSegmentFilterException $e) {
+                    continue;
+                }
 
-            /** @var ContactSegmentFilter $condition */
-            foreach ($segmentConditions as $id => $condition) {
-                $queryAlias        = 'filter_'.$id;
-                $customFieldId     = (int) $condition->getField();
-                $innerQueryBuilder = $this->queryFilterHelper->createValueQueryBuilder($queryBuilder->getConnection(), $queryAlias, $customFieldId, $condition->getType());
-                $innerQueryBuilder->select($queryAlias.'_contact.custom_item_id');
-                $this->queryFilterHelper->addCustomFieldValueExpressionFromSegmentFilter($innerQueryBuilder, $queryAlias, $condition);
+                $this->queryFilterHelper->addContactIdRestriction($innerQueryBuilder, $queryAlias, $contactId);
+
+                $innerQueryBuilder->select($queryAlias.'_item.id');
+
+                $operator = in_array($filter['operator'], ['empty', 'neq', 'notLike'], true) ? '!=' : '=';
+
+                $queryBuilder->innerJoin(
+                    CustomItem::TABLE_ALIAS,
+                    "({$innerQueryBuilder->getSQL()})",
+                    $queryAlias,
+                    CustomItem::TABLE_ALIAS.".id {$operator} {$queryAlias}.id"
+                );
+
                 foreach ($innerQueryBuilder->getParameters() as $key => $value) {
                     $queryBuilder->setParameter($key, $value);
                 }
-                $queryBuilder->andWhere($innerQueryBuilder->expr()->exists($innerQueryBuilder->getSQL()));
             }
         }
     }
 
     /**
-     * @param CustomObject $customObject
-     * @param Token        $token
-     * @param Email        $email
-     * @param int          $contactId
+     * This method searches for the right custom items and the right custom field values.
+     * The custom field filters are actually added in the method `onListQuery` above.
+     *
+     * @param CustomObject       $customObject
+     * @param Token              $token
+     * @param EmEmailSendEventil $event
      *
      * @return mixed[]
      */
-    private function getCustomFieldValues(CustomObject $customObject, Token $token, Email $email, int $contactId): array
+    private function getCustomFieldValues(CustomObject $customObject, Token $token, EmailSendEvent $event): array
     {
         $orderBy  = CustomItem::TABLE_ALIAS.'.date_added';
         $orderDir = 'DESC';
@@ -240,13 +276,22 @@ class TokenSubscriber implements EventSubscriberInterface
         $tableConfig = new TableConfig($token->getLimit(), 1, $orderBy, $orderDir);
         $tableConfig->addParameter('customObjectId', $customObject->getId());
         $tableConfig->addParameter('filterEntityType', 'contact');
-        $tableConfig->addParameter('filterEntityId', (int) $contactId);
+        $tableConfig->addParameter('filterEntityId', (int) $event->getLead()['id']);
         $tableConfig->addParameter('token', $token);
-        $tableConfig->addParameter('email', $email);
+        $tableConfig->addParameter('email', $event->getEmail());
+        $tableConfig->addParameter('source', $event->getSource());
         $customItems = $this->customItemModel->getArrayTableData($tableConfig);
         $fieldValues = [];
 
         foreach ($customItems as $customItemData) {
+            // Name is known from the CI data array.
+            if ('name' === $token->getCustomFieldAlias()) {
+                $fieldValues[] = $customItemData['name'];
+
+                continue;
+            }
+
+            // Custom Field values are handled like this.
             $customItem = new CustomItem($customObject);
             $customItem->populateFromArray($customItemData);
             $customItem = $this->customItemModel->populateCustomFields($customItem);
