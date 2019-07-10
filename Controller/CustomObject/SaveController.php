@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
-use Mautic\CoreBundle\Controller\FormController as BaseFormController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsToStringTransformer;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransformer;
@@ -33,8 +32,9 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use Mautic\CoreBundle\Service\FlashBag;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 
-class SaveController extends BaseFormController
+class SaveController extends AbstractFormController
 {
     /**
      * @var RequestStack

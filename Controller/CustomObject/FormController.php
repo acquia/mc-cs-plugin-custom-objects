@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
-use Mautic\CoreBundle\Controller\FormController as BaseFormController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
 use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
@@ -26,8 +25,9 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 
-class FormController extends BaseFormController
+class FormController extends AbstractFormController
 {
     /**
      * @var FormFactory
