@@ -34,6 +34,8 @@ use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\CustomObjectsTrait;
+use Symfony\Component\Translation\TranslatorInterface;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 
 class ImportSubscriberTest extends KernelTestCase
 {
@@ -374,14 +376,23 @@ class ImportSubscriberTest extends KernelTestCase
 
         /** @var CustomItemImportModel $customItemImportModel */
         $customItemImportModel = $this->container->get('mautic.custom.model.import.item');
-        $configProvider        = $this->createMock(ConfigProvider::class);
-        $permissionProvider    = $this->createMock(CustomItemPermissionProvider::class);
+
+        /** @var CustomFieldRepository $customFieldRepository */
+        $customFieldRepository = $this->container->get('custom_field.repository');
+
+        /** @var TranslatorInterface $translator */
+        $translator = $this->container->get('translator');
+
+        $configProvider     = $this->createMock(ConfigProvider::class);
+        $permissionProvider = $this->createMock(CustomItemPermissionProvider::class);
 
         $importSubscriber = new ImportSubscriber(
             $customObjectModel,
             $customItemImportModel,
             $configProvider,
-            $permissionProvider
+            $permissionProvider,
+            $customFieldRepository,
+            $translator
         );
 
         $configProvider->expects($this->once())
