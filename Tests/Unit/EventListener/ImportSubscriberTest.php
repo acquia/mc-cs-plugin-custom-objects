@@ -30,6 +30,7 @@ use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use Symfony\Component\Translation\TranslatorInterface;
 use Mautic\LeadBundle\Event\ImportValidateEvent;
 use Mautic\LeadBundle\Entity\Import;
+use Symfony\Component\Form\Form;
 
 class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -57,6 +58,8 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
 
     private $customObject;
 
+    private $form;
+
     /**
      * @var ImportSubscriber
      */
@@ -78,6 +81,7 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->importProcessEvent    = $this->createMock(ImportProcessEvent::class);
         $this->import                = $this->createMock(Import::class);
         $this->customObject          = $this->createMock(CustomObject::class);
+        $this->form                  = $this->createMock(Form::class);
         $this->importSubscriber      = new ImportSubscriber(
             $this->customObjectModel,
             $this->customItemImportModel,
@@ -242,6 +246,160 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
             ]);
 
         $this->importSubscriber->onFieldMapping($this->importMappingEvent);
+    }
+
+    public function testOnValidateImportWhenPluginIsDisabled(): void
+    {
+        $this->configProvider->expects($this->once())
+            ->method('pluginIsEnabled')
+            ->willReturn(false);
+
+        $this->importValidateEvent->expects($this->never())
+            ->method('getRouteObjectName');
+
+        $this->importSubscriber->onValidateImport($this->importValidateEvent);
+    }
+
+    public function testOnValidateImportWhenNotCustomObjectImport(): void
+    {
+        $this->configProvider->expects($this->once())
+            ->method('pluginIsEnabled')
+            ->willReturn(true);
+
+        $this->importValidateEvent->expects($this->once())
+            ->method('getRouteObjectName')
+            ->willReturn('lead');
+
+        $this->importValidateEvent->expects($this->never())
+            ->method('getForm');
+
+        $this->importSubscriber->onValidateImport($this->importValidateEvent);
+    }
+
+    public function testOnValidateImportWhenNoFieldsWereMatched(): void
+    {
+        $this->configProvider->expects($this->once())
+            ->method('pluginIsEnabled')
+            ->willReturn(true);
+
+        $this->importValidateEvent->expects($this->once())
+            ->method('getRouteObjectName')
+            ->willReturn('custom-object:1000');
+
+        $this->importValidateEvent->expects($this->once())
+            ->method('getForm')
+            ->willReturn($this->form);
+
+        $this->form->expects($this->once())
+            ->method('getData')
+            ->willReturn([]);
+
+        $this->form->expects($this->once())
+            ->method('addError');
+
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with('mautic.lead.import.matchfields', [], 'validators');
+
+        $this->importSubscriber->onValidateImport($this->importValidateEvent);
+    }
+
+    public function testOnValidateImportWhenSomeRequiredFieldsWereNotMatched(): void
+    {
+        $customField = $this->createMock(CustomField::class);
+
+        $this->configProvider->expects($this->once())
+            ->method('pluginIsEnabled')
+            ->willReturn(true);
+
+        $this->importValidateEvent->expects($this->once())
+            ->method('getRouteObjectName')
+            ->willReturn('custom-object:1000');
+
+        $this->importValidateEvent->expects($this->once())
+            ->method('getForm')
+            ->willReturn($this->form);
+
+        $this->form->expects($this->once())
+            ->method('getData')
+            ->willReturn(['alias-1' => '45']); // 45 is custom field ID.
+
+        $this->customFieldRepository->expects($this->once())
+            ->method('getRequiredCustomFieldsForCustomObject')
+            ->with(1000)
+            ->willReturn(new ArrayCollection([$customField]));
+
+        $customField->expects($this->exactly(2))
+            ->method('getAlias')
+            ->willReturn('alias-2');
+
+        $customField->expects($this->once())
+            ->method('getLabel')
+            ->willReturn('Label 2');
+
+        $this->form->expects($this->once())
+            ->method('addError');
+
+        $this->translator->expects($this->exactly(2))
+            ->method('trans')
+            ->withConsecutive(
+                [
+                    'custom.item.name.label',
+                ],
+                [
+                    'mautic.import.missing.required.fields',
+                    [
+                        '%requiredFields%' => 'Label 2 (alias-2), Name',
+                        '%fieldOrFields%'  => 'fields',
+                    ],
+                    'validators',
+                ]
+            )
+            ->will($this->onConsecutiveCalls('Name', 'These fields are required...'));
+
+        $this->importSubscriber->onValidateImport($this->importValidateEvent);
+    }
+
+    public function testOnValidateImportWhenAllRequiredFieldsAreMatched(): void
+    {
+        $customField = $this->createMock(CustomField::class);
+
+        $this->configProvider->expects($this->once())
+            ->method('pluginIsEnabled')
+            ->willReturn(true);
+
+        $this->importValidateEvent->expects($this->once())
+            ->method('getRouteObjectName')
+            ->willReturn('custom-object:1000');
+
+        $this->importValidateEvent->expects($this->once())
+            ->method('getForm')
+            ->willReturn($this->form);
+
+        $this->form->expects($this->once())
+            ->method('getData')
+            ->willReturn(['alias-1' => '45', 'name' => 'customItemName']); // 45 is custom field ID.
+
+        $this->customFieldRepository->expects($this->once())
+            ->method('getRequiredCustomFieldsForCustomObject')
+            ->with(1000)
+            ->willReturn(new ArrayCollection([$customField]));
+
+        $customField->expects($this->once())
+            ->method('getAlias')
+            ->willReturn('alias-1');
+
+        $this->form->expects($this->never())
+            ->method('addError');
+
+        $this->importValidateEvent->expects($this->once())
+            ->method('setMatchedFields')
+            ->with([
+                'alias-1' => '45',
+                'name'    => 'customItemName',
+            ]);
+
+        $this->importSubscriber->onValidateImport($this->importValidateEvent);
     }
 
     public function testOnImportProcessWhenPluginIsDisabled(): void

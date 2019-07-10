@@ -190,6 +190,8 @@ class ImportSubscriber extends CommonSubscriber
                     $this->translator->trans('mautic.lead.import.matchfields', [], 'validators')
                 )
             );
+
+            return;
         }
 
         $this->handleValidateRequired($form, $customObjectId, $matchedFields);
@@ -250,9 +252,9 @@ class ImportSubscriber extends CommonSubscriber
     /**
      * Validate that required fields are mapped.
      *
-     * @param Form  $form
-     * @param int   $customObjectId
-     * @param array $matchedFields
+     * @param Form    $form
+     * @param int     $customObjectId
+     * @param mixed[] $matchedFields
      */
     private function handleValidateRequired(Form $form, int $customObjectId, array $matchedFields): void
     {
