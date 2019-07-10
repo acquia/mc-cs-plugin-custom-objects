@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
-use Mautic\CoreBundle\Controller\FormController as BaseFormController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemType;
 use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
@@ -26,8 +25,9 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 
-class FormController extends BaseFormController
+class FormController extends AbstractFormController
 {
     /**
      * @var FormFactory

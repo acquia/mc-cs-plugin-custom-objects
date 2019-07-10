@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
-use Mautic\CoreBundle\Controller\FormController as BaseFormController;
 use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
 use Symfony\Component\HttpFoundation\RequestStack;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
@@ -28,8 +27,9 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Mautic\CoreBundle\Service\FlashBag;
 use Symfony\Component\HttpFoundation\Request;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 
-class SaveController extends BaseFormController
+class SaveController extends AbstractFormController
 {
     /**
      * @var RequestStack
