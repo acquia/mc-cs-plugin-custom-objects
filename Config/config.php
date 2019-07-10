@@ -655,6 +655,8 @@ return [
                     'mautic.custom.model.import.item',
                     'custom_object.config.provider',
                     'custom_item.permission.provider',
+                    'custom_field.repository',
+                    'translator',
                 ],
             ],
             'custom_item.contact.subscriber' => [

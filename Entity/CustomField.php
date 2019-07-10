@@ -31,6 +31,9 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class CustomField extends FormEntity implements UniqueEntityInterface
 {
+    public const TABLE_NAME  = 'custom_field';
+    public const TABLE_ALIAS = 'CustomField';
+
     /**
      * @var int|null
      */
@@ -123,7 +126,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('custom_field')
+        $builder->setTable(self::TABLE_NAME)
             ->setCustomRepositoryClass(CustomFieldRepository::class)
             ->addIndex(['alias'], 'alias');
 
