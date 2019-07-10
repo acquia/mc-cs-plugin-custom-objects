@@ -26,6 +26,10 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Doctrine\Common\Collections\ArrayCollection;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
+use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\LeadBundle\Event\ImportValidateEvent;
+use Mautic\LeadBundle\Entity\Import;
 
 class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -37,12 +41,25 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
 
     private $configProvider;
 
+    private $customFieldRepository;
+
+    private $translator;
+
+    private $importValidateEvent;
+
     private $importInitEvent;
 
     private $importMappingEvent;
 
     private $importProcessEvent;
 
+    private $import;
+
+    private $customObject;
+
+    /**
+     * @var ImportSubscriber
+     */
     private $importSubscriber;
 
     protected function setUp(): void
@@ -53,14 +70,21 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->customItemImportModel = $this->createMock(CustomItemImportModel::class);
         $this->permissionProvider    = $this->createMock(CustomItemPermissionProvider::class);
         $this->configProvider        = $this->createMock(ConfigProvider::class);
+        $this->customFieldRepository = $this->createMock(CustomFieldRepository::class);
+        $this->translator            = $this->createMock(TranslatorInterface::class);
+        $this->importValidateEvent   = $this->createMock(ImportValidateEvent::class);
         $this->importInitEvent       = $this->createMock(ImportInitEvent::class);
         $this->importMappingEvent    = $this->createMock(ImportMappingEvent::class);
         $this->importProcessEvent    = $this->createMock(ImportProcessEvent::class);
+        $this->import                = $this->createMock(Import::class);
+        $this->customObject          = $this->createMock(CustomObject::class);
         $this->importSubscriber      = new ImportSubscriber(
             $this->customObjectModel,
             $this->customItemImportModel,
             $this->configProvider,
-            $this->permissionProvider
+            $this->permissionProvider,
+            $this->customFieldRepository,
+            $this->translator
         );
     }
 
@@ -78,9 +102,7 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testOnImportInit(): void
     {
-        $customObject = $this->createMock(CustomObject::class);
-
-        $customObject->method('getNamePlural')->willReturn('Test Object');
+        $this->customObject->method('getNamePlural')->willReturn('Test Object');
 
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
@@ -93,7 +115,7 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->customObjectModel->expects($this->once())
             ->method('fetchEntity')
             ->with(35)
-            ->willReturn($customObject);
+            ->willReturn($this->customObject);
 
         $this->importInitEvent->expects($this->once())
             ->method('setObjectIsSupported')
@@ -123,10 +145,6 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
 
     public function testOnImportInitWhenCustomObjectNotFound(): void
     {
-        $customObject = $this->createMock(CustomObject::class);
-
-        $customObject->method('getNamePlural')->willReturn('Test Object');
-
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
             ->willReturn(true);
@@ -187,8 +205,7 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getRouteObjectName')
             ->willReturn('custom-object:35');
 
-        $customObject = $this->createMock(CustomObject::class);
-        $customField  = $this->createMock(CustomField::class);
+        $customField = $this->createMock(CustomField::class);
 
         $customField->expects($this->once())
             ->method('getId')
@@ -198,18 +215,18 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getName')
             ->willReturn('Field A');
 
-        $customObject->expects($this->once())
+        $this->customObject->expects($this->once())
             ->method('getCustomFields')
             ->willReturn(new ArrayCollection([$customField]));
 
-        $customObject->expects($this->once())
+        $this->customObject->expects($this->once())
             ->method('getNamePlural')
             ->willReturn('Object A');
 
         $this->customObjectModel->expects($this->once())
             ->method('fetchEntity')
             ->with(35)
-            ->willReturn($customObject);
+            ->willReturn($this->customObject);
 
         $this->importMappingEvent->expects($this->once())
             ->method('setFields')
@@ -235,6 +252,92 @@ class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->importProcessEvent->expects($this->never())
             ->method('getImport');
+
+        $this->importSubscriber->onImportProcess($this->importProcessEvent);
+    }
+
+    public function testOnImportProcessWhenNotACustomObjectImport(): void
+    {
+        $this->configProvider->expects($this->once())
+            ->method('pluginIsEnabled')
+            ->willReturn(true);
+
+        $this->importProcessEvent->expects($this->once())
+            ->method('getImport')
+            ->willReturn($this->import);
+
+        $this->import->expects($this->once())
+            ->method('getObject')
+            ->willReturn('company');
+
+        $this->permissionProvider->expects($this->never())
+            ->method('canCreate');
+
+        $this->importSubscriber->onImportProcess($this->importProcessEvent);
+    }
+
+    public function testOnImportProcessWhenCustomObjectNotFound(): void
+    {
+        $this->configProvider->expects($this->once())
+            ->method('pluginIsEnabled')
+            ->willReturn(true);
+
+        $this->importProcessEvent->expects($this->once())
+            ->method('getImport')
+            ->willReturn($this->import);
+
+        $this->import->expects($this->once())
+            ->method('getObject')
+            ->willReturn('custom-object:350');
+
+        $this->permissionProvider->expects($this->once())
+            ->method('canCreate');
+
+        $this->customObjectModel->expects($this->once())
+            ->method('fetchEntity')
+            ->with(350)
+            ->will($this->throwException(new NotFoundException()));
+
+        $this->customItemImportModel->expects($this->never())
+            ->method('import');
+
+        $this->importSubscriber->onImportProcess($this->importProcessEvent);
+    }
+
+    public function testOnImportProcess(): void
+    {
+        $this->configProvider->expects($this->once())
+            ->method('pluginIsEnabled')
+            ->willReturn(true);
+
+        $this->importProcessEvent->expects($this->exactly(2))
+            ->method('getImport')
+            ->willReturn($this->import);
+
+        $this->importProcessEvent->expects($this->once())
+            ->method('getRowData')
+            ->willReturn(['some' => 'rows']);
+
+        $this->import->expects($this->once())
+            ->method('getObject')
+            ->willReturn('custom-object:350');
+
+        $this->permissionProvider->expects($this->once())
+            ->method('canCreate');
+
+        $this->customObjectModel->expects($this->once())
+            ->method('fetchEntity')
+            ->with(350)
+            ->willReturn($this->customObject);
+
+        $this->customItemImportModel->expects($this->once())
+            ->method('import')
+            ->with($this->import, ['some' => 'rows'], $this->customObject)
+            ->willReturn(false);
+
+        $this->importProcessEvent->expects($this->once())
+            ->method('setWasMerged')
+            ->with(false);
 
         $this->importSubscriber->onImportProcess($this->importProcessEvent);
     }
