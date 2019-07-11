@@ -28,9 +28,10 @@ class CustomFieldRepository extends CommonRepository
     public function isAliasUnique(string $alias, ?int $id = null): bool
     {
         $q = $this->createQueryBuilder(CustomField::TABLE_ALIAS);
-        $q->select('count(e.id) as alias_count');
+        $q->select('count('.CustomField::TABLE_ALIAS.'.id) as alias_count');
         $q->where(CustomField::TABLE_ALIAS.'.alias = :alias');
         $q->setParameter('alias', $alias);
+
         if (null !== $id) {
             $q->andWhere($q->expr()->neq(CustomField::TABLE_ALIAS.'.id', ':ignoreId'));
             $q->setParameter('ignoreId', $id);

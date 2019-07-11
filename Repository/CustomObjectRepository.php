@@ -26,12 +26,13 @@ class CustomObjectRepository extends CommonRepository
      */
     public function checkAliasExists(string $alias, ?int $id = null): bool
     {
-        $q = $this->createQueryBuilder('e');
-        $q->select('count(e.id) as alias_count');
-        $q->where('e.alias = :alias');
+        $q = $this->createQueryBuilder(CustomObject::TABLE_ALIAS);
+        $q->select('count('.CustomObject::TABLE_ALIAS.'.id) as alias_count');
+        $q->where(CustomObject::TABLE_ALIAS.'.alias = :alias');
         $q->setParameter('alias', $alias);
+
         if (null !== $id) {
-            $q->andWhere($q->expr()->neq('e.id', ':ignoreId'));
+            $q->andWhere($q->expr()->neq(CustomObject::TABLE_ALIAS.'.id', ':ignoreId'));
             $q->setParameter('ignoreId', $id);
         }
 

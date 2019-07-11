@@ -59,14 +59,14 @@ class CustomFieldRepositoryTest extends \PHPUnit_Framework_TestCase
             ->method('select')
             ->withConsecutive(
                 [CustomField::TABLE_ALIAS],
-                ['count(e.id) as alias_count']
+                ['count(CustomField.id) as alias_count']
             )
             ->willReturnSelf();
 
         $this->queryBuilder->expects($this->once())
             ->method('from')
             ->willReturnSelf();
-        
+
         $this->queryBuilder->expects($this->once())
             ->method('where')
             ->with('CustomField.alias = :alias');
@@ -78,7 +78,7 @@ class CustomFieldRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->query->expects($this->once())
             ->method('getSingleResult')
             ->willReturn(['alias_count' => 10]);
-        
+
         $this->assertTrue($this->repository->isAliasUnique('alias-1'));
     }
 
@@ -88,14 +88,14 @@ class CustomFieldRepositoryTest extends \PHPUnit_Framework_TestCase
             ->method('select')
             ->withConsecutive(
                 [CustomField::TABLE_ALIAS],
-                ['count(e.id) as alias_count']
+                ['count(CustomField.id) as alias_count']
             )
             ->willReturnSelf();
 
         $this->queryBuilder->expects($this->once())
             ->method('from')
             ->willReturnSelf();
-        
+
         $this->queryBuilder->expects($this->once())
             ->method('where')
             ->with('CustomField.alias = :alias');
@@ -117,7 +117,7 @@ class CustomFieldRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->query->expects($this->once())
             ->method('getSingleResult')
             ->willReturn(['alias_count' => 0]);
-        
+
         $this->assertFalse($this->repository->isAliasUnique('alias-1', 444));
     }
 
@@ -131,7 +131,7 @@ class CustomFieldRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->queryBuilder->expects($this->once())
             ->method('from')
             ->willReturnSelf();
-        
+
         $this->queryBuilder->expects($this->once())
             ->method('where')
             ->with('CustomField.customObject = :customObjectId');
@@ -152,7 +152,7 @@ class CustomFieldRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->query->expects($this->once())
             ->method('getResult')
             ->willReturn([$customField]);
-        
+
         $collection = $this->repository->getRequiredCustomFieldsForCustomObject(456);
 
         $this->assertCount(1, $collection);
