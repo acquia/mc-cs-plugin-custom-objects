@@ -39,6 +39,7 @@ class ImportSubscriber extends CommonSubscriber
      * @var TranslatorInterface
      */
     protected $translator;
+
     /**
      * @var CustomObjectModel
      */
