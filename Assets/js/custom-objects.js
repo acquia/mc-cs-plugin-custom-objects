@@ -107,7 +107,7 @@ CustomObjects = {
             let nameInput = mQuery(nameInputHtml);
             let customObjectId = nameInput.attr('data-custom-object-id');
             let idInput = mQuery(nameInput.attr('data-id-input-selector'));
-            CustomObjects.initCustomItemTypeahead(nameInput, customObjectId, null, function(selectedItem) {
+            CustomObjects.initCustomItemTypeahead(nameInput, customObjectId, function(selectedItem) {
                 idInput.val(selectedItem.id);
                 CustomObjects.addIconToInput(nameInput, 'check');
             });
