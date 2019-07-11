@@ -82,7 +82,7 @@ class LookupControllerTest extends ControllerTestCase
         $this->customItemModel->expects($this->once())
             ->method('getLookupData')
             ->with($this->callback(function (TableConfig $tableConfig) {
-                $this->assertSame(10, $tableConfig->getLimit());
+                $this->assertSame(15, $tableConfig->getLimit());
                 $this->assertSame(0, $tableConfig->getOffset());
                 $this->assertSame('CustomItem.name', $tableConfig->getOrderBy());
                 $this->assertSame('ASC', $tableConfig->getOrderDirection());
@@ -113,7 +113,7 @@ class LookupControllerTest extends ControllerTestCase
         $this->customItemModel->expects($this->once())
             ->method('getLookupData')
             ->with($this->callback(function (TableConfig $tableConfig) {
-                $this->assertSame(10, $tableConfig->getLimit());
+                $this->assertSame(15, $tableConfig->getLimit());
                 $this->assertSame(0, $tableConfig->getOffset());
                 $this->assertSame('CustomItem.name', $tableConfig->getOrderBy());
                 $this->assertSame('ASC', $tableConfig->getOrderDirection());

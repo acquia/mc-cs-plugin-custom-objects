@@ -292,6 +292,7 @@ class CustomItemModel extends FormModel
         $queryBuilder = $this->createListOrmQueryBuilder($tableConfig);
         $rootAlias    = CustomItem::TABLE_ALIAS;
         $queryBuilder->select("{$rootAlias}.name as value, {$rootAlias}.id");
+        $queryBuilder->groupBy("{$rootAlias}.id");
 
         $this->dispatcher->dispatch(
             CustomItemEvents::ON_CUSTOM_ITEM_LOOKUP_QUERY,

@@ -83,7 +83,7 @@ class LookupController extends JsonController
         $search           = InputHelper::clean($request->get('filter'));
         $filterEntityId   = (int) $request->get('filterEntityId');
         $filterEntityType = InputHelper::clean($request->get('filterEntityType'));
-        $tableConfig      = new TableConfig(10, 1, CustomItem::TABLE_ALIAS.'.name', 'ASC');
+        $tableConfig      = new TableConfig(15, 1, CustomItem::TABLE_ALIAS.'.name', 'ASC');
         $tableConfig->addParameter('search', $search);
         $tableConfig->addParameter('customObjectId', $objectId);
         $tableConfig->addParameter('filterEntityType', $filterEntityType);
