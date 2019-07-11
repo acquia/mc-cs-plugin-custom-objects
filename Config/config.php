@@ -702,6 +702,7 @@ return [
                     'custom_object.repository',
                     'translator',
                     'custom_object.config.provider',
+                    'custom_field.type.provider'
                 ],
             ],
             'custom_object.segments.filters_dictionary.subscriber' => [

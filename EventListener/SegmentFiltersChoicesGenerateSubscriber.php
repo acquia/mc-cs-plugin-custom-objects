@@ -17,8 +17,11 @@ use Doctrine\Common\Collections\Criteria;
 use Mautic\LeadBundle\Entity\OperatorListTrait;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\LeadEvents;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\HiddenType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -47,18 +50,26 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
     private $configProvider;
 
     /**
-     * @param CustomObjectRepository $customObjectRepository
-     * @param TranslatorInterface    $translator
-     * @param ConfigProvider         $configProvider
+     * @var CustomFieldTypeProvider
+     */
+    private $fieldTypeProvider;
+
+    /**
+     * @param CustomObjectRepository  $customObjectRepository
+     * @param TranslatorInterface     $translator
+     * @param ConfigProvider          $configProvider
+     * @param CustomFieldTypeProvider $fieldTypeProvider
      */
     public function __construct(
         CustomObjectRepository $customObjectRepository,
         TranslatorInterface $translator,
-        ConfigProvider $configProvider
+        ConfigProvider $configProvider,
+        CustomFieldTypeProvider $fieldTypeProvider
     ) {
         $this->customObjectRepository = $customObjectRepository;
         $this->translator             = $translator;
         $this->configProvider         = $configProvider;
+        $this->fieldTypeProvider        = $fieldTypeProvider;
     }
 
     /**
@@ -78,10 +89,12 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
             return;
         }
 
+        $fieldTypes = $this->fieldTypeProvider->getKeyTypeMapping();
+
         $criteria = new Criteria(Criteria::expr()->eq('isPublished', 1));
 
         $this->customObjectRepository->matching($criteria)->map(
-            function (CustomObject $customObject) use ($event): void {
+            function (CustomObject $customObject) use ($event, $fieldTypes): void {
                 $event->addChoice(
                     'custom_object',
                     'cmo_'.$customObject->getId(),
@@ -95,6 +108,10 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
 
                 /** @var CustomField $customField */
                 foreach ($customObject->getCustomFields()->getIterator() as $customField) {
+                    if ($customField->getType()===$fieldTypes[HiddenType::NAME]) { // We don't want to show hidden types in filter list
+                        continue;
+                    }
+
                     $availableOperator = $this->getOperatorsForFieldType($customField->getType());
                     $allowedOperators = $customField->getTypeObject()->getOperators();
                     $operators = array_intersect_key($availableOperator, $allowedOperators);

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Provider;
 
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\AbstractCustomFieldType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
@@ -57,5 +58,18 @@ class CustomFieldTypeProvider
     public function addType(CustomFieldTypeInterface $customFieldType): void
     {
         $this->customFieldTypes[$customFieldType->getKey()] = $customFieldType;
+    }
+
+    /**
+     * @return array
+     */
+    public function getKeyTypeMapping(): array {
+        $mapping = [];
+        array_walk($this->customFieldTypes, function($key, $val) use (&$mapping){
+            /** @var AbstractCustomFieldType $key */
+           $mapping[$key::NAME] = $val;
+
+        });
+        return $mapping;
     }
 }
