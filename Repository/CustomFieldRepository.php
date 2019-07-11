@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Repository;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use Doctrine\Common\Collections\ArrayCollection;
 
 class CustomFieldRepository extends CommonRepository
 {
@@ -35,5 +37,24 @@ class CustomFieldRepository extends CommonRepository
         }
 
         return (bool) $q->getQuery()->getSingleResult()['alias_count'];
+    }
+
+    /**
+     * @param int $customObjectId
+     *
+     * @return ArrayCollection|CustomField[]
+     */
+    public function getRequiredCustomFieldsForCustomObject(int $customObjectId): ArrayCollection
+    {
+        $queryBuilder = $this->createQueryBuilder(CustomField::TABLE_ALIAS);
+        $queryBuilder->select(CustomField::TABLE_ALIAS);
+        $queryBuilder->where(CustomField::TABLE_ALIAS.'.customObject = :customObjectId');
+        $queryBuilder->setParameter('customObjectId', $customObjectId);
+        $queryBuilder->andWhere(CustomField::TABLE_ALIAS.'.required = :required');
+        $queryBuilder->setParameter('required', true);
+
+        $query = $queryBuilder->getQuery();
+
+        return new ArrayCollection($query->getResult());
     }
 }

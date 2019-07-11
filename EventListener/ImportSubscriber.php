@@ -25,9 +25,21 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use Mautic\LeadBundle\Event\ImportValidateEvent;
+use Symfony\Component\Form\FormError;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
+use Symfony\Component\Form\Form;
+use Mautic\CoreBundle\Helper\ArrayHelper;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ImportSubscriber extends CommonSubscriber
 {
+    /**
+     * @var TranslatorInterface
+     */
+    protected $translator;
+
     /**
      * @var CustomObjectModel
      */
@@ -49,21 +61,32 @@ class ImportSubscriber extends CommonSubscriber
     private $permissionProvider;
 
     /**
+     * @var CustomFieldRepository
+     */
+    private $customFieldRepository;
+
+    /**
      * @param CustomObjectModel            $customObjectModel
      * @param CustomItemImportModel        $customItemImportModel
      * @param ConfigProvider               $configProvider
      * @param CustomItemPermissionProvider $permissionProvider
+     * @param CustomFieldRepository        $customFieldRepository
+     * @param TranslatorInterface          $translator
      */
     public function __construct(
         CustomObjectModel $customObjectModel,
         CustomItemImportModel $customItemImportModel,
         ConfigProvider $configProvider,
-        CustomItemPermissionProvider $permissionProvider
+        CustomItemPermissionProvider $permissionProvider,
+        CustomFieldRepository $customFieldRepository,
+        TranslatorInterface $translator
     ) {
         $this->customObjectModel     = $customObjectModel;
         $this->customItemImportModel = $customItemImportModel;
         $this->configProvider        = $configProvider;
         $this->permissionProvider    = $permissionProvider;
+        $this->customFieldRepository = $customFieldRepository;
+        $this->translator            = $translator;
     }
 
     /**
@@ -75,6 +98,7 @@ class ImportSubscriber extends CommonSubscriber
             LeadEvents::IMPORT_ON_INITIALIZE    => 'onImportInit',
             LeadEvents::IMPORT_ON_FIELD_MAPPING => 'onFieldMapping',
             LeadEvents::IMPORT_ON_PROCESS       => 'onImportProcess',
+            LeadEvents::IMPORT_ON_VALIDATE      => 'onValidateImport',
         ];
     }
 
@@ -137,6 +161,46 @@ class ImportSubscriber extends CommonSubscriber
     }
 
     /**
+     * @param ImportValidateEvent $event
+     */
+    public function onValidateImport(ImportValidateEvent $event): void
+    {
+        if (!$this->configProvider->pluginIsEnabled()) {
+            return;
+        }
+
+        try {
+            $customObjectId = $this->getCustomObjectId($event->getRouteObjectName());
+        } catch (NotFoundException $e) {
+            // This is not a Custom Object import. Abort.
+            return;
+        }
+
+        $form          = $event->getForm();
+        $matchedFields = $form->getData();
+
+        $event->setOwnerId($this->handleValidateOwner($matchedFields));
+
+        $matchedFields = array_map(function ($value) {
+            return is_string($value) ? trim($value) : $value;
+        }, array_filter($matchedFields));
+
+        if (empty($matchedFields)) {
+            $form->addError(
+                new FormError(
+                    $this->translator->trans('mautic.lead.import.matchfields', [], 'validators')
+                )
+            );
+
+            return;
+        }
+
+        $this->handleValidateRequired($form, $customObjectId, $matchedFields);
+
+        $event->setMatchedFields($matchedFields);
+    }
+
+    /**
      * @param ImportProcessEvent $event
      */
     public function onImportProcess(ImportProcessEvent $event): void
@@ -172,5 +236,54 @@ class ImportSubscriber extends CommonSubscriber
         }
 
         throw new NotFoundException("{$routeObjectName} is not a custom object import");
+    }
+
+    /**
+     * @param mixed[] $matchedFields
+     *
+     * @return int|null
+     */
+    private function handleValidateOwner(array $matchedFields): ?int
+    {
+        $owner = ArrayHelper::getValue('owner', $matchedFields);
+
+        return $owner ? $owner->getId() : null;
+    }
+
+    /**
+     * Validate that required fields are mapped.
+     *
+     * @param Form    $form
+     * @param int     $customObjectId
+     * @param mixed[] $matchedFields
+     */
+    private function handleValidateRequired(Form $form, int $customObjectId, array $matchedFields): void
+    {
+        $requiredFields = $this->customFieldRepository->getRequiredCustomFieldsForCustomObject($customObjectId);
+
+        $missingRequiredFields = $requiredFields->filter(function (CustomField $customField) use ($matchedFields) {
+            return !array_key_exists($customField->getAlias(), $matchedFields);
+        })->map(function (CustomField $customField) {
+            return "{$customField->getLabel()} ({$customField->getAlias()})";
+        });
+
+        if (!in_array('customItemName', $matchedFields, true)) {
+            $missingRequiredFields[] = $this->translator->trans('custom.item.name.label');
+        }
+
+        if (count($missingRequiredFields)) {
+            $form->addError(
+                new FormError(
+                    $this->translator->trans(
+                        'mautic.import.missing.required.fields',
+                        [
+                            '%requiredFields%' => implode(', ', $missingRequiredFields->toArray()),
+                            '%fieldOrFields%'  => 1 === count($missingRequiredFields) ? 'field' : 'fields',
+                        ],
+                        'validators'
+                    )
+                )
+            );
+        }
     }
 }

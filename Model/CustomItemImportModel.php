@@ -77,20 +77,22 @@ class CustomItemImportModel extends FormModel
 
             $csvValue = $rowData[$csvField];
 
-            if (0 === strcasecmp('linkedContactIds', $customFieldId)) {
-                $contactIds = $this->formatterHelper->simpleCsvToArray($csvValue, 'int');
+            if (is_string($customFieldId)) {
+                if (0 === strcasecmp('linkedContactIds', $customFieldId)) {
+                    $contactIds = $this->formatterHelper->simpleCsvToArray($csvValue, 'int');
 
-                continue;
-            }
+                    continue;
+                }
 
-            if (0 === strcasecmp('customItemName', $customFieldId)) {
-                $customItem->setName($csvValue);
+                if (0 === strcasecmp('customItemName', $customFieldId)) {
+                    $customItem->setName($csvValue);
 
-                continue;
-            }
+                    continue;
+                }
 
-            if (0 === strcasecmp('customItemId', $customFieldId)) {
-                continue;
+                if (0 === strcasecmp('customItemId', $customFieldId)) {
+                    continue;
+                }
             }
 
             try {
