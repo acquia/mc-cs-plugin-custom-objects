@@ -170,10 +170,10 @@ CustomObjects = {
                 wildcard: '%QUERY',
                 ajax: {
                     beforeSend: function() {
-                        CustomObjects.addIconToInput(input, 'spinner', true);
+                        Mautic.startPageLoadingBar();
                     },
                     complete: function() {
-                        CustomObjects.removeIconFromInput(input);
+                        Mautic.stopPageLoadingBar();
                     }
                 },
                 filter: function(response) {
@@ -202,14 +202,20 @@ CustomObjects = {
             type: 'POST',
             url: mauticBaseUrl+'s/custom/item/'+customItemId+'/link/'+entityType+'/'+entitytId+'.json',
             success: callback,
+            showLoadingBar: true,
         });
     },
 
     unlinkCustomItemFromEntity(elHtml, event, customObjectId, currentEntityType, currentEntityId, tabId) { // update this to use it for all entity types
         event.preventDefault();
-        mQuery.ajax({type: 'POST', url: mQuery(elHtml).attr('data-action'), success: function() {
-            CustomObjects.reloadItemsTable(customObjectId, currentEntityId, currentEntityType, tabId);
-        }});
+        mQuery.ajax({
+            type: 'POST',
+            url: mQuery(elHtml).attr('data-action'),
+            showLoadingBar: true,
+            success: function() {
+                CustomObjects.reloadItemsTable(customObjectId, currentEntityId, currentEntityType, tabId);
+            }
+        });
     },
 
     getItemsForObjectLinkedToEntity(customObjectId, currentEntityId, currentEntityType, callback) {
@@ -218,6 +224,7 @@ CustomObjects = {
             url: mauticBaseUrl+'s/custom/object/'+customObjectId+'/item?tmpl=list',
             data: {filterEntityId: currentEntityId, 'filterEntityType': currentEntityType},
             success: callback,
+            showLoadingBar: true,
         });
     },
 };
