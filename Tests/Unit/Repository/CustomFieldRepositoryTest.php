@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Repository;
 
-use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 
-class CustomObjectRepositoryTest extends \PHPUnit_Framework_TestCase
+class CustomFieldRepositoryTest extends \PHPUnit_Framework_TestCase
 {
     private $entityManager;
     private $classMetadata;
@@ -30,7 +30,7 @@ class CustomObjectRepositoryTest extends \PHPUnit_Framework_TestCase
     private $expression;
 
     /**
-     * @var CustomObjectRepository
+     * @var CustomFieldRepository
      */
     private $repository;
 
@@ -43,7 +43,7 @@ class CustomObjectRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->queryBuilder  = $this->createMock(QueryBuilder::class);
         $this->query         = $this->createMock(AbstractQuery::class);
         $this->expression    = $this->createMock(Expr::class);
-        $this->repository    = new CustomObjectRepository(
+        $this->repository    = new CustomFieldRepository(
             $this->entityManager,
             $this->classMetadata
         );
@@ -53,13 +53,13 @@ class CustomObjectRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->queryBuilder->method('expr')->willReturn($this->expression);
     }
 
-    public function testCheckAliasExists(): void
+    public function testIsAliasUnique(): void
     {
         $this->queryBuilder->expects($this->exactly(2))
             ->method('select')
             ->withConsecutive(
-                [CustomObject::TABLE_ALIAS],
-                ['count(CustomObject.id) as alias_count']
+                [CustomField::TABLE_ALIAS],
+                ['count(CustomField.id) as alias_count']
             )
             ->willReturnSelf();
 
@@ -69,7 +69,7 @@ class CustomObjectRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $this->queryBuilder->expects($this->once())
             ->method('where')
-            ->with('CustomObject.alias = :alias');
+            ->with('CustomField.alias = :alias');
 
         $this->queryBuilder->expects($this->once())
             ->method('setParameter')
@@ -79,16 +79,16 @@ class CustomObjectRepositoryTest extends \PHPUnit_Framework_TestCase
             ->method('getSingleResult')
             ->willReturn(['alias_count' => 10]);
 
-        $this->assertTrue($this->repository->checkAliasExists('alias-1'));
+        $this->assertTrue($this->repository->isAliasUnique('alias-1'));
     }
 
-    public function testCheckAliasExistsWithId(): void
+    public function testIsAliasUniqueWithId(): void
     {
         $this->queryBuilder->expects($this->exactly(2))
             ->method('select')
             ->withConsecutive(
-                [CustomObject::TABLE_ALIAS],
-                ['count(CustomObject.id) as alias_count']
+                [CustomField::TABLE_ALIAS],
+                ['count(CustomField.id) as alias_count']
             )
             ->willReturnSelf();
 
@@ -98,7 +98,7 @@ class CustomObjectRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $this->queryBuilder->expects($this->once())
             ->method('where')
-            ->with('CustomObject.alias = :alias');
+            ->with('CustomField.alias = :alias');
 
         $this->queryBuilder->expects($this->once())
             ->method('andWhere');
@@ -112,17 +112,50 @@ class CustomObjectRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $this->expression->expects($this->once())
             ->method('neq')
-            ->with('CustomObject.id', ':ignoreId');
+            ->with('CustomField.id', ':ignoreId');
 
         $this->query->expects($this->once())
             ->method('getSingleResult')
             ->willReturn(['alias_count' => 0]);
 
-        $this->assertFalse($this->repository->checkAliasExists('alias-1', 444));
+        $this->assertFalse($this->repository->isAliasUnique('alias-1', 444));
     }
 
-    public function testGetTableAlias(): void
+    public function testGetRequiredCustomFieldsForCustomObject(): void
     {
-        $this->assertSame(CustomObject::TABLE_ALIAS, $this->repository->getTableAlias());
+        $this->queryBuilder->expects($this->once())
+            ->method('select')
+            ->with(CustomField::TABLE_ALIAS)
+            ->willReturnSelf();
+
+        $this->queryBuilder->expects($this->once())
+            ->method('from')
+            ->willReturnSelf();
+
+        $this->queryBuilder->expects($this->once())
+            ->method('where')
+            ->with('CustomField.customObject = :customObjectId');
+
+        $this->queryBuilder->expects($this->once())
+            ->method('andWhere')
+            ->with('CustomField.required = :required');
+
+        $this->queryBuilder->expects($this->exactly(2))
+            ->method('setParameter')
+            ->withConsecutive(
+                ['customObjectId', 456],
+                ['required', true]
+            );
+
+        $customField = $this->createMock(CustomField::class);
+
+        $this->query->expects($this->once())
+            ->method('getResult')
+            ->willReturn([$customField]);
+
+        $collection = $this->repository->getRequiredCustomFieldsForCustomObject(456);
+
+        $this->assertCount(1, $collection);
+        $this->assertSame($customField, $collection->current());
     }
 }
