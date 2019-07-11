@@ -166,7 +166,7 @@ CustomObjects = {
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value', 'id'),
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             remote: {
-                url: url+'?filter=%QUERY',
+                url: url+'&filter=%QUERY',
                 wildcard: '%QUERY',
                 ajax: {
                     beforeSend: function() {
