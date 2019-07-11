@@ -240,7 +240,7 @@ class ImportSubscriber extends CommonSubscriber
     /**
      * @param mixed[] $matchedFields
      *
-     * @return ?int
+     * @return int|null
      */
     private function handleValidateOwner(array $matchedFields): ?int
     {
