@@ -375,6 +375,106 @@ class CustomObjectFormTest extends MauticMysqlTestCase
         $this->assertCustomObject($payload, 1);
     }
 
+    public function testCreateWithCorrectOptionToCFAssignment(): void
+    {
+        $payload = [
+            'custom_object' => [
+                'nameSingular' => 'singularValue',
+                'namePlural'   => 'pluralValue',
+                'alias'        => 'aliasValue',
+                'description'  => 'descriptionValue',
+                'customFields' => [
+                    0 => [
+                        'id'           => '',
+                        'customObject' => '',
+                        'isPublished'  => '1',
+                        'type'         => 'checkbox_group',
+                        'order'        => '0',
+                        'label'        => 'CheckboxGroup',
+                        'alias'        => '1',
+                        'required'     => '',
+                        'params'       => '[]',
+                        'options'      => '[
+                            {
+                                "label": "cl1",
+                                "value": "cv1",
+                                "order": "1"
+                            },
+                            {
+                                "label": "cl2",
+                                "value": "cv2",
+                                "order": "2"
+                            },
+                            {
+                                "label": "cl3",
+                                "value": "cv3",
+                                "order": "3"
+                            }
+                        ]',
+                        'defaultValue' => [
+                            0 => 'cv1',
+                            1 => 'cv2',
+                        ],
+                        'deleted' => '',
+                    ],
+                    1 => [
+                        'id'           => '',
+                        'customObject' => '',
+                        'isPublished'  => '1',
+                        'type'         => 'multiselect',
+                        'order'        => '1',
+                        'label'        => 'Multiselect',
+                        'alias'        => '2',
+                        'required'     => '',
+                        'params'       => '[]',
+                        'options'      => '[
+                            {
+                                "label": "ml1",
+                                "value": "mv1",
+                                "order": "1"
+                            },
+                            {
+                                "label": "ml2",
+                                "value": "mv2",
+                                "order": "2"
+                            },
+                            {
+                                "label": "ml3",
+                                "value": "mv3",
+                                "order": "3"
+                            }
+                        ]',
+                        'defaultValue' => [
+                            0 => 'mv2',
+                            1 => 'mv3',
+                        ],
+                        'deleted' => '',
+                    ],
+                ],
+                'category'    => '',
+                'isPublished' => '1',
+                'buttons'     => ['apply' => ''],
+            ],
+        ];
+
+        $this->client->request(
+            'POST',
+            's/custom/object/save',
+            $payload,
+            [],
+            $this->createHeaders()
+        );
+
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertCount(1, $response);
+        $this->assertSame('/s/custom/object/edit/1', $response['redirect']);
+
+        $this->assertCustomObject($payload, 1);
+    }
+
     /**
      * @param string[] $expected
      * @param int      $id
