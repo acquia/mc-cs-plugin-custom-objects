@@ -124,18 +124,20 @@ class AbstractMultivalueTypeTest extends \PHPUnit_Framework_TestCase
         $this->fieldType->validateValue($this->customField, 'two');
     }
 
-    public function testValidateValueWithValidTwoOption(): void
+    public function testValidateValueWithValidOptions(): void
     {
         $option1 = new CustomFieldOption();
         $option2 = new CustomFieldOption();
+        $option3 = new CustomFieldOption();
         $option1->setValue('one');
         $option2->setValue('two');
+        $option3->setValue('3');
 
         $this->customField->expects($this->once())
             ->method('getOptions')
-            ->willReturn(new ArrayCollection([$option1, $option2]));
+            ->willReturn(new ArrayCollection([$option1, $option2, $option3]));
 
-        $this->fieldType->validateValue($this->customField, ['one', 'two']);
+        $this->fieldType->validateValue($this->customField, ['one', 'two', 3]);
     }
 
     public function testValidateValueWithInvalidSingleOptionString(): void
