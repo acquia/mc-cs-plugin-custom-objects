@@ -357,7 +357,7 @@ class CustomObjectModelTest extends \PHPUnit_Framework_TestCase
         $this->customObjectModel->fetchEntityByAlias('alias1');
     }
 
-    public function testFetchAllPublishedEntitiesForAdmin(): void
+    public function testFetchAllPublishedEntitiesForCli(): void
     {
         $expectedQuery = [
             'ignore_paginator' => true,
@@ -372,9 +372,8 @@ class CustomObjectModelTest extends \PHPUnit_Framework_TestCase
             ],
         ];
 
-        $this->customObjectPermissionProvider->expects($this->once())
-            ->method('isGranted')
-            ->with('viewother');
+        $this->customObjectPermissionProvider->expects($this->never())
+            ->method('isGranted');
 
         $this->customObjectRepository->expects($this->once())
             ->method('getEntities')
@@ -398,11 +397,14 @@ class CustomObjectModelTest extends \PHPUnit_Framework_TestCase
                     [
                         'column' => CustomObject::TABLE_ALIAS.'.createdBy',
                         'expr'   => 'eq',
-                        'value'  => $this->userHelper->getUser()->getId(),
+                        'value'  => 532,
                     ],
                 ],
             ],
         ];
+
+        $this->user->method('getId')
+            ->willReturn(532);
 
         $this->customObjectPermissionProvider->expects($this->once())
             ->method('isGranted')
@@ -425,7 +427,7 @@ class CustomObjectModelTest extends \PHPUnit_Framework_TestCase
                     [
                         'column' => CustomObject::TABLE_ALIAS.'.createdBy',
                         'expr'   => 'eq',
-                        'value'  => $this->userHelper->getUser()->getId(),
+                        'value'  => 532,
                     ],
                 ],
             ],
@@ -440,6 +442,9 @@ class CustomObjectModelTest extends \PHPUnit_Framework_TestCase
             ->method('getEntities')
             ->with($expectedQuery)
             ->willReturn(['list of custom objects here']);
+
+        $this->user->method('getId')
+            ->willReturn(532);
 
         $this->customObjectModel->fetchEntities();
     }
