@@ -352,6 +352,11 @@ class CustomObjectModel extends FormModel
      */
     private function addCreatorLimit(array $args): array
     {
+        // We don't know the user when executed through CLI.
+        if (!$this->userHelper->getUser() || !$this->userHelper->getUser()->getId()) {
+            return $args;
+        }
+
         try {
             $this->permissionProvider->isGranted('viewother');
         } catch (ForbiddenException $e) {
