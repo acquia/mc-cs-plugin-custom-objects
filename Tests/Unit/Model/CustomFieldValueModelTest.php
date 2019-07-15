@@ -279,11 +279,11 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
 
         $customFieldValue->expects($this->once())
             ->method('getValue')
-            ->willReturn(['red', 'green']);
+            ->willReturn(['red', 'green', 4]);
 
-        $customFieldValue->expects($this->exactly(2))
+        $customFieldValue->expects($this->exactly(3))
             ->method('setValue')
-            ->withConsecutive(['red'], ['green']);
+            ->withConsecutive(['red'], ['green'], [4]);
 
         $this->customItem->expects($this->once())
             ->method('getId')
@@ -310,11 +310,11 @@ class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
             ->method('execute')
             ->willReturn(2);
 
-        $this->entityManager->expects($this->exactly(2))
+        $this->entityManager->expects($this->exactly(3))
             ->method('persist')
             ->with($customFieldValue);
 
-        $this->validator->expects($this->exactly(2))
+        $this->validator->expects($this->exactly(3))
             ->method('validate')
             ->with($customFieldValue)
             ->willReturn($this->violationList);

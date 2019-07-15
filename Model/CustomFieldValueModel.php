@@ -85,8 +85,9 @@ class CustomFieldValueModel
                 }
             }
             foreach ($options as $optionKey) {
+                $optionKey   = is_string($optionKey) ? trim($optionKey) : $optionKey;
                 $optionValue = clone $customFieldValue;
-                $optionValue->setValue(trim($optionKey));
+                $optionValue->setValue($optionKey);
 
                 $errors = $this->validator->validate($optionValue);
 

@@ -32,13 +32,13 @@ class CustomObjectFormTest extends MauticMysqlTestCase
         $this->repo = $this->client->getContainer()->get('custom_object.repository');
     }
 
-    public function testCreate(): void
+    public function testCreateEdit(): void
     {
         $payload = [
             'custom_object' => [
                 'nameSingular' => 'singularValue',
                 'namePlural'   => 'pluralValue',
-                'alias'        => 'aliasValue',
+                'alias'        => 'pluralValue',
                 'description'  => 'descriptionValue',
                 'customFields' => [
                     0 => [
@@ -78,6 +78,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
             ],
         ];
 
+        // Create CO
         $this->client->request(
             'POST',
             's/custom/object/save',
@@ -94,6 +95,66 @@ class CustomObjectFormTest extends MauticMysqlTestCase
         $this->assertSame('/s/custom/object/edit/1', $response['redirect']);
 
         $this->assertCustomObject($payload, 1);
+
+        // Edit CO
+        $payload['custom_object']['alias']                           = 'pluralvalue';
+        $payload['custom_object']['customFields'][0]['id']           = 1;
+        $payload['custom_object']['customFields'][0]['customObject'] = 1;
+
+        $this->client->restart();
+        $this->client->request(
+            'POST',
+            's/custom/object/save/1',
+            $payload,
+            [],
+            $this->createHeaders()
+        );
+
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertCount(1, $response);
+        $this->assertSame('/s/custom/object/edit/1', $response['redirect']);
+
+        $this->assertCustomObject($payload, 1);
+
+        // Delete CF
+        $payload['custom_object']['customFields'][0]['deleted'] = 1;
+
+        $this->client->restart();
+        $this->client->request(
+            'POST',
+            's/custom/object/save/1',
+            $payload,
+            [],
+            $this->createHeaders()
+        );
+
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertCount(1, $response);
+        $this->assertSame('/s/custom/object/edit/1', $response['redirect']);
+
+        $this->assertCustomObject($payload, 1);
+
+        // Delete CO
+        $this->client->restart();
+        $this->client->request(
+            'GET',
+            's/custom/object/delete/1',
+            [],
+            [],
+            $this->createHeaders()
+        );
+
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertSame('/s/custom/object', $response['route']);
     }
 
     public function testCreateAll(): void
@@ -375,6 +436,106 @@ class CustomObjectFormTest extends MauticMysqlTestCase
         $this->assertCustomObject($payload, 1);
     }
 
+    public function testCreateWithCorrectOptionToCFAssignment(): void
+    {
+        $payload = [
+            'custom_object' => [
+                'nameSingular' => 'singularValue',
+                'namePlural'   => 'pluralValue',
+                'alias'        => 'aliasValue',
+                'description'  => 'descriptionValue',
+                'customFields' => [
+                    0 => [
+                        'id'           => '',
+                        'customObject' => '',
+                        'isPublished'  => '1',
+                        'type'         => 'checkbox_group',
+                        'order'        => '0',
+                        'label'        => 'CheckboxGroup',
+                        'alias'        => '1',
+                        'required'     => '',
+                        'params'       => '[]',
+                        'options'      => '[
+                            {
+                                "label": "cl1",
+                                "value": "cv1",
+                                "order": "1"
+                            },
+                            {
+                                "label": "cl2",
+                                "value": "cv2",
+                                "order": "2"
+                            },
+                            {
+                                "label": "cl3",
+                                "value": "cv3",
+                                "order": "3"
+                            }
+                        ]',
+                        'defaultValue' => [
+                            0 => 'cv1',
+                            1 => 'cv2',
+                        ],
+                        'deleted' => '',
+                    ],
+                    1 => [
+                        'id'           => '',
+                        'customObject' => '',
+                        'isPublished'  => '1',
+                        'type'         => 'multiselect',
+                        'order'        => '1',
+                        'label'        => 'Multiselect',
+                        'alias'        => '2',
+                        'required'     => '',
+                        'params'       => '[]',
+                        'options'      => '[
+                            {
+                                "label": "ml1",
+                                "value": "mv1",
+                                "order": "1"
+                            },
+                            {
+                                "label": "ml2",
+                                "value": "mv2",
+                                "order": "2"
+                            },
+                            {
+                                "label": "ml3",
+                                "value": "mv3",
+                                "order": "3"
+                            }
+                        ]',
+                        'defaultValue' => [
+                            0 => 'mv2',
+                            1 => 'mv3',
+                        ],
+                        'deleted' => '',
+                    ],
+                ],
+                'category'    => '',
+                'isPublished' => '1',
+                'buttons'     => ['apply' => ''],
+            ],
+        ];
+
+        $this->client->request(
+            'POST',
+            's/custom/object/save',
+            $payload,
+            [],
+            $this->createHeaders()
+        );
+
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertCount(1, $response);
+        $this->assertSame('/s/custom/object/edit/1', $response['redirect']);
+
+        $this->assertCustomObject($payload, 1);
+    }
+
     /**
      * @param string[] $expected
      * @param int      $id
@@ -394,6 +555,10 @@ class CustomObjectFormTest extends MauticMysqlTestCase
         $this->assertSame((bool) $expected['isPublished'], $customObject->isPublished());
 
         $customFields = $customObject->getCustomFields();
+
+        if (!$customFields->count()) {
+            return;
+        }
 
         /*
          * @var int

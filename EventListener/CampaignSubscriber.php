@@ -77,12 +77,12 @@ class CampaignSubscriber extends CommonSubscriber
         TranslatorInterface $translator,
         ConfigProvider $configProvider
     ) {
-        $this->customFieldModel           = $customFieldModel;
-        $this->customObjectModel          = $customObjectModel;
-        $this->customItemRepository       = $customItemRepository;
-        $this->customItemModel            = $customItemModel;
-        $this->translator                 = $translator;
-        $this->configProvider             = $configProvider;
+        $this->customFieldModel     = $customFieldModel;
+        $this->customObjectModel    = $customObjectModel;
+        $this->customItemRepository = $customItemRepository;
+        $this->customItemModel      = $customItemModel;
+        $this->translator           = $translator;
+        $this->configProvider       = $configProvider;
     }
 
     /**
@@ -143,8 +143,9 @@ class CampaignSubscriber extends CommonSubscriber
             return;
         }
 
-        $linkCustomItemId   = (int) ArrayHelper::getValue('linkCustomItemId', $event->getConfig());
-        $unlinkCustomItemId = (int) ArrayHelper::getValue('unlinkCustomItemId', $event->getConfig());
+        $eventConfig        = $event->getConfig();
+        $linkCustomItemId   = (int) ArrayHelper::getValue('linkCustomItemId', $eventConfig);
+        $unlinkCustomItemId = (int) ArrayHelper::getValue('unlinkCustomItemId', $eventConfig);
         $contactId          = (int) $event->getLead()->getId();
 
         if ($linkCustomItemId) {
@@ -152,7 +153,7 @@ class CampaignSubscriber extends CommonSubscriber
                 $customItem = $this->customItemModel->fetchEntity($linkCustomItemId);
                 $this->customItemModel->linkEntity($customItem, 'contact', $contactId);
             } catch (NotFoundException $e) {
-                // Do nothing  if the custom item doesn't exist anymore.
+                // Do nothing if the custom item doesn't exist anymore.
             }
         }
 
@@ -161,7 +162,7 @@ class CampaignSubscriber extends CommonSubscriber
                 $customItem = $this->customItemModel->fetchEntity($unlinkCustomItemId);
                 $this->customItemModel->unlinkEntity($customItem, 'contact', $contactId);
             } catch (NotFoundException $e) {
-                // Do nothing  if the custom item doesn't exist anymore.
+                // Do nothing if the custom item doesn't exist anymore.
             }
         }
     }

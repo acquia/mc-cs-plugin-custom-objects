@@ -103,12 +103,12 @@ abstract class AbstractMultivalueType extends AbstractCustomFieldType
             return;
         }
 
-        if (is_string($value)) {
-            if ($this->isJson($value)) {
-                $value = json_decode($value, true);
-            } else {
-                $value = [$value];
-            }
+        if (is_string($value) && $this->isJson($value)) {
+            $value = json_decode($value, true);
+        }
+
+        if (!is_array($value)) {
+            $value = [$value];
         }
 
         $options        = $customField->getOptions();

@@ -225,6 +225,9 @@ class CustomObjectModel extends FormModel
     {
         $queryBuilder = $this->createListQueryBuilder($tableConfig);
         $queryBuilder->select($queryBuilder->expr()->countDistinct(CustomObject::TABLE_ALIAS));
+        $queryBuilder->setMaxResults(1);
+        $queryBuilder->setFirstResult(0);
+        $queryBuilder->resetDQLPart('orderBy');
 
         return (int) $queryBuilder->getQuery()->getSingleScalarResult();
     }
@@ -352,6 +355,11 @@ class CustomObjectModel extends FormModel
      */
     private function addCreatorLimit(array $args): array
     {
+        // We don't know the user when executed through CLI.
+        if (!$this->userHelper->getUser() || !$this->userHelper->getUser()->getId()) {
+            return $args;
+        }
+
         try {
             $this->permissionProvider->isGranted('viewother');
         } catch (ForbiddenException $e) {

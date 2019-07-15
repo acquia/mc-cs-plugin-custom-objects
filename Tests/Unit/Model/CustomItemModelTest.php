@@ -434,7 +434,7 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
     public function testGetCountForTable(): void
     {
         $expr        = $this->createMock(Expr::class);
-        $tableConfig = new TableConfig(10, 1, 'column');
+        $tableConfig = new TableConfig(10, 2, 'column');
         $tableConfig->addParameter('customObjectId', 44);
 
         $this->customItemPermissionProvider->expects($this->once())
@@ -451,6 +451,18 @@ class CustomItemModelTest extends \PHPUnit_Framework_TestCase
                 [CustomItem::TABLE_ALIAS],
                 ['the select count expr']
             );
+
+        $this->queryBuilder->expects($this->exactly(2))
+            ->method('setMaxResults')
+            ->withConsecutive([10], [1]);
+
+        $this->queryBuilder->expects($this->exactly(2))
+            ->method('setFirstResult')
+            ->withConsecutive([10], [0]);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('resetDQLPart')
+            ->with('orderBy');
 
         $this->queryBuilder->expects($this->once())
             ->method('expr')

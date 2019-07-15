@@ -273,6 +273,9 @@ class CustomItemModel extends FormModel
     {
         $queryBuilder = $this->createListOrmQueryBuilder($tableConfig);
         $queryBuilder->select($queryBuilder->expr()->countDistinct(CustomItem::TABLE_ALIAS));
+        $queryBuilder->setMaxResults(1);
+        $queryBuilder->setFirstResult(0);
+        $queryBuilder->resetDQLPart('orderBy');
 
         $this->dispatcher->dispatch(
             CustomItemEvents::ON_CUSTOM_ITEM_LIST_ORM_QUERY,

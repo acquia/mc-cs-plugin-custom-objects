@@ -107,7 +107,7 @@ CustomObjects = {
             let nameInput = mQuery(nameInputHtml);
             let customObjectId = nameInput.attr('data-custom-object-id');
             let idInput = mQuery(nameInput.attr('data-id-input-selector'));
-            CustomObjects.initCustomItemTypeahead(nameInput, customObjectId, null, function(selectedItem) {
+            CustomObjects.initCustomItemTypeahead(nameInput, customObjectId, function(selectedItem) {
                 idInput.val(selectedItem.id);
                 CustomObjects.addIconToInput(nameInput, 'check');
             });
@@ -162,11 +162,12 @@ CustomObjects = {
 
         input.attr('data-typeahead-initialized', true);
         let url = input.attr('data-action');
+        let separator = (url.indexOf('?') >= 0) ? '&' : '?';
         let customItems = new Bloodhound({
             datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value', 'id'),
             queryTokenizer: Bloodhound.tokenizers.whitespace,
             remote: {
-                url: url+'&filter=%QUERY',
+                url: url+separator+'filter=%QUERY',
                 wildcard: '%QUERY',
                 ajax: {
                     beforeSend: function() {
