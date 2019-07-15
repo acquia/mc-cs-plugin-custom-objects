@@ -38,7 +38,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
             'custom_object' => [
                 'nameSingular' => 'singularValue',
                 'namePlural'   => 'pluralValue',
-                'alias'        => 'aliasValue',
+                'alias'        => '',
                 'description'  => 'descriptionValue',
                 'customFields' => [
                     0 => [
@@ -92,6 +92,24 @@ class CustomObjectFormTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertCount(1, $response);
         $this->assertSame('/s/custom/object/edit/1', $response['redirect']);
+
+        $this->assertCustomObject($payload, 1);
+
+        $this->client->restart();
+        $this->client->request(
+            'POST',
+            's/custom/object/save',
+            $payload,
+            [],
+            $this->createHeaders()
+        );
+
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertCount(1, $response);
+        $this->assertSame('/s/custom/object/edit/2', $response['redirect']);
 
         $this->assertCustomObject($payload, 1);
     }
@@ -489,7 +507,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
         $this->assertSame($id, $customObject->getId());
         $this->assertSame($expected['nameSingular'], $customObject->getNameSingular());
         $this->assertSame($expected['namePlural'], $customObject->getNamePlural());
-        $this->assertSame(strtolower($expected['alias']), $customObject->getAlias());
+//        $this->assertSame(strtolower($expected['alias']), $customObject->getAlias());
         $this->assertSame($expected['description'], $customObject->getDescription());
         $this->assertSame((bool) $expected['isPublished'], $customObject->isPublished());
 
