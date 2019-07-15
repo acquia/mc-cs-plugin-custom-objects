@@ -218,14 +218,8 @@ class QueryFilterHelper
             case 'empty':
             case 'notIn':
                 break;
-            case 'neq':
-            case 'notLike':
-                $queryBuilder->andWhere($expression);
-
-                break;
             default:
                 $queryBuilder->andWhere($expression);
-
                 break;
         }
 

@@ -565,6 +565,14 @@ return [
                     \MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact::class,
                 ],
             ],
+            'custom_object.segment_decorator_country' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Decorator\CountryDecorator::class,
+                'arguments' => [
+                    'mautic.lead.model.lead_segment_filter_operator',
+                    'mautic.lead.repository.lead_segment_filter_descriptor',
+                    'doctrine.orm.entity_manager',
+                ],
+            ],
         ],
         'events' => [
             'custom_object.api.subscriber' => [
@@ -745,6 +753,13 @@ return [
                     'mautic.campaign.model.event',
                 ],
             ],
+            'custom_object.segments.decorator_delegate.subscriber'   => [
+                'class'    => \MauticPlugin\CustomObjectsBundle\EventListener\SegmentFilterDecoratorDelegateSubscriber::class,
+                'arguments'=> [
+                    'custom_object.segment_decorator_country'
+                ],
+            ],
+
         ],
         'forms' => [
             'custom_item.item.form' => [
