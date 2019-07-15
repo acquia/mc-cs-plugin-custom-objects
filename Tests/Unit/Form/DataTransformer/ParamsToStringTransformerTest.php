@@ -44,6 +44,16 @@ class ParamsToStringTransformerTest extends \PHPUnit_Framework_TestCase
 
         $transformer = new ParamsToStringTransformer($serializer);
         $this->assertSame('[]', $transformer->transform($params));
+
+        $params     = [];
+        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer
+            ->expects($this->once())
+            ->method('serialize')
+            ->willReturn('[]');
+
+        $transformer = new ParamsToStringTransformer($serializer);
+        $this->assertSame('[]', $transformer->transform($params));
     }
 
     public function testReverseTransform(): void
