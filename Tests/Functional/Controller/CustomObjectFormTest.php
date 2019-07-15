@@ -32,13 +32,13 @@ class CustomObjectFormTest extends MauticMysqlTestCase
         $this->repo = $this->client->getContainer()->get('custom_object.repository');
     }
 
-    public function testCreate(): void
+    public function testCreateEdit(): void
     {
         $payload = [
             'custom_object' => [
                 'nameSingular' => 'singularValue',
                 'namePlural'   => 'pluralValue',
-                'alias'        => '',
+                'alias'        => 'pluralValue',
                 'description'  => 'descriptionValue',
                 'customFields' => [
                     0 => [
@@ -95,10 +95,14 @@ class CustomObjectFormTest extends MauticMysqlTestCase
 
         $this->assertCustomObject($payload, 1);
 
+        $payload['custom_object']['alias'] = 'pluralvalue';
+        $payload['custom_object']['customFields'][0]['id'] = 1;
+        $payload['custom_object']['customFields'][0]['customObject'] = 1;
+
         $this->client->restart();
         $this->client->request(
             'POST',
-            's/custom/object/save',
+            's/custom/object/save/1',
             $payload,
             [],
             $this->createHeaders()
@@ -109,7 +113,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
 
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertCount(1, $response);
-        $this->assertSame('/s/custom/object/edit/2', $response['redirect']);
+        $this->assertSame('/s/custom/object/edit/1', $response['redirect']);
 
         $this->assertCustomObject($payload, 1);
     }
@@ -507,7 +511,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
         $this->assertSame($id, $customObject->getId());
         $this->assertSame($expected['nameSingular'], $customObject->getNameSingular());
         $this->assertSame($expected['namePlural'], $customObject->getNamePlural());
-//        $this->assertSame(strtolower($expected['alias']), $customObject->getAlias());
+        $this->assertSame(strtolower($expected['alias']), $customObject->getAlias());
         $this->assertSame($expected['description'], $customObject->getDescription());
         $this->assertSame((bool) $expected['isPublished'], $customObject->isPublished());
 

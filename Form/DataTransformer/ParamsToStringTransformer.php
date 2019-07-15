@@ -46,7 +46,11 @@ class ParamsToStringTransformer implements DataTransformerInterface
             return '[]';
         }
 
-        return $this->serializer->serialize($params->__toArray(), 'json');
+        if ($params instanceof Params) {
+            $params = $params->__toArray();
+        }
+
+        return $this->serializer->serialize($params, 'json');
     }
 
     /**
