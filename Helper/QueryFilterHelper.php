@@ -130,12 +130,8 @@ class QueryFilterHelper
     {
         $expression = $this->getCustomValueValueExpression($queryBuilder, $tableAlias, $filter->getOperator());
 
-        $value = in_array($filter->getType(), ['multiselect', '!multiselect'])
-            ? $filter->getCrateFilterValue()
-            : $filter->getParameterValue();
-
         $this->addOperatorExpression($queryBuilder, $tableAlias, $expression, $filter->getOperator(),
-            $value);
+            $filter->getParameterValue());
 
     }
 

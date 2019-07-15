@@ -15,19 +15,22 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Mautic\LeadBundle\Event\LeadListFiltersDecoratorDelegateEvent;
 use Mautic\LeadBundle\LeadEvents;
-use MauticPlugin\CustomObjectsBundle\Segment\Decorator\CountryDecorator;
+use MauticPlugin\CustomObjectsBundle\Segment\Decorator\MultiselectDecorator;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SegmentFilterDecoratorDelegateSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var CountryDecorator
+     * @var MultiselectDecorator
      */
-    private $countryDecorator;
+    private $multiselectDecorator;
 
-    public function __construct(CountryDecorator $countryDecorator)
+    /**
+     * @param MultiselectDecorator $multiselectDecorator
+     */
+    public function __construct(MultiselectDecorator $multiselectDecorator)
     {
-        $this->countryDecorator = $countryDecorator;
+        $this->multiselectDecorator = $multiselectDecorator;
     }
 
     /**
@@ -48,8 +51,8 @@ class SegmentFilterDecoratorDelegateSubscriber implements EventSubscriberInterfa
 
         if ($crate->getObject()==='custom_object') {
             switch($crate->getType()) {
-                case 'country':
-                    $delegateEvent->setDecorator($this->countryDecorator);
+                case 'multiselect':
+                    $delegateEvent->setDecorator($this->multiselectDecorator);
                     $delegateEvent->stopPropagation();
                     break;
             }
