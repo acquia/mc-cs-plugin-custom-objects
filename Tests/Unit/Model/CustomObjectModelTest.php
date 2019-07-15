@@ -489,7 +489,7 @@ class CustomObjectModelTest extends \PHPUnit_Framework_TestCase
 
     public function testGetCountForTable(): void
     {
-        $tableConfig = new TableConfig(10, 1, 'column');
+        $tableConfig = new TableConfig(10, 3, 'column');
         $expr        = $this->createMock(Expr::class);
 
         $tableConfig->addParameter('search', 'Unicorn');
@@ -508,6 +508,18 @@ class CustomObjectModelTest extends \PHPUnit_Framework_TestCase
                 [CustomObject::TABLE_ALIAS],
                 ['the select count expr']
             );
+
+        $this->queryBuilder->expects($this->exactly(2))
+            ->method('setMaxResults')
+            ->withConsecutive([10], [1]);
+
+        $this->queryBuilder->expects($this->exactly(2))
+            ->method('setFirstResult')
+            ->withConsecutive([20], [0]);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('resetDQLPart')
+            ->with('orderBy');
 
         $this->queryBuilder->expects($this->once())
             ->method('expr')

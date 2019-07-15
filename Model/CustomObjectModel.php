@@ -225,6 +225,9 @@ class CustomObjectModel extends FormModel
     {
         $queryBuilder = $this->createListQueryBuilder($tableConfig);
         $queryBuilder->select($queryBuilder->expr()->countDistinct(CustomObject::TABLE_ALIAS));
+        $queryBuilder->setMaxResults(1);
+        $queryBuilder->setFirstResult(0);
+        $queryBuilder->resetDQLPart('orderBy');
 
         return (int) $queryBuilder->getQuery()->getSingleScalarResult();
     }
