@@ -97,8 +97,8 @@ class CustomObjectFormTest extends MauticMysqlTestCase
         $this->assertCustomObject($payload, 1);
 
         // Edit CO
-        $payload['custom_object']['alias'] = 'pluralvalue';
-        $payload['custom_object']['customFields'][0]['id'] = 1;
+        $payload['custom_object']['alias']                           = 'pluralvalue';
+        $payload['custom_object']['customFields'][0]['id']           = 1;
         $payload['custom_object']['customFields'][0]['customObject'] = 1;
 
         $this->client->restart();
