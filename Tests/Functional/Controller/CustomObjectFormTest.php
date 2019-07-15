@@ -78,6 +78,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
             ],
         ];
 
+        // Create CO
         $this->client->request(
             'POST',
             's/custom/object/save',
@@ -95,9 +96,31 @@ class CustomObjectFormTest extends MauticMysqlTestCase
 
         $this->assertCustomObject($payload, 1);
 
+        // Edit CO
         $payload['custom_object']['alias'] = 'pluralvalue';
         $payload['custom_object']['customFields'][0]['id'] = 1;
         $payload['custom_object']['customFields'][0]['customObject'] = 1;
+
+        $this->client->restart();
+        $this->client->request(
+            'POST',
+            's/custom/object/save/1',
+            $payload,
+            [],
+            $this->createHeaders()
+        );
+
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertCount(1, $response);
+        $this->assertSame('/s/custom/object/edit/1', $response['redirect']);
+
+        $this->assertCustomObject($payload, 1);
+
+        // Delete CF
+        $payload['custom_object']['customFields'][0]['deleted'] = 1;
 
         $this->client->restart();
         $this->client->request(
@@ -516,6 +539,10 @@ class CustomObjectFormTest extends MauticMysqlTestCase
         $this->assertSame((bool) $expected['isPublished'], $customObject->isPublished());
 
         $customFields = $customObject->getCustomFields();
+
+        if (!$customFields->count()) {
+            return;
+        }
 
         /*
          * @var int
