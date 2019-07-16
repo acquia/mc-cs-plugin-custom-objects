@@ -252,6 +252,12 @@ CustomObjectsForm = {
             // Add empty value option
             case 'select' :
             case 'multiselect':
+                let placeholder = mQuery('#objectFieldModal #custom_field_params_placeholder').val();
+
+                if (placeholder !== '') {
+                    mQuery('#objectFieldModal #custom_field_defaultValue').attr('data-placeholder', placeholder);
+                }
+
                 options = options + '<option value=""></option>';
                 break;
             case `radio_group` :
