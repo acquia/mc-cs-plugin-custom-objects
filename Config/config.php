@@ -694,6 +694,8 @@ return [
                     'mautic.custom.model.item',
                     'translator',
                     'custom_object.config.provider',
+                    'custom_object.query.filter.helper',
+                    'custom_object.query.filter.factory',
                 ],
             ],
             'custom_object.segments.filters_generate.subscriber'   => [

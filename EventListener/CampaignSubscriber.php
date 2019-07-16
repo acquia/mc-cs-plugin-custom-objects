@@ -28,9 +28,14 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
+use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
+use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
+use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 
 class CampaignSubscriber extends CommonSubscriber
 {
+    use DbalQueryTrait;
+
     /**
      * @var TranslatorInterface
      */
@@ -62,12 +67,24 @@ class CampaignSubscriber extends CommonSubscriber
     private $configProvider;
 
     /**
+     * @var QueryFilterHelper
+     */
+    private $queryFilterHelper;
+
+    /**
+     * @var QueryFilterFactory
+     */
+    private $queryFilterFactory;
+
+    /**
      * @param CustomFieldModel     $customFieldModel
      * @param CustomObjectModel    $customObjectModel
      * @param CustomItemRepository $customItemRepository
      * @param CustomItemModel      $customItemModel
      * @param TranslatorInterface  $translator
      * @param ConfigProvider       $configProvider
+     * @param QueryFilterHelper    $queryFilterHelper
+     * @param QueryFilterFactory           $queryFilterFactory
      */
     public function __construct(
         CustomFieldModel $customFieldModel,
@@ -75,7 +92,9 @@ class CampaignSubscriber extends CommonSubscriber
         CustomItemRepository $customItemRepository,
         CustomItemModel $customItemModel,
         TranslatorInterface $translator,
-        ConfigProvider $configProvider
+        ConfigProvider $configProvider,
+        QueryFilterHelper $queryFilterHelper,
+        QueryFilterFactory $queryFilterFactory
     ) {
         $this->customFieldModel     = $customFieldModel;
         $this->customObjectModel    = $customObjectModel;
@@ -83,6 +102,8 @@ class CampaignSubscriber extends CommonSubscriber
         $this->customItemModel      = $customItemModel;
         $this->translator           = $translator;
         $this->configProvider       = $configProvider;
+        $this->queryFilterHelper    = $queryFilterHelper;
+        $this->queryFilterFactory   = $queryFilterFactory;
     }
 
     /**
@@ -196,18 +217,44 @@ class CampaignSubscriber extends CommonSubscriber
             return;
         }
 
-        try {
-            $customItemId = $this->customItemRepository->findItemIdForValue(
-                $customField,
-                $contact,
-                $customField->getTypeObject()->getOperators()[$event->getConfig()['operator']]['expr'],
-                $event->getConfig()['value']
-            );
+        $fakeSegmentFilter = [
+            'glue'     => 'and',
+            'field'    => 'cmf_'.$customField->getId(),
+            'object'   => 'custom_object',
+            'type'     => $customField->getType(),
+            'filter'   => $event->getConfig()['value'],
+            'operator' => $event->getConfig()['operator'],
+            'display'  => null,
+        ];
 
+        $queryBuilder = $this->queryFilterFactory->configureQueryBuilderFromSegmentFilter(
+            $fakeSegmentFilter,
+            'queryAlias'
+        );
+
+        $this->queryFilterHelper->addContactIdRestriction($queryBuilder, 'queryAlias', (int) $contact->getId());
+        $queryBuilder->select('queryAlias_item.id');
+
+        $customItemId = $this->executeSelect($queryBuilder)->fetchColumn();
+        dump($event->getConfig()['operator']);
+        dump($customField->getTypeObject()->getOperators()[$event->getConfig()['operator']]);
+        dump($queryBuilder->getSQL());
+        dump($queryBuilder->getParameters());
+        dump($customItemId);
+
+        if ($customItemId) {
             $event->setChannel('customItem', $customItemId);
             $event->setResult(true);
-        } catch (NotFoundException $e) {
+        } else {
             $event->setResult(false);
         }
+
+        // $customItemId = $this->customItemRepository->findItemIdForValue(
+        //     $customField,
+        //     $contact,
+        //     $customField->getTypeObject()->getOperators()[$event->getConfig()['operator']]['expr'],
+        //     $event->getConfig()['value']
+        // );
+
     }
 }

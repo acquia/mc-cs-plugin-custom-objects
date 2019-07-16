@@ -83,11 +83,8 @@ class CampaignSubscriberTest extends KernelTestCase
         $this->createFreshDatabaseSchema($entityManager);
     }
 
-    public function testImportForAllFieldTypesWithValidValuesAndLinksPlusUpdateToo(): void
+    public function testTextFieldConditions(): void
     {
-        $fieldId      = 12;
-        $fieldAlias   = 'text-test-field';
-        $fieldValue   = 'abracadabra';
         $contact      = $this->createContact('john@doe.email');
         $customObject = $this->createCustomObjectWithAllFields($this->container, 'Campaign test object');
         $customItem   = new CustomItem($customObject);
@@ -96,21 +93,92 @@ class CampaignSubscriberTest extends KernelTestCase
 
         $this->customFieldValueModel->createValuesForItem($customItem);
 
-        $value = $customItem->findCustomFieldValueForFieldAlias($fieldAlias);
+        $value = $customItem->findCustomFieldValueForFieldAlias('text-test-field');
 
-        $value->setValue($fieldValue);
+        $value->setValue('abracadabra');
         
         $this->customItemModel->save($customItem);
         $this->customItemModel->linkEntity($customItem, 'contact', (int) $contact->getId());
 
-        $event = new CampaignExecutionEvent(
+        // Test equals the same text as the field value.
+        // $event = $this->createCampaignExecutionEvent(
+        //     $contact,
+        //     $value->getCustomField()->getId(),
+        //     '=',
+        //     'abracadabra'
+        // );
+
+        // $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        // $this->assertTrue($event->getResult());
+
+        // Test equals the different text as the field value.
+        // $event = $this->createCampaignExecutionEvent(
+        //     $contact,
+        //     $value->getCustomField()->getId(),
+        //     '=',
+        //     'unicorn'
+        // );
+
+        // $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        // $this->assertFalse($event->getResult());
+
+        // Test not equals the different text as the field value.
+        // $event = $this->createCampaignExecutionEvent(
+        //     $contact,
+        //     $value->getCustomField()->getId(),
+        //     '!=',
+        //     'unicorn'
+        // );
+
+        // $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        // $this->assertTrue($event->getResult());
+
+        // Test the text value is empty.
+        $event = $this->createCampaignExecutionEvent(
+            $contact,
+            $value->getCustomField()->getId(),
+            'empty',
+            'abracadabra'
+        );
+
+        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $this->assertFalse($event->getResult());
+
+        // Test the text value is not empty.
+        $event = $this->createCampaignExecutionEvent(
+            $contact,
+            $value->getCustomField()->getId(),
+            '!empty',
+            'abracadabra'
+        );
+
+        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $this->assertTrue($event->getResult());
+    }
+
+    /**
+     * @param Lead $contact
+     * @param int $fieldId
+     * @param string $operator
+     * @param string $fieldValue
+     * 
+     * @return CampaignExecutionEvent
+     */
+    private function createCampaignExecutionEvent(
+        Lead $contact,
+        int $fieldId,
+        string $operator,
+        string $fieldValue
+    ): CampaignExecutionEvent
+    {
+        return new CampaignExecutionEvent(
             [
                 'lead'  => $contact,
                 'event' => [
                     'type' => 'custom_item.1.fieldvalue',
                     'properties' => [
                         'field' => $fieldId,
-                        'operator' => '=',
+                        'operator' => $operator,
                         'value' => $fieldValue,
                     ],
                 ],
@@ -120,10 +188,6 @@ class CampaignSubscriberTest extends KernelTestCase
             ],
             null
         );
-
-        $this->campaignSubscriber->onCampaignTriggerCondition($event);
-
-        $this->assertTrue($event->getResult());
     }
 
     /**
