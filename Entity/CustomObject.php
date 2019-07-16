@@ -289,11 +289,11 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
      *
      * @throws NotFoundException
      */
-    public function getCustomFieldByOrder(int $order): CustomField
+    public function getCustomFieldByOrder($order)
     {
         /** @var CustomField $customField */
         foreach ($this->customFields as $customField) {
-            if ($customField->getOrder() === $order) {
+            if ($customField->getOrder() == $order) {
                 return $customField;
             }
         }
