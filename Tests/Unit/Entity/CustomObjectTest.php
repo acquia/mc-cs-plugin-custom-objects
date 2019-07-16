@@ -17,6 +17,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Mautic\CategoryBundle\Entity\Category;
 use Doctrine\Common\Collections\ArrayCollection;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -127,5 +128,24 @@ class CustomObjectTest extends \PHPUnit_Framework_TestCase
 
         $this->assertCount(1, $publishedFields);
         $this->assertSame($publishedField, $publishedFields->current());
+    }
+
+    public function testGetCfByOrder()
+    {
+        $object = new CustomObject();
+        $field1 = $this->createMock(CustomField::class);
+        $field2 = $this->createMock(CustomField::class);
+
+        $field1->method('getOrder')->willReturn(1);
+        $field2->method('getOrder')->willReturn(2);
+
+        $object->addCustomField($field1);
+        $object->addCustomField($field2);
+
+        $this->assertSame($field2, $object->getCustomFieldByOrder(2));
+
+        $this->expectException(NotFoundException::class);
+
+        $object->getCustomFieldByOrder(3);
     }
 }
