@@ -226,31 +226,32 @@ class SaveController extends AbstractFormController
             return;
         }
 
-        // $_POST data contains custom fields in reversed order
+        // Let's order received $_POST data and apply delete for existing CFs
         $customFields = [];
         foreach ($rawCustomObject['customFields'] as $customField) {
-            // We are using order key as key to access collection of CustomFields below
-            $customFields[$customField['order']] = $customField;
+            if ($customField['deleted'] && $customField['id']) {
+                // Remove deleted custom fields
+                $this->customObjectModel->removeCustomFieldById($customObject, (int) $customField['id']);
+            } else {
+                // We are using order key as key to access collection of CustomFields below
+                $customFields[(int) $customField['order']] = $customField;
+            }
         }
 
-        foreach ($customFields as $key => $rawCustomField) {
-            if ($rawCustomField['deleted'] && $rawCustomField['id']) {
-                // Remove deleted custom fields
-                $this->customObjectModel->removeCustomFieldById($customObject, (int) $rawCustomField['id']);
-            } else {
-                // Should be resolved better in form/transformer, but here it is more clear
-                $params = $rawCustomField['params'];
-                $params = $this->paramsToStringTransformer->reverseTransform($params);
+        foreach ($customFields as $order => $rawCustomField) {
+            // Should be resolved better in form/transformer, but here it is more clear
+            $params = $rawCustomField['params'];
+            $params = $this->paramsToStringTransformer->reverseTransform($params);
 
-                $options = $rawCustomField['options'];
-                $options = $this->optionsToStringTransformer->reverseTransform($options);
+            $options = $rawCustomField['options'];
+            $options = $this->optionsToStringTransformer->reverseTransform($options);
 
-                /** @var CustomField $customField */
-                $customField = $customObject->getCustomFields()->get($key);
-                $customField->setParams($params);
-                $customField->setOptions($options);
-                $customField->setDefaultValue(!empty($rawCustomField['defaultValue']) ? $rawCustomField['defaultValue'] : null);
-            }
+            /** @var CustomField $customField */
+            $customField = $customObject->getCustomFieldByOrder((int) $order);
+
+            $customField->setParams($params);
+            $customField->setOptions($options);
+            $customField->setDefaultValue(!empty($rawCustomField['defaultValue']) ? $rawCustomField['defaultValue'] : null);
         }
     }
 

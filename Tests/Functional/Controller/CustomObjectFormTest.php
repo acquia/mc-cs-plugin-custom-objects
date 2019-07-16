@@ -536,6 +536,143 @@ class CustomObjectFormTest extends MauticMysqlTestCase
         $this->assertCustomObject($payload, 1);
     }
 
+    public function testMultiselectWithRadioOrder(): void
+    {
+        $payload = ['custom_object' => [
+            'nameSingular' => 'Testing',
+            'namePlural'   => 'MultiOrder',
+            'alias'        => 'alias4all',
+            'description'  => 'description',
+            'customFields' => [
+                0 => [
+                    'id'           => '',
+                    'customObject' => '',
+                    'isPublished'  => '1',
+                    'type'         => 'multiselect',
+                    'order'        => '0',
+                    'label'        => 'Multiselect',
+                    'alias'        => '110',
+                    'required'     => '0',
+                    'options'      => '[
+                            {
+                                "label": "msl",
+                                "value": "msv",
+                                "order": "1"
+                            },
+                            {
+                                "label": "msl1",
+                                "value": "msl2",
+                                "order": "2"
+                            }
+                        ]',
+                    'params'       => '[]',
+                    'defaultValue' => ['msv'],
+                    'deleted'      => '',
+                ],
+            ],
+            'category'    => '',
+            'isPublished' => '0',
+            'buttons'     => ['apply' => ''],
+        ]];
+
+        $this->client->request(
+            'POST',
+            's/custom/object/save',
+            $payload,
+            [],
+            $this->createHeaders()
+        );
+
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertCount(1, $response);
+        $this->assertSame('/s/custom/object/edit/1', $response['redirect']);
+
+        $this->assertCustomObject($payload, 1);
+
+        $payload = ['custom_object' => [
+            'nameSingular' => 'Testing',
+            'namePlural'   => 'Multi',
+            'alias'        => 'alias4all',
+            'description'  => 'description',
+            'customFields' => [
+                8 => [
+                    'id'           => '',
+                    'customObject' => '',
+                    'isPublished'  => '0',
+                    'type'         => 'radio_group',
+                    'order'        => '0',
+                    'label'        => 'Radio group',
+                    'alias'        => '18',
+                    'required'     => '1',
+                    'options'      => '[
+                            {
+                                "label": "rl",
+                                "value": "rv",
+                                "order": "1"
+                            },
+                            {
+                                "label": "rl1",
+                                "value": "rl2",
+                                "order": "2"
+                            }
+                        ]',
+                    'params'       => '[]',
+                    'defaultValue' => 'rv',
+                    'deleted'      => '',
+                ],
+                1 => [
+                    'id'           => 1,
+                    'customObject' => 1,
+                    'isPublished'  => '1',
+                    'type'         => 'multiselect',
+                    'order'        => '1',
+                    'label'        => 'Multiselect',
+                    'alias'        => '110',
+                    'required'     => '0',
+                    'options'      => '[
+                            {
+                                "label": "msl",
+                                "value": "msv",
+                                "order": "1"
+                            },
+                            {
+                                "label": "msl1",
+                                "value": "msl2",
+                                "order": "2"
+                            }
+                        ]',
+                    'params'       => '[]',
+                    'defaultValue' => ['msv'],
+                    'deleted'      => '',
+                ],
+            ],
+            'category'    => '',
+            'isPublished' => '0',
+            'buttons'     => ['apply' => ''],
+        ]];
+
+        $this->client->restart();
+        $this->client->request(
+            'POST',
+            's/custom/object/save/1',
+            $payload,
+            [],
+            $this->createHeaders()
+        );
+
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertCount(1, $response);
+        $this->assertSame('/s/custom/object/edit/1', $response['redirect']);
+
+        $this->assertCustomObject($payload, 1);
+    }
+
     /**
      * @param string[] $expected
      * @param int      $id
@@ -554,9 +691,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
         $this->assertSame($expected['description'], $customObject->getDescription());
         $this->assertSame((bool) $expected['isPublished'], $customObject->isPublished());
 
-        $customFields = $customObject->getCustomFields();
-
-        if (!$customFields->count()) {
+        if (!$customObject->getCustomFields()->count()) {
             return;
         }
 
@@ -565,7 +700,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
          * @var CustomField $customField
          */
         foreach ($expected['customFields'] as $key => $expectedCf) {
-            $customField = $customFields->get($key);
+            $customField = $customObject->getCustomFieldByOrder((int) $expectedCf['order']);
             $this->assertSame($customObject, $customField->getCustomObject());
 
             $this->assertSame((bool) $expectedCf['isPublished'], $customField->isPublished());
