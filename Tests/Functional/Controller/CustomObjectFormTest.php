@@ -691,9 +691,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
         $this->assertSame($expected['description'], $customObject->getDescription());
         $this->assertSame((bool) $expected['isPublished'], $customObject->isPublished());
 
-        $customFields = $customObject->getCustomFields();
-
-        if (!$customFields->count()) {
+        if (!$customObject->getCustomFields()->count()) {
             return;
         }
 
@@ -702,7 +700,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
          * @var CustomField $customField
          */
         foreach ($expected['customFields'] as $key => $expectedCf) {
-            $customField = $customFields->get($key);
+            $customField = $customObject->getCustomFieldByOrder((int) $expectedCf['order']);
             $this->assertSame($customObject, $customField->getCustomObject());
 
             $this->assertSame((bool) $expectedCf['isPublished'], $customField->isPublished());
