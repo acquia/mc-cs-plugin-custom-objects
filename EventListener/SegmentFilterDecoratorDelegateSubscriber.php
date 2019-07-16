@@ -46,14 +46,16 @@ class SegmentFilterDecoratorDelegateSubscriber implements EventSubscriberInterfa
     /**
      * @param LeadListFiltersDecoratorDelegateEvent $delegateEvent
      */
-    public function onDecoratorDelegate(LeadListFiltersDecoratorDelegateEvent $delegateEvent): void {
+    public function onDecoratorDelegate(LeadListFiltersDecoratorDelegateEvent $delegateEvent): void
+    {
         $crate = $delegateEvent->getCrate();
 
-        if ($crate->getObject()==='custom_object') {
-            switch($crate->getType()) {
+        if ('custom_object' === $crate->getObject()) {
+            switch ($crate->getType()) {
                 case 'multiselect':
                     $delegateEvent->setDecorator($this->multiselectDecorator);
                     $delegateEvent->stopPropagation();
+
                     break;
             }
         }

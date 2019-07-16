@@ -55,8 +55,7 @@ class QueryFilterHelper
         string $builderAlias,
         int $fieldId,
         ?string $fieldType = null
-    ): QueryBuilder
-    {
+    ): QueryBuilder {
         $queryBuilder      = new QueryBuilder($connection);
         $fieldType         = $fieldType ?: $this->getCustomFieldType($queryBuilder, $fieldId);
         $valueQueryBuilder = $this->getBasicItemQueryBuilder($queryBuilder, $builderAlias);
@@ -132,7 +131,6 @@ class QueryFilterHelper
 
         $this->addOperatorExpression($queryBuilder, $tableAlias, $expression, $filter->getOperator(),
             $filter->getParameterValue());
-
     }
 
     /**
@@ -171,8 +169,7 @@ class QueryFilterHelper
         string $tableAlias,
         string $operator,
         string $value
-    ): void
-    {
+    ): void {
         $expression = $this->getCustomObjectNameExpression($queryBuilder, $tableAlias, $operator);
         $this->addOperatorExpression($queryBuilder, $tableAlias, $expression, $operator, $value);
     }
@@ -190,8 +187,7 @@ class QueryFilterHelper
         $expression,
         string $operator,
         $value
-    ): void
-    {
+    ): void {
         $valueType = null;
 
         switch ($operator) {
@@ -216,6 +212,7 @@ class QueryFilterHelper
                 break;
             default:
                 $queryBuilder->andWhere($expression);
+
                 break;
         }
 
@@ -239,8 +236,7 @@ class QueryFilterHelper
         QueryBuilder $customQuery,
         string $glue,
         string $operator
-    ): void
-    {
+    ): void {
         switch ($operator) {
             case 'empty':
             case 'notIn':

@@ -20,7 +20,6 @@ use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\HiddenType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -105,7 +104,7 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
 
                 /** @var CustomField $customField */
                 foreach ($customObject->getCustomFields()->getIterator() as $customField) {
-                    if ($customField->getType()===$fieldTypes[HiddenType::NAME]) { // We don't want to show hidden types in filter list
+                    if ($customField->getType() === $fieldTypes[HiddenType::NAME]) { // We don't want to show hidden types in filter list
                         continue;
                     }
 

@@ -758,7 +758,6 @@ return [
                     'custom_object.segment_decorator_multiselect'
                 ],
             ],
-
         ],
         'forms' => [
             'custom_item.item.form' => [

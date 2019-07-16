@@ -51,7 +51,6 @@ class QueryFilterFactory
         $this->queryFilterHelper = $queryFilterHelper;
     }
 
-
     /**
      * @param mixed[] $segmentFilter
      *

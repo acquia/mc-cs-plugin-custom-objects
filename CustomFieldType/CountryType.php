@@ -17,9 +17,6 @@ use Mautic\LeadBundle\Helper\FormFieldHelper;
 
 class CountryType extends SelectType
 {
-    /** @var array */
-    private $countryList;
-
     /**
      * @var string
      */
@@ -31,11 +28,16 @@ class CountryType extends SelectType
     protected $key = 'country';
 
     /**
+     * @var string[]
+     */
+    private $countryList;
+
+    /**
      * {@inheritdoc}
      */
-    public function getChoices()
+    public function getChoices(): array
     {
-        if (is_null($this->countryList)) {
+        if (null === $this->countryList) {
             $this->countryList = array_flip(FormFieldHelper::getCountryChoices());
         }
 

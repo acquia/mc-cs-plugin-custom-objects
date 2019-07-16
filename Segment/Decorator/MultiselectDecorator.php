@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /*
@@ -20,7 +21,7 @@ class MultiselectDecorator extends CustomMappedDecorator
     /**
      * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
      *
-     * @return array
+     * @return string[]
      */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate): array
     {

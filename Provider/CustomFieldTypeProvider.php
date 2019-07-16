@@ -61,15 +61,16 @@ class CustomFieldTypeProvider
     }
 
     /**
-     * @return array
+     * @return mixed[]
      */
-    public function getKeyTypeMapping(): array {
+    public function getKeyTypeMapping(): array
+    {
         $mapping = [];
-        array_walk($this->customFieldTypes, function($key, $val) use (&$mapping){
+        array_walk($this->customFieldTypes, function ($key, $val) use (&$mapping): void {
             /** @var AbstractCustomFieldType $key */
-           $mapping[$key::NAME] = $val;
-
+            $mapping[$key::NAME] = $val;
         });
+
         return $mapping;
     }
 }
