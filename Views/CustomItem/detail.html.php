@@ -48,7 +48,11 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
                                 <th><?php echo $view->escape($fieldValue->getCustomField()->getName()); ?></th>
                                 <td>
                                     <?php if ($fieldValue->getValue() instanceof \DateTimeInterface) : ?>
-                                        <?php echo $view['date']->toFull($fieldValue->getValue()); ?>
+                                        <?php if ('date' === $fieldValue->getCustomField()->getType()) : ?>
+                                            <?php echo $view['date']->toDate($fieldValue->getValue()); ?>
+                                        <?php else : // This must be 'datetime' field?>
+                                            <?php echo $view['date']->toFull($fieldValue->getValue()); ?>
+                                        <?php endif; ?>
                                     <?php elseif (is_array($fieldValue->getValue())) : ?>
                                         <?php echo $view->escape($view['formatter']->arrayToString($fieldValue->getValue())); ?>
                                     <?php else : ?>
