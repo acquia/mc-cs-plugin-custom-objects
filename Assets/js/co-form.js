@@ -181,7 +181,7 @@ CustomObjectsForm = {
     },
 
     initCancelModal() {
-        mQuery('button.btn-cancel')
+        mQuery('#objectFieldModal button.btn-cancel')
             .unbind('click')
             .bind('click', function() {
                 mQuery('#objectFieldModal').modal('hide');
