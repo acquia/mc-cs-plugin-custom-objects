@@ -43,8 +43,6 @@ class CustomFieldTypeProvider
      */
     public function getType(string $key): CustomFieldTypeInterface
     {
-        $this->getTypes();
-
         if (isset($this->customFieldTypes[$key])) {
             return $this->customFieldTypes[$key];
         }
@@ -66,7 +64,9 @@ class CustomFieldTypeProvider
     public function getKeyTypeMapping(): array
     {
         $mapping = [];
-        array_walk($this->customFieldTypes, function ($key, $val) use (&$mapping): void {
+        $types = $this->getTypes();
+
+        array_walk($types, function ($key, $val) use (&$mapping): void {
             /** @var AbstractCustomFieldType $key */
             $mapping[$key::NAME] = $val;
         });
