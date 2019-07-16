@@ -37,7 +37,7 @@ class QueryFilterFactory
     private $queryFilterHelper;
 
     /**
-     * @param Connection                  $filterFactory
+     * @param Connection                  $connection
      * @param ContactSegmentFilterFactory $filterFactory
      * @param QueryFilterHelper           $queryFilterHelper
      */
@@ -57,6 +57,8 @@ class QueryFilterFactory
      * @return QueryBuilder
      *
      * @throws InvalidSegmentFilterException
+     * @throws \MauticPlugin\CustomObjectsBundle\Exception\NotFoundException
+     * @throws \Exception
      */
     public function configureQueryBuilderFromSegmentFilter(array $segmentFilter, string $queryAlias): QueryBuilder
     {

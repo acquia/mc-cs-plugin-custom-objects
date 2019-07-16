@@ -565,6 +565,13 @@ return [
                     \MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact::class,
                 ],
             ],
+            'custom_object.segment_decorator_multiselect' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Decorator\MultiselectDecorator::class,
+                'arguments' => [
+                    'mautic.lead.model.lead_segment_filter_operator',
+                    'mautic.lead.repository.lead_segment_filter_descriptor',
+                ],
+            ],
         ],
         'events' => [
             'custom_object.api.subscriber' => [
@@ -702,6 +709,7 @@ return [
                     'custom_object.repository',
                     'translator',
                     'custom_object.config.provider',
+                    'custom_field.type.provider'
                 ],
             ],
             'custom_object.segments.filters_dictionary.subscriber' => [
@@ -742,6 +750,12 @@ return [
                     'mautic.custom.model.item',
                     'custom_object.token.parser',
                     'mautic.campaign.model.event',
+                ],
+            ],
+            'custom_object.segments.decorator_delegate.subscriber'   => [
+                'class'    => \MauticPlugin\CustomObjectsBundle\EventListener\SegmentFilterDecoratorDelegateSubscriber::class,
+                'arguments'=> [
+                    'custom_object.segment_decorator_multiselect'
                 ],
             ],
         ],

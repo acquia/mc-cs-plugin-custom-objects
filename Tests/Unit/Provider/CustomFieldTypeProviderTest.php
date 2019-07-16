@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Provider;
 
+use Mautic\CoreBundle\Translation\Translator;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateTimeType;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateType;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
@@ -31,5 +34,32 @@ class CustomFieldTypeProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->expectException(NotFoundException::class);
         $customFieldTypeProvider->getType('unicorn');
+    }
+
+    public function testKeyTypeMapping(): void
+    {
+        $mockTranslator = $this->createMock(Translator::class);
+
+        $typesArray = [
+            'custom.field.type.date'      => new DateType($mockTranslator),
+            'custom.field.type.datetime'  => new DateTimeType($mockTranslator),
+        ];
+
+        $mockTranslator->expects($this->exactly(count($typesArray)))->method('trans')
+            ->willReturnCallback(function ($argument) {return $argument; });
+
+        $typeProvider = new CustomFieldTypeProvider();
+
+        $match = [];
+
+        foreach ($typesArray as $type) {
+            $typeProvider->addType($type);
+            $match[$type->getName()] = $type->getKey();
+        }
+
+        $mapping = $typeProvider->getKeyTypeMapping();
+
+        $this->assertSame(count($typesArray), count($mapping));
+        $this->assertSame($match, $mapping);
     }
 }

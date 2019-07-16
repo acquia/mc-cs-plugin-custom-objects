@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 
@@ -47,7 +48,7 @@ class QueryFilterHelper
      *
      * @return QueryBuilder
      *
-     * @throws InvalidArgumentException
+     * @throws NotFoundException
      */
     public function createValueQueryBuilder(
         Connection $connection,
@@ -127,6 +128,7 @@ class QueryFilterHelper
         ContactSegmentFilter $filter): void
     {
         $expression = $this->getCustomValueValueExpression($queryBuilder, $tableAlias, $filter->getOperator());
+
         $this->addOperatorExpression($queryBuilder, $tableAlias, $expression, $filter->getOperator(),
             $filter->getParameterValue());
     }
@@ -192,13 +194,11 @@ class QueryFilterHelper
             case 'empty':
             case 'notEmpty':
                 break;
+            case '!multiselect':
             case 'notIn':
-                $valueType      = (string) $queryBuilder->getConnection()::PARAM_STR_ARRAY;
-                $valueParameter = $tableAlias.'_value_value';
-
-                break;
+            case 'multiselect':
             case 'in':
-                $valueType      = (string) $queryBuilder->getConnection()::PARAM_STR_ARRAY;
+                $valueType      = $queryBuilder->getConnection()::PARAM_STR_ARRAY;
                 $valueParameter = $tableAlias.'_value_value';
 
                 break;
@@ -209,11 +209,6 @@ class QueryFilterHelper
         switch ($operator) {
             case 'empty':
             case 'notIn':
-                break;
-            case 'neq':
-            case 'notLike':
-                $queryBuilder->andWhere($expression);
-
                 break;
             default:
                 $queryBuilder->andWhere($expression);
@@ -294,14 +289,9 @@ class QueryFilterHelper
 
                 break;
             case 'notIn':
-                $valueParameter = $tableAlias.'_value_value';
-                $expression     = $customQuery->expr()->in(
-                    $tableAlias.'_value.value',
-                    ":${valueParameter}"
-                );
-
-                break;
+            case '!multiselect':
             case 'in':
+            case 'multiselect':
                 $valueParameter = $tableAlias.'_value_value';
                 $expression     = $customQuery->expr()->in(
                     $tableAlias.'_value.value',
@@ -323,7 +313,6 @@ class QueryFilterHelper
                 $expression = $customQuery->expr()->like($tableAlias.'_value.value', "%:{$valueParameter}%");
 
                 break;
-
             case 'notLike':
                 $valueParameter = $tableAlias.'_value_value';
 
@@ -362,13 +351,6 @@ class QueryFilterHelper
 
                 break;
             case 'notIn':
-                $valueParameter = $tableAlias.'_value_value';
-                $expression     = $customQuery->expr()->in(
-                    $tableAlias.'_item.name',
-                    ":${valueParameter}"
-                );
-
-                break;
             case 'in':
                 $valueParameter = $tableAlias.'_value_value';
                 $expression     = $customQuery->expr()->in(
@@ -412,7 +394,7 @@ class QueryFilterHelper
      *
      * @return QueryBuilder
      *
-     * @throws InvalidArgumentException
+     * @throws NotFoundException
      */
     private function addCustomFieldValueJoin(QueryBuilder $customFieldQueryBuilder, string $alias, string $fieldType): QueryBuilder
     {
