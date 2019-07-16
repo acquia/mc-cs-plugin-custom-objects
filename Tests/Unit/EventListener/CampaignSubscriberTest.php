@@ -26,8 +26,13 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
+use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
+use Doctrine\DBAL\Statement;
 
 class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -39,7 +44,6 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
 
     private $customFieldModel;
     private $customObjectModel;
-    private $customItemRepository;
     private $customItemModel;
     private $translator;
     private $campaignBuilderEvent;
@@ -48,6 +52,12 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
     private $customField;
     private $contact;
     private $configProvider;
+    private $queryFilterHelper;
+    private $queryFilterFactory;
+    private $connection;
+    private $queryBuilder;
+    private $segmentQueryBuilder;
+    private $statement;
 
     /**
      * @var CampaignSubscriber
@@ -60,22 +70,29 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $this->customFieldModel       = $this->createMock(CustomFieldModel::class);
         $this->customObjectModel      = $this->createMock(CustomObjectModel::class);
-        $this->customItemRepository   = $this->createMock(CustomItemRepository::class);
         $this->customItemModel        = $this->createMock(CustomItemModel::class);
         $this->translator             = $this->createMock(TranslatorInterface::class);
         $this->configProvider         = $this->createMock(ConfigProvider::class);
+        $this->queryFilterHelper      = $this->createMock(QueryFilterHelper::class);
+        $this->queryFilterFactory     = $this->createMock(QueryFilterFactory::class);
+        $this->connection             = $this->createMock(Connection::class);
         $this->campaignBuilderEvent   = $this->createMock(CampaignBuilderEvent::class);
         $this->campaignExecutionEvent = $this->createMock(CampaignExecutionEvent::class);
         $this->customObject           = $this->createMock(CustomObject::class);
         $this->customField            = $this->createMock(CustomField::class);
         $this->contact                = $this->createMock(Lead::class);
+        $this->queryBuilder           = $this->createMock(QueryBuilder::class);
+        $this->segmentQueryBuilder    = $this->createMock(SegmentQueryBuilder::class);
+        $this->statement              = $this->createMock(Statement::class);
         $this->campaignSubscriber     = new CampaignSubscriber(
             $this->customFieldModel,
             $this->customObjectModel,
-            $this->customItemRepository,
             $this->customItemModel,
             $this->translator,
-            $this->configProvider
+            $this->configProvider,
+            $this->queryFilterHelper,
+            $this->queryFilterFactory,
+            $this->connection
         );
 
         $this->customObject->method('getId')->willReturn(self::OBJECT_ID);
@@ -330,6 +347,22 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('pluginIsEnabled')
             ->willReturn(true);
 
+        $this->connection->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($this->queryBuilder);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('execute')
+            ->willReturn($this->statement);
+
+        $this->queryFilterFactory->expects($this->once())
+            ->method('configureQueryBuilderFromSegmentFilter')
+            ->willReturn($this->segmentQueryBuilder);
+
+        $this->segmentQueryBuilder->expects($this->once())
+            ->method('getParameters')
+            ->willReturn([]);
+
         $this->campaignExecutionEvent->expects($this->once())
             ->method('getEvent')
             ->willReturn(['type' => 'custom_item.63.fieldvalue']);
@@ -338,8 +371,7 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getLead')
             ->willReturn($this->contact);
 
-        $this->campaignExecutionEvent->expects($this->exactly(3))
-            ->method('getConfig')
+        $this->campaignExecutionEvent->method('getConfig')
             ->willReturn([
                 'field'    => '432',
                 'operator' => 'like',
@@ -350,10 +382,9 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('fetchEntity')
             ->willReturn($this->customField);
 
-        $this->customItemRepository->expects($this->once())
-            ->method('findItemIdForValue')
-            ->with($this->customField, $this->contact, 'like', 'value A')
-            ->will($this->throwException(new NotFoundException()));
+        $this->statement->expects($this->once())
+            ->method('fetchColumn')
+            ->willReturn(false);
 
         $this->campaignExecutionEvent->expects($this->once())
             ->method('setResult')
@@ -368,6 +399,22 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('pluginIsEnabled')
             ->willReturn(true);
 
+        $this->connection->expects($this->once())
+            ->method('createQueryBuilder')
+            ->willReturn($this->queryBuilder);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('execute')
+            ->willReturn($this->statement);
+
+        $this->queryFilterFactory->expects($this->once())
+            ->method('configureQueryBuilderFromSegmentFilter')
+            ->willReturn($this->segmentQueryBuilder);
+
+        $this->segmentQueryBuilder->expects($this->once())
+            ->method('getParameters')
+            ->willReturn([]);
+
         $this->campaignExecutionEvent->expects($this->once())
             ->method('getEvent')
             ->willReturn(['type' => 'custom_item.63.fieldvalue']);
@@ -376,8 +423,7 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getLead')
             ->willReturn($this->contact);
 
-        $this->campaignExecutionEvent->expects($this->exactly(3))
-            ->method('getConfig')
+        $this->campaignExecutionEvent->method('getConfig')
             ->willReturn([
                 'field'    => '432',
                 'operator' => 'like',
@@ -388,14 +434,13 @@ class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('fetchEntity')
             ->willReturn($this->customField);
 
-        $this->customItemRepository->expects($this->once())
-            ->method('findItemIdForValue')
-            ->with($this->customField, $this->contact, 'like', 'value A')
-            ->willReturn(4344);
-
         $this->campaignExecutionEvent->expects($this->once())
             ->method('setChannel')
             ->with('customItem', 4344);
+
+        $this->statement->expects($this->once())
+            ->method('fetchColumn')
+            ->willReturn('4344');
 
         $this->campaignExecutionEvent->expects($this->once())
             ->method('setResult')
