@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * @copyright   2018 Mautic Contributors. All rights reserved
@@ -19,7 +20,7 @@ class MultiselectDecorator extends CustomMappedDecorator
     /**
      * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
      *
-     * @return array|bool|float|string|null
+     * @return array
      */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate): array
     {

@@ -27,9 +27,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 
-/**
- * SegmentFiltersChoicesGenerateSubscriber.
- */
 class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterface
 {
     use OperatorListTrait;
@@ -69,7 +66,7 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
         $this->customObjectRepository = $customObjectRepository;
         $this->translator             = $translator;
         $this->configProvider         = $configProvider;
-        $this->fieldTypeProvider        = $fieldTypeProvider;
+        $this->fieldTypeProvider      = $fieldTypeProvider;
     }
 
     /**
