@@ -312,7 +312,7 @@ class QueryFilterHelper
             case 'neq':
                 $valueParameter = $tableAlias.'_value_value';
                 $expression     = $customQuery->expr()->orX(
-                    $customQuery->expr()->eq($tableAlias.'_value.value', ":${valueParameter}"),
+                    $customQuery->expr()->neq($tableAlias.'_value.value', ":${valueParameter}"),
                     $customQuery->expr()->isNull($tableAlias.'_value.value')
                 );
 
