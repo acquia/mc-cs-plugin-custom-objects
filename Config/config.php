@@ -690,12 +690,12 @@ return [
                 'arguments' => [
                     'mautic.custom.model.field',
                     'mautic.custom.model.object',
-                    'custom_item.repository',
                     'mautic.custom.model.item',
                     'translator',
                     'custom_object.config.provider',
                     'custom_object.query.filter.helper',
                     'custom_object.query.filter.factory',
+                    'database_connection',
                 ],
             ],
             'custom_object.segments.filters_generate.subscriber'   => [

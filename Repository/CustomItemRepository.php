@@ -15,8 +15,6 @@ namespace MauticPlugin\CustomObjectsBundle\Repository;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Mautic\LeadBundle\Entity\Lead;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Doctrine\ORM\Query\Expr\Join;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
@@ -71,43 +69,6 @@ class CustomItemRepository extends CommonRepository
         $queryBuilder->setParameter('customItemId', $customItem->getId());
 
         return (int) $queryBuilder->getQuery()->getSingleScalarResult();
-    }
-
-    /**
-     * @param CustomField $customField
-     * @param Lead        $contact
-     * @param string      $expr
-     * @param mixed       $value
-     *
-     * @return int
-     *
-     * @throws NotFoundException
-     */
-    public function findItemIdForValue(CustomField $customField, Lead $contact, string $expr, $value): int
-    {
-        $fieldType    = $customField->getTypeObject();
-        $queryBuilder = $this->_em->getConnection()->createQueryBuilder();
-        $queryBuilder->select('ci.id');
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX.CustomItem::TABLE_NAME, 'ci');
-        $queryBuilder->innerJoin('ci', MAUTIC_TABLE_PREFIX.'custom_item_xref_contact', 'cixcont', 'cixcont.custom_item_id = ci.id');
-        $queryBuilder->innerJoin('ci', $fieldType->getTableName(), $fieldType->getTableAlias(), "{$fieldType->getTableAlias()}.custom_item_id = ci.id");
-        $queryBuilder->where('cixcont.contact_id = :contactId');
-        $queryBuilder->setParameter('contactId', $contact->getId());
-        $queryBuilder->andWhere("{$fieldType->getTableAlias()}.custom_field_id = :customFieldId");
-        $queryBuilder->setParameter('customFieldId', $customField->getId());
-        $queryBuilder->andWhere($queryBuilder->expr()->{$expr}("{$fieldType->getTableAlias()}.value", ':value'));
-        $queryBuilder->setParameter('value', $value);
-
-        $result = $this->executeSelect($queryBuilder)->fetchColumn();
-
-        if (false === $result) {
-            $stringValue = print_r($value, true);
-            $msg         = "Custom Item for contact {$contact->getId()}, custom field {$customField->getId()} and value {$expr} {$stringValue} was not found.";
-
-            throw new NotFoundException($msg);
-        }
-
-        return (int) $result;
     }
 
     /**

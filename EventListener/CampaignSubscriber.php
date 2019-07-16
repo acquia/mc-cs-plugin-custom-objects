@@ -27,10 +27,11 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
+use Doctrine\DBAL\Connection;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 
 class CampaignSubscriber extends CommonSubscriber
 {
@@ -50,11 +51,6 @@ class CampaignSubscriber extends CommonSubscriber
      * @var CustomObjectModel
      */
     private $customObjectModel;
-
-    /**
-     * @var CustomItemRepository
-     */
-    private $customItemRepository;
 
     /**
      * @var CustomItemModel
@@ -77,33 +73,38 @@ class CampaignSubscriber extends CommonSubscriber
     private $queryFilterFactory;
 
     /**
-     * @param CustomFieldModel     $customFieldModel
-     * @param CustomObjectModel    $customObjectModel
-     * @param CustomItemRepository $customItemRepository
-     * @param CustomItemModel      $customItemModel
-     * @param TranslatorInterface  $translator
-     * @param ConfigProvider       $configProvider
-     * @param QueryFilterHelper    $queryFilterHelper
-     * @param QueryFilterFactory           $queryFilterFactory
+     * @var Connection
+     */
+    private $connection;
+
+    /**
+     * @param CustomFieldModel    $customFieldModel
+     * @param CustomObjectModel   $customObjectModel
+     * @param CustomItemModel     $customItemModel
+     * @param TranslatorInterface $translator
+     * @param ConfigProvider      $configProvider
+     * @param QueryFilterHelper   $queryFilterHelper
+     * @param QueryFilterFactory  $queryFilterFactory
+     * @param Connection          $connection
      */
     public function __construct(
         CustomFieldModel $customFieldModel,
         CustomObjectModel $customObjectModel,
-        CustomItemRepository $customItemRepository,
         CustomItemModel $customItemModel,
         TranslatorInterface $translator,
         ConfigProvider $configProvider,
         QueryFilterHelper $queryFilterHelper,
-        QueryFilterFactory $queryFilterFactory
+        QueryFilterFactory $queryFilterFactory,
+        Connection $connection
     ) {
-        $this->customFieldModel     = $customFieldModel;
-        $this->customObjectModel    = $customObjectModel;
-        $this->customItemRepository = $customItemRepository;
-        $this->customItemModel      = $customItemModel;
-        $this->translator           = $translator;
-        $this->configProvider       = $configProvider;
-        $this->queryFilterHelper    = $queryFilterHelper;
-        $this->queryFilterFactory   = $queryFilterFactory;
+        $this->customFieldModel   = $customFieldModel;
+        $this->customObjectModel  = $customObjectModel;
+        $this->customItemModel    = $customItemModel;
+        $this->translator         = $translator;
+        $this->configProvider     = $configProvider;
+        $this->queryFilterHelper  = $queryFilterHelper;
+        $this->queryFilterFactory = $queryFilterFactory;
+        $this->connection         = $connection;
     }
 
     /**
@@ -217,6 +218,8 @@ class CampaignSubscriber extends CommonSubscriber
             return;
         }
 
+        $queryAlias = 'q1';
+
         $fakeSegmentFilter = [
             'glue'     => 'and',
             'field'    => 'cmf_'.$customField->getId(),
@@ -227,20 +230,32 @@ class CampaignSubscriber extends CommonSubscriber
             'display'  => null,
         ];
 
-        $queryBuilder = $this->queryFilterFactory->configureQueryBuilderFromSegmentFilter(
+        $queryBuilder = $this->connection->createQueryBuilder();
+        $queryBuilder->select(CustomItem::TABLE_ALIAS.'.id');
+        $queryBuilder->from(MAUTIC_TABLE_PREFIX.CustomItem::TABLE_NAME, CustomItem::TABLE_ALIAS);
+
+        $innerQueryBuilder = $this->queryFilterFactory->configureQueryBuilderFromSegmentFilter(
             $fakeSegmentFilter,
-            'queryAlias'
+            $queryAlias
         );
 
-        $this->queryFilterHelper->addContactIdRestriction($queryBuilder, 'queryAlias', (int) $contact->getId());
-        $queryBuilder->select('queryAlias_item.id');
+        $this->queryFilterHelper->addContactIdRestriction($innerQueryBuilder, $queryAlias, (int) $contact->getId());
+        $innerQueryBuilder->select($queryAlias.'_item.id');
+
+        $negator = in_array($event->getConfig()['operator'], ['empty', 'neq', 'notLike'], true) ? '!' : '';
+
+        $queryBuilder->innerJoin(
+            CustomItem::TABLE_ALIAS,
+            "({$innerQueryBuilder->getSQL()})",
+            $queryAlias,
+            CustomItem::TABLE_ALIAS.".id {$negator}= {$queryAlias}.id"
+        );
+
+        foreach ($innerQueryBuilder->getParameters() as $key => $value) {
+            $queryBuilder->setParameter($key, $value);
+        }
 
         $customItemId = $this->executeSelect($queryBuilder)->fetchColumn();
-        dump($event->getConfig()['operator']);
-        dump($customField->getTypeObject()->getOperators()[$event->getConfig()['operator']]);
-        dump($queryBuilder->getSQL());
-        dump($queryBuilder->getParameters());
-        dump($customItemId);
 
         if ($customItemId) {
             $event->setChannel('customItem', $customItemId);
@@ -248,13 +263,5 @@ class CampaignSubscriber extends CommonSubscriber
         } else {
             $event->setResult(false);
         }
-
-        // $customItemId = $this->customItemRepository->findItemIdForValue(
-        //     $customField,
-        //     $contact,
-        //     $customField->getTypeObject()->getOperators()[$event->getConfig()['operator']]['expr'],
-        //     $event->getConfig()['value']
-        // );
-
     }
 }
