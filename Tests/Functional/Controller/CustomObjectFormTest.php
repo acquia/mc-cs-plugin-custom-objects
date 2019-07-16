@@ -52,7 +52,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                         'required'     => '',
                         'params'       => '{
                             "requiredValidationMessage": "aa",
-                            "emptyValue": "bb"
+                            "placeholder": "bb"
                         }',
                         'options'      => '[
                             {
@@ -177,7 +177,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                         'required'     => '',
                         'params'       => '{
                             "requiredValidationMessage": "This is required",
-                            "emptyValue": "empty value"
+                            "placeholder": "select option"
                         }',
                         'options'      => '[
                             {

@@ -12,7 +12,7 @@
 /** @var \MauticPlugin\CustomObjectsBundle\Entity\CustomField $customField */
 $title = $customField->getId() ? $customField->getLabel() : $customField->getTypeObject()->getName();
 
-$showProperties = isset($form['options']) || $customField->getTypeObject()->useEmptyValue();
+$showProperties = isset($form['options']) || $customField->getTypeObject()->usePlaceholder();
 ?>
 
 <div class="bundle-form">
@@ -89,9 +89,9 @@ $showProperties = isset($form['options']) || $customField->getTypeObject()->useE
 <?php endif; ?>
                 </div>
                 <div class="row">
-<?php if ($customField->getTypeObject()->useEmptyValue()): ?>
+<?php if ($customField->getTypeObject()->usePlaceholder()): ?>
                     <div class="col-md-6">
-                        <?php echo $view['form']->row($form['params']['emptyValue']); ?>
+                        <?php echo $view['form']->row($form['params']['placeholder']); ?>
                     </div>
 <?php endif; ?>
                 </div>

@@ -163,9 +163,9 @@ class AbstractCustomFieldTypeTest extends \PHPUnit_Framework_TestCase
         $this->fieldType->validateRequired($this->customField, '');
     }
 
-    public function testUseEmptyValue(): void
+    public function testUsePlaceholder(): void
     {
-        $this->assertFalse($this->fieldType->useEmptyValue());
+        $this->assertFalse($this->fieldType->usePlaceholder());
     }
 
     public function testCreateDefaultValueTransformer(): void

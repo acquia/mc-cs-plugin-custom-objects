@@ -34,8 +34,8 @@ class MultiselectTypeTest extends \PHPUnit_Framework_TestCase
         $this->fieldType  = new MultiselectType($this->translator, new CsvHelper());
     }
 
-    public function testUseEmptyValue(): void
+    public function testUsePlaceholder(): void
     {
-        $this->assertTrue($this->fieldType->useEmptyValue());
+        $this->assertTrue($this->fieldType->usePlaceholder());
     }
 }

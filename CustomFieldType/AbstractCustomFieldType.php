@@ -137,7 +137,7 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function useEmptyValue(): bool
+    public function usePlaceholder(): bool
     {
         return $this->hasChoices() && (!$this instanceof AbstractMultivalueType);
     }
