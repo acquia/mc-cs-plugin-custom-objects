@@ -21,6 +21,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
 use Symfony\Component\Form\DataTransformerInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\ViewDateTransformer;
+use DateTimeInterface;
 
 class DateType extends AbstractCustomFieldType
 {
@@ -121,5 +122,17 @@ class DateType extends AbstractCustomFieldType
     public function createViewTransformer(): DataTransformerInterface
     {
         return new ViewDateTransformer();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function valueToString($value): string
+    {
+        if ($value instanceof DateTimeInterface) {
+            return $value->format('Y-m-d');
+        }
+
+        return (string) $value;
     }
 }

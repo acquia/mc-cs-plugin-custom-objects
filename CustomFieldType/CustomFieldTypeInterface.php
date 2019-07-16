@@ -134,4 +134,11 @@ interface CustomFieldTypeInterface
      * @return DataTransformerInterface
      */
     public function createViewTransformer(): DataTransformerInterface;
+
+    /**
+     * @param mixed $value
+     *
+     * @return string
+     */
+    public function valueToString($value): string;
 }

@@ -39,6 +39,8 @@ use Mautic\CampaignBundle\Model\EventModel;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
 use Mautic\CampaignBundle\Event\CampaignEvent;
 use Mautic\CampaignBundle\Entity\Campaign;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
 {
@@ -404,6 +406,7 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
+        $customField            = $this->createMock(CustomField::class);
         $customObject           = $this->createMock(CustomObject::class);
         $customItemWithField    = $this->createMock(CustomItem::class);
         $customItemWithoutField = $this->createMock(CustomItem::class);
@@ -412,6 +415,14 @@ class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
         $valueEntity->expects($this->once())
             ->method('getValue')
             ->willReturn('The field value');
+
+        $valueEntity->expects($this->once())
+            ->method('getCustomField')
+            ->willReturn($customField);
+
+        $customField->expects($this->once())
+            ->method('getTypeObject')
+            ->willReturn(new TextType($this->createMock(TranslatorInterface::class)));
 
         $customObject->method('getId')->willReturn(1234);
 
