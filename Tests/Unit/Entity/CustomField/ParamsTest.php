@@ -20,17 +20,17 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
     public function testConstructorAndToArray()
     {
         $requiredValidationMessage = 'requiredValidationMessage';
-        $emptyValue                = 'emptyValue';
+        $placeholder               = 'placeholder';
 
         $paramsArray = [
             'requiredValidationMessage' => $requiredValidationMessage,
-            'emptyValue'                => $emptyValue,
+            'placeholder'               => $placeholder,
         ];
 
         $params = new Params($paramsArray);
 
         $this->assertSame($requiredValidationMessage, $params->getRequiredValidationMessage());
-        $this->assertSame($emptyValue, $params->getEmptyValue());
+        $this->assertSame($placeholder, $params->getPlaceholder());
 
         $this->assertSame($paramsArray, $params->__toArray());
     }
@@ -38,11 +38,11 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
     public function testToArrayRemovingFalseAndNullValues()
     {
         $requiredValidationMessage = 'requiredValidationMessage';
-        $emptyValue                = null;
+        $placeholder               = null;
 
         $paramsArray = [
             'requiredValidationMessage' => $requiredValidationMessage,
-            'emptyValue'                => $emptyValue,
+            'placeholder'               => $placeholder,
         ];
 
         $params = new Params($paramsArray);
@@ -52,15 +52,15 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
 
     public function testGettersSetters()
     {
-        $requiredValidationMessage = 'requiredValidationMessage';
-        $emptyValue                = 'emptyValue';
+        $requiredValidationMessage  = 'requiredValidationMessage';
+        $placeholder                = 'placeholder';
 
         $params = new Params();
 
         $params->setRequiredValidationMessage($requiredValidationMessage);
         $this->assertSame($requiredValidationMessage, $params->getRequiredValidationMessage());
 
-        $params->setEmptyValue($emptyValue);
-        $this->assertSame($emptyValue, $params->getEmptyValue());
+        $params->setPlaceholder($placeholder);
+        $this->assertSame($placeholder, $params->getPlaceholder());
     }
 }

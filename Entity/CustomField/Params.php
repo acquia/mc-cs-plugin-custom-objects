@@ -26,7 +26,7 @@ class Params
     /**
      * @var string|null
      */
-    private $emptyValue;
+    private $placeholder;
 
     /**
      * @param mixed[] $params
@@ -47,7 +47,7 @@ class Params
     {
         $return = [
             'requiredValidationMessage' => $this->requiredValidationMessage,
-            'emptyValue'                => $this->emptyValue,
+            'placeholder'               => $this->placeholder,
         ];
 
         // Remove null and false values as they are default
@@ -73,16 +73,16 @@ class Params
     /**
      * @return string|null
      */
-    public function getEmptyValue(): ?string
+    public function getPlaceholder(): ?string
     {
-        return $this->emptyValue;
+        return $this->placeholder;
     }
 
     /**
-     * @param string|null $emptyValue
+     * @param string|null $placeholder
      */
-    public function setEmptyValue(?string $emptyValue): void
+    public function setPlaceholder(?string $placeholder): void
     {
-        $this->emptyValue = $emptyValue;
+        $this->placeholder = $placeholder;
     }
 }

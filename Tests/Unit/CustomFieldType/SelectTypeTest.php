@@ -39,9 +39,9 @@ class SelectTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(ChoiceType::class, $this->fieldType->getSymfonyFormFieldType());
     }
 
-    public function testUseEmptyValue(): void
+    public function testUsePlaceholder(): void
     {
-        $this->assertTrue($this->fieldType->useEmptyValue());
+        $this->assertTrue($this->fieldType->usePlaceholder());
     }
 
     public function testGetOperators(): void

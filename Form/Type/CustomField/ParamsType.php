@@ -38,12 +38,12 @@ class ParamsType extends AbstractType
             ]
         );
 
-        if ($options['use_empty_value']) {
+        if ($options['use_placeholder']) {
             $builder->add(
-                'emptyValue',
+                'placeholder',
                 TextType::class,
                 [
-                    'label'      => 'custom.field.label.empty_value',
+                    'label'      => 'custom.field.label.placeholder',
                     'required'   => false,
                     'attr'       => [
                         'class'    => 'form-control',
@@ -64,7 +64,7 @@ class ParamsType extends AbstractType
                 'custom_object_form' => false,
                 'csrf_protection'    => false,
                 'has_choices'        => false,
-                'use_empty_value'    => false, // @see \MauticPlugin\CustomObjectsBundle\CustomFieldType\AbstractCustomFieldType::useEmptyValue()
+                'use_placeholder'    => false, // @see \MauticPlugin\CustomObjectsBundle\CustomFieldType\AbstractCustomFieldType::usePlaceholder()
             ]
         );
     }

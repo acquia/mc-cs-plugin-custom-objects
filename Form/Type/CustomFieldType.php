@@ -221,7 +221,7 @@ class CustomFieldType extends AbstractType
                 ParamsType::class,
                 [
                     'has_choices'     => $hasChoices,
-                    'use_empty_value' => $customField->getTypeObject()->useEmptyValue(),
+                    'use_placeholder' => $customField->getTypeObject()->usePlaceholder(),
                 ]
             );
 
@@ -313,9 +313,9 @@ class CustomFieldType extends AbstractType
 
         $options = $customField->getFormFieldOptions();
 
-        if ($customField->getTypeObject()->useEmptyValue() && $customField->getParams()->getEmptyValue()) {
+        if ($customField->getTypeObject()->usePlaceholder() && $customField->getParams()->getPlaceholder()) {
             // This works for multiselect chosen plugin. Can be extended for
-            $options['attr']['data-placeholder'] = $customField->getParams()->getEmptyValue();
+            $options['attr']['data-placeholder'] = $customField->getParams()->getPlaceholder();
         }
 
         if ($isModal) {

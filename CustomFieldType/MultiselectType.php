@@ -36,7 +36,7 @@ class MultiselectType extends AbstractMultivalueType
     /**
      * {@inheritdoc}
      */
-    public function useEmptyValue(): bool
+    public function usePlaceholder(): bool
     {
         return true;
     }

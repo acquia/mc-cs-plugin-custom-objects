@@ -107,11 +107,11 @@ interface CustomFieldTypeInterface
     public function createFormTypeOptions(array $options = []): array;
 
     /**
-     * Using "empty value" is needed.
+     * Using placeholder for form field is needed.
      *
      * @return bool
      */
-    public function useEmptyValue(): bool;
+    public function usePlaceholder(): bool;
 
     /**
      * Create transformer for transformation default value type from string to custom type.
