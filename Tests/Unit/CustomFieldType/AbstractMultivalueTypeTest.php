@@ -211,4 +211,10 @@ class AbstractMultivalueTypeTest extends \PHPUnit_Framework_TestCase
         $this->expectException(\UnexpectedValueException::class);
         $this->fieldType->validateValue($this->customField, ['one', 'unicorn']);
     }
+
+    public function testValueToString(): void
+    {
+        $this->assertSame('one,two', $this->fieldType->valueToString(['one', 'two']));
+        $this->assertSame('one', $this->fieldType->valueToString('one'));
+    }
 }

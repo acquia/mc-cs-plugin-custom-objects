@@ -466,11 +466,13 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         ];
 
         $this->client->request('POST', 'api/contacts/new?includeCustomObjects=true', $contact);
-        $response               = $this->client->getResponse();
-        $responseData           = json_decode($response->getContent(), true);
-        $customItemFromResponse = $responseData['contact']['customObjects']['data'][0]['data'][0];
+        $response     = $this->client->getResponse();
+        $responseData = json_decode($response->getContent(), true);
 
         $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
+
+        $customItemFromResponse = $responseData['contact']['customObjects']['data'][0]['data'][0];
+
         $this->assertSame(1, $customItemFromResponse['id']);
         $this->assertSame(null, $customItemFromResponse['attributes']['date-test-field']);
         $this->assertSame('2019-06-26T13:29:43+00:00', $customItemFromResponse['attributes']['datetime-test-field']);

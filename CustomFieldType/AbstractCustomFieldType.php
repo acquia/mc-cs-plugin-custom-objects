@@ -192,4 +192,12 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
             )
         );
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function valueToString($value): string
+    {
+        return (string) $value;
+    }
 }

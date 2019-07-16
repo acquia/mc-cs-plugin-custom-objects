@@ -143,6 +143,20 @@ abstract class AbstractMultivalueType extends AbstractCustomFieldType
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function valueToString($value): string
+    {
+        if (is_array($value)) {
+            $transformer = $this->createApiValueTransformer();
+
+            return $transformer->transform($value);
+        }
+
+        return (string) $value;
+    }
+
+    /**
      * @param string $string
      *
      * @return bool
