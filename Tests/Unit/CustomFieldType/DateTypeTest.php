@@ -126,4 +126,10 @@ class DateTypeTest extends \PHPUnit_Framework_TestCase
             $this->fieldType->createViewTransformer()
         );
     }
+
+    public function testValueToString(): void
+    {
+        $this->assertSame('2019-07-16', $this->fieldType->valueToString(new \DateTime('2019-07-16')));
+        $this->assertSame('2019-07-16', $this->fieldType->valueToString('2019-07-16'));
+    }
 }
