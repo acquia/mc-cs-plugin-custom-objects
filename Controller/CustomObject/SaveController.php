@@ -248,7 +248,6 @@ class SaveController extends AbstractFormController
 
             /** @var CustomField $customField */
             $customField = $customObject->getCustomFieldByOrder((int) $order);
-//            $customField->setCustomObject($customObject);
 
             $customField->setParams($params);
             $customField->setOptions($options);
