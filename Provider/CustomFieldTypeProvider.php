@@ -64,7 +64,7 @@ class CustomFieldTypeProvider
     public function getKeyTypeMapping(): array
     {
         $mapping = [];
-        $types = $this->getTypes();
+        $types   = $this->getTypes();
 
         array_walk($types, function ($key, $val) use (&$mapping): void {
             /** @var AbstractCustomFieldType $key */

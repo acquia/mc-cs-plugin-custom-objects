@@ -36,17 +36,17 @@ class CustomFieldTypeProviderTest extends \PHPUnit_Framework_TestCase
         $customFieldTypeProvider->getType('unicorn');
     }
 
-    public function testKeyTypeMapping(): void {
+    public function testKeyTypeMapping(): void
+    {
         $mockTranslator = $this->createMock(Translator::class);
 
         $typesArray = [
-            'custom.field.type.date'  => new DateType($mockTranslator),
+            'custom.field.type.date'      => new DateType($mockTranslator),
             'custom.field.type.datetime'  => new DateTimeType($mockTranslator),
-
         ];
 
         $mockTranslator->expects($this->exactly(count($typesArray)))->method('trans')
-            ->willReturnCallback(function($argument){return $argument;});
+            ->willReturnCallback(function ($argument) {return $argument; });
 
         $typeProvider = new CustomFieldTypeProvider();
 
@@ -59,7 +59,7 @@ class CustomFieldTypeProviderTest extends \PHPUnit_Framework_TestCase
 
         $mapping = $typeProvider->getKeyTypeMapping();
 
-        $this->assertEquals(count($typesArray), count($mapping));
-        $this->assertEquals($match, $mapping);
+        $this->assertSame(count($typesArray), count($mapping));
+        $this->assertSame($match, $mapping);
     }
 }
