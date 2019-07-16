@@ -16,6 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Entity;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
 use Mautic\CategoryBundle\Entity\Category;
@@ -279,6 +280,24 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     public function getCustomFields()
     {
         return $this->customFields;
+    }
+
+    /**
+     * @param int $order
+     *
+     * @return CustomField
+     * @throws NotFoundException
+     */
+    public function getCustomFieldByOrder(int $order): CustomField
+    {
+        /** @var CustomField $customField */
+        foreach ($this->customFields as $customField){
+            if ($customField->getOrder() === $order) {
+                return $customField;
+            }
+        }
+
+        throw new NotFoundException("Custom field with order index '$order' not found.");
     }
 
     /**
