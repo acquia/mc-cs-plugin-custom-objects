@@ -15,20 +15,13 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Repository;
 
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Mautic\LeadBundle\Entity\Lead;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType;
-use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
-use Doctrine\DBAL\Statement;
-use Symfony\Component\Translation\TranslatorInterface;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use Doctrine\ORM\Query\Expr\Join;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
@@ -38,14 +31,9 @@ class CustomItemRepositoryTest extends \PHPUnit_Framework_TestCase
     private $entityManager;
     private $classMetadata;
     private $customObject;
-    private $customField;
-    private $contact;
     private $queryBuilder;
-    private $queryBuilderDbal;
     private $connection;
-    private $statement;
     private $expr;
-    private $expressionBuilder;
     private $query;
 
     /**
@@ -62,14 +50,10 @@ class CustomItemRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->entityManager        = $this->createMock(EntityManager::class);
         $this->classMetadata        = $this->createMock(ClassMetadata::class);
         $this->customObject         = $this->createMock(CustomObject::class);
-        $this->customField          = $this->createMock(CustomField::class);
         $this->contact              = $this->createMock(Lead::class);
         $this->queryBuilder         = $this->createMock(QueryBuilder::class);
-        $this->queryBuilderDbal     = $this->createMock(DbalQueryBuilder::class);
         $this->connection           = $this->createMock(Connection::class);
-        $this->statement            = $this->createMock(Statement::class);
         $this->expr                 = $this->createMock(Expr::class);
-        $this->expressionBuilder    = $this->createMock(ExpressionBuilder::class);
         $this->query                = $this->createMock(AbstractQuery::class);
         $this->customItemRepository = new CustomItemRepository(
             $this->entityManager,
@@ -78,12 +62,9 @@ class CustomItemRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $this->entityManager->method('createQueryBuilder')->willReturn($this->queryBuilder);
         $this->entityManager->method('getConnection')->willReturn($this->connection);
-        $this->connection->method('createQueryBuilder')->willReturn($this->queryBuilderDbal);
         $this->queryBuilder->method('select')->willReturnSelf();
         $this->queryBuilder->method('from')->willReturnSelf();
         $this->queryBuilder->method('expr')->willReturn($this->expr);
-        $this->queryBuilderDbal->method('expr')->willReturn($this->expressionBuilder);
-        $this->queryBuilderDbal->method('execute')->willReturn($this->statement);
         $this->queryBuilder->method('getQuery')->willReturn($this->query);
     }
 
@@ -214,100 +195,6 @@ class CustomItemRepositoryTest extends \PHPUnit_Framework_TestCase
                 $this->customObject,
                 $customItem
             )
-        );
-    }
-
-    public function testFindItemIdForValue(): void
-    {
-        $count         = 33;
-        $expr          = 'lte';
-        $value         = 1000;
-        $contactId     = 33;
-        $customFieldId = 33;
-
-        $this->contact->expects($this->once())
-            ->method('getId')
-            ->willReturn($contactId);
-
-        $this->customField->expects($this->once())
-            ->method('getId')
-            ->willReturn($customFieldId);
-
-        $this->customField->expects($this->once())
-            ->method('getTypeObject')
-            ->willReturn(new IntType($this->createMock(TranslatorInterface::class)));
-
-        $this->queryBuilderDbal->expects($this->once())
-            ->method('select')
-            ->with('ci.id');
-
-        $this->queryBuilderDbal->expects($this->once())
-            ->method('from')
-            ->with(MAUTIC_TABLE_PREFIX.'custom_item', 'ci');
-
-        $this->queryBuilderDbal->expects($this->exactly(2))
-            ->method('innerJoin')
-            ->withConsecutive(
-                ['ci', MAUTIC_TABLE_PREFIX.'custom_item_xref_contact', 'cixcont', 'cixcont.custom_item_id = ci.id'],
-                ['ci', 'custom_field_value_int', 'cfv_int', 'cfv_int.custom_item_id = ci.id']
-            );
-
-        $this->queryBuilderDbal->expects($this->once())
-            ->method('where')
-            ->with('cixcont.contact_id = :contactId');
-
-        $this->expressionBuilder->expects($this->once())
-            ->method($expr)
-            ->with('cfv_int.value', ':value')
-            ->willReturn('lte-expression-here');
-
-        $this->queryBuilderDbal->expects($this->exactly(2))
-            ->method('andWhere')
-            ->withConsecutive(
-                ['cfv_int.custom_field_id = :customFieldId'],
-                ['lte-expression-here']
-            );
-
-        $this->queryBuilderDbal->expects($this->exactly(3))
-            ->method('setParameter')
-            ->withConsecutive(
-                ['contactId', $contactId],
-                ['customFieldId', $customFieldId],
-                ['value', $value]
-            );
-
-        $this->statement->expects($this->once())
-            ->method('fetchColumn')
-            ->willReturn($count);
-
-        $this->assertSame(
-            $count,
-            $this->customItemRepository->findItemIdForValue(
-                $this->customField,
-                $this->contact,
-                $expr,
-                $value
-            )
-        );
-    }
-
-    public function testFindItemIdForValueIfNotFound(): void
-    {
-        $this->customField->expects($this->once())
-            ->method('getTypeObject')
-            ->willReturn(new IntType($this->createMock(TranslatorInterface::class)));
-
-        $this->statement->expects($this->once())
-            ->method('fetchColumn')
-            ->willReturn(false);
-
-        $this->expectException(NotFoundException::class);
-
-        $this->customItemRepository->findItemIdForValue(
-            $this->customField,
-            $this->contact,
-            'lte',
-            1000
         );
     }
 

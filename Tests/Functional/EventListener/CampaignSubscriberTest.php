@@ -24,8 +24,6 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\CustomObjectsTrait;
 use MauticPlugin\CustomObjectsBundle\EventListener\CampaignSubscriber;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
-use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 
 class CampaignSubscriberTest extends KernelTestCase
 {
@@ -38,21 +36,16 @@ class CampaignSubscriberTest extends KernelTestCase
     private $container;
 
     /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /** 
      * @var CustomItemModel
      */
     private $customItemModel;
 
-    /** 
+    /**
      * @var CustomFieldValueModel
      */
     private $customFieldValueModel;
 
-    /** 
+    /**
      * @var CampaignSubscriber
      */
     private $campaignSubscriber;
@@ -64,20 +57,18 @@ class CampaignSubscriberTest extends KernelTestCase
         $this->container = static::$kernel->getContainer();
 
         /** @var EntityManager $entityManager */
-        $entityManager       = $this->container->get('doctrine.orm.entity_manager');
-        $this->entityManager = $entityManager;
+        $entityManager = $this->container->get('doctrine.orm.entity_manager');
 
         /** @var CustomItemModel $customItemModel */
-        $customItemModel = $this->container->get('mautic.custom.model.item');
+        $customItemModel       = $this->container->get('mautic.custom.model.item');
         $this->customItemModel = $customItemModel;
 
         /** @var CustomFieldValueModel $customFieldValueModel */
-        $customFieldValueModel = $this->container->get('mautic.custom.model.field.value');
+        $customFieldValueModel       = $this->container->get('mautic.custom.model.field.value');
         $this->customFieldValueModel = $customFieldValueModel;
 
-
         /** @var CampaignSubscriber $campaignSubscriber */
-        $campaignSubscriber = $this->container->get('custom_item.campaign.subscriber');
+        $campaignSubscriber       = $this->container->get('custom_item.campaign.subscriber');
         $this->campaignSubscriber = $campaignSubscriber;
 
         $this->createFreshDatabaseSchema($entityManager);
@@ -96,42 +87,42 @@ class CampaignSubscriberTest extends KernelTestCase
         $value = $customItem->findCustomFieldValueForFieldAlias('text-test-field');
 
         $value->setValue('abracadabra');
-        
+
         $this->customItemModel->save($customItem);
         $this->customItemModel->linkEntity($customItem, 'contact', (int) $contact->getId());
 
         // Test equals the same text as the field value.
-        // $event = $this->createCampaignExecutionEvent(
-        //     $contact,
-        //     $value->getCustomField()->getId(),
-        //     '=',
-        //     'abracadabra'
-        // );
+        $event = $this->createCampaignExecutionEvent(
+            $contact,
+            $value->getCustomField()->getId(),
+            '=',
+            'abracadabra'
+        );
 
-        // $this->campaignSubscriber->onCampaignTriggerCondition($event);
-        // $this->assertTrue($event->getResult());
+        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $this->assertTrue($event->getResult());
 
         // Test equals the different text as the field value.
-        // $event = $this->createCampaignExecutionEvent(
-        //     $contact,
-        //     $value->getCustomField()->getId(),
-        //     '=',
-        //     'unicorn'
-        // );
+        $event = $this->createCampaignExecutionEvent(
+            $contact,
+            $value->getCustomField()->getId(),
+            '=',
+            'unicorn'
+        );
 
-        // $this->campaignSubscriber->onCampaignTriggerCondition($event);
-        // $this->assertFalse($event->getResult());
+        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $this->assertFalse($event->getResult());
 
         // Test not equals the different text as the field value.
-        // $event = $this->createCampaignExecutionEvent(
-        //     $contact,
-        //     $value->getCustomField()->getId(),
-        //     '!=',
-        //     'unicorn'
-        // );
+        $event = $this->createCampaignExecutionEvent(
+            $contact,
+            $value->getCustomField()->getId(),
+            '!=',
+            'unicorn'
+        );
 
-        // $this->campaignSubscriber->onCampaignTriggerCondition($event);
-        // $this->assertTrue($event->getResult());
+        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $this->assertTrue($event->getResult());
 
         // Test the text value is empty.
         $event = $this->createCampaignExecutionEvent(
@@ -157,11 +148,11 @@ class CampaignSubscriberTest extends KernelTestCase
     }
 
     /**
-     * @param Lead $contact
-     * @param int $fieldId
+     * @param Lead   $contact
+     * @param int    $fieldId
      * @param string $operator
      * @param string $fieldValue
-     * 
+     *
      * @return CampaignExecutionEvent
      */
     private function createCampaignExecutionEvent(
@@ -169,22 +160,21 @@ class CampaignSubscriberTest extends KernelTestCase
         int $fieldId,
         string $operator,
         string $fieldValue
-    ): CampaignExecutionEvent
-    {
+    ): CampaignExecutionEvent {
         return new CampaignExecutionEvent(
             [
                 'lead'  => $contact,
                 'event' => [
-                    'type' => 'custom_item.1.fieldvalue',
+                    'type'       => 'custom_item.1.fieldvalue',
                     'properties' => [
-                        'field' => $fieldId,
+                        'field'    => $fieldId,
                         'operator' => $operator,
-                        'value' => $fieldValue,
+                        'value'    => $fieldValue,
                     ],
                 ],
-                'eventDetails' => [],
+                'eventDetails'    => [],
                 'systemTriggered' => [],
-                'eventSettings' => [],
+                'eventSettings'   => [],
             ],
             null
         );
