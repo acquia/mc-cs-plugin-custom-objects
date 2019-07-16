@@ -231,7 +231,7 @@ class SaveController extends AbstractFormController
         foreach ($rawCustomObject['customFields'] as $customField) {
             if ($customField['deleted'] && $customField['id']) {
                 // Remove deleted custom fields
-                $this->customObjectModel->removeCustomFieldById($customObject, (int)$customField['id']);
+                $this->customObjectModel->removeCustomFieldById($customObject, (int) $customField['id']);
             } else {
                 // We are using order key as key to access collection of CustomFields below
                 $customFields[(int) $customField['order']] = $customField;

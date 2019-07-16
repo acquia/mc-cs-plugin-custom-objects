@@ -536,7 +536,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
         $this->assertCustomObject($payload, 1);
     }
 
-    public function testMultiselectWithRadioOrder()
+    public function testMultiselectWithRadioOrder(): void
     {
         $payload = ['custom_object' => [
             'nameSingular' => 'Testing',
