@@ -68,7 +68,7 @@ class QueryFilterHelperTest extends WebTestCase
             ],
             [
                 'filter' => ['glue' => 'and', 'field' => 'cmf_'.$this->getFixtureById('custom_field1')->getId(), 'type' => 'custom_object', 'operator' => 'neq', 'value' => 'love'],
-                'match'  => '(test_value.value = :test_value_value) OR (test_value.value IS NULL)',
+                'match'  => '(test_value.value <> :test_value_value) OR (test_value.value IS NULL)',
             ],
         ];
 

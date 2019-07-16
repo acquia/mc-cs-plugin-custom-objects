@@ -23,6 +23,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 
 class CampaignConditionFieldValueType extends AbstractType
 {
@@ -75,6 +76,7 @@ class CampaignConditionFieldValueType extends AbstractType
                     'class' => 'form-control',
                 ],
                 'choice_attr' => function ($fieldId) use ($fields) {
+                    /** @var CustomField $field */
                     $field     = $fields[$fieldId];
                     $operators = $field->getTypeObject()->getOperatorOptions();
                     $options   = $field->getOptions()->map(function (CustomFieldOption $option) {
