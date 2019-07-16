@@ -293,7 +293,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     {
         /** @var CustomField $customField */
         foreach ($this->customFields as $customField) {
-            if ($customField->getOrder() == $order) {
+            if ($customField->getOrder() === (int) $order) {
                 return $customField;
             }
         }
