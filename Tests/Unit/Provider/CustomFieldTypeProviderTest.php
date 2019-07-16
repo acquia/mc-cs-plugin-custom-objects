@@ -52,7 +52,7 @@ class CustomFieldTypeProviderTest extends \PHPUnit_Framework_TestCase
 
         $match = [];
 
-        foreach ($typesArray as $key=>$type) {
+        foreach ($typesArray as $type) {
             $typeProvider->addType($type);
             $match[$type->getName()] = $type->getKey();
         }
