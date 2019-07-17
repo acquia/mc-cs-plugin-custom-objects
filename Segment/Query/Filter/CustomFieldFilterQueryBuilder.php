@@ -78,6 +78,7 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
             case 'empty':
             case 'neq':
             case 'notLike':
+            case '!multiselect':
                 $queryBuilder->addLogic($queryBuilder->expr()->notExists($filterQueryBuilder->getSQL()), $filter->getGlue());
 
                 break;
