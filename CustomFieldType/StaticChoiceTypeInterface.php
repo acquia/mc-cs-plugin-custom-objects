@@ -19,7 +19,7 @@ namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 interface StaticChoiceTypeInterface
 {
     /**
-     * @return array
+     * @return string[]
      */
     public function getChoices(): array;
 }
