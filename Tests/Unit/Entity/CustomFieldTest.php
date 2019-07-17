@@ -232,7 +232,7 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
             'required'   => true,
             'label_attr' => ['class' => 'control-label'],
             'attr'       => [
-                'class' => 'form-control',
+                'class'            => 'form-control',
                 'data-placeholder' => 'Select one',
             ],
             'choices'    => [
