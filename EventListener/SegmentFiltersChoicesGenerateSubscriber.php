@@ -134,7 +134,7 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
      */
     private function getFieldProperties(CustomField $customField): array
     {
-        $type = $customField->getType();
+        $type = $customField->isChoiceType() ? 'select' : $customField->getType();
 
         $properties = ['type' => $type];
 
