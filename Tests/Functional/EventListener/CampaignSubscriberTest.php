@@ -84,17 +84,40 @@ class CampaignSubscriberTest extends KernelTestCase
 
         $this->customFieldValueModel->createValuesForItem($customItem);
 
-        $value = $customItem->findCustomFieldValueForFieldAlias('text-test-field');
+        // Set some values
+        $textValue = $customItem->findCustomFieldValueForFieldAlias('text-test-field');
+        $textValue->setValue('abracadabra');
 
-        $value->setValue('abracadabra');
+        $dateValue = $customItem->findCustomFieldValueForFieldAlias('date-test-field');
+        $dateValue->setValue('2019-07-17');
 
+        $datetimeValue = $customItem->findCustomFieldValueForFieldAlias('datetime-test-field');
+        $datetimeValue->setValue('2019-07-17 12:44:55');
+
+        $multiselectValue = $customItem->findCustomFieldValueForFieldAlias('multiselect-test-field');
+        $multiselectValue->setValue(['option_b']);
+
+        $urlValue = $customItem->findCustomFieldValueForFieldAlias('url-test-field');
+
+        // Save the values
         $this->customItemModel->save($customItem);
         $this->customItemModel->linkEntity($customItem, 'contact', (int) $contact->getId());
+
+        // Test the URL value is empty.
+        // Reported as a segment bug https://github.com/mautic-inc/mautic-internal/issues/1781. Uncomment once fixed.
+        // $event = $this->createCampaignExecutionEvent(
+        //     $contact,
+        //     $urlValue->getCustomField()->getId(),
+        //     'empty'
+        // );
+
+        // $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        // $this->assertTrue($event->getResult());
 
         // Test equals the same text as the field value.
         $event = $this->createCampaignExecutionEvent(
             $contact,
-            $value->getCustomField()->getId(),
+            $textValue->getCustomField()->getId(),
             '=',
             'abracadabra'
         );
@@ -105,7 +128,7 @@ class CampaignSubscriberTest extends KernelTestCase
         // Test equals the different text as the field value.
         $event = $this->createCampaignExecutionEvent(
             $contact,
-            $value->getCustomField()->getId(),
+            $textValue->getCustomField()->getId(),
             '=',
             'unicorn'
         );
@@ -116,7 +139,7 @@ class CampaignSubscriberTest extends KernelTestCase
         // Test not equals the different text as the field value.
         $event = $this->createCampaignExecutionEvent(
             $contact,
-            $value->getCustomField()->getId(),
+            $textValue->getCustomField()->getId(),
             '!=',
             'unicorn'
         );
@@ -127,9 +150,8 @@ class CampaignSubscriberTest extends KernelTestCase
         // Test the text value is empty.
         $event = $this->createCampaignExecutionEvent(
             $contact,
-            $value->getCustomField()->getId(),
-            'empty',
-            'abracadabra'
+            $textValue->getCustomField()->getId(),
+            'empty'
         );
 
         $this->campaignSubscriber->onCampaignTriggerCondition($event);
@@ -138,20 +160,152 @@ class CampaignSubscriberTest extends KernelTestCase
         // Test the text value is not empty.
         $event = $this->createCampaignExecutionEvent(
             $contact,
-            $value->getCustomField()->getId(),
-            '!empty',
-            'abracadabra'
+            $textValue->getCustomField()->getId(),
+            '!empty'
         );
 
         $this->campaignSubscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
+
+        // Test the text value starts with abra.
+        $event = $this->createCampaignExecutionEvent(
+            $contact,
+            $textValue->getCustomField()->getId(),
+            'startsWith',
+            'abra'
+        );
+
+        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $this->assertTrue($event->getResult());
+
+        // Test the text value starts with unicorn.
+        $event = $this->createCampaignExecutionEvent(
+            $contact,
+            $textValue->getCustomField()->getId(),
+            'startsWith',
+            'unicorn'
+        );
+
+        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $this->assertFalse($event->getResult());
+
+        // Test the text value ends with abra.
+        $event = $this->createCampaignExecutionEvent(
+            $contact,
+            $textValue->getCustomField()->getId(),
+            'endsWith',
+            'cadabra'
+        );
+
+        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $this->assertTrue($event->getResult());
+
+        // Test the text value emnds with unicorn.
+        $event = $this->createCampaignExecutionEvent(
+            $contact,
+            $textValue->getCustomField()->getId(),
+            'endsWith',
+            'unicorn'
+        );
+
+        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $this->assertFalse($event->getResult());
+
+        // Test the text value contains abra.
+        $event = $this->createCampaignExecutionEvent(
+            $contact,
+            $textValue->getCustomField()->getId(),
+            'contains',
+            'cada'
+        );
+
+        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $this->assertTrue($event->getResult());
+
+        // Test the text value contains unicorn.
+        $event = $this->createCampaignExecutionEvent(
+            $contact,
+            $textValue->getCustomField()->getId(),
+            'contains',
+            'unicorn'
+        );
+
+        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $this->assertFalse($event->getResult());
+
+        // Test the date value less than 2019-08-05.
+        $event = $this->createCampaignExecutionEvent(
+            $contact,
+            $dateValue->getCustomField()->getId(),
+            'lt',
+            '2019-08-05'
+        );
+
+        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $this->assertTrue($event->getResult());
+
+        // Test the date value less than 2019-06-05.
+        $event = $this->createCampaignExecutionEvent(
+            $contact,
+            $dateValue->getCustomField()->getId(),
+            'lt',
+            '2019-06-05'
+        );
+
+        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $this->assertFalse($event->getResult());
+
+        // Test the date value greater than 2019-08-05.
+        $event = $this->createCampaignExecutionEvent(
+            $contact,
+            $dateValue->getCustomField()->getId(),
+            'gt',
+            '2019-08-05'
+        );
+
+        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $this->assertFalse($event->getResult());
+
+        // Test the date value greater than 2019-06-05.
+        $event = $this->createCampaignExecutionEvent(
+            $contact,
+            $dateValue->getCustomField()->getId(),
+            'gt',
+            '2019-06-05'
+        );
+
+        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $this->assertTrue($event->getResult());
+
+        // Test the multiselect value less than 2019-08-05.
+        // This is throwing 'Array to string conversion' exception. Have to investigate further.
+        // $event = $this->createCampaignExecutionEvent(
+        //     $contact,
+        //     $multiselectValue->getCustomField()->getId(),
+        //     'in',
+        //     ['option_b']
+        // );
+
+        // $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        // $this->assertTrue($event->getResult());
+
+        // Test the multiselect value less than 2019-06-05.
+        // $event = $this->createCampaignExecutionEvent(
+        //     $contact,
+        //     $multiselectValue->getCustomField()->getId(),
+        //     'in',
+        //     ['option_a']
+        // );
+
+        // $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        // $this->assertFalse($event->getResult());
     }
 
     /**
      * @param Lead   $contact
      * @param int    $fieldId
      * @param string $operator
-     * @param string $fieldValue
+     * @param mixed  $fieldValue
      *
      * @return CampaignExecutionEvent
      */
@@ -159,7 +313,7 @@ class CampaignSubscriberTest extends KernelTestCase
         Lead $contact,
         int $fieldId,
         string $operator,
-        string $fieldValue
+        $fieldValue = null
     ): CampaignExecutionEvent {
         return new CampaignExecutionEvent(
             [
