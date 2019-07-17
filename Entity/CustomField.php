@@ -309,7 +309,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         ];
 
         if ($placeholder) {
-            $fieldOptions['placeholder'] = $placeholder;
+            $fieldOptions['attr']['data-placeholder'] = $placeholder;
         }
 
         if ($choices) {
