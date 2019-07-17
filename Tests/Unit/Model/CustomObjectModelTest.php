@@ -601,15 +601,39 @@ class CustomObjectModelTest extends \PHPUnit_Framework_TestCase
             ->method('removeCustomField')
             ->with($customField5);
 
-        $this->customFieldModel->expects($this->once())
-            ->method('deleteEntity')
-            ->with($customField5);
-
         $this->entityManager->expects($this->once())
             ->method('contains')
             ->with($customField5)
             ->willReturn(true);
 
+        $this->customFieldModel->expects($this->once())
+            ->method('deleteEntity')
+            ->with($customField5);
+
         $this->customObjectModel->removeCustomFieldById($this->customObject, 5);
+    }
+
+    public function testIgnoreRemoveNotExistingCustomFieldById(): void
+    {
+        $customField1 = $this->createMock(CustomField::class);
+        $customField1->method('getId')->willReturn(1);
+
+        $this->customObject->expects($this->once())
+            ->method('getCustomFields')
+            ->willReturn(new ArrayCollection([$customField1]));
+
+        $this->customObject->expects($this->once())
+            ->method('removeCustomField')
+            ->with($customField1);
+
+        $this->entityManager->expects($this->once())
+            ->method('contains')
+            ->with($customField1)
+            ->willReturn(false);
+
+        $this->customFieldModel->expects($this->never())
+            ->method('deleteEntity');
+
+        $this->customObjectModel->removeCustomFieldById($this->customObject, 1);
     }
 }
