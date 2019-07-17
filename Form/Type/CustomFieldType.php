@@ -321,6 +321,13 @@ class CustomFieldType extends AbstractType
         if ($isModal) {
             // Do not use defined label in modal form
             $options['label'] = 'custom.field.label.default_value';
+        } else {
+            // Is rendering for panel, thus disable fields
+            $options['disabled'] = true;
+            if ($customField->getTypeObject()->hasChoices()) {
+                // Do not use chosen jQuery plugin
+                $options['attr']['class'] = $options['attr']['class'] ? $options['attr']['class'].' not-chosen' : 'not-chosen';
+            }
         }
 
         $options['required'] = false;
