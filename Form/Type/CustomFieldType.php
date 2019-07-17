@@ -30,8 +30,8 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class CustomFieldType extends AbstractType
 {
@@ -63,7 +63,12 @@ class CustomFieldType extends AbstractType
     /**
      * @var bool
      */
-    private $isCustomObjectForm = false;
+    private $isCustomObjectForm;
+
+    /**
+     * @var bool
+     */
+    private $unlockDefaultValues;
 
     /**
      * @param CustomObjectRepository     $customObjectRepository
@@ -94,6 +99,7 @@ class CustomFieldType extends AbstractType
     {
         // Is part of custom object form?
         $this->isCustomObjectForm = !empty($options['custom_object_form']);
+        $this->unlockDefaultValues = !empty($options['unlock_default_values']);
 
         $builder->add('id', HiddenType::class);
 
@@ -154,6 +160,8 @@ class CustomFieldType extends AbstractType
                 'custom_object_form' => false, // Is form used as subform?
                 'csrf_protection'    => false,
                 'allow_extra_fields' => true,
+                // For CO panels we need to enable default values to save them
+                'unlock_default_values' => false,
             ]
         );
     }
@@ -324,7 +332,7 @@ class CustomFieldType extends AbstractType
 
         if ($this->isCustomObjectForm) {
             // Is rendering for panel, thus disable fields
-            $options['disabled'] = true;
+            $options['read_only'] = true;
             if ($customField->getTypeObject()->hasChoices()) {
                 // Do not use chosen jQuery plugin
                 $options['attr']['class'] = $options['attr']['class'] ? $options['attr']['class'].' not-chosen' : 'not-chosen';
