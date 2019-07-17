@@ -97,7 +97,7 @@ class CampaignSubscriberTest extends KernelTestCase
         $multiselectValue = $customItem->findCustomFieldValueForFieldAlias('multiselect-test-field');
         $multiselectValue->setValue(['option_b']);
 
-        $urlValue = $customItem->findCustomFieldValueForFieldAlias('url-test-field');
+        // $urlValue = $customItem->findCustomFieldValueForFieldAlias('url-test-field');
 
         // Save the values
         $this->customItemModel->save($customItem);
