@@ -605,6 +605,11 @@ class CustomObjectModelTest extends \PHPUnit_Framework_TestCase
             ->method('deleteEntity')
             ->with($customField5);
 
+        $this->entityManager->expects($this->once())
+            ->method('contains')
+            ->with($customField5)
+            ->willReturn(true);
+
         $this->customObjectModel->removeCustomFieldById($this->customObject, 5);
     }
 }
