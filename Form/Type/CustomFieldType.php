@@ -61,6 +61,11 @@ class CustomFieldType extends AbstractType
     private $customFieldFactory;
 
     /**
+     * @var bool
+     */
+    private $isCustomObjectForm = false;
+
+    /**
      * @param CustomObjectRepository     $customObjectRepository
      * @param CustomFieldTypeProvider    $customFieldTypeProvider
      * @param ParamsToStringTransformer  $paramsToStringTransformer
@@ -88,7 +93,7 @@ class CustomFieldType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // Is part of custom object form?
-        $isCustomObjectForm = !empty($options['custom_object_form']);
+        $this->isCustomObjectForm = !empty($options['custom_object_form']);
 
         $builder->add('id', HiddenType::class);
 
@@ -125,7 +130,7 @@ class CustomFieldType extends AbstractType
             HiddenType::class
         );
 
-        if ($isCustomObjectForm) {
+        if ($this->isCustomObjectForm) {
             $this->buildPanelFormFields($builder);
         } else {
             $this->buildModalFormFields($builder, $options);
@@ -214,7 +219,7 @@ class CustomFieldType extends AbstractType
             $form = $event->getForm();
             $hasChoices = $customField->getTypeObject()->hasChoices();
 
-            $this->createDefaultValueInput($form, $customField, true);
+            $this->createDefaultValueInput($form, $customField);
 
             $form->add(
                 'params',
@@ -265,7 +270,7 @@ class CustomFieldType extends AbstractType
                 return;
             }
 
-            $this->createDefaultValueInput($form, $customField, false);
+            $this->createDefaultValueInput($form, $customField);
         });
 
         $this->recreateDefaultValueBeforePost($builder);
@@ -301,13 +306,12 @@ class CustomFieldType extends AbstractType
      *
      * @param FormInterface $form
      * @param CustomField   $customField
-     * @param bool          $isModal     Id definition used for modal
      */
-    private function createDefaultValueInput(FormInterface $form, CustomField $customField, bool $isModal): void
+    private function createDefaultValueInput(FormInterface $form, CustomField $customField): void
     {
         $symfonyFormFieldType = $customField->getTypeObject()->getSymfonyFormFieldType();
 
-        if ($isModal && HiddenType::class === $symfonyFormFieldType) {
+        if (!$this->isCustomObjectForm && HiddenType::class === $symfonyFormFieldType) {
             $symfonyFormFieldType = TextType::class;
         }
 
@@ -318,16 +322,16 @@ class CustomFieldType extends AbstractType
             $options['attr']['data-placeholder'] = $customField->getParams()->getPlaceholder();
         }
 
-        if ($isModal) {
-            // Do not use defined label in modal form
-            $options['label'] = 'custom.field.label.default_value';
-        } else {
+        if ($this->isCustomObjectForm) {
             // Is rendering for panel, thus disable fields
             $options['disabled'] = true;
             if ($customField->getTypeObject()->hasChoices()) {
                 // Do not use chosen jQuery plugin
                 $options['attr']['class'] = $options['attr']['class'] ? $options['attr']['class'].' not-chosen' : 'not-chosen';
             }
+        } else {
+            // Do not use defined label in modal form
+            $options['label'] = 'custom.field.label.default_value';
         }
 
         $options['required'] = false;
