@@ -299,12 +299,18 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     {
         $fieldTypeOptions = $this->getTypeObject()->createFormTypeOptions();
         $choices          = $this->getChoices();
+        $placeholder      = $this->getParams()->getPlaceholder();
+
         $fieldOptions     = [
             'label'      => $this->getLabel(),
             'required'   => $this->isRequired(),
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control'],
         ];
+
+        if ($placeholder) {
+            $fieldOptions['placeholder'] = $placeholder;
+        }
 
         if ($choices) {
             $fieldOptions['choices'] = $choices;
