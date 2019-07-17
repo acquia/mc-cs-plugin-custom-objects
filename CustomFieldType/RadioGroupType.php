@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-
-class RadioGroupType extends AbstractTextType
+class RadioGroupType extends SelectType
 {
     /**
      * @var string
@@ -32,27 +30,6 @@ class RadioGroupType extends AbstractTextType
      */
     protected $formTypeOptions = [
         'expanded'    => true,
-        'multiple'    => true,
+        'multiple'    => false,
     ];
-
-    /**
-     * @return mixed[]
-     */
-    public function getOperators(): array
-    {
-        $allOperators     = parent::getOperators();
-        $allowedOperators = array_flip(['in', '!in', 'empty', '!empty']);
-
-        return array_intersect_key($allOperators, $allowedOperators);
-    }
-
-    /**
-     * @return string
-     */
-    public function getSymfonyFormFieldType(): string
-    {
-        return ChoiceType::class;
-    }
 }
-
-
