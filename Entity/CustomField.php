@@ -513,8 +513,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
         if (is_object($params)) {
             $placeholder = $params->getPlaceholder();
-        }
-        elseif (array_key_exists('placeholder', $params)) {
+        } elseif (array_key_exists('placeholder', $params)) {
             $placeholder = $params['placeholder'];
         }
 
