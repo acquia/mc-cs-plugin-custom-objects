@@ -66,11 +66,6 @@ class CustomFieldType extends AbstractType
     private $isCustomObjectForm;
 
     /**
-     * @var bool
-     */
-    private $unlockDefaultValues;
-
-    /**
      * @param CustomObjectRepository     $customObjectRepository
      * @param CustomFieldTypeProvider    $customFieldTypeProvider
      * @param ParamsToStringTransformer  $paramsToStringTransformer
@@ -98,8 +93,7 @@ class CustomFieldType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // Is part of custom object form?
-        $this->isCustomObjectForm = !empty($options['custom_object_form']);
-        $this->unlockDefaultValues = !empty($options['unlock_default_values']);
+        $this->isCustomObjectForm  = !empty($options['custom_object_form']);
 
         $builder->add('id', HiddenType::class);
 
@@ -160,8 +154,6 @@ class CustomFieldType extends AbstractType
                 'custom_object_form' => false, // Is form used as subform?
                 'csrf_protection'    => false,
                 'allow_extra_fields' => true,
-                // For CO panels we need to enable default values to save them
-                'unlock_default_values' => false,
             ]
         );
     }
@@ -333,6 +325,12 @@ class CustomFieldType extends AbstractType
         if ($this->isCustomObjectForm) {
             // Is rendering for panel, thus disable fields
             $options['read_only'] = true;
+
+            if (!empty($options['attr']['data-toggle'])) {
+                // Disable datepicker for date/datetime fields
+                unset($options['attr']['data-toggle']);
+            }
+
             if ($customField->getTypeObject()->hasChoices()) {
                 // Do not use chosen jQuery plugin
                 $options['attr']['class'] = $options['attr']['class'] ? $options['attr']['class'].' not-chosen' : 'not-chosen';
