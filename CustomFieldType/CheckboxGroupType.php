@@ -32,4 +32,12 @@ class CheckboxGroupType extends AbstractMultivalueType
         'expanded' => true,
         'multiple' => true,
     ];
+
+    /**
+     * {@inheritdoc}
+     */
+    public function usePlaceholder(): bool
+    {
+        return false;
+    }
 }

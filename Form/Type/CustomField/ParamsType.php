@@ -47,6 +47,7 @@ class ParamsType extends AbstractType
                     'required'   => false,
                     'attr'       => [
                         'class'    => 'form-control',
+                        'tooltip'  => 'custom.field.help.placeholder',
                     ],
                 ]
             );
