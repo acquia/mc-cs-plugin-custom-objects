@@ -28,6 +28,7 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\AbstractMultivalueType;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\StaticChoiceTypeInterface;
 
 class CustomField extends FormEntity implements UniqueEntityInterface
 {
@@ -453,8 +454,12 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     {
         $choices = [];
 
-        foreach ($this->getOptions() as $option) {
-            $choices[$option->getValue()] = $option->getLabel();
+        if ($this->getTypeObject() instanceof StaticChoiceTypeInterface) {
+            $choices = $this->getTypeObject()->getChoices();
+        } else {
+            foreach ($this->getOptions() as $option) {
+                $choices[$option->getValue()] = $option->getLabel();
+            }
         }
 
         return $choices;

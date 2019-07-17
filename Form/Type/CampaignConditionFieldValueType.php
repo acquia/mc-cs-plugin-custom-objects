@@ -24,6 +24,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\StaticChoiceTypeInterface;
 
 class CampaignConditionFieldValueType extends AbstractType
 {
@@ -76,16 +77,13 @@ class CampaignConditionFieldValueType extends AbstractType
                     'class' => 'form-control',
                 ],
                 'choice_attr' => function ($fieldId) use ($fields) {
+                    
                     /** @var CustomField $field */
-                    $field     = $fields[$fieldId];
-                    $operators = $field->getTypeObject()->getOperatorOptions();
-                    $options   = $field->getOptions()->map(function (CustomFieldOption $option) {
-                        return ['value' => $option->getValue(), 'label' => $option->getLabel()];
-                    });
+                    $field = $fields[$fieldId];
 
                     return [
-                        'data-operators'  => json_encode($operators),
-                        'data-options'    => json_encode($options->toArray()),
+                        'data-operators'  => json_encode($field->getTypeObject()->getOperatorOptions()),
+                        'data-options'    => json_encode($field->getChoices()),
                         'data-field-type' => $field->getType(),
                     ];
                 },
