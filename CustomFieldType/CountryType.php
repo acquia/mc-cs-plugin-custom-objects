@@ -14,6 +14,9 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
 use Mautic\LeadBundle\Helper\FormFieldHelper;
+use Symfony\Component\Form\Extension\Core\Type\CountryType as SymfonyCountryType;
+use Symfony\Component\Intl\Intl;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CountryType extends SelectType
 {
@@ -43,4 +46,25 @@ class CountryType extends SelectType
 
         return ['choices' => $this->countryList];
     }
+
+    /**
+     * @return string
+     */
+    public function getSymfonyFormFieldType(): string
+    {
+        return SymfonyCountryType::class;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(array(
+            'choices' => $this->getChoices(),
+            'choices_as_values' => true,
+            'choice_translation_domain' => false,
+        ));
+    }
+
 }
