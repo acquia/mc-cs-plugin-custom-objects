@@ -299,7 +299,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     {
         $fieldTypeOptions = $this->getTypeObject()->createFormTypeOptions();
         $choices          = $this->getChoices();
-        $placeholder      = $this->getParams()->getPlaceholder();
+        $placeholder      = $this->getPlaceholder();
 
         $fieldOptions     = [
             'label'      => $this->getLabel(),
@@ -501,5 +501,23 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     public function canHaveMultipleValues(): bool
     {
         return $this->getTypeObject() instanceof AbstractMultivalueType;
+    }
+
+    /**
+     * @return string|null
+     */
+    private function getPlaceholder()
+    {
+        $params      = $this->getParams();
+        $placeholder = null;
+
+        if (is_object($params)) {
+            $placeholder = $params->getPlaceholder();
+        }
+        elseif (array_key_exists('placeholder', $params)) {
+            $placeholder = $params['placeholder'];
+        }
+
+        return $placeholder;
     }
 }
