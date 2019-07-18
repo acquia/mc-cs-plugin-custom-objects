@@ -496,13 +496,6 @@ CustomObjectsForm = {
             panel = mQuery(panelSelector);
         }
 
-        if (response.type === 'multiselect') {
-            let select = panel.find('select');
-            select.chosen({
-                'placeholder_text_single' : select.attr('data-placeholder')
-            });
-        }
-
         mQuery('#objectFieldModal').modal('hide');
         mQuery('body').removeClass('modal-open');
         mQuery('.modal-backdrop').remove();
