@@ -21,11 +21,6 @@ class Params
     /**
      * @var string|null
      */
-    private $requiredValidationMessage;
-
-    /**
-     * @var string|null
-     */
     private $placeholder;
 
     /**
@@ -46,28 +41,11 @@ class Params
     public function __toArray(): array
     {
         $return = [
-            'requiredValidationMessage' => $this->requiredValidationMessage,
-            'placeholder'               => $this->placeholder,
+            'placeholder' => $this->placeholder,
         ];
 
         // Remove null and false values as they are default
         return array_filter($return);
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getRequiredValidationMessage(): ?string
-    {
-        return $this->requiredValidationMessage;
-    }
-
-    /**
-     * @param string|null $requiredValidationMessage
-     */
-    public function setRequiredValidationMessage(?string $requiredValidationMessage): void
-    {
-        $this->requiredValidationMessage = $requiredValidationMessage;
     }
 
     /**

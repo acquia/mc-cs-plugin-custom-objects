@@ -51,7 +51,6 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                         'alias'        => '2',
                         'required'     => '',
                         'params'       => '{
-                            "requiredValidationMessage": "aa",
                             "placeholder": "bb"
                         }',
                         'options'      => '[
@@ -176,7 +175,6 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                         'alias'        => '10',
                         'required'     => '',
                         'params'       => '{
-                            "requiredValidationMessage": "This is required",
                             "placeholder": "select option"
                         }',
                         'options'      => '[
@@ -692,7 +690,6 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                         'alias'        => '1',
                         'required'     => '',
                         'params'       => '{
-                            "requiredValidationMessage": "This is required",
                             "placeholder": "placeholder"
                         }',
                         'options'      => '[
@@ -720,7 +717,6 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                         'alias'        => '2',
                         'required'     => '',
                         'params'       => '{
-                            "requiredValidationMessage": "aa",
                             "placeholder": "bbs"
                         }',
                         'options'      => '[

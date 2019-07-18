@@ -26,18 +26,6 @@ class ParamsType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->add(
-            'requiredValidationMessage',
-            TextType::class,
-            [
-                'label'      => 'custom.field.label.required_validation_message',
-                'required'   => false,
-                'attr'       => [
-                    'class'    => 'form-control',
-                ],
-            ]
-        );
-
         if ($options['use_placeholder']) {
             $builder->add(
                 'placeholder',
