@@ -414,7 +414,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      */
     public function setOptions(Collection $options): void
     {
-        $order = 1;
+        $order = 0;
 
         foreach ($options as $option) {
             $option->setCustomField($this);
@@ -471,6 +471,11 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     public function getParams()
     {
         if ($this->params) {
+            if (is_array($this->params)) {
+                // @todo this should not happen, but when fetching CO, lazy loaded CF is not using CustomFieldPostLoadSubscriber
+                $this->params = new Params($this->params);
+            }
+
             return $this->params;
         }
 
