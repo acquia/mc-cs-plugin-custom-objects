@@ -59,9 +59,7 @@ class QueryFilterHelper
         $queryBuilder      = new QueryBuilder($connection);
         $fieldType         = $fieldType ?: $this->getCustomFieldType($queryBuilder, $fieldId);
         $valueQueryBuilder = $this->getBasicItemQueryBuilder($queryBuilder, $builderAlias);
-        $this->addCustomFieldValueJoin($valueQueryBuilder, $builderAlias, $fieldType);
-        $this->addCustomFieldIdRestriction($valueQueryBuilder, $builderAlias, $fieldId);
-
+        $this->addCustomFieldValueJoin($valueQueryBuilder, $builderAlias, $fieldType, $fieldId);
         return $valueQueryBuilder;
     }
 
@@ -76,19 +74,6 @@ class QueryFilterHelper
         $queryBuilder = new QueryBuilder($connection);
 
         return $this->getBasicItemQueryBuilder($queryBuilder, $queryBuilderAlias);
-    }
-
-    /**
-     * Restricts the result to certain custom field.
-     *
-     * @param QueryBuilder $queryBuilder
-     * @param string       $queryBuilderAlias
-     * @param int          $customFieldId
-     */
-    public function addCustomFieldIdRestriction(QueryBuilder $queryBuilder, string $queryBuilderAlias, int $customFieldId): void
-    {
-        $queryBuilder->andWhere($queryBuilder->expr()->eq($queryBuilderAlias.'_value.custom_field_id', ":{$queryBuilderAlias}_custom_field_id"));
-        $queryBuilder->setParameter("{$queryBuilderAlias}_custom_field_id", $customFieldId);
     }
 
     /**
@@ -207,7 +192,6 @@ class QueryFilterHelper
         }
 
         switch ($operator) {
-            case 'empty':
             case 'notIn':
                 break;
             default:
@@ -284,9 +268,13 @@ class QueryFilterHelper
     {
         switch ($operator) {
             case 'empty':
+                $expression = $customQuery->expr()->andX(
+                    $customQuery->expr()->isNotNull($tableAlias.'_value.value'),
+                    $customQuery->expr()->neq($tableAlias.'_value.value', $customQuery->expr()->literal(''))
+                );
+                break;
             case 'notEmpty':
                 $expression = $customQuery->expr()->isNotNull($tableAlias.'_value.value');
-
                 break;
             case 'notIn':
             case '!multiselect':
@@ -391,12 +379,16 @@ class QueryFilterHelper
      * @param QueryBuilder $customFieldQueryBuilder
      * @param string       $alias
      * @param string       $fieldType
+     * @param int          $fieldId
      *
      * @return QueryBuilder
-     *
      * @throws NotFoundException
      */
-    private function addCustomFieldValueJoin(QueryBuilder $customFieldQueryBuilder, string $alias, string $fieldType): QueryBuilder
+    private function addCustomFieldValueJoin(
+        QueryBuilder $customFieldQueryBuilder,
+        string $alias,
+        string $fieldType,
+        int $fieldId): QueryBuilder
     {
         $dataTable = $this->fieldTypeProvider->getType($fieldType)->getTableName();
 
@@ -404,8 +396,13 @@ class QueryFilterHelper
             $alias.'_item',
             $dataTable,
             $alias.'_value',
-            $alias.'_value.custom_item_id = '.$alias.'_item.id');
+            $customFieldQueryBuilder->expr()->andX(
+                $alias.'_value.custom_item_id = '.$alias.'_item.id',
+                $customFieldQueryBuilder->expr()->eq($alias.'_value.custom_field_id', ":{$alias}_custom_field_id")
+            )
+        );
 
+        $customFieldQueryBuilder->setParameter("{$alias}_custom_field_id", $fieldId);
         return $customFieldQueryBuilder;
     }
 
