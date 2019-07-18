@@ -19,30 +19,24 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructorAndToArray()
     {
-        $requiredValidationMessage = 'requiredValidationMessage';
-        $placeholder               = 'placeholder';
+        $placeholder = 'placeholder';
 
         $paramsArray = [
-            'requiredValidationMessage' => $requiredValidationMessage,
-            'placeholder'               => $placeholder,
+            'placeholder' => $placeholder,
         ];
 
         $params = new Params($paramsArray);
 
-        $this->assertSame($requiredValidationMessage, $params->getRequiredValidationMessage());
         $this->assertSame($placeholder, $params->getPlaceholder());
-
         $this->assertSame($paramsArray, $params->__toArray());
     }
 
     public function testToArrayRemovingFalseAndNullValues()
     {
-        $requiredValidationMessage = 'requiredValidationMessage';
-        $placeholder               = null;
+        $placeholder = null;
 
         $paramsArray = [
-            'requiredValidationMessage' => $requiredValidationMessage,
-            'placeholder'               => $placeholder,
+            'placeholder' => $placeholder,
         ];
 
         $params = new Params($paramsArray);
@@ -52,13 +46,9 @@ class ParamsTest extends \PHPUnit_Framework_TestCase
 
     public function testGettersSetters()
     {
-        $requiredValidationMessage  = 'requiredValidationMessage';
-        $placeholder                = 'placeholder';
+        $placeholder = 'placeholder';
 
         $params = new Params();
-
-        $params->setRequiredValidationMessage($requiredValidationMessage);
-        $this->assertSame($requiredValidationMessage, $params->getRequiredValidationMessage());
 
         $params->setPlaceholder($placeholder);
         $this->assertSame($placeholder, $params->getPlaceholder());

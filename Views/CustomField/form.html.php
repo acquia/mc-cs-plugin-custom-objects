@@ -70,10 +70,7 @@ $showProperties = isset($form['options']) || $customField->getTypeObject()->useP
 
             <div role="tabpanel" class="tab-pane" id="validation">
                 <div class="row">
-                    <div class="col-md-6">
-                        <?php echo $view['form']->row($form['params']['requiredValidationMessage']); ?>
-                    </div>
-                    <div class="col-md-6 chosen-required">
+                    <div class="col-md-12 chosen-required">
                         <?php echo $view['form']->row($form['required']); ?>
                     </div>
                 </div>
