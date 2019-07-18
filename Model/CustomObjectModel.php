@@ -241,7 +241,10 @@ class CustomObjectModel extends FormModel
         foreach ($customObject->getCustomFields() as $customField) {
             if ($customField->getId() === $customFieldId) {
                 $customObject->removeCustomField($customField);
-                $this->customFieldModel->deleteEntity($customField);
+                if ($this->entityManager->contains($customField)) {
+                    // We need to ensure that field exists when cloning CO with deleted fields
+                    $this->customFieldModel->deleteEntity($customField);
+                }
             }
         }
     }

@@ -53,4 +53,12 @@ class RadioGroupType extends AbstractTextType
         $allowedOperators = array_flip(['=', '!=', 'empty', '!empty','in','!in']);
         return array_intersect_key($availableOperators, $allowedOperators);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function usePlaceholder(): bool
+    {
+        return false;
+    }
 }

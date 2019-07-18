@@ -17,7 +17,7 @@ use Mautic\LeadBundle\Helper\FormFieldHelper;
 use Symfony\Component\Form\Extension\Core\Type\CountryType as SymfonyCountryType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class CountryType extends SelectType
+class CountryType extends SelectType implements StaticChoiceTypeInterface
 {
     /**
      * @var string
@@ -43,7 +43,7 @@ class CountryType extends SelectType
             $this->countryList = array_flip(FormFieldHelper::getCountryChoices());
         }
 
-        return ['choices' => $this->countryList];
+        return $this->countryList;
     }
 
     /**
@@ -60,7 +60,7 @@ class CountryType extends SelectType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'choices'                   => $this->getChoices(),
+            'choices'                   => ['choices' => $this->getChoices()],
             'choices_as_values'         => true,
             'choice_translation_domain' => false,
         ]);

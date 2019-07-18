@@ -28,6 +28,7 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\AbstractMultivalueType;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\StaticChoiceTypeInterface;
 
 class CustomField extends FormEntity implements UniqueEntityInterface
 {
@@ -299,12 +300,18 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     {
         $fieldTypeOptions = $this->getTypeObject()->createFormTypeOptions();
         $choices          = $this->getChoices();
+        $placeholder      = $this->getPlaceholder();
+
         $fieldOptions     = [
             'label'      => $this->getLabel(),
             'required'   => $this->isRequired(),
             'label_attr' => ['class' => 'control-label'],
             'attr'       => ['class' => 'form-control'],
         ];
+
+        if ($placeholder) {
+            $fieldOptions['attr']['data-placeholder'] = $placeholder;
+        }
 
         if ($choices) {
             $fieldOptions['choices'] = $choices;
@@ -453,8 +460,12 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     {
         $choices = [];
 
-        foreach ($this->getOptions() as $option) {
-            $choices[$option->getLabel()] = $option->getValue();
+        if ($this->getTypeObject() instanceof StaticChoiceTypeInterface) {
+            $choices = $this->getTypeObject()->getChoices();
+        } else {
+            foreach ($this->getOptions() as $option) {
+                $choices[$option->getValue()] = $option->getLabel();
+            }
         }
 
         return $choices;
@@ -495,5 +506,22 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     public function canHaveMultipleValues(): bool
     {
         return $this->getTypeObject() instanceof AbstractMultivalueType;
+    }
+
+    /**
+     * @return string|null
+     */
+    private function getPlaceholder()
+    {
+        $params      = $this->getParams();
+        $placeholder = null;
+
+        if (is_object($params)) {
+            $placeholder = $params->getPlaceholder();
+        } elseif (array_key_exists('placeholder', $params)) {
+            $placeholder = $params['placeholder'];
+        }
+
+        return $placeholder;
     }
 }

@@ -36,6 +36,14 @@ class CheckboxGroupType extends AbstractMultivalueType
     ];
 
     /**
+     * {@inheritdoc}
+     */
+    public function usePlaceholder(): bool
+    {
+        return false;
+    }
+
+    /**
      * @return string
      */
     public function getSymfonyFormFieldType(): string
