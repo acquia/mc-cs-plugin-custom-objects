@@ -58,12 +58,12 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                             {
                                 "label": "1",
                                 "value": "1",
-                                "order": "1"
+                                "order": "0"
                             },
                             {
                                 "label": "2",
                                 "value": "2",
-                                "order": "2"
+                                "order": "1"
                             }
                         ]',
                         'defaultValue' => [
@@ -183,12 +183,12 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                             {
                                 "label": "aa",
                                 "value": "av",
-                                "order": "1"
+                                "order": "0"
                             },
                             {
                                 "label": "bb",
                                 "value": "bv",
-                                "order": "2"
+                                "order": "1"
                             }
                         ]',
                         'defaultValue' => [
@@ -307,12 +307,12 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                             {
                                 "label": "rl",
                                 "value": "rv",
-                                "order": "1"
+                                "order": "0"
                             },
                             {
                                 "label": "rl1",
                                 "value": "rl2",
-                                "order": "2"
+                                "order": "1"
                             }
                         ]',
                         'params'       => '[]',
@@ -332,12 +332,12 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                             {
                                 "label": "sl",
                                 "value": "sv",
-                                "order": "1"
+                                "order": "0"
                             },
                             {
                                 "label": "sl1",
                                 "value": "sl2",
-                                "order": "2"
+                                "order": "1"
                             }
                         ]',
                         'params'       => '[]',
@@ -357,12 +357,12 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                             {
                                 "label": "msl",
                                 "value": "msv",
-                                "order": "1"
+                                "order": "0"
                             },
                             {
                                 "label": "msl1",
                                 "value": "msl2",
-                                "order": "2"
+                                "order": "1"
                             }
                         ]',
                         'params'       => '[]',
@@ -459,17 +459,17 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                             {
                                 "label": "cl1",
                                 "value": "cv1",
-                                "order": "1"
+                                "order": "0"
                             },
                             {
                                 "label": "cl2",
                                 "value": "cv2",
-                                "order": "2"
+                                "order": "1"
                             },
                             {
                                 "label": "cl3",
                                 "value": "cv3",
-                                "order": "3"
+                                "order": "2"
                             }
                         ]',
                         'defaultValue' => [
@@ -492,17 +492,17 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                             {
                                 "label": "ml1",
                                 "value": "mv1",
-                                "order": "1"
+                                "order": "0"
                             },
                             {
                                 "label": "ml2",
                                 "value": "mv2",
-                                "order": "2"
+                                "order": "1"
                             },
                             {
                                 "label": "ml3",
                                 "value": "mv3",
-                                "order": "3"
+                                "order": "2"
                             }
                         ]',
                         'defaultValue' => [
@@ -557,12 +557,12 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                             {
                                 "label": "msl",
                                 "value": "msv",
-                                "order": "1"
+                                "order": "0"
                             },
                             {
                                 "label": "msl1",
                                 "value": "msl2",
-                                "order": "2"
+                                "order": "1"
                             }
                         ]',
                     'params'       => '[]',
@@ -611,12 +611,12 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                             {
                                 "label": "rl",
                                 "value": "rv",
-                                "order": "1"
+                                "order": "0"
                             },
                             {
                                 "label": "rl1",
                                 "value": "rl2",
-                                "order": "2"
+                                "order": "1"
                             }
                         ]',
                     'params'       => '[]',
@@ -636,12 +636,12 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                             {
                                 "label": "msl",
                                 "value": "msv",
-                                "order": "1"
+                                "order": "0"
                             },
                             {
                                 "label": "msl1",
                                 "value": "msl2",
-                                "order": "2"
+                                "order": "1"
                             }
                         ]',
                     'params'       => '[]',
@@ -669,6 +669,122 @@ class CustomObjectFormTest extends MauticMysqlTestCase
         $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
         $this->assertCount(1, $response);
         $this->assertSame('/s/custom/object/edit/1', $response['redirect']);
+
+        $this->assertCustomObject($payload, 1);
+    }
+
+    public function testParametersCreateEdit(): void
+    {
+        $payload = [
+            'custom_object' => [
+                'nameSingular' => 'singularValue',
+                'namePlural'   => 'pluralValue',
+                'alias'        => 'pluralValue',
+                'description'  => 'descriptionValue',
+                'customFields' => [
+                    0 => [
+                        'id'           => '',
+                        'customObject' => '',
+                        'isPublished'  => '1',
+                        'type'         => 'select',
+                        'order'        => '0',
+                        'label'        => 'Select',
+                        'alias'        => '1',
+                        'required'     => '',
+                        'params'       => '{
+                            "requiredValidationMessage": "This is required",
+                            "placeholder": "placeholder"
+                        }',
+                        'options'      => '[
+                            {
+                                "label": "sl1",
+                                "value": "sv1",
+                                "order": "0"
+                            },
+                            {
+                                "label": "s12",
+                                "value": "sv2",
+                                "order": "1"
+                            }
+                        ]',
+                        'defaultValue' => 'sv2',
+                        'deleted'      => '',
+                    ],
+                    1 => [
+                        'id'           => '',
+                        'customObject' => '',
+                        'isPublished'  => '1',
+                        'type'         => 'multiselect',
+                        'order'        => '1',
+                        'label'        => 'Multiselect',
+                        'alias'        => '2',
+                        'required'     => '',
+                        'params'       => '{
+                            "requiredValidationMessage": "aa",
+                            "placeholder": "bbs"
+                        }',
+                        'options'      => '[
+                            {
+                                "label": "ml1",
+                                "value": "mv1",
+                                "order": "0"
+                            },
+                            {
+                                "label": "ml2",
+                                "value": "mv2",
+                                "order": "1"
+                            }
+                        ]',
+                        'defaultValue' => [
+                            0 => 'mv2',
+                        ],
+                        'deleted' => '',
+                    ],
+                ],
+                'isPublished' => '1',
+                'buttons'     => ['apply' => ''],
+            ],
+        ];
+
+        // Create CO
+        $this->client->request(
+            'POST',
+            's/custom/object/save',
+            $payload,
+            [],
+            $this->createHeaders()
+        );
+
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertCount(1, $response);
+        $this->assertSame('/s/custom/object/edit/1', $response['redirect']);
+
+        $this->assertCustomObject($payload, 1);
+
+        // Edit CO
+        $payload['custom_object']['alias']                           = 'pluralvalue';
+        $payload['custom_object']['customFields'][0]['id']           = 1;
+        $payload['custom_object']['customFields'][0]['customObject'] = 1;
+        $payload['custom_object']['customFields'][1]['id']           = 2;
+        $payload['custom_object']['customFields'][1]['customObject'] = 2;
+
+        $this->client->restart();
+        $this->client->request(
+            'POST',
+            's/custom/object/save/1',
+            $payload,
+            [],
+            $this->createHeaders()
+        );
+
+        $clientResponse = $this->client->getResponse();
+        $response       = json_decode($clientResponse->getContent(), true);
+
+        $this->assertSame(Response::HTTP_OK, $clientResponse->getStatusCode());
+        $this->assertSame('/s/custom/object/edit/1', $response['route']);
 
         $this->assertCustomObject($payload, 1);
     }
@@ -714,11 +830,13 @@ class CustomObjectFormTest extends MauticMysqlTestCase
             if ($expectedOptions) {
                 foreach ($expectedOptions as $key => $expectedOption) {
                     /** @var CustomFieldOption $option */
-                    $option = $customField->getOptions()[$key];
+                    $option = $customField->getOptions()->current();
 
                     $this->assertSame($expectedOption['label'], $option->getLabel());
                     $this->assertSame($expectedOption['value'], $option->getValue());
                     $this->assertSame((int) $expectedOption['order'], $option->getOrder());
+
+                    $customField->getOptions()->next();
                 }
             }
 
