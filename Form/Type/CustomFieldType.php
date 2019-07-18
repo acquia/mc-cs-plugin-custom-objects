@@ -331,7 +331,7 @@ class CustomFieldType extends AbstractType
                 unset($options['attr']['data-toggle']);
             }
 
-            if ($customField->getTypeObject()->hasChoices() || 'country' === $customField->getType()) {
+            if ($customField->isChoiceType() || $customField->getTypeObject() instanceof StaticChoiceTypeInterface) {
                 // Do not use chosen jQuery plugin
                 $options['attr']['class'] = $options['attr']['class'] ? $options['attr']['class'].' not-chosen' : 'not-chosen';
             }
