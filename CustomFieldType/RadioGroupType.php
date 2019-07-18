@@ -45,12 +45,13 @@ class RadioGroupType extends AbstractTextType
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getOperators(): array
     {
         $availableOperators     = OperatorOptions::getFilterExpressionFunctions();
-        $allowedOperators = array_flip(['=', '!=', 'empty', '!empty','in','!in']);
+        $allowedOperators       = array_flip(['=', '!=', 'empty', '!empty', 'in', '!in']);
+
         return array_intersect_key($availableOperators, $allowedOperators);
     }
 
