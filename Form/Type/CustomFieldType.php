@@ -331,7 +331,7 @@ class CustomFieldType extends AbstractType
                 unset($options['attr']['data-toggle']);
             }
 
-            if (method_exists($symfonyFormFieldType,'configureOptions')) {
+            if (method_exists($symfonyFormFieldType, 'configureOptions')) {
                 // Do not use chosen jQuery plugin
                 $options['attr']['class'] = $options['attr']['class'] ? $options['attr']['class'].' not-chosen' : 'not-chosen';
             }
