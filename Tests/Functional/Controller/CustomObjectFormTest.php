@@ -45,9 +45,9 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                         'id'           => '',
                         'customObject' => '',
                         'isPublished'  => '1',
-                        'type'         => 'checkbox_group',
+                        'type'         => 'multiselect',
                         'order'        => '0',
-                        'label'        => 'CheckboxGroup',
+                        'label'        => 'Multiselect',
                         'alias'        => '2',
                         'required'     => '',
                         'params'       => '{
@@ -170,9 +170,9 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                         'id'           => '',
                         'customObject' => '',
                         'isPublished'  => '1',
-                        'type'         => 'checkbox_group',
+                        'type'         => 'multiselect',
                         'order'        => '0',
-                        'label'        => 'CheckboxGroup',
+                        'label'        => 'Multiselect',
                         'alias'        => '10',
                         'required'     => '',
                         'params'       => '{
@@ -298,9 +298,9 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                         'id'           => '',
                         'customObject' => '',
                         'isPublished'  => '0',
-                        'type'         => 'radio_group',
+                        'type'         => 'select',
                         'order'        => '8',
-                        'label'        => 'Radio group',
+                        'label'        => 'Select',
                         'alias'        => '18',
                         'required'     => '1',
                         'options'      => '[
@@ -449,9 +449,9 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                         'id'           => '',
                         'customObject' => '',
                         'isPublished'  => '1',
-                        'type'         => 'checkbox_group',
+                        'type'         => 'multiselect',
                         'order'        => '0',
-                        'label'        => 'CheckboxGroup',
+                        'label'        => 'Multiselect',
                         'alias'        => '1',
                         'required'     => '',
                         'params'       => '[]',
@@ -536,7 +536,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
         $this->assertCustomObject($payload, 1);
     }
 
-    public function testMultiselectWithRadioOrder(): void
+    public function testMultiselectWithSelectOrder(): void
     {
         $payload = ['custom_object' => [
             'nameSingular' => 'Testing',
@@ -602,9 +602,9 @@ class CustomObjectFormTest extends MauticMysqlTestCase
                     'id'           => '',
                     'customObject' => '',
                     'isPublished'  => '0',
-                    'type'         => 'radio_group',
+                    'type'         => 'select',
                     'order'        => '0',
-                    'label'        => 'Radio group',
+                    'label'        => 'Select',
                     'alias'        => '18',
                     'required'     => '1',
                     'options'      => '[

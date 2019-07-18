@@ -85,7 +85,6 @@ class ApiSubscriberTest extends MauticMysqlTestCase
                                     'url-test-field'          => 'https://mautic.org',
                                     'multiselect-test-field'  => ['option_b'],
                                     'select-test-field'       => 'option_a',
-                                    'radio-group-test-field'  => 'option_b',
                                     'phone-number-test-field' => '+420775308002',
                                     'number-test-field'       => 123,
                                     'hidden-test-field'       => 'secret',
@@ -152,8 +151,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
                             [
                                 'name'       => 'Custom Item Created Via Contact API 2',
                                 'attributes' => [
-                                    'multiselect-test-field'    => 'option_a',
-                                    'checkbox-group-test-field' => ['option_b'],
+                                    'multiselect-test-field' => ['option_a'],
                                 ],
                             ],
                         ],
@@ -172,7 +170,6 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $customItemFromResponse = $responseData['contact']['customObjects']['data'][0]['data'][0];
 
         $this->assertSame(['option_a'], $customItemFromResponse['attributes']['multiselect-test-field']);
-        $this->assertSame(['option_b'], $customItemFromResponse['attributes']['checkbox-group-test-field']);
     }
 
     public function testCreatingContactWithCustomItemsAndEditAndClearValues(): void
@@ -192,9 +189,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
                                     'textarea-test-field'       => "Multi\nline\nvalue",
                                     'url-test-field'            => 'https://mautic.org',
                                     'multiselect-test-field'    => ['option_b'],
-                                    'checkbox-group-test-field' => ['option_b', 'option_a'],
                                     'select-test-field'         => 'option_a',
-                                    'radio-group-test-field'    => 'option_b',
                                     'phone-number-test-field'   => '+420775308002',
                                     'number-test-field'         => 123,
                                     'hidden-test-field'         => 'secret',
@@ -232,9 +227,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $this->assertSame("Multi\nline\nvalue", $customItemFromResponse['attributes']['textarea-test-field']);
         $this->assertSame('https://mautic.org', $customItemFromResponse['attributes']['url-test-field']);
         $this->assertSame(['option_b'], $customItemFromResponse['attributes']['multiselect-test-field']);
-        $this->assertSame(['option_b', 'option_a'], $customItemFromResponse['attributes']['checkbox-group-test-field']);
         $this->assertSame('option_a', $customItemFromResponse['attributes']['select-test-field']);
-        $this->assertSame('option_b', $customItemFromResponse['attributes']['radio-group-test-field']);
         $this->assertSame('+420775308002', $customItemFromResponse['attributes']['phone-number-test-field']);
         $this->assertSame(123, $customItemFromResponse['attributes']['number-test-field']);
         $this->assertSame('secret', $customItemFromResponse['attributes']['hidden-test-field']);
@@ -260,9 +253,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
                                     'textarea-test-field'       => "Multi\nnine\nvalue",
                                     'url-test-field'            => 'https://mautic.com',
                                     'multiselect-test-field'    => ['option_a'],
-                                    'checkbox-group-test-field' => ['option_a'],
                                     'select-test-field'         => 'option_b',
-                                    'radio-group-test-field'    => 'option_a',
                                     'phone-number-test-field'   => '+420775308003',
                                     'number-test-field'         => 123456,
                                     // 'hidden-test-field'         => 'secret sauce', // Test the value stick if not in the request.
@@ -295,9 +286,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $this->assertSame("Multi\nnine\nvalue", $customItemFromResponse['attributes']['textarea-test-field']);
         $this->assertSame('https://mautic.com', $customItemFromResponse['attributes']['url-test-field']);
         $this->assertSame(['option_a'], $customItemFromResponse['attributes']['multiselect-test-field']);
-        $this->assertSame(['option_a'], $customItemFromResponse['attributes']['checkbox-group-test-field']);
         $this->assertSame('option_b', $customItemFromResponse['attributes']['select-test-field']);
-        $this->assertSame('option_a', $customItemFromResponse['attributes']['radio-group-test-field']);
         $this->assertSame('+420775308003', $customItemFromResponse['attributes']['phone-number-test-field']);
         $this->assertSame(123456, $customItemFromResponse['attributes']['number-test-field']);
         $this->assertSame('secret', $customItemFromResponse['attributes']['hidden-test-field']);
@@ -323,9 +312,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
                                     'textarea-test-field'       => null,
                                     'url-test-field'            => null,
                                     'multiselect-test-field'    => null,
-                                    'checkbox-group-test-field' => null,
                                     'select-test-field'         => null,
-                                    'radio-group-test-field'    => null,
                                     'phone-number-test-field'   => null,
                                     'number-test-field'         => null,
                                     'hidden-test-field'         => null,
@@ -360,9 +347,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $this->assertSame('', $customItemFromResponse['attributes']['textarea-test-field']);
         $this->assertSame('', $customItemFromResponse['attributes']['url-test-field']);
         $this->assertSame([], $customItemFromResponse['attributes']['multiselect-test-field']);
-        $this->assertSame([], $customItemFromResponse['attributes']['checkbox-group-test-field']);
         $this->assertSame('', $customItemFromResponse['attributes']['select-test-field']);
-        $this->assertSame('', $customItemFromResponse['attributes']['radio-group-test-field']);
         $this->assertSame('', $customItemFromResponse['attributes']['phone-number-test-field']);
         $this->assertSame(null, $customItemFromResponse['attributes']['number-test-field']);
         $this->assertSame('', $customItemFromResponse['attributes']['hidden-test-field']);
@@ -396,8 +381,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
                             [
                                 'name'       => 'Custom Item Created Via Contact API for default value field test',
                                 'attributes' => [
-                                    'datetime-test-field'       => '2019-06-26 13:29:43',
-                                    'checkbox-group-test-field' => ['option_a'],
+                                    'datetime-test-field' => '2019-06-26 13:29:43',
                                     // 'date-test-field' => '', // Intentionally not provided in the request.
                                     // 'text-test-field' => '', // Intentionally not provided in the request.
                                     // 'multiselect-test-field' => '', // Intentionally not provided in the request.
@@ -422,7 +406,6 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $this->assertSame('2019-06-21', $customItemFromResponse['attributes']['date-test-field']);
         $this->assertSame('2019-06-26T13:29:43+00:00', $customItemFromResponse['attributes']['datetime-test-field']);
         $this->assertSame('A default value', $customItemFromResponse['attributes']['text-test-field']);
-        $this->assertSame(['option_a'], $customItemFromResponse['attributes']['checkbox-group-test-field']);
         $this->assertSame(['option_b'], $customItemFromResponse['attributes']['multiselect-test-field']);
         $this->assertSame('', $customItemFromResponse['attributes']['url-test-field']);
     }
@@ -453,7 +436,6 @@ class ApiSubscriberTest extends MauticMysqlTestCase
                                 'name'       => 'Custom Item Created Via Contact API for default value field test',
                                 'attributes' => [
                                     'datetime-test-field'       => '2019-06-26 13:29:43',
-                                    'checkbox-group-test-field' => ['option_a'],
                                     'date-test-field'           => '',
                                     'text-test-field'           => '',
                                     'multiselect-test-field'    => '',
@@ -477,7 +459,6 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $this->assertSame(null, $customItemFromResponse['attributes']['date-test-field']);
         $this->assertSame('2019-06-26T13:29:43+00:00', $customItemFromResponse['attributes']['datetime-test-field']);
         $this->assertSame('', $customItemFromResponse['attributes']['text-test-field']);
-        $this->assertSame(['option_a'], $customItemFromResponse['attributes']['checkbox-group-test-field']);
         $this->assertSame([], $customItemFromResponse['attributes']['multiselect-test-field']);
         $this->assertSame('', $customItemFromResponse['attributes']['url-test-field']);
     }
@@ -546,7 +527,6 @@ class ApiSubscriberTest extends MauticMysqlTestCase
                                     'url-test-field'          => 'https://mautic.org',
                                     'multiselect-test-field'  => ['option_b'],
                                     'select-test-field'       => 'option_a',
-                                    'radio-group-test-field'  => 'option_b',
                                     'phone-number-test-field' => '+420775308002',
                                     'number-test-field'       => 123,
                                     'hidden-test-field'       => 'secret',
@@ -578,7 +558,6 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $this->assertSame('https://mautic.org', $customItemFromResponse['attributes']['url-test-field']);
         $this->assertSame(['option_b'], $customItemFromResponse['attributes']['multiselect-test-field']);
         $this->assertSame('option_a', $customItemFromResponse['attributes']['select-test-field']);
-        $this->assertSame('option_b', $customItemFromResponse['attributes']['radio-group-test-field']);
         $this->assertSame('+420775308002', $customItemFromResponse['attributes']['phone-number-test-field']);
         $this->assertSame(123, $customItemFromResponse['attributes']['number-test-field']);
         $this->assertSame('secret', $customItemFromResponse['attributes']['hidden-test-field']);
@@ -602,7 +581,6 @@ class ApiSubscriberTest extends MauticMysqlTestCase
                                     'url-test-field'          => 'https://mautic.com',
                                     'multiselect-test-field'  => ['option_a'],
                                     'select-test-field'       => 'option_b',
-                                    'radio-group-test-field'  => 'option_a',
                                     'phone-number-test-field' => '+420775308003',
                                     'number-test-field'       => 123456,
                                     'hidden-test-field'       => 'secret sauce',
@@ -635,7 +613,6 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $this->assertSame('https://mautic.com', $customItemFromResponse['attributes']['url-test-field']);
         $this->assertSame(['option_a'], $customItemFromResponse['attributes']['multiselect-test-field']);
         $this->assertSame('option_b', $customItemFromResponse['attributes']['select-test-field']);
-        $this->assertSame('option_a', $customItemFromResponse['attributes']['radio-group-test-field']);
         $this->assertSame('+420775308003', $customItemFromResponse['attributes']['phone-number-test-field']);
         $this->assertSame(123456, $customItemFromResponse['attributes']['number-test-field']);
         $this->assertSame('secret sauce', $customItemFromResponse['attributes']['hidden-test-field']);

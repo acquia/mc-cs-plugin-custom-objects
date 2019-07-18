@@ -83,7 +83,6 @@ class ImportSubscriberTest extends KernelTestCase
             'name'           => 'Import CI all fields test Custom Item',
             'contacts'       => "{$jane->getId()},{$john->getId()}",
             'text'           => 'Some text value',
-            'checkbox_group' => 'option_b',
             'country'        => 'Czech Republic',
             'datetime'       => '2019-03-04 12:35:09',
             'date'           => '2019-03-04',
@@ -92,7 +91,6 @@ class ImportSubscriberTest extends KernelTestCase
             'int'            => '3453562',
             'multiselect'    => 'option_b,option_a',
             'phone'          => '+420775603019',
-            'radio_group'    => 'option_a',
             'select'         => 'option_b',
             'textarea'       => "Some looong\ntext\n\nhere",
             'url'            => 'https://mautic.org',
@@ -101,7 +99,6 @@ class ImportSubscriberTest extends KernelTestCase
         $expectedValues                   = $csvRow;
         $expectedValues['datetime']       = new \DateTimeImmutable('2019-03-04 12:35:09');
         $expectedValues['date']           = new \DateTimeImmutable('2019-03-04 00:00:00');
-        $expectedValues['checkbox_group'] = ['option_b'];
         $expectedValues['multiselect']    = ['option_a', 'option_b'];
 
         // Import the custom item
@@ -140,7 +137,6 @@ class ImportSubscriberTest extends KernelTestCase
         $expectedUpdatedValues                   = $editCsvRow;
         $expectedUpdatedValues['datetime']       = new \DateTimeImmutable('2019-03-04 12:35:09');
         $expectedUpdatedValues['date']           = new \DateTimeImmutable('2019-05-24 00:00:00');
-        $expectedUpdatedValues['checkbox_group'] = ['option_b'];
         $expectedUpdatedValues['multiselect']    = ['option_a', 'option_b'];
 
         $this->assertTrue($updateStatus);
@@ -192,7 +188,6 @@ class ImportSubscriberTest extends KernelTestCase
             'name'           => 'Import CI all fields test Custom Item',
             'contacts'       => "{$jane->getId()},{$john->getId()}",
             // 'text'           => '', // Missing on puprose so the default value could kick in.
-            'checkbox_group' => 'option_b',
             // 'multiselect'    => '', // Missing on puprose so the default value could kick in.
             'country'        => 'Czech Republic',
             // 'date'           => '', // Missing on puprose so the default value could kick in.
@@ -201,7 +196,6 @@ class ImportSubscriberTest extends KernelTestCase
             'hidden'         => 'secret hidden text', // Ensure the default value can be overwritten when provided.
             'int'            => '3453562',
             'phone'          => '+420775603019',
-            'radio_group'    => 'option_a',
             'select'         => 'option_b',
             'textarea'       => "Some looong\ntext\n\nhere",
             'url'            => 'https://mautic.org',
@@ -210,7 +204,6 @@ class ImportSubscriberTest extends KernelTestCase
         $expectedValues                   = $csvRow;
         $expectedValues['datetime']       = new \DateTimeImmutable('2019-03-04 12:35:09');
         $expectedValues['date']           = new \DateTimeImmutable('2019-06-21 00:00:00');
-        $expectedValues['checkbox_group'] = ['option_b'];
         $expectedValues['multiselect']    = ['option_b'];
         $expectedValues['text']           = 'A default value';
 
