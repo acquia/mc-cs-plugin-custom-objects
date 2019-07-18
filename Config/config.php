@@ -19,7 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 return [
     'name'        => 'Custom Objects',
     'description' => 'Adds custom objects and fields features to Mautic',
-    'version'     => '0.0.9',
+    'version'     => '0.0.10',
     'author'      => 'Mautic, Inc.',
 
     'routes' => [
@@ -829,11 +829,6 @@ return [
             ],
         ],
         'fieldTypes' => [
-            'custom.field.type.checkbox_group' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\CheckboxGroupType::class,
-                'arguments' => ['translator', 'custom_object.csv.helper'],
-                'tag'       => 'custom.field.type',
-            ],
             'custom.field.type.country' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\CountryType::class,
                 'arguments' => ['translator'],
@@ -869,11 +864,6 @@ return [
                 'arguments' => ['translator'],
                 'tag'       => 'custom.field.type',
             ],
-            'custom.field.type.radio_group' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\RadioGroupType::class,
-                'arguments' => ['translator'],
-                'tag'       => 'custom.field.type',
-            ],
             'custom.field.type.select' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\SelectType::class,
                 'arguments' => ['translator'],
@@ -899,6 +889,18 @@ return [
                 'arguments' => ['translator'],
                 'tag'       => 'custom.field.type',
             ],
+            // Hiding these as they duplicate the select and multiselect field type functionality.
+            // Remove these field types if no one will miss them.
+            // 'custom.field.type.checkbox_group' => [
+            //     'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\CheckboxGroupType::class,
+            //     'arguments' => ['translator', 'custom_object.csv.helper'],
+            //     'tag'       => 'custom.field.type',
+            // ],
+            // 'custom.field.type.radio_group' => [
+            //     'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\RadioGroupType::class,
+            //     'arguments' => ['translator'],
+            //     'tag'       => 'custom.field.type',
+            // ],
         ],
         'other' => [
             'custom_object.config.provider' => [
