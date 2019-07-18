@@ -50,12 +50,4 @@ class CheckboxGroupType extends AbstractMultivalueType
     {
         return ChoiceType::class;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function useEmptyValue(): bool
-    {
-        return true;
-    }
 }
