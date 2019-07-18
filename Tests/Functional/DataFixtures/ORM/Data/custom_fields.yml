@@ -41,13 +41,6 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomField:
     label: '<word()> Select'
     alias: 'select_6'
     type: 'select'
-  custom_field7:
-    custom_object: '@custom_object1'
-    is_published: true
-    date_added: '<datetime()>'
-    label: '<word()> Radio'
-    alias: 'radio_7'
-    type: 'radio_group'
   custom_field8:
     custom_object: '@custom_object1'
     is_published: true
@@ -76,10 +69,3 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomField:
     label: '<word()> Country'
     alias: 'country_11'
     type: 'country'
-  custom_field12:
-    custom_object: '@custom_object1'
-    is_published: true
-    date_added: '<datetime()>'
-    label: '<word()> CheckBox'
-    alias: 'checkbox_12'
-    type: 'checkbox_group'
