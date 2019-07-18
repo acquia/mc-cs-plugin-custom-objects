@@ -60,6 +60,7 @@ class QueryFilterHelper
         $fieldType         = $fieldType ?: $this->getCustomFieldType($queryBuilder, $fieldId);
         $valueQueryBuilder = $this->getBasicItemQueryBuilder($queryBuilder, $builderAlias);
         $this->addCustomFieldValueJoin($valueQueryBuilder, $builderAlias, $fieldType, $fieldId);
+
         return $valueQueryBuilder;
     }
 
@@ -272,9 +273,11 @@ class QueryFilterHelper
                     $customQuery->expr()->isNotNull($tableAlias.'_value.value'),
                     $customQuery->expr()->neq($tableAlias.'_value.value', $customQuery->expr()->literal(''))
                 );
+
                 break;
             case 'notEmpty':
                 $expression = $customQuery->expr()->isNotNull($tableAlias.'_value.value');
+
                 break;
             case 'notIn':
             case '!multiselect':
@@ -382,6 +385,7 @@ class QueryFilterHelper
      * @param int          $fieldId
      *
      * @return QueryBuilder
+     *
      * @throws NotFoundException
      */
     private function addCustomFieldValueJoin(
@@ -403,6 +407,7 @@ class QueryFilterHelper
         );
 
         $customFieldQueryBuilder->setParameter("{$alias}_custom_field_id", $fieldId);
+
         return $customFieldQueryBuilder;
     }
 
