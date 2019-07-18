@@ -103,6 +103,29 @@ class CampaignSubscriberTest extends KernelTestCase
         $this->customItemModel->save($customItem);
         $this->customItemModel->linkEntity($customItem, 'contact', (int) $contact->getId());
 
+        // Test the multiselect value less than 2019-08-05.
+        // This is throwing 'Array to string conversion' exception. Have to investigate further.
+        $event = $this->createCampaignExecutionEvent(
+            $contact,
+            $multiselectValue->getCustomField()->getId(),
+            'in',
+            'option_b'
+        );
+
+        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $this->assertTrue($event->getResult());
+
+        // Test the multiselect value less than 2019-06-05.
+        $event = $this->createCampaignExecutionEvent(
+            $contact,
+            $multiselectValue->getCustomField()->getId(),
+            'in',
+            ['option_a']
+        );
+
+        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $this->assertFalse($event->getResult());
+
         // Test the URL value is empty.
         // Reported as a segment bug https://github.com/mautic-inc/mautic-internal/issues/1781. Uncomment once fixed.
         // $event = $this->createCampaignExecutionEvent(
@@ -276,29 +299,6 @@ class CampaignSubscriberTest extends KernelTestCase
 
         $this->campaignSubscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
-
-        // Test the multiselect value less than 2019-08-05.
-        // This is throwing 'Array to string conversion' exception. Have to investigate further.
-        // $event = $this->createCampaignExecutionEvent(
-        //     $contact,
-        //     $multiselectValue->getCustomField()->getId(),
-        //     'in',
-        //     ['option_b']
-        // );
-
-        // $this->campaignSubscriber->onCampaignTriggerCondition($event);
-        // $this->assertTrue($event->getResult());
-
-        // Test the multiselect value less than 2019-06-05.
-        // $event = $this->createCampaignExecutionEvent(
-        //     $contact,
-        //     $multiselectValue->getCustomField()->getId(),
-        //     'in',
-        //     ['option_a']
-        // );
-
-        // $this->campaignSubscriber->onCampaignTriggerCondition($event);
-        // $this->assertFalse($event->getResult());
     }
 
     /**
