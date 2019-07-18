@@ -49,6 +49,7 @@ class ParamsType extends AbstractType
     {
         $resolver->setDefaults(
             [
+                'label'              => false,
                 'data_class'         => Params::class,
                 'custom_object_form' => false,
                 'csrf_protection'    => false,
