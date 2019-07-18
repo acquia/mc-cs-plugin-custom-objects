@@ -13,10 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
-use Mautic\LeadBundle\Segment\OperatorOptions;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
-class RadioGroupType extends AbstractTextType
+class RadioGroupType extends SelectType
 {
     /**
      * @var string
@@ -35,25 +34,6 @@ class RadioGroupType extends AbstractTextType
         'expanded'    => true,
         'multiple'    => false,
     ];
-
-    /**
-     * @return string
-     */
-    public function getSymfonyFormFieldType(): string
-    {
-        return ChoiceType::class;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getOperators(): array
-    {
-        $availableOperators     = OperatorOptions::getFilterExpressionFunctions();
-        $allowedOperators       = array_flip(['=', '!=', 'empty', '!empty', 'in', '!in']);
-
-        return array_intersect_key($availableOperators, $allowedOperators);
-    }
 
     /**
      * {@inheritdoc}
