@@ -223,9 +223,9 @@ class TokenSubscriberTest extends KernelTestCase
 
     public function testMultiselectFieldSegmentFilterToken(): void
     {
-        $this->markTestIncomplete(
-            'Return to this test after "Error: Call to undefined method Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder::multiselect()" is fixed. Jan Kozak is on it.'
-        );
+        // $this->markTestIncomplete(
+        //     'Return to this test after "Error: Call to undefined method Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder::multiselect()" is fixed. Jan Kozak is on it.'
+        // );
         $customObject = $this->createCustomObjectWithAllFields($this->container, 'Product');
         $customItem   = new CustomItem($customObject);
         $contact      = $this->createContact('john@doe.email');
@@ -247,7 +247,7 @@ class TokenSubscriberTest extends KernelTestCase
                 'field'    => 'cmf_'.$value->getCustomField()->getId(),
                 'object'   => 'custom_object',
                 'type'     => 'multiselect',
-                'filter'   => 'option_b',
+                'filter'   => ['option_b'],
                 'display'  => null,
                 'operator' => 'in',
             ],
@@ -287,7 +287,7 @@ class TokenSubscriberTest extends KernelTestCase
 
         $this->assertSame(
             [
-                '{custom-object=products:multiselect-test-field | where=segment-filter |order=latest|limit=1 | default=No thing}' => 'what will be here?',
+                '{custom-object=products:multiselect-test-field | where=segment-filter |order=latest|limit=1 | default=No thing}' => 'Option B',
             ],
             $event->getTokens()
         );
