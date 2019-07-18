@@ -32,10 +32,12 @@ use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use Doctrine\DBAL\Connection;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryBuilderParamCopyTrait;
 
 class CampaignSubscriber extends CommonSubscriber
 {
     use DbalQueryTrait;
+    use DbalQueryBuilderParamCopyTrait;
 
     /**
      * @var TranslatorInterface
@@ -220,12 +222,18 @@ class CampaignSubscriber extends CommonSubscriber
 
         $queryAlias = 'q1';
 
+        $value = $event->getConfig()['value'];
+
+        if ($customField->canHaveMultipleValues() && is_string($value)) {
+            $value = [$value];
+        }
+
         $fakeSegmentFilter = [
             'glue'     => 'and',
             'field'    => 'cmf_'.$customField->getId(),
             'object'   => 'custom_object',
             'type'     => $customField->getType(),
-            'filter'   => $event->getConfig()['value'],
+            'filter'   => $value,
             'operator' => $event->getConfig()['operator'],
             'display'  => null,
         ];
@@ -251,9 +259,7 @@ class CampaignSubscriber extends CommonSubscriber
             CustomItem::TABLE_ALIAS.".id {$negator}= {$queryAlias}.id"
         );
 
-        foreach ($innerQueryBuilder->getParameters() as $key => $value) {
-            $queryBuilder->setParameter($key, $value);
-        }
+        $this->copyParams($innerQueryBuilder, $queryBuilder);
 
         $customItemId = $this->executeSelect($queryBuilder)->fetchColumn();
 

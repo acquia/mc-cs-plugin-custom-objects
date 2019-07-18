@@ -18,9 +18,12 @@ use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
+use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryBuilderParamCopyTrait;
 
 class CustomItemFilterQueryBuilder extends BaseFilterQueryBuilder
 {
+    use DbalQueryBuilderParamCopyTrait;
+
     /**
      * @var QueryFilterHelper
      */
@@ -78,9 +81,7 @@ class CustomItemFilterQueryBuilder extends BaseFilterQueryBuilder
                 $queryBuilder->addLogic($queryBuilder->expr()->exists($filterQueryBuilder->getSQL()), $filter->getGlue());
         }
 
-        foreach ($filterQueryBuilder->getParameters() as $paraName => $paraValue) {
-            $queryBuilder->setParameter($paraName, $paraValue);
-        }
+        $this->copyParams($filterQueryBuilder, $queryBuilder);
 
         return $queryBuilder;
     }
