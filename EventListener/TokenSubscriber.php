@@ -37,6 +37,7 @@ use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CampaignBundle\Entity\Event;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
+use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryBuilderParamCopyTrait;
 
 /**
  * Handles Custom Object token replacements with the correct value in emails.
@@ -44,6 +45,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
 class TokenSubscriber implements EventSubscriberInterface
 {
     use MatchFilterForLeadTrait;
+    use DbalQueryBuilderParamCopyTrait;
 
     /**
      * @var ConfigProvider
@@ -246,9 +248,7 @@ class TokenSubscriber implements EventSubscriberInterface
                     CustomItem::TABLE_ALIAS.".id {$operator} {$queryAlias}.id"
                 );
 
-                foreach ($innerQueryBuilder->getParameters() as $key => $value) {
-                    $queryBuilder->setParameter($key, $value);
-                }
+                $this->copyParams($innerQueryBuilder, $queryBuilder);
             }
         }
     }
