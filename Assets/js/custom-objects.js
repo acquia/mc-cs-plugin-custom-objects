@@ -33,8 +33,9 @@ CustomObjects = {
 
     updateFormFieldOptions(fieldSelect, operatorSelect) {
         let valueField = mQuery('#campaignevent_properties_value');
-        let operators = JSON.parse(fieldSelect.find(':selected').attr('data-operators'));
-        let options = JSON.parse(fieldSelect.find(':selected').attr('data-options'));
+        let selectedField = fieldSelect.find(':selected');
+        let operators = JSON.parse(selectedField.attr('data-operators'));
+        let options = JSON.parse(selectedField.attr('data-options'));
         let selectedOperator = operatorSelect.find(':selected').attr('value');
         let isEmptyOperator = selectedOperator === 'empty' || selectedOperator === '!empty';
         let valueFieldAttrs = {
@@ -59,22 +60,21 @@ CustomObjects = {
 
         let newValueField = mQuery('<input/>').attr('type', 'text');
 
-        if (options.length && !isEmptyOperator) {
+        if (!mQuery.isEmptyObject(options) && !isEmptyOperator) {
             newValueField = mQuery('<select/>');
-            for (let optionKey in options) {
-                let optionData = options[optionKey];
-                let option = mQuery("<option></option>")
-                    .attr('value', optionData.value)
-                    .text(optionData.label);
-                if (valueField.attr('value') == optionData.value) {
-                    option.attr('selected', true);
-                }
-                newValueField.append(option);
+            for (let optionValue in options) {
+                newValueField.append(
+                    mQuery("<option></option>")
+                        .attr('value', optionValue)
+                        .attr('selected', valueField.attr('value') == optionValue)
+                        .text(options[optionValue])
+                );
             };
         }
 
         if (isEmptyOperator) {
             newValueField.attr('readonly', true);
+            newValueField.attr('value', '');
         } else {
             newValueField.attr('value', valueFieldAttrs['value']);
         }

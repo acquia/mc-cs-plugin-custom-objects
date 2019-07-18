@@ -32,4 +32,12 @@ class RadioGroupType extends SelectType
         'expanded'    => true,
         'multiple'    => false,
     ];
+
+    /**
+     * {@inheritdoc}
+     */
+    public function usePlaceholder(): bool
+    {
+        return false;
+    }
 }

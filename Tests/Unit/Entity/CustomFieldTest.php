@@ -223,21 +223,30 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
         $customField->setLabel('Colors');
         $customField->addOption($red);
         $customField->addOption($blue);
+        $customField->setParams(['placeholder' => 'Select one']);
 
-        $this->assertSame([
+        $expectedOptions = [
             'expanded'   => false,
             'multiple'   => false,
             'label'      => 'Colors',
             'required'   => true,
             'label_attr' => ['class' => 'control-label'],
-            'attr'       => ['class' => 'form-control'],
+            'attr'       => [
+                'class'            => 'form-control',
+                'data-placeholder' => 'Select one',
+            ],
             'choices'    => [
                 'red'  => 'Red',
                 'blue' => 'Blue',
             ],
-        ],
-            $customField->getFormFieldOptions(['required' => true])
-        );
+        ];
+
+        $this->assertSame($expectedOptions, $customField->getFormFieldOptions(['required' => true]));
+
+        $params = new Params(['placeholder' => 'Select one']);
+        $customField->setParams($params);
+
+        $this->assertSame($expectedOptions, $customField->getFormFieldOptions(['required' => true]));
     }
 
     public function testGetChoices(): void

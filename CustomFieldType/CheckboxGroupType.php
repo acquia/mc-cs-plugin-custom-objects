@@ -49,5 +49,12 @@ class CheckboxGroupType extends AbstractMultivalueType
     public function useEmptyValue(): bool
     {
         return true;
+
+     /**
+     * {@inheritdoc}
+     */
+    public function usePlaceholder(): bool
+    {
+        return false;
     }
 }
