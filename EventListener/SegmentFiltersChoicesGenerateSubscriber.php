@@ -108,9 +108,13 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
                         continue;
                     }
 
-                    $availableOperator = $this->getOperatorsForFieldType($customField->getType());
+                    $availableOperators = $this->getOperatorChoiceList([
+                        'include' => array_keys($customField->getTypeObject()->getOperators())
+                    ]);
+
                     $allowedOperators = $customField->getTypeObject()->getOperators();
-                    $operators = array_intersect_key($availableOperator, $allowedOperators);
+                    $availableOperators = $this->getOperatorsForFieldType($customField->getType());
+                    $operators = array_intersect_key($availableOperators, $allowedOperators);
 
                     $event->addChoice(
                         'custom_object',

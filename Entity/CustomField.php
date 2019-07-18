@@ -454,7 +454,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         $choices = [];
 
         foreach ($this->getOptions() as $option) {
-            $choices[$option->getValue()] = $option->getLabel();
+            $choices[$option->getLabel()] = $option->getValue();
         }
 
         return $choices;
