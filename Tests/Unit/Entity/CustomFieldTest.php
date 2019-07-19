@@ -31,6 +31,7 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\Callback;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CheckboxGroupType;
 use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\CountryType;
 
 class CustomFieldTest extends \PHPUnit_Framework_TestCase
 {
@@ -269,6 +270,25 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
             'option_a' => 'Option A',
             'option_b' => 'Option B',
         ], $customField->getChoices());
+    }
+
+    public function testGetChoicesWithCountryField(): void
+    {
+        $customField = new CustomField();
+        $customField->setTypeObject(new CountryType($this->createMock(TranslatorInterface::class)));
+
+        $this->assertSame('Czech Republic', $customField->getChoices()['Czech Republic']);
+    }
+
+    public function testValueToLabel(): void
+    {
+        $customField = new CustomField();
+        $optionB     = new CustomFieldOption();
+        $optionB->setLabel('Option B');
+        $optionB->setValue('option_b');
+        $customField->addOption($optionB);
+        $customField->setTypeObject(new SelectType($this->createMock(TranslatorInterface::class)));
+        $this->assertSame('Option B', $customField->valueToLabel('option_b'));
     }
 
     public function testDefaultValueTransformation()

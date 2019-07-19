@@ -16,10 +16,16 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\CustomFieldType;
 use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\SelectType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
 class SelectTypeTest extends \PHPUnit_Framework_TestCase
 {
     private $translator;
+    private $customField;
+    private $customItem;
 
     /**
      * @var SelectType
@@ -30,8 +36,10 @@ class SelectTypeTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->fieldType  = new SelectType($this->translator);
+        $this->translator  = $this->createMock(TranslatorInterface::class);
+        $this->customField = $this->createMock(CustomField::class);
+        $this->customItem  = $this->createMock(CustomItem::class);
+        $this->fieldType   = new SelectType($this->translator);
     }
 
     public function testGetSymfonyFormFieldType(): void
@@ -54,5 +62,29 @@ class SelectTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('empty', $operators);
         $this->assertArrayHasKey('!empty', $operators);
         $this->assertArrayNotHasKey('in', $operators);
+    }
+
+    public function testValueToString(): void
+    {
+        $fieldValue = new CustomFieldValueOption($this->customField, $this->customItem, 'option_b');
+
+        $this->customField->expects($this->once())
+            ->method('valueToLabel')
+            ->with('option_b')
+            ->willReturn('Option B');
+
+        $this->assertSame('Option B', $this->fieldType->valueToString($fieldValue));
+    }
+
+    public function testValueToStringIfOptionDoesNotExist(): void
+    {
+        $fieldValue = new CustomFieldValueOption($this->customField, $this->customItem, 'unicorn');
+
+        $this->customField->expects($this->once())
+            ->method('valueToLabel')
+            ->with('unicorn')
+            ->will($this->throwException(new NotFoundException('Option unicorn does not exist')));
+
+        $this->assertSame('unicorn', $this->fieldType->valueToString($fieldValue));
     }
 }

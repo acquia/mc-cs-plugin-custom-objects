@@ -24,6 +24,7 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\MultivalueT
 use Doctrine\Common\Collections\ArrayCollection;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\CsvTransformer;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
 class AbstractMultivalueTypeTest extends \PHPUnit_Framework_TestCase
 {
@@ -214,13 +215,19 @@ class AbstractMultivalueTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testValueToStringWithArrayValue(): void
     {
-        $fieldValue = new CustomFieldValueOption($this->customField, $this->customItem, ['one', 'two']);
+        // Note: unicorn value does not exist in the options for this field.
+        $fieldValue = new CustomFieldValueOption($this->customField, $this->customItem, ['one', 'two', 'unicorn']);
 
-        $this->customField->expects($this->once())
-            ->method('getChoices')
-            ->willReturn(['one' => 'Option 1', 'two' => 'Option2']);
+        $this->customField->expects($this->exactly(3))
+            ->method('valueToLabel')
+            ->withConsecutive(['one'], ['two'], ['unicorn'])
+            ->will($this->onConsecutiveCalls(
+                'Option 1',
+                'Option2',
+                $this->throwException(new NotFoundException('Value unicorn does not exist'))
+            ));
 
-        $this->assertSame('"Option 1",Option2', $this->fieldType->valueToString($fieldValue));
+        $this->assertSame('"Option 1",Option2,unicorn', $this->fieldType->valueToString($fieldValue));
     }
 
     public function testValueToStringWithStringValue(): void
@@ -228,20 +235,10 @@ class AbstractMultivalueTypeTest extends \PHPUnit_Framework_TestCase
         $fieldValue = new CustomFieldValueOption($this->customField, $this->customItem, 'one');
 
         $this->customField->expects($this->once())
-            ->method('getChoices')
-            ->willReturn(['one' => 'Option 1', 'two' => 'Option2']);
+            ->method('valueToLabel')
+            ->with('one')
+            ->willReturn('Option 1');
 
         $this->assertSame('"Option 1"', $this->fieldType->valueToString($fieldValue));
-    }
-
-    public function testValuesToLabels(): void
-    {
-        $this->customField->expects($this->once())
-            ->method('getChoices')
-            ->willReturn(['one' => 'Choice 1', 'two' => 'Choice 2', 3 => 'Choice 3']);
-
-        $labels = $this->fieldType->valuesToLabels($this->customField, ['two', 3]);
-
-        $this->assertSame(['Choice 2', 'Choice 3'], $labels);
     }
 }
