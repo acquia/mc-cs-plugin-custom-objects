@@ -33,6 +33,8 @@ use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use Doctrine\DBAL\Connection;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryBuilderParamCopyTrait;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
 class CampaignSubscriber extends CommonSubscriber
 {
@@ -220,46 +222,28 @@ class CampaignSubscriber extends CommonSubscriber
             return;
         }
 
-        $queryAlias = 'q1';
-
-        $value = $event->getConfig()['value'];
-
-        if ($customField->canHaveMultipleValues() && is_string($value)) {
-            $value = [$value];
-        }
-
-        $fakeSegmentFilter = [
-            'glue'     => 'and',
-            'field'    => 'cmf_'.$customField->getId(),
-            'object'   => 'custom_object',
-            'type'     => $customField->getType(),
-            'filter'   => $value,
-            'operator' => $event->getConfig()['operator'],
-            'display'  => null,
-        ];
-
-        $queryBuilder = $this->connection->createQueryBuilder();
-        $queryBuilder->select(CustomItem::TABLE_ALIAS.'.id');
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX.CustomItem::TABLE_NAME, CustomItem::TABLE_ALIAS);
-
+        $queryAlias        = 'q1';
+        $value             = $event->getConfig()['value'];
+        $operator          = $event->getConfig()['operator'];
+        $queryBuilder      = $this->connection->createQueryBuilder();
         $innerQueryBuilder = $this->queryFilterFactory->configureQueryBuilderFromSegmentFilter(
-            $fakeSegmentFilter,
+            $this->modelSegmentFilterArray($customField, $operator, $value),
             $queryAlias
         );
 
-        $this->queryFilterHelper->addContactIdRestriction($innerQueryBuilder, $queryAlias, (int) $contact->getId());
         $innerQueryBuilder->select($queryAlias.'_item.id');
+        $this->queryFilterHelper->addContactIdRestriction($innerQueryBuilder, $queryAlias, (int) $contact->getId());
+        $this->handleEmptyOperators($operator, $queryAlias, $innerQueryBuilder);
+        $this->copyParams($innerQueryBuilder, $queryBuilder);
 
-        $negator = in_array($event->getConfig()['operator'], ['empty', 'neq', 'notLike'], true) ? '!' : '';
-
+        $queryBuilder->select(CustomItem::TABLE_ALIAS.'.id');
+        $queryBuilder->from(MAUTIC_TABLE_PREFIX.CustomItem::TABLE_NAME, CustomItem::TABLE_ALIAS);
         $queryBuilder->innerJoin(
             CustomItem::TABLE_ALIAS,
             "({$innerQueryBuilder->getSQL()})",
             $queryAlias,
-            CustomItem::TABLE_ALIAS.".id {$negator}= {$queryAlias}.id"
+            CustomItem::TABLE_ALIAS.".id = {$queryAlias}.id"
         );
-
-        $this->copyParams($innerQueryBuilder, $queryBuilder);
 
         $customItemId = $this->executeSelect($queryBuilder)->fetchColumn();
 
@@ -269,5 +253,60 @@ class CampaignSubscriber extends CommonSubscriber
         } else {
             $event->setResult(false);
         }
+    }
+
+    /**
+     * Empty and NotEmpty operators require different/opposite behaviour than what segment helper does.
+     * We have to handle it ourselves here.
+     *
+     * @param string       $operator
+     * @param string       $queryAlias
+     * @param QueryBuilder $innerQueryBuilder
+     */
+    private function handleEmptyOperators(string $operator, string $queryAlias, QueryBuilder $innerQueryBuilder): void
+    {
+        if ('empty' === $operator) {
+            $innerQueryBuilder->resetQueryPart('where');
+            $innerQueryBuilder->where(
+                $innerQueryBuilder->expr()->orX(
+                    $innerQueryBuilder->expr()->isNull($queryAlias.'_value.value'),
+                    $innerQueryBuilder->expr()->eq($queryAlias.'_value.value', $innerQueryBuilder->expr()->literal(''))
+                )
+            );
+        }
+
+        if ('!empty' === $operator) {
+            $innerQueryBuilder->resetQueryPart('where');
+            $innerQueryBuilder->where(
+                $innerQueryBuilder->expr()->andX(
+                    $innerQueryBuilder->expr()->isNotNull($queryAlias.'_value.value'),
+                    $innerQueryBuilder->expr()->neq($queryAlias.'_value.value', $innerQueryBuilder->expr()->literal(''))
+                )
+            );
+        }
+    }
+
+    /**
+     * @param CustomField $customField
+     * @param string      $operator
+     * @param mixed       $value
+     *
+     * @return mixed[]
+     */
+    private function modelSegmentFilterArray(CustomField $customField, string $operator, $value): array
+    {
+        if ($customField->canHaveMultipleValues() && is_string($value)) {
+            $value = [$value];
+        }
+
+        return [
+            'glue'     => 'and',
+            'field'    => 'cmf_'.$customField->getId(),
+            'object'   => 'custom_object',
+            'type'     => $customField->getType(),
+            'filter'   => $value,
+            'operator' => $operator,
+            'display'  => null,
+        ];
     }
 }
