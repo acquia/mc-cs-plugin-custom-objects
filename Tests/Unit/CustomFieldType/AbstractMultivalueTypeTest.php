@@ -212,9 +212,36 @@ class AbstractMultivalueTypeTest extends \PHPUnit_Framework_TestCase
         $this->fieldType->validateValue($this->customField, ['one', 'unicorn']);
     }
 
-    public function testValueToString(): void
+    public function testValueToStringWithArrayValue(): void
     {
-        $this->assertSame('one,two', $this->fieldType->valueToString(['one', 'two']));
-        $this->assertSame('one', $this->fieldType->valueToString('one'));
+        $fieldValue = new CustomFieldValueOption($this->customField, $this->customItem, ['one', 'two']);
+
+        $this->customField->expects($this->once())
+            ->method('getChoices')
+            ->willReturn(['one' => 'Option 1', 'two' => 'Option2']);
+
+        $this->assertSame('"Option 1",Option2', $this->fieldType->valueToString($fieldValue));
+    }
+
+    public function testValueToStringWithStringValue(): void
+    {
+        $fieldValue = new CustomFieldValueOption($this->customField, $this->customItem, 'one');
+
+        $this->customField->expects($this->once())
+            ->method('getChoices')
+            ->willReturn(['one' => 'Option 1', 'two' => 'Option2']);
+
+        $this->assertSame('"Option 1"', $this->fieldType->valueToString($fieldValue));
+    }
+
+    public function testValuesToLabels(): void
+    {
+        $this->customField->expects($this->once())
+            ->method('getChoices')
+            ->willReturn(['one' => 'Choice 1', 'two' => 'Choice 2', 3 => 'Choice 3']);
+
+        $labels = $this->fieldType->valuesToLabels($this->customField, ['two', 3]);
+
+        $this->assertSame(['Choice 2', 'Choice 3'], $labels);
     }
 }

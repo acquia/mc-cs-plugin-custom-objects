@@ -128,9 +128,19 @@ class DateTimeTypeTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testValueToString(): void
+    public function testValueToStringWithDateTimeValue(): void
     {
-        $this->assertSame('2019-07-16 14:22:11', $this->fieldType->valueToString(new \DateTime('2019-07-16 14:22:11')));
-        $this->assertSame('2019-07-16 14:22:11', $this->fieldType->valueToString('2019-07-16 14:22:11'));
+        $fieldValue = new CustomFieldValueDateTime($this->customField, $this->customItem, new \DateTime('2019-07-16 14:22:11'));
+
+        $this->assertSame('2019-07-16 14:22:11', $this->fieldType->valueToString($fieldValue));
+    }
+
+    public function testValueToStringWithStringValue(): void
+    {
+        $fieldValue = new CustomFieldValueDateTime($this->customField, $this->customItem);
+
+        $fieldValue->setValue('2019-07-16 14:22:11');
+
+        $this->assertSame('2019-07-16 14:22:11', $this->fieldType->valueToString($fieldValue));
     }
 }
