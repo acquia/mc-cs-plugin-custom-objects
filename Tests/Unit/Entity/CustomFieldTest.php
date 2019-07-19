@@ -32,6 +32,7 @@ use Symfony\Component\Validator\Constraints\Callback;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CheckboxGroupType;
 use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CountryType;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
 class CustomFieldTest extends \PHPUnit_Framework_TestCase
 {
@@ -289,6 +290,14 @@ class CustomFieldTest extends \PHPUnit_Framework_TestCase
         $customField->addOption($optionB);
         $customField->setTypeObject(new SelectType($this->createMock(TranslatorInterface::class)));
         $this->assertSame('Option B', $customField->valueToLabel('option_b'));
+    }
+
+    public function testValueToLabelIfOptionNotFound(): void
+    {
+        $customField = new CustomField();
+        $customField->setTypeObject(new SelectType($this->createMock(TranslatorInterface::class)));
+        $this->expectException(NotFoundException::class);
+        $customField->valueToLabel('option_b');
     }
 
     public function testDefaultValueTransformation()
