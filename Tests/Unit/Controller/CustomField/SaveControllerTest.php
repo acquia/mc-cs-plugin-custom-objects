@@ -18,6 +18,8 @@ use MauticPlugin\CustomObjectsBundle\Controller\CustomField\SaveController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
@@ -28,6 +30,7 @@ use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class SaveControllerTest extends ControllerTestCase
@@ -65,6 +68,90 @@ class SaveControllerTest extends ControllerTestCase
             $this->customObjectModel);
 
         $this->addSymfonyDependencies($this->saveController);
+    }
+
+    public function testRenderFormIfCustomFieldNotFound(): void
+    {
+        $objectId   = 1;
+        $fieldId    = 2;
+        $fieldType  = 'text';
+        $panelId    = null;
+        $panelCount = null;
+
+        $request = $this->createMock(Request::class);
+        $request->expects($this->at(0))
+            ->method('get')
+            ->with('objectId')
+            ->willReturn($objectId);
+        $request->expects($this->at(1))
+            ->method('get')
+            ->with('fieldId')
+            ->willReturn($fieldId);
+        $request->expects($this->at(2))
+            ->method('get')
+            ->with('fieldType')
+            ->willReturn($fieldType);
+        $request->expects($this->at(3))
+            ->method('get')
+            ->with('panelId')
+            ->willReturn($panelId);
+        $request->expects($this->at(4))
+            ->method('get')
+            ->with('panelCount')
+            ->willReturn($panelCount);
+
+        $this->customFieldModel->expects($this->once())
+            ->method('fetchEntity')
+            ->will($this->throwException(new NotFoundException('not found message')));
+
+        $this->permissionProvider->expects($this->never())
+            ->method('canEdit');
+
+        $this->saveController->saveAction($request);
+    }
+
+    public function testRenderFormIfCustomFieldAccessDenied(): void
+    {
+        $objectId   = null; // Cover creating CO too
+        $fieldId    = 2;
+        $fieldType  = 'text';
+        $panelId    = null;
+        $panelCount = null;
+
+        $request = $this->createMock(Request::class);
+        $request->expects($this->at(0))
+            ->method('get')
+            ->with('objectId')
+            ->willReturn($objectId);
+        $request->expects($this->at(1))
+            ->method('get')
+            ->with('fieldId')
+            ->willReturn($fieldId);
+        $request->expects($this->at(2))
+            ->method('get')
+            ->with('fieldType')
+            ->willReturn($fieldType);
+        $request->expects($this->at(3))
+            ->method('get')
+            ->with('panelId')
+            ->willReturn($panelId);
+        $request->expects($this->at(4))
+            ->method('get')
+            ->with('panelCount')
+            ->willReturn($panelCount);
+
+        $this->customFieldModel->expects($this->once())
+            ->method('fetchEntity')
+            ->with($fieldId)
+            ->willReturn(new CustomField());
+
+        $this->permissionProvider->expects($this->once())
+            ->method('canEdit')
+            ->will($this->throwException(new ForbiddenException('forbidden message')));
+
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $this->saveController->saveAction($request);
     }
 
     public function testSaveActionEdit(): void
