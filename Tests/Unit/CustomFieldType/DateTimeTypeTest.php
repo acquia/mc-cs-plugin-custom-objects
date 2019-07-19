@@ -143,4 +143,11 @@ class DateTimeTypeTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame('2019-07-16 14:22:11', $this->fieldType->valueToString($fieldValue));
     }
+
+    public function testValueToStringWithNullValue(): void
+    {
+        $fieldValue = new CustomFieldValueDateTime($this->customField, $this->customItem);
+
+        $this->assertSame('', $this->fieldType->valueToString($fieldValue));
+    }
 }

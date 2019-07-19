@@ -64,15 +64,10 @@ class ApiSubscriber extends CommonSubscriber
      */
     public static function getSubscribedEvents(): array
     {
-        // This check can be removed once https://github.com/mautic-inc/mautic-cloud/pull/555 is merged to deployed.
-        if (defined('\Mautic\ApiBundle\ApiEvents::API_ON_ENTITY_PRE_SAVE')) {
-            return [
-                ApiEvents::API_ON_ENTITY_PRE_SAVE  => 'validateCustomObjectsInContactRequest',
-                ApiEvents::API_ON_ENTITY_POST_SAVE => 'saveCustomObjectsInContactRequest',
-            ];
-        }
-
-        return [];
+        return [
+            ApiEvents::API_ON_ENTITY_PRE_SAVE  => 'validateCustomObjectsInContactRequest',
+            ApiEvents::API_ON_ENTITY_POST_SAVE => 'saveCustomObjectsInContactRequest',
+        ];
     }
 
     /**
