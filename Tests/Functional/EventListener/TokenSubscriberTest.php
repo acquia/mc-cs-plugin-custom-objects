@@ -87,12 +87,11 @@ class TokenSubscriberTest extends KernelTestCase
 
         $this->customFieldValueModel->createValuesForItem($customItem);
 
-        $textValue = $customItem->findCustomFieldValueForFieldAlias('text-test-field');
-
-        $textValue->setValue('abracadabra');
-
+        $textValue       = $customItem->findCustomFieldValueForFieldAlias('text-test-field');
+        $urlValue        = $customItem->findCustomFieldValueForFieldAlias('url-test-field');
         $mutiselectValue = $customItem->findCustomFieldValueForFieldAlias('multiselect-test-field');
 
+        $textValue->setValue('abracadabra');
         $mutiselectValue->setValue('option_b');
 
         $this->customItemModel->save($customItem);
@@ -107,6 +106,15 @@ class TokenSubscriberTest extends KernelTestCase
                 'filter'   => 'abracadabra',
                 'display'  => null,
                 'operator' => '=',
+            ],
+            [
+                'glue'     => 'and',
+                'field'    => 'cmf_'.$urlValue->getCustomField()->getId(),
+                'object'   => 'custom_object',
+                'type'     => 'text',
+                'filter'   => '',
+                'display'  => null,
+                'operator' => 'empty',
             ],
         ];
         $segment = $this->createSegment($filters);

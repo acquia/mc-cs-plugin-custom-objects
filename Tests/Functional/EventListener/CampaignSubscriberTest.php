@@ -74,7 +74,7 @@ class CampaignSubscriberTest extends KernelTestCase
         $this->createFreshDatabaseSchema($entityManager);
     }
 
-    public function testTextFieldConditions(): void
+    public function testVariousConditions(): void
     {
         $contact      = $this->createContact('john@doe.email');
         $customObject = $this->createCustomObjectWithAllFields($this->container, 'Campaign test object');
@@ -97,7 +97,7 @@ class CampaignSubscriberTest extends KernelTestCase
         $multiselectValue = $customItem->findCustomFieldValueForFieldAlias('multiselect-test-field');
         $multiselectValue->setValue(['option_b']);
 
-        // $urlValue = $customItem->findCustomFieldValueForFieldAlias('url-test-field');
+        $urlValue = $customItem->findCustomFieldValueForFieldAlias('url-test-field');
 
         // Save the values
         $this->customItemModel->save($customItem);
@@ -127,15 +127,24 @@ class CampaignSubscriberTest extends KernelTestCase
         $this->assertFalse($event->getResult());
 
         // Test the URL value is empty.
-        // Reported as a segment bug https://github.com/mautic-inc/mautic-internal/issues/1781. Uncomment once fixed.
-        // $event = $this->createCampaignExecutionEvent(
-        //     $contact,
-        //     $urlValue->getCustomField()->getId(),
-        //     'empty'
-        // );
+        $event = $this->createCampaignExecutionEvent(
+            $contact,
+            $urlValue->getCustomField()->getId(),
+            'empty'
+        );
 
-        // $this->campaignSubscriber->onCampaignTriggerCondition($event);
-        // $this->assertTrue($event->getResult());
+        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $this->assertTrue($event->getResult());
+
+        // Test the URL value is not empty.
+        $event = $this->createCampaignExecutionEvent(
+            $contact,
+            $urlValue->getCustomField()->getId(),
+            '!empty'
+        );
+
+        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $this->assertFalse($event->getResult());
 
         // Test equals the same text as the field value.
         $event = $this->createCampaignExecutionEvent(
@@ -234,7 +243,7 @@ class CampaignSubscriberTest extends KernelTestCase
         $this->campaignSubscriber->onCampaignTriggerCondition($event);
         $this->assertFalse($event->getResult());
 
-        // Test the text value contains abra.
+        // Test the text value contains cada.
         $event = $this->createCampaignExecutionEvent(
             $contact,
             $textValue->getCustomField()->getId(),
@@ -250,6 +259,25 @@ class CampaignSubscriberTest extends KernelTestCase
             $contact,
             $textValue->getCustomField()->getId(),
             'contains',
+            'unicorn'
+        );
+
+        // Test the text value like abra%.
+        $event = $this->createCampaignExecutionEvent(
+            $contact,
+            $textValue->getCustomField()->getId(),
+            'like',
+            'abra%'
+        );
+
+        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $this->assertTrue($event->getResult());
+
+        // Test the text value not like unicorn.
+        $event = $this->createCampaignExecutionEvent(
+            $contact,
+            $textValue->getCustomField()->getId(),
+            '!like',
             'unicorn'
         );
 

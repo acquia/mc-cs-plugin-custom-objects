@@ -37,7 +37,7 @@ use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CampaignBundle\Entity\Event;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
-use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryBuilderParamCopyTrait;
+use MauticPlugin\CustomObjectsBundle\Helper\QueryBuilderManipulatorTrait;
 
 /**
  * Handles Custom Object token replacements with the correct value in emails.
@@ -45,7 +45,7 @@ use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryBuilderParamCopyTrait;
 class TokenSubscriber implements EventSubscriberInterface
 {
     use MatchFilterForLeadTrait;
-    use DbalQueryBuilderParamCopyTrait;
+    use QueryBuilderManipulatorTrait;
 
     /**
      * @var ConfigProvider
@@ -236,16 +236,14 @@ class TokenSubscriber implements EventSubscriberInterface
                 }
 
                 $this->queryFilterHelper->addContactIdRestriction($innerQueryBuilder, $queryAlias, $contactId);
-
                 $innerQueryBuilder->select($queryAlias.'_item.id');
-
-                $operator = in_array($filter['operator'], ['empty', 'neq', 'notLike'], true) ? '!=' : '=';
+                $this->handleEmptyOperators($filter['operator'], $queryAlias, $innerQueryBuilder);
 
                 $queryBuilder->innerJoin(
                     CustomItem::TABLE_ALIAS,
                     "({$innerQueryBuilder->getSQL()})",
                     $queryAlias,
-                    CustomItem::TABLE_ALIAS.".id {$operator} {$queryAlias}.id"
+                    CustomItem::TABLE_ALIAS.".id = {$queryAlias}.id"
                 );
 
                 $this->copyParams($innerQueryBuilder, $queryBuilder);

@@ -18,11 +18,11 @@ use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
-use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryBuilderParamCopyTrait;
+use MauticPlugin\CustomObjectsBundle\Helper\QueryBuilderManipulatorTrait;
 
 class CustomItemFilterQueryBuilder extends BaseFilterQueryBuilder
 {
-    use DbalQueryBuilderParamCopyTrait;
+    use QueryBuilderManipulatorTrait;
 
     /**
      * @var QueryFilterHelper
