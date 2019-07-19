@@ -24,6 +24,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\CsvTransformer;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
 abstract class AbstractMultivalueType extends AbstractCustomFieldType
 {
@@ -147,37 +148,24 @@ abstract class AbstractMultivalueType extends AbstractCustomFieldType
      */
     public function valueToString(CustomFieldValueInterface $fieldValue): string
     {
-        $values = $fieldValue->getValue();
+        $transformer = $this->createApiValueTransformer();
+        $values      = $fieldValue->getValue();
+        $labels      = [];
 
         if (!is_array($values)) {
             $values = [$values];
         }
 
-        $labels = $this->valuesToLabels($fieldValue->getCustomField(), $values);
-
-        $transformer = $this->createApiValueTransformer();
-
-        return $transformer->transform($labels);
-    }
-
-    /**
-     * @param CustomField $customField
-     * @param mixed[]     $values
-     *
-     * @return string[]
-     */
-    public function valuesToLabels(CustomField $customField, array $values): array
-    {
-        $labels  = [];
-        $choices = $customField->getChoices();
-
         foreach ($values as $value) {
-            if (isset($choices[$value])) {
-                $labels[] = $choices[$value];
+            try {
+                $labels[] = $fieldValue->getCustomField()->valueToLabel((string) $value);
+            } catch (NotFoundException $e) {
+                // When the value does not exist anymore, use the value instead.
+                $labels[] = $value;
             }
         }
 
-        return $labels;
+        return $transformer->transform($labels);
     }
 
     /**

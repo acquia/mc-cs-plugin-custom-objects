@@ -29,6 +29,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\AbstractMultivalueType;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\StaticChoiceTypeInterface;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
 class CustomField extends FormEntity implements UniqueEntityInterface
 {
@@ -469,6 +470,26 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         }
 
         return $choices;
+    }
+
+    /**
+     * Method for multi/select fields that will convert a value to its label.
+     *
+     * @param string $value
+     *
+     * @return string
+     *
+     * @throws NotFoundException
+     */
+    public function valueToLabel(string $value): string
+    {
+        $choices = $this->getChoices();
+
+        if (isset($choices[$value])) {
+            return $choices[$value];
+        }
+
+        throw new NotFoundException("Label was not found for value {$value}");
     }
 
     /**
