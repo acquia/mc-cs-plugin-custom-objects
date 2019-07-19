@@ -148,13 +148,13 @@ class QueryFilterHelper
      * @param QueryBuilder $queryBuilder
      * @param string       $tableAlias
      * @param string       $operator
-     * @param string       $value
+     * @param string|null  $value
      */
     public function addCustomObjectNameExpression(
         QueryBuilder $queryBuilder,
         string $tableAlias,
         string $operator,
-        string $value
+        ?string $value
     ): void {
         $expression = $this->getCustomObjectNameExpression($queryBuilder, $tableAlias, $operator);
         $this->addOperatorExpression($queryBuilder, $tableAlias, $expression, $operator, $value);
@@ -269,14 +269,11 @@ class QueryFilterHelper
     {
         switch ($operator) {
             case 'empty':
+            case 'notEmpty':
                 $expression = $customQuery->expr()->andX(
                     $customQuery->expr()->isNotNull($tableAlias.'_value.value'),
                     $customQuery->expr()->neq($tableAlias.'_value.value', $customQuery->expr()->literal(''))
                 );
-
-                break;
-            case 'notEmpty':
-                $expression = $customQuery->expr()->isNotNull($tableAlias.'_value.value');
 
                 break;
             case 'notIn':
@@ -338,7 +335,10 @@ class QueryFilterHelper
         switch ($operator) {
             case 'empty':
             case 'notEmpty':
-                $expression = $customQuery->expr()->isNotNull($tableAlias.'_value.value');
+                $expression = $customQuery->expr()->andX(
+                    $customQuery->expr()->isNotNull($tableAlias.'_item.name'),
+                    $customQuery->expr()->neq($tableAlias.'_item.name', $customQuery->expr()->literal(''))
+                    );
 
                 break;
             case 'notIn':
