@@ -24,6 +24,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\CsvTransformer;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
 abstract class AbstractMultivalueType extends AbstractCustomFieldType
 {
@@ -145,15 +146,26 @@ abstract class AbstractMultivalueType extends AbstractCustomFieldType
     /**
      * {@inheritdoc}
      */
-    public function valueToString($value): string
+    public function valueToString(CustomFieldValueInterface $fieldValue): string
     {
-        if (is_array($value)) {
-            $transformer = $this->createApiValueTransformer();
+        $transformer = $this->createApiValueTransformer();
+        $values      = $fieldValue->getValue();
+        $labels      = [];
 
-            return $transformer->transform($value);
+        if (!is_array($values)) {
+            $values = [$values];
         }
 
-        return (string) $value;
+        foreach ($values as $value) {
+            try {
+                $labels[] = $fieldValue->getCustomField()->valueToLabel((string) $value);
+            } catch (NotFoundException $e) {
+                // When the value does not exist anymore, use the value instead.
+                $labels[] = $value;
+            }
+        }
+
+        return $transformer->transform($labels);
     }
 
     /**
