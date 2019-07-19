@@ -146,7 +146,7 @@ class TokenSubscriberTest extends KernelTestCase
         $this->assertSame(
             [
                 '{custom-object=products:text-test-field | where=segment-filter |order=latest|limit=1 | default=No thing}'        => 'abracadabra',
-                '{custom-object=products:multiselect-test-field | where=segment-filter |order=latest|limit=1 | default=No thing}' => 'option_b',
+                '{custom-object=products:multiselect-test-field | where=segment-filter |order=latest|limit=1 | default=No thing}' => '"Option B"',
             ],
             $event->getTokens()
         );
@@ -285,6 +285,75 @@ class TokenSubscriberTest extends KernelTestCase
         $this->assertSame(
             [
                 '{custom-object=products:multiselect-test-field | where=segment-filter |order=latest|limit=1 | default=No thing}' => '"Option A","Option B"',
+            ],
+            $event->getTokens()
+        );
+    }
+
+    public function testSelectFieldSegmentFilterToken(): void
+    {
+        $customObject = $this->createCustomObjectWithAllFields($this->container, 'Product');
+        $customItem   = new CustomItem($customObject);
+        $contact      = $this->createContact('john@doe.email');
+
+        $customItem->setName('Light bulb');
+
+        $this->customFieldValueModel->createValuesForItem($customItem);
+
+        $value = $customItem->findCustomFieldValueForFieldAlias('select-test-field');
+
+        $value->setValue('option_b');
+
+        $this->customItemModel->save($customItem);
+        $this->customItemModel->linkEntity($customItem, 'contact', (int) $contact->getId());
+
+        $filters = [
+            [
+                'glue'     => 'and',
+                'field'    => 'cmf_'.$value->getCustomField()->getId(),
+                'object'   => 'custom_object',
+                'type'     => 'select',
+                'filter'   => 'option_b',
+                'display'  => null,
+                'operator' => 'in',
+            ],
+        ];
+        $segment = $this->createSegment($filters);
+        $this->addContactToSegment($contact, $segment);
+
+        $html = '<!DOCTYPE html>
+        <html>
+        <head>
+        <title>{subject}</title>
+        </head>
+        <body>
+        Hello, here is the thing:
+        {custom-object=products:select-test-field | where=segment-filter |order=latest|limit=1 | default=No thing} 
+        Regards
+        </body>
+        </html>
+        ';
+
+        $email = new Email();
+        $email->setEmailType('list');
+        $email->addList($segment);
+        $event = new EmailSendEvent(
+            null,
+            [
+                'subject'          => 'CO segment test',
+                'content'          => $html,
+                'conplainTexttent' => '',
+                'email'            => $email,
+                'lead'             => ['id' => $contact->getId(), 'email' => $contact->getEmail()],
+                'source'           => null,
+            ]
+        );
+
+        $this->subscriber->decodeTokens($event);
+
+        $this->assertSame(
+            [
+                '{custom-object=products:select-test-field | where=segment-filter |order=latest|limit=1 | default=No thing}' => 'Option B',
             ],
             $event->getTokens()
         );
