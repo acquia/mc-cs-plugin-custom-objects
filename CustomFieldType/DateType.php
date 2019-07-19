@@ -127,8 +127,10 @@ class DateType extends AbstractCustomFieldType
     /**
      * {@inheritdoc}
      */
-    public function valueToString($value): string
+    public function valueToString(CustomFieldValueInterface $fieldValue): string
     {
+        $value = $fieldValue->getValue();
+
         if ($value instanceof DateTimeInterface) {
             return $value->format('Y-m-d');
         }

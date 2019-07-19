@@ -19,6 +19,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 
 abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
 {
@@ -196,8 +197,8 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function valueToString($value): string
+    public function valueToString(CustomFieldValueInterface $fieldValue): string
     {
-        return (string) $value;
+        return (string) $fieldValue->getValue();
     }
 }

@@ -145,15 +145,39 @@ abstract class AbstractMultivalueType extends AbstractCustomFieldType
     /**
      * {@inheritdoc}
      */
-    public function valueToString($value): string
+    public function valueToString(CustomFieldValueInterface $fieldValue): string
     {
-        if (is_array($value)) {
-            $transformer = $this->createApiValueTransformer();
+        $values = $fieldValue->getValue();
 
-            return $transformer->transform($value);
+        if (!is_array($values)) {
+            $values = [$values];
         }
 
-        return (string) $value;
+        $labels = $this->valuesToLabels($fieldValue->getCustomField(), $values);
+
+        $transformer = $this->createApiValueTransformer();
+
+        return $transformer->transform($labels);
+    }
+
+    /**
+     * @param CustomField $customField
+     * @param mixed[]     $values
+     *
+     * @return string[]
+     */
+    public function valuesToLabels(CustomField $customField, array $values): array
+    {
+        $labels  = [];
+        $choices = $customField->getChoices();
+
+        foreach ($values as $value) {
+            if (isset($choices[$value])) {
+                $labels[] = $choices[$value];
+            }
+        }
+
+        return $labels;
     }
 
     /**
