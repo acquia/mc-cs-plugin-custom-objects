@@ -37,7 +37,7 @@
                 <directory>Assets</directory>
                 <directory>Command</directory>
                 <directory>Config</directory>
-                <directory>Migrations</directory>
+                <directory>Migration</directory>
                 <directory>Tests</directory>
                 <directory>Translations</directory>
                 <directory>vendor</directory>
