@@ -92,7 +92,7 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
                 ]);
                 $registeredObjects[] = $COId;
             }
-            if (!$event->hasTranslation('cmf_'.$field['id']) && !empty($fields['f.id'])) {
+            if (!$event->hasTranslation('cmf_'.$field['id']) && !empty($field['id'])) {
                 $event->addTranslation('cmf_'.$field['id'], $this->createTranslation($field));
             }
         }
