@@ -76,8 +76,8 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
         $queryBuilder = $connection->createQueryBuilder();
         $queryBuilder
             ->select('f.id, f.label, f.type, o.id as custom_object_id')
-            ->from(MAUTIC_TABLE_PREFIX.'custom_field', 'f')
-            ->innerJoin('f', MAUTIC_TABLE_PREFIX.'custom_object', 'o', 'f.custom_object_id = o.id');
+            ->from(MAUTIC_TABLE_PREFIX.'custom_object', 'o')
+            ->leftJoin('o', MAUTIC_TABLE_PREFIX.'custom_field', 'f', 'f.custom_object_id = o.id');
 
         $registeredObjects = [];
         $fields            = $this->executeSelect($queryBuilder)->fetchAll();
@@ -92,7 +92,9 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
                 ]);
                 $registeredObjects[] = $COId;
             }
-            $event->addTranslation('cmf_'.$field['id'], $this->createTranslation($field));
+            if (!$event->hasTranslation('cmf_'.$field['id']) && !empty($fields['f.id'])) {
+                $event->addTranslation('cmf_'.$field['id'], $this->createTranslation($field));
+            }
         }
     }
 
