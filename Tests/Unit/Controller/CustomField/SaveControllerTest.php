@@ -299,7 +299,7 @@ class SaveControllerTest extends AbstractFieldControllerTest
         $this->saveController->saveAction($request);
     }
 
-    public function testInvalidPost()
+    public function testInvalidPost(): void
     {
         $objectId   = 1;
         $fieldId    = null;

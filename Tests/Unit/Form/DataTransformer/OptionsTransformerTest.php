@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * @copyright   2019 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
@@ -17,7 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsTransformer;
 
 class OptionsTransformerTest extends \PHPUnit_Framework_TestCase
 {
-    public function testTransform()
+    public function testTransform(): void
     {
         $transformer = new OptionsTransformer();
         $this->assertSame(['list' => []], $transformer->transform(null));
@@ -35,7 +37,7 @@ class OptionsTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expectedOptions, $transformer->transform($optionsInCollection));
     }
 
-    public function testReverseTransform()
+    public function testReverseTransform(): void
     {
         $key     = 0;
         $options = [
