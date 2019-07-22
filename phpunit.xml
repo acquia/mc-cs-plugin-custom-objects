@@ -35,7 +35,6 @@
             <directory>*</directory>
             <exclude>
                 <directory>Assets</directory>
-                <directory>Command</directory>
                 <directory>Config</directory>
                 <directory>Migrations</directory>
                 <directory>Tests</directory>
