@@ -18,19 +18,20 @@ use MauticPlugin\CustomObjectsBundle\Controller\CustomField\SaveController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class SaveControllerTest extends ControllerTestCase
+class SaveControllerTest extends AbstractFieldControllerTest
 {
     private $formFactory;
     private $translator;
@@ -67,6 +68,50 @@ class SaveControllerTest extends ControllerTestCase
         $this->addSymfonyDependencies($this->saveController);
     }
 
+    public function testRenderFormIfCustomFieldNotFound(): void
+    {
+        $objectId   = 1;
+        $fieldId    = 2;
+        $fieldType  = 'text';
+        $panelId    = null;
+        $panelCount = null;
+
+        $request = $this->createRequestMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
+
+        $this->customFieldModel->expects($this->once())
+            ->method('fetchEntity')
+            ->will($this->throwException(new NotFoundException('not found message')));
+
+        $this->permissionProvider->expects($this->never())
+            ->method('canEdit');
+
+        $this->saveController->saveAction($request);
+    }
+
+    public function testRenderFormIfCustomFieldAccessDenied(): void
+    {
+        $objectId   = null; // Cover creating CO too
+        $fieldId    = 2;
+        $fieldType  = 'text';
+        $panelId    = null;
+        $panelCount = null;
+
+        $request = $this->createRequestMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
+
+        $this->customFieldModel->expects($this->once())
+            ->method('fetchEntity')
+            ->with($fieldId)
+            ->willReturn(new CustomField());
+
+        $this->permissionProvider->expects($this->once())
+            ->method('canEdit')
+            ->will($this->throwException(new ForbiddenException('forbidden message')));
+
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $this->saveController->saveAction($request);
+    }
+
     public function testSaveActionEdit(): void
     {
         $objectId   = 1;
@@ -82,27 +127,7 @@ class SaveControllerTest extends ControllerTestCase
 
         $customField = $this->createMock(CustomField::class);
 
-        $request = $this->createMock(Request::class);
-        $request->expects($this->at(0))
-            ->method('get')
-            ->with('objectId')
-            ->willReturn($objectId);
-        $request->expects($this->at(1))
-            ->method('get')
-            ->with('fieldId')
-            ->willReturn($fieldId);
-        $request->expects($this->at(2))
-            ->method('get')
-            ->with('fieldType')
-            ->willReturn($fieldType);
-        $request->expects($this->at(3))
-            ->method('get')
-            ->with('panelId')
-            ->willReturn($panelId);
-        $request->expects($this->at(4))
-            ->method('get')
-            ->with('panelCount')
-            ->willReturn($panelCount);
+        $request = $this->createRequestMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
         $request->expects($this->at(5))
             ->method('get')
             ->with('custom_field')
@@ -192,27 +217,7 @@ class SaveControllerTest extends ControllerTestCase
 
         $customField = $this->createMock(CustomField::class);
 
-        $request = $this->createMock(Request::class);
-        $request->expects($this->at(0))
-            ->method('get')
-            ->with('objectId')
-            ->willReturn($objectId);
-        $request->expects($this->at(1))
-            ->method('get')
-            ->with('fieldId')
-            ->willReturn($fieldId);
-        $request->expects($this->at(2))
-            ->method('get')
-            ->with('fieldType')
-            ->willReturn($fieldType);
-        $request->expects($this->at(3))
-            ->method('get')
-            ->with('panelId')
-            ->willReturn($panelId);
-        $request->expects($this->at(4))
-            ->method('get')
-            ->with('panelCount')
-            ->willReturn($panelCount);
+        $request = $this->createRequestMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
         $request->expects($this->at(5))
             ->method('get')
             ->with('custom_field')
@@ -290,6 +295,67 @@ class SaveControllerTest extends ControllerTestCase
             ->method('create')
             ->with(CustomObjectType::class, $customObject)
             ->willReturn($this->form);
+
+        $this->saveController->saveAction($request);
+    }
+
+    public function testInvalidPost(): void
+    {
+        $objectId   = 1;
+        $fieldId    = null;
+        $fieldType  = 'text';
+        $panelId    = null;
+        $panelCount = null;
+
+        $customObject = $this->createMock(CustomObject::class);
+        $customObject->expects($this->once())
+            ->method('getId')
+            ->willReturn($objectId);
+
+        $customField = $this->createMock(CustomField::class);
+
+        $request = $this->createRequestMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
+        $request->expects($this->at(5))
+            ->method('get')
+            ->with('custom_field')
+            ->willReturn([]);
+        $request->expects($this->at(5))
+            ->method('get')
+            ->with('custom_field')
+            ->willReturn([]);
+
+        $this->customObjectModel->expects($this->once())
+            ->method('fetchEntity')
+            ->with($objectId)
+            ->willReturn($customObject);
+
+        $this->permissionProvider->expects($this->once())
+            ->method('canCreate')
+            ->with();
+
+        $this->customFieldFactory->expects($this->once())
+            ->method('create')
+            ->with($fieldType, $customObject)
+            ->willReturn($customField);
+
+        $action = 'action';
+        $this->fieldRouteProvider->expects($this->once())
+            ->method('buildSaveRoute')
+            ->with($fieldType, $fieldId, $objectId, $panelCount, $panelId)
+            ->willReturn($action);
+
+        $this->formFactory->expects($this->at(0))
+            ->method('create')
+            ->with(CustomFieldType::class, $customField, ['action' => $action])
+            ->willReturn($this->form);
+
+        $this->form->expects($this->once())
+            ->method('handleRequest')
+            ->with($request);
+
+        $this->form->expects($this->once())
+            ->method('isValid')
+            ->willReturn(false);
 
         $this->saveController->saveAction($request);
     }
