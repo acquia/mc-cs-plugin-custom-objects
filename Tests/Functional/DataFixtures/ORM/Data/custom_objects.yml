@@ -13,3 +13,10 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomObject:
     name_plural: '<sentence(2)>'
     description: '<sentence(2)>'
     alias: 'custom_object_2'
+  custom_object3:
+    is_published: 1
+    date_added: '<dateTimeBetween("-20 days","-2 days")>'
+    name_singular: '<sentence(2)>'
+    name_plural: '<sentence(2)>'
+    description: '<sentence(2)>'
+    alias: 'custom_object_3'
