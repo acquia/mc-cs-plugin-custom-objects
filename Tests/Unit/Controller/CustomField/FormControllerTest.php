@@ -25,13 +25,11 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
-class FormControllerTest extends ControllerTestCase
+class FormControllerTest extends AbstractFieldControllerTest
 {
     private $formFactory;
     private $customFieldModel;
@@ -77,27 +75,7 @@ class FormControllerTest extends ControllerTestCase
         $panelId    = null;
         $panelCount = null;
 
-        $request = $this->createMock(Request::class);
-        $request->expects($this->at(0))
-            ->method('get')
-            ->with('objectId')
-            ->willReturn($objectId);
-        $request->expects($this->at(1))
-            ->method('get')
-            ->with('fieldId')
-            ->willReturn($fieldId);
-        $request->expects($this->at(2))
-            ->method('get')
-            ->with('fieldType')
-            ->willReturn($fieldType);
-        $request->expects($this->at(3))
-            ->method('get')
-            ->with('panelId')
-            ->willReturn($panelId);
-        $request->expects($this->at(4))
-            ->method('get')
-            ->with('panelCount')
-            ->willReturn($panelCount);
+        $request = $this->createRequestMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
 
         $this->customFieldModel->expects($this->once())
             ->method('fetchEntity')
@@ -117,27 +95,7 @@ class FormControllerTest extends ControllerTestCase
         $panelId    = null;
         $panelCount = null;
 
-        $request = $this->createMock(Request::class);
-        $request->expects($this->at(0))
-            ->method('get')
-            ->with('objectId')
-            ->willReturn($objectId);
-        $request->expects($this->at(1))
-            ->method('get')
-            ->with('fieldId')
-            ->willReturn($fieldId);
-        $request->expects($this->at(2))
-            ->method('get')
-            ->with('fieldType')
-            ->willReturn($fieldType);
-        $request->expects($this->at(3))
-            ->method('get')
-            ->with('panelId')
-            ->willReturn($panelId);
-        $request->expects($this->at(4))
-            ->method('get')
-            ->with('panelCount')
-            ->willReturn($panelCount);
+        $request = $this->createRequestMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
 
         $this->customFieldModel->expects($this->once())
             ->method('fetchEntity')
@@ -161,27 +119,7 @@ class FormControllerTest extends ControllerTestCase
         $panelId    = null;
         $panelCount = null;
 
-        $request = $this->createMock(Request::class);
-        $request->expects($this->at(0))
-            ->method('get')
-            ->with('objectId')
-            ->willReturn($objectId);
-        $request->expects($this->at(1))
-            ->method('get')
-            ->with('fieldId')
-            ->willReturn($fieldId);
-        $request->expects($this->at(2))
-            ->method('get')
-            ->with('fieldType')
-            ->willReturn($fieldType);
-        $request->expects($this->at(3))
-            ->method('get')
-            ->with('panelId')
-            ->willReturn($panelId);
-        $request->expects($this->at(4))
-            ->method('get')
-            ->with('panelCount')
-            ->willReturn($panelCount);
+        $request = $this->createRequestMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
 
         $customObject = new CustomObject();
         $this->customObjectModel->expects($this->once())
@@ -239,27 +177,7 @@ class FormControllerTest extends ControllerTestCase
         $panelId    = null;
         $panelCount = null;
 
-        $request = $this->createMock(Request::class);
-        $request->expects($this->at(0))
-            ->method('get')
-            ->with('objectId')
-            ->willReturn($objectId);
-        $request->expects($this->at(1))
-            ->method('get')
-            ->with('fieldId')
-            ->willReturn($fieldId);
-        $request->expects($this->at(2))
-            ->method('get')
-            ->with('fieldType')
-            ->willReturn($fieldType);
-        $request->expects($this->at(3))
-            ->method('get')
-            ->with('panelId')
-            ->willReturn($panelId);
-        $request->expects($this->at(4))
-            ->method('get')
-            ->with('panelCount')
-            ->willReturn($panelCount);
+        $request = $this->createRequestMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
 
         $this->permissionProvider->expects($this->once())
             ->method('canCreate');
