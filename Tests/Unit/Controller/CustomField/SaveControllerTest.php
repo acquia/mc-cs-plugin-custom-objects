@@ -298,4 +298,65 @@ class SaveControllerTest extends AbstractFieldControllerTest
 
         $this->saveController->saveAction($request);
     }
+
+    public function testInvalidPost()
+    {
+        $objectId   = 1;
+        $fieldId    = null;
+        $fieldType  = 'text';
+        $panelId    = null;
+        $panelCount = null;
+
+        $customObject = $this->createMock(CustomObject::class);
+        $customObject->expects($this->once())
+            ->method('getId')
+            ->willReturn($objectId);
+
+        $customField = $this->createMock(CustomField::class);
+
+        $request = $this->createRequestMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
+        $request->expects($this->at(5))
+            ->method('get')
+            ->with('custom_field')
+            ->willReturn([]);
+        $request->expects($this->at(5))
+            ->method('get')
+            ->with('custom_field')
+            ->willReturn([]);
+
+        $this->customObjectModel->expects($this->once())
+            ->method('fetchEntity')
+            ->with($objectId)
+            ->willReturn($customObject);
+
+        $this->permissionProvider->expects($this->once())
+            ->method('canCreate')
+            ->with();
+
+        $this->customFieldFactory->expects($this->once())
+            ->method('create')
+            ->with($fieldType, $customObject)
+            ->willReturn($customField);
+
+        $action = 'action';
+        $this->fieldRouteProvider->expects($this->once())
+            ->method('buildSaveRoute')
+            ->with($fieldType, $fieldId, $objectId, $panelCount, $panelId)
+            ->willReturn($action);
+
+        $this->formFactory->expects($this->at(0))
+            ->method('create')
+            ->with(CustomFieldType::class, $customField, ['action' => $action])
+            ->willReturn($this->form);
+
+        $this->form->expects($this->once())
+            ->method('handleRequest')
+            ->with($request);
+
+        $this->form->expects($this->once())
+            ->method('isValid')
+            ->willReturn(false);
+
+        $this->saveController->saveAction($request);
+    }
 }
