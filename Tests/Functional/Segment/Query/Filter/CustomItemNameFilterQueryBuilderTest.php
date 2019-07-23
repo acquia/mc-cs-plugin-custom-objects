@@ -54,6 +54,15 @@ class CustomItemNameFilterQueryBuilderTest extends WebTestCase
         parent::setUp();
     }
 
+    protected function tearDown(): void
+    {
+        foreach ($this->getFixturesInUnloadableOrder() as $entity) {
+            $this->entityManager->remove($entity);
+        }
+        $this->entityManager->flush();
+        parent::tearDown();
+    }
+
     public function testApplyQuery(): void
     {
         /** @var CustomFieldTypeProvider $fieldTypeProvider */
@@ -66,17 +75,6 @@ class CustomItemNameFilterQueryBuilderTest extends WebTestCase
         $queryBuilderService->applyQuery($queryBuilder, $filterMock);
 
         $this->assertSame(2, $this->executeSelect($queryBuilder)->rowCount());
-    }
-
-    protected function XtearDown(): void
-    {
-        foreach ($this->getFixturesInUnloadableOrder() as $entity) {
-            $this->entityManager->remove($entity);
-        }
-
-        $this->entityManager->flush();
-
-        parent::tearDown();
     }
 
     /**

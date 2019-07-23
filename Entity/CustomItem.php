@@ -192,18 +192,6 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param CustomObject $customObject
-     *
-     * @return CustomItem
-     */
-    public function setCustomObject(CustomObject $customObject): self
-    {
-        $this->customObject = $customObject;
-
-        return $this;
-    }
-
-    /**
      * @return Category|null
      */
     public function getCategory()

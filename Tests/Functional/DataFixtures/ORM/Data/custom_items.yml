@@ -1,13 +1,11 @@
 MauticPlugin\CustomObjectsBundle\Entity\CustomItem:
   custom_item{emotion,attribute}:
-    custom_object: '@custom_object1'
     is_published: 1
     name: 'Object <current()>'
     __construct: ['@custom_object1']
   custom_item{1..5}:
     is_published: 1
     name: 'Object <current()>'
-    custom_object: '@custom_object3'
     __construct: ['@custom_object1']
   custom_item{6..20}:
     is_published: 1
@@ -16,5 +14,4 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomItem:
   custom_item{21}:
     is_published: 1
     name: 'No emotions'
-    custom_object: '@custom_object3'
-    __construct: ['@custom_object*']
+    __construct: ['@custom_object3']
