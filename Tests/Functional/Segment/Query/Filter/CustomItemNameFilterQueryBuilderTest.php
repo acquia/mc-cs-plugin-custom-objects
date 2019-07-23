@@ -54,7 +54,21 @@ class CustomItemNameFilterQueryBuilderTest extends WebTestCase
         parent::setUp();
     }
 
-    protected function tearDown(): void
+    public function testApplyQuery(): void
+    {
+        /** @var CustomFieldTypeProvider $fieldTypeProvider */
+        $fieldTypeProvider   = $this->getContainer()->get('custom_field.type.provider');
+        $filterHelper        = new QueryFilterHelper($fieldTypeProvider);
+        $queryBuilderService = new CustomItemNameFilterQueryBuilder(new RandomParameterName(), $filterHelper);
+        $filterMock          = $this->createSegmentFilterMock('%emotion%', 'text', 'like', 'custom_object3');
+        $queryBuilder        = $this->getLeadsQueryBuilder();
+
+        $queryBuilderService->applyQuery($queryBuilder, $filterMock);
+
+        $this->assertSame(2, $this->executeSelect($queryBuilder)->rowCount());
+    }
+
+    protected function XtearDown(): void
     {
         foreach ($this->getFixturesInUnloadableOrder() as $entity) {
             $this->entityManager->remove($entity);
@@ -63,21 +77,6 @@ class CustomItemNameFilterQueryBuilderTest extends WebTestCase
         $this->entityManager->flush();
 
         parent::tearDown();
-    }
-
-    public function testApplyQuery(): void
-    {
-        /** @var CustomFieldTypeProvider $fieldTypeProvider */
-        $fieldTypeProvider   = $this->getContainer()->get('custom_field.type.provider');
-        $filterHelper        = new QueryFilterHelper($fieldTypeProvider);
-        $queryBuilderService = new CustomItemNameFilterQueryBuilder(new RandomParameterName(), $filterHelper);
-        $filterMock          = $this->createSegmentFilterMock('%emotion%', 'text', 'like', 'custom_item21');
-        $queryBuilder        = $this->getLeadsQueryBuilder();
-        
-        $queryBuilderService->applyQuery($queryBuilder, $filterMock);
-
-        $this->assertSame(1, $this->executeSelect($queryBuilder)->rowCount());
-
     }
 
     /**

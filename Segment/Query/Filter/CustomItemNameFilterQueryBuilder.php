@@ -49,7 +49,7 @@ class CustomItemNameFilterQueryBuilder extends BaseFilterQueryBuilder
 
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
-        $filterFieldId = $filter->getField();
+        $customObjectId = $filter->getField();
 
         $tableAlias = 'cin_'.(int) $filter->getField();
 
@@ -59,10 +59,10 @@ class CustomItemNameFilterQueryBuilder extends BaseFilterQueryBuilder
         );
 
         $filterQueryBuilder->andWhere(
-            $filterQueryBuilder->expr()->eq($tableAlias.'_item.id', ':'.$tableAlias.'ItemId')
+            $filterQueryBuilder->expr()->eq($tableAlias.'_item.custom_object_id', ':'.$tableAlias.'ObjectId')
         );
 
-        $filterQueryBuilder->setParameter($tableAlias.'ItemId', $filterFieldId);
+        $filterQueryBuilder->setParameter($tableAlias.'ObjectId', (int) $customObjectId);
 
         $this->filterHelper->addCustomObjectNameExpression(
             $filterQueryBuilder,
@@ -73,8 +73,6 @@ class CustomItemNameFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $filterQueryBuilder->select($tableAlias.'_contact.contact_id as lead_id');
         $filterQueryBuilder->andWhere('l.id = '.$tableAlias.'_contact.contact_id');
-
-        $queryBuilder->setParameter($tableAlias.'ItemId', (int) $filterFieldId);
 
         switch ($filter->getOperator()) {
             case 'empty':
