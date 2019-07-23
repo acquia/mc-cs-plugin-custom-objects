@@ -59,7 +59,7 @@ class CustomItemFilterQueryBuilder extends BaseFilterQueryBuilder
         );
 
         $filterQueryBuilder->andWhere(
-            $filterQueryBuilder->expr()->eq($tableAlias."_item.id", ":" . $tableAlias."ItemId")
+            $filterQueryBuilder->expr()->eq($tableAlias.'_item.id', ':'.$tableAlias.'ItemId')
         );
 
         $this->filterHelper->addCustomObjectNameExpression(
@@ -72,7 +72,7 @@ class CustomItemFilterQueryBuilder extends BaseFilterQueryBuilder
         $filterQueryBuilder->select($tableAlias.'_contact.contact_id as lead_id');
         $filterQueryBuilder->andWhere('l.id = '.$tableAlias.'_contact.contact_id');
 
-        $queryBuilder->setParameter($tableAlias."ItemId", (int) $filterFieldId);
+        $queryBuilder->setParameter($tableAlias.'ItemId', (int) $filterFieldId);
 
         switch ($filter->getOperator()) {
             case 'empty':
