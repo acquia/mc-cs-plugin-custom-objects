@@ -12,7 +12,7 @@ use MauticPlugin\CustomObjectsBundle\EventListener\DynamicContentSubscriber;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder;
-use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemFilterQueryBuilder;
+use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemNameFilterQueryBuilder;
 use Monolog\Logger;
 use PHPUnit_Framework_TestCase;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
@@ -103,7 +103,7 @@ class DynamicContentSubscriberTest extends PHPUnit_Framework_TestCase
                 'foreign_table' => 'custom_objects',
             ],
             'custom_item_1'  => [
-                'type'          => CustomItemFilterQueryBuilder::getServiceId(),
+                'type'          => CustomItemNameFilterQueryBuilder::getServiceId(),
                 'table'         => 'custom_field_text',
                 'field'         => 'cowq_2',
                 'foreign_table' => 'custom_objects',
@@ -126,7 +126,7 @@ class DynamicContentSubscriberTest extends PHPUnit_Framework_TestCase
                 ],
                 [
                     [
-                        'type'          => CustomItemFilterQueryBuilder::getServiceId(),
+                        'type'          => CustomItemNameFilterQueryBuilder::getServiceId(),
                         'table'         => 'custom_field_text',
                         'field'         => 'cowq_2',
                         'foreign_table' => 'custom_objects',

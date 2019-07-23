@@ -11,3 +11,5 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact:
     __construct: ['@custom_item4', '@contact5']
   custom_item_xref6:
     __construct: ['@custom_item5', '@contact6']
+  custom_item_xref7:
+    __construct: ['@custom_item21', '@contact3']

@@ -20,7 +20,7 @@ use Mautic\LeadBundle\Segment\RandomParameterName;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryBuilderManipulatorTrait;
 
-class CustomItemFilterQueryBuilder extends BaseFilterQueryBuilder
+class CustomItemNameFilterQueryBuilder extends BaseFilterQueryBuilder
 {
     use QueryBuilderManipulatorTrait;
 
@@ -61,6 +61,8 @@ class CustomItemFilterQueryBuilder extends BaseFilterQueryBuilder
         $filterQueryBuilder->andWhere(
             $filterQueryBuilder->expr()->eq($tableAlias.'_item.id', ':'.$tableAlias.'ItemId')
         );
+
+        $filterQueryBuilder->setParameter($tableAlias.'ItemId', $filterFieldId);
 
         $this->filterHelper->addCustomObjectNameExpression(
             $filterQueryBuilder,

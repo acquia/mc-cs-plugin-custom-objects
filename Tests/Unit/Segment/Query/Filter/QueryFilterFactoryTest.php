@@ -21,7 +21,7 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
-use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemFilterQueryBuilder;
+use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemNameFilterQueryBuilder;
 
 class QueryFilterFactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -164,7 +164,7 @@ class QueryFilterFactoryTest extends \PHPUnit_Framework_TestCase
 
         $this->contactSegmentFilter->expects($this->once())
             ->method('getQueryType')
-            ->willReturn(CustomItemFilterQueryBuilder::getServiceId());
+            ->willReturn(CustomItemNameFilterQueryBuilder::getServiceId());
 
         $this->contactSegmentFilter->expects($this->once())
             ->method('getOperator')
