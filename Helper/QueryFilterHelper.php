@@ -446,7 +446,7 @@ class QueryFilterHelper
                 $alias.'_contact',
                 MAUTIC_TABLE_PREFIX.'custom_item',
                 $alias.'_item',
-                $alias.'_item.id='.$alias.'_contact.custom_item_id and '.$alias.'_item.id=:customFieldId_'.$alias);
+                $alias.'_item.id='.$alias.'_contact.custom_item_id');
 
         return $customFieldQueryBuilder;
     }
