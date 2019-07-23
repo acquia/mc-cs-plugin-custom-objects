@@ -20,11 +20,11 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
-use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemFilterQueryBuilder;
+use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemNameFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 
-class CustomItemFilterQueryBuilderTest extends WebTestCase
+class CustomItemNameFilterQueryBuilderTest extends WebTestCase
 {
     use FixtureObjectsTrait;
     use DbalQueryTrait;
@@ -59,9 +59,7 @@ class CustomItemFilterQueryBuilderTest extends WebTestCase
         foreach ($this->getFixturesInUnloadableOrder() as $entity) {
             $this->entityManager->remove($entity);
         }
-
         $this->entityManager->flush();
-
         parent::tearDown();
     }
 
@@ -70,18 +68,13 @@ class CustomItemFilterQueryBuilderTest extends WebTestCase
         /** @var CustomFieldTypeProvider $fieldTypeProvider */
         $fieldTypeProvider   = $this->getContainer()->get('custom_field.type.provider');
         $filterHelper        = new QueryFilterHelper($fieldTypeProvider);
-        $queryBuilderService = new CustomItemFilterQueryBuilder(new RandomParameterName(), $filterHelper);
-        $filterMock          = $this->createSegmentFilterMock('%emotion%', 'text', 'like');
+        $queryBuilderService = new CustomItemNameFilterQueryBuilder(new RandomParameterName(), $filterHelper);
+        $filterMock          = $this->createSegmentFilterMock('%emotion%', 'text', 'like', 'custom_object3');
         $queryBuilder        = $this->getLeadsQueryBuilder();
+
         $queryBuilderService->applyQuery($queryBuilder, $filterMock);
 
-        $this->assertSame(1, $this->executeSelect($queryBuilder)->rowCount());
-
-        $filterMock   = $this->createSegmentFilterMock('%Object%', 'text', 'like');
-        $queryBuilder = $this->getLeadsQueryBuilder();
-        $queryBuilderService->applyQuery($queryBuilder, $filterMock);
-
-        $this->assertSame(6, $this->executeSelect($queryBuilder)->rowCount());
+        $this->assertSame(2, $this->executeSelect($queryBuilder)->rowCount());
     }
 
     /**

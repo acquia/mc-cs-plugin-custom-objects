@@ -18,7 +18,7 @@ use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder;
-use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemFilterQueryBuilder;
+use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemNameFilterQueryBuilder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use Doctrine\DBAL\Connection;
@@ -86,7 +86,7 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
             $COId = $field['custom_object_id'];
             if (!in_array($COId, $registeredObjects, true)) {
                 $event->addTranslation('cmo_'.$COId, [
-                    'type'          => CustomItemFilterQueryBuilder::getServiceId(),
+                    'type'          => CustomItemNameFilterQueryBuilder::getServiceId(),
                     'field'         => $COId,
                     'foreign_table' => 'custom_objects',
                 ]);

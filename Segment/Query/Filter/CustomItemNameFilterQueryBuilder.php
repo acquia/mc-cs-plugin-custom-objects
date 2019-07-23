@@ -20,7 +20,7 @@ use Mautic\LeadBundle\Segment\RandomParameterName;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryBuilderManipulatorTrait;
 
-class CustomItemFilterQueryBuilder extends BaseFilterQueryBuilder
+class CustomItemNameFilterQueryBuilder extends BaseFilterQueryBuilder
 {
     use QueryBuilderManipulatorTrait;
 
@@ -49,14 +49,20 @@ class CustomItemFilterQueryBuilder extends BaseFilterQueryBuilder
 
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
-        $filterFieldId = $filter->getField();
+        $customObjectId = $filter->getField();
 
-        $tableAlias = 'cfwq_'.(int) $filter->getField();
+        $tableAlias = 'cin_'.(int) $filter->getField();
 
         $filterQueryBuilder = $this->filterHelper->createItemNameQueryBuilder(
             $queryBuilder->getConnection(),
             $tableAlias
         );
+
+        $filterQueryBuilder->andWhere(
+            $filterQueryBuilder->expr()->eq($tableAlias.'_item.custom_object_id', ':'.$tableAlias.'ObjectId')
+        );
+
+        $filterQueryBuilder->setParameter($tableAlias.'ObjectId', (int) $customObjectId);
 
         $this->filterHelper->addCustomObjectNameExpression(
             $filterQueryBuilder,
@@ -67,8 +73,6 @@ class CustomItemFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $filterQueryBuilder->select($tableAlias.'_contact.contact_id as lead_id');
         $filterQueryBuilder->andWhere('l.id = '.$tableAlias.'_contact.contact_id');
-
-        $queryBuilder->setParameter('customFieldId_'.$tableAlias, (int) $filterFieldId);
 
         switch ($filter->getOperator()) {
             case 'empty':

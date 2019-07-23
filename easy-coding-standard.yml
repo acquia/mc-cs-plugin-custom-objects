@@ -36,7 +36,7 @@ parameters:
     SlevomatCodingStandard\Sniffs\TypeHints\TypeHintDeclarationSniff.MissingPropertyTypeHint:
       - 'Tests/*'
     SlevomatCodingStandard\Sniffs\TypeHints\TypeHintDeclarationSniff.MissingTraversableReturnTypeHintSpecification:
-      - 'Segment/Query/Filter/CustomItemFilterQueryBuilder.php'
+      - 'Segment/Query/Filter/CustomItemNameFilterQueryBuilder.php'
     PhpCsFixer\Fixer\PhpUnit\PhpUnitStrictFixer:
       - 'Tests/Functional/EventListener/ImportSubscriberTest.php'
     PhpCsFixer\Fixer\Strict\StrictParamFixer:
