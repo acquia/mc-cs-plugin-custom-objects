@@ -104,20 +104,25 @@ pipeline {
       }
       steps {
         script {
-          echo "Updating submodule in mautic-cloud for branch ${env.BRANCH_NAME}"
+          if (BRANCH_NAME == 'master') {
+            MC_BRANCH_NAME = 'deployed'
+          } else {
+            MC_BRANCH_NAME = BRANCH_NAME
+          }
+          echo "Updating CustomObjectsBundle submodule (branch ${BRANCH_NAME}) in mautic-cloud repo (branch ${MC_BRANCH_NAME})"
           sshagent (credentials: ['1a066462-6d24-4247-bef6-1da084c8f484']) {
             sh '''
               git config --global user.email "9725490+mautibot@users.noreply.github.com"
               git config --global user.name "Jenkins"
-              git clone git@github.com:mautic-inc/mautic-cloud.git -b $BRANCH_NAME
+              git clone git@github.com:mautic-inc/mautic-cloud.git -b '''+MC_BRANCH_NAME+'''
               cd mautic-cloud
-              git submodule update --init plugins/CustomObjectsBundle/
+              git submodule update --init --recursive plugins/CustomObjectsBundle/
               cd plugins/CustomObjectsBundle/
               git pull origin $BRANCH_NAME
               SUBMODULE_COMMIT=$(git log -1 | awk 'NR==1{print $2}')
               cd ../..
               git add plugins/CustomObjectsBundle
-              git commit -m "Submodule updated with commit $SUBMODULE_COMMIT"
+              git commit -m "CustomObjectsBundle updated with commit $SUBMODULE_COMMIT"
               git push
             '''
           }
