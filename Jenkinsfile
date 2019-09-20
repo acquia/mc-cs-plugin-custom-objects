@@ -132,7 +132,7 @@ pipeline {
         }
       }
     }    
-    stage('Fill Hash') {
+    stage('Set Revision') {
       when {
         not {
           changeRequest()
@@ -151,14 +151,16 @@ pipeline {
               git config --global user.name "Jenkins"
               git clone git@github.com:mautic-inc/mautic-cloud.git -b $BRANCH_NAME
               cd mautic-cloud
-              git submodule update --init --recursive plugins/CustomObjectsBundle/
-              cd plugins/CustomObjectsBundle/
-              git pull origin $BRANCH_NAME
-              SUBMODULE_COMMIT=$(git log -1 | awk 'NR==1{print $2}')
-              cd ../..
-              git add plugins/CustomObjectsBundle
-              git commit -m "CustomObjectsBundle updated with commit $SUBMODULE_COMMIT"
-              git push
+              if [ -n "$(grep CustomObjectsBundle .gitmodules)" ]; then
+                git submodule update --init --recursive plugins/CustomObjectsBundle/
+                cd plugins/CustomObjectsBundle/
+                git pull origin $BRANCH_NAME
+                SUBMODULE_COMMIT=$(git log -1 | awk 'NR==1{print $2}')
+                cd ../..
+                git add plugins/CustomObjectsBundle
+                git commit -m "CustomObjectsBundle updated with commit $SUBMODULE_COMMIT"
+                git push
+              fi
             '''
           }
         }
