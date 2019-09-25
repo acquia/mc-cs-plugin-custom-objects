@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Migrations;
 
 use Mautic\CoreBundle\Exception\SchemaException;
-use MauticPlugin\CustomObjectsBundle\Migration\AbstractMigration;
+use MauticPlugin\IntegrationsBundle\Migration\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
 
 class Version_0_0_9 extends AbstractMigration
