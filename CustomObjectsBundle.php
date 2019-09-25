@@ -38,7 +38,7 @@ class CustomObjectsBundle extends AbstractPluginBundle
      * @param array|null    $metadata
      * @param MauticFactory $factory
      */
-    private static function installAllTablesIfMissing(Schema $schema, string $tablePrefix, MauticFactory $factory, array $metadata = null): void
+    protected static function installAllTablesIfMissing(Schema $schema, string $tablePrefix, MauticFactory $factory, array $metadata = null): void
     {
         if (!$schema->hasTable($tablePrefix.'custom_object')) {
             self::installPluginSchema($metadata, $factory, null);
