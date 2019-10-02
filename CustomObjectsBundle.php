@@ -14,44 +14,13 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle;
 
 use Doctrine\DBAL\Schema\Schema;
-use Mautic\PluginBundle\Bundle\PluginBundleBase;
-use Mautic\PluginBundle\Entity\Plugin;
 use Mautic\CoreBundle\Factory\MauticFactory;
-use MauticPlugin\CustomObjectsBundle\Migration\Engine;
 use MauticPlugin\CustomObjectsBundle\DependencyInjection\Compiler\CustomFieldTypePass;
+use MauticPlugin\IntegrationsBundle\Bundle\AbstractPluginBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class CustomObjectsBundle extends PluginBundleBase
+class CustomObjectsBundle extends AbstractPluginBundle
 {
-    /**
-     * @param Plugin        $plugin
-     * @param MauticFactory $factory
-     * @param array|null    $metadata
-     * @param Schema|null   $installedSchema
-     *
-     * @throws \Exception
-     */
-    public static function onPluginUpdate(Plugin $plugin, MauticFactory $factory, $metadata = null, Schema $installedSchema = null): void
-    {
-        $entityManager = $factory->getEntityManager();
-        $tablePrefix   = $factory->getParameter('mautic.db_table_prefix');
-
-        $migrationEngine = new Engine(
-            $entityManager,
-            $tablePrefix,
-            dirname(__FILE__)
-        );
-
-        self::installAllTablesIfMissing(
-            $entityManager->getConnection()->getSchemaManager()->createSchema(),
-            $tablePrefix,
-            $factory,
-            $metadata
-        );
-
-        $migrationEngine->up();
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -69,7 +38,7 @@ class CustomObjectsBundle extends PluginBundleBase
      * @param array|null    $metadata
      * @param MauticFactory $factory
      */
-    private static function installAllTablesIfMissing(Schema $schema, string $tablePrefix, MauticFactory $factory, array $metadata = null): void
+    protected static function installAllTablesIfMissing(Schema $schema, string $tablePrefix, MauticFactory $factory, array $metadata = null): void
     {
         if (!$schema->hasTable($tablePrefix.'custom_object')) {
             self::installPluginSchema($metadata, $factory, null);
