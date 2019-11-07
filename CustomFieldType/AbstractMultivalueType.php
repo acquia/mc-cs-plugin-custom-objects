@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\CsvTransformer;
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\MultivalueTransformer;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
@@ -35,9 +36,18 @@ abstract class AbstractMultivalueType extends AbstractCustomFieldType
      */
     private $csvHelper;
 
-    public function __construct(TranslatorInterface $translator, CsvHelper $csvHelper)
+    /**
+     * @param TranslatorInterface $translator
+     * @param FilterOperatorProviderInterface $filterOperatorProvider
+     * @param CsvHelper           $csvHelper
+     */
+    public function __construct(
+        TranslatorInterface $translator,
+        FilterOperatorProviderInterface $filterOperatorProvider,
+        CsvHelper $csvHelper
+    )
     {
-        parent::__construct($translator);
+        parent::__construct($translator, $filterOperatorProvider);
 
         $this->csvHelper = $csvHelper;
     }
