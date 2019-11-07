@@ -42,15 +42,15 @@ class CustomFieldModel extends FormModel
         CustomFieldPermissionProvider $permissionProvider,
         UserHelper $userHelper
     ) {
-        $this->customFieldRepository  = $customFieldRepository;
-        $this->permissionProvider     = $permissionProvider;
-        $this->userHelper             = $userHelper;
+        $this->customFieldRepository = $customFieldRepository;
+        $this->permissionProvider    = $permissionProvider;
+        $this->userHelper            = $userHelper;
     }
 
     public function setMetadata(CustomField $entity): CustomField
     {
-        $user   = $this->userHelper->getUser();
-        $now    = new DateTimeHelper();
+        $user = $this->userHelper->getUser();
+        $now  = new DateTimeHelper();
 
         if ($entity->isNew()) {
             $entity->setCreatedBy($user);
