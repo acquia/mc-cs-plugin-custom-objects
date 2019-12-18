@@ -33,9 +33,9 @@ class OptionsType extends AbstractType
                 'list',
                 CollectionType::class,
                 [
-                    'label'      => false,
-                    'entry_type' => SortableValueLabelListType::class,
-                    'options'    => [
+                    'label'         => false,
+                    'entry_type'    => SortableValueLabelListType::class,
+                    'entry_options' => [
                         'label'    => false,
                         'required' => false,
                         'attr'     => [
@@ -70,14 +70,6 @@ class OptionsType extends AbstractType
      * {@inheritdoc}
      */
     public function getBlockPrefix(): string
-    {
-        return $this->getName();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName(): string
     {
         return 'sortablelist';
     }

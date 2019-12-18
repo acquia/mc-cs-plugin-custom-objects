@@ -13,9 +13,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
@@ -25,12 +26,14 @@ class CustomFieldValueType extends AbstractType
     /**
      * @param FormBuilderInterface $builder
      * @param mixed[]              $options
+     *
+     * @throws NotFoundException
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var CustomItem $customItem */
         $customItem       = $options['customItem'];
-        $customFieldId    = (int) $builder->getName();
+        $customFieldId    = (int) $builder->getName(); // @todo Check Symfony 3 compatibility
         $customFieldValue = $customItem->findCustomFieldValueForFieldId($customFieldId);
         $customField      = $customFieldValue->getCustomField();
         $symfonyFormType  = $customField->getTypeObject()->getSymfonyFormFieldType();
@@ -50,7 +53,7 @@ class CustomFieldValueType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver): void
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(['data_class' => CustomFieldValueInterface::class]);
         $resolver->setRequired(['customItem']);

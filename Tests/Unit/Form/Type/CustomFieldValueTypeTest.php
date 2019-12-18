@@ -20,7 +20,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldValueType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\DataTransformerInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
 
@@ -43,7 +43,7 @@ class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
         parent::setUp();
 
         $this->formBuilder      = $this->createMock(FormBuilderInterface::class);
-        $this->optionsResolver  = $this->createMock(OptionsResolverInterface::class);
+        $this->optionsResolver  = $this->createMock(OptionsResolver::class);
         $this->customItem       = $this->createMock(CustomItem::class);
         $this->customFieldValue = $this->createMock(CustomFieldValueInterface::class);
         $this->customField      = $this->createMock(CustomField::class);
@@ -169,7 +169,7 @@ class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
         $this->formType->buildForm($this->formBuilder, $options);
     }
 
-    public function testSetDefaultOptions(): void
+    public function testConfigureOptions(): void
     {
         $this->optionsResolver->expects($this->once())
             ->method('setDefaults')
@@ -179,6 +179,6 @@ class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
             ->method('setRequired')
             ->with(['customItem']);
 
-        $this->formType->setDefaultOptions($this->optionsResolver);
+        $this->formType->configureOptions($this->optionsResolver);
     }
 }
