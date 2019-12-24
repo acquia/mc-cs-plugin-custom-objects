@@ -16,7 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Factory\MauticFactory;
 use MauticPlugin\CustomObjectsBundle\DependencyInjection\Compiler\CustomFieldTypePass;
-use MauticPlugin\IntegrationsBundle\Bundle\AbstractPluginBundle;
+use Mautic\IntegrationsBundle\Bundle\AbstractPluginBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class CustomObjectsBundle extends AbstractPluginBundle
