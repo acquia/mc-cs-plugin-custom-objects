@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
 use Mautic\LeadBundle\Entity\Lead;
@@ -26,8 +28,9 @@ use Doctrine\ORM\NoResultException;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CustomItemXrefContactSubscriber extends CommonSubscriber
+class CustomItemXrefContactSubscriber implements EventSubscriberInterface
 {
     /**
      * @var EntityManager
@@ -39,10 +42,6 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
      */
     private $userHelper;
 
-    /**
-     * @param EntityManager $entityManager
-     * @param UserHelper    $userHelper
-     */
     public function __construct(
         EntityManager $entityManager,
         UserHelper $userHelper
@@ -72,9 +71,6 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param CustomItemListQueryEvent $event
-     */
     public function onListDbalQuery(CustomItemListDbalQueryEvent $event): void
     {
         $tableConfig = $event->getTableConfig();
@@ -91,9 +87,6 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param CustomItemListQueryEvent $event
-     */
     public function onListOrmQuery(CustomItemListQueryEvent $event): void
     {
         $tableConfig = $event->getTableConfig();
@@ -105,9 +98,6 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param CustomItemListQueryEvent $event
-     */
     public function onLookupQuery(CustomItemListQueryEvent $event): void
     {
         $tableConfig = $event->getTableConfig();
@@ -123,6 +113,7 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
 
     /**
      * @param CustomItemXrefEntityDiscoveryEvent $event
+     * @throws ORMException
      */
     public function onEntityLinkDiscovery(CustomItemXrefEntityDiscoveryEvent $event): void
     {
@@ -144,6 +135,8 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
      * Save the xref only if it isn't in the entity manager already as it means it was loaded from the database already.
      *
      * @param CustomItemXrefEntityEvent $event
+     * @throws OptimisticLockException
+     * @throws ORMException
      */
     public function saveLink(CustomItemXrefEntityEvent $event): void
     {
@@ -153,9 +146,6 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param CustomItemXrefEntityEvent $event
-     */
     public function createNewEventLogForLinkedContact(CustomItemXrefEntityEvent $event): void
     {
         if ($event->getXref() instanceof CustomItemXrefContact) {
@@ -165,6 +155,8 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
 
     /**
      * @param CustomItemXrefEntityEvent $event
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     public function deleteLink(CustomItemXrefEntityEvent $event): void
     {
@@ -176,6 +168,8 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
 
     /**
      * @param CustomItemXrefEntityEvent $event
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     public function createNewEventLogForUnlinkedContact(CustomItemXrefEntityEvent $event): void
     {
@@ -186,7 +180,9 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
 
     /**
      * @param CustomItemXrefContact $xRef
-     * @param string                $eventName
+     * @param string $eventName
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     private function saveEventLog(CustomItemXrefContact $xRef, string $eventName): void
     {
@@ -227,6 +223,7 @@ class CustomItemXrefContactSubscriber extends CommonSubscriber
      * @return CustomItemXrefContact
      *
      * @throws NoResultException if the reference does not exist
+     * @throws NonUniqueResultException
      */
     private function getContactXrefEntity(int $customItemId, int $contactId): CustomItemXrefContact
     {

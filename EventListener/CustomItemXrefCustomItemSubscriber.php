@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
 use Doctrine\ORM\EntityManager;
@@ -21,20 +23,18 @@ use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
 use Doctrine\ORM\NoResultException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use UnexpectedValueException;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
 use Doctrine\ORM\Query\Expr\Join;
 
-class CustomItemXrefCustomItemSubscriber extends CommonSubscriber
+class CustomItemXrefCustomItemSubscriber implements EventSubscriberInterface
 {
     /**
      * @var EntityManager
      */
     private $entityManager;
 
-    /**
-     * @param EntityManager $entityManager
-     */
     public function __construct(
         EntityManager $entityManager
     ) {
@@ -61,9 +61,6 @@ class CustomItemXrefCustomItemSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param CustomItemListQueryEvent $event
-     */
     public function onListQuery(CustomItemListQueryEvent $event): void
     {
         $tableConfig = $event->getTableConfig();
@@ -84,9 +81,6 @@ class CustomItemXrefCustomItemSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param CustomItemListQueryEvent $event
-     */
     public function onLookupQuery(CustomItemListQueryEvent $event): void
     {
         $tableConfig = $event->getTableConfig();
@@ -115,6 +109,7 @@ class CustomItemXrefCustomItemSubscriber extends CommonSubscriber
      * @param CustomItemXrefEntityDiscoveryEvent $event
      *
      * @throws UnexpectedValueException
+     * @throws ORMException
      */
     public function onEntityLinkDiscovery(CustomItemXrefEntityDiscoveryEvent $event): void
     {
@@ -136,6 +131,8 @@ class CustomItemXrefCustomItemSubscriber extends CommonSubscriber
      * Save the xref only if it isn't in the entity manager already as it means it was loaded from the database already.
      *
      * @param CustomItemXrefEntityEvent $event
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     public function saveLink(CustomItemXrefEntityEvent $event): void
     {
@@ -145,9 +142,6 @@ class CustomItemXrefCustomItemSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param CustomItemXrefEntityEvent $event
-     */
     public function createNewEvenLogForLinkedCustomItem(CustomItemXrefEntityEvent $event): void
     {
         if ($event->getXref() instanceof CustomItemXrefCustomItem) {
@@ -157,6 +151,8 @@ class CustomItemXrefCustomItemSubscriber extends CommonSubscriber
 
     /**
      * @param CustomItemXrefEntityEvent $event
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     public function deleteLink(CustomItemXrefEntityEvent $event): void
     {
@@ -166,9 +162,6 @@ class CustomItemXrefCustomItemSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param CustomItemXrefEntityEvent $event
-     */
     public function createNewEvenLogForUnlinkedCustomItem(CustomItemXrefEntityEvent $event): void
     {
         if ($event->getXref() instanceof CustomItemXrefCustomItem) {
@@ -183,6 +176,7 @@ class CustomItemXrefCustomItemSubscriber extends CommonSubscriber
      * @return CustomItemXrefCustomItem
      *
      * @throws NoResultException if the reference does not exist
+     * @throws NonUniqueResultException
      */
     public function getXrefEntity(int $customItemAId, int $customItemBId): CustomItemXrefCustomItem
     {

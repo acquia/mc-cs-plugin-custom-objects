@@ -726,7 +726,8 @@ return [
                 'arguments' => [
                     'custom_object.query.filter.factory',
                     'custom_object.query.filter.helper',
-                    'custom_object.config.provider'
+                    'custom_object.config.provider',
+                    'logger',
                 ],
             ],
             'custom_object.serializer.subscriber' => [

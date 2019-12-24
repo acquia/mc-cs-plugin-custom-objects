@@ -13,11 +13,14 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use Doctrine\DBAL\DBALException;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CampaignActionLinkType;
 use Mautic\CoreBundle\Helper\ArrayHelper;
@@ -35,7 +38,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryBuilderManipulatorTrait;
 
-class CampaignSubscriber extends CommonSubscriber
+class CampaignSubscriber implements EventSubscriberInterface
 {
     use DbalQueryTrait;
     use QueryBuilderManipulatorTrait;
@@ -43,7 +46,7 @@ class CampaignSubscriber extends CommonSubscriber
     /**
      * @var TranslatorInterface
      */
-    protected $translator;
+    private $translator;
 
     /**
      * @var CustomFieldModel
@@ -80,16 +83,6 @@ class CampaignSubscriber extends CommonSubscriber
      */
     private $connection;
 
-    /**
-     * @param CustomFieldModel    $customFieldModel
-     * @param CustomObjectModel   $customObjectModel
-     * @param CustomItemModel     $customItemModel
-     * @param TranslatorInterface $translator
-     * @param ConfigProvider      $configProvider
-     * @param QueryFilterHelper   $queryFilterHelper
-     * @param QueryFilterFactory  $queryFilterFactory
-     * @param Connection          $connection
-     */
     public function __construct(
         CustomFieldModel $customFieldModel,
         CustomObjectModel $customObjectModel,
@@ -194,6 +187,10 @@ class CampaignSubscriber extends CommonSubscriber
 
     /**
      * @param CampaignExecutionEvent $event
+     * @throws NotFoundException
+     * @throws DBALException
+     * @throws InvalidArgumentException
+     * @throws InvalidSegmentFilterException
      */
     public function onCampaignTriggerCondition(CampaignExecutionEvent $event): void
     {

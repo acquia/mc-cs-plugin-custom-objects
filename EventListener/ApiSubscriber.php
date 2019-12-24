@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Mautic\ApiBundle\ApiEvents;
@@ -23,11 +23,12 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Mautic\LeadBundle\Entity\Lead;
 use InvalidArgumentException;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Symfony\Component\HttpFoundation\Response;
 
-class ApiSubscriber extends CommonSubscriber
+class ApiSubscriber implements EventSubscriberInterface
 {
     /**
      * @var ConfigProvider
@@ -44,11 +45,6 @@ class ApiSubscriber extends CommonSubscriber
      */
     private $customItemModel;
 
-    /**
-     * @param ConfigProvider    $configProvider
-     * @param CustomObjectModel $customObjectModel
-     * @param CustomItemModel   $customItemModel
-     */
     public function __construct(
         ConfigProvider $configProvider,
         CustomObjectModel $customObjectModel,
@@ -70,17 +66,11 @@ class ApiSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param ApiEntityEvent $event
-     */
     public function validateCustomObjectsInContactRequest(ApiEntityEvent $event): void
     {
         $this->saveCustomItems($event, true);
     }
 
-    /**
-     * @param ApiEntityEvent $event
-     */
     public function saveCustomObjectsInContactRequest(ApiEntityEvent $event): void
     {
         $this->saveCustomItems($event);
@@ -88,7 +78,9 @@ class ApiSubscriber extends CommonSubscriber
 
     /**
      * @param ApiEntityEvent $event
-     * @param bool           $dryRun
+     * @param bool $dryRun
+     * @throws NotFoundException
+     * @throws InvalidValueException
      */
     private function saveCustomItems(ApiEntityEvent $event, bool $dryRun = false): void
     {
@@ -177,6 +169,7 @@ class ApiSubscriber extends CommonSubscriber
      * @param mixed[]      $customItemData
      *
      * @return CustomItem
+     * @throws NotFoundException
      */
     private function getCustomItem(CustomObject $customObject, array $customItemData): CustomItem
     {
@@ -198,6 +191,7 @@ class ApiSubscriber extends CommonSubscriber
      * @param mixed[]    $customItemData
      *
      * @return CustomItem
+     * @throws NotFoundException
      */
     private function populateCustomItemWithRequestData(CustomItem $customItem, array $customItemData): CustomItem
     {

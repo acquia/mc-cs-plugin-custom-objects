@@ -13,19 +13,21 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use PDOException;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class DynamicContentSubscriber extends CommonSubscriber
+class DynamicContentSubscriber implements EventSubscriberInterface
 {
     use MatchFilterForLeadTrait;
     use DbalQueryTrait;
@@ -46,18 +48,20 @@ class DynamicContentSubscriber extends CommonSubscriber
     private $configProvider;
 
     /**
-     * @param QueryFilterFactory $queryFilterFactory
-     * @param QueryFilterHelper  $queryFilterHelper
-     * @param ConfigProvider     $configProvider
+     * @var LoggerInterface
      */
+    private $logger;
+
     public function __construct(
         QueryFilterFactory $queryFilterFactory,
         QueryFilterHelper $queryFilterHelper,
-        ConfigProvider $configProvider)
-    {
+        ConfigProvider $configProvider,
+        LoggerInterface $logger
+    ) {
         $this->queryFilterFactory = $queryFilterFactory;
         $this->queryFilterHelper  = $queryFilterHelper;
         $this->configProvider     = $configProvider;
+        $this->logger             = $logger;
     }
 
     /**
@@ -74,6 +78,7 @@ class DynamicContentSubscriber extends CommonSubscriber
      * @param ContactFiltersEvaluateEvent $event
      *
      * @throws InvalidArgumentException
+     * @throws NotFoundException
      */
     public function evaluateFilters(ContactFiltersEvaluateEvent $event): void
     {

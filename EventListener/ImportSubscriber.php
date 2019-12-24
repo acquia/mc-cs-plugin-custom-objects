@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Event\ImportInitEvent;
 use Mautic\LeadBundle\Event\ImportMappingEvent;
@@ -26,6 +25,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Mautic\LeadBundle\Event\ImportValidateEvent;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormError;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use Symfony\Component\Form\Form;
@@ -33,12 +33,12 @@ use Mautic\CoreBundle\Helper\ArrayHelper;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class ImportSubscriber extends CommonSubscriber
+class ImportSubscriber implements EventSubscriberInterface
 {
     /**
      * @var TranslatorInterface
      */
-    protected $translator;
+    private $translator;
 
     /**
      * @var CustomObjectModel
@@ -65,14 +65,6 @@ class ImportSubscriber extends CommonSubscriber
      */
     private $customFieldRepository;
 
-    /**
-     * @param CustomObjectModel            $customObjectModel
-     * @param CustomItemImportModel        $customItemImportModel
-     * @param ConfigProvider               $configProvider
-     * @param CustomItemPermissionProvider $permissionProvider
-     * @param CustomFieldRepository        $customFieldRepository
-     * @param TranslatorInterface          $translator
-     */
     public function __construct(
         CustomObjectModel $customObjectModel,
         CustomItemImportModel $customItemImportModel,
@@ -102,9 +94,6 @@ class ImportSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param ImportInitEvent $event
-     */
     public function onImportInit(ImportInitEvent $event): void
     {
         if (!$this->configProvider->pluginIsEnabled()) {
@@ -125,9 +114,6 @@ class ImportSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param ImportMappingEvent $event
-     */
     public function onFieldMapping(ImportMappingEvent $event): void
     {
         if (!$this->configProvider->pluginIsEnabled()) {
@@ -160,9 +146,6 @@ class ImportSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param ImportValidateEvent $event
-     */
     public function onValidateImport(ImportValidateEvent $event): void
     {
         if (!$this->configProvider->pluginIsEnabled()) {
@@ -202,6 +185,7 @@ class ImportSubscriber extends CommonSubscriber
 
     /**
      * @param ImportProcessEvent $event
+     * @throws ForbiddenException
      */
     public function onImportProcess(ImportProcessEvent $event): void
     {
