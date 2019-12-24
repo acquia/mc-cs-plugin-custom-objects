@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
 use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
 use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class AuditLogSubscriber extends CommonSubscriber
+class AuditLogSubscriber implements EventSubscriberInterface
 {
     /**
      * @var AuditLogModel
@@ -33,10 +33,6 @@ class AuditLogSubscriber extends CommonSubscriber
      */
     private $ipLookupHelper;
 
-    /**
-     * @param AuditLogModel  $auditLogModel
-     * @param IpLookupHelper $ipLookupHelper
-     */
     public function __construct(AuditLogModel $auditLogModel, IpLookupHelper $ipLookupHelper)
     {
         $this->auditLogModel  = $auditLogModel;

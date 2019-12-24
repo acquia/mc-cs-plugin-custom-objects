@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class MenuSubscriber extends CommonSubscriber
+class MenuSubscriber implements EventSubscriberInterface
 {
     /**
      * @var CustomObjectModel
@@ -33,10 +33,6 @@ class MenuSubscriber extends CommonSubscriber
      */
     private $configProvider;
 
-    /**
-     * @param CustomObjectModel $customObjectModel
-     * @param ConfigProvider    $configProvider
-     */
     public function __construct(CustomObjectModel $customObjectModel, ConfigProvider $configProvider)
     {
         $this->customObjectModel = $customObjectModel;
@@ -53,9 +49,6 @@ class MenuSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param MenuEvent $event
-     */
     public function onBuildMenu(MenuEvent $event): void
     {
         if ($this->configProvider->pluginIsEnabled()) {
@@ -69,9 +62,6 @@ class MenuSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param MenuEvent $event
-     */
     private function addMainMenuItems(MenuEvent $event): void
     {
         $customObjects = $this->customObjectModel->fetchAllPublishedEntities();
@@ -110,9 +100,6 @@ class MenuSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param MenuEvent $event
-     */
     private function addAdminMenuItems(MenuEvent $event): void
     {
         $event->addMenuItems(

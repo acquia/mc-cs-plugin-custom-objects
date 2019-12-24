@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
@@ -25,12 +25,12 @@ use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 
-class ContactSubscriber extends CommonSubscriber
+class ContactSubscriber implements EventSubscriberInterface
 {
     /**
      * @var TranslatorInterface
      */
-    protected $translator;
+    private $translator;
 
     /**
      * @var EntityManager
@@ -52,13 +52,6 @@ class ContactSubscriber extends CommonSubscriber
      */
     private $configProvider;
 
-    /**
-     * @param EntityManager           $entityManager
-     * @param TranslatorInterface     $translator
-     * @param CustomItemRouteProvider $routeProvider
-     * @param CustomItemModel         $customItemModel
-     * @param ConfigProvider          $configProvider
-     */
     public function __construct(
         EntityManager $entityManager,
         TranslatorInterface $translator,

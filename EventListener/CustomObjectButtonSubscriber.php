@@ -15,7 +15,6 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
@@ -23,8 +22,9 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class CustomObjectButtonSubscriber extends CommonSubscriber
+class CustomObjectButtonSubscriber implements EventSubscriberInterface
 {
     /**
      * @var CustomObjectPermissionProvider
@@ -46,12 +46,6 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
      */
     private $customItemRouteProvider;
 
-    /**
-     * @param CustomObjectPermissionProvider $permissionProvider
-     * @param CustomObjectRouteProvider      $routeProvider
-     * @param CustomItemPermissionProvider   $customItemPermissionProvider
-     * @param CustomItemRouteProvider        $customItemRouteProvider
-     */
     public function __construct(
         CustomObjectPermissionProvider $permissionProvider,
         CustomObjectRouteProvider $routeProvider,
@@ -74,9 +68,6 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param CustomButtonEvent $event
-     */
     public function injectViewButtons(CustomButtonEvent $event): void
     {
         switch ($event->getRoute()) {
@@ -112,10 +103,6 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
         }
     }
 
-    /**
-     * @param CustomButtonEvent $event
-     * @param string            $location
-     */
     private function addEntityButtons(CustomButtonEvent $event, string $location): void
     {
         $entity = $event->getItem();
@@ -238,6 +225,7 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
      * @param CustomObject $customObject
      *
      * @return string[]
+     * @throws ForbiddenException
      */
     private function defineViewCustomItemsButton(CustomObject $customObject): array
     {
@@ -257,6 +245,7 @@ class CustomObjectButtonSubscriber extends CommonSubscriber
      * @param CustomObject $customObject
      *
      * @return string[]
+     * @throws ForbiddenException
      */
     private function defineCreateNewCustomItemButton(CustomObject $customObject): array
     {

@@ -15,20 +15,20 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class CustomItemButtonSubscriber extends CommonSubscriber
+class CustomItemButtonSubscriber implements EventSubscriberInterface
 {
     /**
      * @var TranslatorInterface
      */
-    protected $translator;
+    private $translator;
 
     /**
      * @var CustomItemPermissionProvider
@@ -65,9 +65,6 @@ class CustomItemButtonSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param CustomButtonEvent $event
-     */
     public function injectViewButtons(CustomButtonEvent $event): void
     {
         switch ($event->getRoute()) {

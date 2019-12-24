@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use Symfony\Component\HttpFoundation\Request;
 
-class AssetsSubscriber extends CommonSubscriber
+class AssetsSubscriber implements EventSubscriberInterface
 {
     /**
      * @var AssetsHelper
@@ -32,10 +32,6 @@ class AssetsSubscriber extends CommonSubscriber
      */
     private $configProvider;
 
-    /**
-     * @param AssetsHelper   $assetHelper
-     * @param ConfigProvider $configProvider
-     */
     public function __construct(
         AssetsHelper $assetHelper,
         ConfigProvider $configProvider
@@ -54,9 +50,6 @@ class AssetsSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param GetResponseEvent $event
-     */
     public function loadAssets(GetResponseEvent $event): void
     {
         if ($this->configProvider->pluginIsEnabled() && $event->isMasterRequest() && $this->isMauticAdministrationPage($event->getRequest())) {

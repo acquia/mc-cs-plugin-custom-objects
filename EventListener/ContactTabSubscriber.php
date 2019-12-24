@@ -14,17 +14,17 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Event\CustomContentEvent;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 
-class ContactTabSubscriber extends CommonSubscriber
+class ContactTabSubscriber implements EventSubscriberInterface
 {
     /**
      * @var TranslatorInterface
@@ -56,13 +56,6 @@ class ContactTabSubscriber extends CommonSubscriber
      */
     private $customObjects = [];
 
-    /**
-     * @param CustomObjectModel       $customObjectModel
-     * @param CustomItemRepository    $customItemRepository
-     * @param ConfigProvider          $configProvider
-     * @param TranslatorInterface     $translator
-     * @param CustomItemRouteProvider $customItemRouteProvider
-     */
     public function __construct(
         CustomObjectModel $customObjectModel,
         CustomItemRepository $customItemRepository,
@@ -87,9 +80,6 @@ class ContactTabSubscriber extends CommonSubscriber
         ];
     }
 
-    /**
-     * @param CustomContentEvent $event
-     */
     public function injectTabs(CustomContentEvent $event): void
     {
         if (!$this->configProvider->pluginIsEnabled()) {
