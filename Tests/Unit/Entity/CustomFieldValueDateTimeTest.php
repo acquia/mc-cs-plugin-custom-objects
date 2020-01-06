@@ -18,7 +18,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueDateTime;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
-class CustomFieldValueDateTimeTest extends \PHPUnit_Framework_TestCase
+class CustomFieldValueDateTimeTest extends \PHPUnit\Framework\TestCase
 {
     public function testGettersSetters(): void
     {

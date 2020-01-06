@@ -17,7 +17,7 @@ use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use Doctrine\DBAL\Query\QueryBuilder;
 
-class CustomItemListDbalQueryEventTest extends \PHPUnit_Framework_TestCase
+class CustomItemListDbalQueryEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testGettersSetters(): void
     {

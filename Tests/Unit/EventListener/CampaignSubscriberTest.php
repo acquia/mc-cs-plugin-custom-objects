@@ -34,7 +34,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
 use Doctrine\DBAL\Statement;
 
-class CampaignSubscriberTest extends \PHPUnit_Framework_TestCase
+class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private const OBJECT_ID = 63;
 

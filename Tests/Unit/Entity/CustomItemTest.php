@@ -25,7 +25,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class CustomItemTest extends \PHPUnit_Framework_TestCase
+class CustomItemTest extends \PHPUnit\Framework\TestCase
 {
     public function testClone(): void
     {

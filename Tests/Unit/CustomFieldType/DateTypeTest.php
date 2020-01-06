@@ -22,7 +22,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueDate;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\DateTransformer;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\ViewDateTransformer;
 
-class DateTypeTest extends \PHPUnit_Framework_TestCase
+class DateTypeTest extends \PHPUnit\Framework\TestCase
 {
     private $translator;
     private $customField;

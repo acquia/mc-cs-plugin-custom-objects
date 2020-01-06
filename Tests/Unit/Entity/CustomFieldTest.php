@@ -34,7 +34,7 @@ use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CountryType;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
-class CustomFieldTest extends \PHPUnit_Framework_TestCase
+class CustomFieldTest extends \PHPUnit\Framework\TestCase
 {
     public function testClone(): void
     {

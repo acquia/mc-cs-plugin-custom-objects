@@ -20,7 +20,7 @@ use Symfony\Component\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
 
-class LockFlashMessageHelperTest extends \PHPUnit_Framework_TestCase
+class LockFlashMessageHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testAddFlash(): void
     {

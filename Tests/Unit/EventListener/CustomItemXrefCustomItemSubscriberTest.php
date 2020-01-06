@@ -27,7 +27,7 @@ use Doctrine\ORM\NoResultException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
 use Doctrine\ORM\Query\Expr\Join;
 
-class CustomItemXrefCustomItemSubscriberTest extends \PHPUnit_Framework_TestCase
+class CustomItemXrefCustomItemSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private const ITEM_A_ID = 90;
 

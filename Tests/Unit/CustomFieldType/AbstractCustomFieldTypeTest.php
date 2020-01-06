@@ -19,7 +19,7 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldType\EmailType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\AbstractCustomFieldType;
 use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
 
-class AbstractCustomFieldTypeTest extends \PHPUnit_Framework_TestCase
+class AbstractCustomFieldTypeTest extends \PHPUnit\Framework\TestCase
 {
     private $translator;
     private $customField;

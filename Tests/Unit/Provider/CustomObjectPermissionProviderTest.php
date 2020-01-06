@@ -21,7 +21,7 @@ use Mautic\CoreBundle\Entity\FormEntity;
 /**
  * Tests methods in the AbstractPermissionProvider by CustomObjectPermissionProvider.
  */
-class CustomObjectPermissionProviderTest extends \PHPUnit_Framework_TestCase
+class CustomObjectPermissionProviderTest extends \PHPUnit\Framework\TestCase
 {
     private $permissions;
     private $entity;

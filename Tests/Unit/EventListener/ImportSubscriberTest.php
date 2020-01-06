@@ -32,7 +32,7 @@ use Mautic\LeadBundle\Event\ImportValidateEvent;
 use Mautic\LeadBundle\Entity\Import;
 use Symfony\Component\Form\Form;
 
-class ImportSubscriberTest extends \PHPUnit_Framework_TestCase
+class ImportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private $customObjectModel;
 

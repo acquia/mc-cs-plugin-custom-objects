@@ -21,7 +21,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query\Expr;
 
-class CustomObjectRepositoryTest extends \PHPUnit_Framework_TestCase
+class CustomObjectRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     private $entityManager;
     private $classMetadata;

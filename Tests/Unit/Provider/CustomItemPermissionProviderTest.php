@@ -19,7 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
-class CustomItemPermissionProviderTest extends \PHPUnit_Framework_TestCase
+class CustomItemPermissionProviderTest extends \PHPUnit\Framework\TestCase
 {
     private const OBJECT_ID = 33;
 

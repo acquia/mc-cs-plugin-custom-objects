@@ -24,6 +24,7 @@ use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQuery
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class CustomFieldFilterQueryBuilderTest extends WebTestCase
 {
@@ -98,7 +99,7 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
      * @param string $operator
      * @param string $fixtureField
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return MockObject
      *
      * @throws \MauticPlugin\CustomObjectsBundle\Tests\Functional\Exception\FixtureNotFoundException
      */
@@ -107,7 +108,7 @@ class CustomFieldFilterQueryBuilderTest extends WebTestCase
         string $type = 'text',
         string $operator = 'eq',
         string $fixtureField = 'custom_field1'
-    ): \PHPUnit_Framework_MockObject_MockObject {
+    ): MockObject {
         $filterMock = $this->getMockBuilder(ContactSegmentFilter::class)
             ->disableOriginalConstructor()
             ->getMock();

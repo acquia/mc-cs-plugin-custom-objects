@@ -29,7 +29,7 @@ use Mautic\UserBundle\Entity\User;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 
-class CustomItemImportModelTest extends \PHPUnit_Framework_TestCase
+class CustomItemImportModelTest extends \PHPUnit\Framework\TestCase
 {
     private const ROW_DATA = [
         'name'        => 'Mautic Demo',

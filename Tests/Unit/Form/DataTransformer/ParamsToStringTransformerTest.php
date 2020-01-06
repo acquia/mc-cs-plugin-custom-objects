@@ -17,7 +17,7 @@ use JMS\Serializer\SerializerInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransformer;
 
-class ParamsToStringTransformerTest extends \PHPUnit_Framework_TestCase
+class ParamsToStringTransformerTest extends \PHPUnit\Framework\TestCase
 {
     public function testTransform(): void
     {

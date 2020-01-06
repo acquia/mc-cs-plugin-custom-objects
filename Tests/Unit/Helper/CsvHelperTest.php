@@ -15,7 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Helper;
 
 use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 
-class CsvHelperTest extends \PHPUnit_Framework_TestCase
+class CsvHelperTest extends \PHPUnit\Framework\TestCase
 {
     public function testArrayToCsvLine(): void
     {

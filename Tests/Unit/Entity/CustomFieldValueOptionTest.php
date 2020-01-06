@@ -18,7 +18,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
-class CustomFieldValueOptionTest extends \PHPUnit_Framework_TestCase
+class CustomFieldValueOptionTest extends \PHPUnit\Framework\TestCase
 {
     public function testGettersSetters(): void
     {

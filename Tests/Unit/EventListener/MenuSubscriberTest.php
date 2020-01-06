@@ -21,7 +21,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 
-class MenuSubscriberTest extends \PHPUnit_Framework_TestCase
+class MenuSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private $customObjectModel;
 

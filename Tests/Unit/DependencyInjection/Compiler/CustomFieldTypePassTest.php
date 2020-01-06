@@ -17,7 +17,7 @@ use MauticPlugin\CustomObjectsBundle\DependencyInjection\Compiler\CustomFieldTyp
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class CustomFieldTypePassTest extends \PHPUnit_Framework_TestCase
+class CustomFieldTypePassTest extends \PHPUnit\Framework\TestCase
 {
     public function testProcess(): void
     {

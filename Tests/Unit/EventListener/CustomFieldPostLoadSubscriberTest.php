@@ -22,7 +22,7 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class CustomFieldPostLoadSubscriberTest extends \PHPUnit_Framework_TestCase
+class CustomFieldPostLoadSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private const FIELD_TYPE = 'text';
 

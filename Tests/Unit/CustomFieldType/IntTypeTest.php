@@ -19,7 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInt;
 
-class IntTypeTest extends \PHPUnit_Framework_TestCase
+class IntTypeTest extends \PHPUnit\Framework\TestCase
 {
     private $translator;
     private $customField;

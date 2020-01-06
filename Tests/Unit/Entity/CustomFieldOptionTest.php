@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Length;
 
-class CustomFieldOptionTest extends \PHPUnit_Framework_TestCase
+class CustomFieldOptionTest extends \PHPUnit\Framework\TestCase
 {
     public function testLoadValidatorMetadata(): void
     {

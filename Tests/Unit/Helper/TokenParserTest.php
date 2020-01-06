@@ -16,7 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Helper;
 use MauticPlugin\CustomObjectsBundle\Helper\TokenParser;
 use MauticPlugin\CustomObjectsBundle\DTO\Token;
 
-class TokenParserTest extends \PHPUnit_Framework_TestCase
+class TokenParserTest extends \PHPUnit\Framework\TestCase
 {
     public function testFindTokens(): void
     {

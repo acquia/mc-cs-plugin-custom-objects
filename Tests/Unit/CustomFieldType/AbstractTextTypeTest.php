@@ -20,7 +20,7 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldType\AbstractTextType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 
-class AbstractTextTypeTest extends \PHPUnit_Framework_TestCase
+class AbstractTextTypeTest extends \PHPUnit\Framework\TestCase
 {
     private $translator;
     private $customField;

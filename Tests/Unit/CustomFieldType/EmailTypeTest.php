@@ -17,7 +17,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\EmailType;
 
-class EmailTypeTest extends \PHPUnit_Framework_TestCase
+class EmailTypeTest extends \PHPUnit\Framework\TestCase
 {
     private $translator;
     private $customField;

@@ -16,7 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Provider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
 use Symfony\Component\Routing\RouterInterface;
 
-class CustomFieldRouteProviderTest extends \PHPUnit_Framework_TestCase
+class CustomFieldRouteProviderTest extends \PHPUnit\Framework\TestCase
 {
     private $router;
 

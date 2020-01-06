@@ -16,7 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Event;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
 
-class CustomItemXrefEntityEventTest extends \PHPUnit_Framework_TestCase
+class CustomItemXrefEntityEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testGettersSetters(): void
     {

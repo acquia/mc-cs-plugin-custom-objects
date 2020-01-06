@@ -27,7 +27,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
-class ContactSubscriberTest extends \PHPUnit_Framework_TestCase
+class ContactSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private $translator;
     private $entityManager;

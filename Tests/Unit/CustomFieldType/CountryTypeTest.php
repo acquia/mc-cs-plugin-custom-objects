@@ -18,7 +18,7 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldType\CountryType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 
-class CountryTypeTest extends \PHPUnit_Framework_TestCase
+class CountryTypeTest extends \PHPUnit\Framework\TestCase
 {
     private $translator;
 

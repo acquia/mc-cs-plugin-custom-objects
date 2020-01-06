@@ -21,7 +21,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
-class AuditLogSubscriberTest extends \PHPUnit_Framework_TestCase
+class AuditLogSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private $auditLogModel;
 

@@ -17,7 +17,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\PhoneType;
 
-class PhoneTypeTest extends \PHPUnit_Framework_TestCase
+class PhoneTypeTest extends \PHPUnit\Framework\TestCase
 {
     private $translator;
     private $customField;

@@ -20,7 +20,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 /**
  * Tests methods in the AbstractSessionProvider by CustomObjectSessionProvider.
  */
-class CustomObjectSessionProviderTest extends \PHPUnit_Framework_TestCase
+class CustomObjectSessionProviderTest extends \PHPUnit\Framework\TestCase
 {
     private $session;
     private $params;

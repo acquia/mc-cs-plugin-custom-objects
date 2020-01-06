@@ -15,7 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\CustomFieldType\DataTransf
 
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\MultivalueTransformer;
 
-class MultivalueTransformerTest extends \PHPUnit_Framework_TestCase
+class MultivalueTransformerTest extends \PHPUnit\Framework\TestCase
 {
     public function test(): void
     {

@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class CustomObjectTest extends \PHPUnit_Framework_TestCase
+class CustomObjectTest extends \PHPUnit\Framework\TestCase
 {
     public function testClone(): void
     {
