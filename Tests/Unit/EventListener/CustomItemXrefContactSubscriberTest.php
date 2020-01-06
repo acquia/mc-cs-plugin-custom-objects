@@ -32,7 +32,7 @@ use Doctrine\ORM\NoResultException;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 
-class CustomItemXrefContactSubscriberTest extends \PHPUnit_Framework_TestCase
+class CustomItemXrefContactSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private const ITEM_ID = 90;
 

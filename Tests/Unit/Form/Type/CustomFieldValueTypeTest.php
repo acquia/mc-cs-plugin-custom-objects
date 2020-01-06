@@ -24,7 +24,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\DataTransformerInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
 
-class CustomFieldValueTypeTest extends \PHPUnit_Framework_TestCase
+class CustomFieldValueTypeTest extends \PHPUnit\Framework\TestCase
 {
     private $formBuilder;
     private $optionsResolver;

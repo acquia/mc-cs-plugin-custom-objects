@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 
-class CustomItemButtonSubscriberTest extends \PHPUnit_Framework_TestCase
+class CustomItemButtonSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private const OBJECT_ID  = 555;
     private const ITEM_ID    = 222;

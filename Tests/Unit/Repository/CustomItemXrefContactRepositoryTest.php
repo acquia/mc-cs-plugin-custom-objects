@@ -29,7 +29,7 @@ use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 
-class CustomItemXrefContactRepositoryTest extends \PHPUnit_Framework_TestCase
+class CustomItemXrefContactRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     private $entityManager;
     private $classMetadata;

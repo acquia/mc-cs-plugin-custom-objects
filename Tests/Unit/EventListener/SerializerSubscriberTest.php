@@ -36,7 +36,7 @@ use JMS\Serializer\EventDispatcher\Events;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueDate;
 
-class SerializerSubscriberTest extends \PHPUnit_Framework_TestCase
+class SerializerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private $configProvider;
 

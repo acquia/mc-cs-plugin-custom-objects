@@ -15,7 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\CustomFieldType\DataTransf
 
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\CsvTransformer;
 
-class CsvTransformerTest extends \PHPUnit_Framework_TestCase
+class CsvTransformerTest extends \PHPUnit\Framework\TestCase
 {
     public function test(): void
     {

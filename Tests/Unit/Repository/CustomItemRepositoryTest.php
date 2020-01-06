@@ -26,7 +26,7 @@ use Doctrine\ORM\Query\Expr\Join;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
 
-class CustomItemRepositoryTest extends \PHPUnit_Framework_TestCase
+class CustomItemRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     private $entityManager;
     private $classMetadata;

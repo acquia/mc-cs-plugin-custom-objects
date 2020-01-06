@@ -15,7 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Entity\CustomField;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 
-class ParamsTest extends \PHPUnit_Framework_TestCase
+class ParamsTest extends \PHPUnit\Framework\TestCase
 {
     public function testConstructorAndToArray()
     {

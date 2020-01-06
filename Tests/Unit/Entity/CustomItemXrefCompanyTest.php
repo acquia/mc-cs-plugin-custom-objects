@@ -18,7 +18,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCompany;
 use Mautic\LeadBundle\Entity\Company;
 use DateTimeImmutable;
 
-class CustomItemXrefCompanyTest extends \PHPUnit_Framework_TestCase
+class CustomItemXrefCompanyTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetters(): void
     {

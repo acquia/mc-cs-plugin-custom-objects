@@ -24,7 +24,7 @@ use Doctrine\DBAL\Query\QueryBuilder as DBALQueryBuilder;
 use Doctrine\DBAL\Driver\Statement;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class CustomItemXrefContactModelTest extends \PHPUnit_Framework_TestCase
+class CustomItemXrefContactModelTest extends \PHPUnit\Framework\TestCase
 {
     private $customItem;
 

@@ -31,7 +31,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType;
 use InvalidArgumentException;
 
-class ApiSubscriberTest extends \PHPUnit_Framework_TestCase
+class ApiSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private $configProvider;
 

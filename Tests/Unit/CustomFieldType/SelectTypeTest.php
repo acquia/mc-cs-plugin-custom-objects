@@ -21,7 +21,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
-class SelectTypeTest extends \PHPUnit_Framework_TestCase
+class SelectTypeTest extends \PHPUnit\Framework\TestCase
 {
     private $translator;
     private $customField;

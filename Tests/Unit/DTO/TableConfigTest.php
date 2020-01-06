@@ -17,7 +17,7 @@ use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 
-class TableConfigTest extends \PHPUnit_Framework_TestCase
+class TableConfigTest extends \PHPUnit\Framework\TestCase
 {
     private const LIMIT = 10;
 

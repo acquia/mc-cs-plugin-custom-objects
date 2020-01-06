@@ -18,7 +18,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 
-class CustomFieldFactoryTest extends \PHPUnit_Framework_TestCase
+class CustomFieldFactoryTest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var string[]

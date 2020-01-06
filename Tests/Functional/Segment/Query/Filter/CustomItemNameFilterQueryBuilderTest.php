@@ -23,6 +23,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemNameFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class CustomItemNameFilterQueryBuilderTest extends WebTestCase
 {
@@ -83,11 +84,11 @@ class CustomItemNameFilterQueryBuilderTest extends WebTestCase
      * @param string $operator
      * @param string $fixtureField
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return MockObject
      *
      * @throws \MauticPlugin\CustomObjectsBundle\Tests\Functional\Exception\FixtureNotFoundException
      */
-    private function createSegmentFilterMock($value, $type = 'text', $operator = 'eq', $fixtureField = 'custom_field1'): \PHPUnit_Framework_MockObject_MockObject
+    private function createSegmentFilterMock($value, $type = 'text', $operator = 'eq', $fixtureField = 'custom_field1'): MockObject
     {
         $filterMock = $this->getMockBuilder(ContactSegmentFilter::class)
             ->disableOriginalConstructor()

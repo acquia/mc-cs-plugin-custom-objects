@@ -23,7 +23,7 @@ use Mautic\LeadBundle\Entity\Lead;
 use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 
-class ContactTabSubscriberTest extends \PHPUnit_Framework_TestCase
+class ContactTabSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private $customObjectModel;
 

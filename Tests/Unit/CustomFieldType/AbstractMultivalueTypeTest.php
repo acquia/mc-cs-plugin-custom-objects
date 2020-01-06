@@ -26,7 +26,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\CsvTransformer;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
-class AbstractMultivalueTypeTest extends \PHPUnit_Framework_TestCase
+class AbstractMultivalueTypeTest extends \PHPUnit\Framework\TestCase
 {
     private $translator;
     private $customField;

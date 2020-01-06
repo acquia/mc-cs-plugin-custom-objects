@@ -23,7 +23,7 @@ use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQuery
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemNameFilterQueryBuilder;
 
-class QueryFilterFactoryTest extends \PHPUnit_Framework_TestCase
+class QueryFilterFactoryTest extends \PHPUnit\Framework\TestCase
 {
     private $connection;
     private $contactSegmentFilterFactory;

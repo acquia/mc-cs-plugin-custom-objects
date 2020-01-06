@@ -21,9 +21,8 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectButtonSubscriber;
-use PHPUnit_Framework_TestCase;
 
-class CustomObjectButtonSubscriberTest extends PHPUnit_Framework_TestCase
+class CustomObjectButtonSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private $itemPermissionProvider;
     private $objectPermissionProvider;

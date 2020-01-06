@@ -15,7 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\CustomFieldType\DataTransf
 
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\DateTimeTransformer;
 
-class DateTimeTransformerTest extends \PHPUnit_Framework_TestCase
+class DateTimeTransformerTest extends \PHPUnit\Framework\TestCase
 {
     public function test(): void
     {

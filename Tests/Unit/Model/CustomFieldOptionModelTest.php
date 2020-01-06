@@ -18,7 +18,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldOptionModel;
 
-class CustomFieldOptionModelTest extends \PHPUnit_Framework_TestCase
+class CustomFieldOptionModelTest extends \PHPUnit\Framework\TestCase
 {
     private $entityManager;
     private $connection;

@@ -20,7 +20,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class CustomObjectPermissionsTest extends \PHPUnit_Framework_TestCase
+class CustomObjectPermissionsTest extends \PHPUnit\Framework\TestCase
 {
     private $customObjectModel;
     private $customObject;

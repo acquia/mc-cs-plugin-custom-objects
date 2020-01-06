@@ -16,7 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Event;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
 
-class CustomObjectEventTest extends \PHPUnit_Framework_TestCase
+class CustomObjectEventTest extends \PHPUnit\Framework\TestCase
 {
     public function testGettersSetters(): void
     {

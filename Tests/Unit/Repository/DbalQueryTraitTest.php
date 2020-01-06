@@ -18,7 +18,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Driver\Statement;
 use Mautic\AllydeBundle\Tests\TestingTrait;
 
-class DbalQueryTraitTest extends \PHPUnit_Framework_TestCase
+class DbalQueryTraitTest extends \PHPUnit\Framework\TestCase
 {
     use TestingTrait;
 

@@ -43,7 +43,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\DBAL\Statement;
 
-class CustomItemModelTest extends \PHPUnit_Framework_TestCase
+class CustomItemModelTest extends \PHPUnit\Framework\TestCase
 {
     private $customItem;
 

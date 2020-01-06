@@ -42,7 +42,7 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class TokenSubscriberTest extends \PHPUnit_Framework_TestCase
+class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private $configProvider;
 

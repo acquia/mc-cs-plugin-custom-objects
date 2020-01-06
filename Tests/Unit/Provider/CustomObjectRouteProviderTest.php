@@ -16,7 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Provider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use Symfony\Component\Routing\RouterInterface;
 
-class CustomObjectRouteProviderTest extends \PHPUnit_Framework_TestCase
+class CustomObjectRouteProviderTest extends \PHPUnit\Framework\TestCase
 {
     private const OBJECT_ID = 33;
 

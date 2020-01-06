@@ -18,7 +18,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use DateTimeImmutable;
 use Mautic\LeadBundle\Entity\Lead;
 
-class CustomItemXrefContactTest extends \PHPUnit_Framework_TestCase
+class CustomItemXrefContactTest extends \PHPUnit\Framework\TestCase
 {
     public function testGetters(): void
     {

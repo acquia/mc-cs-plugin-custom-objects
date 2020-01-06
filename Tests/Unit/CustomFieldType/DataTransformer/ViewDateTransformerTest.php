@@ -15,7 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\CustomFieldType\DataTransf
 
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\ViewDateTransformer;
 
-class ViewDateTransformerTest extends \PHPUnit_Framework_TestCase
+class ViewDateTransformerTest extends \PHPUnit\Framework\TestCase
 {
     private const VAL = 'value';
 

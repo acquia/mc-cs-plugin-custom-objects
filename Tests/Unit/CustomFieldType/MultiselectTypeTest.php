@@ -17,7 +17,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\MultiselectType;
 use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 
-class MultiselectTypeTest extends \PHPUnit_Framework_TestCase
+class MultiselectTypeTest extends \PHPUnit\Framework\TestCase
 {
     private $translator;
 

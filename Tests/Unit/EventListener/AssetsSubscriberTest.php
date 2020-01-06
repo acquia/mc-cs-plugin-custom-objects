@@ -19,7 +19,7 @@ use MauticPlugin\CustomObjectsBundle\EventListener\AssetsSubscriber;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\Request;
 
-class AssetsSubscriberTest extends \PHPUnit_Framework_TestCase
+class AssetsSubscriberTest extends \PHPUnit\Framework\TestCase
 {
     private $assetsHelper;
 

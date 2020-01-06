@@ -21,7 +21,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
-class CustomFieldTypeProviderTest extends \PHPUnit_Framework_TestCase
+class CustomFieldTypeProviderTest extends \PHPUnit\Framework\TestCase
 {
     public function testWorkflow(): void
     {

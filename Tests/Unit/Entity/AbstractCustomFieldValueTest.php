@@ -24,7 +24,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
-class AbstractCustomFieldValueTest extends \PHPUnit_Framework_TestCase
+class AbstractCustomFieldValueTest extends \PHPUnit\Framework\TestCase
 {
     private $customObject;
     private $customField;

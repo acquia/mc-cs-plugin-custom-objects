@@ -21,7 +21,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 
-class CustomFieldRepositoryTest extends \PHPUnit_Framework_TestCase
+class CustomFieldRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     private $entityManager;
     private $classMetadata;

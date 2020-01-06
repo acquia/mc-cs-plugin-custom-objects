@@ -17,7 +17,7 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldType\UrlType;
 use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 
-class UrlTypeTest extends \PHPUnit_Framework_TestCase
+class UrlTypeTest extends \PHPUnit\Framework\TestCase
 {
     private $translator;
     private $customField;

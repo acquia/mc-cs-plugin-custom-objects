@@ -38,7 +38,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Doctrine\DBAL\Query\QueryBuilder as QueryBuilderDbal;
 use Doctrine\DBAL\Statement;
 
-class CustomObjectModelTest extends \PHPUnit_Framework_TestCase
+class CustomObjectModelTest extends \PHPUnit\Framework\TestCase
 {
     private $customObject;
     private $customField;

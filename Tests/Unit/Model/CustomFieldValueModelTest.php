@@ -30,7 +30,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
-class CustomFieldValueModelTest extends \PHPUnit_Framework_TestCase
+class CustomFieldValueModelTest extends \PHPUnit\Framework\TestCase
 {
     private $customObject;
     private $customItem;

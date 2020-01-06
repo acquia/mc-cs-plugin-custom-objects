@@ -20,7 +20,7 @@ use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsToStringTransfo
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 
-class OptionsToStringTransformerTest extends \PHPUnit_Framework_TestCase
+class OptionsToStringTransformerTest extends \PHPUnit\Framework\TestCase
 {
     public function testTransformWithEmptyOptions(): void
     {

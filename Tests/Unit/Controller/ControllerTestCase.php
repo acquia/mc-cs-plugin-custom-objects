@@ -34,7 +34,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
  * `forward` or `postActionRedirect` it use container and all that nasty stuff. This trait should
  * take care of it.
  */
-class ControllerTestCase extends \PHPUnit_Framework_TestCase
+class ControllerTestCaseextends \PHPUnit\Framework\TestCase
 {
     protected $requestStack;
     protected $request;

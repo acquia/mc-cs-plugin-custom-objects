@@ -23,7 +23,7 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\DateTimeTra
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\ViewDateTransformer;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\DateTimeAtomTransformer;
 
-class DateTimeTypeTest extends \PHPUnit_Framework_TestCase
+class DateTimeTypeTest extends \PHPUnit\Framework\TestCase
 {
     private $translator;
     private $customField;

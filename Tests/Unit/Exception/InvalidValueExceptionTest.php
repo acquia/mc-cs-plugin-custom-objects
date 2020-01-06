@@ -16,7 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Exception;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
 
-class InvalidValueExceptionTest extends \PHPUnit_Framework_TestCase
+class InvalidValueExceptionTest extends \PHPUnit\Framework\TestCase
 {
     public function testGettersSetters(): void
     {

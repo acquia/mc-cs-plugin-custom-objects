@@ -18,7 +18,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
 use DateTimeImmutable;
 use UnexpectedValueException;
 
-class CustomItemXrefCustomItemTest extends \PHPUnit_Framework_TestCase
+class CustomItemXrefCustomItemTest extends \PHPUnit\Framework\TestCase
 {
     public function testGettersIfCustomItemAIsLower(): void
     {
