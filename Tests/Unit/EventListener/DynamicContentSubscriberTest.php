@@ -16,34 +16,35 @@ use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemNameFilterQu
 use Monolog\Logger;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigProvider|\MockObject */
+    /** @var ConfigProvider|MockObject */
     private $configProviderMock;
 
-    /** @var QueryFilterHelper|\MockObject */
+    /** @var QueryFilterHelper|MockObject */
     private $queryFilterHelperMock;
 
-    /** @var QueryFilterFactory|\MockObject */
+    /** @var QueryFilterFactory|MockObject */
     private $queryFilterFactory;
 
-    /** @var ContactFiltersEvaluateEvent|\MockObject */
+    /** @var ContactFiltersEvaluateEvent|MockObject */
     private $evaluateEvent;
 
-    /** @var Lead|\MockObject */
+    /** @var Lead|MockObject */
     private $leadMock;
 
-    /** @var Logger|\MockObject */
+    /** @var Logger|MockObject */
     private $loggerMock;
 
-    /** @var QueryBuilder|\MockObject */
+    /** @var QueryBuilder|MockObject */
     private $queryBuilderMock;
 
     /** @var DynamicContentSubscriber */
     private $dynamicContentSubscriber;
 
-    /** @var Statement|\MockObject */
+    /** @var Statement|MockObject */
     private $statementMock;
 
     protected function setUp(): void
