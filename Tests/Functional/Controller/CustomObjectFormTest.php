@@ -16,6 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Controller;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\HttpFoundation\Response;
 
 class CustomObjectFormTest extends MauticMysqlTestCase
@@ -873,7 +874,7 @@ class CustomObjectFormTest extends MauticMysqlTestCase
             'HTTP_Content-Type'     => 'application/x-www-form-urlencoded; charset=UTF-8',
             'HTTP_X-Requested-With' => 'XMLHttpRequest',
             'HTTP_XDEBUG_SESSION'   => 'XDEBUG_ECLIPSE',
-            'HTTP_X-CSRF-Token'     => $this->getCsrfToken('mautic_ajax_post')->getValue(),
+            'HTTP_X-CSRF-Token'     => $this->getCsrfToken('mautic_ajax_post'),
         ];
     }
 }
