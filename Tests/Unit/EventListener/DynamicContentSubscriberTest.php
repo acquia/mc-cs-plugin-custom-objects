@@ -62,10 +62,9 @@ class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->dynamicContentSubscriber = new DynamicContentSubscriber(
             $this->queryFilterFactory,
             $this->queryFilterHelperMock,
-            $this->configProviderMock
+            $this->configProviderMock,
+            $this->loggerMock
         );
-
-        $this->dynamicContentSubscriber->setLogger($this->loggerMock);
     }
 
     public function testOnCampaignBuildWhenPluginDisabled(): void

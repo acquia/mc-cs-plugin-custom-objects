@@ -16,6 +16,8 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\Events;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
+use JMS\Serializer\JsonSerializationVisitor;
+use JMS\Serializer\Metadata\StaticPropertyMetadata;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use Mautic\LeadBundle\Entity\Lead;
@@ -158,7 +160,10 @@ class SerializerSubscriber implements EventSubscriberInterface
             }
         }
 
-        $event->getContext()->getVisitor()->addData('customObjects', $payload);
+        /** @var JsonSerializationVisitor $visitor */
+        $visitor = $event->getContext()->getVisitor();
+
+        $visitor->visitProperty(new StaticPropertyMetadata('', 'customObjects', $payload), $payload);
     }
 
     /**
