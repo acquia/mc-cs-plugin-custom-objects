@@ -6,14 +6,14 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\EventListener;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
-use Liip\FunctionalTestBundle\Test\WebTestCase;
+use Mautic\CoreBundle\Test\MauticWebTestCase;
 use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
 use MauticPlugin\CustomObjectsBundle\EventListener\SegmentFiltersDictionarySubscriber;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
 
-class SegmentFiltersDictionarySubscriberTest extends WebTestCase
+class SegmentFiltersDictionarySubscriberTest extends MauticWebTestCase
 {
     use FixtureObjectsTrait;
     use DatabaseSchemaTrait;

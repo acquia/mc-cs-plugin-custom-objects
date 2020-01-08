@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\EventListener;
 
+use Mautic\CoreBundle\Test\MauticWebTestCase;
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use MauticPlugin\CustomObjectsBundle\EventListener\DynamicContentSubscriber;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
 use Doctrine\ORM\EntityManager;
 
-class DynamicContentSubscriberTest extends \Liip\FunctionalTestBundle\Test\WebTestCase
+class DynamicContentSubscriberTest extends MauticWebTestCase
 {
     use FixtureObjectsTrait;
     use DatabaseSchemaTrait;
