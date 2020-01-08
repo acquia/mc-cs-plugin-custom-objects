@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Helper;
 
-use Liip\FunctionalTestBundle\Test\WebTestCase;
+use Mautic\CoreBundle\Test\MauticWebTestCase;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
@@ -12,7 +12,7 @@ use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\Fixtur
 use Doctrine\ORM\EntityManager;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
 
-class QueryFilterHelperTest extends WebTestCase
+class QueryFilterHelperTest extends MauticWebTestCase
 {
     use FixtureObjectsTrait;
     use DatabaseSchemaTrait;
