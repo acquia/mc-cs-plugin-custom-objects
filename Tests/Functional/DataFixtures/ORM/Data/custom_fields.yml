@@ -2,21 +2,21 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomField:
   custom_field1:
     custom_object: '@custom_object1'
     is_published: true
-    date_added: '<date()>'
+    date_added: '<date_create()>'
     label: '<word()> Text'
     alias: 'text_1'
     type: 'tect'
   custom_field2:
     custom_object: '@custom_object1'
     is_published: true
-    date_added: '<date()>'
+    date_added: '<date_create()>'
     label: '<word()> Integer'
     alias: 'integer_2'
     type: 'int'
   custom_field3:
     custom_object: '@custom_object1'
     is_published: true
-    date_added: '<date()>'
+    date_added: '<date_create()>'
     label: '<word()> Date'
     alias: 'date_3'
     type: 'date'
