@@ -324,7 +324,7 @@ class CustomFieldType extends AbstractType
 
         if ($this->isCustomObjectForm) {
             // Is rendering for panel, thus disable fields
-            $options['read_only'] = true;
+            $options['attr']['readonly'] = true;
 
             if (!empty($options['attr']['data-toggle'])) {
                 // Disable datepicker for date/datetime fields
