@@ -103,7 +103,7 @@ class ListControllerTest extends ControllerTestCase
         $customObject = $this->createMock(CustomObject::class);
 
         $this->request->method('get')->will($this->returnValueMap([
-            ['limit', $pageLimit, false, $pageLimit],
+            ['limit', $pageLimit, $pageLimit],
         ]));
 
         $this->permissionProvider->expects($this->once())
@@ -169,7 +169,7 @@ class ListControllerTest extends ControllerTestCase
         );
 
         $this->request->method('get')->will($this->returnValueMap([
-            ['limit', $pageLimit, false, $pageLimit],
+            ['limit', $pageLimit, $pageLimit],
         ]));
 
         $this->request->method('isXmlHttpRequest')
