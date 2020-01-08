@@ -1,5 +1,9 @@
 MauticPlugin\CustomObjectsBundle\Entity\CustomItem:
-  custom_item{emotion,attribute}:
+  custom_itememotion:
+    is_published: 1
+    name: 'Object <current()>'
+    __construct: ['@custom_object1']
+  custom_itemattribute:
     is_published: 1
     name: 'Object <current()>'
     __construct: ['@custom_object1']
