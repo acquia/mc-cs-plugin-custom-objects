@@ -13,28 +13,29 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
-use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
-use Symfony\Component\HttpFoundation\RequestStack;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
-use MauticPlugin\CustomObjectsBundle\EventListener\SerializerSubscriber;
-use JMS\Serializer\EventDispatcher\ObjectEvent;
-use Symfony\Component\HttpFoundation\Request;
-use Mautic\PageBundle\Entity\Page;
-use Mautic\LeadBundle\Entity\Lead;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Doctrine\Common\Collections\ArrayCollection;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use JMS\Serializer\Context;
-use JMS\Serializer\JsonSerializationVisitor;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
-use Symfony\Component\Translation\TranslatorInterface;
 use JMS\Serializer\EventDispatcher\Events;
+use JMS\Serializer\EventDispatcher\ObjectEvent;
+use JMS\Serializer\Metadata\StaticPropertyMetadata;
+use JMS\Serializer\Visitor\SerializationVisitorInterface;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\PageBundle\Entity\Page;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateType;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
+use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueDate;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\EventListener\SerializerSubscriber;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
+use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class SerializerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -204,7 +205,7 @@ class SerializerSubscriberTest extends \PHPUnit\Framework\TestCase
         $customFieldText = $this->createMock(CustomField::class);
         $customFieldDate = $this->createMock(CustomField::class);
         $context         = $this->createMock(Context::class);
-        $visitor         = $this->createMock(JsonSerializationVisitor::class);
+        $visitor         = $this->createMock(SerializationVisitorInterface::class);
 
         $contact->method('getId')->willReturn(345);
         $customFieldDate->method('getAlias')->willReturn('text-field-1');
@@ -299,26 +300,31 @@ class SerializerSubscriberTest extends \PHPUnit\Framework\TestCase
                         ],
                     ],
                     'meta' => [
+                        'sort' => '-dateAdded',
                         'page' => [
                             'number' => 1,
                             'size'   => 10,
                         ],
-                        'sort' => '-dateAdded',
                     ],
                 ],
             ],
             'meta' => [
+                'sort' => '-dateAdded',
                 'page' => [
                     'number' => 1,
                     'size'   => 10,
                 ],
-                'sort' => '-dateAdded',
             ],
         ];
 
         $visitor->expects($this->once())
-            ->method('addData')
-            ->with('customObjects', $expectedPayload);
+            ->method('visitProperty')
+            ->willReturnCallback(function (StaticPropertyMetadata $metadata, $payload) use ($expectedPayload) {
+                $this->assertSame('', $metadata->class);
+                $this->assertSame('customObjects', $metadata->name);
+                $this->assertSame($metadata->getValue(), $payload);
+                $this->assertSame($expectedPayload, $payload);
+            });
 
         $this->serializerSubscriber->addCustomItemsIntoContactResponse($this->objectEvent);
     }
