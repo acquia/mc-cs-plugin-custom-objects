@@ -50,10 +50,14 @@ class UrlTypeTest extends \PHPUnit\Framework\TestCase
     public function testValidateValueWithEmptyString(): void
     {
         $this->fieldType->validateValue($this->customField, '');
+        // No exception means it passes
+        $this->addToAssertionCount(1);
     }
 
     public function testValidateValueWithValidUrl(): void
     {
         $this->fieldType->validateValue($this->customField, 'https://mautic.org');
+        // No exception means it passes
+        $this->addToAssertionCount(1);
     }
 }

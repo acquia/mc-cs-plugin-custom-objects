@@ -50,6 +50,8 @@ class PhoneTypeTest extends \PHPUnit\Framework\TestCase
     public function testValidateValueWithEmptyString(): void
     {
         $this->fieldType->validateValue($this->customField, '');
+        // No exception means it passes
+        $this->addToAssertionCount(1);
     }
 
     public function testValidateValueWithInvalidPhoneNumberFormat(): void
@@ -77,5 +79,7 @@ class PhoneTypeTest extends \PHPUnit\Framework\TestCase
     public function testValidateValueWithValidPhoneNumber(): void
     {
         $this->fieldType->validateValue($this->customField, '+1 888 922 7842');
+        // No exception means it passes
+        $this->addToAssertionCount(1);
     }
 }

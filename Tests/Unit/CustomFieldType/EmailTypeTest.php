@@ -50,10 +50,14 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
     public function testValidateValueWithEmptyString(): void
     {
         $this->fieldType->validateValue($this->customField, '');
+        // No exception means it passes
+        $this->addToAssertionCount(1);
     }
 
     public function testValidateValueWithValidEmailAddress(): void
     {
         $this->fieldType->validateValue($this->customField, 'hello@mautic.org');
+        // No exception means it passes
+        $this->addToAssertionCount(1);
     }
 }
