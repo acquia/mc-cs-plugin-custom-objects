@@ -89,7 +89,7 @@ class AbstractMultivalueTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateDefaultValueTransformer(): void
     {
-        $this->isInstanceOf(
+        $this->assertInstanceOf(
             MultivalueTransformer::class,
             $this->fieldType->createDefaultValueTransformer()
         );
@@ -97,7 +97,7 @@ class AbstractMultivalueTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testCreateApiValueTransformer(): void
     {
-        $this->isInstanceOf(
+        $this->assertInstanceOf(
             CsvTransformer::class,
             $this->fieldType->createApiValueTransformer()
         );

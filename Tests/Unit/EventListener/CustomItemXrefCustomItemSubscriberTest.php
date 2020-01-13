@@ -324,10 +324,10 @@ class CustomItemXrefCustomItemSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->xrefSubscriber->saveLink($this->event);
     }
 
-    public function testCreateNewEvenLogForLinkedCustomItem(): void
+    public function testCreateNewEventLogForLinkedCustomItem(): void
     {
         // @todo once the method is implemented.
-
+        $this->markTestSkipped('Not yet implemented.');
         $this->xrefSubscriber->createNewEvenLogForLinkedCustomItem($this->event);
     }
 
@@ -352,10 +352,10 @@ class CustomItemXrefCustomItemSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->xrefSubscriber->deleteLink($this->event);
     }
 
-    public function testCreateNewEvenLogForUnlinkedCustomItem(): void
+    public function testCreateNewEventLogForUnlinkedCustomItem(): void
     {
         // @todo once the method is implemented.
-
+        $this->markTestSkipped('Not yet implemented');
         $this->xrefSubscriber->createNewEvenLogForUnlinkedCustomItem($this->event);
     }
 

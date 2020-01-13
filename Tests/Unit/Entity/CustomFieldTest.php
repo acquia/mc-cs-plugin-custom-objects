@@ -76,6 +76,9 @@ class CustomFieldTest extends \PHPUnit\Framework\TestCase
         $translator  = $this->createMock(TranslatorInterface::class);
         $customField = new CustomField();
 
+        $context->expects($this->never())
+            ->method('buildViolation');
+
         $customField->setTypeObject(new EmailType($translator));
         $customField->setDefaultValue('valid@email.address');
         $customField->validateDefaultValue($context);
