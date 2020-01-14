@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Security\Permissions;
 
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
-use Symfony\Component\Form\FormBuilderInterface;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use Symfony\Component\Translation\TranslatorInterface;
-use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomObjectPermissions extends AbstractPermissions
 {
@@ -96,7 +96,7 @@ class CustomObjectPermissions extends AbstractPermissions
 
         $customObjects = $this->getCustomObjects();
         foreach ($customObjects as $customObject) {
-            $this->addExtendedFormFields(self::NAME, (string) $customObject->getId(), $builder, $data);
+            $this->addExtendedFormFields(self::NAME, $customObject->getId(), $builder, $data);
         }
     }
 
