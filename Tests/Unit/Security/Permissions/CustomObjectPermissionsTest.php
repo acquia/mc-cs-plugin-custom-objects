@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Security\Permissions;
 
-use MauticPlugin\CustomObjectsBundle\Security\Permissions\CustomObjectPermissions;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
-use Symfony\Component\Translation\TranslatorInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Security\Permissions\CustomObjectPermissions;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomObjectPermissionsTest extends \PHPUnit\Framework\TestCase
 {
@@ -124,32 +124,36 @@ class CustomObjectPermissionsTest extends \PHPUnit\Framework\TestCase
 
     public function testBuildForm(): void
     {
+        $objectId = 45;
+        $objectNamePlural = 'Products';
+        $translation = 'Products - User has access to';
+
         $this->customObject->expects($this->once())
             ->method('getId')
-            ->willReturn(45);
+            ->willReturn($objectId);
 
         $this->customObject->expects($this->once())
             ->method('getNamePlural')
-            ->willReturn('Products');
+            ->willReturn($objectNamePlural);
 
         $this->translator->expects($this->once())
             ->method('trans')
             ->with(
                 'custom.object.permissions',
-                ['%name%' => 'Products']
+                ['%name%' => $objectNamePlural]
             )
-            ->willReturn('Products - User has access to');
+            ->willReturn($translation);
 
         $this->customObjectModel->expects($this->once())
             ->method('getEntities')
-            ->willReturn([45 => $this->customObject]);
+            ->willReturn([$objectId => $this->customObject]);
 
         $this->formBuilder->expects($this->exactly(3))
             ->method('add')
             ->withConsecutive(
                 ['custom_objects:custom_fields'],
                 ['custom_objects:custom_objects'],
-                ['custom_objects:45']
+                ["custom_objects:$objectId"]
             );
 
         $this->permissions->buildForm($this->formBuilder, [], []);
