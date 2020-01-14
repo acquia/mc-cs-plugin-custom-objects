@@ -183,10 +183,10 @@ pipeline {
             'anton-vlasenko':'anton.vlasenko',
             'dongilbert':'don.gilbert',
             'escopecz':'jan.linhart',
-            'galvani':'jan.kozak',
             'Gregy':'petr.gregor',
             'hluchas':'lukas.drahy',
             'javjim-mautic':'javier.jimeno',
+            'lukassykora':'lukas.sykora',
             'mtshaw3':'mike.shaw',
             'ondrejsibl':'ondrej.sibl',
             'pavel-hladik':'pavel.hladik'
