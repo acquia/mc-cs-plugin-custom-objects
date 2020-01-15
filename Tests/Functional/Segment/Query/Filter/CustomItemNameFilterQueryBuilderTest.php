@@ -37,6 +37,8 @@ class CustomItemNameFilterQueryBuilderTest extends MauticWebTestCase
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         /** @var EntityManager */
         $entityManager       = $this->getContainer()->get('doctrine.orm.entity_manager');
         $this->entityManager = $entityManager;
@@ -53,8 +55,6 @@ class CustomItemNameFilterQueryBuilderTest extends MauticWebTestCase
         ], false, null, 'doctrine'); //,ORMPurger::PURGE_MODE_DELETE);
 
         $this->setFixtureObjects($objects);
-
-        parent::setUp();
     }
 
     protected function tearDown(): void
