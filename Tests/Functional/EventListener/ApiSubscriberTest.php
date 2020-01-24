@@ -317,8 +317,6 @@ class ApiSubscriberTest extends MauticMysqlTestCase
                                     'number-test-field'         => null,
                                     'hidden-test-field'         => null,
                                     'email-test-field'          => null,
-                                    'date-test-field'           => null,
-                                    'datetime-test-field'       => null,
                                     'date-test-field'           => '',
                                     'datetime-test-field'       => null,
                                 ],

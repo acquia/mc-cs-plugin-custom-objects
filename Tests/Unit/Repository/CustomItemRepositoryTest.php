@@ -33,6 +33,7 @@ class CustomItemRepositoryTest extends \PHPUnit\Framework\TestCase
     private $customObject;
     private $queryBuilder;
     private $connection;
+    private $contact;
     private $expr;
     private $query;
 

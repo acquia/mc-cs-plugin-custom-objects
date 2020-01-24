@@ -50,6 +50,8 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private $queryBuilder;
 
+    private $queryBuilderDbal;
+
     private $query;
 
     private $event;
