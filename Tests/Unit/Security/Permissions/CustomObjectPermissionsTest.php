@@ -13,23 +13,50 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Security\Permissions;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Security\Permissions\CustomObjectPermissions;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class CustomObjectPermissionsTest extends \PHPUnit\Framework\TestCase
+class CustomObjectPermissionsTest extends TestCase
 {
+    /**
+     * @var MockObject|CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
+    /**
+     * @var MockObject|CustomObjectModel
+     */
     private $customObjectModel;
+
+    /**
+     * @var MockObject|CustomObject
+     */
     private $customObject;
+
+    /**
+     * @var MockObject|FormBuilderInterface
+     */
     private $formBuilder;
+
+    /**
+     * @var MockObject|ConfigProvider
+     */
     private $configProvider;
+
+    /**
+     * @var MockObject|TranslatorInterface
+     */
     private $translator;
 
     /**
-     * @var CustomObjectPermissions
+     * @var MockObject|CustomObjectPermissions
      */
     private $permissions;
 
@@ -37,13 +64,14 @@ class CustomObjectPermissionsTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->customObjectModel = $this->createMock(CustomObjectModel::class);
-        $this->customObject      = $this->createMock(CustomObject::class);
-        $this->configProvider    = $this->createMock(ConfigProvider::class);
-        $this->formBuilder       = $this->createMock(FormBuilderInterface::class);
-        $this->translator        = $this->createMock(TranslatorInterface::class);
-        $this->permissions       = new CustomObjectPermissions(
-            [],
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->customObjectModel    = $this->createMock(CustomObjectModel::class);
+        $this->customObject         = $this->createMock(CustomObject::class);
+        $this->configProvider       = $this->createMock(ConfigProvider::class);
+        $this->formBuilder          = $this->createMock(FormBuilderInterface::class);
+        $this->translator           = $this->createMock(TranslatorInterface::class);
+        $this->permissions          = new CustomObjectPermissions(
+            $this->coreParametersHelper,
             $this->customObjectModel,
             $this->configProvider,
             $this->translator
