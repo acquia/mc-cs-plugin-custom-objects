@@ -102,9 +102,9 @@ class LockFlashMessageHelper
                         'returnUrl'    => $returnUrl,
                     ]
                 ),
-                '%date%'     => $datetime->format($this->coreParametersHelper->getParameter('date_format_dateonly')),
-                '%time%'     => $datetime->format($this->coreParametersHelper->getParameter('date_format_timeonly')),
-                '%datetime%' => $datetime->format($this->coreParametersHelper->getParameter('date_format_full')),
+                '%date%'     => $datetime->format($this->coreParametersHelper->get('date_format_dateonly')),
+                '%time%'     => $datetime->format($this->coreParametersHelper->get('date_format_timeonly')),
+                '%datetime%' => $datetime->format($this->coreParametersHelper->get('date_format_full')),
                 '%override%' => $override,
             ],
             'error'

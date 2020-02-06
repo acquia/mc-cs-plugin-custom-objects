@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Security\Permissions;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Security\Permissions\AbstractPermissions;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
@@ -46,19 +47,13 @@ class CustomObjectPermissions extends AbstractPermissions
      */
     private $customObjects = [];
 
-    /**
-     * @param mixed[]             $params
-     * @param CustomObjectModel   $customObjectModel
-     * @param ConfigProvider      $configProvider
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
-        array $params,
+        CoreParametersHelper $coreParametersHelper,
         CustomObjectModel $customObjectModel,
         ConfigProvider $configProvider,
         TranslatorInterface $translator
     ) {
-        parent::__construct($params);
+        parent::__construct($coreParametersHelper->all());
 
         $this->customObjectModel = $customObjectModel;
         $this->configProvider    = $configProvider;

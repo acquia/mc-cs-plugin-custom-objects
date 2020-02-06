@@ -51,7 +51,7 @@ class CustomObjectSessionProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetPageLimit(): void
     {
         $this->params->expects($this->once())
-            ->method('getParameter')
+            ->method('get')
             ->with('default_pagelimit')
             ->willReturn(5);
 

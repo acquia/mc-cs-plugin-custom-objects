@@ -529,7 +529,7 @@ return [
             'custom_object.permissions' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Security\Permissions\CustomObjectPermissions::class,
                 'arguments' => [
-                    '%mautic.parameters%',
+                    'mautic.helper.core_parameters',
                     'mautic.custom.model.object',
                     'custom_object.config.provider',
                     'translator',

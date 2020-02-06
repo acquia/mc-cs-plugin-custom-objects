@@ -77,15 +77,15 @@ class LockFlashMessageHelperTest extends \PHPUnit\Framework\TestCase
             ->willReturn($contactUrl);
 
         $coreParametersHelper->expects($this->at(0))
-            ->method('getParameter')
+            ->method('get')
             ->with('date_format_dateonly')
             ->willReturn($dateFormat1);
         $coreParametersHelper->expects($this->at(1))
-            ->method('getParameter')
+            ->method('get')
             ->with('date_format_timeonly')
             ->willReturn($dateFormat2);
         $coreParametersHelper->expects($this->at(2))
-            ->method('getParameter')
+            ->method('get')
             ->with('date_format_full')
             ->willReturn($dateFormat3);
 
