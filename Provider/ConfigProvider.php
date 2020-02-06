@@ -42,6 +42,6 @@ class ConfigProvider
      */
     public function pluginIsEnabled(): bool
     {
-        return (bool) $this->coreParametersHelper->getParameter(self::CONFIG_PARAM_ENABLED, true);
+        return (bool) $this->coreParametersHelper->get(self::CONFIG_PARAM_ENABLED, true);
     }
 }

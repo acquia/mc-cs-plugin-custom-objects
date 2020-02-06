@@ -53,7 +53,7 @@ abstract class AbstractSessionProvider implements SessionProviderInterface
      */
     public function getPageLimit(): int
     {
-        $defaultlimit = (int) $this->coreParametersHelper->getParameter('default_pagelimit');
+        $defaultlimit = (int) $this->coreParametersHelper->get('default_pagelimit');
 
         return (int) $this->session->get(static::KEY_LIMIT, $defaultlimit);
     }
