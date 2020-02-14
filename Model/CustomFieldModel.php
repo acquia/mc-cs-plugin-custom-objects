@@ -13,17 +13,17 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use Mautic\CoreBundle\Model\FormModel;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
-use Mautic\CoreBundle\Entity\CommonRepository;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
-use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Model\FormModel;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 
 class CustomFieldModel extends FormModel
 {
@@ -37,11 +37,6 @@ class CustomFieldModel extends FormModel
      */
     private $permissionProvider;
 
-    /**
-     * @param CustomFieldRepository         $customFieldRepository
-     * @param CustomFieldPermissionProvider $permissionProvider
-     * @param UserHelper                    $userHelper
-     */
     public function __construct(
         CustomFieldRepository $customFieldRepository,
         CustomFieldPermissionProvider $permissionProvider,
@@ -52,11 +47,6 @@ class CustomFieldModel extends FormModel
         $this->userHelper             = $userHelper;
     }
 
-    /**
-     * @param CustomField $entity
-     *
-     * @return CustomField
-     */
     public function setMetadata(CustomField $entity): CustomField
     {
         $user   = $this->userHelper->getUser();
@@ -76,11 +66,6 @@ class CustomFieldModel extends FormModel
         return $entity;
     }
 
-    /**
-     * @param CustomField $entity
-     *
-     * @return CustomField
-     */
     public function setAlias(CustomField $entity): CustomField
     {
         $entity = $this->sanitizeAlias($entity);
@@ -89,10 +74,6 @@ class CustomFieldModel extends FormModel
     }
 
     /**
-     * @param int $id
-     *
-     * @return CustomField
-     *
      * @throws NotFoundException
      */
     public function fetchEntity(int $id): CustomField
@@ -108,8 +89,6 @@ class CustomFieldModel extends FormModel
     }
 
     /**
-     * @param CustomObject $customObject
-     *
      * @return CustomField[]
      */
     public function fetchCustomFieldsForObject(CustomObject $customObject): array
@@ -147,8 +126,6 @@ class CustomFieldModel extends FormModel
 
     /**
      * Used only by Mautic's generic methods. Use DI instead.
-     *
-     * @return CommonRepository
      */
     public function getRepository(): CommonRepository
     {
@@ -157,8 +134,6 @@ class CustomFieldModel extends FormModel
 
     /**
      * Used only by Mautic's generic methods. Use CustomFieldPermissionProvider instead.
-     *
-     * @return string
      */
     public function getPermissionBase(): string
     {
@@ -167,10 +142,6 @@ class CustomFieldModel extends FormModel
 
     /**
      **.
-     *
-     * @param CustomField $entity
-     *
-     * @return CustomField
      */
     private function sanitizeAlias(CustomField $entity): CustomField
     {
@@ -186,10 +157,6 @@ class CustomFieldModel extends FormModel
 
     /**
      * Make sure alias is not already taken.
-     *
-     * @param CustomField $entity
-     *
-     * @return CustomField
      */
     private function ensureUniqueAlias(CustomField $entity): CustomField
     {

@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\DTO;
 
-use Mautic\CoreBundle\Helper\ArrayHelper;
-use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
+use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
+use Mautic\CoreBundle\Helper\ArrayHelper;
 
 class TableConfig
 {
@@ -44,12 +44,6 @@ class TableConfig
      */
     private $parameters = [];
 
-    /**
-     * @param int    $limit
-     * @param int    $page
-     * @param string $orderBy
-     * @param string $orderDirection
-     */
     public function __construct(int $limit, int $page, string $orderBy, string $orderDirection = 'ASC')
     {
         $this->limit          = $limit;
@@ -58,25 +52,16 @@ class TableConfig
         $this->orderDirection = $orderDirection;
     }
 
-    /**
-     * @return string
-     */
     public function getOrderBy(): string
     {
         return $this->orderBy;
     }
 
-    /**
-     * @return string
-     */
     public function getOrderDirection(): string
     {
         return $this->orderDirection;
     }
 
-    /**
-     * @return int
-     */
     public function getOffset(): int
     {
         $offset = 1 === $this->page ? 0 : (($this->page - 1) * $this->limit);
@@ -84,17 +69,13 @@ class TableConfig
         return $offset < 0 ? 0 : $offset;
     }
 
-    /**
-     * @return int
-     */
     public function getLimit(): int
     {
         return $this->limit;
     }
 
     /**
-     * @param string $key
-     * @param mixed  $value
+     * @param mixed $value
      */
     public function addParameter(string $key, $value): void
     {
@@ -102,8 +83,7 @@ class TableConfig
     }
 
     /**
-     * @param string $key
-     * @param mixed  $defaultValue
+     * @param mixed $defaultValue
      *
      * @return mixed
      */
@@ -112,21 +92,11 @@ class TableConfig
         return ArrayHelper::getValue($key, $this->parameters, $defaultValue);
     }
 
-    /**
-     * @param OrmQueryBuilder $queryBuilder
-     *
-     * @return OrmQueryBuilder
-     */
     public function configureOrmQueryBuilder(OrmQueryBuilder $queryBuilder): OrmQueryBuilder
     {
         return $this->configureQueryBuilder($queryBuilder);
     }
 
-    /**
-     * @param DbalQueryBuilder $queryBuilder
-     *
-     * @return DbalQueryBuilder
-     */
     public function configureDbalQueryBuilder(DbalQueryBuilder $queryBuilder): DbalQueryBuilder
     {
         return $this->configureQueryBuilder($queryBuilder);

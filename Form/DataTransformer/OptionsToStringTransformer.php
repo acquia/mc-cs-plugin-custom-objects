@@ -38,10 +38,6 @@ class OptionsToStringTransformer implements DataTransformerInterface
      */
     private $customFieldCache = [];
 
-    /**
-     * @param SerializerInterface $serializer
-     * @param CustomFieldModel    $customFieldModel
-     */
     public function __construct(SerializerInterface $serializer, CustomFieldModel $customFieldModel)
     {
         $this->serializer       = $serializer;
@@ -52,8 +48,6 @@ class OptionsToStringTransformer implements DataTransformerInterface
      * Transforms a collection of objects (CustomFieldOption[]) to a string (json).
      *
      * @param ArrayCollection|CustomFieldOption[]|null $options
-     *
-     * @return string
      */
     public function transform($options = null): string
     {
@@ -93,10 +87,6 @@ class OptionsToStringTransformer implements DataTransformerInterface
     }
 
     /**
-     * @param int $id
-     *
-     * @return CustomField
-     *
      * @throws NotFoundException
      */
     private function fetchCustomFieldById(int $id): CustomField

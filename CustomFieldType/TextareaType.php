@@ -25,9 +25,6 @@ class TextareaType extends AbstractTextType
      */
     protected $key = 'textarea';
 
-    /**
-     * @return string
-     */
     public function getSymfonyFormFieldType(): string
     {
         return \Symfony\Component\Form\Extension\Core\Type\TextareaType::class;

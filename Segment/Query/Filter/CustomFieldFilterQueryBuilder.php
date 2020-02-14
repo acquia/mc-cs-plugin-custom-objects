@@ -28,10 +28,6 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
      */
     private $filterHelper;
 
-    /**
-     * @param RandomParameterName $randomParameterNameService
-     * @param QueryFilterHelper   $filterHelper
-     */
     public function __construct(RandomParameterName $randomParameterNameService, QueryFilterHelper $filterHelper)
     {
         parent::__construct($randomParameterNameService);
@@ -45,11 +41,6 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
     }
 
     /**
-     * @param QueryBuilder         $queryBuilder
-     * @param ContactSegmentFilter $filter
-     *
-     * @return QueryBuilder
-     *
      * @throws DBALException
      * @throws InvalidArgumentException
      * @throws \MauticPlugin\CustomObjectsBundle\Exception\NotFoundException

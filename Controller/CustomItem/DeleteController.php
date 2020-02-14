@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
-use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Controller\CommonController;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
+use Mautic\CoreBundle\Service\FlashBag;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemSessionProvider;
-use Mautic\CoreBundle\Service\FlashBag;
+use Symfony\Component\HttpFoundation\Response;
 
 class DeleteController extends CommonController
 {
@@ -50,13 +50,6 @@ class DeleteController extends CommonController
      */
     private $flashBag;
 
-    /**
-     * @param CustomItemModel              $customItemModel
-     * @param CustomItemSessionProvider    $sessionProvider
-     * @param FlashBag                     $flashBag
-     * @param CustomItemPermissionProvider $permissionProvider
-     * @param CustomItemRouteProvider      $routeProvider
-     */
     public function __construct(
         CustomItemModel $customItemModel,
         CustomItemSessionProvider $sessionProvider,
@@ -71,12 +64,6 @@ class DeleteController extends CommonController
         $this->routeProvider      = $routeProvider;
     }
 
-    /**
-     * @param int $objectId
-     * @param int $itemId
-     *
-     * @return Response
-     */
     public function deleteAction(int $objectId, int $itemId): Response
     {
         try {

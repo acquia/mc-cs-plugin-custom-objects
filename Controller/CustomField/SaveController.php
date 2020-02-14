@@ -14,23 +14,23 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Mautic\CoreBundle\Controller\CommonController;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
-use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Form\FormFactory;
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Mautic\CoreBundle\Controller\CommonController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
+use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
+use Symfony\Component\Form\FormFactory;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * This controller is not used for saving to database, it is used only to generate forms and data validation.
@@ -70,15 +70,6 @@ class SaveController extends CommonController
      */
     private $customObjectModel;
 
-    /**
-     * @param FormFactory                   $formFactory
-     * @param TranslatorInterface           $translator
-     * @param CustomFieldModel              $customFieldModel
-     * @param CustomFieldFactory            $customFieldFactory
-     * @param CustomFieldPermissionProvider $permissionProvider
-     * @param CustomFieldRouteProvider      $fieldRouteProvider
-     * @param CustomObjectModel             $customObjectModel
-     */
     public function __construct(
         FormFactory $formFactory,
         TranslatorInterface $translator,
@@ -99,8 +90,6 @@ class SaveController extends CommonController
 
     /**
      * Not save but validate Custom Field data and return proper response. Check class description.
-     *
-     * @param Request $request
      *
      * @return Response|JsonResponse
      */
@@ -166,12 +155,6 @@ class SaveController extends CommonController
 
     /**
      * Here is CO form panel part build and injected in the frontend as part of existing CO form.
-     *
-     * @param CustomObject $customObject
-     * @param CustomField  $customField
-     * @param Request      $request
-     *
-     * @return JsonResponse
      */
     private function buildSuccessForm(CustomObject $customObject, CustomField $customField, Request $request): JsonResponse
     {
@@ -238,8 +221,7 @@ class SaveController extends CommonController
      *
      * @see \Symfony\Component\Form\Exception\TransformationFailedException
      *
-     * @param string[]    $customFieldPost
-     * @param CustomField $customField
+     * @param string[] $customFieldPost
      */
     private function recreateOptionsFromPost(array $customFieldPost, CustomField $customField): void
     {

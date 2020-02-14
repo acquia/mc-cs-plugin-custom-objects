@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
-use Doctrine\ORM\EntityManager;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\EntityManager;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class CustomFieldValueModel
 {
@@ -35,10 +35,6 @@ class CustomFieldValueModel
      */
     private $validator;
 
-    /**
-     * @param EntityManager      $entityManager
-     * @param ValidatorInterface $validator
-     */
     public function __construct(
         EntityManager $entityManager,
         ValidatorInterface $validator
@@ -49,8 +45,6 @@ class CustomFieldValueModel
 
     /**
      * The values are joined from several tables. Each value type can have own table.
-     *
-     * @param CustomItem $customItem
      */
     public function createValuesForItem(CustomItem $customItem): void
     {
@@ -66,9 +60,6 @@ class CustomFieldValueModel
      * If the entities were created manually, not fetched by Entity Manager
      * then we have to merge them to the entity manager and flush.
      * New entities are just persisted. Call flush after.
-     *
-     * @param CustomFieldValueInterface $customFieldValue
-     * @param bool                      $dryRun
      */
     public function save(CustomFieldValueInterface $customFieldValue, bool $dryRun = false): void
     {
@@ -126,8 +117,6 @@ class CustomFieldValueModel
     }
 
     /**
-     * @param CustomFieldValueInterface $customFieldValue
-     *
      * @return int Number of deleted rows
      */
     private function deleteOptionsForField(CustomFieldValueInterface $customFieldValue): int
@@ -146,9 +135,6 @@ class CustomFieldValueModel
 
     /**
      * Creates custom field value entities and add them to the CustomItem entity.
-     *
-     * @param Collection $customFields
-     * @param CustomItem $customItem
      */
     private function createValueEntities(Collection $customFields, CustomItem $customItem): void
     {
@@ -162,10 +148,6 @@ class CustomFieldValueModel
         });
     }
 
-    /**
-     * @param Collection $valueRows
-     * @param CustomItem $customItem
-     */
     private function setValuesFromDatabase(Collection $valueRows, CustomItem $customItem): void
     {
         $customFieldValues = $customItem->getCustomFieldValues();
@@ -182,11 +164,6 @@ class CustomFieldValueModel
         });
     }
 
-    /**
-     * @param Collection $queries
-     *
-     * @return ArrayCollection
-     */
     private function fetchValues(Collection $queries): ArrayCollection
     {
         // No need to query for values in case there are no queries
@@ -201,12 +178,6 @@ class CustomFieldValueModel
         return new ArrayCollection($statement->fetchAll());
     }
 
-    /**
-     * @param CustomItem $customItem
-     * @param Collection $customFields
-     *
-     * @return Collection
-     */
     private function buildQueriesForUnion(CustomItem $customItem, Collection $customFields): Collection
     {
         // No need to build queries for new CustomItem entity

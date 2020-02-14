@@ -13,16 +13,16 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CampaignConditionFieldValueType extends AbstractType
 {
@@ -41,11 +41,6 @@ class CampaignConditionFieldValueType extends AbstractType
      */
     protected $translator;
 
-    /**
-     * @param CustomFieldModel        $customFieldModel
-     * @param CustomItemRouteProvider $routeProvider
-     * @param TranslatorInterface     $translator
-     */
     public function __construct(
         CustomFieldModel $customFieldModel,
         CustomItemRouteProvider $routeProvider,
@@ -57,8 +52,7 @@ class CampaignConditionFieldValueType extends AbstractType
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param mixed[]              $options
+     * @param mixed[] $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

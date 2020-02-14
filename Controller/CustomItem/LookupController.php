@@ -13,16 +13,16 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
-use Symfony\Component\HttpFoundation\RequestStack;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
-use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Service\FlashBag;
+use MauticPlugin\CustomObjectsBundle\Controller\JsonController;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Controller\JsonController;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Mautic\CoreBundle\Service\FlashBag;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class LookupController extends JsonController
 {
@@ -46,12 +46,6 @@ class LookupController extends JsonController
      */
     private $flashBag;
 
-    /**
-     * @param RequestStack                 $requestStack
-     * @param CustomItemModel              $customItemModel
-     * @param CustomItemPermissionProvider $permissionProvider
-     * @param FlashBag                     $flashBag
-     */
     public function __construct(
         RequestStack $requestStack,
         CustomItemModel $customItemModel,
@@ -64,11 +58,6 @@ class LookupController extends JsonController
         $this->flashBag           = $flashBag;
     }
 
-    /**
-     * @param int $objectId
-     *
-     * @return JsonResponse
-     */
     public function listAction(int $objectId): JsonResponse
     {
         try {

@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
+use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use Symfony\Component\HttpFoundation\Response;
-use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemSessionProvider;
+use Symfony\Component\HttpFoundation\Response;
 
 class CancelController extends CommonController
 {
@@ -37,11 +37,6 @@ class CancelController extends CommonController
      */
     private $customItemModel;
 
-    /**
-     * @param CustomItemSessionProvider $sessionProvider
-     * @param CustomItemRouteProvider   $routeProvider
-     * @param CustomItemModel           $customItemModel
-     */
     public function __construct(
         CustomItemSessionProvider $sessionProvider,
         CustomItemRouteProvider $routeProvider,
@@ -53,11 +48,6 @@ class CancelController extends CommonController
     }
 
     /**
-     * @param int      $objectId
-     * @param int|null $itemId
-     *
-     * @return Response
-     *
      * @throws NotFoundException
      */
     public function cancelAction(int $objectId, ?int $itemId = null): Response

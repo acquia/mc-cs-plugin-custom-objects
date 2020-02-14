@@ -15,8 +15,8 @@ namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\DateTransformer;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Symfony\Component\Form\DataTransformerInterface;
 
 interface CustomFieldTypeInterface
@@ -25,68 +25,43 @@ interface CustomFieldTypeInterface
 
     public const NAME = 'undefined';
 
-    /**
-     * @return string
-     */
     public function getName(): string;
 
-    /**
-     * @return string
-     */
     public function getKey(): string;
 
     /**
      * Symfony form field representing this custom field.
-     *
-     * @return string
      */
     public function getSymfonyFormFieldType(): string;
 
     /**
      * Has this field multiple choicesS?
-     *
-     * @return bool
      */
     public function hasChoices(): bool;
 
-    /**
-     * @return string
-     */
     public function getEntityClass(): string;
 
     /**
-     * @param CustomField $customField
-     * @param CustomItem  $customItem
-     * @param mixed|null  $value
-     *
-     * @return CustomFieldValueInterface
+     * @param mixed|null $value
      */
     public function createValueEntity(CustomField $customField, CustomItem $customItem, $value = null): CustomFieldValueInterface;
 
     /**
-     * @param CustomField $customField
-     * @param mixed       $value
+     * @param mixed $value
      *
      * @throws \UnexpectedValueException
      */
     public function validateValue(CustomField $customField, $value): void;
 
     /**
-     * @param CustomField $customField
-     * @param mixed       $value
+     * @param mixed $value
      *
      * @throws \UnexpectedValueException
      */
     public function validateRequired(CustomField $customField, $value): void;
 
-    /**
-     * @return string
-     */
     public function getTableName(): string;
 
-    /**
-     * @return string
-     */
     public function getTableAlias(): string;
 
     /**
@@ -108,8 +83,6 @@ interface CustomFieldTypeInterface
 
     /**
      * Using placeholder for form field is needed.
-     *
-     * @return bool
      */
     public function usePlaceholder(): bool;
 
@@ -118,27 +91,18 @@ interface CustomFieldTypeInterface
      *
      * @see CustomField::getDefaultValue()
      * @see DateTransformer
-     *
-     * @return DataTransformerInterface
      */
     public function createDefaultValueTransformer(): DataTransformerInterface;
 
     /**
      * Transformer used for API requests and responses.
-     *
-     * @return DataTransformerInterface
      */
     public function createApiValueTransformer(): DataTransformerInterface;
 
-    /**
-     * @return DataTransformerInterface
-     */
     public function createViewTransformer(): DataTransformerInterface;
 
     /**
      * @param mixed $fieldValue
-     *
-     * @return string
      */
     public function valueToString(CustomFieldValueInterface $fieldValue): string;
 }

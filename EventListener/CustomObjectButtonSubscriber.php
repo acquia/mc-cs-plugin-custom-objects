@@ -125,8 +125,6 @@ class CustomObjectButtonSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param CustomObject $entity
-     *
      * @return mixed[]
      *
      * @throws ForbiddenException
@@ -161,8 +159,6 @@ class CustomObjectButtonSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param CustomObject $entity
-     *
      * @return mixed[]
      *
      * @throws ForbiddenException
@@ -182,8 +178,6 @@ class CustomObjectButtonSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param CustomObject $entity
-     *
      * @return mixed[]
      *
      * @throws ForbiddenException
@@ -222,9 +216,8 @@ class CustomObjectButtonSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param CustomObject $customObject
-     *
      * @return string[]
+     *
      * @throws ForbiddenException
      */
     private function defineViewCustomItemsButton(CustomObject $customObject): array
@@ -242,9 +235,8 @@ class CustomObjectButtonSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param CustomObject $customObject
-     *
      * @return string[]
+     *
      * @throws ForbiddenException
      */
     private function defineCreateNewCustomItemButton(CustomObject $customObject): array

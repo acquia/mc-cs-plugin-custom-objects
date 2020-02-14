@@ -13,18 +13,18 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\CustomFieldType;
 
-use Symfony\Component\Translation\TranslatorInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption;
+use Doctrine\Common\Collections\ArrayCollection;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\AbstractMultivalueType;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\CsvTransformer;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\MultivalueTransformer;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\MultivalueTransformer;
-use Doctrine\Common\Collections\ArrayCollection;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\CsvTransformer;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class AbstractMultivalueTypeTest extends \PHPUnit\Framework\TestCase
 {

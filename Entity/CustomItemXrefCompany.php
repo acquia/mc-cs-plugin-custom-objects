@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
+use DateTimeImmutable;
+use DateTimeInterface;
+use DateTimeZone;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use DateTimeInterface;
-use DateTimeImmutable;
-use DateTimeZone;
 use Mautic\LeadBundle\Entity\Company;
 
 class CustomItemXrefCompany implements CustomItemXrefInterface
@@ -38,11 +38,6 @@ class CustomItemXrefCompany implements CustomItemXrefInterface
      */
     private $dateAdded;
 
-    /**
-     * @param CustomItem             $customItem
-     * @param Company                $company
-     * @param DateTimeInterface|null $dateAdded
-     */
     public function __construct(CustomItem $customItem, Company $company, ?DateTimeInterface $dateAdded = null)
     {
         $this->customItem = $customItem;
@@ -50,9 +45,6 @@ class CustomItemXrefCompany implements CustomItemXrefInterface
         $this->dateAdded  = $dateAdded ?: new DateTimeImmutable('now', new DateTimeZone('UTC'));
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);

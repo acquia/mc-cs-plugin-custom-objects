@@ -13,18 +13,18 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\CsvTransformer;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\MultivalueTransformer;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Translation\TranslatorInterface;
-use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\CsvTransformer;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
 abstract class AbstractMultivalueType extends AbstractCustomFieldType
 {
@@ -35,10 +35,6 @@ abstract class AbstractMultivalueType extends AbstractCustomFieldType
      */
     private $csvHelper;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param CsvHelper           $csvHelper
-     */
     public function __construct(TranslatorInterface $translator, CsvHelper $csvHelper)
     {
         parent::__construct($translator);
@@ -47,28 +43,18 @@ abstract class AbstractMultivalueType extends AbstractCustomFieldType
     }
 
     /**
-     * @param CustomField $customField
-     * @param CustomItem  $customItem
-     * @param mixed|null  $value
-     *
-     * @return CustomFieldValueInterface
+     * @param mixed|null $value
      */
     public function createValueEntity(CustomField $customField, CustomItem $customItem, $value = null): CustomFieldValueInterface
     {
         return new CustomFieldValueOption($customField, $customItem, $value);
     }
 
-    /**
-     * @return string
-     */
     public function getSymfonyFormFieldType(): string
     {
         return ChoiceType::class;
     }
 
-    /**
-     * @return string
-     */
     public function getEntityClass(): string
     {
         return CustomFieldValueOption::class;
@@ -119,18 +105,7 @@ abstract class AbstractMultivalueType extends AbstractCustomFieldType
 
         foreach ($value as $singleValue) {
             if (!in_array($singleValue, $possibleValues)) {
-                throw new \UnexpectedValueException(
-                    $this->translator->trans(
-                        'custom.field.option.invalid',
-                        [
-                            '%value%'          => $singleValue,
-                            '%fieldLabel%'     => $customField->getLabel(),
-                            '%fieldAlias%'     => $customField->getAlias(),
-                            '%possibleValues%' => $this->csvHelper->arrayToCsvLine($possibleValues),
-                        ],
-                        'validators'
-                    )
-                );
+                throw new \UnexpectedValueException($this->translator->trans('custom.field.option.invalid', ['%value%'          => $singleValue, '%fieldLabel%'     => $customField->getLabel(), '%fieldAlias%'     => $customField->getAlias(), '%possibleValues%' => $this->csvHelper->arrayToCsvLine($possibleValues)], 'validators'));
             }
         }
     }
@@ -168,11 +143,6 @@ abstract class AbstractMultivalueType extends AbstractCustomFieldType
         return $transformer->transform($labels);
     }
 
-    /**
-     * @param string $string
-     *
-     * @return bool
-     */
     private function isJson(string $string): bool
     {
         json_decode($string);

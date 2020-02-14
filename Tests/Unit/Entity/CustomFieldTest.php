@@ -13,26 +13,26 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Entity;
 
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\CheckboxGroupType;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\CountryType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateType;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\EmailType;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\SelectType;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\SelectType;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
+use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\EmailType;
-use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\Callback;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\CheckboxGroupType;
-use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\CountryType;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
 class CustomFieldTest extends \PHPUnit\Framework\TestCase
 {

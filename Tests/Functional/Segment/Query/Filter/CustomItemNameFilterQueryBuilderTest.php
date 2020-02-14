@@ -21,9 +21,9 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
+use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemNameFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
-use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\Exception\FixtureNotFoundException;
 use PHPUnit\Framework\MockObject\MockObject;
 
@@ -88,8 +88,6 @@ class CustomItemNameFilterQueryBuilderTest extends MauticWebTestCase
      * @param string $type
      * @param string $operator
      * @param string $fixtureField
-     *
-     * @return ContactSegmentFilter
      *
      * @throws FixtureNotFoundException
      */

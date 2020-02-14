@@ -82,7 +82,7 @@ $view['slots']->set('headerTitle', $header);
                                 </div>
                             </div>
                             <div class="drop-here">
-                                <?php include('_form-fields.html.php'); ?>
+                                <?php include '_form-fields.html.php'; ?>
                             </div>
                             <?php if (!count($customFields)): ?>
                                 <div class="alert alert-info" id="form-field-placeholder">

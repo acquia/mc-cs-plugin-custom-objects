@@ -13,18 +13,18 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
-use Doctrine\DBAL\Types\Type;
-use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Constraints as Assert;
-use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Entity\FormEntity;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\Mapping as ORM;
+use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\ArrayHelper;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class CustomObject extends FormEntity implements UniqueEntityInterface
 {
@@ -88,9 +88,6 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         $this->alias = null;
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -116,9 +113,6 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         $builder->addNullableField('language', Type::STRING, 'lang');
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('alias', new Assert\Length(['max' => 255]));
@@ -248,26 +242,17 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         $this->language = $language;
     }
 
-    /**
-     * @param CustomField $customField
-     */
     public function addCustomField(CustomField $customField)
     {
         $customField->setCustomObject($this);
         $this->customFields->add($customField);
     }
 
-    /**
-     * @param ArrayCollection $customFields
-     */
     public function setCustomFields(ArrayCollection $customFields)
     {
         $this->customFields = $customFields;
     }
 
-    /**
-     * @param CustomField $customField
-     */
     public function removeCustomField(CustomField $customField)
     {
         $this->customFields->removeElement($customField);

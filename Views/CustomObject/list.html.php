@@ -9,8 +9,8 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 
 if ('index' === $tmpl) {
     $view->extend('CustomObjectsBundle:CustomObject:index.html.php');

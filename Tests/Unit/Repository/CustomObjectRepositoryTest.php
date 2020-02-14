@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Repository;
 
-use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\QueryBuilder;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 
 class CustomObjectRepositoryTest extends \PHPUnit\Framework\TestCase
 {

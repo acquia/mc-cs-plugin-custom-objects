@@ -13,17 +13,17 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use Mautic\LeadBundle\LeadEvents;
-use Mautic\LeadBundle\Event\LeadTimelineEvent;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
+use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\LeadEvents;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ContactSubscriber implements EventSubscriberInterface
 {
@@ -78,8 +78,6 @@ class ContactSubscriber implements EventSubscriberInterface
 
     /**
      * Compile events for the lead timeline.
-     *
-     * @param LeadTimelineEvent $event
      */
     public function onTimelineGenerate(LeadTimelineEvent $event): void
     {
@@ -111,9 +109,6 @@ class ContactSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param LeadTimelineEvent $event
-     * @param string            $action
-     *
      * @return mixed[]
      */
     private function getEvents(LeadTimelineEvent $event, string $action): array
@@ -130,12 +125,6 @@ class ContactSubscriber implements EventSubscriberInterface
         );
     }
 
-    /**
-     * @param LeadTimelineEvent $event
-     * @param string            $eventTypeKey
-     * @param string            $eventTypeName
-     * @param string            $action
-     */
     private function addLinkTimelineEntry(LeadTimelineEvent $event, string $eventTypeKey, string $eventTypeName, string $action): void
     {
         $links = $this->getEvents($event, $action);

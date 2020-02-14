@@ -13,24 +13,24 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
-use Mautic\CoreBundle\Helper\Chart\ChartQuery;
-use Mautic\CoreBundle\Helper\Chart\LineChart;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
-use Mautic\CoreBundle\Model\FormModel;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
-use Mautic\CoreBundle\Entity\CommonRepository;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use Mautic\CoreBundle\Helper\UserHelper;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
-use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Model\FormModel;
 use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
-use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CustomObjectModel extends FormModel
 {
@@ -54,14 +54,6 @@ class CustomObjectModel extends FormModel
      */
     private $customFieldModel;
 
-    /**
-     * @param EntityManager                  $entityManager
-     * @param CustomObjectRepository         $customObjectRepository
-     * @param CustomObjectPermissionProvider $permissionProvider
-     * @param UserHelper                     $userHelper
-     * @param CustomFieldModel               $customFieldModel
-     * @param EventDispatcherInterface       $dispatcher
-     */
     public function __construct(
         EntityManager $entityManager,
         CustomObjectRepository $customObjectRepository,
@@ -78,11 +70,6 @@ class CustomObjectModel extends FormModel
         $this->dispatcher             = $dispatcher;
     }
 
-    /**
-     * @param CustomObject $customObject
-     *
-     * @return CustomObject
-     */
     public function save(CustomObject $customObject): CustomObject
     {
         $user         = $this->userHelper->getUser();
@@ -115,9 +102,6 @@ class CustomObjectModel extends FormModel
         return $customObject;
     }
 
-    /**
-     * @param CustomObject $customObject
-     */
     public function delete(CustomObject $customObject): void
     {
         // Take note of ID before doctrine wipes it out
@@ -134,10 +118,6 @@ class CustomObjectModel extends FormModel
     }
 
     /**
-     * @param int $id
-     *
-     * @return CustomObject
-     *
      * @throws NotFoundException
      */
     public function fetchEntity(int $id): CustomObject
@@ -155,10 +135,6 @@ class CustomObjectModel extends FormModel
     }
 
     /**
-     * @param string $alias
-     *
-     * @return CustomObject
-     *
      * @throws NotFoundException
      */
     public function fetchEntityByAlias(string $alias): CustomObject
@@ -205,8 +181,6 @@ class CustomObjectModel extends FormModel
     }
 
     /**
-     * @param TableConfig $tableConfig
-     *
      * @return CustomObject[]
      */
     public function getTableData(TableConfig $tableConfig): array
@@ -216,11 +190,6 @@ class CustomObjectModel extends FormModel
         return $queryBuilder->getQuery()->getResult();
     }
 
-    /**
-     * @param TableConfig $tableConfig
-     *
-     * @return int
-     */
     public function getCountForTable(TableConfig $tableConfig): int
     {
         $queryBuilder = $this->createListQueryBuilder($tableConfig);
@@ -232,10 +201,6 @@ class CustomObjectModel extends FormModel
         return (int) $queryBuilder->getQuery()->getSingleScalarResult();
     }
 
-    /**
-     * @param CustomObject $customObject
-     * @param int          $customFieldId
-     */
     public function removeCustomFieldById(CustomObject $customObject, int $customFieldId): void
     {
         foreach ($customObject->getCustomFields() as $customField) {
@@ -251,8 +216,6 @@ class CustomObjectModel extends FormModel
 
     /**
      * Used only by Mautic's generic methods. Use DI instead.
-     *
-     * @return CommonRepository
      */
     public function getRepository(): CommonRepository
     {
@@ -261,8 +224,6 @@ class CustomObjectModel extends FormModel
 
     /**
      * Used only by Mautic's generic methods. Use CustomFieldPermissionProvider instead.
-     *
-     * @return string
      */
     public function getPermissionBase(): string
     {
@@ -270,10 +231,6 @@ class CustomObjectModel extends FormModel
     }
 
     /**
-     * @param \DateTime    $from
-     * @param \DateTime    $to
-     * @param CustomObject $customObject
-     *
      * @return mixed[]
      */
     public function getItemsLineChartData(\DateTime $from, \DateTime $to, CustomObject $customObject): array
@@ -286,11 +243,6 @@ class CustomObjectModel extends FormModel
         return $chart->render();
     }
 
-    /**
-     * @param TableConfig $tableConfig
-     *
-     * @return QueryBuilder
-     */
     private function createListQueryBuilder(TableConfig $tableConfig): QueryBuilder
     {
         $queryBuilder = $this->entityManager->createQueryBuilder();
@@ -308,11 +260,6 @@ class CustomObjectModel extends FormModel
         return $this->applyOwnerFilter($queryBuilder);
     }
 
-    /**
-     * @param CustomObject $entity
-     *
-     * @return CustomObject
-     */
     private function sanitizeAlias(CustomObject $entity): CustomObject
     {
         $dirtyAlias = $entity->getAlias();
@@ -327,10 +274,6 @@ class CustomObjectModel extends FormModel
 
     /**
      * Make sure alias is not already taken.
-     *
-     * @param CustomObject $entity
-     *
-     * @return CustomObject
      */
     private function ensureUniqueAlias(CustomObject $entity): CustomObject
     {
@@ -386,10 +329,6 @@ class CustomObjectModel extends FormModel
 
     /**
      * Adds condition for owner if the user doesn't have permissions to view other.
-     *
-     * @param QueryBuilder $queryBuilder
-     *
-     * @return QueryBuilder
      */
     private function applyOwnerFilter(QueryBuilder $queryBuilder): QueryBuilder
     {
@@ -402,11 +341,6 @@ class CustomObjectModel extends FormModel
         return $queryBuilder;
     }
 
-    /**
-     * @param CustomObject $customObject
-     *
-     * @return CustomObject
-     */
     private function setCustomFieldsMetadata(CustomObject $customObject): CustomObject
     {
         foreach ($customObject->getCustomFields() as $customField) {

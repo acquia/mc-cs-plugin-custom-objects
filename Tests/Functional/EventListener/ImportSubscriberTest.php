@@ -13,29 +13,29 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\EventListener;
 
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
 use Doctrine\ORM\EntityManager;
-use MauticPlugin\CustomObjectsBundle\EventListener\ImportSubscriber;
-use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Entity\Import;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
+use Mautic\LeadBundle\Event\ImportProcessEvent;
+use Mautic\LeadBundle\Model\LeadModel;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\EventListener\ImportSubscriber;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemImportModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\LeadModel;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
-use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\CustomObjectsTrait;
-use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
+use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\CustomObjectsTrait;
+use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ImportSubscriberTest extends KernelTestCase
 {
@@ -230,8 +230,7 @@ class ImportSubscriberTest extends KernelTestCase
     /**
      * Try to save a multiselect option that does not exist.
      *
-     * @param CustomObject $customObject
-     * @param string[]     $csvRow
+     * @param string[] $csvRow
      */
     private function validateSelectOptionValueExists(CustomObject $customObject, array $csvRow): void
     {
@@ -247,8 +246,7 @@ class ImportSubscriberTest extends KernelTestCase
     /**
      * Try to save a multiselect option that does not exist.
      *
-     * @param CustomObject $customObject
-     * @param string[]     $csvRow
+     * @param string[] $csvRow
      */
     private function validateDateValue(CustomObject $customObject, array $csvRow): void
     {
@@ -265,8 +263,7 @@ class ImportSubscriberTest extends KernelTestCase
     /**
      * Try to save a multiselect option that does not exist.
      *
-     * @param CustomObject $customObject
-     * @param string[]     $csvRow
+     * @param string[] $csvRow
      */
     private function validateEmail(CustomObject $customObject, array $csvRow): void
     {
@@ -282,8 +279,7 @@ class ImportSubscriberTest extends KernelTestCase
     /**
      * Try to save a multiselect option that does not exist.
      *
-     * @param CustomObject $customObject
-     * @param string[]     $csvRow
+     * @param string[] $csvRow
      */
     private function validatePhone(CustomObject $customObject, array $csvRow): void
     {
@@ -299,8 +295,7 @@ class ImportSubscriberTest extends KernelTestCase
     /**
      * Try to save a multiselect option that does not exist.
      *
-     * @param CustomObject $customObject
-     * @param string[]     $csvRow
+     * @param string[] $csvRow
      */
     private function validateUrl(CustomObject $customObject, array $csvRow): void
     {
@@ -316,8 +311,7 @@ class ImportSubscriberTest extends KernelTestCase
     /**
      * Try to save a multiselect option that does not exist.
      *
-     * @param CustomObject $customObject
-     * @param string[]     $csvRow
+     * @param string[] $csvRow
      */
     private function validateNameCannotBeEmpty(CustomObject $customObject, array $csvRow): void
     {
@@ -331,10 +325,7 @@ class ImportSubscriberTest extends KernelTestCase
     }
 
     /**
-     * @param CustomObject $customObject
-     * @param string[]     $csvRow
-     *
-     * @return bool
+     * @param string[] $csvRow
      */
     private function importCsvRow(CustomObject $customObject, array $csvRow): bool
     {
@@ -410,8 +401,6 @@ class ImportSubscriberTest extends KernelTestCase
     }
 
     /**
-     * @param string $name
-     *
      * @return CustomItem|mixed
      */
     private function getCustomItemByName(string $name)
@@ -432,11 +421,6 @@ class ImportSubscriberTest extends KernelTestCase
         return $customItemModel->populateCustomFields($customItem);
     }
 
-    /**
-     * @param string $email
-     *
-     * @return Lead
-     */
     private function createContact(string $email): Lead
     {
         /** @var LeadModel $contactModel */

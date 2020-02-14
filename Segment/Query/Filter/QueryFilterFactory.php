@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Segment\Query\Filter;
 
-use Mautic\LeadBundle\Segment\Query\QueryBuilder;
-use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
-use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use Doctrine\DBAL\Connection;
+use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
+use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 
 class QueryFilterFactory
 {
@@ -36,11 +36,6 @@ class QueryFilterFactory
      */
     private $queryFilterHelper;
 
-    /**
-     * @param Connection                  $connection
-     * @param ContactSegmentFilterFactory $filterFactory
-     * @param QueryFilterHelper           $queryFilterHelper
-     */
     public function __construct(
         Connection $connection,
         ContactSegmentFilterFactory $filterFactory,
@@ -53,8 +48,6 @@ class QueryFilterFactory
 
     /**
      * @param mixed[] $segmentFilter
-     *
-     * @return QueryBuilder
      *
      * @throws InvalidSegmentFilterException
      * @throws \MauticPlugin\CustomObjectsBundle\Exception\NotFoundException

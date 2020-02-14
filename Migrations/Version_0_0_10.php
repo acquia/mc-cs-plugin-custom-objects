@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Migrations;
 
-use Mautic\IntegrationsBundle\Migration\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
+use Mautic\IntegrationsBundle\Migration\AbstractMigration;
 
 /**
  * Delete this migration for next version as it should only delete fields that were hidden.

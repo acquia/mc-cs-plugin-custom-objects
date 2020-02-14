@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\CustomFieldType;
 
-use Symfony\Component\Translation\TranslatorInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\EmailType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\AbstractCustomFieldType;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\EmailType;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class AbstractCustomFieldTypeTest extends \PHPUnit\Framework\TestCase
 {

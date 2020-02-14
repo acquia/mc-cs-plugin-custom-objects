@@ -16,9 +16,9 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Helper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Service\FlashBag;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
-use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
 
 class LockFlashMessageHelperTest extends \PHPUnit\Framework\TestCase
 {

@@ -46,9 +46,6 @@ class CountryType extends SelectType implements StaticChoiceTypeInterface
         return $this->countryList;
     }
 
-    /**
-     * @return string
-     */
     public function getSymfonyFormFieldType(): string
     {
         return SymfonyCountryType::class;

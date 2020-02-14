@@ -13,26 +13,26 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
+use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Service\FlashBag;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsToStringTransformer;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransformer;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
 use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
-use Symfony\Component\HttpFoundation\RequestStack;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
-use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
-use Mautic\CoreBundle\Service\FlashBag;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Mautic\CoreBundle\Controller\AbstractFormController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 class SaveController extends AbstractFormController
 {
@@ -91,19 +91,6 @@ class SaveController extends AbstractFormController
      */
     private $lockFlashMessageHelper;
 
-    /**
-     * @param RequestStack                   $requestStack
-     * @param FlashBag                       $flashBag
-     * @param FormFactoryInterface           $formFactory
-     * @param CustomObjectModel              $customObjectModel
-     * @param CustomFieldModel               $customFieldModel
-     * @param CustomObjectPermissionProvider $permissionProvider
-     * @param CustomObjectRouteProvider      $routeProvider
-     * @param CustomFieldTypeProvider        $customFieldTypeProvider
-     * @param ParamsToStringTransformer      $paramsToStringTransformer
-     * @param OptionsToStringTransformer     $optionsToStringTransformer
-     * @param LockFlashMessageHelper         $lockFlashMessageHelper
-     */
     public function __construct(
         RequestStack $requestStack,
         FlashBag $flashBag,
@@ -130,11 +117,6 @@ class SaveController extends AbstractFormController
         $this->lockFlashMessageHelper     = $lockFlashMessageHelper;
     }
 
-    /**
-     * @param int|null $objectId
-     *
-     * @return Response
-     */
     public function saveAction(?int $objectId = null): Response
     {
         try {
@@ -217,8 +199,7 @@ class SaveController extends AbstractFormController
     }
 
     /**
-     * @param CustomObject $customObject
-     * @param string[]     $rawCustomObject
+     * @param string[] $rawCustomObject
      */
     private function handleRawPost(CustomObject $customObject, array $rawCustomObject): void
     {
@@ -255,12 +236,6 @@ class SaveController extends AbstractFormController
         }
     }
 
-    /**
-     * @param Request $request
-     * @param string  $url
-     *
-     * @return Response
-     */
     private function redirectWithCompletePageRefresh(Request $request, string $url): Response
     {
         return $request->isXmlHttpRequest() ? new JsonResponse(['redirect' => $url]) : $this->redirect($url);

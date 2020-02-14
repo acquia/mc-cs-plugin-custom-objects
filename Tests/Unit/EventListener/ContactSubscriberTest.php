@@ -13,19 +13,19 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
-use MauticPlugin\CustomObjectsBundle\EventListener\ContactSubscriber;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use Symfony\Component\Translation\TranslatorInterface;
 use Doctrine\ORM\EntityManager;
-use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
-use Mautic\LeadBundle\Event\LeadTimelineEvent;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
-use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\EventListener\ContactSubscriber;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
+use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ContactSubscriberTest extends \PHPUnit\Framework\TestCase
 {

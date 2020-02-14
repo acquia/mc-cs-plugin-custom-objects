@@ -48,17 +48,11 @@ class Params
         return array_filter($return);
     }
 
-    /**
-     * @return string|null
-     */
     public function getPlaceholder(): ?string
     {
         return $this->placeholder;
     }
 
-    /**
-     * @param string|null $placeholder
-     */
     public function setPlaceholder(?string $placeholder): void
     {
         $this->placeholder = $placeholder;

@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
+use Mautic\CoreBundle\Service\FlashBag;
+use MauticPlugin\CustomObjectsBundle\Controller\JsonController;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
-use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use MauticPlugin\CustomObjectsBundle\Controller\JsonController;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use UnexpectedValueException;
-use Mautic\CoreBundle\Service\FlashBag;
 
 class UnlinkController extends JsonController
 {
@@ -39,11 +39,6 @@ class UnlinkController extends JsonController
      */
     private $flashBag;
 
-    /**
-     * @param CustomItemModel              $customItemModel
-     * @param CustomItemPermissionProvider $permissionProvider
-     * @param FlashBag                     $flashBag
-     */
     public function __construct(
         CustomItemModel $customItemModel,
         CustomItemPermissionProvider $permissionProvider,
@@ -54,13 +49,6 @@ class UnlinkController extends JsonController
         $this->flashBag           = $flashBag;
     }
 
-    /**
-     * @param int    $itemId
-     * @param string $entityType
-     * @param int    $entityId
-     *
-     * @return JsonResponse
-     */
     public function saveAction(int $itemId, string $entityType, int $entityId): JsonResponse
     {
         try {

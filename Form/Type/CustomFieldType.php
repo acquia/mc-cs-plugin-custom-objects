@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
+use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\CustomObjectHiddenTransformer;
 use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsToStringTransformer;
@@ -24,13 +26,11 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
-use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CustomFieldType extends AbstractType
@@ -65,13 +65,6 @@ class CustomFieldType extends AbstractType
      */
     private $isCustomObjectForm;
 
-    /**
-     * @param CustomObjectRepository     $customObjectRepository
-     * @param CustomFieldTypeProvider    $customFieldTypeProvider
-     * @param ParamsToStringTransformer  $paramsToStringTransformer
-     * @param OptionsToStringTransformer $optionsToStringTransformer
-     * @param CustomFieldFactory         $customFieldFactory
-     */
     public function __construct(
         CustomObjectRepository $customObjectRepository,
         CustomFieldTypeProvider $customFieldTypeProvider,
@@ -87,8 +80,7 @@ class CustomFieldType extends AbstractType
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param mixed[]              $options
+     * @param mixed[] $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
@@ -161,8 +153,7 @@ class CustomFieldType extends AbstractType
     /**
      * Build fields for form in modal. Full specification of custom field.
      *
-     * @param FormBuilderInterface $builder
-     * @param mixed[]              $options
+     * @param mixed[] $options
      */
     private function buildModalFormFields(FormBuilderInterface $builder, array $options): void
     {
@@ -255,8 +246,6 @@ class CustomFieldType extends AbstractType
     /**
      * Build fields for panel - custom field list.
      * All should be hidden.
-     *
-     * @param FormBuilderInterface $builder
      */
     private function buildPanelFormFields(FormBuilderInterface $builder): void
     {
@@ -303,9 +292,6 @@ class CustomFieldType extends AbstractType
     /**
      * Create default value input for CO form and modal.
      * Dynamically options managed in modal are not supported so for them leave default value input as text for now.
-     *
-     * @param FormInterface $form
-     * @param CustomField   $customField
      */
     private function createDefaultValueInput(FormInterface $form, CustomField $customField): void
     {
@@ -352,8 +338,6 @@ class CustomFieldType extends AbstractType
 
     /**
      * Recreate default vale before post based on send data. To be able validate new and un saved options selection.
-     *
-     * @param FormBuilderInterface $builder
      */
     private function recreateDefaultValueBeforePost(FormBuilderInterface $builder): void
     {

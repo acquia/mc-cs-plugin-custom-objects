@@ -55,113 +55,71 @@ class Token
      */
     private $customObjectAlias;
 
-    /**
-     * @param string $token
-     */
     public function __construct(string $token)
     {
         $this->token = $token;
     }
 
-    /**
-     * @param string $defaultValue
-     */
     public function setDefaultValue(string $defaultValue): void
     {
         $this->defaultValue = $defaultValue;
     }
 
-    /**
-     * @return string
-     */
     public function getDefaultValue(): string
     {
         return $this->defaultValue;
     }
 
-    /**
-     * @return string
-     */
     public function getOrder(): string
     {
         return $this->order;
     }
 
-    /**
-     * @param string $order
-     */
     public function setOrder(string $order): void
     {
         $this->order = $order;
     }
 
-    /**
-     * @return string
-     */
     public function getWhere(): string
     {
         return $this->where;
     }
 
-    /**
-     * @param string $where
-     */
     public function setWhere(string $where): void
     {
         $this->where = $where;
     }
 
-    /**
-     * @return int
-     */
     public function getLimit(): int
     {
         return $this->limit;
     }
 
-    /**
-     * @param int $limit
-     */
     public function setLimit(int $limit): void
     {
         $this->limit = $limit;
     }
 
-    /**
-     * @return string
-     */
     public function getToken(): string
     {
         return $this->token;
     }
 
-    /**
-     * @return string
-     */
     public function getCustomFieldAlias(): string
     {
         return $this->customFieldAlias;
     }
 
-    /**
-     * @param string $customFieldAlias
-     */
     public function setCustomFieldAlias(string $customFieldAlias): void
     {
         $this->customFieldAlias = $customFieldAlias;
     }
 
-    /**
-     * @return string
-     */
     public function getCustomObjectAlias(): string
     {
         return $this->customObjectAlias;
     }
 
-    /**
-     * @param string $customObjectAlias
-     */
     public function setCustomObjectAlias(string $customObjectAlias): void
     {
         $this->customObjectAlias = $customObjectAlias;

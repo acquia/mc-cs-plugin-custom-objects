@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class CampaignActionLinkType extends AbstractType
@@ -33,10 +33,6 @@ class CampaignActionLinkType extends AbstractType
      */
     protected $translator;
 
-    /**
-     * @param CustomItemRouteProvider $routeProvider
-     * @param TranslatorInterface     $translator
-     */
     public function __construct(CustomItemRouteProvider $routeProvider, TranslatorInterface $translator)
     {
         $this->routeProvider = $routeProvider;
@@ -44,8 +40,7 @@ class CampaignActionLinkType extends AbstractType
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param mixed[]              $options
+     * @param mixed[] $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {

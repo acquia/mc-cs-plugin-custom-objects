@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Repository;
 
-use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Driver\Statement;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\AllydeBundle\Tests\TestingTrait;
+use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 
 class DbalQueryTraitTest extends \PHPUnit\Framework\TestCase
 {

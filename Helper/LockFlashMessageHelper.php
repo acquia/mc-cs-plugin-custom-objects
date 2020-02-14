@@ -40,12 +40,6 @@ class LockFlashMessageHelper
      */
     private $router;
 
-    /**
-     * @param CoreParametersHelper $coreParametersHelper
-     * @param TranslatorInterface  $translator
-     * @param FlashBag             $flashBag
-     * @param Router               $router
-     */
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
         TranslatorInterface $translator,
@@ -60,8 +54,6 @@ class LockFlashMessageHelper
 
     /**
      * @param mixed  $entity
-     * @param string $returnUrl
-     * @param bool   $canEdit
      * @param string $modelName pattern 'bundle.modelName'
      */
     public function addFlash($entity, string $returnUrl, bool $canEdit, string $modelName): void

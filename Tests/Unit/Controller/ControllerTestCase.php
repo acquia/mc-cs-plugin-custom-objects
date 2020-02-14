@@ -13,21 +13,21 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\HttpKernel;
-use Symfony\Component\HttpFoundation\Response;
-use Mautic\CoreBundle\Templating\Engine\PhpEngine;
+use Mautic\CoreBundle\Controller\MauticController;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Model\NotificationModel;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Templating\Engine\PhpEngine;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Mautic\CoreBundle\Controller\MauticController;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpKernel\HttpKernel;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * Even though we use nice controllers with defined dependencies, when we call some method like

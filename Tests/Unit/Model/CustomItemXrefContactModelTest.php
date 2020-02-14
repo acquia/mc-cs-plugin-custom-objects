@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Model;
 
-use Doctrine\ORM\EntityManager;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\AbstractQuery;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel;
 use DateTime;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Query\QueryBuilder as DBALQueryBuilder;
 use Doctrine\DBAL\Driver\Statement;
+use Doctrine\DBAL\Query\QueryBuilder as DBALQueryBuilder;
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomItemXrefContactModelTest extends \PHPUnit\Framework\TestCase

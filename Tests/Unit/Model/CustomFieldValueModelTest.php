@@ -13,22 +13,22 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Model;
 
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use Doctrine\ORM\EntityManager;
-use MauticPlugin\CustomObjectsBundle\Model\CustomFieldValueModel;
 use Doctrine\Common\Collections\ArrayCollection;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Statement;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\EntityManager;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Model\CustomFieldValueModel;
 use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class CustomFieldValueModelTest extends \PHPUnit\Framework\TestCase
 {

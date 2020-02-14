@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer;
 
-use Symfony\Component\Form\DataTransformerInterface;
 use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
+use Symfony\Component\Form\DataTransformerInterface;
 
 class CsvTransformer implements DataTransformerInterface
 {

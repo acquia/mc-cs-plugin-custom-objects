@@ -20,11 +20,11 @@ use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\HiddenType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
-use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 
 class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterface
 {
@@ -50,12 +50,6 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
      */
     private $fieldTypeProvider;
 
-    /**
-     * @param CustomObjectRepository  $customObjectRepository
-     * @param TranslatorInterface     $translator
-     * @param ConfigProvider          $configProvider
-     * @param CustomFieldTypeProvider $fieldTypeProvider
-     */
     public function __construct(
         CustomObjectRepository $customObjectRepository,
         TranslatorInterface $translator,
@@ -76,9 +70,6 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
         return [LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE => 'onGenerateSegmentFilters'];
     }
 
-    /**
-     * @param LeadListFiltersChoicesEvent $event
-     */
     public function onGenerateSegmentFilters(LeadListFiltersChoicesEvent $event): void
     {
         if (!$this->configProvider->pluginIsEnabled()) {
@@ -128,8 +119,6 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
     }
 
     /**
-     * @param CustomField $customField
-     *
      * @return mixed[]
      */
     private function getFieldProperties(CustomField $customField): array

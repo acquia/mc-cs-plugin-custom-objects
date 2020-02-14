@@ -24,11 +24,6 @@ class CustomFieldValueText extends AbstractCustomFieldValue
      */
     private $value;
 
-    /**
-     * @param CustomField $customField
-     * @param CustomItem  $customItem
-     * @param string|null $value
-     */
     public function __construct(CustomField $customField, CustomItem $customItem, ?string $value = null)
     {
         parent::__construct($customField, $customItem);
@@ -39,8 +34,6 @@ class CustomFieldValueText extends AbstractCustomFieldValue
     /**
      * Doctrine doesn't support prefix indexes. It's being added in the updatePluginSchema method.
      * $builder->addIndex(['value(64)'], 'value_index');.
-     *
-     * @param ORM\ClassMetadata $metadata
      */
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {

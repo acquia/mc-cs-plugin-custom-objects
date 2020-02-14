@@ -21,10 +21,6 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
  */
 trait QueryBuilderManipulatorTrait
 {
-    /**
-     * @param QueryBuilder $fromQueryBuilder
-     * @param QueryBuilder $toQueryBuilder
-     */
     private function copyParams(QueryBuilder $fromQueryBuilder, QueryBuilder $toQueryBuilder): void
     {
         foreach ($fromQueryBuilder->getParameters() as $key => $value) {
@@ -36,10 +32,6 @@ trait QueryBuilderManipulatorTrait
     /**
      * Empty and NotEmpty operators require different/opposite behaviour than what segment helper does.
      * We have to handle it ourselves here.
-     *
-     * @param string              $operator
-     * @param string              $queryAlias
-     * @param SegmentQueryBuilder $innerQueryBuilder
      */
     private function handleEmptyOperators(string $operator, string $queryAlias, SegmentQueryBuilder $innerQueryBuilder): void
     {

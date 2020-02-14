@@ -13,20 +13,20 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
+use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Form\FormFactory;
-use Mautic\CoreBundle\Controller\CommonController;
-use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
+use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
+use Symfony\Component\Form\FormFactory;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class FormController extends CommonController
 {
@@ -65,15 +65,6 @@ class FormController extends CommonController
      */
     private $objectRouteProvider;
 
-    /**
-     * @param FormFactory                   $formFactory
-     * @param CustomFieldModel              $customFieldModel
-     * @param CustomFieldFactory            $customFieldFactory
-     * @param CustomFieldPermissionProvider $permissionProvider
-     * @param CustomFieldRouteProvider      $fieldRouteProvider
-     * @param CustomObjectModel             $customObjectModel
-     * @param CustomObjectRouteProvider     $objectRouteProvider
-     */
     public function __construct(
         FormFactory $formFactory,
         CustomFieldModel $customFieldModel,
@@ -92,11 +83,6 @@ class FormController extends CommonController
         $this->objectRouteProvider     = $objectRouteProvider;
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return Response
-     */
     public function renderFormAction(Request $request): Response
     {
         $objectId   = (int) $request->get('objectId');

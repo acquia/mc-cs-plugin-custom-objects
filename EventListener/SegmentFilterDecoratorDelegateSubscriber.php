@@ -25,9 +25,6 @@ class SegmentFilterDecoratorDelegateSubscriber implements EventSubscriberInterfa
      */
     private $multiselectDecorator;
 
-    /**
-     * @param MultiselectDecorator $multiselectDecorator
-     */
     public function __construct(MultiselectDecorator $multiselectDecorator)
     {
         $this->multiselectDecorator = $multiselectDecorator;
@@ -43,9 +40,6 @@ class SegmentFilterDecoratorDelegateSubscriber implements EventSubscriberInterfa
         ];
     }
 
-    /**
-     * @param LeadListFiltersDecoratorDelegateEvent $delegateEvent
-     */
     public function onDecoratorDelegate(LeadListFiltersDecoratorDelegateEvent $delegateEvent): void
     {
         $crate = $delegateEvent->getCrate();

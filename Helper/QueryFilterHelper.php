@@ -32,22 +32,12 @@ class QueryFilterHelper
      */
     private $fieldTypeProvider;
 
-    /**
-     * @param CustomFieldTypeProvider $fieldTypeProvider
-     */
     public function __construct(CustomFieldTypeProvider $fieldTypeProvider)
     {
         $this->fieldTypeProvider = $fieldTypeProvider;
     }
 
     /**
-     * @param Connection  $connection
-     * @param string      $builderAlias
-     * @param int         $fieldId
-     * @param string|null $fieldType
-     *
-     * @return QueryBuilder
-     *
      * @throws NotFoundException
      */
     public function createValueQueryBuilder(
@@ -64,12 +54,6 @@ class QueryFilterHelper
         return $valueQueryBuilder;
     }
 
-    /**
-     * @param Connection $connection
-     * @param string     $queryBuilderAlias
-     *
-     * @return QueryBuilder
-     */
     public function createItemNameQueryBuilder(Connection $connection, string $queryBuilderAlias): QueryBuilder
     {
         $queryBuilder = new QueryBuilder($connection);
@@ -80,10 +64,6 @@ class QueryFilterHelper
     /**
      * Limit the result to given contact Id, table used is selected by availability
      * CustomFieldValue and CustomItemName are supported.
-     *
-     * @param QueryBuilder $queryBuilder
-     * @param string       $queryAlias
-     * @param int          $contactId
      *
      * @throws InvalidArgumentException
      */
@@ -103,11 +83,6 @@ class QueryFilterHelper
         $queryBuilder->setParameter('contact_id_'.$contactId, $contactId);
     }
 
-    /**
-     * @param QueryBuilder         $queryBuilder
-     * @param string               $tableAlias
-     * @param ContactSegmentFilter $filter
-     */
     public function addCustomFieldValueExpressionFromSegmentFilter(
         QueryBuilder $queryBuilder,
         string $tableAlias,
@@ -119,11 +94,6 @@ class QueryFilterHelper
             $filter->getParameterValue());
     }
 
-    /**
-     * @param QueryBuilder         $queryBuilder
-     * @param string               $tableAlias
-     * @param ContactSegmentFilter $filter
-     */
     public function addCustomObjectNameExpressionFromSegmentFilter(QueryBuilder $queryBuilder, string $tableAlias, ContactSegmentFilter $filter): void
     {
         $expression = $this->getCustomObjectNameExpression($queryBuilder, $tableAlias, $filter->getOperator());
@@ -133,9 +103,6 @@ class QueryFilterHelper
     /**
      * Limit the result of query builder to given value of in CustomFieldValue.
      *
-     * @param QueryBuilder                     $queryBuilder
-     * @param string                           $tableAlias
-     * @param string                           $operator
      * @param array|string|CompositeExpression $value
      */
     public function addCustomFieldValueExpression(QueryBuilder $queryBuilder, string $tableAlias, string $operator, $value): void
@@ -144,12 +111,6 @@ class QueryFilterHelper
         $this->addOperatorExpression($queryBuilder, $tableAlias, $expression, $operator, $value);
     }
 
-    /**
-     * @param QueryBuilder $queryBuilder
-     * @param string       $tableAlias
-     * @param string       $operator
-     * @param string|null  $value
-     */
     public function addCustomObjectNameExpression(
         QueryBuilder $queryBuilder,
         string $tableAlias,
@@ -161,10 +122,7 @@ class QueryFilterHelper
     }
 
     /**
-     * @param QueryBuilder                          $queryBuilder
-     * @param string                                $tableAlias
      * @param CompositeExpression|string            $expression
-     * @param string                                $operator
      * @param array|string|CompositeExpression|null $value
      */
     public function addOperatorExpression(
@@ -209,11 +167,6 @@ class QueryFilterHelper
     /**
      * Limit the result of queryBuilder to result of customQuery.
      *
-     * @param QueryBuilder $queryBuilder
-     * @param QueryBuilder $customQuery
-     * @param string       $glue
-     * @param string       $operator
-     *
      * @throws DBALException
      */
     public function addValueExpressionFromQueryBuilder(
@@ -238,12 +191,6 @@ class QueryFilterHelper
         $queryBuilder->setParametersPairs(array_keys($customQuery->getParameters()), array_values($customQuery->getParameters()));
     }
 
-    /**
-     * @param QueryBuilder $queryBuilder
-     * @param int          $customFieldId
-     *
-     * @return string
-     */
     private function getCustomFieldType(QueryBuilder $queryBuilder, int $customFieldId): string
     {
         $qb = $queryBuilder->getConnection()->createQueryBuilder();
@@ -258,10 +205,6 @@ class QueryFilterHelper
 
     /**
      * Form the logical expression needed to limit the CustomValue's value for given operator.
-     *
-     * @param QueryBuilder $customQuery
-     * @param string       $tableAlias
-     * @param string       $operator
      *
      * @return CompositeExpression|string
      */
@@ -324,10 +267,6 @@ class QueryFilterHelper
     /**
      * Form the logical expression needed to limit the CustomValue's value for given operator.
      *
-     * @param QueryBuilder $customQuery
-     * @param string       $tableAlias
-     * @param string       $operator
-     *
      * @return CompositeExpression|string
      */
     private function getCustomObjectNameExpression(QueryBuilder $customQuery, string $tableAlias, string $operator)
@@ -379,13 +318,6 @@ class QueryFilterHelper
     }
 
     /**
-     * @param QueryBuilder $customFieldQueryBuilder
-     * @param string       $alias
-     * @param string       $fieldType
-     * @param int          $fieldId
-     *
-     * @return QueryBuilder
-     *
      * @throws NotFoundException
      */
     private function addCustomFieldValueJoin(
@@ -414,8 +346,6 @@ class QueryFilterHelper
     /**
      * Get all tables currently registered in the queryBuilder.
      *
-     * @param QueryBuilder $queryBuilder
-     *
      * @return mixed[]
      */
     private function getQueryJoinAliases(QueryBuilder $queryBuilder): array
@@ -429,11 +359,6 @@ class QueryFilterHelper
 
     /**
      * Get basic query builder with contact reference and item join.
-     *
-     * @param QueryBuilder $queryBuilder
-     * @param string       $alias
-     *
-     * @return QueryBuilder
      */
     private function getBasicItemQueryBuilder(QueryBuilder $queryBuilder, string $alias): QueryBuilder
     {

@@ -44,8 +44,6 @@ class OptionsTransformer implements DataTransformerInterface
 
     /**
      * @param string[] $value
-     *
-     * @return ArrayCollection
      */
     public function reverseTransform($value): ArrayCollection
     {

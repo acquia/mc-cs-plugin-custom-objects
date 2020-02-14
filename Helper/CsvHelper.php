@@ -17,11 +17,6 @@ class CsvHelper
 {
     /**
      * @param mixed[] $row
-     * @param string  $delimiter
-     * @param string  $enclosure
-     * @param string  $escapeChar
-     *
-     * @return string
      */
     public function arrayToCsvLine(array $row, string $delimiter = ',', string $enclosure = '"', string $escapeChar = '\\'): string
     {
@@ -36,8 +31,6 @@ class CsvHelper
     }
 
     /**
-     * @param string $row
-     *
      * @return string[]
      */
     public static function csvLineToArray(string $row): array

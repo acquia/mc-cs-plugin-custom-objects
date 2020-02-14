@@ -16,10 +16,10 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Provider;
 use Mautic\CoreBundle\Translation\Translator;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateTimeType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateType;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
-use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomFieldTypeProviderTest extends \PHPUnit\Framework\TestCase
 {

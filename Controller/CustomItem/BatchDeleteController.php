@@ -13,16 +13,16 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Controller\CommonController;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use Mautic\CoreBundle\Service\FlashBag;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderInterface;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 class BatchDeleteController extends CommonController
 {
@@ -56,14 +56,6 @@ class BatchDeleteController extends CommonController
      */
     private $flashBag;
 
-    /**
-     * @param RequestStack                 $requestStack
-     * @param CustomItemModel              $customItemModel
-     * @param SessionProviderInterface     $sessionProvider
-     * @param CustomItemPermissionProvider $permissionProvider
-     * @param CustomItemRouteProvider      $routeProvider
-     * @param FlashBag                     $flashBag
-     */
     public function __construct(
         RequestStack $requestStack,
         CustomItemModel $customItemModel,
@@ -80,11 +72,6 @@ class BatchDeleteController extends CommonController
         $this->flashBag           = $flashBag;
     }
 
-    /**
-     * @param int $objectId
-     *
-     * @return Response
-     */
     public function deleteAction(int $objectId): Response
     {
         $request  = $this->requestStack->getCurrentRequest();

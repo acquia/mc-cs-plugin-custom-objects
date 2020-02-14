@@ -14,8 +14,8 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Doctrine\Common\EventSubscriber;
-use Doctrine\ORM\Events;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\Events;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
@@ -30,9 +30,6 @@ class CustomFieldPostLoadSubscriber implements EventSubscriber
      */
     private $customFieldTypeProvider;
 
-    /**
-     * @param CustomFieldTypeProvider $customFieldTypeProvider
-     */
     public function __construct(CustomFieldTypeProvider $customFieldTypeProvider)
     {
         $this->customFieldTypeProvider = $customFieldTypeProvider;
@@ -49,8 +46,6 @@ class CustomFieldPostLoadSubscriber implements EventSubscriber
     }
 
     /**
-     * @param LifecycleEventArgs $args
-     *
      * @throws NotFoundException
      */
     public function postLoad(LifecycleEventArgs $args): void

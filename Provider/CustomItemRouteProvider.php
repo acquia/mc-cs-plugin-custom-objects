@@ -52,32 +52,16 @@ class CustomItemRouteProvider
      */
     private $router;
 
-    /**
-     * @param RouterInterface $router
-     */
     public function __construct(RouterInterface $router)
     {
         $this->router = $router;
     }
 
-    /**
-     * @param int $objectId
-     * @param int $page
-     *
-     * @return string
-     */
     public function buildListRoute(int $objectId, int $page = 1): string
     {
         return $this->router->generate(static::ROUTE_LIST, ['objectId' => $objectId, 'page' => $page]);
     }
 
-    /**
-     * @param int    $customItemId
-     * @param string $entityType
-     * @param int    $entityId
-     *
-     * @return string
-     */
     public function buildUnlinkRoute(int $customItemId, string $entityType, int $entityId): string
     {
         return $this->router->generate(
@@ -86,77 +70,39 @@ class CustomItemRouteProvider
         );
     }
 
-    /**
-     * @param int $objectId
-     *
-     * @return string
-     */
     public function buildNewRoute(int $objectId): string
     {
         return $this->router->generate(static::ROUTE_NEW, ['objectId' => $objectId]);
     }
 
-    /**
-     * @param int      $objectId
-     * @param int|null $itemId
-     *
-     * @return string
-     */
     public function buildSaveRoute(int $objectId, ?int $itemId = null): string
     {
         return $this->router->generate(static::ROUTE_SAVE, ['objectId' => $objectId, 'itemId' => $itemId]);
     }
 
-    /**
-     * @param int $objectId
-     * @param int $itemId
-     *
-     * @return string
-     */
     public function buildViewRoute(int $objectId, int $itemId): string
     {
         return $this->router->generate(static::ROUTE_VIEW, ['objectId' => $objectId, 'itemId' => $itemId]);
     }
 
-    /**
-     * @param int $objectId
-     * @param int $itemId
-     *
-     * @return string
-     */
     public function buildEditRoute(int $objectId, int $itemId): string
     {
         return $this->router->generate(static::ROUTE_EDIT, ['objectId' => $objectId, 'itemId' => $itemId]);
     }
 
-    /**
-     * @param int $objectId
-     * @param int $itemId
-     *
-     * @return string
-     */
     public function buildCloneRoute(int $objectId, int $itemId): string
     {
         return $this->router->generate(static::ROUTE_CLONE, ['objectId' => $objectId, 'itemId' => $itemId]);
     }
 
-    /**
-     * @param int $objectId
-     * @param int $itemId
-     *
-     * @return string
-     */
     public function buildDeleteRoute(int $objectId, int $itemId): string
     {
         return $this->router->generate(static::ROUTE_DELETE, ['objectId' => $objectId, 'itemId' => $itemId]);
     }
 
     /**
-     * @param int     $objectId
      * @param ?string $entityType
      * @param ?int    $entityId
-     *
-     * @return string
      */
     public function buildLookupRoute(int $objectId, ?string $entityType = null, ?int $entityId = null): string
     {
@@ -166,21 +112,11 @@ class CustomItemRouteProvider
         );
     }
 
-    /**
-     * @param int $objectId
-     *
-     * @return string
-     */
     public function buildBatchDeleteRoute(int $objectId): string
     {
         return $this->router->generate(static::ROUTE_BATCH_DELETE, ['objectId' => $objectId]);
     }
 
-    /**
-     * @param int $objectId
-     *
-     * @return string
-     */
     public function buildNewImportRoute(int $objectId): string
     {
         return $this->router->generate(static::ROUTE_IMPORT_ACTION, [
@@ -189,21 +125,11 @@ class CustomItemRouteProvider
         ]);
     }
 
-    /**
-     * @param int $objectId
-     *
-     * @return string
-     */
     public function buildListImportRoute(int $objectId): string
     {
         return $this->router->generate(static::ROUTE_IMPORT_LIST, ['object' => $this->buildImportRouteObject($objectId)]);
     }
 
-    /**
-     * @param int $objectId
-     *
-     * @return string
-     */
     private function buildImportRouteObject(int $objectId): string
     {
         return "custom-object:{$objectId}";

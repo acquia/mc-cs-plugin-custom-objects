@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits;
 
 use Mautic\CoreBundle\Entity\CommonEntity;
-use MauticPlugin\CustomObjectsBundle\Tests\Functional\Exception\FixtureNotFoundException;
 use MauticPlugin\CustomObjectsBundle\Entity\UniqueEntityInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Tests\Functional\Exception\FixtureNotFoundException;
+use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Trait FixtureObjectsTrait implements Liip fixtures with Alice and offers helper methods for handling them.
@@ -48,8 +48,6 @@ trait FixtureObjectsTrait
     }
 
     /**
-     * @param string $type
-     *
      * @return mixed[]
      *
      * @throws FixtureNotFoundException
@@ -64,11 +62,6 @@ trait FixtureObjectsTrait
     }
 
     /**
-     * @param string $type
-     * @param int    $index
-     *
-     * @return CommonEntity
-     *
      * @throws FixtureNotFoundException
      */
     public function getFixtureByEntityClassNameAndIndex(string $type, int $index): CommonEntity
@@ -86,8 +79,6 @@ trait FixtureObjectsTrait
 
     /**
      * @param string $id key specified in fixtures
-     *
-     * @return UniqueEntityInterface
      *
      * @throws FixtureNotFoundException
      */
@@ -116,9 +107,6 @@ trait FixtureObjectsTrait
         return $entities;
     }
 
-    /**
-     * @return string
-     */
     private function getFixturesDirectory(): string
     {
         /** @var KernelInterface $kernel */

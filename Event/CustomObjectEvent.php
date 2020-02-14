@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use Symfony\Component\EventDispatcher\Event;
 
 class CustomObjectEvent extends Event
 {
@@ -28,26 +28,17 @@ class CustomObjectEvent extends Event
      */
     private $isNew;
 
-    /**
-     * @param CustomObject $customObject
-     */
     public function __construct(CustomObject $customObject, bool $isNew = false)
     {
         $this->customObject = $customObject;
         $this->isNew        = $isNew;
     }
 
-    /**
-     * @return CustomObject
-     */
     public function getCustomObject(): CustomObject
     {
         return $this->customObject;
     }
 
-    /**
-     * @return bool
-     */
     public function entityIsNew(): bool
     {
         return $this->isNew;

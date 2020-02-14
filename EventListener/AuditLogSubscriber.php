@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
-use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
-use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
+use Mautic\CoreBundle\Model\AuditLogModel;
+use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class AuditLogSubscriber implements EventSubscriberInterface
@@ -54,8 +54,6 @@ class AuditLogSubscriber implements EventSubscriberInterface
 
     /**
      * Add a create/update entry to the audit log.
-     *
-     * @param CustomItemEvent $event
      */
     public function onCustomItemPostSave(CustomItemEvent $event): void
     {
@@ -76,8 +74,6 @@ class AuditLogSubscriber implements EventSubscriberInterface
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param CustomItemEvent $event
      */
     public function onCustomItemPostDelete(CustomItemEvent $event): void
     {
@@ -94,8 +90,6 @@ class AuditLogSubscriber implements EventSubscriberInterface
 
     /**
      * Add a create/update entry to the audit log.
-     *
-     * @param CustomObjectEvent $event
      */
     public function onCustomObjectPostSave(CustomObjectEvent $event): void
     {
@@ -116,8 +110,6 @@ class AuditLogSubscriber implements EventSubscriberInterface
 
     /**
      * Add a delete entry to the audit log.
-     *
-     * @param CustomObjectEvent $event
      */
     public function onCustomObjectPostDelete(CustomObjectEvent $event): void
     {

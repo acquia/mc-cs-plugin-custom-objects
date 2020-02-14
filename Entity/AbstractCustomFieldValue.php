@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 abstract class AbstractCustomFieldValue implements CustomFieldValueInterface
 {
@@ -30,19 +30,12 @@ abstract class AbstractCustomFieldValue implements CustomFieldValueInterface
      */
     protected $customItem;
 
-    /**
-     * @param CustomField $customField
-     * @param CustomItem  $customItem
-     */
     public function __construct(CustomField $customField, CustomItem $customItem)
     {
         $this->customField = $customField;
         $this->customItem  = $customItem;
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('customField', new Assert\NotBlank());
@@ -52,8 +45,6 @@ abstract class AbstractCustomFieldValue implements CustomFieldValueInterface
 
     /**
      * Allow different field types to validate the value.
-     *
-     * @param ExecutionContextInterface $context
      */
     public function validateValue(ExecutionContextInterface $context): void
     {
@@ -68,25 +59,16 @@ abstract class AbstractCustomFieldValue implements CustomFieldValueInterface
         }
     }
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->customField->getId();
     }
 
-    /**
-     * @return CustomField
-     */
     public function getCustomField(): CustomField
     {
         return $this->customField;
     }
 
-    /**
-     * @return CustomItem
-     */
     public function getCustomItem(): CustomItem
     {
         return $this->customItem;
@@ -100,9 +82,6 @@ abstract class AbstractCustomFieldValue implements CustomFieldValueInterface
         throw new \Exception('addValue is not implemented for '.self::class);
     }
 
-    /**
-     * @param ClassMetadataBuilder $builder
-     */
     protected static function addReferenceColumns(ClassMetadataBuilder $builder): void
     {
         $builder->createManyToOne('customField', CustomField::class)

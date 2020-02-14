@@ -10,8 +10,8 @@ use Mautic\CoreBundle\Test\MauticWebTestCase;
 use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
 use MauticPlugin\CustomObjectsBundle\EventListener\SegmentFiltersDictionarySubscriber;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
-use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
+use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
 
 class SegmentFiltersDictionarySubscriberTest extends MauticWebTestCase
 {
@@ -29,7 +29,7 @@ class SegmentFiltersDictionarySubscriberTest extends MauticWebTestCase
     {
         parent::setUp();
 
-        /** @var ManagerRegistry $managerRegistry */
+        /* @var ManagerRegistry $managerRegistry */
         $this->registry       = $this->getContainer()->get('doctrine');
         $this->entityManager  = $this->registry->getManager();
         $fixturesDirectory    = $this->getFixturesDirectory();

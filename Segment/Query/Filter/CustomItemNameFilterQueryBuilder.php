@@ -17,8 +17,8 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
-use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryBuilderManipulatorTrait;
+use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 
 class CustomItemNameFilterQueryBuilder extends BaseFilterQueryBuilder
 {
@@ -29,19 +29,12 @@ class CustomItemNameFilterQueryBuilder extends BaseFilterQueryBuilder
      */
     private $filterHelper;
 
-    /**
-     * @param RandomParameterName $randomParameterNameService
-     * @param QueryFilterHelper   $filterHelper
-     */
     public function __construct(RandomParameterName $randomParameterNameService, QueryFilterHelper $filterHelper)
     {
         parent::__construct($randomParameterNameService);
         $this->filterHelper = $filterHelper;
     }
 
-    /**
-     * @return string
-     */
     public static function getServiceId(): string
     {
         return 'mautic.lead.query.builder.custom_item.value';
