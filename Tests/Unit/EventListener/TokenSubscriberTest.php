@@ -455,7 +455,7 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
                 $this->assertSame('contact', $tableConfig->getParameter('filterEntityType'));
                 $this->assertSame(2345, $tableConfig->getParameter('filterEntityId'));
                 $this->assertSame($email, $tableConfig->getParameter('email'));
-                $this->isInstanceOf(Token::class, $tableConfig->getParameter('token'));
+                $this->assertInstanceOf(Token::class, $tableConfig->getParameter('token'));
 
                 return true;
             }))
