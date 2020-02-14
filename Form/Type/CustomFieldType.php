@@ -368,7 +368,7 @@ class CustomFieldType extends AbstractType
             }
 
             $form->remove('defaultValue');
-            $this->createDefaultValueInput($form, $customField, false);
+            $this->createDefaultValueInput($form, $customField);
         });
     }
 }
