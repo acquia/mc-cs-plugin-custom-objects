@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
-use MauticPlugin\CustomObjectsBundle\EventListener\AuditLogSubscriber;
-use Mautic\CoreBundle\Model\AuditLogModel;
 use Mautic\CoreBundle\Helper\IpLookupHelper;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
+use Mautic\CoreBundle\Model\AuditLogModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
+use MauticPlugin\CustomObjectsBundle\EventListener\AuditLogSubscriber;
 
 class AuditLogSubscriberTest extends \PHPUnit\Framework\TestCase
 {

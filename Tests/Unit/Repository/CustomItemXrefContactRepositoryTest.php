@@ -13,21 +13,21 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Repository;
 
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use Mautic\LeadBundle\Entity\Lead;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Query\Expr;
-use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
+use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\DBAL\Statement;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\QueryBuilder;
+use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
 
 class CustomItemXrefContactRepositoryTest extends \PHPUnit\Framework\TestCase
 {

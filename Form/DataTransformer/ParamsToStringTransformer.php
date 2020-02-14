@@ -24,9 +24,6 @@ class ParamsToStringTransformer implements DataTransformerInterface
      */
     private $serializer;
 
-    /**
-     * @param SerializerInterface $serializer
-     */
     public function __construct(SerializerInterface $serializer)
     {
         $this->serializer = $serializer;
@@ -36,8 +33,6 @@ class ParamsToStringTransformer implements DataTransformerInterface
      * Transforms an object (Params) to a string (json).
      *
      * @param Params|null $params
-     *
-     * @return string
      */
     public function transform($params = null): string
     {
@@ -57,8 +52,6 @@ class ParamsToStringTransformer implements DataTransformerInterface
      * Transforms a string (json) to an object (Params).
      *
      * @param string $params
-     *
-     * @return Params
      */
     public function reverseTransform($params): Params
     {

@@ -24,8 +24,6 @@ class CustomFieldOptionModel
 
     /**
      * CustomFieldOptionModel constructor.
-     *
-     * @param EntityManager $entityManager
      */
     public function __construct(
         EntityManager $entityManager
@@ -35,8 +33,6 @@ class CustomFieldOptionModel
 
     /**
      * @todo Move this logic into repo.
-     *
-     * @param int $customFieldId
      */
     public function deleteByCustomFieldId(int $customFieldId): void
     {

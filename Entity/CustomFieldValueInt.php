@@ -24,11 +24,6 @@ class CustomFieldValueInt extends AbstractCustomFieldValue
      */
     private $value;
 
-    /**
-     * @param CustomField $customField
-     * @param CustomItem  $customItem
-     * @param int|null    $value
-     */
     public function __construct(CustomField $customField, CustomItem $customItem, ?int $value = null)
     {
         parent::__construct($customField, $customItem);
@@ -36,9 +31,6 @@ class CustomFieldValueInt extends AbstractCustomFieldValue
         $this->value = $value;
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);

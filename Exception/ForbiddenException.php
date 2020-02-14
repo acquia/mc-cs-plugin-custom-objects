@@ -20,11 +20,8 @@ use Throwable;
 class ForbiddenException extends Exception
 {
     /**
-     * @param string         $permission
-     * @param string         $entityType
-     * @param int            $entityId
-     * @param int            $code
-     * @param Throwable|null $throwable
+     * @param string $entityType
+     * @param int    $entityId
      */
     public function __construct(
         string $permission,

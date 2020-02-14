@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Doctrine\DBAL\Types\Type;
 
 /**
  * Table for multiselect/checkbox option values.
@@ -28,8 +28,6 @@ class CustomFieldValueOption extends AbstractCustomFieldValue
     private $value;
 
     /**
-     * @param CustomField          $customField
-     * @param CustomItem           $customItem
      * @param string|string[]|null $value
      */
     public function __construct(CustomField $customField, CustomItem $customItem, $value = null)
@@ -39,9 +37,6 @@ class CustomFieldValueOption extends AbstractCustomFieldValue
         $this->setValue($value);
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);

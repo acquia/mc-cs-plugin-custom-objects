@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class SelectType extends AbstractTextType
 {
@@ -37,9 +37,6 @@ class SelectType extends AbstractTextType
         'multiple' => false,
     ];
 
-    /**
-     * @return string
-     */
     public function getSymfonyFormFieldType(): string
     {
         return ChoiceType::class;

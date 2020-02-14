@@ -35,10 +35,6 @@ class CustomFieldTypeProvider
     }
 
     /**
-     * @param string $key
-     *
-     * @return CustomFieldTypeInterface
-     *
      * @throws NotFoundException
      */
     public function getType(string $key): CustomFieldTypeInterface
@@ -50,9 +46,6 @@ class CustomFieldTypeProvider
         throw new NotFoundException("Field type '{$key}' does not exist.");
     }
 
-    /**
-     * @param CustomFieldTypeInterface $customFieldType
-     */
     public function addType(CustomFieldTypeInterface $customFieldType): void
     {
         $this->customFieldTypes[$customFieldType->getKey()] = $customFieldType;
@@ -67,7 +60,7 @@ class CustomFieldTypeProvider
         $types   = $this->getTypes();
 
         array_walk($types, function ($key, $val) use (&$mapping): void {
-            /** @var AbstractCustomFieldType $key */
+            /* @var AbstractCustomFieldType $key */
             $mapping[$key::NAME] = $val;
         });
 

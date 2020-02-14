@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
+use Doctrine\ORM\Event\LifecycleEventArgs;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldPostLoadSubscriber;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
-use Doctrine\ORM\Event\LifecycleEventArgs;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomFieldPostLoadSubscriberTest extends \PHPUnit\Framework\TestCase

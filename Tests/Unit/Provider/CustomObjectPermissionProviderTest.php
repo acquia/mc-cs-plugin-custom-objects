@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Provider;
 
-use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
+use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use Mautic\CoreBundle\Entity\FormEntity;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 
 /**
  * Tests methods in the AbstractPermissionProvider by CustomObjectPermissionProvider.

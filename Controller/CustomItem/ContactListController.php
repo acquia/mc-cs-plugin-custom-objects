@@ -23,11 +23,6 @@ class ContactListController extends CommonController
 
     /**
      * @codeCoverageIgnore as this just calls a Mautic core method
-     *
-     * @param int $objectId
-     * @param int $page
-     *
-     * @return Response
      */
     public function listAction(int $objectId, int $page = 1): Response
     {

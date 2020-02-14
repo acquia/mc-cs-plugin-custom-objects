@@ -13,23 +13,17 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Repository;
 
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use Doctrine\ORM\Query\Expr\Join;
+use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use Doctrine\ORM\Query\Expr\Join;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
-use Mautic\CoreBundle\Entity\CommonRepository;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 class CustomItemRepository extends CommonRepository
 {
     use DbalQueryTrait;
 
-    /**
-     * @param CustomObject $customObject
-     * @param Lead         $contact
-     *
-     * @return int
-     */
     public function countItemsLinkedToContact(CustomObject $customObject, Lead $contact): int
     {
         $queryBuilder = $this->createQueryBuilder('ci', 'ci.id');
@@ -43,12 +37,6 @@ class CustomItemRepository extends CommonRepository
         return (int) $queryBuilder->getQuery()->getSingleScalarResult();
     }
 
-    /**
-     * @param CustomObject $customObject
-     * @param CustomItem   $customItem
-     *
-     * @return int
-     */
     public function countItemsLinkedToAnotherItem(CustomObject $customObject, CustomItem $customItem): int
     {
         $queryBuilder = $this->createQueryBuilder('ci', 'ci.id');
@@ -73,8 +61,6 @@ class CustomItemRepository extends CommonRepository
 
     /**
      * Used by internal Mautic methods. Use the contstant difectly instead.
-     *
-     * @return string
      */
     public function getTableAlias(): string
     {

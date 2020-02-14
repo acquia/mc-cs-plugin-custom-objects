@@ -13,21 +13,21 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
-use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
-use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Helper\UserHelper;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
-use Doctrine\ORM\NoResultException;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
+use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CustomItemXrefContactSubscriber implements EventSubscriberInterface
@@ -112,7 +112,6 @@ class CustomItemXrefContactSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param CustomItemXrefEntityDiscoveryEvent $event
      * @throws ORMException
      */
     public function onEntityLinkDiscovery(CustomItemXrefEntityDiscoveryEvent $event): void
@@ -134,7 +133,6 @@ class CustomItemXrefContactSubscriber implements EventSubscriberInterface
     /**
      * Save the xref only if it isn't in the entity manager already as it means it was loaded from the database already.
      *
-     * @param CustomItemXrefEntityEvent $event
      * @throws OptimisticLockException
      * @throws ORMException
      */
@@ -154,7 +152,6 @@ class CustomItemXrefContactSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param CustomItemXrefEntityEvent $event
      * @throws ORMException
      * @throws OptimisticLockException
      */
@@ -167,7 +164,6 @@ class CustomItemXrefContactSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param CustomItemXrefEntityEvent $event
      * @throws ORMException
      * @throws OptimisticLockException
      */
@@ -179,8 +175,6 @@ class CustomItemXrefContactSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param CustomItemXrefContact $xRef
-     * @param string $eventName
      * @throws ORMException
      * @throws OptimisticLockException
      */
@@ -194,12 +188,7 @@ class CustomItemXrefContactSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param Lead    $contact
-     * @param string  $action
-     * @param int     $objectId
      * @param mixed[] $properties
-     *
-     * @return LeadEventLog
      */
     private function initContactEventLog(Lead $contact, string $action, int $objectId, array $properties = []): LeadEventLog
     {
@@ -217,12 +206,7 @@ class CustomItemXrefContactSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param int $customItemId
-     * @param int $contactId
-     *
-     * @return CustomItemXrefContact
-     *
-     * @throws NoResultException if the reference does not exist
+     * @throws NoResultException        if the reference does not exist
      * @throws NonUniqueResultException
      */
     private function getContactXrefEntity(int $customItemId, int $contactId): CustomItemXrefContact

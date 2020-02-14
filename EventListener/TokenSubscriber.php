@@ -13,31 +13,31 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use Mautic\EmailBundle\EmailEvents;
-use Mautic\EmailBundle\Event\EmailSendEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
-use Mautic\CoreBundle\Event\BuilderEvent;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
-use Mautic\LeadBundle\Entity\LeadList;
-use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
-use MauticPlugin\CustomObjectsBundle\Helper\TokenParser;
-use MauticPlugin\CustomObjectsBundle\DTO\Token;
-use Mautic\EmailBundle\Entity\Email;
-use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CampaignBundle\Entity\Event;
-use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
+use Mautic\CampaignBundle\Model\EventModel;
+use Mautic\CoreBundle\Event\BuilderEvent;
+use Mautic\EmailBundle\EmailEvents;
+use Mautic\EmailBundle\Entity\Email;
+use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
+use Mautic\LeadBundle\Entity\LeadList;
+use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
+use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
+use MauticPlugin\CustomObjectsBundle\DTO\Token;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryBuilderManipulatorTrait;
+use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
+use MauticPlugin\CustomObjectsBundle\Helper\TokenParser;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
+use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Handles Custom Object token replacements with the correct value in emails.
@@ -82,15 +82,6 @@ class TokenSubscriber implements EventSubscriberInterface
      */
     private $eventModel;
 
-    /**
-     * @param ConfigProvider     $configProvider
-     * @param QueryFilterHelper  $queryFilterHelper
-     * @param QueryFilterFactory $queryFilterFactory
-     * @param CustomObjectModel  $customObjectModel
-     * @param CustomItemModel    $customItemModel
-     * @param TokenParser        $tokenParser
-     * @param EventModel         $eventModel
-     */
     public function __construct(
         ConfigProvider $configProvider,
         QueryFilterHelper $queryFilterHelper,
@@ -122,9 +113,6 @@ class TokenSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param BuilderEvent $event
-     */
     public function onBuilderBuild(BuilderEvent $event): void
     {
         if (!$this->configProvider->pluginIsEnabled()) {
@@ -153,9 +141,6 @@ class TokenSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param EmailSendEvent $event
-     */
     public function decodeTokens(EmailSendEvent $event): void
     {
         if (!$this->configProvider->pluginIsEnabled()) {
@@ -184,8 +169,6 @@ class TokenSubscriber implements EventSubscriberInterface
 
     /**
      * Add some where conditions to the query requesting the right custom items for the token replacement.
-     *
-     * @param CustomItemListDbalQueryEvent $event
      */
     public function onListQuery(CustomItemListDbalQueryEvent $event): void
     {
@@ -255,8 +238,6 @@ class TokenSubscriber implements EventSubscriberInterface
      * This method searches for the right custom items and the right custom field values.
      * The custom field filters are actually added in the method `onListQuery` above.
      *
-     * @param CustomObject       $customObject
-     * @param Token              $token
      * @param EmEmailSendEventil $event
      *
      * @return mixed[]

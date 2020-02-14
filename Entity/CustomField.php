@@ -18,18 +18,18 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
-use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Constraints as Assert;
 use Mautic\CoreBundle\Entity\FormEntity;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\AbstractMultivalueType;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\StaticChoiceTypeInterface;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class CustomField extends FormEntity implements UniqueEntityInterface
 {
@@ -121,9 +121,6 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         ];
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -169,9 +166,6 @@ class CustomField extends FormEntity implements UniqueEntityInterface
             ->build();
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('label', new Assert\NotBlank());
@@ -186,8 +180,6 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
     /**
      * Allow different field types to validate the value.
-     *
-     * @param ExecutionContextInterface $context
      */
     public function validateDefaultValue(ExecutionContextInterface $context): void
     {
@@ -200,9 +192,6 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         }
     }
 
-    /**
-     * @param int|null $id
-     */
     public function setId(?int $id): void
     {
         $this->id = $id;
@@ -216,18 +205,12 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         return $this->id;
     }
 
-    /**
-     * @param string|null $label
-     */
     public function setLabel(?string $label): void
     {
         $this->isChanged('label', $label);
         $this->label = $label;
     }
 
-    /**
-     * @return string|null
-     */
     public function getLabel(): ?string
     {
         return $this->label;
@@ -235,8 +218,6 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
     /**
      * Alias for abstractions. Do not use.
-     *
-     * @return string|null
      */
     public function getName(): ?string
     {
@@ -260,33 +241,21 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         return $this->alias;
     }
 
-    /**
-     * @param string|null $type
-     */
     public function setType(?string $type): void
     {
         $this->type = $type;
     }
 
-    /**
-     * @return string|null
-     */
     public function getType(): ?string
     {
         return $this->type;
     }
 
-    /**
-     * @param CustomFieldTypeInterface $typeObject
-     */
     public function setTypeObject(CustomFieldTypeInterface $typeObject): void
     {
         $this->typeObject = $typeObject;
     }
 
-    /**
-     * @return CustomFieldTypeInterface|null
-     */
     public function getTypeObject(): ?CustomFieldTypeInterface
     {
         return $this->typeObject;
@@ -321,9 +290,6 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         return array_replace_recursive($fieldTypeOptions, $fieldOptions, $customOptions);
     }
 
-    /**
-     * @return CustomObject|null
-     */
     public function getCustomObject(): ?CustomObject
     {
         return $this->customObject;
@@ -340,25 +306,16 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         }
     }
 
-    /**
-     * @return int|null
-     */
     public function getOrder(): ?int
     {
         return $this->order;
     }
 
-    /**
-     * @param int|null $order
-     */
     public function setOrder(?int $order): void
     {
         $this->order = $order;
     }
 
-    /**
-     * @return bool
-     */
     public function isRequired(): bool
     {
         return $this->required;
@@ -432,9 +389,6 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         $this->options = $options;
     }
 
-    /**
-     * @param CustomFieldOption $option
-     */
     public function removeOption(CustomFieldOption $option): void
     {
         $this->options->removeElement($option);
@@ -475,10 +429,6 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * Method for multi/select fields that will convert a value to its label.
      *
-     * @param string $value
-     *
-     * @return string
-     *
      * @throws NotFoundException
      */
     public function valueToLabel(string $value): string
@@ -517,18 +467,12 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         $this->params = $params;
     }
 
-    /**
-     * @return bool
-     */
     public function isChoiceType(): bool
     {
         return ChoiceType::class === $this->getTypeObject()->getSymfonyFormFieldType() ||
             is_subclass_of($this->getTypeObject()->getSymfonyFormFieldType(), ChoiceType::class);
     }
 
-    /**
-     * @return bool
-     */
     public function canHaveMultipleValues(): bool
     {
         return $this->getTypeObject() instanceof AbstractMultivalueType;

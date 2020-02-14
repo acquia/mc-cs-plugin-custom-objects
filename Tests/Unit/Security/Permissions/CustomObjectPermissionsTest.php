@@ -152,9 +152,9 @@ class CustomObjectPermissionsTest extends TestCase
 
     public function testBuildForm(): void
     {
-        $objectId = 45;
+        $objectId         = 45;
         $objectNamePlural = 'Products';
-        $translation = 'Products - User has access to';
+        $translation      = 'Products - User has access to';
 
         $this->customObject->expects($this->once())
             ->method('getId')

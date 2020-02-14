@@ -13,13 +13,13 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Model\FormModel;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use Mautic\LeadBundle\Entity\Import;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\LeadBundle\Entity\Import;
 use Mautic\UserBundle\Entity\User;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
 class CustomItemImportModel extends FormModel
@@ -39,11 +39,6 @@ class CustomItemImportModel extends FormModel
      */
     private $formatterHelper;
 
-    /**
-     * @param EntityManager   $entityManager
-     * @param CustomItemModel $customItemModel
-     * @param FormatterHelper $formatterHelper
-     */
     public function __construct(
         EntityManager $entityManager,
         CustomItemModel $customItemModel,
@@ -55,9 +50,7 @@ class CustomItemImportModel extends FormModel
     }
 
     /**
-     * @param Import       $import
-     * @param mixed[]      $rowData
-     * @param CustomObject $customObject
+     * @param mixed[] $rowData
      *
      * @return bool updated = true, inserted = false
      */
@@ -114,10 +107,7 @@ class CustomItemImportModel extends FormModel
     }
 
     /**
-     * @param CustomItem $customItem
-     * @param int[]      $contactIds
-     *
-     * @return CustomItem
+     * @param int[] $contactIds
      */
     private function linkContacts(CustomItem $customItem, array $contactIds): CustomItem
     {
@@ -129,12 +119,6 @@ class CustomItemImportModel extends FormModel
         return $customItem;
     }
 
-    /**
-     * @param Import     $import
-     * @param CustomItem $customItem
-     *
-     * @return CustomItem
-     */
     private function setOwner(Import $import, CustomItem $customItem): CustomItem
     {
         $owner = $import->getDefault('owner');
@@ -150,11 +134,7 @@ class CustomItemImportModel extends FormModel
     }
 
     /**
-     * @param Import       $import
-     * @param CustomObject $customObject
-     * @param mixed[]      $rowData
-     *
-     * @return CustomItem
+     * @param mixed[] $rowData
      */
     private function getCustomItem(Import $import, CustomObject $customObject, array $rowData): CustomItem
     {

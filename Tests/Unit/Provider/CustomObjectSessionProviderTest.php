@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Provider;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectSessionProvider;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 /**
  * Tests methods in the AbstractSessionProvider by CustomObjectSessionProvider.

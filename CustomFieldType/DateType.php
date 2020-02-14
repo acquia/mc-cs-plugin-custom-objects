@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
+use DateTimeInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\DateTransformer;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\ViewDateTransformer;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueDate;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
 use Symfony\Component\Form\DataTransformerInterface;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\ViewDateTransformer;
-use DateTimeInterface;
 
 class DateType extends AbstractCustomFieldType
 {
@@ -50,11 +50,7 @@ class DateType extends AbstractCustomFieldType
     ];
 
     /**
-     * @param CustomField $customField
-     * @param CustomItem  $customItem
-     * @param mixed|null  $value
-     *
-     * @return CustomFieldValueInterface
+     * @param mixed|null $value
      *
      * @throws InvalidValueException
      */
@@ -73,17 +69,11 @@ class DateType extends AbstractCustomFieldType
         return new CustomFieldValueDate($customField, $customItem, $value);
     }
 
-    /**
-     * @return string
-     */
     public function getSymfonyFormFieldType(): string
     {
         return \Symfony\Component\Form\Extension\Core\Type\DateType::class;
     }
 
-    /**
-     * @return string
-     */
     public function getEntityClass(): string
     {
         return CustomFieldValueDate::class;

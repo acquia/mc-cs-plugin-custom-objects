@@ -13,17 +13,17 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\EventListener;
 
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
 use Doctrine\ORM\EntityManager;
+use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\EventListener\CampaignSubscriber;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\CustomObjectsTrait;
-use MauticPlugin\CustomObjectsBundle\EventListener\CampaignSubscriber;
-use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class CampaignSubscriberTest extends KernelTestCase
 {
@@ -330,12 +330,7 @@ class CampaignSubscriberTest extends KernelTestCase
     }
 
     /**
-     * @param Lead   $contact
-     * @param int    $fieldId
-     * @param string $operator
-     * @param mixed  $fieldValue
-     *
-     * @return CampaignExecutionEvent
+     * @param mixed $fieldValue
      */
     private function createCampaignExecutionEvent(
         Lead $contact,
@@ -362,11 +357,6 @@ class CampaignSubscriberTest extends KernelTestCase
         );
     }
 
-    /**
-     * @param string $email
-     *
-     * @return Lead
-     */
     private function createContact(string $email): Lead
     {
         /** @var LeadModel $contactModel */

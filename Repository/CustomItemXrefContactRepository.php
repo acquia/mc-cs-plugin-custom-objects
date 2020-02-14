@@ -14,18 +14,15 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Repository;
 
 use Mautic\CoreBundle\Entity\CommonRepository;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Mautic\LeadBundle\Entity\Lead;
+use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
-use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 class CustomItemXrefContactRepository extends CommonRepository
 {
     /**
-     * @param Lead        $contact
-     * @param TableConfig $tableConfig
-     *
      * @return int[]
      */
     public function getCustomObjectsRelatedToContact(Lead $contact, TableConfig $tableConfig): array
@@ -46,8 +43,6 @@ class CustomItemXrefContactRepository extends CommonRepository
 
     /**
      * Used by internal Mautic methods. Use the contstant directly instead.
-     *
-     * @return string
      */
     public function getTableAlias(): string
     {

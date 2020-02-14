@@ -788,7 +788,6 @@ class CustomObjectFormTest extends MauticMysqlTestCase
 
     /**
      * @param string[] $expected
-     * @param int      $id
      */
     private function assertCustomObject(array $expected, int $id): void
     {

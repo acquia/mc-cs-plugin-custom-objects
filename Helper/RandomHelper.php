@@ -20,11 +20,6 @@ class RandomHelper
      */
     private $randomWords = [];
 
-    /**
-     * @param int $limit
-     *
-     * @return string
-     */
     public function getSentence(int $limit): string
     {
         $words = [];
@@ -36,11 +31,6 @@ class RandomHelper
         return ucfirst(implode(' ', $words));
     }
 
-    /**
-     * @param int $limit
-     *
-     * @return string
-     */
     public function getString(int $limit): string
     {
         $string = '';
@@ -52,9 +42,6 @@ class RandomHelper
         return substr($string, 0, $limit);
     }
 
-    /**
-     * @return string
-     */
     public function getWord(): string
     {
         $randomWords = $this->getRandomWords();

@@ -14,10 +14,10 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
-use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\EventListener\AssetsSubscriber;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 class AssetsSubscriberTest extends \PHPUnit\Framework\TestCase
 {

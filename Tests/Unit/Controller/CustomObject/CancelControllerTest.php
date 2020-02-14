@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomObject;
 
+use MauticPlugin\CustomObjectsBundle\Controller\CustomObject\CancelController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
-use MauticPlugin\CustomObjectsBundle\Controller\CustomObject\CancelController;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectSessionProvider;
+use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 
 class CancelControllerTest extends ControllerTestCase
 {

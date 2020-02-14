@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Model\FormModel;
-use Mautic\CoreBundle\Helper\Chart\LineChart;
-use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use DateTime;
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\Chart\ChartQuery;
+use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Model\FormModel;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomItemXrefContactModel extends FormModel
@@ -28,10 +28,6 @@ class CustomItemXrefContactModel extends FormModel
      */
     private $entityManager;
 
-    /**
-     * @param EntityManager       $entityManager
-     * @param TranslatorInterface $translator
-     */
     public function __construct(
         EntityManager $entityManager,
         TranslatorInterface $translator
@@ -41,10 +37,6 @@ class CustomItemXrefContactModel extends FormModel
     }
 
     /**
-     * @param DateTime   $from
-     * @param DateTime   $to
-     * @param CustomItem $customItem
-     *
      * @return mixed[]
      */
     public function getLinksLineChartData(
@@ -66,8 +58,6 @@ class CustomItemXrefContactModel extends FormModel
 
     /**
      * Used only by Mautic's generic methods. Use CustomItemPermissionProvider instead.
-     *
-     * @return string
      */
     public function getPermissionBase(): string
     {

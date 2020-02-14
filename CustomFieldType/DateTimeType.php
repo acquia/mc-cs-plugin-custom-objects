@@ -13,16 +13,16 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
+use DateTimeInterface;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\DateTimeAtomTransformer;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\DateTimeTransformer;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\ViewDateTransformer;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueDateTime;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
 use Symfony\Component\Form\DataTransformerInterface;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\ViewDateTransformer;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\DateTimeAtomTransformer;
-use DateTimeInterface;
 
 class DateTimeType extends AbstractCustomFieldType
 {
@@ -50,11 +50,7 @@ class DateTimeType extends AbstractCustomFieldType
     ];
 
     /**
-     * @param CustomField $customField
-     * @param CustomItem  $customItem
-     * @param mixed|null  $value
-     *
-     * @return CustomFieldValueInterface
+     * @param mixed|null $value
      *
      * @throws InvalidValueException
      */
@@ -73,17 +69,11 @@ class DateTimeType extends AbstractCustomFieldType
         return new CustomFieldValueDateTime($customField, $customItem, $value);
     }
 
-    /**
-     * @return string
-     */
     public function getSymfonyFormFieldType(): string
     {
         return \Symfony\Component\Form\Extension\Core\Type\DateTimeType::class;
     }
 
-    /**
-     * @return string
-     */
     public function getEntityClass(): string
     {
         return CustomFieldValueDateTime::class;

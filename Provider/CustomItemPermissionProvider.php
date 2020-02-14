@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Provider;
 
-use MauticPlugin\CustomObjectsBundle\Security\Permissions\CustomObjectPermissions;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Security\Permissions\CustomObjectPermissions;
 
 class CustomItemPermissionProvider
 {
@@ -25,18 +25,12 @@ class CustomItemPermissionProvider
      */
     private $corePermissions;
 
-    /**
-     * @param CorePermissions $corePermissions
-     */
     public function __construct(CorePermissions $corePermissions)
     {
         $this->corePermissions = $corePermissions;
     }
 
     /**
-     * @param string $permission
-     * @param int    $customObjectId
-     *
      * @throws ForbiddenException
      */
     public function isGranted(string $permission, int $customObjectId): void
@@ -47,9 +41,6 @@ class CustomItemPermissionProvider
     }
 
     /**
-     * @param string     $permission
-     * @param CustomItem $entity
-     *
      * @throws ForbiddenException
      */
     public function hasEntityAccess(string $permission, CustomItem $entity): void
@@ -61,8 +52,6 @@ class CustomItemPermissionProvider
     }
 
     /**
-     * @param int $customObjectId
-     *
      * @throws ForbiddenException
      */
     public function canCreate(int $customObjectId): void
@@ -71,8 +60,6 @@ class CustomItemPermissionProvider
     }
 
     /**
-     * @param CustomItem $entity
-     *
      * @throws ForbiddenException
      */
     public function canView(CustomItem $entity): void
@@ -81,8 +68,6 @@ class CustomItemPermissionProvider
     }
 
     /**
-     * @param int $customObjectId
-     *
      * @throws ForbiddenException
      */
     public function canViewAtAll(int $customObjectId): void
@@ -91,8 +76,6 @@ class CustomItemPermissionProvider
     }
 
     /**
-     * @param CustomItem $entity
-     *
      * @throws ForbiddenException
      */
     public function canEdit(CustomItem $entity): void
@@ -101,8 +84,6 @@ class CustomItemPermissionProvider
     }
 
     /**
-     * @param CustomItem $entity
-     *
      * @throws ForbiddenException
      */
     public function canClone(CustomItem $entity): void
@@ -115,8 +96,6 @@ class CustomItemPermissionProvider
     }
 
     /**
-     * @param CustomItem $entity
-     *
      * @throws ForbiddenException
      */
     public function canDelete(CustomItem $entity): void
@@ -124,12 +103,6 @@ class CustomItemPermissionProvider
         $this->hasEntityAccess('delete', $entity);
     }
 
-    /**
-     * @param int    $customObjectId
-     * @param string $permission
-     *
-     * @return string
-     */
     private function getPermissionName(int $customObjectId, string $permission): string
     {
         return sprintf('%s:%d:%s', CustomObjectPermissions::NAME, $customObjectId, $permission);

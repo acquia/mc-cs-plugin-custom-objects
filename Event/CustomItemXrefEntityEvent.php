@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefInterface;
+use Symfony\Component\EventDispatcher\Event;
 
 class CustomItemXrefEntityEvent extends Event
 {
@@ -23,17 +23,11 @@ class CustomItemXrefEntityEvent extends Event
      */
     private $xRef;
 
-    /**
-     * @param CustomItemXrefInterface $xRef
-     */
     public function __construct(CustomItemXrefInterface $xRef)
     {
         $this->xRef = $xRef;
     }
 
-    /**
-     * @return CustomItemXrefInterface
-     */
     public function getXref(): CustomItemXrefInterface
     {
         return $this->xRef;

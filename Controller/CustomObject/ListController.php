@@ -13,17 +13,17 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
-use Symfony\Component\HttpFoundation\RequestStack;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Mautic\CoreBundle\Controller\CommonController;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
-use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use Mautic\CoreBundle\Helper\InputHelper;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
-use Symfony\Component\HttpFoundation\Response;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectSessionProvider;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectSessionProvider;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 class ListController extends CommonController
 {
@@ -52,13 +52,6 @@ class ListController extends CommonController
      */
     private $routeProvider;
 
-    /**
-     * @param RequestStack                   $requestStack
-     * @param CustomObjectSessionProvider    $sessionProvider
-     * @param CustomObjectModel              $customObjectModel
-     * @param CustomObjectPermissionProvider $permissionProvider
-     * @param CustomObjectRouteProvider      $routeProvider
-     */
     public function __construct(
         RequestStack $requestStack,
         CustomObjectSessionProvider $sessionProvider,
@@ -73,11 +66,6 @@ class ListController extends CommonController
         $this->routeProvider      = $routeProvider;
     }
 
-    /**
-     * @param int $page
-     *
-     * @return Response
-     */
     public function listAction(int $page = 1): Response
     {
         try {

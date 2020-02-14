@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Entity;
 
+use DateTimeImmutable;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
-use DateTimeImmutable;
 use UnexpectedValueException;
 
 class CustomItemXrefCustomItemTest extends \PHPUnit\Framework\TestCase

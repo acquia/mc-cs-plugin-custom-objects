@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
+use DateTimeInterface;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use DateTimeInterface;
 
 class CustomFieldValueDate extends AbstractCustomFieldValue
 {
@@ -25,11 +25,6 @@ class CustomFieldValueDate extends AbstractCustomFieldValue
      */
     private $value;
 
-    /**
-     * @param CustomField            $customField
-     * @param CustomItem             $customItem
-     * @param DateTimeInterface|null $value
-     */
     public function __construct(CustomField $customField, CustomItem $customItem, ?DateTimeInterface $value = null)
     {
         parent::__construct($customField, $customItem);
@@ -37,9 +32,6 @@ class CustomFieldValueDate extends AbstractCustomFieldValue
         $this->setValue($value);
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);

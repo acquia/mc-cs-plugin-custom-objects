@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
-use libphonenumber\PhoneNumberUtil;
 use libphonenumber\NumberParseException;
+use libphonenumber\PhoneNumberUtil;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 
 class PhoneType extends AbstractTextType

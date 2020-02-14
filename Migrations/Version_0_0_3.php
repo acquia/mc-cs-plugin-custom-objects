@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Migrations;
 
-use Mautic\IntegrationsBundle\Migration\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
+use Mautic\IntegrationsBundle\Migration\AbstractMigration;
 
 class Version_0_0_3 extends AbstractMigration
 {

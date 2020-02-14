@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Provider;
 
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
-use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 
 class CustomItemPermissionProviderTest extends \PHPUnit\Framework\TestCase
 {

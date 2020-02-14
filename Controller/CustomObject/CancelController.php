@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Controller\CommonController;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectSessionProvider;
+use Symfony\Component\HttpFoundation\Response;
 
 class CancelController extends CommonController
 {
@@ -36,11 +36,6 @@ class CancelController extends CommonController
      */
     private $customObjectModel;
 
-    /**
-     * @param CustomObjectSessionProvider $sessionProvider
-     * @param CustomObjectRouteProvider   $routeProvider
-     * @param CustomObjectModel           $customObjectModel
-     */
     public function __construct(
         CustomObjectSessionProvider $sessionProvider,
         CustomObjectRouteProvider $routeProvider,
@@ -51,11 +46,6 @@ class CancelController extends CommonController
         $this->customObjectModel = $customObjectModel;
     }
 
-    /**
-     * @param int|null $objectId
-     *
-     * @return Response
-     */
     public function cancelAction(?int $objectId): Response
     {
         $page = $this->sessionProvider->getPage();

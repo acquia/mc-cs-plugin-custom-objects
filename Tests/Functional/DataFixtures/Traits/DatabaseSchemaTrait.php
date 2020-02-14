@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits;
 
-use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Tools\SchemaTool;
 
 trait DatabaseSchemaTrait
 {

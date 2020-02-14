@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Provider;
 
+use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use Mautic\CoreBundle\Entity\FormEntity;
 
 abstract class AbstractPermissionProvider
 {
@@ -26,17 +26,12 @@ abstract class AbstractPermissionProvider
      */
     private $corePermissions;
 
-    /**
-     * @param CorePermissions $corePermissions
-     */
     public function __construct(CorePermissions $corePermissions)
     {
         $this->corePermissions = $corePermissions;
     }
 
     /**
-     * @param string $permission
-     *
      * @throws ForbiddenException
      */
     public function isGranted(string $permission): void
@@ -47,9 +42,6 @@ abstract class AbstractPermissionProvider
     }
 
     /**
-     * @param string     $permission
-     * @param FormEntity $entity
-     *
      * @throws ForbiddenException
      */
     public function hasEntityAccess(string $permission, FormEntity $entity): void
@@ -70,8 +62,6 @@ abstract class AbstractPermissionProvider
     }
 
     /**
-     * @param FormEntity $entity
-     *
      * @throws ForbiddenException
      */
     public function canView(FormEntity $entity): void
@@ -88,8 +78,6 @@ abstract class AbstractPermissionProvider
     }
 
     /**
-     * @param FormEntity $entity
-     *
      * @throws ForbiddenException
      */
     public function canEdit(FormEntity $entity): void
@@ -98,8 +86,6 @@ abstract class AbstractPermissionProvider
     }
 
     /**
-     * @param FormEntity $entity
-     *
      * @throws ForbiddenException
      */
     public function canClone(FormEntity $entity): void
@@ -112,8 +98,6 @@ abstract class AbstractPermissionProvider
     }
 
     /**
-     * @param FormEntity $entity
-     *
      * @throws ForbiddenException
      */
     public function canDelete(FormEntity $entity): void

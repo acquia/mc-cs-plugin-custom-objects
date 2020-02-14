@@ -13,24 +13,24 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
-use MauticPlugin\CustomObjectsBundle\EventListener\CustomItemXrefContactSubscriber;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
+use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\QueryBuilder;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadEventLog;
+use Mautic\UserBundle\Entity\User;
+use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\UserBundle\Entity\User;
-use Mautic\LeadBundle\Entity\LeadEventLog;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
-use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Query\Expr;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
-use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\NoResultException;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
-use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
+use MauticPlugin\CustomObjectsBundle\EventListener\CustomItemXrefContactSubscriber;
 
 class CustomItemXrefContactSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -405,11 +405,6 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->xrefSubscriber->createNewEventLogForUnlinkedContact($this->event);
     }
 
-    /**
-     * @param string $action
-     *
-     * @return callable
-     */
     private function makePersistCallback(string $action): callable
     {
         return function (LeadEventLog $eventLog) use ($action) {

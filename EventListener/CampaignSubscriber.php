@@ -13,30 +13,30 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
-use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
-use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
-use MauticPlugin\CustomObjectsBundle\Form\Type\CampaignActionLinkType;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
-use MauticPlugin\CustomObjectsBundle\Form\Type\CampaignConditionFieldValueType;
-use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
-use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
-use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
-use Doctrine\DBAL\Connection;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CampaignActionLinkType;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CampaignConditionFieldValueType;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryBuilderManipulatorTrait;
+use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
+use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
+use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
+use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
@@ -117,8 +117,6 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     /**
      * Add event triggers and actions.
-     *
-     * @param CampaignBuilderEvent $event
      */
     public function onCampaignBuild(CampaignBuilderEvent $event): void
     {
@@ -148,9 +146,6 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param CampaignExecutionEvent $event
-     */
     public function onCampaignTriggerAction(CampaignExecutionEvent $event): void
     {
         if (!$this->configProvider->pluginIsEnabled()) {
@@ -186,7 +181,6 @@ class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param CampaignExecutionEvent $event
      * @throws NotFoundException
      * @throws DBALException
      * @throws InvalidArgumentException
@@ -252,9 +246,7 @@ class CampaignSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param CustomField $customField
-     * @param string      $operator
-     * @param mixed       $value
+     * @param mixed $value
      *
      * @return mixed[]
      */

@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 class AssetsSubscriber implements EventSubscriberInterface
 {
@@ -61,10 +61,6 @@ class AssetsSubscriber implements EventSubscriberInterface
 
     /**
      * Returns true for routes that starts with /s/.
-     *
-     * @param Request $request
-     *
-     * @return bool
      */
     private function isMauticAdministrationPage(Request $request): bool
     {

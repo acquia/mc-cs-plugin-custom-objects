@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Helper;
 
-use MauticPlugin\CustomObjectsBundle\Helper\TokenParser;
 use MauticPlugin\CustomObjectsBundle\DTO\Token;
+use MauticPlugin\CustomObjectsBundle\Helper\TokenParser;
 
 class TokenParserTest extends \PHPUnit\Framework\TestCase
 {

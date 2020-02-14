@@ -13,17 +13,13 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Repository;
 
-use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Driver\Statement;
+use Doctrine\DBAL\Query\QueryBuilder;
 
 trait DbalQueryTrait
 {
     /**
      * Method `execute` returns Statement of int. Ensure it's Statement. (PhpStan was complaining).
-     *
-     * @param QueryBuilder $queryBuilder
-     *
-     * @return Statement
      *
      * @throws \UnexpectedValueException
      */
@@ -35,8 +31,6 @@ trait DbalQueryTrait
             return $statement;
         }
 
-        throw new \UnexpectedValueException(
-            sprintf('Unexpected value of %s. Instance of %s expected.', print_r($statement, true), Statement::class)
-        );
+        throw new \UnexpectedValueException(sprintf('Unexpected value of %s. Instance of %s expected.', print_r($statement, true), Statement::class));
     }
 }

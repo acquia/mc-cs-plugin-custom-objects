@@ -13,20 +13,20 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\EventListener;
 
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
 use Doctrine\ORM\EntityManager;
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\LeadModel;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\CustomObjectsTrait;
-use MauticPlugin\CustomObjectsBundle\EventListener\TokenSubscriber;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Model\LeadModel;
 use Mautic\LeadBundle\Model\ListModel;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\EventListener\TokenSubscriber;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
+use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\CustomObjectsTrait;
+use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class TokenSubscriberTest extends KernelTestCase
 {
@@ -367,11 +367,6 @@ class TokenSubscriberTest extends KernelTestCase
         );
     }
 
-    /**
-     * @param string $email
-     *
-     * @return Lead
-     */
     private function createContact(string $email): Lead
     {
         /** @var LeadModel $contactModel */
@@ -385,8 +380,6 @@ class TokenSubscriberTest extends KernelTestCase
 
     /**
      * @param mixed[] $filters
-     *
-     * @return LeadList
      */
     private function createSegment(array $filters): LeadList
     {
@@ -401,9 +394,6 @@ class TokenSubscriberTest extends KernelTestCase
     }
 
     /**
-     * @param Lead     $contact
-     * @param LeadList $segment
-     *
      * @return LeadList
      */
     private function addContactToSegment(Lead $contact, LeadList $segment): void

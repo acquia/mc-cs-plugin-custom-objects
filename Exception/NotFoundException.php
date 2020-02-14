@@ -19,11 +19,6 @@ use Throwable;
 
 class NotFoundException extends Exception
 {
-    /**
-     * @param string         $message
-     * @param int            $code
-     * @param Throwable|null $throwable
-     */
     public function __construct(
         string $message = 'Not found',
         int $code = 404,

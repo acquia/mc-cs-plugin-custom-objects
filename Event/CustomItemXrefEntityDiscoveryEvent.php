@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefInterface;
+use Symfony\Component\EventDispatcher\Event;
 
 class CustomItemXrefEntityDiscoveryEvent extends Event
 {
@@ -39,11 +39,6 @@ class CustomItemXrefEntityDiscoveryEvent extends Event
      */
     private $customItemXrefEntity;
 
-    /**
-     * @param CustomItem $customItem
-     * @param string     $entityType
-     * @param int        $entityId
-     */
     public function __construct(CustomItem $customItem, string $entityType, int $entityId)
     {
         $this->customItem = $customItem;
@@ -51,33 +46,21 @@ class CustomItemXrefEntityDiscoveryEvent extends Event
         $this->entityId   = $entityId;
     }
 
-    /**
-     * @return CustomItem
-     */
     public function getCustomItem(): CustomItem
     {
         return $this->customItem;
     }
 
-    /**
-     * @return string
-     */
     public function getEntityType(): string
     {
         return $this->entityType;
     }
 
-    /**
-     * @return int
-     */
     public function getEntityId(): int
     {
         return $this->entityId;
     }
 
-    /**
-     * @param CustomItemXrefInterface $customItemXrefEntity
-     */
     public function setXrefEntity(CustomItemXrefInterface $customItemXrefEntity): void
     {
         $this->customItemXrefEntity = $customItemXrefEntity;

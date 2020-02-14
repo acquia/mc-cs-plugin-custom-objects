@@ -13,19 +13,19 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
-use MauticPlugin\CustomObjectsBundle\EventListener\CustomItemXrefCustomItemSubscriber;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
-use Doctrine\ORM\EntityManager;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
-use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Query\Expr;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
 use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\NoResultException;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\QueryBuilder;
+use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
+use MauticPlugin\CustomObjectsBundle\EventListener\CustomItemXrefCustomItemSubscriber;
 
 class CustomItemXrefCustomItemSubscriberTest extends \PHPUnit\Framework\TestCase
 {

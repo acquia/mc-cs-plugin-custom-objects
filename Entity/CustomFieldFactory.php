@@ -24,20 +24,12 @@ class CustomFieldFactory
      */
     private $customFieldTypeProvider;
 
-    /**
-     * @param CustomFieldTypeProvider $customFieldTypeProvider
-     */
     public function __construct(CustomFieldTypeProvider $customFieldTypeProvider)
     {
         $this->customFieldTypeProvider = $customFieldTypeProvider;
     }
 
     /**
-     * @param string       $type
-     * @param CustomObject $customObject
-     *
-     * @return CustomField
-     *
      * @throws NotFoundException
      */
     public function create(string $type, CustomObject $customObject): CustomField

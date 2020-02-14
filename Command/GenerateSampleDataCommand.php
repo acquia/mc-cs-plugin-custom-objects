@@ -13,25 +13,25 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Command;
 
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use Symfony\Component\Console\Question\ConfirmationQuestion;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Helper\RandomHelper;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use Mautic\LeadBundle\Model\LeadModel;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
-use Mautic\LeadBundle\Entity\Lead;
-use Symfony\Component\Console\Style\SymfonyStyle;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInt;
-use Symfony\Component\Console\Helper\ProgressBar;
 use Doctrine\ORM\EntityManager;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Model\LeadModel;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInt;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Helper\RandomHelper;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
 class GenerateSampleDataCommand extends ContainerAwareCommand
 {
@@ -60,13 +60,6 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
      */
     private $randomHelper;
 
-    /**
-     * @param CustomObjectModel $customObjectModel
-     * @param CustomItemModel   $customItemModel
-     * @param LeadModel         $contactModel
-     * @param EntityManager     $entityManager
-     * @param RandomHelper      $randomHelper
-     */
     public function __construct(
         CustomObjectModel $customObjectModel,
         CustomItemModel $customItemModel,
@@ -162,11 +155,6 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         return 0;
     }
 
-    /**
-     * @param CustomObject $customObject
-     *
-     * @return CustomItem
-     */
     private function generateCustomItem(CustomObject $customObject): CustomItem
     {
         $customItem = new CustomItem($customObject);
@@ -175,12 +163,6 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         return $customItem;
     }
 
-    /**
-     * @param CustomItem   $customItem
-     * @param CustomObject $customObject
-     *
-     * @return CustomItem
-     */
     private function generateCustomFieldValues(CustomItem $customItem, CustomObject $customObject): CustomItem
     {
         foreach ($customObject->getCustomFields() as $field) {
@@ -198,10 +180,6 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
 
     /**
      * Generates up to 10 custom item - contact references and adds them to the CustomItem entity.
-     *
-     * @param CustomItem $customItem
-     *
-     * @return CustomItem
      */
     private function generateContactReferences(CustomItem $customItem): CustomItem
     {
@@ -219,9 +197,6 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         return $customItem;
     }
 
-    /**
-     * @param CustomItem $customItem
-     */
     private function clearMemory(CustomItem $customItem): void
     {
         foreach ($customItem->getCustomFieldValues() as $value) {

@@ -13,22 +13,22 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
+use Doctrine\Common\Collections\Collection;
 use JMS\Serializer\EventDispatcher\Events;
+use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
 use JMS\Serializer\JsonSerializationVisitor;
 use JMS\Serializer\Metadata\StaticPropertyMetadata;
-use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
-use Doctrine\Common\Collections\Collection;
-use Symfony\Component\HttpFoundation\RequestStack;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
+use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class SerializerSubscriber implements EventSubscriberInterface
 {
@@ -52,12 +52,6 @@ class SerializerSubscriber implements EventSubscriberInterface
      */
     private $requestStack;
 
-    /**
-     * @param ConfigProvider                  $configProvider
-     * @param CustomItemXrefContactRepository $customItemXrefContactRepository
-     * @param CustomItemModel                 $customItemModel
-     * @param RequestStack                    $requestStack
-     */
     public function __construct(
         ConfigProvider $configProvider,
         CustomItemXrefContactRepository $customItemXrefContactRepository,
@@ -83,9 +77,6 @@ class SerializerSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param ObjectEvent $event
-     */
     public function addCustomItemsIntoContactResponse(ObjectEvent $event): void
     {
         $limit    = 10;
@@ -167,8 +158,6 @@ class SerializerSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param CustomItem $customItem
-     *
      * @return mixed[]
      */
     private function serializeCustomItem(CustomItem $customItem): array

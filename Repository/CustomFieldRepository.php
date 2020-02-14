@@ -13,18 +13,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Repository;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use Doctrine\Common\Collections\ArrayCollection;
 
 class CustomFieldRepository extends CommonRepository
 {
-    /**
-     * @param string   $alias
-     * @param int|null $id
-     *
-     * @return bool
-     */
     public function isAliasUnique(string $alias, ?int $id = null): bool
     {
         $q = $this->createQueryBuilder(CustomField::TABLE_ALIAS);
@@ -41,8 +35,6 @@ class CustomFieldRepository extends CommonRepository
     }
 
     /**
-     * @param int $customObjectId
-     *
      * @return ArrayCollection|CustomField[]
      */
     public function getRequiredCustomFieldsForCustomObject(int $customObjectId): ArrayCollection

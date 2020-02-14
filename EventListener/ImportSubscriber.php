@@ -13,24 +13,24 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use Mautic\LeadBundle\LeadEvents;
+use Mautic\CoreBundle\Helper\ArrayHelper;
 use Mautic\LeadBundle\Event\ImportInitEvent;
 use Mautic\LeadBundle\Event\ImportMappingEvent;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
+use Mautic\LeadBundle\Event\ImportValidateEvent;
+use Mautic\LeadBundle\LeadEvents;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemImportModel;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
-use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use Mautic\LeadBundle\Event\ImportValidateEvent;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Form\FormError;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Form;
-use Mautic\CoreBundle\Helper\ArrayHelper;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class ImportSubscriber implements EventSubscriberInterface
@@ -184,7 +184,6 @@ class ImportSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param ImportProcessEvent $event
      * @throws ForbiddenException
      */
     public function onImportProcess(ImportProcessEvent $event): void
@@ -205,10 +204,6 @@ class ImportSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param string $routeObjectName
-     *
-     * @return int
-     *
      * @throws NotFoundException
      */
     private function getCustomObjectId(string $routeObjectName): int
@@ -224,8 +219,6 @@ class ImportSubscriber implements EventSubscriberInterface
 
     /**
      * @param mixed[] $matchedFields
-     *
-     * @return int|null
      */
     private function handleValidateOwner(array $matchedFields): ?int
     {
@@ -237,8 +230,6 @@ class ImportSubscriber implements EventSubscriberInterface
     /**
      * Validate that required fields are mapped.
      *
-     * @param Form    $form
-     * @param int     $customObjectId
      * @param mixed[] $matchedFields
      */
     private function handleValidateRequired(Form $form, int $customObjectId, array $matchedFields): void

@@ -19,8 +19,6 @@ use Mautic\LeadBundle\Segment\Decorator\CustomMappedDecorator;
 class MultiselectDecorator extends CustomMappedDecorator
 {
     /**
-     * @param ContactSegmentFilterCrate $contactSegmentFilterCrate
-     *
      * @return string[]
      */
     public function getParameterValue(ContactSegmentFilterCrate $contactSegmentFilterCrate): array

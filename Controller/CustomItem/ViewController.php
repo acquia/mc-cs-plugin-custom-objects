@@ -13,18 +13,18 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
-use Symfony\Component\HttpFoundation\RequestStack;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use Mautic\CoreBundle\Controller\CommonController;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
-use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
-use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Symfony\Component\Form\FormFactoryInterface;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 class ViewController extends CommonController
 {
@@ -63,15 +63,6 @@ class ViewController extends CommonController
      */
     private $formFactory;
 
-    /**
-     * @param RequestStack                 $requestStack
-     * @param FormFactoryInterface         $formFactory
-     * @param CustomItemModel              $customItemModel
-     * @param CustomItemXrefContactModel   $customItemXrefContactModel
-     * @param AuditLogModel                $auditLogModel
-     * @param CustomItemPermissionProvider $permissionProvider
-     * @param CustomItemRouteProvider      $routeProvider
-     */
     public function __construct(
         RequestStack $requestStack,
         FormFactoryInterface $formFactory,
@@ -90,12 +81,6 @@ class ViewController extends CommonController
         $this->routeProvider              = $routeProvider;
     }
 
-    /**
-     * @param int $objectId
-     * @param int $itemId
-     *
-     * @return Response
-     */
     public function viewAction(int $objectId, int $itemId): Response
     {
         try {

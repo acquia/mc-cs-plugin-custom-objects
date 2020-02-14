@@ -13,20 +13,20 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
+use Doctrine\ORM\Query\Expr\Join;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
-use Doctrine\ORM\EntityManager;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
-use Doctrine\ORM\NoResultException;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use UnexpectedValueException;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
-use Doctrine\ORM\Query\Expr\Join;
 
 class CustomItemXrefCustomItemSubscriber implements EventSubscriberInterface
 {
@@ -106,8 +106,6 @@ class CustomItemXrefCustomItemSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param CustomItemXrefEntityDiscoveryEvent $event
-     *
      * @throws UnexpectedValueException
      * @throws ORMException
      */
@@ -130,7 +128,6 @@ class CustomItemXrefCustomItemSubscriber implements EventSubscriberInterface
     /**
      * Save the xref only if it isn't in the entity manager already as it means it was loaded from the database already.
      *
-     * @param CustomItemXrefEntityEvent $event
      * @throws ORMException
      * @throws OptimisticLockException
      */
@@ -150,7 +147,6 @@ class CustomItemXrefCustomItemSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param CustomItemXrefEntityEvent $event
      * @throws ORMException
      * @throws OptimisticLockException
      */
@@ -170,12 +166,7 @@ class CustomItemXrefCustomItemSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param int $customItemAId
-     * @param int $customItemBId
-     *
-     * @return CustomItemXrefCustomItem
-     *
-     * @throws NoResultException if the reference does not exist
+     * @throws NoResultException        if the reference does not exist
      * @throws NonUniqueResultException
      */
     public function getXrefEntity(int $customItemAId, int $customItemBId): CustomItemXrefCustomItem

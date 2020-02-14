@@ -13,17 +13,17 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
+use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Model\AuditLogModel;
-use Symfony\Component\HttpFoundation\RequestStack;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use Mautic\CoreBundle\Controller\CommonController;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 class ViewController extends CommonController
 {
@@ -57,14 +57,6 @@ class ViewController extends CommonController
      */
     private $routeProvider;
 
-    /**
-     * @param RequestStack                   $requestStack
-     * @param FormFactoryInterface           $formFactory
-     * @param CustomObjectModel              $customObjectModel
-     * @param AuditLogModel                  $auditLogModel
-     * @param CustomObjectPermissionProvider $permissionProvider
-     * @param CustomObjectRouteProvider      $routeProvider
-     */
     public function __construct(
         RequestStack $requestStack,
         FormFactoryInterface $formFactory,
@@ -81,11 +73,6 @@ class ViewController extends CommonController
         $this->routeProvider        = $routeProvider;
     }
 
-    /**
-     * @param int $objectId
-     *
-     * @return Response
-     */
     public function viewAction(int $objectId): Response
     {
         try {

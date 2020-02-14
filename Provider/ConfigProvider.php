@@ -27,9 +27,6 @@ class ConfigProvider
      */
     private $coreParametersHelper;
 
-    /**
-     * @param CoreParametersHelper $coreParametersHelper
-     */
     public function __construct(CoreParametersHelper $coreParametersHelper)
     {
         $this->coreParametersHelper = $coreParametersHelper;
@@ -37,8 +34,6 @@ class ConfigProvider
 
     /**
      * Returns true if the Custom Objects plugin is enabled.
-     *
-     * @return bool
      */
     public function pluginIsEnabled(): bool
     {

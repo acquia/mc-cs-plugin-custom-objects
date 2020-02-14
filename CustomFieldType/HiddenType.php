@@ -25,9 +25,6 @@ class HiddenType extends AbstractTextType
      */
     protected $key = 'hidden';
 
-    /**
-     * @return string
-     */
     public function getSymfonyFormFieldType(): string
     {
         return \Symfony\Component\Form\Extension\Core\Type\HiddenType::class;

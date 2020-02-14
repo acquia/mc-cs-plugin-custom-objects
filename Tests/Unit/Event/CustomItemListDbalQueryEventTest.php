@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Event;
 
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
-use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use Doctrine\DBAL\Query\QueryBuilder;
+use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
 
 class CustomItemListDbalQueryEventTest extends \PHPUnit\Framework\TestCase
 {

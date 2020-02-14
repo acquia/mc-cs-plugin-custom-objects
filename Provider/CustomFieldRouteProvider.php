@@ -26,23 +26,11 @@ class CustomFieldRouteProvider
      */
     private $router;
 
-    /**
-     * @param RouterInterface $router
-     */
     public function __construct(RouterInterface $router)
     {
         $this->router = $router;
     }
 
-    /**
-     * @param string   $fieldType
-     * @param int|null $id
-     * @param int|null $objectId
-     * @param int|null $panelCount
-     * @param int|null $panelId
-     *
-     * @return string
-     */
     public function buildSaveRoute(string $fieldType, ?int $id = null, ?int $objectId = null, ?int $panelCount = null, ?int $panelId = null): string
     {
         $params['fieldType'] = $fieldType;
@@ -66,11 +54,6 @@ class CustomFieldRouteProvider
         return $this->router->generate(static::ROUTE_SAVE, $params);
     }
 
-    /**
-     * @param int|null $id
-     *
-     * @return string
-     */
     public function buildFormRoute(?int $id = null): string
     {
         $params = $id ? ['fieldId' => $id] : [];

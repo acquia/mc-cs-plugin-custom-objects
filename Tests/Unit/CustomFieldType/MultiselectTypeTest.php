@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\CustomFieldType;
 
-use Symfony\Component\Translation\TranslatorInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\MultiselectType;
 use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class MultiselectTypeTest extends \PHPUnit\Framework\TestCase
 {

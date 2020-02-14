@@ -23,28 +23,18 @@ abstract class AbstractTextType extends AbstractCustomFieldType
     public const TABLE_NAME = 'custom_field_value_text';
 
     /**
-     * @param CustomField $customField
-     * @param CustomItem  $customItem
-     * @param mixed|null  $value
-     *
-     * @return CustomFieldValueInterface
+     * @param mixed|null $value
      */
     public function createValueEntity(CustomField $customField, CustomItem $customItem, $value = null): CustomFieldValueInterface
     {
         return new CustomFieldValueText($customField, $customItem, (string) $value);
     }
 
-    /**
-     * @return string
-     */
     public function getSymfonyFormFieldType(): string
     {
         return \Symfony\Component\Form\Extension\Core\Type\TextType::class;
     }
 
-    /**
-     * @return string
-     */
     public function getEntityClass(): string
     {
         return CustomFieldValueText::class;

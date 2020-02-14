@@ -11,10 +11,10 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 
 return [
     'name'        => 'Custom Objects',
@@ -631,8 +631,8 @@ return [
             'custom_field.pre_save.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldPreSaveSubscriber::class,
                 'arguments' => [
-                    'mautic.custom.model.field.option'
-                ]
+                    'mautic.custom.model.field.option',
+                ],
             ],
             'custom_item.button.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomItemButtonSubscriber::class,
@@ -711,7 +711,7 @@ return [
                     'custom_object.repository',
                     'translator',
                     'custom_object.config.provider',
-                    'custom_field.type.provider'
+                    'custom_field.type.provider',
                 ],
             ],
             'custom_object.segments.filters_dictionary.subscriber' => [
@@ -758,7 +758,7 @@ return [
             'custom_object.segments.decorator_delegate.subscriber'   => [
                 'class'    => \MauticPlugin\CustomObjectsBundle\EventListener\SegmentFilterDecoratorDelegateSubscriber::class,
                 'arguments'=> [
-                    'custom_object.segment_decorator_multiselect'
+                    'custom_object.segment_decorator_multiselect',
                 ],
             ],
         ],
@@ -780,14 +780,14 @@ return [
             'custom_field.field.params.to.string.transformer' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransformer::class,
                 'arguments' => [
-                    'jms_serializer'
+                    'jms_serializer',
                 ],
             ],
             'custom_field.field.options.to.string.transformer' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsToStringTransformer::class,
                 'arguments' => [
                     'jms_serializer',
-                    'mautic.custom.model.field'
+                    'mautic.custom.model.field',
                 ],
             ],
             'custom_object.object.form' => [
@@ -973,7 +973,7 @@ return [
                     'translator',
                     'mautic.core.service.flashbag',
                     'router',
-                ]
+                ],
             ],
             'custom_object.csv.helper'                  => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Helper\CsvHelper::class,

@@ -13,19 +13,19 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemType;
 use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Form\FormFactory;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use Mautic\CoreBundle\Controller\AbstractFormController;
+use Symfony\Component\Form\FormFactory;
+use Symfony\Component\HttpFoundation\Response;
 
 class FormController extends AbstractFormController
 {
@@ -59,14 +59,6 @@ class FormController extends AbstractFormController
      */
     private $lockFlashMessageHelper;
 
-    /**
-     * @param FormFactory                  $formFactory
-     * @param CustomObjectModel            $customObjectModel
-     * @param CustomItemModel              $customItemModel
-     * @param CustomItemPermissionProvider $permissionProvider
-     * @param CustomItemRouteProvider      $routeProvider
-     * @param LockFlashMessageHelper       $lockFlashMessageHelper
-     */
     public function __construct(
         FormFactory $formFactory,
         CustomObjectModel $customObjectModel,
@@ -83,11 +75,6 @@ class FormController extends AbstractFormController
         $this->lockFlashMessageHelper = $lockFlashMessageHelper;
     }
 
-    /**
-     * @param int $objectId
-     *
-     * @return Response
-     */
     public function newAction(int $objectId): Response
     {
         try {
@@ -101,12 +88,6 @@ class FormController extends AbstractFormController
         return $this->renderFormForItem($customItem, $customObject, $this->routeProvider->buildNewRoute($objectId));
     }
 
-    /**
-     * @param int $objectId
-     * @param int $itemId
-     *
-     * @return Response
-     */
     public function editAction(int $objectId, int $itemId): Response
     {
         try {
@@ -135,12 +116,6 @@ class FormController extends AbstractFormController
         return $this->renderFormForItem($customItem, $customObject, $this->routeProvider->buildEditRoute($objectId, $itemId));
     }
 
-    /**
-     * @param int $objectId
-     * @param int $itemId
-     *
-     * @return Response
-     */
     public function cloneAction(int $objectId, int $itemId): Response
     {
         try {
@@ -157,13 +132,6 @@ class FormController extends AbstractFormController
         return $this->renderFormForItem($customItem, $customItem->getCustomObject(), $this->routeProvider->buildCloneRoute($objectId, $itemId));
     }
 
-    /**
-     * @param CustomItem   $customItem
-     * @param CustomObject $customObject
-     * @param string       $route
-     *
-     * @return Response
-     */
     private function renderFormForItem(CustomItem $customItem, CustomObject $customObject, string $route): Response
     {
         $action = $this->routeProvider->buildSaveRoute($customObject->getId(), $customItem->getId());

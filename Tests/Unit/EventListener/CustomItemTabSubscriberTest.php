@@ -13,14 +13,14 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use Mautic\CoreBundle\Event\CustomContentEvent;
-use MauticPlugin\CustomObjectsBundle\EventListener\CustomItemTabSubscriber;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use Symfony\Component\Translation\TranslatorInterface;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\EventListener\CustomItemTabSubscriber;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomItemTabSubscriberTest extends \PHPUnit\Framework\TestCase
 {

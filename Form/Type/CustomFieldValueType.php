@@ -13,19 +13,18 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
 
 class CustomFieldValueType extends AbstractType
 {
     /**
-     * @param FormBuilderInterface $builder
-     * @param mixed[]              $options
+     * @param mixed[] $options
      *
      * @throws NotFoundException
      */

@@ -14,15 +14,15 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\DBAL\Connection;
 use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
+use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemNameFilterQueryBuilder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
-use Doctrine\DBAL\Connection;
-use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 
 class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
 {
@@ -38,10 +38,6 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
      */
     private $configProvider;
 
-    /**
-     * @param Registry       $registry
-     * @param ConfigProvider $configProvider
-     */
     public function __construct(Registry $registry, ConfigProvider $configProvider)
     {
         $this->doctrineRegistry = $registry;
@@ -59,8 +55,6 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param SegmentDictionaryGenerationEvent $event
-     *
      * @throws \Doctrine\DBAL\DBALException
      */
     public function onGenerateSegmentDictionary(SegmentDictionaryGenerationEvent $event): void

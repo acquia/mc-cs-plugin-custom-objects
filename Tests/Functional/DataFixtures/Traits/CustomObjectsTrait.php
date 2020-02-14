@@ -13,22 +13,15 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 trait CustomObjectsTrait
 {
-    /**
-     * @param ContainerInterface $container
-     * @param string             $customObjectName
-     * @param callable|null      $configureFieldCallback
-     *
-     * @return CustomObject
-     */
     private function createCustomObjectWithAllFields(ContainerInterface $container, string $customObjectName, ?callable $configureFieldCallback = null): CustomObject
     {
         /** @var CustomObjectModel $customObjectModel */
@@ -65,11 +58,6 @@ trait CustomObjectsTrait
         return $customObject;
     }
 
-    /**
-     * @param CustomField $customField
-     * @param string      $label
-     * @param string      $value
-     */
     private function addFieldOption(CustomField $customField, string $label, string $value): void
     {
         $option = new CustomFieldOption();

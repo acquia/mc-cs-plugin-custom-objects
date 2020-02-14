@@ -20,11 +20,6 @@ class TokenParser
 {
     public const TOKEN = '{custom-object=(.*?)}';
 
-    /**
-     * @param string $content
-     *
-     * @return ArrayCollection
-     */
     public function findTokens(string $content): ArrayCollection
     {
         $tokens = new ArrayCollection();
@@ -79,34 +74,16 @@ class TokenParser
         return $tokens;
     }
 
-    /**
-     * @param string $customObjectAlias
-     * @param string $customFieldAlias
-     *
-     * @return string
-     */
     public function buildTokenWithDefaultOptions(string $customObjectAlias, string $customFieldAlias): string
     {
         return "{custom-object={$customObjectAlias}:{$customFieldAlias} | where=segment-filter | order=latest | limit=1 | default=}";
     }
 
-    /**
-     * @param string $customObjectName
-     * @param string $customFieldLabel
-     *
-     * @return string
-     */
     public function buildTokenLabel(string $customObjectName, string $customFieldLabel): string
     {
         return "{$customObjectName}: {$customFieldLabel}";
     }
 
-    /**
-     * @param string $firstPart
-     * @param Token  $token
-     *
-     * @return Token
-     */
     private function extractAliases(string $firstPart, Token $token): Token
     {
         $aliases = $this->trimArrayElements(explode(':', $firstPart));
@@ -122,8 +99,6 @@ class TokenParser
     }
 
     /**
-     * @param string $tokenDataRaw
-     *
      * @return string[]
      */
     private function getPartsDividedByPipe(string $tokenDataRaw): array

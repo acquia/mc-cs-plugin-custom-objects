@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
-use Symfony\Component\HttpFoundation\Response;
 use Mautic\CoreBundle\Controller\CommonController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
-use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectSessionProvider;
 use Mautic\CoreBundle\Service\FlashBag;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectSessionProvider;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 class DeleteController extends CommonController
 {
@@ -45,12 +45,6 @@ class DeleteController extends CommonController
      */
     private $permissionProvider;
 
-    /**
-     * @param CustomObjectModel              $customObjectModel
-     * @param CustomObjectSessionProvider    $sessionProvider
-     * @param FlashBag                       $flashBag
-     * @param CustomObjectPermissionProvider $permissionProvider
-     */
     public function __construct(
         CustomObjectModel $customObjectModel,
         CustomObjectSessionProvider $sessionProvider,
@@ -64,8 +58,6 @@ class DeleteController extends CommonController
     }
 
     /**
-     * @param int $objectId
-     *
      * @return Response|JsonResponse
      */
     public function deleteAction(int $objectId)

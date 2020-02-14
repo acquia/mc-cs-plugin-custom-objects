@@ -13,19 +13,19 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
-use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use InvalidArgumentException;
 use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event\ApiEntityEvent;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Mautic\LeadBundle\Entity\Lead;
-use InvalidArgumentException;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Symfony\Component\HttpFoundation\Response;
 
 class ApiSubscriber implements EventSubscriberInterface
@@ -77,8 +77,6 @@ class ApiSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param ApiEntityEvent $event
-     * @param bool $dryRun
      * @throws NotFoundException
      * @throws InvalidValueException
      */
@@ -118,7 +116,6 @@ class ApiSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param Request $request
      * @param mixed[] $entityRequestParameters
      *
      * @return mixed[]
@@ -145,8 +142,6 @@ class ApiSubscriber implements EventSubscriberInterface
     /**
      * @param mixed[] $customObjectData
      *
-     * @return CustomObject
-     *
      * @throws NotFoundException|InvalidArgumentException
      */
     private function getCustomObject(array $customObjectData): CustomObject
@@ -165,10 +160,8 @@ class ApiSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param CustomObject $customObject
-     * @param mixed[]      $customItemData
+     * @param mixed[] $customItemData
      *
-     * @return CustomItem
      * @throws NotFoundException
      */
     private function getCustomItem(CustomObject $customObject, array $customItemData): CustomItem
@@ -187,10 +180,8 @@ class ApiSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param CustomItem $customItem
-     * @param mixed[]    $customItemData
+     * @param mixed[] $customItemData
      *
-     * @return CustomItem
      * @throws NotFoundException
      */
     private function populateCustomItemWithRequestData(CustomItem $customItem, array $customItemData): CustomItem

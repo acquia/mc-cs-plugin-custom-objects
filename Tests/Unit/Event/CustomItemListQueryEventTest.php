@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Event;
 
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
 use Doctrine\ORM\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
 
 class CustomItemListQueryEventTest extends \PHPUnit\Framework\TestCase
 {

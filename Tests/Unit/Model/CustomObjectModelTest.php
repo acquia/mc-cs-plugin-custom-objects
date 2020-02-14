@@ -13,30 +13,30 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Model;
 
-use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use Mautic\UserBundle\Entity\User;
 use Doctrine\Common\Collections\ArrayCollection;
-use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
-use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\AbstractQuery;
-use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use Doctrine\ORM\Query\Expr;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
-use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use Symfony\Component\Translation\TranslatorInterface;
 use Doctrine\DBAL\Query\QueryBuilder as QueryBuilderDbal;
 use Doctrine\DBAL\Statement;
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Query\Expr;
+use Doctrine\ORM\QueryBuilder;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\UserBundle\Entity\User;
+use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
+use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomObjectModelTest extends \PHPUnit\Framework\TestCase
 {

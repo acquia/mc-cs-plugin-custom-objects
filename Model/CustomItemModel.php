@@ -13,31 +13,31 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Model\FormModel;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
-use Mautic\CoreBundle\Entity\CommonRepository;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
-use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use Doctrine\ORM\QueryBuilder;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Model\FormModel;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
+use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
-use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefInterface;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use UnexpectedValueException;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefInterface;
-use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
 
 class CustomItemModel extends FormModel
 {
@@ -66,15 +66,6 @@ class CustomItemModel extends FormModel
      */
     private $validator;
 
-    /**
-     * @param EntityManager                $entityManager
-     * @param CustomItemRepository         $customItemRepository
-     * @param CustomItemPermissionProvider $permissionProvider
-     * @param UserHelper                   $userHelper
-     * @param CustomFieldValueModel        $customFieldValueModel
-     * @param EventDispatcherInterface     $dispatcher
-     * @param ValidatorInterface           $validator
-     */
     public function __construct(
         EntityManager $entityManager,
         CustomItemRepository $customItemRepository,
@@ -93,12 +84,6 @@ class CustomItemModel extends FormModel
         $this->validator             = $validator;
     }
 
-    /**
-     * @param CustomItem $customItem
-     * @param bool       $dryRun
-     *
-     * @return CustomItem
-     */
     public function save(CustomItem $customItem, bool $dryRun = false): CustomItem
     {
         $user  = $this->userHelper->getUser();
@@ -142,12 +127,6 @@ class CustomItemModel extends FormModel
     }
 
     /**
-     * @param CustomItem $customItem
-     * @param string     $entityType
-     * @param int        $entityId
-     *
-     * @return CustomItemXrefInterface
-     *
      * @throws UnexpectedValueException
      */
     public function linkEntity(CustomItem $customItem, string $entityType, int $entityId): CustomItemXrefInterface
@@ -166,12 +145,6 @@ class CustomItemModel extends FormModel
     }
 
     /**
-     * @param CustomItem $customItem
-     * @param string     $entityType
-     * @param int        $entityId
-     *
-     * @return CustomItemXrefInterface
-     *
      * @throws UnexpectedValueException
      */
     public function unlinkEntity(CustomItem $customItem, string $entityType, int $entityId): CustomItemXrefInterface
@@ -189,9 +162,6 @@ class CustomItemModel extends FormModel
         return $event->getXrefEntity();
     }
 
-    /**
-     * @param CustomItem $customItem
-     */
     public function delete(CustomItem $customItem): void
     {
         //take note of ID before doctrine wipes it out
@@ -208,10 +178,6 @@ class CustomItemModel extends FormModel
     }
 
     /**
-     * @param int $id
-     *
-     * @return CustomItem
-     *
      * @throws NotFoundException
      */
     public function fetchEntity(int $id): CustomItem
@@ -228,8 +194,6 @@ class CustomItemModel extends FormModel
 
     /**
      * Returns a list of entities (ORM).
-     *
-     * @param TableConfig $tableConfig
      *
      * @return CustomItem[]
      */
@@ -248,8 +212,6 @@ class CustomItemModel extends FormModel
     /**
      * Returns a list of arrays representing custom items (DBAL).
      *
-     * @param TableConfig $tableConfig
-     *
      * @return CustomItem[]
      */
     public function getArrayTableData(TableConfig $tableConfig): array
@@ -264,11 +226,6 @@ class CustomItemModel extends FormModel
         return $queryBuilder->execute()->fetchAll();
     }
 
-    /**
-     * @param TableConfig $tableConfig
-     *
-     * @return int
-     */
     public function getCountForTable(TableConfig $tableConfig): int
     {
         $queryBuilder = $this->createListOrmQueryBuilder($tableConfig);
@@ -286,8 +243,6 @@ class CustomItemModel extends FormModel
     }
 
     /**
-     * @param TableConfig $tableConfig
-     *
      * @return mixed[]
      */
     public function getLookupData(TableConfig $tableConfig): array
@@ -315,11 +270,6 @@ class CustomItemModel extends FormModel
         return $data;
     }
 
-    /**
-     * @param CustomItem $customItem
-     *
-     * @return CustomItem
-     */
     public function populateCustomFields(CustomItem $customItem): CustomItem
     {
         if ($customItem->getCustomFieldValues()->count() > 0) {
@@ -336,8 +286,6 @@ class CustomItemModel extends FormModel
 
     /**
      * Used only by Mautic's generic methods. Use DI instead.
-     *
-     * @return CommonRepository
      */
     public function getRepository(): CommonRepository
     {
@@ -349,8 +297,6 @@ class CustomItemModel extends FormModel
      *
      * 'custom_objects:custom_objects' is used as custom item permissions are dynamic
      * and must contain the specific custom object ID.
-     *
-     * @return string
      */
     public function getPermissionBase(): string
     {
@@ -358,10 +304,6 @@ class CustomItemModel extends FormModel
     }
 
     /**
-     * @param TableConfig $tableConfig
-     *
-     * @return QueryBuilder
-     *
      * @throws UnexpectedValueException
      */
     private function createListOrmQueryBuilder(TableConfig $tableConfig): QueryBuilder
@@ -387,10 +329,6 @@ class CustomItemModel extends FormModel
     }
 
     /**
-     * @param TableConfig $tableConfig
-     *
-     * @return DbalQueryBuilder
-     *
      * @throws UnexpectedValueException
      */
     private function createListDbalQueryBuilder(TableConfig $tableConfig): DbalQueryBuilder
@@ -416,8 +354,6 @@ class CustomItemModel extends FormModel
     }
 
     /**
-     * @param TableConfig $tableConfig
-     *
      * @throws UnexpectedValueException
      */
     private function validateTableConfig(TableConfig $tableConfig): void
@@ -431,7 +367,6 @@ class CustomItemModel extends FormModel
      * Adds condition for owner if the user doesn't have permissions to view other.
      *
      * @param QueryBuilder|DbalQueryBuilder $queryBuilder
-     * @param int                           $customObjectId
      *
      * @return QueryBuilder|DbalQueryBuilder
      */

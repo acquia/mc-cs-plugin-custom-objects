@@ -38,47 +38,26 @@ class CustomObjectRouteProvider
      */
     private $router;
 
-    /**
-     * @param RouterInterface $router
-     */
     public function __construct(RouterInterface $router)
     {
         $this->router = $router;
     }
 
-    /**
-     * @param int $page
-     *
-     * @return string
-     */
     public function buildListRoute(int $page = 1): string
     {
         return $this->router->generate(static::ROUTE_LIST, ['page' => $page]);
     }
 
-    /**
-     * @param int|null $id
-     *
-     * @return string
-     */
     public function buildSaveRoute(?int $id = null): string
     {
         return $this->router->generate(static::ROUTE_SAVE, ['objectId' => $id]);
     }
 
-    /**
-     * @param int $id
-     *
-     * @return string
-     */
     public function buildViewRoute(int $id): string
     {
         return $this->router->generate(static::ROUTE_VIEW, ['objectId' => $id]);
     }
 
-    /**
-     * @return string
-     */
     public function buildNewRoute(): string
     {
         return $this->router->generate(static::ROUTE_NEW);
@@ -86,29 +65,17 @@ class CustomObjectRouteProvider
 
     /**
      * @param int $id
-     *
-     * @return string
      */
     public function buildEditRoute(?int $id = null): string
     {
         return $this->router->generate(static::ROUTE_EDIT, ['objectId' => $id]);
     }
 
-    /**
-     * @param int $id
-     *
-     * @return string
-     */
     public function buildCloneRoute(int $id): string
     {
         return $this->router->generate(static::ROUTE_CLONE, ['objectId' => $id]);
     }
 
-    /**
-     * @param int $id
-     *
-     * @return string
-     */
     public function buildDeleteRoute(int $id): string
     {
         return $this->router->generate(static::ROUTE_DELETE, ['objectId' => $id]);

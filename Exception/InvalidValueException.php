@@ -24,17 +24,11 @@ class InvalidValueException extends Exception
      */
     private $customField;
 
-    /**
-     * @param CustomField $customField
-     */
     public function setCustomField(CustomField $customField): void
     {
         $this->customField = $customField;
     }
 
-    /**
-     * @return CustomField|null
-     */
     public function getCustomField(): ?CustomField
     {
         return $this->customField;

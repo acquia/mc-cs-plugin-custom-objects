@@ -18,12 +18,6 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 class CustomObjectRepository extends CommonRepository
 {
-    /**
-     * @param string   $alias
-     * @param int|null $id
-     *
-     * @return bool
-     */
     public function checkAliasExists(string $alias, ?int $id = null): bool
     {
         $q = $this->createQueryBuilder(CustomObject::TABLE_ALIAS);
@@ -41,8 +35,6 @@ class CustomObjectRepository extends CommonRepository
 
     /**
      * Used by internal Mautic methods. Use the contstant directly instead.
-     *
-     * @return string
      */
     public function getTableAlias(): string
     {

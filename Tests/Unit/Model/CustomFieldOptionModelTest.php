@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Model;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\EntityManager;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldOptionModel;
 
 class CustomFieldOptionModelTest extends \PHPUnit\Framework\TestCase

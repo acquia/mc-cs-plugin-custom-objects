@@ -13,18 +13,18 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
-use Doctrine\DBAL\Types\Type;
-use Doctrine\ORM\Mapping as ORM;
-use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Symfony\Component\Validator\Constraints as Assert;
-use Mautic\CategoryBundle\Entity\Category;
-use Mautic\CoreBundle\Entity\FormEntity;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use Doctrine\DBAL\Types\Type;
+use Doctrine\ORM\Mapping as ORM;
+use Mautic\CategoryBundle\Entity\Category;
+use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\ArrayHelper;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 class CustomItem extends FormEntity implements UniqueEntityInterface
 {
@@ -81,9 +81,6 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     private $customItemReferences;
 
-    /**
-     * @param CustomObject $customObject
-     */
     public function __construct(CustomObject $customObject)
     {
         $this->customObject         = $customObject;
@@ -98,9 +95,6 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         $this->id = null;
     }
 
-    /**
-     * @param ORM\ClassMetadata $metadata
-     */
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -138,9 +132,6 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         $builder->addNullableField('language', Type::STRING, 'lang');
     }
 
-    /**
-     * @param ClassMetadata $metadata
-     */
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('name', new Assert\NotBlank());
@@ -314,10 +305,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param int   $customFieldId
      * @param mixed $value
-     *
-     * @return CustomFieldValueInterface
      *
      * @throws NotFoundException
      */
@@ -338,10 +326,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @param string $customFieldAlias
-     * @param mixed  $value
-     *
-     * @return CustomFieldValueInterface
+     * @param mixed $value
      *
      * @throws NotFoundException
      */

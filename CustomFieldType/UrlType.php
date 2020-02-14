@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
-use Symfony\Component\Validator\Constraints\UrlValidator;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use Symfony\Component\Validator\Constraints\UrlValidator;
 
 class UrlType extends AbstractTextType
 {
@@ -36,9 +36,6 @@ class UrlType extends AbstractTextType
      */
     protected $key = 'url';
 
-    /**
-     * @return string
-     */
     public function getSymfonyFormFieldType(): string
     {
         return \Symfony\Component\Form\Extension\Core\Type\UrlType::class;
@@ -59,9 +56,7 @@ class UrlType extends AbstractTextType
         $pattern    = sprintf(UrlValidator::PATTERN, implode('|', $constraint->protocols));
 
         if (!preg_match($pattern, $value)) {
-            throw new \UnexpectedValueException(
-                $this->translator->trans('custom.field.url.invalid', ['%value%' => $value], 'validators')
-            );
+            throw new \UnexpectedValueException($this->translator->trans('custom.field.url.invalid', ['%value%' => $value], 'validators'));
         }
     }
 }

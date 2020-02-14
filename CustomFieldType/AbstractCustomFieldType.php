@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
 use Mautic\LeadBundle\Segment\OperatorOptions;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Translation\TranslatorInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 
 abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
 {
@@ -38,41 +38,26 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
      */
     protected $translator;
 
-    /**
-     * @param TranslatorInterface $translator
-     */
     public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
 
-    /**
-     * @return string
-     */
     public function __toString(): string
     {
         return $this->getKey();
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->translator->trans(static::NAME);
     }
 
-    /**
-     * @return string
-     */
     public function getKey(): string
     {
         return $this->key;
     }
 
-    /**
-     * @return string
-     */
     public function getTableAlias(): string
     {
         return 'cfv_'.$this->getKey();
@@ -86,9 +71,6 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
         return OperatorOptions::getFilterExpressionFunctions();
     }
 
-    /**
-     * @return string
-     */
     public function getTableName(): string
     {
         return MAUTIC_TABLE_PREFIX.static::TABLE_NAME;
@@ -168,8 +150,7 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     }
 
     /**
-     * @param CustomField $customField
-     * @param mixed       $value
+     * @param mixed $value
      *
      * @throws \UnexpectedValueException
      */
@@ -185,13 +166,7 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
             return;
         }
 
-        throw new \UnexpectedValueException(
-            $this->translator->trans(
-                'custom.field.required',
-                ['%fieldName%' => "{$customField->getLabel()} ({$customField->getAlias()})"],
-                'validators'
-            )
-        );
+        throw new \UnexpectedValueException($this->translator->trans('custom.field.required', ['%fieldName%' => "{$customField->getLabel()} ({$customField->getAlias()})"], 'validators'));
     }
 
     /**

@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Entity;
 
+use DateTimeImmutable;
+use Mautic\LeadBundle\Entity\Company;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCompany;
-use Mautic\LeadBundle\Entity\Company;
-use DateTimeImmutable;
 
 class CustomItemXrefCompanyTest extends \PHPUnit\Framework\TestCase
 {

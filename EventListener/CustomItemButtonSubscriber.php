@@ -40,11 +40,6 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
      */
     private $routeProvider;
 
-    /**
-     * @param CustomItemPermissionProvider $permissionProvider
-     * @param CustomItemRouteProvider      $routeProvider
-     * @param TranslatorInterface          $translator
-     */
     public function __construct(
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider,
@@ -124,11 +119,6 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * @param CustomButtonEvent $event
-     * @param string            $location
-     * @param int               $customObjectId
-     */
     private function addEntityButtons(CustomButtonEvent $event, string $location, int $customObjectId): void
     {
         $customItem = $event->getItem();
@@ -151,9 +141,6 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param int        $customObjectId
-     * @param CustomItem $customItem
-     *
      * @return mixed[]
      *
      * @throws ForbiddenException
@@ -173,8 +160,6 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param int $customObjectId
-     *
      * @return mixed[]
      */
     private function defineCloseButton(int $customObjectId): array
@@ -190,9 +175,6 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param int        $customObjectId
-     * @param CustomItem $customItem
-     *
      * @return mixed[]
      *
      * @throws ForbiddenException
@@ -212,9 +194,6 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param int        $customObjectId
-     * @param CustomItem $customItem
-     *
      * @return mixed[]
      *
      * @throws ForbiddenException
@@ -234,8 +213,6 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param int $customObjectId
-     *
      * @return mixed[]
      *
      * @throws ForbiddenException
@@ -255,11 +232,6 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param int    $customObjectId
-     * @param int    $customItemId
-     * @param string $entityType
-     * @param int    $entityId
-     *
      * @return mixed[]
      *
      * @throws ForbiddenException
@@ -282,8 +254,6 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param int $customObjectId
-     *
      * @return mixed[]
      *
      * @throws ForbiddenException
@@ -303,8 +273,6 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param int $customObjectId
-     *
      * @return mixed[]
      *
      * @throws ForbiddenException
@@ -324,8 +292,6 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param int $customObjectId
-     *
      * @return mixed[]
      *
      * @throws ForbiddenException
@@ -344,11 +310,6 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param CustomButtonEvent $event
-     *
-     * @return int
-     */
     private function getCustomObjectIdFromEvent(CustomButtonEvent $event): int
     {
         [, $routeParams] = $event->getRoute(true);

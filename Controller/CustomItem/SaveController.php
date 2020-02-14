@@ -13,21 +13,21 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
-use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
-use Symfony\Component\HttpFoundation\RequestStack;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemType;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Form\FormFactoryInterface;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
-use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use Mautic\CoreBundle\Service\FlashBag;
-use Symfony\Component\HttpFoundation\Request;
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Service\FlashBag;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemType;
+use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 class SaveController extends AbstractFormController
 {
@@ -71,16 +71,6 @@ class SaveController extends AbstractFormController
      */
     private $lockFlashMessageHelper;
 
-    /**
-     * @param RequestStack                 $requestStack
-     * @param FormFactoryInterface         $formFactory
-     * @param FlashBag                     $flashBag
-     * @param CustomItemModel              $customItemModel
-     * @param CustomObjectModel            $customObjectModel
-     * @param CustomItemPermissionProvider $permissionProvider
-     * @param CustomItemRouteProvider      $routeProvider
-     * @param LockFlashMessageHelper       $lockFlashMessageHelper
-     */
     public function __construct(
         RequestStack $requestStack,
         FormFactoryInterface $formFactory,
@@ -101,12 +91,6 @@ class SaveController extends AbstractFormController
         $this->lockFlashMessageHelper = $lockFlashMessageHelper;
     }
 
-    /**
-     * @param int      $objectId
-     * @param int|null $itemId
-     *
-     * @return Response
-     */
     public function saveAction(int $objectId, ?int $itemId = null): Response
     {
         try {

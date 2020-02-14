@@ -27,9 +27,6 @@ class EmailType extends AbstractTextType
      */
     protected $key = 'email';
 
-    /**
-     * @return string
-     */
     public function getSymfonyFormFieldType(): string
     {
         return \Symfony\Component\Form\Extension\Core\Type\EmailType::class;
@@ -47,9 +44,7 @@ class EmailType extends AbstractTextType
         }
 
         if (!preg_match('/^.+\@\S+\.\S+$/', $value)) {
-            throw new \UnexpectedValueException(
-                $this->translator->trans('custom.field.email.invalid', ['%value%' => $value], 'validators')
-            );
+            throw new \UnexpectedValueException($this->translator->trans('custom.field.email.invalid', ['%value%' => $value], 'validators'));
         }
     }
 }

@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\DTO;
 
-use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
-use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
+use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
+use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 
 class TableConfigTest extends \PHPUnit\Framework\TestCase
 {
@@ -97,14 +97,6 @@ class TableConfigTest extends \PHPUnit\Framework\TestCase
         $tableConfig->configureDbalQueryBuilder($builder);
     }
 
-    /**
-     * @param int    $limit
-     * @param int    $page
-     * @param string $orderBy
-     * @param string $orderDirection
-     *
-     * @return TableConfig
-     */
     private function initTableConfig(
         int $limit = self::LIMIT,
         int $page = self::PAGE,

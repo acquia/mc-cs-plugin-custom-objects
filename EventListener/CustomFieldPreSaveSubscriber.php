@@ -15,10 +15,10 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldOptionModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 
 /**
  * CustomField entity lifecycle ends here.
@@ -32,8 +32,6 @@ class CustomFieldPreSaveSubscriber implements EventSubscriberInterface
 
     /**
      * CustomFieldPreSaveSubscriber constructor.
-     *
-     * @param CustomFieldOptionModel $customFieldOptionModel
      */
     public function __construct(CustomFieldOptionModel $customFieldOptionModel)
     {
@@ -52,9 +50,6 @@ class CustomFieldPreSaveSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @param CustomObjectEvent $event
-     */
     public function preSave(CustomObjectEvent $event): void
     {
         $event->getCustomObject()->getCustomFields()->map(
