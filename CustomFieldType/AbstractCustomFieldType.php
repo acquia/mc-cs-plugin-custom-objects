@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
-use Mautic\LeadBundle\Segment\OperatorOptions;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
@@ -51,8 +50,7 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     public function __construct(
         TranslatorInterface $translator,
         FilterOperatorProviderInterface $filterOperatorProvider
-    )
-    {
+    ) {
         $this->translator = $translator;
         $this->filterOperatorProvider = $filterOperatorProvider;
     }
