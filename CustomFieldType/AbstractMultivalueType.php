@@ -45,15 +45,17 @@ abstract class AbstractMultivalueType extends AbstractCustomFieldType
         TranslatorInterface $translator,
         FilterOperatorProviderInterface $filterOperatorProvider,
         CsvHelper $csvHelper
-    )
-    {
+    ) {
         parent::__construct($translator, $filterOperatorProvider);
 
         $this->csvHelper = $csvHelper;
     }
 
     /**
-     * @param mixed|null $value
+     * @param CustomField $customField
+     * @param CustomItem $customItem
+     * @param null $value
+     * @return CustomFieldValueInterface
      */
     public function createValueEntity(CustomField $customField, CustomItem $customItem, $value = null): CustomFieldValueInterface
     {

@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
 use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class FilterOperatorSubscriber extends CommonSubscriber
+class FilterOperatorSubscriber implements EventSubscriberInterface
 {
     public const WITHIN_VALUES = 'withinValues';
     /**
