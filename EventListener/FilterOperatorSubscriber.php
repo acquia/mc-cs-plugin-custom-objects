@@ -15,11 +15,11 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
-use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\TypeOperatorsEvent;
-use Mautic\LeadBundle\Event\ListFieldChoicesEvent;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Mautic\LeadBundle\Event\FilterPropertiesTypeEvent;
 
 class FilterOperatorSubscriber implements EventSubscriberInterface
 {
@@ -45,8 +45,7 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
         return [
             LeadEvents::LIST_FILTERS_OPERATORS_ON_GENERATE => ['onOperatorsGenerate', 0],
             LeadEvents::COLLECT_OPERATORS_FOR_FIELD_TYPE => ['addWithinFieldValuesOperator', -9999],
-            LeadEvents::COLLECT_FILTER_CHOICES_FOR_LIST_FIELD_TYPE => ['addWithinFieldValuesChoices', -9999],
-            // LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE => ['onGenerateSegmentFilters', -9999],
+            LeadEvents::ADJUST_FILTER_FORM_TYPE_FOR_FIELD => ['onSegmentFilterFormHandleWithinFieldFormType', 2000],
         ];
     }
 
@@ -57,7 +56,6 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
     {
         $event->addOperator(self::WITHIN_VALUES, [
             'label'       => 'custom.within.field.values.label',
-            'choices'     => ['a' => ['b' => 'k']],
             'expr'        => self::WITHIN_VALUES,
             'negate_expr' => 'notWithinValues',
         ]);
@@ -71,39 +69,42 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
         $typeOperators = $event->getOperatorsForAllFieldTypes();
 
         foreach ($typeOperators as $fieldType => $typeOperator) {
+            if (empty($typeOperator['include'])) {
+                continue;
+            }
             $typeOperator['include'][] = self::WITHIN_VALUES;
             $event->setOperatorsForFieldType($fieldType, $typeOperator);
         }
     }
 
-    /**
-     * @param ListFieldChoicesEvent $event
-     */
-    public function addWithinFieldValuesChoices(ListFieldChoicesEvent $event)
+    public function onSegmentFilterFormHandleWithinFieldFormType(FilterPropertiesTypeEvent $event): void
     {
+        if (!$event->operatorIsOneOf(self::WITHIN_VALUES)) {
+            return;
+        }
+
+        $form          = $event->getFilterPropertiesForm();
         $customObjects = $this->customObjectModel->fetchAllPublishedEntities();
-        $choices = [];
+        $choices  = [];
 
-        $choices['a']['b'] = 'c';
+        foreach ($customObjects as $customObject) {
+            $choices[$customObject->getNameSingular()] = ['Name' => "object:{$customObject->getId()}:name"];
+            foreach ($customObject->getCustomFields() as $field) {
+                $choices[$customObject->getNameSingular()][$field->getName()] = $field->getId();
+            }
+        }
 
-        // foreach ($customObjects as $customObject) {
-        //     $choices[]
-        // }
-        $event->setChoicesForFieldType(self::WITHIN_VALUES, $choices);
+        $form->add(
+            'filter',
+            ChoiceType::class,
+            [
+                'label'   => false,
+                'data'    => $form->getData()['filter'] ?? '',
+                'choices' => $choices,
+                'attr'    => ['class' => 'form-control'],
+            ]
+        );
+
+        $event->stopPropagation();
     }
-
-    /**
-     * @param LeadListFiltersChoicesEvent $event
-     */
-    // public function onGenerateSegmentFilters(LeadListFiltersChoicesEvent $event)
-    // {
-    //     $choiceObjects = $event->getChoices();
-
-    //     foreach ($choiceObjects as $object => $choices) {
-    //         foreach ($choices as $choiceKey => $choiceConfig) {
-    //             $choiceConfig['operators']['withinFieldValue'] = 'withinFieldValue';
-    //             $event->setChoice($object, $choiceKey, $choiceConfig);
-    //         }
-    //     }
-    // }
 }

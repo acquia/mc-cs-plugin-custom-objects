@@ -25,6 +25,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 
 class CustomObject extends FormEntity implements UniqueEntityInterface
 {
@@ -260,7 +261,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * @return Collection
+     * @return Collection|CustomField[]
      */
     public function getCustomFields()
     {
