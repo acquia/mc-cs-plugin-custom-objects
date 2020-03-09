@@ -19,6 +19,7 @@ use Doctrine\DBAL\Statement;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
@@ -33,7 +34,6 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
 use Symfony\Component\Translation\TranslatorInterface;
-use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 
 class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {

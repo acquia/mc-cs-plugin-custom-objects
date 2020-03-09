@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Entity;
 
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CheckboxGroupType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CountryType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateType;
@@ -33,7 +34,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
-use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 
 class CustomFieldTest extends \PHPUnit\Framework\TestCase
 {

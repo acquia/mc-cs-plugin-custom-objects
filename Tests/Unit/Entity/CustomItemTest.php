@@ -15,6 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Entity;
 
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\LeadBundle\Entity\Company;
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
@@ -24,7 +25,6 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use Symfony\Component\Translation\TranslatorInterface;
-use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 
 class CustomItemTest extends \PHPUnit\Framework\TestCase
 {

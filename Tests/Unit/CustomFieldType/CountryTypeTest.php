@@ -13,11 +13,11 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\CustomFieldType;
 
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CountryType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
-use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 
 class CountryTypeTest extends \PHPUnit\Framework\TestCase
 {
