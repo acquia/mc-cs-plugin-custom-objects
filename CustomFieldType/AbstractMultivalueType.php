@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\CsvTransformer;
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\CsvTransformer;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\MultivalueTransformer;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
@@ -36,11 +36,6 @@ abstract class AbstractMultivalueType extends AbstractCustomFieldType
      */
     private $csvHelper;
 
-    /**
-     * @param TranslatorInterface $translator
-     * @param FilterOperatorProviderInterface $filterOperatorProvider
-     * @param CsvHelper           $csvHelper
-     */
     public function __construct(
         TranslatorInterface $translator,
         FilterOperatorProviderInterface $filterOperatorProvider,
@@ -52,10 +47,7 @@ abstract class AbstractMultivalueType extends AbstractCustomFieldType
     }
 
     /**
-     * @param CustomField $customField
-     * @param CustomItem $customItem
      * @param null $value
-     * @return CustomFieldValueInterface
      */
     public function createValueEntity(CustomField $customField, CustomItem $customItem, $value = null): CustomFieldValueInterface
     {

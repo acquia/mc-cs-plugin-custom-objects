@@ -16,6 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 use InvalidArgumentException;
 use Mautic\ApiBundle\Event\ApiEntityEvent;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
@@ -30,7 +31,6 @@ use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Translation\TranslatorInterface;
-use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 
 class ApiSubscriberTest extends \PHPUnit\Framework\TestCase
 {

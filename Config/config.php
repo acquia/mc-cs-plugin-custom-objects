@@ -686,7 +686,7 @@ return [
             'custom_object.filter.operator.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\FilterOperatorSubscriber::class,
                 'arguments' => [
-                    'mautic.custom.model.object'
+                    'mautic.custom.model.object',
                 ],
             ],
             'custom_object.button.subscriber' => [

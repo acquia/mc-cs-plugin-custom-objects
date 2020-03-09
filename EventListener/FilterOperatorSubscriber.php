@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use Mautic\LeadBundle\LeadEvents;
+use Mautic\LeadBundle\Event\FieldOperatorsEvent;
+use Mautic\LeadBundle\Event\FilterPropertiesTypeEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
+use Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent;
+use Mautic\LeadBundle\LeadEvents;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Mautic\LeadBundle\Event\FilterPropertiesTypeEvent;
-use Mautic\LeadBundle\Event\FieldOperatorsEvent;
-use Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
 class FilterOperatorSubscriber implements EventSubscriberInterface
 {
@@ -97,7 +97,7 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
 
         $event->stopPropagation();
     }
-    
+
     public function onWithinFieldValuesBuilder(SegmentOperatorQueryBuilderEvent $event): void
     {
         if (!$event->operatorIsOneOf(self::WITHIN_VALUES)) {
@@ -105,7 +105,7 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
         }
 
         $customObjectId = $this->getCustomObjectId($event->getFilter()->getParameterValue());
-        $contactField = $event->getFilter()->getField();
+        $contactField   = $event->getFilter()->getField();
 
         $event->getQueryBuilder()->innerJoin(
             'l',
