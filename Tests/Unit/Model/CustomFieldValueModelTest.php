@@ -19,6 +19,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Statement;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
@@ -42,6 +43,8 @@ class CustomFieldValueModelTest extends \PHPUnit\Framework\TestCase
     private $customFieldValueModel;
     private $validator;
     private $violationList;
+    private $filterOperatorProvider;
+    private $translator;
 
     protected function setUp(): void
     {
@@ -49,16 +52,18 @@ class CustomFieldValueModelTest extends \PHPUnit\Framework\TestCase
 
         defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
-        $this->customObject          = $this->createMock(CustomObject::class);
-        $this->customItem            = $this->createMock(CustomItem::class);
-        $this->customField           = $this->createMock(CustomField::class);
-        $this->entityManager         = $this->createMock(EntityManager::class);
-        $this->connection            = $this->createMock(Connection::class);
-        $this->queryBuilder          = $this->createMock(QueryBuilder::class);
-        $this->statement             = $this->createMock(Statement::class);
-        $this->validator             = $this->createMock(ValidatorInterface::class);
-        $this->violationList         = $this->createMock(ConstraintViolationListInterface::class);
-        $this->customFieldValueModel = new CustomFieldValueModel(
+        $this->customObject           = $this->createMock(CustomObject::class);
+        $this->customItem             = $this->createMock(CustomItem::class);
+        $this->customField            = $this->createMock(CustomField::class);
+        $this->entityManager          = $this->createMock(EntityManager::class);
+        $this->connection             = $this->createMock(Connection::class);
+        $this->queryBuilder           = $this->createMock(QueryBuilder::class);
+        $this->statement              = $this->createMock(Statement::class);
+        $this->validator              = $this->createMock(ValidatorInterface::class);
+        $this->violationList          = $this->createMock(ConstraintViolationListInterface::class);
+        $this->filterOperatorProvider = $this->createMock(FilterOperatorProviderInterface::class);
+        $this->translator             = $this->createMock(TranslatorInterface::class);
+        $this->customFieldValueModel  = new CustomFieldValueModel(
             $this->entityManager,
             $this->validator
         );
@@ -82,7 +87,7 @@ class CustomFieldValueModelTest extends \PHPUnit\Framework\TestCase
 
         $this->customField->expects($this->once())
             ->method('getTypeObject')
-            ->willReturn(new TextType($this->createMock(TranslatorInterface::class)));
+            ->willReturn(new TextType($this->translator, $this->filterOperatorProvider));
 
         $this->entityManager->expects($this->never())
             ->method('getConnection');
@@ -117,11 +122,11 @@ class CustomFieldValueModelTest extends \PHPUnit\Framework\TestCase
 
         $this->customField->expects($this->exactly(2))
             ->method('getTypeObject')
-            ->willReturn(new TextType($this->createMock(TranslatorInterface::class)));
+            ->willReturn(new TextType($this->translator, $this->filterOperatorProvider));
 
         $noValueField->expects($this->exactly(2))
             ->method('getTypeObject')
-            ->willReturn(new IntType($this->createMock(TranslatorInterface::class)));
+            ->willReturn(new IntType($this->translator, $this->filterOperatorProvider));
 
         $noValueField->expects($this->any())
             ->method('getId')

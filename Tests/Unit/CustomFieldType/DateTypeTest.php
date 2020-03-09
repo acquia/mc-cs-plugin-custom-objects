@@ -21,6 +21,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueDate;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
 use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 
 class DateTypeTest extends \PHPUnit\Framework\TestCase
 {
@@ -40,7 +41,10 @@ class DateTypeTest extends \PHPUnit\Framework\TestCase
         $this->translator  = $this->createMock(TranslatorInterface::class);
         $this->customField = $this->createMock(CustomField::class);
         $this->customItem  = $this->createMock(CustomItem::class);
-        $this->fieldType   = new DateType($this->translator);
+        $this->fieldType   = new DateType(
+            $this->translator,
+            $this->createMock(FilterOperatorProviderInterface::class)
+        );
     }
 
     public function testCreateValueEntityWithoutValue(): void

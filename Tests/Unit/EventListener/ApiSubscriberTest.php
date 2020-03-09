@@ -30,6 +30,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 
 class ApiSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -387,10 +388,20 @@ class ApiSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $skuField->setId(21);
         $skuField->setAlias('sku');
-        $skuField->setTypeObject(new TextType($this->createMock(TranslatorInterface::class)));
+        $skuField->setTypeObject(
+            new TextType(
+                $this->createMock(TranslatorInterface::class),
+                $this->createMock(FilterOperatorProviderInterface::class)
+            )
+        );
         $priceField->setId(34);
         $priceField->setAlias('price');
-        $priceField->setTypeObject(new IntType($this->createMock(TranslatorInterface::class)));
+        $priceField->setTypeObject(
+            new IntType(
+                $this->createMock(TranslatorInterface::class),
+                $this->createMock(FilterOperatorProviderInterface::class)
+            )
+        );
 
         $customObject->addCustomField($skuField);
         $customObject->addCustomField($priceField);

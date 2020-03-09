@@ -33,6 +33,7 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
 use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 
 class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -97,7 +98,12 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->customObject->method('getId')->willReturn(self::OBJECT_ID);
         $this->customField->method('getId')->willReturn(self::FIELD_ID);
-        $this->customField->method('getTypeObject')->willReturn(new TextType($this->translator));
+        $this->customField->method('getTypeObject')->willReturn(
+            new TextType(
+                $this->translator,
+                $this->createMock(FilterOperatorProviderInterface::class)
+            )
+        );
         $this->contact->method('getId')->willReturn(self::CONTACT_ID);
     }
 
