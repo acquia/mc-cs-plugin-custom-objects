@@ -20,6 +20,7 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
 {
@@ -28,9 +29,12 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
      */
     private $filterHelper;
 
-    public function __construct(RandomParameterName $randomParameterNameService, QueryFilterHelper $filterHelper)
-    {
-        parent::__construct($randomParameterNameService);
+    public function __construct(
+        RandomParameterName $randomParameterNameService,
+        EventDispatcherInterface $dispatcher,
+        QueryFilterHelper $filterHelper
+    ) {
+        parent::__construct($randomParameterNameService, $dispatcher);
         $this->filterHelper = $filterHelper;
     }
 

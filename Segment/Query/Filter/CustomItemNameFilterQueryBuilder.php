@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryBuilderManipulatorTrait;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CustomItemNameFilterQueryBuilder extends BaseFilterQueryBuilder
 {
@@ -29,9 +30,12 @@ class CustomItemNameFilterQueryBuilder extends BaseFilterQueryBuilder
      */
     private $filterHelper;
 
-    public function __construct(RandomParameterName $randomParameterNameService, QueryFilterHelper $filterHelper)
-    {
-        parent::__construct($randomParameterNameService);
+    public function __construct(
+        RandomParameterName $randomParameterNameService,
+        QueryFilterHelper $filterHelper,
+        EventDispatcherInterface $dispatcher
+    ) {
+        parent::__construct($randomParameterNameService, $dispatcher);
         $this->filterHelper = $filterHelper;
     }
 
