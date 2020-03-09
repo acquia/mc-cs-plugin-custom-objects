@@ -22,6 +22,7 @@ use Mautic\CoreBundle\Event\BuilderEvent;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Entity\LeadList;
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentBuilder;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
@@ -422,7 +423,12 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $customField->expects($this->once())
             ->method('getTypeObject')
-            ->willReturn(new TextType($this->createMock(TranslatorInterface::class)));
+            ->willReturn(
+                new TextType(
+                    $this->createMock(TranslatorInterface::class),
+                    $this->createMock(FilterOperatorProviderInterface::class)
+                )
+            );
 
         $customObject->method('getId')->willReturn(1234);
 

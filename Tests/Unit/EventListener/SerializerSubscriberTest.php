@@ -20,6 +20,7 @@ use JMS\Serializer\EventDispatcher\ObjectEvent;
 use JMS\Serializer\Metadata\StaticPropertyMetadata;
 use JMS\Serializer\Visitor\SerializationVisitorInterface;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use Mautic\PageBundle\Entity\Page;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
@@ -206,12 +207,14 @@ class SerializerSubscriberTest extends \PHPUnit\Framework\TestCase
         $customFieldDate = $this->createMock(CustomField::class);
         $context         = $this->createMock(Context::class);
         $visitor         = $this->createMock(SerializationVisitorInterface::class);
+        $translator      = $this->createMock(TranslatorInterface::class);
+        $filterOperator  = $this->createMock(FilterOperatorProviderInterface::class);
 
         $contact->method('getId')->willReturn(345);
         $customFieldDate->method('getAlias')->willReturn('text-field-1');
         $customFieldText->method('getAlias')->willReturn('text-field-2');
-        $customFieldDate->method('getTypeObject')->willReturn(new DateType($this->createMock(TranslatorInterface::class)));
-        $customFieldText->method('getTypeObject')->willReturn(new TextType($this->createMock(TranslatorInterface::class)));
+        $customFieldDate->method('getTypeObject')->willReturn(new DateType($translator, $filterOperator));
+        $customFieldText->method('getTypeObject')->willReturn(new TextType($translator, $filterOperator));
         $customItem->method('getId')->willReturn(567);
         $customItem->method('getName')->willReturn('Test Item');
         $customItem->method('getDateAdded')->willReturn(new \DateTimeImmutable('2019-06-12T13:24:00+00:00'));

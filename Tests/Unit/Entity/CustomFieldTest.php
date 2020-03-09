@@ -33,6 +33,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 
 class CustomFieldTest extends \PHPUnit\Framework\TestCase
 {
@@ -74,12 +75,13 @@ class CustomFieldTest extends \PHPUnit\Framework\TestCase
     {
         $context     = $this->createMock(ExecutionContextInterface::class);
         $translator  = $this->createMock(TranslatorInterface::class);
+        $provider    = $this->createMock(FilterOperatorProviderInterface::class);
         $customField = new CustomField();
 
         $context->expects($this->never())
             ->method('buildViolation');
 
-        $customField->setTypeObject(new EmailType($translator));
+        $customField->setTypeObject(new EmailType($translator, $provider));
         $customField->setDefaultValue('valid@email.address');
         $customField->validateDefaultValue($context);
     }
@@ -89,6 +91,7 @@ class CustomFieldTest extends \PHPUnit\Framework\TestCase
         $context     = $this->createMock(ExecutionContextInterface::class);
         $translator  = $this->createMock(TranslatorInterface::class);
         $violation   = $this->createMock(ConstraintViolationBuilderInterface::class);
+        $provider    = $this->createMock(FilterOperatorProviderInterface::class);
         $customField = new CustomField();
 
         $translator->method('trans')->willReturn('a validation message');
@@ -101,7 +104,7 @@ class CustomFieldTest extends \PHPUnit\Framework\TestCase
         $violation->expects($this->once())
             ->method('addViolation');
 
-        $customField->setTypeObject(new EmailType($translator));
+        $customField->setTypeObject(new EmailType($translator, $provider));
         $customField->setDefaultValue('invalid.email.address');
         $customField->validateDefaultValue($context);
     }
@@ -188,7 +191,10 @@ class CustomFieldTest extends \PHPUnit\Framework\TestCase
     public function testGetFormFieldOptions(): void
     {
         $customField  = new CustomField();
-        $typeObject   = new DateType($this->createMock(TranslatorInterface::class));
+        $typeObject   = new DateType(
+            $this->createMock(TranslatorInterface::class),
+            $this->createMock(FilterOperatorProviderInterface::class)
+        );
 
         $customField->setTypeObject($typeObject);
         $customField->setLabel('Start Date');
@@ -216,9 +222,12 @@ class CustomFieldTest extends \PHPUnit\Framework\TestCase
     public function testGetFormFieldOptionsWithChoices(): void
     {
         $customField  = new CustomField();
-        $typeObject   = new SelectType($this->createMock(TranslatorInterface::class));
         $red          = new CustomFieldOption();
         $blue         = new CustomFieldOption();
+        $typeObject   = new SelectType(
+            $this->createMock(TranslatorInterface::class),
+            $this->createMock(FilterOperatorProviderInterface::class)
+        );
 
         $red->setLabel('Red');
         $red->setValue('red');
@@ -268,7 +277,12 @@ class CustomFieldTest extends \PHPUnit\Framework\TestCase
         $customField = new CustomField();
         $customField->addOption($optionA);
         $customField->addOption($optionB);
-        $customField->setTypeObject(new SelectType($this->createMock(TranslatorInterface::class)));
+        $customField->setTypeObject(
+            new SelectType(
+                $this->createMock(TranslatorInterface::class),
+                $this->createMock(FilterOperatorProviderInterface::class)
+            )
+        );
 
         $this->assertSame([
             'option_a' => 'Option A',
@@ -279,7 +293,12 @@ class CustomFieldTest extends \PHPUnit\Framework\TestCase
     public function testGetChoicesWithCountryField(): void
     {
         $customField = new CustomField();
-        $customField->setTypeObject(new CountryType($this->createMock(TranslatorInterface::class)));
+        $customField->setTypeObject(
+            new CountryType(
+                $this->createMock(TranslatorInterface::class),
+                $this->createMock(FilterOperatorProviderInterface::class)
+            )
+        );
 
         $this->assertSame('Czech Republic', $customField->getChoices()['Czech Republic']);
     }
@@ -291,14 +310,24 @@ class CustomFieldTest extends \PHPUnit\Framework\TestCase
         $optionB->setLabel('Option B');
         $optionB->setValue('option_b');
         $customField->addOption($optionB);
-        $customField->setTypeObject(new SelectType($this->createMock(TranslatorInterface::class)));
+        $customField->setTypeObject(
+            new SelectType(
+                $this->createMock(TranslatorInterface::class),
+                $this->createMock(FilterOperatorProviderInterface::class)
+            )
+        );
         $this->assertSame('Option B', $customField->valueToLabel('option_b'));
     }
 
     public function testValueToLabelIfOptionNotFound(): void
     {
         $customField = new CustomField();
-        $customField->setTypeObject(new SelectType($this->createMock(TranslatorInterface::class)));
+        $customField->setTypeObject(
+            new SelectType(
+                $this->createMock(TranslatorInterface::class),
+                $this->createMock(FilterOperatorProviderInterface::class)
+            )
+        );
         $this->expectException(NotFoundException::class);
         $customField->valueToLabel('option_b');
     }
@@ -348,7 +377,10 @@ class CustomFieldTest extends \PHPUnit\Framework\TestCase
 
     public function testCanHaveMultipleValuesForDateType()
     {
-        $typeObject  = new DateType($this->createMock(TranslatorInterface::class));
+        $typeObject = new DateType(
+            $this->createMock(TranslatorInterface::class),
+            $this->createMock(FilterOperatorProviderInterface::class)
+        );
         $customField = new CustomField();
         $customField->setTypeObject($typeObject);
 
@@ -359,6 +391,7 @@ class CustomFieldTest extends \PHPUnit\Framework\TestCase
     {
         $typeObject = new CheckboxGroupType(
             $this->createMock(TranslatorInterface::class),
+            $this->createMock(FilterOperatorProviderInterface::class),
             $this->createMock(CsvHelper::class)
         );
         $customField = new CustomField();

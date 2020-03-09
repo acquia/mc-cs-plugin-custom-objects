@@ -18,6 +18,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInt;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 
 class IntTypeTest extends \PHPUnit\Framework\TestCase
 {
@@ -37,7 +38,10 @@ class IntTypeTest extends \PHPUnit\Framework\TestCase
         $this->translator  = $this->createMock(TranslatorInterface::class);
         $this->customField = $this->createMock(CustomField::class);
         $this->customItem  = $this->createMock(CustomItem::class);
-        $this->fieldType   = new IntType($this->translator);
+        $this->fieldType   = new IntType(
+            $this->translator,
+            $this->createMock(FilterOperatorProviderInterface::class)
+        );
     }
 
     public function testGetSymfonyFormFieldType(): void

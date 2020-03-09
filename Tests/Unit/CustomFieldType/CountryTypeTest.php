@@ -17,6 +17,7 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldType\CountryType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 
 class CountryTypeTest extends \PHPUnit\Framework\TestCase
 {
@@ -32,7 +33,10 @@ class CountryTypeTest extends \PHPUnit\Framework\TestCase
         parent::setUp();
 
         $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->fieldType  = new CountryType($this->translator);
+        $this->fieldType  = new CountryType(
+            $this->translator,
+            $this->createMock(FilterOperatorProviderInterface::class)
+        );
     }
 
     public function testGetSymfonyFormFieldType(): void

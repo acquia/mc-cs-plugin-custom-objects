@@ -16,6 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\CustomFieldType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\PhoneType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 
 class PhoneTypeTest extends \PHPUnit\Framework\TestCase
 {
@@ -33,7 +34,10 @@ class PhoneTypeTest extends \PHPUnit\Framework\TestCase
 
         $this->translator  = $this->createMock(TranslatorInterface::class);
         $this->customField = $this->createMock(CustomField::class);
-        $this->fieldType   = new PhoneType($this->translator);
+        $this->fieldType   = new PhoneType(
+            $this->translator,
+            $this->createMock(FilterOperatorProviderInterface::class)
+        );
     }
 
     public function testValidateValueWithBogusString(): void

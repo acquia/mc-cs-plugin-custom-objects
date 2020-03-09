@@ -24,6 +24,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 
 class CustomItemTest extends \PHPUnit\Framework\TestCase
 {
@@ -123,7 +124,10 @@ class CustomItemTest extends \PHPUnit\Framework\TestCase
 
         $field->method('getId')->willReturn(1);
         $field->method('getTypeObject')->willReturn(
-            new TextType($this->createMock(TranslatorInterface::class))
+            new TextType(
+                $this->createMock(TranslatorInterface::class),
+                $this->createMock(FilterOperatorProviderInterface::class)
+            )
         );
 
         $object->addCustomField($field);
@@ -147,7 +151,10 @@ class CustomItemTest extends \PHPUnit\Framework\TestCase
         $field->method('getAlias')->willReturn('field-alias-1');
         $field->method('getId')->willReturn(1);
         $field->method('getTypeObject')->willReturn(
-            new TextType($this->createMock(TranslatorInterface::class))
+            new TextType(
+                $this->createMock(TranslatorInterface::class),
+                $this->createMock(FilterOperatorProviderInterface::class)
+            )
         );
 
         $object->addCustomField($field);
@@ -173,19 +180,28 @@ class CustomItemTest extends \PHPUnit\Framework\TestCase
         $fieldA->method('getId')->willReturn(1);
         $fieldA->expects($this->never())->method('getDefaultValue');
         $fieldA->method('getTypeObject')->willReturn(
-            new TextType($this->createMock(TranslatorInterface::class))
+            new TextType(
+                $this->createMock(TranslatorInterface::class),
+                $this->createMock(FilterOperatorProviderInterface::class)
+            )
         );
 
         $fieldB->method('getId')->willReturn(2);
         $fieldB->expects($this->once())->method('getDefaultValue')->willReturn('Default B');
         $fieldB->method('getTypeObject')->willReturn(
-            new TextType($this->createMock(TranslatorInterface::class))
+            new TextType(
+                $this->createMock(TranslatorInterface::class),
+                $this->createMock(FilterOperatorProviderInterface::class)
+            )
         );
 
         $fieldC->method('getId')->willReturn(3);
         $fieldB->expects($this->once())->method('getDefaultValue')->willReturn(null);
         $fieldC->method('getTypeObject')->willReturn(
-            new TextType($this->createMock(TranslatorInterface::class))
+            new TextType(
+                $this->createMock(TranslatorInterface::class),
+                $this->createMock(FilterOperatorProviderInterface::class)
+            )
         );
 
         $object->addCustomField($fieldA);
