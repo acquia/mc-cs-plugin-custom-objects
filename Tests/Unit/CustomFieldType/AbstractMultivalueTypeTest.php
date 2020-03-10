@@ -25,12 +25,14 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 
 class AbstractMultivalueTypeTest extends \PHPUnit\Framework\TestCase
 {
     private $translator;
     private $customField;
     private $customItem;
+    private $provider;
 
     /**
      * @var AbstractMultivalueType
@@ -44,9 +46,10 @@ class AbstractMultivalueTypeTest extends \PHPUnit\Framework\TestCase
         $this->translator  = $this->createMock(TranslatorInterface::class);
         $this->customField = $this->createMock(CustomField::class);
         $this->customItem  = $this->createMock(CustomItem::class);
+        $this->provider    = $this->createMock(FilterOperatorProviderInterface::class);
         $this->fieldType   = $this->getMockForAbstractClass(
             AbstractMultivalueType::class,
-            [$this->translator, new CsvHelper()]
+            [$this->translator, $this->provider, new CsvHelper()]
         );
     }
 
@@ -78,6 +81,16 @@ class AbstractMultivalueTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOperators(): void
     {
+        $this->provider->expects($this->once())
+            ->method('getAllOperators')
+            ->willReturn([
+                'empty' => [],
+                '!empty' => [],
+                'in' => [],
+                '!in' => [],
+                'somethingelse' => [],
+                ]);
+
         $operators = $this->fieldType->getOperators();
 
         $this->assertCount(4, $operators);
