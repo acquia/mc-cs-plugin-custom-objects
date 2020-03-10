@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\CustomFieldType;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\AbstractMultivalueType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\CsvTransformer;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\MultivalueTransformer;
@@ -25,7 +26,6 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Translation\TranslatorInterface;
-use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 
 class AbstractMultivalueTypeTest extends \PHPUnit\Framework\TestCase
 {
@@ -84,10 +84,10 @@ class AbstractMultivalueTypeTest extends \PHPUnit\Framework\TestCase
         $this->provider->expects($this->once())
             ->method('getAllOperators')
             ->willReturn([
-                'empty' => [],
-                '!empty' => [],
-                'in' => [],
-                '!in' => [],
+                'empty'         => [],
+                '!empty'        => [],
+                'in'            => [],
+                '!in'           => [],
                 'somethingelse' => [],
                 ]);
 
