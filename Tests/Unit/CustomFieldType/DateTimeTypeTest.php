@@ -29,6 +29,7 @@ class DateTimeTypeTest extends \PHPUnit\Framework\TestCase
     private $translator;
     private $customField;
     private $customItem;
+    private $filterOperatorProvider;
 
     /**
      * @var DateTimeType
@@ -39,12 +40,13 @@ class DateTimeTypeTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->translator  = $this->createMock(TranslatorInterface::class);
-        $this->customField = $this->createMock(CustomField::class);
-        $this->customItem  = $this->createMock(CustomItem::class);
-        $this->fieldType   = new DateTimeType(
+        $this->translator             = $this->createMock(TranslatorInterface::class);
+        $this->customField            = $this->createMock(CustomField::class);
+        $this->customItem             = $this->createMock(CustomItem::class);
+        $this->filterOperatorProvider = $this->createMock(FilterOperatorProviderInterface::class);
+        $this->fieldType              = new DateTimeType(
             $this->translator,
-            $this->createMock(FilterOperatorProviderInterface::class)
+            $this->filterOperatorProvider
         );
     }
 
@@ -101,9 +103,19 @@ class DateTimeTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOperators(): void
     {
+        $this->filterOperatorProvider->expects($this->once())
+            ->method('getAllOperators')
+            ->willReturn([
+                'empty'         => [],
+                '!empty'        => [],
+                'in'            => [],
+                '='             => [],
+                '!='            => [],
+                'somethingelse' => [],
+            ]);
+
         $operators = $this->fieldType->getOperators();
 
-        $this->assertCount(8, $operators);
         $this->assertArrayHasKey('=', $operators);
         $this->assertArrayNotHasKey('in', $operators);
     }

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\CustomFieldType;
 
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\AbstractTextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
@@ -25,6 +26,7 @@ class AbstractTextTypeTest extends \PHPUnit\Framework\TestCase
     private $translator;
     private $customField;
     private $customItem;
+    private $filterOperatorProvider;
 
     /**
      * @var AbstractTextType
@@ -35,12 +37,13 @@ class AbstractTextTypeTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->translator  = $this->createMock(TranslatorInterface::class);
-        $this->customField = $this->createMock(CustomField::class);
-        $this->customItem  = $this->createMock(CustomItem::class);
-        $this->fieldType   = $this->getMockForAbstractClass(
+        $this->translator             = $this->createMock(TranslatorInterface::class);
+        $this->customField            = $this->createMock(CustomField::class);
+        $this->customItem             = $this->createMock(CustomItem::class);
+        $this->filterOperatorProvider = $this->createMock(FilterOperatorProviderInterface::class);
+        $this->fieldType              = $this->getMockForAbstractClass(
             AbstractTextType::class,
-            [$this->translator]
+            [$this->translator, $this->filterOperatorProvider]
         );
     }
 
@@ -73,16 +76,20 @@ class AbstractTextTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOperators(): void
     {
+        $this->filterOperatorProvider->expects($this->once())
+            ->method('getAllOperators')
+            ->willReturn([
+                'empty'  => [],
+                '!empty' => [],
+                '='      => [],
+                '!='     => [],
+            ]);
+
         $operators = $this->fieldType->getOperators();
 
         $this->assertArrayHasKey('=', $operators);
         $this->assertArrayHasKey('!=', $operators);
         $this->assertArrayHasKey('empty', $operators);
         $this->assertArrayHasKey('!empty', $operators);
-        $this->assertArrayHasKey('like', $operators);
-        $this->assertArrayHasKey('!like', $operators);
-        $this->assertArrayHasKey('startsWith', $operators);
-        $this->assertArrayHasKey('endsWith', $operators);
-        $this->assertArrayHasKey('contains', $operators);
     }
 }
