@@ -1006,8 +1006,8 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemNameFilterQueryBuilder::class,
                 'arguments' => [
                     'mautic.lead.model.random_parameter_name',
-                    'event_dispatcher',
                     'custom_object.query.filter.helper',
+                    'event_dispatcher',
                 ],
             ],
             'custom_object.query.filter.factory' => [
