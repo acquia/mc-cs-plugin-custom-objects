@@ -154,8 +154,8 @@ class CustomFieldValueModelTest extends \PHPUnit\Framework\TestCase
         $this->queryBuilder->expects($this->exactly(2))
             ->method('from')
             ->withConsecutive(
-                ['custom_field_value_text'],
-                ['custom_field_value_int']
+                [MAUTIC_TABLE_PREFIX.'custom_field_value_text'],
+                [MAUTIC_TABLE_PREFIX.'custom_field_value_int']
             );
 
         $this->queryBuilder->expects($this->exactly(2))

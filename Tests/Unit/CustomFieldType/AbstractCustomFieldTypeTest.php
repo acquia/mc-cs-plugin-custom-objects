@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\CustomFieldType;
 
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\AbstractCustomFieldType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\EmailType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
@@ -23,6 +24,7 @@ class AbstractCustomFieldTypeTest extends \PHPUnit\Framework\TestCase
 {
     private $translator;
     private $customField;
+    private $filterOperatorProvider;
 
     /**
      * @var EmailType
@@ -35,11 +37,12 @@ class AbstractCustomFieldTypeTest extends \PHPUnit\Framework\TestCase
 
         defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
-        $this->translator  = $this->createMock(TranslatorInterface::class);
-        $this->customField = $this->createMock(CustomField::class);
-        $this->fieldType   = $this->getMockForAbstractClass(
+        $this->translator             = $this->createMock(TranslatorInterface::class);
+        $this->customField            = $this->createMock(CustomField::class);
+        $this->filterOperatorProvider = $this->createMock(FilterOperatorProviderInterface::class);
+        $this->fieldType              = $this->getMockForAbstractClass(
             AbstractCustomFieldType::class,
-            [$this->translator]
+            [$this->translator, $this->filterOperatorProvider]
         );
     }
 
@@ -69,16 +72,34 @@ class AbstractCustomFieldTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOperators(): void
     {
+        $this->filterOperatorProvider->expects($this->once())
+            ->method('getAllOperators')
+            ->willReturn([
+                'empty'  => [],
+                '!empty' => [],
+                '='      => [],
+                '!='     => [],
+            ]);
+
         $this->assertArrayHasKey('=', $this->fieldType->getOperators());
     }
 
     public function testGetTableName(): void
     {
-        $this->assertSame('undefined', $this->fieldType->getTableName());
+        $this->assertSame(MAUTIC_TABLE_PREFIX.'undefined', $this->fieldType->getTableName());
     }
 
     public function testGetOperatorOptions(): void
     {
+        $this->filterOperatorProvider->expects($this->once())
+            ->method('getAllOperators')
+            ->willReturn([
+                'empty'  => [],
+                '!empty' => [],
+                '='      => [],
+                '!='     => [],
+            ]);
+
         $this->assertArrayHasKey('=', $this->fieldType->getOperatorOptions());
     }
 

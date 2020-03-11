@@ -98,7 +98,7 @@ class QueryFilterFactoryTest extends \PHPUnit\Framework\TestCase
 
         $this->contactSegmentFilter->expects($this->once())
             ->method('getTable')
-            ->willReturn('custom_objects');
+            ->willReturn(MAUTIC_TABLE_PREFIX.'custom_objects');
 
         $this->contactSegmentFilter->expects($this->once())
             ->method('getQueryType')
@@ -160,7 +160,7 @@ class QueryFilterFactoryTest extends \PHPUnit\Framework\TestCase
 
         $this->contactSegmentFilter->expects($this->once())
             ->method('getTable')
-            ->willReturn('custom_objects');
+            ->willReturn(MAUTIC_TABLE_PREFIX.'custom_objects');
 
         $this->contactSegmentFilter->expects($this->once())
             ->method('getQueryType')
@@ -217,7 +217,7 @@ class QueryFilterFactoryTest extends \PHPUnit\Framework\TestCase
 
         $this->contactSegmentFilter->expects($this->once())
             ->method('getTable')
-            ->willReturn('custom_objects');
+            ->willReturn(MAUTIC_TABLE_PREFIX.'custom_objects');
 
         $this->contactSegmentFilter->expects($this->once())
             ->method('getQueryType')
