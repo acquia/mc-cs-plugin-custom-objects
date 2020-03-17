@@ -1,8 +1,6 @@
 <?php
 
-
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
-
 
 use Mautic\LeadBundle\Event\FieldOperatorsEvent;
 use Mautic\LeadBundle\Event\FilterPropertiesTypeEvent;
@@ -52,7 +50,7 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface translatorInterfaceMock */
         $translatorInterfaceMock = $this->createMock(TranslatorInterface::class);
-        $event = new LeadListFiltersOperatorsEvent([], $translatorInterfaceMock);
+        $event                   = new LeadListFiltersOperatorsEvent([], $translatorInterfaceMock);
         $this->assertCount(0, $event->getOperators(), 'Expects 0 operators');
         $this->filterOperatorSubscriber->onOperatorsGenerate($event);
         $this->assertCount(1, $event->getOperators(), 'Expects 1 operator');
@@ -66,7 +64,7 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $event = new FieldOperatorsEvent('choice',
             'generated_email_domain',
             ['withinCustomObjects' => [
-                'label' => 'custom_label']
+                'label' => 'custom_label', ],
             ],
             []
         );
@@ -83,7 +81,7 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $event = new FieldOperatorsEvent('choice',
             'not_generated_email_domain',
             ['withinCustomObjects' => [
-                'label' => 'custom_label']
+                'label' => 'custom_label', ],
             ],
             []
         );
@@ -99,7 +97,7 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         /** @var \PHPUnit\Framework\MockObject\MockObject|FormInterface $formMock */
         $formMock = $this->createMock(FormInterface::class);
-        $event = new FilterPropertiesTypeEvent($formMock,
+        $event    = new FilterPropertiesTypeEvent($formMock,
             'town',
             'Object',
             'NotWithinCustomObjects',
@@ -118,7 +116,7 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         /** @var \PHPUnit\Framework\MockObject\MockObject|FormInterface $formMock */
         $formMock = $this->createMock(FormInterface::class);
-        $event = new FilterPropertiesTypeEvent($formMock, 'town', 'Object', 'withinCustomObjects', []);
+        $event    = new FilterPropertiesTypeEvent($formMock, 'town', 'Object', 'withinCustomObjects', []);
         /** @var \PHPUnit\Framework\MockObject\MockObject|CustomObject $customObjectMock */
         $customObjectMock = $this->createMock(CustomObject::class);
         $this->customObjectModelMock->expects($this->once())
@@ -138,7 +136,7 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
             ->with('filter', ChoiceType::class, [
                 'label'   => false,
                 'data'    => '',
-                'choices' => ['object_name' => ['Name' => "custom-object:1:name"]],
+                'choices' => ['object_name' => ['Name' => 'custom-object:1:name']],
                 'attr'    => ['class' => 'form-control'],
             ]);
         $this->filterOperatorSubscriber->onSegmentFilterFormHandleWithinFieldFormType($event);
@@ -185,7 +183,7 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
             ->with('l',
                 MAUTIC_TABLE_PREFIX.'custom_item',
                 'ci',
-                "ci.custom_object_id = 1 AND ci.name = l.city AND ci.is_published = 1");
+                'ci.custom_object_id = 1 AND ci.name = l.city AND ci.is_published = 1');
         $event = new SegmentOperatorQueryBuilderEvent($queryBuilderMock, $contactSegmentFilterMock, []);
         $this->filterOperatorSubscriber->onWithinFieldValuesBuilder($event);
     }
