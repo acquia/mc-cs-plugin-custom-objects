@@ -15,6 +15,9 @@ use MauticPlugin\CustomObjectsBundle\EventListener\FilterOperatorSubscriber;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Translation\TranslatorInterface;
+
+define("MAUTIC_TABLE_PREFIX", "");
 
 class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -44,20 +47,16 @@ class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * Test adding operators to a filter event.
+     * Test adding an operator to a filter event.
      */
     public function testOnOperatorsGenerate(): void
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|LeadListFiltersOperatorsEvent $eventMock */
-        $eventMock = $this->createMock(LeadListFiltersOperatorsEvent);
-        $eventMock->expects($this->once())
-            ->method('addOperator')
-            ->with('withinCustomObjects', [
-                'label'       => 'custom.within.custom.objects.label',
-                'expr'        => 'withinCustomObjects',
-                'negate_expr' => 'notWithinCustomObjects',
-            ]);
-        $this->filterOperatorSubscriber->onOperatorsGenerate($eventMock);
+        /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface translatorInterfaceMock */
+        $translatorInterfaceMock = $this->createMock(TranslatorInterface::class);
+        $event = new LeadListFiltersOperatorsEvent([], $translatorInterfaceMock);
+        $this->assertCount(0, $event->getOperators(), 'Expects 0 operators');
+        $this->filterOperatorSubscriber->onOperatorsGenerate($event);
+        $this->assertCount(1, $event->getOperators(), 'Expects 1 operator');
     }
 
     /**
@@ -65,64 +64,62 @@ class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     public function testAddWithinFieldValuesOperatorWhenGeneratedEmailDomain(): void
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|FieldOperatorsEvent $eventMock */
-        $eventMock = $this->createMock(FieldOperatorsEvent::class);
-        $eventMock->expects($this->once())
-            ->method('getField')
-            ->willReturn('generated_email_domain');
-        $eventMock->expects($this->once())
-            ->method('addOperator')
-            ->with('withinCustomObjects');
-        $this->filterOperatorSubscriber->addWithinFieldValuesOperator($eventMock);
+        $event = new FieldOperatorsEvent('choice',
+            'generated_email_domain',
+            ['withinCustomObjects' => [
+                'label' => 'custom_label']
+            ],
+            []
+        );
+        $this->assertEmpty($event->getOperators());
+        $this->filterOperatorSubscriber->addWithinFieldValuesOperator($event);
+        $this->assertContains('withinCustomObjects', $event->getOperators());
     }
 
     /**
-     * Test adding operators to an field event when field is not generated email domain.
+     * Test adding operators to an field event when field is not generated email domain. Nothing added.
      */
     public function testAddWithinFieldValuesOperatorWhenNotGeneratedEmailDomain(): void
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|FieldOperatorsEvent $eventMock */
-        $eventMock = $this->createMock(FieldOperatorsEvent::class);
-        $eventMock->expects($this->once())
-            ->method('getField')
-            ->willReturn('not_generated_email_domain');
-        $eventMock->expects($this->never())
-            ->method('addOperator');
-        $this->filterOperatorSubscriber->addWithinFieldValuesOperator($eventMock);
+        $event = new FieldOperatorsEvent('choice',
+            'not_generated_email_domain',
+            ['withinCustomObjects' => [
+                'label' => 'custom_label']
+            ],
+            []
+        );
+        $this->assertEmpty($event->getOperators());
+        $this->filterOperatorSubscriber->addWithinFieldValuesOperator($event);
+        $this->assertEmpty($event->getOperators());
     }
 
     /**
-     * Test segment filter when operator already defined.
+     * Test segment filter when different operator. Method add on form is never called.
      */
     public function testOnSegmentFilterFormHandleWithinFieldFormTypeWhenWithinCustomObjectsIsOneOf(): void
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|FilterPropertiesTypeEvent $eventMock */
-        $eventMock = $this->createMock(FilterPropertiesTypeEvent::class);
-        $eventMock->expects($this->once())
-            ->method('operatorIsOneOf')
-            ->with('withinCustomObjects')
-            ->willReturn(true);
-        $eventMock->expects($this->never())
-            ->method('getFilterPropertiesForm');
-        $this->filterOperatorSubscriber->onSegmentFilterFormHandleWithinFieldFormType($eventMock);
+        /** @var \PHPUnit\Framework\MockObject\MockObject|FormInterface $formMock */
+        $formMock = $this->createMock(FormInterface::class);
+        $event = new FilterPropertiesTypeEvent($formMock,
+            'town',
+            'Object',
+            'NotWithinCustomObjects',
+            []
+        );
+        $this->filterOperatorSubscriber->onSegmentFilterFormHandleWithinFieldFormType($event);
+        $formMock->expects($this->never())
+            ->method('add')
+            ->withAnyParameters();
     }
 
     /**
      * Test adding to form.
      */
-    public function testOnSegmentFilterFormHandleWithinFieldFormType(): void
+    public function testOnSegmentFilterFormHandleWithinFieldFormTypeU(): void
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|FilterPropertiesTypeEvent $eventMock */
-        $eventMock = $this->createMock(FilterPropertiesTypeEvent::class);
-        $eventMock->expects($this->once())
-            ->method('operatorIsOneOf')
-            ->with('withinCustomObjects')
-            ->willReturn(false);
         /** @var \PHPUnit\Framework\MockObject\MockObject|FormInterface $formMock */
         $formMock = $this->createMock(FormInterface::class);
-        $eventMock->expects($this->once())
-            ->method('getFilterPropertiesForm')
-            ->willReturn($formMock);
+        $event = new FilterPropertiesTypeEvent($formMock, 'town', 'Object', 'withinCustomObjects', []);
         /** @var \PHPUnit\Framework\MockObject\MockObject|CustomObject $customObjectMock */
         $customObjectMock = $this->createMock(CustomObject::class);
         $this->customObjectModelMock->expects($this->once())
@@ -145,25 +142,25 @@ class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                 'choices' => ['object_name' => ['Name' => "custom-object:1:name"]],
                 'attr'    => ['class' => 'form-control'],
             ]);
-        $eventMock->expects($this->once())
-            ->method('stopPropagation');
-        $this->filterOperatorSubscriber->onSegmentFilterFormHandleWithinFieldFormType($eventMock);
+        $this->filterOperatorSubscriber->onSegmentFilterFormHandleWithinFieldFormType($event);
     }
 
     /**
-     * Test builder when operator already defined.
+     * Test builder when different operator. It breaks and never calls getParameterValue.
      */
     public function testOnWithinFieldValuesBuilderWhenWithinCustomObjectsIsOneOf(): void
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|SegmentOperatorQueryBuilderEvent $eventMock */
-        $eventMock = $this->createMock(SegmentOperatorQueryBuilderEvent::class);
-        $eventMock->expects($this->once())
-            ->method('operatorIsOneOf')
-            ->with('withinCustomObjects')
-            ->willReturn(true);
-        $eventMock->expects($this->never())
-            ->method('getQueryBuilder');
-        $this->filterOperatorSubscriber->onWithinFieldValuesBuilder($eventMock);
+        /** @var \PHPUnit\Framework\MockObject\MockObject|QueryBuilder $queryBuilderMock */
+        $queryBuilderMock = $this->createMock(QueryBuilder::class);
+        /** @var \PHPUnit\Framework\MockObject\MockObject|ContactSegmentFilter $contactSegmentFilterMock */
+        $contactSegmentFilterMock = $this->createMock(ContactSegmentFilter::class);
+        $contactSegmentFilterMock->expects($this->once())
+            ->method('getOperator')
+            ->willReturn('notWithinCustomObjects');
+        $event = new SegmentOperatorQueryBuilderEvent($queryBuilderMock, $contactSegmentFilterMock, []);
+        $this->filterOperatorSubscriber->onWithinFieldValuesBuilder($event);
+        $contactSegmentFilterMock->expects($this->never())
+            ->method('getParameterValue');
     }
 
     /**
@@ -171,22 +168,17 @@ class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     public function testOnWithinFieldValuesBuilder(): void
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|SegmentOperatorQueryBuilderEvent $eventMock */
-        $eventMock = $this->createMock(SegmentOperatorQueryBuilderEvent::class);
-        $eventMock->expects($this->once())
-            ->method('operatorIsOneOf')
-            ->with('withinCustomObjects')
-            ->willReturn(false);
         /** @var \PHPUnit\Framework\MockObject\MockObject|ContactSegmentFilter $contactSegmentFilterMock */
         $contactSegmentFilterMock = $this->createMock(ContactSegmentFilter::class);
         $contactSegmentFilterMock->expects($this->once())
             ->method('getParameterValue')
             ->willReturn('custom-object:1:name');
-        $eventMock->method('getFilter')
-            ->willReturn($contactSegmentFilterMock);
         $contactSegmentFilterMock->expects($this->once())
             ->method('getField')
             ->willReturn('city');
+        $contactSegmentFilterMock->expects($this->once())
+            ->method('getOperator')
+            ->willReturn('withinCustomObjects');
         /** @var \PHPUnit\Framework\MockObject\MockObject|QueryBuilder $queryBuilderMock */
         $queryBuilderMock = $this->createMock(QueryBuilder::class);
         $queryBuilderMock->expects($this->once())
@@ -195,14 +187,7 @@ class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
                 MAUTIC_TABLE_PREFIX.'custom_item',
                 'ci',
                 "ci.custom_object_id = 1 AND ci.name = l.city AND ci.is_published = 1");
-        $eventMock->expects($this->once())
-            ->method('getQueryBuilder')
-            ->willReturn($queryBuilderMock);
-        $eventMock->expects($this->once())
-            ->method('setOperatorHandled')
-            ->with(true);
-        $eventMock->expects($this->once())
-            ->method('stopPropagation');
-        $this->filterOperatorSubscriber->onWithinFieldValuesBuilder($eventMock);
+        $event = new SegmentOperatorQueryBuilderEvent($queryBuilderMock, $contactSegmentFilterMock, []);
+        $this->filterOperatorSubscriber->onWithinFieldValuesBuilder($event);
     }
 }
