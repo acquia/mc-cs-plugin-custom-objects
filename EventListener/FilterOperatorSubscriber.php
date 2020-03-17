@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Mautic\LeadBundle\Event\FieldOperatorsEvent;
-use Mautic\LeadBundle\Event\FilterPropertiesTypeEvent;
+use Mautic\LeadBundle\Event\FormAdjustmentEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
 use Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent;
 use Mautic\LeadBundle\LeadEvents;
@@ -66,7 +66,7 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onSegmentFilterFormHandleWithinFieldFormType(FilterPropertiesTypeEvent $event): void
+    public function onSegmentFilterFormHandleWithinFieldFormType(FormAdjustmentEvent $event): void
     {
         if (!$event->operatorIsOneOf(self::WITHIN_VALUES)) {
             return;
