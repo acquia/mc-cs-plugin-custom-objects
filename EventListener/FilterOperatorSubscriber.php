@@ -25,7 +25,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class FilterOperatorSubscriber implements EventSubscriberInterface
 {
-    public const WITHIN_VALUES = 'withinValues';
+    public const WITHIN_CUSTOM_OBJECTS = 'withinCustomObjects';
 
     /**
      * @var CustomObjectModel
@@ -52,23 +52,23 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
 
     public function onOperatorsGenerate(LeadListFiltersOperatorsEvent $event)
     {
-        $event->addOperator(self::WITHIN_VALUES, [
-            'label'       => 'custom.within.field.values.label',
-            'expr'        => self::WITHIN_VALUES,
-            'negate_expr' => 'notWithinValues',
+        $event->addOperator(self::WITHIN_CUSTOM_OBJECTS, [
+            'label'       => 'custom.within.custom.objects.label',
+            'expr'        => self::WITHIN_CUSTOM_OBJECTS,
+            'negate_expr' => 'notWithinCustomObjects',
         ]);
     }
 
     public function addWithinFieldValuesOperator(FieldOperatorsEvent $event)
     {
         if ('generated_email_domain' === $event->getField()) {
-            $event->addOperator(self::WITHIN_VALUES);
+            $event->addOperator(self::WITHIN_CUSTOM_OBJECTS);
         }
     }
 
     public function onSegmentFilterFormHandleWithinFieldFormType(FilterPropertiesTypeEvent $event): void
     {
-        if (!$event->operatorIsOneOf(self::WITHIN_VALUES)) {
+        if (!$event->operatorIsOneOf(self::WITHIN_CUSTOM_OBJECTS)) {
             return;
         }
 
@@ -100,7 +100,7 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
 
     public function onWithinFieldValuesBuilder(SegmentOperatorQueryBuilderEvent $event): void
     {
-        if (!$event->operatorIsOneOf(self::WITHIN_VALUES)) {
+        if (!$event->operatorIsOneOf(self::WITHIN_CUSTOM_OBJECTS)) {
             return;
         }
 
