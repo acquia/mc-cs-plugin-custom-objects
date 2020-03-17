@@ -72,7 +72,7 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $form          = $event->getFilterPropertiesForm();
+        $form          = $event->getForm();
         $customObjects = $this->customObjectModel->fetchAllPublishedEntities();
         $choices       = [];
 
