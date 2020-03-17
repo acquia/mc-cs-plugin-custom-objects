@@ -3,7 +3,7 @@
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
 use Mautic\LeadBundle\Event\FieldOperatorsEvent;
-use Mautic\LeadBundle\Event\FilterPropertiesTypeEvent;
+use Mautic\LeadBundle\Event\FormAdjustmentEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
 use Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
@@ -97,7 +97,7 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         /** @var \PHPUnit\Framework\MockObject\MockObject|FormInterface $formMock */
         $formMock = $this->createMock(FormInterface::class);
-        $event    = new FilterPropertiesTypeEvent($formMock,
+        $event    = new FormAdjustmentEvent($formMock,
             'town',
             'Object',
             'NotWithinCustomObjects',
@@ -116,7 +116,7 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         /** @var \PHPUnit\Framework\MockObject\MockObject|FormInterface $formMock */
         $formMock = $this->createMock(FormInterface::class);
-        $event    = new FilterPropertiesTypeEvent($formMock, 'town', 'Object', 'withinCustomObjects', []);
+        $event    = new FormAdjustmentEvent($formMock, 'town', 'Object', 'withinCustomObjects', []);
         /** @var \PHPUnit\Framework\MockObject\MockObject|CustomObject $customObjectMock */
         $customObjectMock = $this->createMock(CustomObject::class);
         $this->customObjectModelMock->expects($this->once())
