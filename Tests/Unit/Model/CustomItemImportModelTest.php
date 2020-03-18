@@ -17,6 +17,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use Mautic\LeadBundle\Entity\Import;
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateTimeType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextareaType;
@@ -27,6 +28,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemImportModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomItemImportModelTest extends \PHPUnit\Framework\TestCase
@@ -45,19 +47,45 @@ class CustomItemImportModelTest extends \PHPUnit\Framework\TestCase
         'name'        => 'customItemName',
     ];
 
+    /**
+     * @var MockObject|CustomObject
+     */
     private $customObject;
 
+    /**
+     * @var MockObject|Import
+     */
     private $import;
 
+    /**
+     * @var MockObject|EntityManager
+     */
     private $entityManager;
 
+    /**
+     * @var MockObject|CustomItemModel
+     */
     private $customItemModel;
 
+    /**
+     * @var MockObject|FormatterHelper
+     */
     private $formatterHelper;
 
+    /**
+     * @var MockObject|CustomField
+     */
     private $descriptionField;
 
+    /**
+     * @var MockObject|CustomField
+     */
     private $dateField;
+
+    /**
+     * @var MockObject|FilterOperatorProviderInterface
+     */
+    private $filterOperatorProvider;
 
     /**
      * @var CustomItemImportModel
@@ -68,23 +96,29 @@ class CustomItemImportModelTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->descriptionField           = $this->createMock(CustomField::class);
-        $this->dateField                  = $this->createMock(CustomField::class);
-        $this->customObject               = $this->createMock(CustomObject::class);
-        $this->import                     = $this->createMock(Import::class);
-        $this->customItemModel            = $this->createMock(CustomItemModel::class);
-        $this->entityManager              = $this->createMock(EntityManager::class);
-        $this->formatterHelper            = $this->createMock(FormatterHelper::class);
-        $this->customItemImportModel      = new CustomItemImportModel(
+        $this->descriptionField       = $this->createMock(CustomField::class);
+        $this->dateField              = $this->createMock(CustomField::class);
+        $this->customObject           = $this->createMock(CustomObject::class);
+        $this->import                 = $this->createMock(Import::class);
+        $this->customItemModel        = $this->createMock(CustomItemModel::class);
+        $this->entityManager          = $this->createMock(EntityManager::class);
+        $this->formatterHelper        = $this->createMock(FormatterHelper::class);
+        $this->filterOperatorProvider = $this->createMock(FilterOperatorProviderInterface::class);
+        $this->customItemImportModel  = new CustomItemImportModel(
             $this->entityManager,
             $this->customItemModel,
             $this->formatterHelper
         );
 
+        /** @var TranslatorInterface $translator */
+        $translator = $this->createMock(TranslatorInterface::class);
+
+        $textareaType = new TextareaType($translator, $this->filterOperatorProvider);
+        $dateTimeType = new DateTimeType($translator, $this->filterOperatorProvider);
         $this->descriptionField->method('getId')->willReturn(33);
-        $this->descriptionField->method('getTypeObject')->willReturn(new TextareaType($this->createMock(TranslatorInterface::class)));
+        $this->descriptionField->method('getTypeObject')->willReturn($textareaType);
         $this->dateField->method('getId')->willReturn(34);
-        $this->dateField->method('getTypeObject')->willReturn(new DateTimeType($this->createMock(TranslatorInterface::class)));
+        $this->dateField->method('getTypeObject')->willReturn($dateTimeType);
     }
 
     public function testImportForCreated(): void

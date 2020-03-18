@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Provider;
 
 use Mautic\CoreBundle\Translation\Translator;
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateTimeType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
@@ -26,7 +27,8 @@ class CustomFieldTypeProviderTest extends \PHPUnit\Framework\TestCase
     public function testWorkflow(): void
     {
         $customFieldTypeProvider = new CustomFieldTypeProvider();
-        $textType                = new TextType($this->createMock(TranslatorInterface::class));
+        $filterOperatorProvider  = $this->createMock(FilterOperatorProviderInterface::class);
+        $textType                = new TextType($this->createMock(TranslatorInterface::class), $filterOperatorProvider);
 
         $customFieldTypeProvider->addType($textType);
 
@@ -38,19 +40,18 @@ class CustomFieldTypeProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testKeyTypeMapping(): void
     {
-        $mockTranslator = $this->createMock(Translator::class);
-
-        $typesArray = [
-            'custom.field.type.date'      => new DateType($mockTranslator),
-            'custom.field.type.datetime'  => new DateTimeType($mockTranslator),
+        $filterOperatorProvider = $this->createMock(FilterOperatorProviderInterface::class);
+        $mockTranslator         = $this->createMock(Translator::class);
+        $typeProvider           = new CustomFieldTypeProvider();
+        $match                  = [];
+        $typesArray             = [
+            'custom.field.type.date'      => new DateType($mockTranslator, $filterOperatorProvider),
+            'custom.field.type.datetime'  => new DateTimeType($mockTranslator, $filterOperatorProvider),
         ];
 
-        $mockTranslator->expects($this->exactly(count($typesArray)))->method('trans')
+        $mockTranslator->expects($this->exactly(count($typesArray)))
+            ->method('trans')
             ->willReturnCallback(function ($argument) {return $argument; });
-
-        $typeProvider = new CustomFieldTypeProvider();
-
-        $match = [];
 
         foreach ($typesArray as $type) {
             $typeProvider->addType($type);

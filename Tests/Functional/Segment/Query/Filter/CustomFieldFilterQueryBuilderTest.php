@@ -26,6 +26,7 @@ use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQuery
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CustomFieldFilterQueryBuilderTest extends MauticWebTestCase
 {
@@ -77,11 +78,19 @@ class CustomFieldFilterQueryBuilderTest extends MauticWebTestCase
     public function testApplyQuery(): void
     {
         /** @var CustomFieldTypeProvider $fieldTypeProvider */
-        $fieldTypeProvider   = $this->getContainer()->get('custom_field.type.provider');
+        $fieldTypeProvider = $this->getContainer()->get('custom_field.type.provider');
+
+        /** @var EventDispatcherInterface $dispatcher */
+        $dispatcher = $this->getContainer()->get('event_dispatcher');
+
         $queryHelper         = new QueryFilterHelper($fieldTypeProvider);
-        $queryBuilderService = new CustomFieldFilterQueryBuilder(new RandomParameterName(), $queryHelper);
-        $filterMock          = $this->createSegmentFilterMock('hate');
-        $queryBuilder        = $this->getLeadsQueryBuilder();
+        $queryBuilderService = new CustomFieldFilterQueryBuilder(
+            new RandomParameterName(),
+            $dispatcher,
+            $queryHelper
+        );
+        $filterMock   = $this->createSegmentFilterMock('hate');
+        $queryBuilder = $this->getLeadsQueryBuilder();
         $queryBuilderService->applyQuery($queryBuilder, $filterMock);
 
         $this->assertSame(2, $this->executeSelect($queryBuilder)->rowCount());

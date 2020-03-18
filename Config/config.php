@@ -683,6 +683,12 @@ return [
                     'mautic.helper.ip_lookup',
                 ],
             ],
+            'custom_object.filter.operator.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\FilterOperatorSubscriber::class,
+                'arguments' => [
+                    'mautic.custom.model.object',
+                ],
+            ],
             'custom_object.button.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectButtonSubscriber::class,
                 'arguments' => [
@@ -832,74 +838,74 @@ return [
         'fieldTypes' => [
             'custom.field.type.country' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\CountryType::class,
-                'arguments' => ['translator'],
+                'arguments' => ['translator', 'mautic.lead.provider.fillterOperator'],
                 'tag'       => 'custom.field.type',
             ],
             'custom.field.type.date' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\DateType::class,
-                'arguments' => ['translator'],
+                'arguments' => ['translator', 'mautic.lead.provider.fillterOperator'],
                 'tag'       => 'custom.field.type',
             ],
             'custom.field.type.datetime' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\DateTimeType::class,
-                'arguments' => ['translator'],
+                'arguments' => ['translator', 'mautic.lead.provider.fillterOperator'],
                 'tag'       => 'custom.field.type',
             ],
             'custom.field.type.email' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\EmailType::class,
-                'arguments' => ['translator'],
+                'arguments' => ['translator', 'mautic.lead.provider.fillterOperator'],
                 'tag'       => 'custom.field.type',
             ],
             'custom.field.type.hidden' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\HiddenType::class,
-                'arguments' => ['translator'],
+                'arguments' => ['translator', 'mautic.lead.provider.fillterOperator'],
                 'tag'       => 'custom.field.type',
             ],
             'custom.field.type.int' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType::class,
-                'arguments' => ['translator'],
+                'arguments' => ['translator', 'mautic.lead.provider.fillterOperator'],
                 'tag'       => 'custom.field.type',
             ],
             'custom.field.type.phone' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\PhoneType::class,
-                'arguments' => ['translator'],
+                'arguments' => ['translator', 'mautic.lead.provider.fillterOperator'],
                 'tag'       => 'custom.field.type',
             ],
             'custom.field.type.select' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\SelectType::class,
-                'arguments' => ['translator'],
+                'arguments' => ['translator', 'mautic.lead.provider.fillterOperator'],
                 'tag'       => 'custom.field.type',
             ],
             'custom.field.type.multiselect' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\MultiselectType::class,
-                'arguments' => ['translator', 'custom_object.csv.helper'],
+                'arguments' => ['translator', 'mautic.lead.provider.fillterOperator', 'custom_object.csv.helper'],
                 'tag'       => 'custom.field.type',
             ],
             'custom.field.type.text' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType::class,
-                'arguments' => ['translator'],
+                'arguments' => ['translator', 'mautic.lead.provider.fillterOperator'],
                 'tag'       => 'custom.field.type',
             ],
             'custom.field.type.textarea' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\TextareaType::class,
-                'arguments' => ['translator'],
+                'arguments' => ['translator', 'mautic.lead.provider.fillterOperator'],
                 'tag'       => 'custom.field.type',
             ],
             'custom.field.type.url' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\UrlType::class,
-                'arguments' => ['translator'],
+                'arguments' => ['translator', 'mautic.lead.provider.fillterOperator'],
                 'tag'       => 'custom.field.type',
             ],
             // Hiding these as they duplicate the select and multiselect field type functionality.
             // Remove these field types if no one will miss them.
             // 'custom.field.type.checkbox_group' => [
             //     'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\CheckboxGroupType::class,
-            //     'arguments' => ['translator', 'custom_object.csv.helper'],
+            //     'arguments' => ['translator', 'mautic.lead.provider.fillterOperator', 'custom_object.csv.helper'],
             //     'tag'       => 'custom.field.type',
             // ],
             // 'custom.field.type.radio_group' => [
             //     'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\RadioGroupType::class,
-            //     'arguments' => ['translator'],
+            //     'arguments' => ['translator', 'mautic.lead.provider.fillterOperator'],
             //     'tag'       => 'custom.field.type',
             // ],
         ],
@@ -990,11 +996,19 @@ return [
             ],
             'mautic.lead.query.builder.custom_field.value' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder::class,
-                'arguments' => ['mautic.lead.model.random_parameter_name', 'custom_object.query.filter.helper'],
+                'arguments' => [
+                    'mautic.lead.model.random_parameter_name',
+                    'event_dispatcher',
+                    'custom_object.query.filter.helper',
+                ],
             ],
             'mautic.lead.query.builder.custom_item.value'  => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemNameFilterQueryBuilder::class,
-                'arguments' => ['mautic.lead.model.random_parameter_name', 'custom_object.query.filter.helper'],
+                'arguments' => [
+                    'mautic.lead.model.random_parameter_name',
+                    'custom_object.query.filter.helper',
+                    'event_dispatcher',
+                ],
             ],
             'custom_object.query.filter.factory' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory::class,

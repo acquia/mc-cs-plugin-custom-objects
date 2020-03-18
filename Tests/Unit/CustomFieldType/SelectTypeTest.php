@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\CustomFieldType;
 
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\SelectType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption;
@@ -26,6 +27,7 @@ class SelectTypeTest extends \PHPUnit\Framework\TestCase
     private $translator;
     private $customField;
     private $customItem;
+    private $filterOperatorProvider;
 
     /**
      * @var SelectType
@@ -36,10 +38,14 @@ class SelectTypeTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->translator  = $this->createMock(TranslatorInterface::class);
-        $this->customField = $this->createMock(CustomField::class);
-        $this->customItem  = $this->createMock(CustomItem::class);
-        $this->fieldType   = new SelectType($this->translator);
+        $this->translator             = $this->createMock(TranslatorInterface::class);
+        $this->customField            = $this->createMock(CustomField::class);
+        $this->customItem             = $this->createMock(CustomItem::class);
+        $this->filterOperatorProvider = $this->createMock(FilterOperatorProviderInterface::class);
+        $this->fieldType              = new SelectType(
+            $this->translator,
+            $this->filterOperatorProvider
+        );
     }
 
     public function testGetSymfonyFormFieldType(): void
@@ -54,6 +60,17 @@ class SelectTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOperators(): void
     {
+        $this->filterOperatorProvider->expects($this->once())
+            ->method('getAllOperators')
+            ->willReturn([
+                'empty'         => [],
+                '!empty'        => [],
+                'in'            => [],
+                '='             => [],
+                '!='            => [],
+                'somethingelse' => [],
+                ]);
+
         $operators = $this->fieldType->getOperators();
 
         $this->assertCount(4, $operators);

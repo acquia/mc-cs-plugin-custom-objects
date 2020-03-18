@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
@@ -61,7 +62,10 @@ class CustomFieldPostLoadSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testPostLoadWhenParamsIsNotAnArray(): void
     {
-        $typeObject = new TextType($this->createMock(TranslatorInterface::class));
+        $typeObject = new TextType(
+            $this->createMock(TranslatorInterface::class),
+            $this->createMock(FilterOperatorProviderInterface::class)
+        );
 
         $this->event->expects($this->once())
             ->method('getObject')
@@ -92,7 +96,10 @@ class CustomFieldPostLoadSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testPostLoadWhenParamsIsAnArray(): void
     {
-        $typeObject = new TextType($this->createMock(TranslatorInterface::class));
+        $typeObject = new TextType(
+            $this->createMock(TranslatorInterface::class),
+            $this->createMock(FilterOperatorProviderInterface::class)
+        );
 
         $this->event->expects($this->once())
             ->method('getObject')

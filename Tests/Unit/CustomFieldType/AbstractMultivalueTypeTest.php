@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\CustomFieldType;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\AbstractMultivalueType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\CsvTransformer;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\MultivalueTransformer;
@@ -31,6 +32,7 @@ class AbstractMultivalueTypeTest extends \PHPUnit\Framework\TestCase
     private $translator;
     private $customField;
     private $customItem;
+    private $provider;
 
     /**
      * @var AbstractMultivalueType
@@ -44,9 +46,10 @@ class AbstractMultivalueTypeTest extends \PHPUnit\Framework\TestCase
         $this->translator  = $this->createMock(TranslatorInterface::class);
         $this->customField = $this->createMock(CustomField::class);
         $this->customItem  = $this->createMock(CustomItem::class);
+        $this->provider    = $this->createMock(FilterOperatorProviderInterface::class);
         $this->fieldType   = $this->getMockForAbstractClass(
             AbstractMultivalueType::class,
-            [$this->translator, new CsvHelper()]
+            [$this->translator, $this->provider, new CsvHelper()]
         );
     }
 
@@ -78,6 +81,16 @@ class AbstractMultivalueTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOperators(): void
     {
+        $this->provider->expects($this->once())
+            ->method('getAllOperators')
+            ->willReturn([
+                'empty'         => [],
+                '!empty'        => [],
+                'in'            => [],
+                '!in'           => [],
+                'somethingelse' => [],
+                ]);
+
         $operators = $this->fieldType->getOperators();
 
         $this->assertCount(4, $operators);

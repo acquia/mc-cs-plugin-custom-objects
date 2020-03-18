@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
-use Mautic\LeadBundle\Segment\OperatorOptions;
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
@@ -38,9 +38,17 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
      */
     protected $translator;
 
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
+    /**
+     * @var FilterOperatorProviderInterface
+     */
+    protected $filterOperatorProvider;
+
+    public function __construct(
+        TranslatorInterface $translator,
+        FilterOperatorProviderInterface $filterOperatorProvider
+    ) {
+        $this->translator             = $translator;
+        $this->filterOperatorProvider = $filterOperatorProvider;
     }
 
     public function __toString(): string
@@ -68,7 +76,7 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
      */
     public function getOperators(): array
     {
-        return OperatorOptions::getFilterExpressionFunctions();
+        return $this->filterOperatorProvider->getAllOperators();
     }
 
     public function getTableName(): string

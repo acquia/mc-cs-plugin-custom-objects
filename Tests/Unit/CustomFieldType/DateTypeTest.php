@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\CustomFieldType;
 
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\DateTransformer;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\ViewDateTransformer;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateType;
@@ -27,6 +28,7 @@ class DateTypeTest extends \PHPUnit\Framework\TestCase
     private $translator;
     private $customField;
     private $customItem;
+    private $filterOperatorProvider;
 
     /**
      * @var DateType
@@ -37,10 +39,14 @@ class DateTypeTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->translator  = $this->createMock(TranslatorInterface::class);
-        $this->customField = $this->createMock(CustomField::class);
-        $this->customItem  = $this->createMock(CustomItem::class);
-        $this->fieldType   = new DateType($this->translator);
+        $this->translator             = $this->createMock(TranslatorInterface::class);
+        $this->customField            = $this->createMock(CustomField::class);
+        $this->customItem             = $this->createMock(CustomItem::class);
+        $this->filterOperatorProvider = $this->createMock(FilterOperatorProviderInterface::class);
+        $this->fieldType              = new DateType(
+            $this->translator,
+            $this->filterOperatorProvider
+        );
     }
 
     public function testCreateValueEntityWithoutValue(): void
@@ -96,9 +102,19 @@ class DateTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testGetOperators(): void
     {
+        $this->filterOperatorProvider->expects($this->once())
+            ->method('getAllOperators')
+            ->willReturn([
+                'empty'         => [],
+                '!empty'        => [],
+                'in'            => [],
+                '='             => [],
+                '!='            => [],
+                'somethingelse' => [],
+            ]);
+
         $operators = $this->fieldType->getOperators();
 
-        $this->assertCount(8, $operators);
         $this->assertArrayHasKey('=', $operators);
         $this->assertArrayNotHasKey('in', $operators);
     }

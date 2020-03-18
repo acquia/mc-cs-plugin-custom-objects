@@ -19,6 +19,7 @@ use Doctrine\DBAL\Statement;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
@@ -97,7 +98,12 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->customObject->method('getId')->willReturn(self::OBJECT_ID);
         $this->customField->method('getId')->willReturn(self::FIELD_ID);
-        $this->customField->method('getTypeObject')->willReturn(new TextType($this->translator));
+        $this->customField->method('getTypeObject')->willReturn(
+            new TextType(
+                $this->translator,
+                $this->createMock(FilterOperatorProviderInterface::class)
+            )
+        );
         $this->contact->method('getId')->willReturn(self::CONTACT_ID);
     }
 

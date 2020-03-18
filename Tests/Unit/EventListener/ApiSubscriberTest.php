@@ -16,6 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 use InvalidArgumentException;
 use Mautic\ApiBundle\Event\ApiEntityEvent;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
@@ -387,10 +388,20 @@ class ApiSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $skuField->setId(21);
         $skuField->setAlias('sku');
-        $skuField->setTypeObject(new TextType($this->createMock(TranslatorInterface::class)));
+        $skuField->setTypeObject(
+            new TextType(
+                $this->createMock(TranslatorInterface::class),
+                $this->createMock(FilterOperatorProviderInterface::class)
+            )
+        );
         $priceField->setId(34);
         $priceField->setAlias('price');
-        $priceField->setTypeObject(new IntType($this->createMock(TranslatorInterface::class)));
+        $priceField->setTypeObject(
+            new IntType(
+                $this->createMock(TranslatorInterface::class),
+                $this->createMock(FilterOperatorProviderInterface::class)
+            )
+        );
 
         $customObject->addCustomField($skuField);
         $customObject->addCustomField($priceField);

@@ -26,6 +26,7 @@ use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemNameFilterQu
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\Exception\FixtureNotFoundException;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CustomItemNameFilterQueryBuilderTest extends MauticWebTestCase
 {
@@ -72,11 +73,19 @@ class CustomItemNameFilterQueryBuilderTest extends MauticWebTestCase
     public function testApplyQuery(): void
     {
         /** @var CustomFieldTypeProvider $fieldTypeProvider */
-        $fieldTypeProvider   = $this->getContainer()->get('custom_field.type.provider');
+        $fieldTypeProvider = $this->getContainer()->get('custom_field.type.provider');
+
+        /** @var EventDispatcherInterface $dispatcher */
+        $dispatcher = $this->getContainer()->get('event_dispatcher');
+
         $filterHelper        = new QueryFilterHelper($fieldTypeProvider);
-        $queryBuilderService = new CustomItemNameFilterQueryBuilder(new RandomParameterName(), $filterHelper);
-        $filterMock          = $this->createSegmentFilterMock('%emotion%', 'text', 'like', 'custom_object3');
-        $queryBuilder        = $this->getLeadsQueryBuilder();
+        $queryBuilderService = new CustomItemNameFilterQueryBuilder(
+            new RandomParameterName(),
+            $filterHelper,
+            $dispatcher
+        );
+        $filterMock   = $this->createSegmentFilterMock('%emotion%', 'text', 'like', 'custom_object3');
+        $queryBuilder = $this->getLeadsQueryBuilder();
 
         $queryBuilderService->applyQuery($queryBuilder, $filterMock);
 
