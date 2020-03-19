@@ -111,6 +111,12 @@ class CustomObjectButtonSubscriberTest extends \PHPUnit\Framework\TestCase
             ->withConsecutive([[
                 'attr' => [
                     'href' => 'generated/delete/route',
+                    'data-toggle' => 'confirmation',
+                    'data-message' => null,
+                    'data-confirm-text' => null,
+                    'data-confirm-callback' => 'executeAction',
+                    'data-cancel-text' => null,
+                    'data-cancel-callback' => 'dismissConfirmation',
                 ],
                 'btnText'   => 'mautic.core.form.delete',
                 'iconClass' => 'fa fa-fw fa-trash-o text-danger',
@@ -246,6 +252,12 @@ class CustomObjectButtonSubscriberTest extends \PHPUnit\Framework\TestCase
             ->withConsecutive([[
                 'attr' => [
                     'href' => 'generated/delete/route',
+                    'data-toggle' => 'confirmation',
+                    'data-message' => null,
+                    'data-confirm-text' => null,
+                    'data-confirm-callback' => 'executeAction',
+                    'data-cancel-text' => null,
+                    'data-cancel-callback' => 'dismissConfirmation'                    ,
                 ],
                 'btnText'   => 'mautic.core.form.delete',
                 'iconClass' => 'fa fa-fw fa-trash-o text-danger',
