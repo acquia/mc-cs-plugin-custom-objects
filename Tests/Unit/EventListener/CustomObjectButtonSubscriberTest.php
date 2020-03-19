@@ -36,7 +36,7 @@ class CustomObjectButtonSubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @var CustomObjectButtonSubscriber
      */
-    private $subscrber;
+    private $subscriber;
 
     protected function setUp(): void
     {
@@ -49,7 +49,7 @@ class CustomObjectButtonSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->translator               = $this->createMock(TranslatorInterface::class);
         $this->customObject             = $this->createMock(CustomObject::class);
         $this->event                    = $this->createMock(CustomButtonEvent::class);
-        $this->subscrber                = new CustomObjectButtonSubscriber(
+        $this->subscriber                = new CustomObjectButtonSubscriber(
             $this->objectPermissionProvider,
             $this->objectRouteProvider,
             $this->itemPermissionProvider,
@@ -138,7 +138,7 @@ class CustomObjectButtonSubscriberTest extends \PHPUnit\Framework\TestCase
                 'priority'  => 500,
             ]]);
 
-        $this->subscrber->injectViewButtons($this->event);
+        $this->subscriber->injectViewButtons($this->event);
     }
 
     public function testInjectViewButtonsForListRouteWithoutPermissions(): void
@@ -177,7 +177,7 @@ class CustomObjectButtonSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->event->expects($this->never())
             ->method('addButton');
 
-        $this->subscrber->injectViewButtons($this->event);
+        $this->subscriber->injectViewButtons($this->event);
     }
 
     public function testInjectViewButtonsForViewRoute(): void
@@ -287,7 +287,7 @@ class CustomObjectButtonSubscriberTest extends \PHPUnit\Framework\TestCase
                 'priority'  => 0,
             ]]);
 
-        $this->subscrber->injectViewButtons($this->event);
+        $this->subscriber->injectViewButtons($this->event);
     }
 
     public function testInjectViewButtonsForViewRouteWithoutPermissions(): void
@@ -344,6 +344,6 @@ class CustomObjectButtonSubscriberTest extends \PHPUnit\Framework\TestCase
                 'priority'  => 400,
             ]);
 
-        $this->subscrber->injectViewButtons($this->event);
+        $this->subscriber->injectViewButtons($this->event);
     }
 }
