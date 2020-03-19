@@ -21,6 +21,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomObjectButtonSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -28,6 +29,7 @@ class CustomObjectButtonSubscriberTest extends \PHPUnit\Framework\TestCase
     private $objectPermissionProvider;
     private $objectRouteProvider;
     private $itemRouteProvider;
+    private $translator;
     private $customObject;
     private $event;
 
@@ -44,13 +46,15 @@ class CustomObjectButtonSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->objectPermissionProvider = $this->createMock(CustomObjectPermissionProvider::class);
         $this->objectRouteProvider      = $this->createMock(CustomObjectRouteProvider::class);
         $this->itemRouteProvider        = $this->createMock(CustomItemRouteProvider::class);
+        $this->translator               = $this->createMock(TranslatorInterface::class);
         $this->customObject             = $this->createMock(CustomObject::class);
         $this->event                    = $this->createMock(CustomButtonEvent::class);
         $this->subscrber                = new CustomObjectButtonSubscriber(
             $this->objectPermissionProvider,
             $this->objectRouteProvider,
             $this->itemPermissionProvider,
-            $this->itemRouteProvider
+            $this->itemRouteProvider,
+            $this->translator
         );
     }
 
