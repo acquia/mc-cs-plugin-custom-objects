@@ -696,6 +696,7 @@ return [
                     'custom_object.route.provider',
                     'custom_item.permission.provider',
                     'custom_item.route.provider',
+                    'translator',
                 ],
             ],
             'custom_item.campaign.subscriber' => [
