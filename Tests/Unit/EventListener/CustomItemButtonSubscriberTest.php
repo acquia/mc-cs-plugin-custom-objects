@@ -186,6 +186,12 @@ class CustomItemButtonSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->translator->expects($this->exactly(4))
             ->method('trans')
+            ->withConsecutive(
+                ['custom.item.delete.confirm'],
+                ['mautic.core.form.delete'],
+                ['mautic.core.form.cancel'],
+                ['mautic.core.form.confirmbatchdelete']
+            )
             ->willReturn('translated string');
 
         $this->event->expects($this->exactly(7))
