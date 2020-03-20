@@ -87,7 +87,7 @@ return [
             CustomItemRouteProvider::ROUTE_DELETE => [
                 'path'       => '/custom/object/{objectId}/item/delete/{itemId}',
                 'controller' => 'CustomObjectsBundle:CustomItem\Delete:delete',
-                'method'     => 'GET',
+                'method'     => 'GET|POST',
             ],
             CustomItemRouteProvider::ROUTE_BATCH_DELETE => [
                 'path'       => '/custom/object/{objectId}/item/batch/delete',
