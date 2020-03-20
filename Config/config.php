@@ -162,7 +162,7 @@ return [
             CustomObjectRouteProvider::ROUTE_DELETE => [
                 'path'       => '/custom/object/delete/{objectId}',
                 'controller' => 'CustomObjectsBundle:CustomObject\Delete:delete',
-                'method'     => 'GET',
+                'method'     => 'GET|POST',
             ],
         ],
     ],
