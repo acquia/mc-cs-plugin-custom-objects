@@ -51,12 +51,14 @@ class CampaignConditionFieldValueType extends AbstractType
         $this->translator       = $translator;
     }
 
-    /**
-     * @param mixed[] $options
-     */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $fields = $this->customFieldModel->fetchCustomFieldsForObject($options['customObject']);
+        $fields       = $this->customFieldModel->fetchCustomFieldsForObject($options['customObject']);
+        $fieldChoices = [];
+
+        foreach ($fields as $field) {
+            $fieldChoices[$field->getName()] = $field->getId();
+        }
 
         $builder->add(
             'field',
@@ -64,17 +66,16 @@ class CampaignConditionFieldValueType extends AbstractType
             [
                 'required' => true,
                 'label'    => 'custom.item.field',
-                'choices'  => $fields,
+                'choices'  => $fieldChoices,
                 'attr'     => [
                     'class' => 'form-control',
                 ],
                 'choice_attr' => function ($fieldId) use ($fields) {
                     /** @var CustomField $field */
                     $field = $fields[$fieldId];
-
                     return [
                         'data-operators'  => json_encode($field->getTypeObject()->getOperatorOptions()),
-                        'data-options'    => json_encode($field->getChoices()),
+                        'data-options'    => json_encode(array_flip($field->getChoices())),
                         'data-field-type' => $field->getType(),
                     ];
                 },
@@ -120,9 +121,6 @@ class CampaignConditionFieldValueType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['customObject']);
