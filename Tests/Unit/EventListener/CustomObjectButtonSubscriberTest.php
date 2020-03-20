@@ -106,16 +106,25 @@ class CustomObjectButtonSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('buildNewRoute')
             ->willReturn('generated/new/route');
 
+        $this->translator->expects($this->exactly(3))
+            ->method('trans')
+            ->withConsecutive(
+                ['custom.object.delete.confirm'],
+                ['mautic.core.form.delete'],
+                ['mautic.core.form.cancel']
+            )
+            ->willReturn('translated string');
+
         $this->event->expects($this->exactly(4))
             ->method('addButton')
             ->withConsecutive([[
                 'attr' => [
                     'href' => 'generated/delete/route',
                     'data-toggle' => 'confirmation',
-                    'data-message' => null,
-                    'data-confirm-text' => null,
+                    'data-message' => 'translated string',
+                    'data-confirm-text' => 'translated string',
                     'data-confirm-callback' => 'executeAction',
-                    'data-cancel-text' => null,
+                    'data-cancel-text' => 'translated string',
                     'data-cancel-callback' => 'dismissConfirmation',
                 ],
                 'btnText'   => 'mautic.core.form.delete',
