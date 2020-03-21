@@ -4,17 +4,27 @@ def SUBMODULE_NAME = "CustomObjectsBundle"
 pipeline {
   options {
     skipDefaultCheckout()
+    disableConcurrentBuilds()
   }
   agent {
     kubernetes {
-      label 'mautic-hosted-build'
       inheritFrom 'with-mysql'
-      containerTemplate {
-        name 'hosted-tester'
-        image 'us.gcr.io/mautic-ma/mautic_tester:master'
-        ttyEnabled true
-        command 'cat'
-      }
+      yaml """
+spec:
+  containers:
+  - name: hosted-tester
+    image: us.gcr.io/mautic-ma/mautic_tester_72:master
+    command:
+    - cat
+    tty: true
+    resources:
+      requests:
+        memory: "4500Mi"
+        cpu: "3"
+      limits:
+        memory: "6000Mi"
+        cpu: "4"
+"""
     }
   }
   stages {
@@ -33,24 +43,35 @@ pipeline {
       steps {
         container('hosted-tester') {
           ansiColor('xterm') {
-            sh """
-              composer install --ansi
-            """
+            sh '''
+              ## We need all private plugins enabled during tests so their tests can run successfully
+              echo "<?php
+              \\$hostedParameters = array_merge(
+                  \\$hostedParameters,
+                  [
+                      'private_cloud_plugin_deny_list'  => [],
+                      'private_cloud_plugin_allow_list' => [],
+                  ]
+              );" > app/config/hosted_local.php
+
+              echo "<?php
+                \\$parameters = array(
+                    'db_driver' => 'pdo_mysql',
+                    'db_host' => '127.0.0.1',
+                    'db_port' => 3306,
+                    'db_name' => 'mautictest',
+                    'db_user' => 'travis',
+                    'db_password' => '',
+                    'db_table_prefix' => '',
+                    'hosted_plan' => 'pro',
+                    'custom_objects_enabled' => true,
+                    'create_custom_field_in_background' => false,
+                );" > app/config/local.php
+                composer validate --no-check-all --strict || (echo "Composer failed validation. If the lock file is out of sync you can try running 'composer update --lock'"; exit 1)
+                composer install --ansi
+            '''
             dir('plugins/CustomObjectsBundle') {
               sh("composer install --ansi")
-            }
-          }
-        }
-      }
-    }
-    stage('Styling') {
-      steps {
-        container('hosted-tester') {
-          ansiColor('xterm') {
-            dir('plugins/CustomObjectsBundle') {
-              sh """
-                vendor/bin/ecs check .
-              """
             }
           }
         }
@@ -62,20 +83,8 @@ pipeline {
           ansiColor('xterm') {
             sh """
               mysql -h 127.0.0.1 -e 'CREATE DATABASE mautictest; CREATE USER travis@"%"; GRANT ALL on mautictest.* to travis@"%"; GRANT SUPER ON *.* TO travis@"%";'
-              echo "<?php
-              \\\$parameters = array(
-                  'db_driver' => 'pdo_mysql',
-                  'db_host' => '127.0.0.1',
-                  'db_port' => 3306,
-                  'db_name' => 'mautictest',
-                  'db_user' => 'travis',
-                  'db_password' => '',
-                  'db_table_prefix' => '',
-                  'hosted_plan' => 'pro',
-                  'custom_objects_enabled' => true
-              );" > app/config/local.php
               export SYMFONY_ENV="test"
-              bin/phpunit -d memory_limit=2048M --bootstrap vendor/autoload.php --configuration plugins/CustomObjectsBundle/phpunit.xml --fail-on-warning  --testsuite=all
+              bin/phpunit -d memory_limit=2048M --bootstrap vendor/autoload.php --fail-on-warning  --testsuite=all --configuration plugins/CustomObjectsBundle/phpunit.xml
             """
           }
         }
@@ -88,6 +97,19 @@ pipeline {
             dir('plugins/CustomObjectsBundle') {
               sh """
                 composer run-script phpstan
+              """
+            }
+          }
+        }
+      }
+    }
+    stage('Styling') {
+      steps {
+        container('hosted-tester') {
+          ansiColor('xterm') {
+            dir('plugins/CustomObjectsBundle') {
+              sh """
+                vendor/bin/ecs check .
               """
             }
           }
@@ -132,7 +154,7 @@ pipeline {
           }
         }
       }
-    }    
+    }
     stage('Set Revision') {
       when {
         not {
@@ -169,7 +191,7 @@ pipeline {
           }
         }
       }
-    }    
+    }
   }
   post {
     failure {
