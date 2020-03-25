@@ -64,9 +64,16 @@ class CustomItemTabSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testForTabsContext(): void
     {
-        $this->customObject->expects($this->once())
+        $itemCustomObject = $this->createMock(CustomObject::class);
+        $itemCustomObject->method('getId')->willReturn(444);
+
+        $this->customObject->expects($this->exactly(2))
             ->method('getId')
             ->willReturn(555);
+
+        $this->customItem->expects($this->once())
+            ->method('getCustomObject')
+            ->willReturn($itemCustomObject);
 
         $this->customObject->expects($this->once())
             ->method('getNamePlural')
@@ -105,6 +112,46 @@ class CustomItemTabSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('countItemsLinkedToAnotherItem')
             ->with($this->customObject, $this->customItem)
             ->willReturn(13);
+
+        $this->tabSubscriber->injectTabs($this->customContentEvent);
+    }
+
+    /**
+     * We don't want to link custom items of the same type together.
+     */
+    public function testForTabsContextWhenTheCustomItemMatchesCustomObject(): void
+    {
+        $this->customObject->expects($this->exactly(2))
+            ->method('getId')
+            ->willReturn(555);
+
+        $this->customItem->expects($this->once())
+            ->method('getCustomObject')
+            ->willReturn($this->customObject);
+
+        $this->customContentEvent->expects($this->at(0))
+            ->method('checkContext')
+            ->with('CustomObjectsBundle:CustomItem:detail.html.php', 'tabs')
+            ->willReturn(true);
+
+        $this->customContentEvent->expects($this->at(1))
+            ->method('getVars')
+            ->willReturn(['item' => $this->customItem]);
+
+        $this->customContentEvent->expects($this->never())
+            ->method('addTemplate');
+
+        $this->customContentEvent->expects($this->at(2))
+            ->method('checkContext')
+            ->with('CustomObjectsBundle:CustomItem:detail.html.php', 'tabs.content')
+            ->willReturn(false);
+
+        $this->customObjectModel->expects($this->once())
+            ->method('fetchAllPublishedEntities')
+            ->willReturn([$this->customObject]);
+
+        $this->customItemRepository->expects($this->never())
+            ->method('countItemsLinkedToAnotherItem');
 
         $this->tabSubscriber->injectTabs($this->customContentEvent);
     }
