@@ -76,7 +76,9 @@ class QueryFilterHelperTest extends MauticWebTestCase
             $queryBuilder = new QueryBuilder($this->entityManager->getConnection());
 
             $filterHelper->addCustomFieldValueExpressionFromSegmentFilter(
-                $queryBuilder, 'test', $this->filterFactory->factorSegmentFilter($filter['filter'])
+                $queryBuilder,
+                'test',
+                $this->filterFactory->factorSegmentFilter($filter['filter'])
             );
 
             $whereResponse = (string) $queryBuilder->getQueryPart('where');

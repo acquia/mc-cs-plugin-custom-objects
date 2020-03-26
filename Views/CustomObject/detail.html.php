@@ -47,9 +47,9 @@ $view['slots']->set(
                         <table class="table table-bordered table-striped mb-0">
                             <tbody>
                             <?php echo $view->render(
-                                'MauticCoreBundle:Helper:details.html.php',
-                                ['entity' => $customObject]
-                            ); ?>
+    'MauticCoreBundle:Helper:details.html.php',
+    ['entity' => $customObject]
+); ?>
                             </tbody>
                         </table>
                     </div>
@@ -84,16 +84,16 @@ $view['slots']->set(
                                 </div>
                                 <div class="col-md-9 va-m">
                                     <?php echo $view->render(
-                                        'MauticCoreBundle:Helper:graph_dateselect.html.php',
-                                        ['dateRangeForm' => $dateRangeForm, 'class' => 'pull-right']
-                                    ); ?>
+    'MauticCoreBundle:Helper:graph_dateselect.html.php',
+    ['dateRangeForm' => $dateRangeForm, 'class' => 'pull-right']
+); ?>
                                 </div>
                             </div>
                             <div class="pt-0 pl-15 pb-10 pr-15">
                                 <?php echo $view->render(
-                                    'MauticCoreBundle:Helper:chart.html.php',
-                                    ['chartData' => $stats, 'chartType' => 'line', 'chartHeight' => 300]
-                                ); ?>
+    'MauticCoreBundle:Helper:chart.html.php',
+    ['chartData' => $stats, 'chartType' => 'line', 'chartHeight' => 300]
+); ?>
                             </div>
                         </div>
                     </div>

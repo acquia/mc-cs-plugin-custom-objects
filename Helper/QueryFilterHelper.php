@@ -86,12 +86,17 @@ class QueryFilterHelper
     public function addCustomFieldValueExpressionFromSegmentFilter(
         QueryBuilder $queryBuilder,
         string $tableAlias,
-        ContactSegmentFilter $filter): void
-    {
+        ContactSegmentFilter $filter
+    ): void {
         $expression = $this->getCustomValueValueExpression($queryBuilder, $tableAlias, $filter->getOperator());
 
-        $this->addOperatorExpression($queryBuilder, $tableAlias, $expression, $filter->getOperator(),
-            $filter->getParameterValue());
+        $this->addOperatorExpression(
+            $queryBuilder,
+            $tableAlias,
+            $expression,
+            $filter->getOperator(),
+            $filter->getParameterValue()
+        );
     }
 
     public function addCustomObjectNameExpressionFromSegmentFilter(QueryBuilder $queryBuilder, string $tableAlias, ContactSegmentFilter $filter): void
@@ -277,7 +282,7 @@ class QueryFilterHelper
                 $expression = $customQuery->expr()->andX(
                     $customQuery->expr()->isNotNull($tableAlias.'_item.name'),
                     $customQuery->expr()->neq($tableAlias.'_item.name', $customQuery->expr()->literal(''))
-                    );
+                );
 
                 break;
             case 'notIn':
@@ -324,8 +329,8 @@ class QueryFilterHelper
         QueryBuilder $customFieldQueryBuilder,
         string $alias,
         string $fieldType,
-        int $fieldId): QueryBuilder
-    {
+        int $fieldId
+    ): QueryBuilder {
         $dataTable = $this->fieldTypeProvider->getType($fieldType)->getTableName();
 
         $customFieldQueryBuilder->leftJoin(
@@ -371,7 +376,8 @@ class QueryFilterHelper
                 $alias.'_contact',
                 MAUTIC_TABLE_PREFIX.'custom_item',
                 $alias.'_item',
-                $alias.'_item.id='.$alias.'_contact.custom_item_id');
+                $alias.'_item.id='.$alias.'_contact.custom_item_id'
+            );
 
         return $customFieldQueryBuilder;
     }

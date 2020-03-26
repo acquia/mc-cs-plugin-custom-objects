@@ -83,6 +83,10 @@ class CustomItemTabSubscriber implements EventSubscriberInterface
 
             /** @var CustomObject $object */
             foreach ($objects as $object) {
+                if ($object->getId() === $item->getCustomObject()->getId()) {
+                    continue;
+                }
+
                 $data = [
                     'title' => $object->getNamePlural(),
                     'count' => $this->customItemRepository->countItemsLinkedToAnotherItem($object, $item),

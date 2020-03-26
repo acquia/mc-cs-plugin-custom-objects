@@ -95,7 +95,8 @@ class LinkControllerTest extends ControllerTestCase
             ->with(
                 'custom.item.error.link.exists.already',
                 ['%itemId%' => self::ITEM_ID, '%entityType%' => self::ENTITY_TYPE, '%entityId%' => self::ENTITY_ID],
-                FlashBag::LEVEL_ERROR);
+                FlashBag::LEVEL_ERROR
+            );
 
         $this->linkController->saveAction(self::ITEM_ID, self::ENTITY_TYPE, self::ENTITY_ID);
     }
