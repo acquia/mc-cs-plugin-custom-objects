@@ -73,9 +73,6 @@ spec:
                 composer validate --no-check-all --strict || (echo "Composer failed validation. If the lock file is out of sync you can try running 'composer update --lock'"; exit 1)
                 composer install --ansi
             '''
-            dir('plugins/CustomObjectsBundle') {
-              sh("composer install --ansi")
-            }
           }
         }
       }
