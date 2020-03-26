@@ -36,11 +36,11 @@ $view['slots']->set('headerTitle', $header);
                 <!-- tabs controls -->
                 <ul class="bg-auto nav nav-tabs pr-md pl-md">
                     <li class="active"><a href="#details-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans(
-                                'mautic.core.details'
-                            ); ?></a></li>
+    'mautic.core.details'
+); ?></a></li>
                     <li id="fields-tab"><a href="#fields-container" role="tab" data-toggle="tab"><?php echo $view['translator']->trans(
-                                'mautic.form.tab.fields'
-                            ); ?></a></li>
+    'mautic.form.tab.fields'
+); ?></a></li>
                 </ul>
                 <!--/ tabs controls -->
                 <div class="tab-content pa-md">
@@ -68,12 +68,12 @@ $view['slots']->set('headerTitle', $header);
                                                     data-target="#objectFieldModal"
                                                     data-href="<?php
                                                         echo $view['router']->path(
-                                                            \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider::ROUTE_FORM,
-                                                            [
+    \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider::ROUTE_FORM,
+    [
                                                                 'objectId'  => $customObject->getId(),
                                                                 'fieldType' => $fieldType->getKey(),
                                                             ]
-                                                        );
+);
                                                     ?>">
                                                 <?php echo $fieldType->getName(); ?>
                                             </option>
@@ -113,13 +113,13 @@ $view['slots']->set('headerTitle', $header);
 
 <?php
 $view['slots']->append(
-    'modal',
-    $view->render(
-        'MauticCoreBundle:Helper:modal.html.php',
-        [
+                                                        'modal',
+                                                        $view->render(
+                                                            'MauticCoreBundle:Helper:modal.html.php',
+                                                            [
             'id'            => 'objectFieldModal',
             'header'        => false,
             'footerButtons' => true,
         ]
-    )
-);
+                                                        )
+                                                    );

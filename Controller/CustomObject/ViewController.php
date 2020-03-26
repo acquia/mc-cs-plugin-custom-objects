@@ -97,7 +97,11 @@ class ViewController extends CommonController
         );
 
         $auditLogs = $this->auditLogModel->getLogForObject(
-            'customObject', $objectId, $customObject->getDateAdded(), 10, 'customObjects'
+            'customObject',
+            $objectId,
+            $customObject->getDateAdded(),
+            10,
+            'customObjects'
         );
 
         return $this->delegateView(

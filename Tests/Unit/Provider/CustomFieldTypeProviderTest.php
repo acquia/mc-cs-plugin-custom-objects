@@ -51,7 +51,9 @@ class CustomFieldTypeProviderTest extends \PHPUnit\Framework\TestCase
 
         $mockTranslator->expects($this->exactly(count($typesArray)))
             ->method('trans')
-            ->willReturnCallback(function ($argument) {return $argument; });
+            ->willReturnCallback(function ($argument) {
+                return $argument;
+            });
 
         foreach ($typesArray as $type) {
             $typeProvider->addType($type);

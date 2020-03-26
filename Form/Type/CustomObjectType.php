@@ -109,7 +109,8 @@ class CustomObjectType extends AbstractType
         $builder->add('category', CategoryListType::class, ['bundle' => 'global']);
         $builder->add('isPublished', YesNoButtonGroupType::class);
 
-        $builder->add('customFields',
+        $builder->add(
+            'customFields',
             CollectionType::class,
             [
                 'entry_type'         => CustomFieldType::class,

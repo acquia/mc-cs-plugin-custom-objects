@@ -27,13 +27,13 @@ $panelId = !empty($panelId) ? $panelId : (int) $customField->vars['value']->getO
 
         <button type="button" data-toggle="ajaxmodal" data-target="#objectFieldModal" href="<?php
         echo $view['router']->path(
-            \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider::ROUTE_FORM,
-            [
+    \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider::ROUTE_FORM,
+    [
                 'fieldId'   => $customFieldEntity->getId(),
                 'objectId'  => $customObject->getId(),
                 'fieldType' => $customFieldEntity->getTypeObject()->getKey(),
             ]
-        );
+);
         ?>" class="btn btn-default btn-edit">
             <i class="fa fa-pencil-square-o text-primary"></i>
         </button>
