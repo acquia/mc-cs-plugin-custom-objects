@@ -96,7 +96,7 @@ spec:
           ansiColor('xterm') {
             dir('plugins/CustomObjectsBundle') {
               sh """
-                composer run-script phpstan
+                composer phpstan -- --no-progress
               """
             }
           }
