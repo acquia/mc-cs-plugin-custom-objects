@@ -109,7 +109,7 @@ spec:
           ansiColor('xterm') {
             dir('plugins/CustomObjectsBundle') {
               sh """
-                vendor/bin/ecs check .
+                composer csfixer
               """
             }
           }
