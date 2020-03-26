@@ -293,10 +293,11 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     public function getPublishedFields()
     {
         return $this->getCustomFields()
-            ->filter(function (\MauticPlugin\CustomObjectsBundle\Entity\CustomField $customField) {
-                return $customField->isPublished();
-            }
-        );
+            ->filter(
+                function (\MauticPlugin\CustomObjectsBundle\Entity\CustomField $customField) {
+                    return $customField->isPublished();
+                }
+            );
     }
 
     /**

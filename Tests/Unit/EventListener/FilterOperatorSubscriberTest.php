@@ -61,7 +61,8 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     public function testAddWithinFieldValuesOperatorWhenGeneratedEmailDomain(): void
     {
-        $event = new FieldOperatorsEvent('choice',
+        $event = new FieldOperatorsEvent(
+            'choice',
             'generated_email_domain',
             ['withinCustomObjects' => [
                 'label' => 'custom_label', ],
@@ -78,7 +79,8 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     public function testAddWithinFieldValuesOperatorWhenNotGeneratedEmailDomain(): void
     {
-        $event = new FieldOperatorsEvent('choice',
+        $event = new FieldOperatorsEvent(
+            'choice',
             'not_generated_email_domain',
             ['withinCustomObjects' => [
                 'label' => 'custom_label', ],
@@ -97,7 +99,8 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         /** @var \PHPUnit\Framework\MockObject\MockObject|FormInterface $formMock */
         $formMock = $this->createMock(FormInterface::class);
-        $event    = new FormAdjustmentEvent($formMock,
+        $event    = new FormAdjustmentEvent(
+            $formMock,
             'town',
             'Object',
             'NotWithinCustomObjects',
@@ -180,10 +183,12 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $queryBuilderMock = $this->createMock(QueryBuilder::class);
         $queryBuilderMock->expects($this->once())
             ->method('innerJoin')
-            ->with('l',
+            ->with(
+                'l',
                 MAUTIC_TABLE_PREFIX.'custom_item',
                 'ci',
-                'ci.custom_object_id = 1 AND ci.name = l.city AND ci.is_published = 1');
+                'ci.custom_object_id = 1 AND ci.name = l.city AND ci.is_published = 1'
+            );
         $event = new SegmentOperatorQueryBuilderEvent($queryBuilderMock, $contactSegmentFilterMock, []);
         $this->filterOperatorSubscriber->onWithinFieldValuesBuilder($event);
     }

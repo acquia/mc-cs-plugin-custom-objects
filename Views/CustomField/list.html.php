@@ -22,14 +22,14 @@ if ('index' === $tmpl) {
             <tr>
                 <?php
                 echo $view->render(
-                    'MauticCoreBundle:Helper:tableheader.html.php',
-                    [
-                        'checkall'  => 'true',
-                        'target'    => '#custom-fields-table',
-                        'langVar'   => 'custom.field',
-                        'routeBase' => 'custom_field',
-                    ]
-                );
+    'MauticCoreBundle:Helper:tableheader.html.php',
+    [
+        'checkall'  => 'true',
+        'target'    => '#custom-fields-table',
+        'langVar'   => 'custom.field',
+        'routeBase' => 'custom_field',
+    ]
+);
 
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
@@ -63,12 +63,12 @@ if ('index' === $tmpl) {
                     <td>
                         <div>
                             <?php echo $view->render(
-                                'MauticCoreBundle:Helper:publishstatus_icon.html.php',
-                                [
-                                    'item'  => $item,
-                                    'model' => 'custom.field',
-                                ]
-                            ); ?>
+                    'MauticCoreBundle:Helper:publishstatus_icon.html.php',
+                    [
+                        'item'  => $item,
+                        'model' => 'custom.field',
+                    ]
+                ); ?>
                             <a href="<?php echo $view['router']->path(CustomFieldRouteProvider::ROUTE_VIEW, ['objectId' => $item->getId()]); ?>" data-toggle="ajax">
                                 <?php echo $item->getName(); ?>
                             </a>
@@ -87,16 +87,16 @@ if ('index' === $tmpl) {
     </div>
     <div class="panel-footer">
         <?php echo $view->render(
-            'MauticCoreBundle:Helper:pagination.html.php',
-            [
-                'totalItems' => count($items),
-                'page'       => $page,
-                'limit'      => $limit,
-                'baseUrl'    => $view['router']->path(CustomFieldRouteProvider::ROUTE_LIST),
-                'sessionVar' => 'custom.field',
-                'routeBase'  => CustomFieldRouteProvider::ROUTE_LIST,
-            ]
-        ); ?>
+                    'MauticCoreBundle:Helper:pagination.html.php',
+                    [
+                        'totalItems' => count($items),
+                        'page'       => $page,
+                        'limit'      => $limit,
+                        'baseUrl'    => $view['router']->path(CustomFieldRouteProvider::ROUTE_LIST),
+                        'sessionVar' => 'custom.field',
+                        'routeBase'  => CustomFieldRouteProvider::ROUTE_LIST,
+                    ]
+                ); ?>
     </div>
 <?php else: ?>
     <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php', ['tip' => 'custom.field.noresults.tip']); ?>

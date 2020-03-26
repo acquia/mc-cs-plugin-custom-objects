@@ -23,14 +23,14 @@ if ('index' === $tmpl) {
             <tr>
                 <?php
                 echo $view->render(
-                    'MauticCoreBundle:Helper:tableheader.html.php',
-                    [
+    'MauticCoreBundle:Helper:tableheader.html.php',
+    [
                         'checkall'  => 'true',
                         'target'    => '#custom-objects-table',
                         'langVar'   => 'custom.object',
                         'routeBase' => 'custom_object',
                     ]
-                );
+);
 
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
@@ -64,12 +64,12 @@ if ('index' === $tmpl) {
                     <td>
                         <div>
                             <?php echo $view->render(
-                                'MauticCoreBundle:Helper:publishstatus_icon.html.php',
-                                [
+                    'MauticCoreBundle:Helper:publishstatus_icon.html.php',
+                    [
                                     'item'  => $item,
                                     'model' => 'custom.object',
                                 ]
-                            ); ?>
+                ); ?>
                             <a href="<?php echo $view['router']->path(CustomObjectRouteProvider::ROUTE_VIEW, ['objectId' => $item->getId()]); ?>" data-toggle="ajax">
                                 <?php echo $item->getName(); ?>
                             </a>
@@ -88,8 +88,8 @@ if ('index' === $tmpl) {
     </div>
     <div class="panel-footer">
         <?php echo $view->render(
-            'MauticCoreBundle:Helper:pagination.html.php',
-            [
+                    'MauticCoreBundle:Helper:pagination.html.php',
+                    [
                 'totalItems' => $count,
                 'page'       => $page,
                 'limit'      => $limit,
@@ -97,7 +97,7 @@ if ('index' === $tmpl) {
                 'sessionVar' => 'custom.object',
                 'routeBase'  => CustomObjectRouteProvider::ROUTE_LIST,
             ]
-        ); ?>
+                ); ?>
     </div>
 <?php else: ?>
     <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php', ['tip' => 'custom.object.noresults.tip']); ?>

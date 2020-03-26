@@ -63,7 +63,8 @@ class SaveControllerTest extends AbstractFieldControllerTest
             $this->customFieldFactory,
             $this->permissionProvider,
             $this->fieldRouteProvider,
-            $this->customObjectModel);
+            $this->customObjectModel
+        );
 
         $this->addSymfonyDependencies($this->saveController);
     }
