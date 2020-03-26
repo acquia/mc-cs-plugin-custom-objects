@@ -43,6 +43,9 @@ spec:
       steps {
         container('hosted-tester') {
           ansiColor('xterm') {
+            withCredentials([string(credentialsId: 'github-composer-token', variable: 'composertoken')]) {
+              sh("composer config --global github-oauth.github.com ${composertoken}")
+            }
             sh '''
               ## We need all private plugins enabled during tests so their tests can run successfully
               echo "<?php
