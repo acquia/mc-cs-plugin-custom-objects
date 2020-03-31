@@ -21,6 +21,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomObjectButtonSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -28,13 +29,14 @@ class CustomObjectButtonSubscriberTest extends \PHPUnit\Framework\TestCase
     private $objectPermissionProvider;
     private $objectRouteProvider;
     private $itemRouteProvider;
+    private $translator;
     private $customObject;
     private $event;
 
     /**
      * @var CustomObjectButtonSubscriber
      */
-    private $subscrber;
+    private $subscriber;
 
     protected function setUp(): void
     {
@@ -44,13 +46,15 @@ class CustomObjectButtonSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->objectPermissionProvider = $this->createMock(CustomObjectPermissionProvider::class);
         $this->objectRouteProvider      = $this->createMock(CustomObjectRouteProvider::class);
         $this->itemRouteProvider        = $this->createMock(CustomItemRouteProvider::class);
+        $this->translator               = $this->createMock(TranslatorInterface::class);
         $this->customObject             = $this->createMock(CustomObject::class);
         $this->event                    = $this->createMock(CustomButtonEvent::class);
-        $this->subscrber                = new CustomObjectButtonSubscriber(
+        $this->subscriber                = new CustomObjectButtonSubscriber(
             $this->objectPermissionProvider,
             $this->objectRouteProvider,
             $this->itemPermissionProvider,
-            $this->itemRouteProvider
+            $this->itemRouteProvider,
+            $this->translator
         );
     }
 
@@ -102,11 +106,26 @@ class CustomObjectButtonSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('buildNewRoute')
             ->willReturn('generated/new/route');
 
+        $this->translator->expects($this->exactly(3))
+            ->method('trans')
+            ->withConsecutive(
+                ['custom.object.delete.confirm'],
+                ['mautic.core.form.delete'],
+                ['mautic.core.form.cancel']
+            )
+            ->willReturn('translated string');
+
         $this->event->expects($this->exactly(4))
             ->method('addButton')
             ->withConsecutive([[
                 'attr' => [
                     'href' => 'generated/delete/route',
+                    'data-toggle' => 'confirmation',
+                    'data-message' => 'translated string',
+                    'data-confirm-text' => 'translated string',
+                    'data-confirm-callback' => 'executeAction',
+                    'data-cancel-text' => 'translated string',
+                    'data-cancel-callback' => 'dismissConfirmation',
                 ],
                 'btnText'   => 'mautic.core.form.delete',
                 'iconClass' => 'fa fa-fw fa-trash-o text-danger',
@@ -134,7 +153,7 @@ class CustomObjectButtonSubscriberTest extends \PHPUnit\Framework\TestCase
                 'priority'  => 500,
             ]]);
 
-        $this->subscrber->injectViewButtons($this->event);
+        $this->subscriber->injectViewButtons($this->event);
     }
 
     public function testInjectViewButtonsForListRouteWithoutPermissions(): void
@@ -173,7 +192,7 @@ class CustomObjectButtonSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->event->expects($this->never())
             ->method('addButton');
 
-        $this->subscrber->injectViewButtons($this->event);
+        $this->subscriber->injectViewButtons($this->event);
     }
 
     public function testInjectViewButtonsForViewRoute(): void
@@ -242,6 +261,12 @@ class CustomObjectButtonSubscriberTest extends \PHPUnit\Framework\TestCase
             ->withConsecutive([[
                 'attr' => [
                     'href' => 'generated/delete/route',
+                    'data-toggle' => 'confirmation',
+                    'data-message' => null,
+                    'data-confirm-text' => null,
+                    'data-confirm-callback' => 'executeAction',
+                    'data-cancel-text' => null,
+                    'data-cancel-callback' => 'dismissConfirmation'                    ,
                 ],
                 'btnText'   => 'mautic.core.form.delete',
                 'iconClass' => 'fa fa-fw fa-trash-o text-danger',
@@ -283,7 +308,7 @@ class CustomObjectButtonSubscriberTest extends \PHPUnit\Framework\TestCase
                 'priority'  => 0,
             ]]);
 
-        $this->subscrber->injectViewButtons($this->event);
+        $this->subscriber->injectViewButtons($this->event);
     }
 
     public function testInjectViewButtonsForViewRouteWithoutPermissions(): void
@@ -340,6 +365,6 @@ class CustomObjectButtonSubscriberTest extends \PHPUnit\Framework\TestCase
                 'priority'  => 400,
             ]);
 
-        $this->subscrber->injectViewButtons($this->event);
+        $this->subscriber->injectViewButtons($this->event);
     }
 }

@@ -23,6 +23,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomObjectButtonSubscriber implements EventSubscriberInterface
 {
@@ -46,16 +47,23 @@ class CustomObjectButtonSubscriber implements EventSubscriberInterface
      */
     private $customItemRouteProvider;
 
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
     public function __construct(
         CustomObjectPermissionProvider $permissionProvider,
         CustomObjectRouteProvider $routeProvider,
         CustomItemPermissionProvider $customItemPermissionProvider,
-        CustomItemRouteProvider $customItemRouteProvider
+        CustomItemRouteProvider $customItemRouteProvider,
+        TranslatorInterface $translator
     ) {
         $this->permissionProvider           = $permissionProvider;
         $this->routeProvider                = $routeProvider;
         $this->customItemPermissionProvider = $customItemPermissionProvider;
         $this->customItemRouteProvider      = $customItemRouteProvider;
+        $this->translator                   = $translator;
     }
 
     /**
@@ -189,6 +197,12 @@ class CustomObjectButtonSubscriber implements EventSubscriberInterface
         return [
             'attr' => [
                 'href' => $this->routeProvider->buildDeleteRoute($entity->getId()),
+                'data-toggle'           => 'confirmation',
+                'data-message'          => $this->translator->trans('custom.object.delete.confirm'),
+                'data-confirm-text'     => $this->translator->trans('mautic.core.form.delete'),
+                'data-confirm-callback' => 'executeAction',
+                'data-cancel-text'      => $this->translator->trans('mautic.core.form.cancel'),
+                'data-cancel-callback'  => 'dismissConfirmation',
             ],
             'btnText'   => 'mautic.core.form.delete',
             'iconClass' => 'fa fa-fw fa-trash-o text-danger',

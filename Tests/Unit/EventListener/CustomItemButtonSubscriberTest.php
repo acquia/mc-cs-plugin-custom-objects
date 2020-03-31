@@ -184,9 +184,14 @@ class CustomItemButtonSubscriberTest extends \PHPUnit\Framework\TestCase
             ->with(self::OBJECT_ID)
             ->willReturn('generated/batch/delete/route');
 
-        $this->translator->expects($this->once())
+        $this->translator->expects($this->exactly(4))
             ->method('trans')
-            ->with('mautic.core.form.confirmbatchdelete')
+            ->withConsecutive(
+                ['custom.item.delete.confirm'],
+                ['mautic.core.form.delete'],
+                ['mautic.core.form.cancel'],
+                ['mautic.core.form.confirmbatchdelete']
+            )
             ->willReturn('translated string');
 
         $this->event->expects($this->exactly(7))
@@ -194,6 +199,12 @@ class CustomItemButtonSubscriberTest extends \PHPUnit\Framework\TestCase
             ->withConsecutive([[
                 'attr' => [
                     'href' => 'generated/delete/route',
+                    'data-toggle'           => 'confirmation',
+                    'data-message'          => 'translated string',
+                    'data-confirm-text'     => 'translated string',
+                    'data-confirm-callback' => 'executeAction',
+                    'data-cancel-text'      => 'translated string',
+                    'data-cancel-callback'  => 'dismissConfirmation',
                 ],
                 'btnText'   => 'mautic.core.form.delete',
                 'iconClass' => 'fa fa-fw fa-trash-o text-danger',
@@ -365,6 +376,12 @@ class CustomItemButtonSubscriberTest extends \PHPUnit\Framework\TestCase
             ->withConsecutive([[
                 'attr' => [
                     'href' => 'generated/delete/route',
+                    'data-toggle' => 'confirmation',
+                    'data-message' => null,
+                    'data-confirm-text' => null,
+                    'data-confirm-callback' => 'executeAction',
+                    'data-cancel-text' => null,
+                    'data-cancel-callback' => 'dismissConfirmation',
                 ],
                 'btnText'   => 'mautic.core.form.delete',
                 'iconClass' => 'fa fa-fw fa-trash-o text-danger',
