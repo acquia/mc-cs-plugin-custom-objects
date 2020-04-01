@@ -419,7 +419,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
             $choices = $this->getTypeObject()->getChoices();
         } else {
             foreach ($this->getOptions() as $option) {
-                $choices[$option->getValue()] = $option->getLabel();
+                $choices[$option->getLabel()] = $option->getValue();
             }
         }
 
@@ -434,12 +434,13 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     public function valueToLabel(string $value): string
     {
         $choices = $this->getChoices();
+        $label   = array_search($value, $choices, true);
 
-        if (isset($choices[$value])) {
-            return $choices[$value];
+        if ($label === false) {
+            throw new NotFoundException("Label was not found for value {$value}");
         }
-
-        throw new NotFoundException("Label was not found for value {$value}");
+        
+        return $label;
     }
 
     /**
