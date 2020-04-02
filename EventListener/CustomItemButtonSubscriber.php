@@ -205,6 +205,12 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
         return [
             'attr' => [
                 'href' => $this->routeProvider->buildDeleteRoute($customObjectId, $customItem->getId()),
+                'data-toggle'           => 'confirmation',
+                'data-message'          => $this->translator->trans('custom.item.delete.confirm'),
+                'data-confirm-text'     => $this->translator->trans('mautic.core.form.delete'),
+                'data-confirm-callback' => 'executeAction',
+                'data-cancel-text'      => $this->translator->trans('mautic.core.form.cancel'),
+                'data-cancel-callback'  => 'dismissConfirmation',
             ],
             'btnText'   => 'mautic.core.form.delete',
             'iconClass' => 'fa fa-fw fa-trash-o text-danger',
