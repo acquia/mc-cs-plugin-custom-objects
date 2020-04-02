@@ -100,7 +100,7 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
                     }
 
                     $allowedOperators = $customField->getTypeObject()->getOperators();
-                    $availableOperators = $this->getOperatorsForFieldType($customField->getType());
+                    $availableOperators = array_flip($this->getOperatorsForFieldType($customField->getType()));
                     $operators = array_intersect_key($availableOperators, $allowedOperators);
 
                     $event->addChoice(
