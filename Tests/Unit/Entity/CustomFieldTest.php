@@ -229,10 +229,10 @@ class CustomFieldTest extends \PHPUnit\Framework\TestCase
             $this->createMock(FilterOperatorProviderInterface::class)
         );
 
-        $red->setLabel('Red');
-        $red->setValue('red');
-        $blue->setLabel('Blue');
-        $blue->setValue('blue');
+        $red->setLabel('Red label');
+        $red->setValue('red value');
+        $blue->setLabel('Blue label');
+        $blue->setValue('blue value');
 
         $customField->setTypeObject($typeObject);
         $customField->setLabel('Colors');
@@ -251,8 +251,8 @@ class CustomFieldTest extends \PHPUnit\Framework\TestCase
                 'data-placeholder' => 'Select one',
             ],
             'choices'    => [
-                'red'  => 'Red',
-                'blue' => 'Blue',
+                'Red label' => 'red value',
+                'Blue label' => 'blue value',
             ],
         ];
 
@@ -269,10 +269,10 @@ class CustomFieldTest extends \PHPUnit\Framework\TestCase
         $optionA = new CustomFieldOption();
         $optionB = new CustomFieldOption();
 
-        $optionA->setLabel('Option A');
-        $optionA->setValue('option_a');
-        $optionB->setLabel('Option B');
-        $optionB->setValue('option_b');
+        $optionA->setLabel('Option A label');
+        $optionA->setValue('option_a_value');
+        $optionB->setLabel('Option B label');
+        $optionB->setValue('option_b_value');
 
         $customField = new CustomField();
         $customField->addOption($optionA);
@@ -285,8 +285,8 @@ class CustomFieldTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->assertSame([
-            'option_a' => 'Option A',
-            'option_b' => 'Option B',
+             'Option A label' => 'option_a_value',
+             'Option B label' => 'option_b_value',
         ], $customField->getChoices());
     }
 
