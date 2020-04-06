@@ -72,6 +72,12 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
      */
     private $customFields;
 
+    private $type;
+
+    private $relationship;
+
+    private $masterObject;
+
     /**
      * @var mixed[]
      */
