@@ -20,6 +20,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -102,6 +103,40 @@ class CustomObjectType extends AbstractType
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class' => 'form-control',
+                ],
+            ]
+        );
+
+        $builder->add(
+            'type',
+            ChoiceType::class,
+            [
+                'label'      => 'custom.object.type.label',
+                'required'   => true,
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class' => 'form-control',
+                ],
+                'choices' => [
+                    'custom.object.type.master' => CustomObject::TYPE_MASTER,
+                    'custom.object.type.relationship' => CustomObject::TYPE_RELATIONSHIP,
+                ],
+            ]
+        );
+
+        $builder->add(
+            'relationship',
+            ChoiceType::class,
+            [
+                'label'      => 'custom.object.relationship.label',
+                'required'   => false,
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class' => 'form-control',
+                ],
+                'choices' => [
+                    'custom.object.relationship.many_to_many' => CustomObject::RELATIONSHIP_MANY_TO_MANY,
+                    'custom.object.relationship.one_to_one' => CustomObject::RELATIONSHIP_ONE_TO_ONE,
                 ],
             ]
         );
