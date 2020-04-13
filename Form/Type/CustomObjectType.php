@@ -141,6 +141,20 @@ class CustomObjectType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'masterObject',
+            ChoiceType::class,
+            [
+                'label'      => 'custom.object.relationship.master_object.label',
+                'required'   => false,
+                'label_attr' => ['class' => 'control-label'],
+                'attr'       => [
+                    'class' => 'form-control',
+                ],
+                'choices' => [],
+            ]
+        );
+
         $builder->add('category', CategoryListType::class, ['bundle' => 'global']);
         $builder->add('isPublished', YesNoButtonGroupType::class);
 

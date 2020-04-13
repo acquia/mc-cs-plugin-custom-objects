@@ -53,6 +53,7 @@ $view['slots']->set('headerTitle', $header);
                                 <?php echo $view['form']->row($form['description']); ?>
                                 <?php echo $view['form']->row($form['type']); ?>
                                 <?php echo $view['form']->row($form['relationship']); ?>
+                                <?php echo $view['form']->row($form['masterObject']); ?>
                             </div>
                         </div>
                     </div>
