@@ -124,7 +124,7 @@ class CustomObjectType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
-                'disabled' => $isNewObject,
+                'disabled' => !$isNewObject,
                 'choices' => [
                     'custom.object.type.master' => CustomObject::TYPE_MASTER,
                     'custom.object.type.relationship' => CustomObject::TYPE_RELATIONSHIP,
@@ -146,6 +146,7 @@ class CustomObjectType extends AbstractType
                     'custom.object.relationship.many_to_many' => CustomObject::RELATIONSHIP_MANY_TO_MANY,
                     'custom.object.relationship.one_to_one' => CustomObject::RELATIONSHIP_ONE_TO_ONE,
                 ],
+                'disabled' => !$isNewObject,
             ]
         );
 
@@ -164,7 +165,8 @@ class CustomObjectType extends AbstractType
                     return $customObject->getNameSingular() . " (" . $customObject->getAlias() . ")";
                 },
                 'choice_value' => 'id',
-                'query_builder' => $this->customObjectRepository->getMasterObjectQueryBuilder($customObject)
+                'query_builder' => $this->customObjectRepository->getMasterObjectQueryBuilder($customObject),
+                'disabled' => !$isNewObject,
             ]
         );
 
