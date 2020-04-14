@@ -1,0 +1,238 @@
+openapi: 3.0.0
+info:
+  version: '1.0.0'
+  title: 'Custom Item Field API'
+  description: 'CRUD for custom Item fields'
+  termsOfService: https://mautic.com/terms-of-service/
+  contact:
+    name: Mautic
+    url: https://mautic.com
+    email: info@mautic.com
+paths:
+
+  /api/custom/items:
+
+    get:
+      description: Obtain information about custom items.
+      parameters:
+        - $ref: './COMPONENTS.yaml#/components/parameters/Limit'
+        - $ref: './COMPONENTS.yaml#/components/parameters/Offset'
+      responses:
+        200:
+          $ref: '#/components/responses/SuccessItems'
+        401:
+          $ref: './COMPONENTS.yaml#/components/responses/Unauthorized'
+
+        403:
+          $ref: './COMPONENTS.yaml#/components/responses/ForbiddenError'
+
+    post:
+      description: New custom item or items.
+      requestBody:
+        $ref: '#/components/requestBodies/RequestItemsWithoutId'
+      responses:
+        201:
+          $ref: '#/components/responses/Created'
+        401:
+          $ref: './COMPONENTS.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: './COMPONENTS.yaml#/components/responses/ForbiddenError'
+
+    put:
+      description: To edit custom items and create new ones if the items are not found.
+      requestBody:
+        $ref: '#/components/requestBodies/RequestItemsWithId'
+      responses:
+        200:
+          $ref: '#/components/responses/Edited'
+        401:
+          $ref: './COMPONENTS.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: './COMPONENTS.yaml#/components/responses/ForbiddenError'
+
+    patch:
+      description: To edit items. It works with uncomplete information.
+      requestBody:
+        $ref: '#/components/requestBodies/RequestItemsWithId'
+      responses:
+        200:
+          $ref: '#/components/responses/Edited'
+        401:
+          $ref: './COMPONENTS.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: './COMPONENTS.yaml#/components/responses/ForbiddenError'
+        404:
+          $ref: './COMPONENTS.yaml#/components/responses/NotFound'
+
+  /api/custom/Items/{id}:
+
+    get:
+      description: Returns an Item by ID.
+      parameters:
+        - $ref: './COMPONENTS.yaml#/components/parameters/Id'
+      responses:
+        200:
+          $ref: '#/components/responses/SuccessItem'
+        401:
+          $ref: './COMPONENTS.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: './COMPONENTS.yaml#/components/responses/ForbiddenError'
+
+    put:
+      description: To edit an item and create a new one if the item is not found.
+      parameters:
+        - $ref: './COMPONENTS.yaml#/components/parameters/Id'
+      requestBody:
+        $ref: '#/components/requestBodies/RequestItemWithId'
+      responses:
+        200:
+          $ref: '#/components/responses/Edited'
+        201:
+          $ref: '#/components/responses/Created'
+        401:
+          $ref: './COMPONENTS.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: './COMPONENTS.yaml#/components/responses/ForbiddenError'
+
+    patch:
+      description: To edit an Item and return a 404 if the Item is not found.
+      parameters:
+        - $ref: './COMPONENTS.yaml#/components/parameters/Id'
+      requestBody:
+        $ref: '#/components/requestBodies/RequestItemWithId'
+      responses:
+        200:
+          $ref: '#/components/responses/Edited'
+        401:
+          $ref: './COMPONENTS.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: './COMPONENTS.yaml#/components/responses/ForbiddenError'
+        404:
+          $ref: './COMPONENTS.yaml#/components/responses/NotFound'
+
+    delete:
+      description: To delete an Item.
+      parameters:
+        - $ref: './COMPONENTS.yaml#/components/parameters/Id'
+      responses:
+        200:
+          $ref: './COMPONENTS.yaml#/components/responses/Deleted'
+        401:
+          $ref: './COMPONENTS.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: './COMPONENTS.yaml#/components/responses/ForbiddenError'
+        404:
+          $ref: './COMPONENTS.yaml#/components/responses/NotFound'
+
+components:
+
+  responses:
+
+    SuccessItem:
+      description: Shows Item.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ItemWithId'
+
+    SuccessItems:
+      description: Shows Items.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ItemsWithId'
+
+    Created:
+      description: New Item was created.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ItemsWithId'
+
+    Edited:
+      description: The Item was edited.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ItemWithId'
+
+  requestBodies:
+
+    RequestItemsWithoutId:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ItemsWithoutId'
+
+    RequestItemsWithId:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ItemsWithId'
+
+    RequestItemWithoutId:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ItemWithoutId'
+
+    RequestItemWithId:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ItemWithId'
+
+  schemas:
+
+    ItemsWithoutId:
+      description: Array of items.
+      type: array
+      items:
+        $ref: '#/components/schemas/ItemsWithoutId'
+
+    ItemsWithId:
+      description: Array of items.
+      type: array
+      items:
+        $ref: '#/components/schemas/ItemsWithId'
+
+    ItemWithId:
+      allOf:
+        - $ref: '#/components/schemas/ItemWithoutId'
+        - type: Item
+          required:
+            - id
+          properties:
+            id:
+              type: integer
+              minimum: 0
+              nullable: false
+              example: 42
+
+    ItemWithoutId:
+      description: Model containing information about item
+      type: Item
+      required:
+        - label
+        - alias
+        - type
+      properties:
+        name:
+          type: string
+          maxLength: 255
+          nullable: false
+          example: city
+        customItemId:
+          type: integer
+          minimum: 0
+          nullable: true
+          example: 42
+        language:
+          type: string
+          maxLength: 255
+          nullable: true
+          example: cs

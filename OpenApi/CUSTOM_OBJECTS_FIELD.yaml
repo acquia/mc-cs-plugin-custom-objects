@@ -1,0 +1,144 @@
+openapi: 3.0.0
+info:
+  version: '1.0.0'
+  title: 'Custom Object Field API'
+  description: 'CRUD for custom object fields'
+  termsOfService: https://mautic.com/terms-of-service/
+  contact: 
+    name: Mautic
+    url: https://mautic.com
+    email: info@mautic.com
+paths:
+
+  /api/custom/objects/{ID}/fields/{ID}:
+
+    delete:
+      description: To delete custom object.
+      parameters:
+        - $ref: '#/components/parameters/ObjectId'
+        - $ref: './COMPONENTS.yaml#/components/parameters/Id'
+      responses:
+        200:
+          $ref: './COMPONENTS.yaml#/components/responses/Deleted'
+        401:
+          $ref: './COMPONENTS.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: './COMPONENTS.yaml#/components/responses/ForbiddenError'
+        404:
+          $ref: './COMPONENTS.yaml#/components/responses/NotFound'
+
+components:
+
+  schemas:
+
+    FieldsWithoutId:
+      description: Array of fields.
+      type: array
+      items:
+        $ref: '#/components/schemas/Field'
+
+    FieldsWithId:
+      description: Array of fields.
+      type: array
+      items:
+        $ref: '#/components/schemas/FieldWithId'
+
+    FieldWithId:
+      allOf:
+        - $ref: '#/components/schemas/Field'
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: integer
+              minimum: 0
+              nullable: false
+              example: 42
+        
+    Field:
+      description: Model containing information about field.
+      type: object
+      required:
+        - label
+        - alias
+        - type
+        - customObjectId
+      properties:
+        id:
+          type: integer
+          minimum: 0
+          nullable: false
+          example: 42
+        label:
+          type: string
+          maxLength: 255
+          nullable: false
+          example: City
+        alias:
+          type: string
+          maxLength: 255
+          nullable: true
+          example: city
+        type:
+          type: string
+          maxLength: 255
+          nullable: false
+          example: textfield
+        customObjectId:
+          type: integer
+          nullable: false
+          minimum: 0
+          example: 42
+        order:
+          type: integer
+          nullable: true
+          example: 42
+        required:
+          type: boolean
+          nullable: true
+          example: true
+        defaultValue:
+          oneOf:
+            - type: string
+            - type: integer
+            - type: boolean
+          maxLength: 255
+          nullable: true
+          example: Prague
+        options:
+          type: array
+          nullable: true
+          items:
+            type: object
+            properties:
+              label:
+                type: string
+                maxLength: 255
+                nullable: false
+                example: visibility
+              value:
+                type: string
+                maxLength: 255
+                nullable: false
+                example: hidden
+              order:
+                type: integer
+                nullable: false
+        params:
+          type: array
+          nullable: true
+          items:
+            type: string
+
+  parameters:
+
+    ObjectId:
+      name: Object id
+      in: path
+      required: true
+      description: ID of object to be returned.
+      schema:
+        type: integer
+        minimum: 0
+        example: 42

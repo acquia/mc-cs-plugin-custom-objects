@@ -1,0 +1,78 @@
+openapi: 3.0.0
+info:
+  title: Components
+  description: Components for other API
+  version: 1.0.0
+servers:
+- url: /
+paths: {}
+
+components:
+
+  schemas:
+
+    Error:
+      description: Error message.
+      type: object
+      properties:
+        error:
+          type: string
+          example: No access
+        error_description:
+          type: string
+          example: Problem with ...
+
+  responses:
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    ForbiddenError:
+      description: Forbidden error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Not Found
+
+    Deleted:
+      description: Deleted
+
+  parameters:
+
+    Limit:
+      name: limit
+      in: query
+      description: The amount of fields returned.
+      schema:
+        type: integer
+        minimum: 10
+        maximum: 100
+        example: 20
+
+    Offset:
+      name: offset
+      in: query
+      description: The amount of skipped pages.
+      schema:
+        type: integer
+        minimum: 0
+        example: 5
+
+    Id:
+      name: id
+      in: path
+      required: true
+      description: ID of object to be returned.
+      schema:
+        type: integer
+        minimum: 0
+        example: 42
+
+

@@ -1,0 +1,262 @@
+openapi: 3.0.0
+info:
+  version: '1.0.0'
+  title: 'Custom Object Field API'
+  description: 'CRUD for custom object fields'
+  termsOfService: https://mautic.com/terms-of-service/
+  contact:
+    name: Mautic
+    url: https://mautic.com
+    email: info@mautic.com
+paths:
+
+  /api/custom/objects:
+
+    get:
+      description: Obtain information about custom objects.
+      parameters:
+        - $ref: './COMPONENTS.yaml#/components/parameters/Limit'
+        - $ref: './COMPONENTS.yaml#/components/parameters/Offset'
+      responses:
+        200:
+          $ref: '#/components/responses/SuccessObjects'
+        401:
+          $ref: './COMPONENTS.yaml#/components/responses/Unauthorized'
+
+        403:
+          $ref: './COMPONENTS.yaml#/components/responses/ForbiddenError'
+
+    post:
+      description: New custom object or custom objects.
+      requestBody:
+        $ref: '#/components/requestBodies/RequestObjectsWithoutId'
+      responses:
+        201:
+          $ref: '#/components/responses/Created'
+        401:
+          $ref: './COMPONENTS.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: './COMPONENTS.yaml#/components/responses/ForbiddenError'
+
+    put:
+      description: To edit objects and create new ones if the objects are not found.
+      requestBody:
+        $ref: '#/components/requestBodies/RequestObjectsWithId'
+      responses:
+        200:
+          $ref: '#/components/responses/Edited'
+        401:
+          $ref: './COMPONENTS.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: './COMPONENTS.yaml#/components/responses/ForbiddenError'
+
+    patch:
+      description: To edit objects. It works with uncomplete information.
+      requestBody:
+        $ref: '#/components/requestBodies/RequestObjectsWithId'
+      responses:
+        200:
+          $ref: '#/components/responses/Edited'
+        401:
+          $ref: './COMPONENTS.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: './COMPONENTS.yaml#/components/responses/ForbiddenError'
+        404:
+          $ref: './COMPONENTS.yaml#/components/responses/NotFound'
+
+  /api/custom/objects/{id}:
+
+    get:
+      description: Returns an object by ID.
+      parameters:
+        - $ref: './COMPONENTS.yaml#/components/parameters/Id'
+      responses:
+        200:
+          $ref: '#/components/responses/SuccessObject'
+        401:
+          $ref: './COMPONENTS.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: './COMPONENTS.yaml#/components/responses/ForbiddenError'
+
+    put:
+      description: To edit an object and create a new one if the object is not found.
+      parameters:
+        - $ref: './COMPONENTS.yaml#/components/parameters/Id'
+      requestBody:
+        $ref: '#/components/requestBodies/RequestObjectWithId'
+      responses:
+        200:
+          $ref: '#/components/responses/Edited'
+        201:
+          $ref: '#/components/responses/Created'
+        401:
+          $ref: './COMPONENTS.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: './COMPONENTS.yaml#/components/responses/ForbiddenError'
+
+    patch:
+      description: To edit a custom object and return a 404 if the custom object is not found.
+      parameters:
+        - $ref: './COMPONENTS.yaml#/components/parameters/Id'
+      requestBody:
+        $ref: '#/components/requestBodies/RequestObjectWithId'
+      responses:
+        200:
+          $ref: '#/components/responses/Edited'
+        401:
+          $ref: './COMPONENTS.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: './COMPONENTS.yaml#/components/responses/ForbiddenError'
+        404:
+          $ref: './COMPONENTS.yaml#/components/responses/NotFound'
+
+    delete:
+      description: To delete custom object.
+      parameters:
+        - $ref: './COMPONENTS.yaml#/components/parameters/Id'
+      responses:
+        200:
+          $ref: './COMPONENTS.yaml#/components/responses/Deleted'
+        401:
+          $ref: './COMPONENTS.yaml#/components/responses/Unauthorized'
+        403:
+          $ref: './COMPONENTS.yaml#/components/responses/ForbiddenError'
+        404:
+          $ref: './COMPONENTS.yaml#/components/responses/NotFound'
+
+components:
+
+  responses:
+
+    SuccessObject:
+      description: Shows object.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ObjectWithId'
+
+    SuccessObjects:
+      description: Shows objects.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ObjectsWithId'
+
+    Created:
+      description: New object was created.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ObjectsWithId'
+
+    Edited:
+      description: The object was edited.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ObjectWithId'
+
+  requestBodies:
+
+    RequestObjectsWithoutId:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ObjectsWithoutId'
+
+    RequestObjectsWithId:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ObjectsWithId'
+
+    RequestObjectWithoutId:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ObjectWithoutId'
+
+    RequestObjectWithId:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ObjectWithId'
+
+  schemas:
+
+    ObjectsWithoutId:
+      description: Array of fields.
+      type: array
+      items:
+        $ref: '#/components/schemas/ObjectsWithoutId'
+
+    ObjectsWithId:
+      description: Array of fields.
+      type: array
+      items:
+        $ref: '#/components/schemas/ObjectsWithId'
+
+    ObjectWithId:
+      allOf:
+        - $ref: '#/components/schemas/Object'
+        - type: object
+          required:
+            - id
+          properties:
+            id:
+              type: integer
+              minimum: 0
+              nullable: false
+              example: 42
+            customFields:
+              $ref: './CUSTOM_OBJECTS_FIELD.yaml#/components/schemas/FieldsWithId'
+
+    ObjectWithoutId:
+      allOf:
+        - $ref: '#/components/schemas/Object'
+        - type: object
+          properties:
+            customFields:
+              $ref: './CUSTOM_OBJECTS_FIELD.yaml#/components/schemas/FieldsWithoutId'
+
+    Object:
+      description: Model containing information about custom object.
+      type: object
+      required:
+        - nameSingular
+        - namePlural
+      properties:
+        alias:
+          type: string
+          maxLength: 255
+          nullable: true
+          example: city
+        nameSingular:
+          type: string
+          maxLength: 255
+          nullable: false
+          example: city
+        namePlural:
+          type: string
+          maxLength: 255
+          nullable: false
+          example: cities
+        description:
+          type: string
+          maxLength: 255
+          nullable: true
+          example: cities
+        language:
+          type: string
+          maxLength: 255
+          nullable: true
+          example: cs
+        categoryId:
+          type: integer
+          minimum: 0
+          nullable: true
+          example: 42
