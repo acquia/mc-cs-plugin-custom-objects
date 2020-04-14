@@ -38,7 +38,8 @@ class CustomObjectRepository extends CommonRepository
      * Used for the CustomObjectType form to load masterObject choices.
      * Should only load custom objects with type = TYPE_MASTER and that are not the current object being edited
      */
-    public function getMasterObjectQueryBuilder(CustomObject $customObject = null): QueryBuilder {
+    public function getMasterObjectQueryBuilder(CustomObject $customObject = null): QueryBuilder
+    {
         $qb = $this->createQueryBuilder(CustomObject::TABLE_ALIAS);
 
         if ($customObject && null !== $customObject->getId()) {

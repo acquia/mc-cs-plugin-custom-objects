@@ -188,33 +188,39 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @return int|null
      */
-    public function getType() {
+    public function getType()
+    {
         return $this->type;
     }
 
-    public function setType(int $type) {
+    public function setType(int $type)
+    {
         $this->type = $type;
     }
 
     /**
      * @return int|null
      */
-    public function getRelationship() {
+    public function getRelationship()
+    {
         return $this->relationship;
     }
 
-    public function setRelationship(int $relationship) {
+    public function setRelationship(int $relationship)
+    {
         $this->relationship = $relationship;
     }
 
     /**
      * @return CustomObject|null
      */
-    public function getMasterObject() {
+    public function getMasterObject()
+    {
         return $this->masterObject;
     }
 
-    public function setMasterObject($customObject) {
+    public function setMasterObject($customObject)
+    {
         $this->masterObject = $customObject;
     }
 
