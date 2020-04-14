@@ -55,6 +55,8 @@ components:
               minimum: 0
               nullable: false
               example: 42
+            links:
+              $ref: './COMPONENTS.yaml#/components/schemas/Links'
         
     Field:
       description: Model containing information about field.

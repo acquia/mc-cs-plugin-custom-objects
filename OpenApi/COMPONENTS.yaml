@@ -11,6 +11,17 @@ components:
 
   schemas:
 
+    Links:
+      description: API links.
+      type: object
+      properties:
+        delete:
+          type: string
+        put:
+          type: string
+        patch:
+          type: string
+
     Error:
       description: Error message.
       type: object

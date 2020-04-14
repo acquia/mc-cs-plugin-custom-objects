@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   version: '1.0.0'
   title: 'Custom Item Field API'
-  description: 'CRUD for custom Item fields'
+  description: 'CRUD for custom Item'
   termsOfService: https://mautic.com/terms-of-service/
   contact:
     name: Mautic
@@ -192,13 +192,13 @@ components:
       description: Array of items.
       type: array
       items:
-        $ref: '#/components/schemas/ItemsWithoutId'
+        $ref: '#/components/schemas/ItemWithoutId'
 
     ItemsWithId:
       description: Array of items.
       type: array
       items:
-        $ref: '#/components/schemas/ItemsWithId'
+        $ref: '#/components/schemas/ItemWithId'
 
     ItemWithId:
       allOf:
@@ -212,6 +212,8 @@ components:
               minimum: 0
               nullable: false
               example: 42
+            links:
+              $ref: './COMPONENTS.yaml#/components/schemas/Links'
 
     ItemWithoutId:
       description: Model containing information about item
@@ -231,8 +233,34 @@ components:
           minimum: 0
           nullable: true
           example: 42
+        categoryId:
+          type: integer
+          minimum: 0
+          nullable: true
+          example: 42
         language:
           type: string
           maxLength: 255
           nullable: true
           example: cs
+        contactReferences:
+          type: array
+          items:
+            type: integer
+            minimum: 0
+            nullable: true
+            example: 42
+        companyReferences:
+          type: array
+          items:
+            type: integer
+            minimum: 0
+            nullable: true
+            example: 42
+        itemReferences:
+          type: array
+          items:
+            type: integer
+            minimum: 0
+            nullable: true
+            example: 42

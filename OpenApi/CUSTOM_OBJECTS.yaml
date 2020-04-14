@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   version: '1.0.0'
   title: 'Custom Object Field API'
-  description: 'CRUD for custom object fields'
+  description: 'CRUD for custom object'
   termsOfService: https://mautic.com/terms-of-service/
   contact:
     name: Mautic
@@ -22,7 +22,6 @@ paths:
           $ref: '#/components/responses/SuccessObjects'
         401:
           $ref: './COMPONENTS.yaml#/components/responses/Unauthorized'
-
         403:
           $ref: './COMPONENTS.yaml#/components/responses/ForbiddenError'
 
@@ -172,13 +171,6 @@ components:
           schema:
             $ref: '#/components/schemas/ObjectsWithId'
 
-    RequestObjectWithoutId:
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ObjectWithoutId'
-
     RequestObjectWithId:
       required: true
       content:
@@ -192,13 +184,13 @@ components:
       description: Array of fields.
       type: array
       items:
-        $ref: '#/components/schemas/ObjectsWithoutId'
+        $ref: '#/components/schemas/ObjectWithoutId'
 
     ObjectsWithId:
       description: Array of fields.
       type: array
       items:
-        $ref: '#/components/schemas/ObjectsWithId'
+        $ref: '#/components/schemas/ObjectWithId'
 
     ObjectWithId:
       allOf:
@@ -214,6 +206,8 @@ components:
               example: 42
             customFields:
               $ref: './CUSTOM_OBJECTS_FIELD.yaml#/components/schemas/FieldsWithId'
+            links:
+              $ref: './COMPONENTS.yaml#/components/schemas/Links'
 
     ObjectWithoutId:
       allOf:
