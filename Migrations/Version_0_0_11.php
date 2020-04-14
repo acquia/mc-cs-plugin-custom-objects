@@ -18,10 +18,12 @@ class Version_0_0_11 extends AbstractMigration
      */
     protected function isApplicable(Schema $schema): bool
     {
+        $tableCustomObject = $this->concatPrefix($this->table);
+
         try {
-            return !$schema->getTable($this->concatPrefix($this->tableCustomObject))->hasColumn('type') ||
-                !$schema->getTable($this->concatPrefix($this->tableCustomObject))->hasColumn('relationship') ||
-                !$schema->getTable($this->concatPrefix($this->tableCustomObject))->hasColumn('master_object');
+            return !$schema->getTable($tableCustomObject)->hasColumn('type') ||
+                !$schema->getTable($tableCustomObject)->hasColumn('relationship') ||
+                !$schema->getTable($tableCustomObject)->hasColumn('master_object');
         } catch (SchemaException $e) {
             return false;
         }

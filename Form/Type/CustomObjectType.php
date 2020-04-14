@@ -19,6 +19,8 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -36,9 +38,15 @@ class CustomObjectType extends AbstractType
      */
     private $customFieldTypeProvider;
 
-    public function __construct(CustomFieldTypeProvider $customFieldTypeProvider)
+    /**
+     * @var CustomObjectRepository
+     */
+    private $customObjectRepository;
+
+    public function __construct(CustomFieldTypeProvider $customFieldTypeProvider, CustomObjectRepository $customObjectRepository)
     {
         $this->customFieldTypeProvider = $customFieldTypeProvider;
+        $this->customObjectRepository = $customObjectRepository;
     }
 
     /**
@@ -48,14 +56,13 @@ class CustomObjectType extends AbstractType
     {
         $customObject = $options['data'];
 
+        $isNewObject = ($customObject->getId() < 0);
+
         $attr = [
             'class'   => 'form-control',
             'tooltip' => 'custom.field.help.alias',
+            'readOnly' => $isNewObject,
         ];
-
-        if ($customObject->getId() > 0) {
-            $attr['readonly'] = true;
-        }
 
         $builder->add(
             'alias',
@@ -117,6 +124,7 @@ class CustomObjectType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
+                'disabled' => $isNewObject,
                 'choices' => [
                     'custom.object.type.master' => CustomObject::TYPE_MASTER,
                     'custom.object.type.relationship' => CustomObject::TYPE_RELATIONSHIP,
@@ -143,15 +151,20 @@ class CustomObjectType extends AbstractType
 
         $builder->add(
             'masterObject',
-            ChoiceType::class,
+            EntityType::class,
             [
                 'label'      => 'custom.object.relationship.master_object.label',
+                'class' => CustomObject::class,
                 'required'   => false,
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class' => 'form-control',
                 ],
-                'choices' => [],
+                'choice_label' => function ($customObject) {
+                    return $customObject->getNameSingular() . " (" . $customObject->getAlias() . ")";
+                },
+                'choice_value' => 'id',
+                'query_builder' => $this->customObjectRepository->getMasterObjectQueryBuilder($customObject)
             ]
         );
 

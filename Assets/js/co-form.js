@@ -18,21 +18,24 @@ CustomObjectsForm = {
 
     initConditionalFields: function () {
         let typeField = mQuery("#custom_object_type")[0];
-        if ("0" === typeField.value) {
-            CustomObjectsForm.hideField("custom_object_relationship");
-            CustomObjectsForm.hideField("custom_object_masterObject");
-        }
-
-        // Only display 'Relationship' and 'Master Object' fields if the type is 'relationship'
-        typeField.onchange = function(event) {
-            if ("0" !== event.target.value) {
-                CustomObjectsForm.showField("custom_object_relationship");
-                CustomObjectsForm.showField("custom_object_masterObject");
-            } else {
+        
+        if (typeField) {
+            if ("0" === typeField.value) {
                 CustomObjectsForm.hideField("custom_object_relationship");
                 CustomObjectsForm.hideField("custom_object_masterObject");
             }
-        };
+
+            // Only display 'Relationship' and 'Master Object' fields if the type is 'relationship'
+            typeField.onchange = function (event) {
+                if ("0" !== event.target.value) {
+                    CustomObjectsForm.showField("custom_object_relationship");
+                    CustomObjectsForm.showField("custom_object_masterObject");
+                } else {
+                    CustomObjectsForm.hideField("custom_object_relationship");
+                    CustomObjectsForm.hideField("custom_object_masterObject");
+                }
+            };
+        }
     },
 
     showField: function (fieldId) {

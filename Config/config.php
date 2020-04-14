@@ -801,6 +801,7 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType::class,
                 'arguments' => [
                     'custom_field.type.provider',
+                    'custom_object.repository',
                 ],
                 'tag' => 'form.type',
             ],

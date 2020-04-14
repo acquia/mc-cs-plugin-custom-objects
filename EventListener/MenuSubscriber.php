@@ -15,6 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\MenuEvent;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
@@ -64,7 +65,12 @@ class MenuSubscriber implements EventSubscriberInterface
 
     private function addMainMenuItems(MenuEvent $event): void
     {
-        $customObjects = $this->customObjectModel->fetchAllPublishedEntities();
+        $customObjects = array_filter(
+            $this->customObjectModel->fetchAllPublishedEntities(),
+            function($item) {
+                return $item->getType() === CustomObject::TYPE_MASTER;
+            }
+        );
 
         if (!$customObjects) {
             return;

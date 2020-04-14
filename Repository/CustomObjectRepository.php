@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Repository;
 
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
@@ -31,6 +32,21 @@ class CustomObjectRepository extends CommonRepository
         }
 
         return (bool) $q->getQuery()->getSingleResult()['alias_count'];
+    }
+
+    /**
+     * Used for the CustomObjectType form to load masterObject choices.
+     * Should only load custom objects with type = TYPE_MASTER and that are not the current object being edited
+     */
+    public function getMasterObjectQueryBuilder(CustomObject $customObject = null): QueryBuilder {
+        $qb = $this->createQueryBuilder(CustomObject::TABLE_ALIAS);
+
+        if ($customObject && null !== $customObject->getId()) {
+            $qb->where($qb->expr()->neq(CustomObject::TABLE_ALIAS.'.id', ':ignoreId'));
+            $qb->setParameter('ignoreId', $customObject->getId());
+        }
+
+        return $qb;
     }
 
     /**
