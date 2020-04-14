@@ -68,7 +68,8 @@ class MenuSubscriber implements EventSubscriberInterface
         $customObjects = array_filter(
             $this->customObjectModel->fetchAllPublishedEntities(),
             function ($item) {
-                return $item->getType() === CustomObject::TYPE_MASTER;
+                $type = $item->getType();
+                return CustomObject::TYPE_MASTER === $type || null === $type;
             }
         );
 
