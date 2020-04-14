@@ -32,6 +32,14 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     const TABLE_NAME  = 'custom_object';
     const TABLE_ALIAS = 'CustomObject';
 
+    // Object type constants for $type field
+    const TYPE_MASTER = 0;
+    const TYPE_RELATIONSHIP = 1;
+
+    // Relationship type constants for $relationship field
+    const RELATIONSHIP_MANY_TO_MANY = 0;
+    const RELATIONSHIP_ONE_TO_ONE = 1;
+
     /**
      * @var int|null
      */
@@ -73,6 +81,21 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     private $customFields;
 
     /**
+     * @var integer|null
+     */
+    private $type;
+
+    /**
+     * @var integer|null
+     */
+    private $relationship;
+
+    /**
+     * @var CustomObject|null
+     */
+    private $masterObject;
+
+    /**
      * @var mixed[]
      */
     private $initialCustomFields = [];
@@ -112,6 +135,9 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         $builder->addNamedField('namePlural', Type::STRING, 'name_plural');
         $builder->addNullableField('description', Type::STRING, 'description');
         $builder->addNullableField('language', Type::STRING, 'lang');
+        $builder->addNullableField('type', Type::INTEGER, 'type');
+        $builder->addNullableField('relationship', Type::INTEGER, 'relationship');
+        $builder->addNullableField('masterObject', Type::INTEGER, 'master_object');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -157,6 +183,45 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     public function getAlias()
     {
         return $this->alias;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    public function setType(int $type)
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getRelationship()
+    {
+        return $this->relationship;
+    }
+
+    public function setRelationship(int $relationship)
+    {
+        $this->relationship = $relationship;
+    }
+
+    /**
+     * @return CustomObject|null
+     */
+    public function getMasterObject()
+    {
+        return $this->masterObject;
+    }
+
+    public function setMasterObject($customObject)
+    {
+        $this->masterObject = $customObject;
     }
 
     /**

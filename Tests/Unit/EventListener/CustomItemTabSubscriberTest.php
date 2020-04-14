@@ -79,6 +79,10 @@ class CustomItemTabSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getNamePlural')
             ->willReturn('Object A');
 
+        $this->customObject->expects($this->once())
+            ->method('getType')
+            ->willReturn(CustomObject::TYPE_MASTER);
+
         $this->customContentEvent->expects($this->at(0))
             ->method('checkContext')
             ->with('CustomObjectsBundle:CustomItem:detail.html.php', 'tabs')
@@ -124,6 +128,10 @@ class CustomItemTabSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->customObject->expects($this->exactly(2))
             ->method('getId')
             ->willReturn(555);
+
+        $this->customObject->expects($this->once())
+            ->method('getType')
+            ->willReturn(CustomObject::TYPE_MASTER);
 
         $this->customItem->expects($this->once())
             ->method('getCustomObject')

@@ -19,7 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 return [
     'name'        => 'Custom Objects',
     'description' => 'Adds custom objects and fields features to Mautic',
-    'version'     => '0.0.10',
+    'version'     => '0.0.11',
     'author'      => 'Mautic, Inc.',
 
     'routes' => [
@@ -801,6 +801,7 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType::class,
                 'arguments' => [
                     'custom_field.type.provider',
+                    'custom_object.repository',
                 ],
                 'tag' => 'form.type',
             ],
