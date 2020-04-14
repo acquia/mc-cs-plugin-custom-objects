@@ -79,7 +79,8 @@ class CustomItemTabSubscriber implements EventSubscriberInterface
             $objects = array_filter(
                 $this->getCustomObjects(),
                 function ($object) {
-                    return $object->getType() === CustomObject::TYPE_MASTER;
+                    $type = $object->getType();
+                    return CustomObject::TYPE_MASTER === $type || null === $type;
                 }
             );
 

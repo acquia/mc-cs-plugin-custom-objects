@@ -91,7 +91,8 @@ class ContactTabSubscriber implements EventSubscriberInterface
             $objects = array_filter(
                 $this->getCustomObjects(),
                 function ($item) {
-                    return $item->getType() === CustomObject::TYPE_MASTER;
+                    $type = $item->getType();
+                    return CustomObject::TYPE_MASTER === $type || null === $type;
                 }
             );
 
