@@ -83,7 +83,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @var integer|null
      */
-    private $type;
+    private $type = self::TYPE_MASTER;
 
     /**
      * @var integer|null
