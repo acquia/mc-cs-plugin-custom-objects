@@ -86,6 +86,10 @@ class ContactTabSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getNamePlural')
             ->willReturn('Object A');
 
+        $customObject->expects($this->once())
+            ->method('getType')
+            ->willReturn(CustomObject::TYPE_MASTER);
+
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
             ->willReturn(true);
