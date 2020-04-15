@@ -44,7 +44,7 @@ class ReportSubscriber implements EventSubscriberInterface
         }
 
         self::$customObjects = $this->repository->findAll();
-        uasort(self::$customObjects, function (CustomObject $a, CustomObject $b): int {
+        usort(self::$customObjects, function (CustomObject $a, CustomObject $b): int {
             return strnatcmp($a->getNamePlural(), $b->getNamePlural());
         });
 
