@@ -137,7 +137,10 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         $builder->addNullableField('language', Type::STRING, 'lang');
         $builder->addNullableField('type', Type::INTEGER, 'type');
         $builder->addNullableField('relationship', Type::INTEGER, 'relationship');
-        $builder->addNullableField('masterObject', Type::INTEGER, 'master_object');
+
+        $builder->createOneToOne('masterObject', CustomObject::class)
+            ->addJoinColumn('master_object', 'id')
+            ->build();
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
