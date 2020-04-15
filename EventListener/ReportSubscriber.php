@@ -53,13 +53,14 @@ class ReportSubscriber implements EventSubscriberInterface
         ];
     }
 
+    private function getContext(CustomObject $customObject): string
+    {
+        return static::CONTEXT_CUSTOM_OBJECTS . '.' . $customObject->getId();
+    }
+
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
-        $callback = function(CustomObject $customObject) {
-            return static::CONTEXT_CUSTOM_OBJECTS . '.' . $customObject->getId();
-        };
-
-        if (!$event->checkContext(array_map($callback, $this->getCustomObjects()))) {
+        if (!$event->checkContext(array_map([$this, 'getContext'], $this->getCustomObjects()))) {
             return;
         }
 
@@ -68,15 +69,13 @@ class ReportSubscriber implements EventSubscriberInterface
             $event->getCategoryColumns()
         );
 
-        $customObjects = $this->getCustomObjects();
-
         /** @var CustomObject $customObject */
-        foreach ($customObjects as $customObject) {
+        foreach ($this->getCustomObjects() as $customObject) {
             $event->addTable(
-                static::CONTEXT_CUSTOM_OBJECTS . '.' . $customObject->getId(),
+                $this->getContext($customObject),
                 [
                     'display_name' => $customObject->getNamePlural(),
-                    'columns'      => $columns,
+                    'columns' => $columns,
                 ],
                 static::CONTEXT_CUSTOM_OBJECTS
             );
