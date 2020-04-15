@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
+use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
@@ -21,7 +22,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
-    const PREFIX = 'co.';
+    const PREFIX = 'co';
     const CONTEXT_CUSTOM_OBJECTS = 'custom.objects';
 
     private static $customObjects = null;
@@ -43,6 +44,10 @@ class ReportSubscriber implements EventSubscriberInterface
         }
 
         self::$customObjects = $this->repository->findAll();
+        uasort(self::$customObjects, function (CustomObject $a, CustomObject $b): int {
+            return strnatcmp($a->getNamePlural(), $b->getNamePlural());
+        });
+
         return self::$customObjects;
     }
 
@@ -58,14 +63,19 @@ class ReportSubscriber implements EventSubscriberInterface
         return static::CONTEXT_CUSTOM_OBJECTS . '.' . $customObject->getId();
     }
 
+    public function getContexts(): array
+    {
+        return array_map([$this, 'getContext'], $this->getCustomObjects());
+    }
+
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
-        if (!$event->checkContext(array_map([$this, 'getContext'], $this->getCustomObjects()))) {
+        if (!$event->checkContext($this->getContexts())) {
             return;
         }
 
         $columns = array_merge(
-            $event->getStandardColumns(static::PREFIX, []),
+            $event->getStandardColumns(static::PREFIX . '.', []),
             $event->getCategoryColumns()
         );
 
@@ -80,5 +90,21 @@ class ReportSubscriber implements EventSubscriberInterface
                 static::CONTEXT_CUSTOM_OBJECTS
             );
         }
+    }
+
+    /**
+     * Initialize the QueryBuilder object to generate reports from.
+     */
+    public function onReportGenerate(ReportGeneratorEvent $event)
+    {
+        if (!$event->checkContext($this->getContexts())) {
+            return;
+        }
+
+        $queryBuilder = $event->getQueryBuilder();
+
+        $queryBuilder->from($this->repository->getTableName(), self::PREFIX);
+
+        $a = 5;
     }
 }
