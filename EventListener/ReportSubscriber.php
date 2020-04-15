@@ -15,12 +15,36 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\ReportEvents;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
     const PREFIX = 'co.';
     const CONTEXT_CUSTOM_OBJECTS = 'custom.objects';
+
+    private static $customObjects = null;
+
+    /**
+     * @var CustomObjectRepository
+     */
+    private $repository;
+
+    public function __construct(CustomObjectRepository $repository)
+    {
+        $this->repository = $repository;
+    }
+
+    private function getCustomObjects(): array
+    {
+        if (null !== self::$customObjects) {
+            return self::$customObjects;
+        }
+
+        self::$customObjects = $this->repository->findAll();
+        return self::$customObjects;
+    }
 
     public static function getSubscribedEvents(): array
     {
@@ -31,17 +55,31 @@ class ReportSubscriber implements EventSubscriberInterface
 
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
+        $callback = function(CustomObject $customObject) {
+            return static::CONTEXT_CUSTOM_OBJECTS . '.' . $customObject->getId();
+        };
+
+        if (!$event->checkContext(array_map($callback, $this->getCustomObjects()))) {
+            return;
+        }
+
         $columns = array_merge(
             $event->getStandardColumns(static::PREFIX, []),
             $event->getCategoryColumns()
         );
 
-        $event->addTable(
-            static::CONTEXT_CUSTOM_OBJECTS,
-            [
-                'display_name' => 'custom.object.title',
-                'columns'      => $columns,
-            ]
-        );
+        $customObjects = $this->getCustomObjects();
+
+        /** @var CustomObject $customObject */
+        foreach ($customObjects as $customObject) {
+            $event->addTable(
+                static::CONTEXT_CUSTOM_OBJECTS . '.' . $customObject->getId(),
+                [
+                    'display_name' => $customObject->getNamePlural(),
+                    'columns'      => $columns,
+                ],
+                static::CONTEXT_CUSTOM_OBJECTS
+            );
+        }
     }
 }
