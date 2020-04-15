@@ -55,14 +55,7 @@ class CustomObjectType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $customObject = $options['data'];
-
-        $isNewObject = ($customObject->getId() < 0);
-
-        $attr = [
-            'class'   => 'form-control',
-            'tooltip' => 'custom.field.help.alias',
-            'readOnly' => $isNewObject,
-        ];
+        $isNewObject = $customObject->isNew();
 
         $builder->add(
             'alias',
@@ -71,7 +64,11 @@ class CustomObjectType extends AbstractType
                 'label'      => 'custom.object.alias.label',
                 'required'   => false,
                 'label_attr' => ['class' => 'control-label'],
-                'attr'       => $attr,
+                'attr'       => [
+                    'class'   => 'form-control',
+                    'tooltip' => 'custom.field.help.alias',
+                    'readOnly' => !$isNewObject,
+                ],
             ]
         );
 
