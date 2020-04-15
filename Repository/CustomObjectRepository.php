@@ -41,9 +41,11 @@ class CustomObjectRepository extends CommonRepository
     public function getMasterObjectQueryBuilder(CustomObject $customObject = null): QueryBuilder
     {
         $qb = $this->createQueryBuilder(CustomObject::TABLE_ALIAS);
+        $qb->where($qb->expr()->eq(CustomObject::TABLE_ALIAS.'.type', ':type'));
+        $qb->setParameter('type', CustomObject::TYPE_MASTER);
 
         if ($customObject && null !== $customObject->getId()) {
-            $qb->where($qb->expr()->neq(CustomObject::TABLE_ALIAS.'.id', ':ignoreId'));
+            $qb->andWhere($qb->expr()->neq(CustomObject::TABLE_ALIAS.'.id', ':ignoreId'));
             $qb->setParameter('ignoreId', $customObject->getId());
         }
 

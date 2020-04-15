@@ -13,7 +13,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
+use Doctrine\ORM\EntityManager;
+use FOS\RestBundle\Form\Transformer\EntityToIdObjectTransformer;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
+use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -35,6 +38,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class CustomObjectType extends AbstractType
 {
     /**
+     * @var EntityManager
+     */
+    private $entityManager;
+
+    /**
      * @var CustomFieldTypeProvider
      */
     private $customFieldTypeProvider;
@@ -44,8 +52,9 @@ class CustomObjectType extends AbstractType
      */
     private $customObjectRepository;
 
-    public function __construct(CustomFieldTypeProvider $customFieldTypeProvider, CustomObjectRepository $customObjectRepository)
+    public function __construct(EntityManager $entityManager, CustomFieldTypeProvider $customFieldTypeProvider, CustomObjectRepository $customObjectRepository)
     {
+        $this->entityManager = $entityManager;
         $this->customFieldTypeProvider = $customFieldTypeProvider;
         $this->customObjectRepository  = $customObjectRepository;
     }
@@ -153,6 +162,8 @@ class CustomObjectType extends AbstractType
             ]
         );
 
+        $transformer = new IdToEntityModelTransformer($this->entityManager, CustomObject::class);
+
         $builder->add(
             'masterObject',
             EntityType::class,
@@ -173,6 +184,7 @@ class CustomObjectType extends AbstractType
                 'disabled'      => !$isNewObject,
             ]
         );
+        $builder->get('masterObject')->addModelTransformer($transformer);
 
         $builder->add('category', CategoryListType::class, ['bundle' => 'global']);
         $builder->add('isPublished', YesNoButtonGroupType::class);

@@ -800,6 +800,7 @@ return [
             'custom_object.object.form' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType::class,
                 'arguments' => [
+                    'doctrine.orm.entity_manager',
                     'custom_field.type.provider',
                     'custom_object.repository',
                 ],
