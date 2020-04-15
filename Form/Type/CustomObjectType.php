@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
+use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
@@ -46,7 +47,7 @@ class CustomObjectType extends AbstractType
     public function __construct(CustomFieldTypeProvider $customFieldTypeProvider, CustomObjectRepository $customObjectRepository)
     {
         $this->customFieldTypeProvider = $customFieldTypeProvider;
-        $this->customObjectRepository = $customObjectRepository;
+        $this->customObjectRepository  = $customObjectRepository;
     }
 
     /**
@@ -54,8 +55,10 @@ class CustomObjectType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $builder->addEventSubscriber(new CleanFormSubscriber(['description' => 'html']));
+
         $customObject = $options['data'];
-        $isNewObject = $customObject->isNew();
+        $isNewObject  = $customObject->isNew();
 
         $builder->add(
             'alias',
@@ -65,8 +68,8 @@ class CustomObjectType extends AbstractType
                 'required'   => false,
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class'   => 'form-control',
-                    'tooltip' => 'custom.field.help.alias',
+                    'class'    => 'form-control',
+                    'tooltip'  => 'custom.field.help.alias',
                     'readOnly' => !$isNewObject,
                 ],
             ]
@@ -106,7 +109,7 @@ class CustomObjectType extends AbstractType
                 'required'   => false,
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class' => 'form-control',
+                    'class' => 'form-control editor',
                 ],
             ]
         );
@@ -121,9 +124,9 @@ class CustomObjectType extends AbstractType
                 'attr'       => [
                     'class' => 'form-control',
                 ],
-                'disabled' => !$isNewObject,
-                'choices' => [
-                    'custom.object.type.master' => CustomObject::TYPE_MASTER,
+                'disabled'   => !$isNewObject,
+                'choices'    => [
+                    'custom.object.type.master'       => CustomObject::TYPE_MASTER,
                     'custom.object.type.relationship' => CustomObject::TYPE_RELATIONSHIP,
                 ],
             ]
@@ -137,13 +140,14 @@ class CustomObjectType extends AbstractType
                 'required'   => false,
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class' => 'form-control',
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"custom_object_type":["'.CustomObject::TYPE_RELATIONSHIP.'"]}',
                 ],
-                'choices' => [
+                'choices'    => [
                     'custom.object.relationship.many_to_many' => CustomObject::RELATIONSHIP_MANY_TO_MANY,
-                    'custom.object.relationship.one_to_one' => CustomObject::RELATIONSHIP_ONE_TO_ONE,
+                    'custom.object.relationship.one_to_one'   => CustomObject::RELATIONSHIP_ONE_TO_ONE,
                 ],
-                'disabled' => !$isNewObject,
+                'disabled'   => !$isNewObject,
             ]
         );
 
@@ -151,19 +155,20 @@ class CustomObjectType extends AbstractType
             'masterObject',
             EntityType::class,
             [
-                'label'      => 'custom.object.relationship.master_object.label',
-                'class' => CustomObject::class,
-                'required'   => false,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class' => 'form-control',
+                'label'         => 'custom.object.relationship.master_object.label',
+                'class'         => CustomObject::class,
+                'required'      => false,
+                'label_attr'    => ['class' => 'control-label'],
+                'attr'          => [
+                    'class'        => 'form-control',
+                    'data-show-on' => '{"custom_object_type":["'.CustomObject::TYPE_RELATIONSHIP.'"]}',
                 ],
-                'choice_label' => function ($customObject) {
-                    return $customObject->getNameSingular() . " (" . $customObject->getAlias() . ")";
+                'choice_label'  => function ($customObject) {
+                    return $customObject->getNameSingular()." (".$customObject->getAlias().")";
                 },
-                'choice_value' => 'id',
+                'choice_value'  => 'id',
                 'query_builder' => $this->customObjectRepository->getMasterObjectQueryBuilder($customObject),
-                'disabled' => !$isNewObject,
+                'disabled'      => !$isNewObject,
             ]
         );
 
@@ -213,22 +218,25 @@ class CustomObjectType extends AbstractType
 
     private function addEvents(FormBuilderInterface $builder): void
     {
-        $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event): void {
-            /** @var CustomObject $customObject */
-            $customObject = $event->getData();
-            $customFields = $customObject->getCustomFields();
+        $builder->addEventListener(
+            FormEvents::POST_SET_DATA,
+            function (FormEvent $event): void {
+                /** @var CustomObject $customObject */
+                $customObject = $event->getData();
+                $customFields = $customObject->getCustomFields();
 
-            if (empty($customFields)) {
-                return;
-            }
+                if (empty($customFields)) {
+                    return;
+                }
 
-            /** @var CustomField $customField */
-            foreach ($customFields as $customField) {
-                if (!$customField->getTypeObject()) {
-                    // Should not happen. Every CF MUST HAVE type object.
-                    $customField->setTypeObject($this->customFieldTypeProvider->getType($customField->getType()));
+                /** @var CustomField $customField */
+                foreach ($customFields as $customField) {
+                    if (!$customField->getTypeObject()) {
+                        // Should not happen. Every CF MUST HAVE type object.
+                        $customField->setTypeObject($this->customFieldTypeProvider->getType($customField->getType()));
+                    }
                 }
             }
-        });
+        );
     }
 }
