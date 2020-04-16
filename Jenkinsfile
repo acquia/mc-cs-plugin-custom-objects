@@ -205,6 +205,7 @@ spec:
             'anton-vlasenko':'anton.vlasenko',
             'dongilbert':'don.gilbert',
             'escopecz':'jan.linhart',
+            'fedys':'miroslav.fedeles',
             'Gregy':'petr.gregor',
             'hluchas':'lukas.drahy',
             'lukassykora':'lukas.sykora',
