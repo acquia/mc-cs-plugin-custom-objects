@@ -28,9 +28,11 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class CustomObjectModel extends FormModel
 {
@@ -348,5 +350,36 @@ class CustomObjectModel extends FormModel
         }
 
         return $customObject;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return CustomObject|null
+     */
+    public function getEntity($id = null)
+    {
+        if (null === $id) {
+            return new CustomObject();
+        }
+
+        return parent::getEntity($id);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws MethodNotAllowedHttpException
+     */
+    public function createForm($entity, $formFactory, $action = null, $options = [])
+    {
+        if (!$entity instanceof CustomObject) {
+            throw new MethodNotAllowedHttpException(['Custom Object']);
+        }
+        if (!empty($action)) {
+            $options['action'] = $action;
+        }
+
+        return $formFactory->create(CustomObjectType::class, $entity, $options);
     }
 }

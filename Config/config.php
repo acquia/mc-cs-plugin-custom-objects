@@ -15,6 +15,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectApiRouteProvider;
 
 return [
     'name'        => 'Custom Objects',
@@ -163,6 +164,13 @@ return [
                 'path'       => '/custom/object/delete/{objectId}',
                 'controller' => 'CustomObjectsBundle:CustomObject\Delete:delete',
                 'method'     => 'GET|POST',
+            ],
+        ],
+        'api' => [
+            CustomObjectApiRouteProvider::ROUTE_NEW => [
+                'path'       => '/custom/objects',
+                'controller' => 'CustomObjectsBundle:Api\CustomObjectApi:newEntity',
+                'method'     => 'POST',
             ],
         ],
     ],
