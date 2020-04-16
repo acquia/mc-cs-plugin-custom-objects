@@ -17,12 +17,13 @@ use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
-    const PREFIX = 'co';
+    const PREFIX = 'ci';
     const CONTEXT_CUSTOM_OBJECTS = 'custom.objects';
 
     private static $customObjects = null;
@@ -30,31 +31,38 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * @var CustomObjectRepository
      */
-    private $repository;
+    private $customObjectRepository;
 
-    public function __construct(CustomObjectRepository $repository)
+    /**
+     * @var CustomItemRepository
+     */
+    private $customItemRepository;
+
+    public function __construct(CustomObjectRepository $customObjectRepository, CustomItemRepository $customItemRepository)
     {
-        $this->repository = $repository;
+        $this->customObjectRepository = $customObjectRepository;
+        $this->customItemRepository = $customItemRepository;
     }
 
     private function getCustomObjects(): array
     {
-        if (null !== self::$customObjects) {
-            return self::$customObjects;
+        if (null !== static::$customObjects) {
+            return static::$customObjects;
         }
 
-        self::$customObjects = $this->repository->findAll();
-        usort(self::$customObjects, function (CustomObject $a, CustomObject $b): int {
+        static::$customObjects = $this->customObjectRepository->findAll();
+        usort(static::$customObjects, function (CustomObject $a, CustomObject $b): int {
             return strnatcmp($a->getNamePlural(), $b->getNamePlural());
         });
 
-        return self::$customObjects;
+        return static::$customObjects;
     }
 
     public static function getSubscribedEvents(): array
     {
         return [
             ReportEvents::REPORT_ON_BUILD => ['onReportBuilder', 0],
+            ReportEvents::REPORT_ON_GENERATE => ['onReportGenerate', 0],
         ];
     }
 
@@ -75,8 +83,8 @@ class ReportSubscriber implements EventSubscriberInterface
         }
 
         $columns = array_merge(
-            $event->getStandardColumns(static::PREFIX . '.', []),
-            $event->getCategoryColumns()
+            $this->getCustomItemColumns(),
+            []
         );
 
         /** @var CustomObject $customObject */
@@ -92,6 +100,20 @@ class ReportSubscriber implements EventSubscriberInterface
         }
     }
 
+    private function getCustomItemColumns(): array
+    {
+        $prefix = static::PREFIX . '.';
+
+        $columns = [
+            $prefix . 'name' => [
+                'label' => 'custom.item.name.label',
+                'type' => 'string',
+            ]
+        ];
+
+        return $columns;
+    }
+
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
@@ -102,9 +124,6 @@ class ReportSubscriber implements EventSubscriberInterface
         }
 
         $queryBuilder = $event->getQueryBuilder();
-
-        $queryBuilder->from($this->repository->getTableName(), self::PREFIX);
-
-        $a = 5;
+        $queryBuilder->from($this->customItemRepository->getTableName(), static::PREFIX);
     }
 }

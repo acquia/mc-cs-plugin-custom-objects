@@ -630,6 +630,7 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\ReportSubscriber::class,
                 'arguments' => [
                     'custom_object.repository',
+                    'custom_item.repository',
                 ],
             ],
             // There's a problem with multiple tags and arguments definition using array.
