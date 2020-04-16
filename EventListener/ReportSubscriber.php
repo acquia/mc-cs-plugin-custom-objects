@@ -23,8 +23,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
-    const PREFIX = 'ci';
-    const CONTEXT_CUSTOM_OBJECTS = 'custom.objects';
+    const CUSTOM_ITEM_TABLE_ALIAS = 'ci';
+    const CUSTOM_ITEM_TABLE_PREFIX = self::CUSTOM_ITEM_TABLE_ALIAS . '.';
+    const CUSTOM_OBJECTS_CONTEXT = 'custom.objects';
 
     private static $customObjects = null;
 
@@ -68,7 +69,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
     private function getContext(CustomObject $customObject): string
     {
-        return static::CONTEXT_CUSTOM_OBJECTS . '.' . $customObject->getId();
+        return static::CUSTOM_OBJECTS_CONTEXT . '.' . $customObject->getId();
     }
 
     public function getContexts(): array
@@ -84,7 +85,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
         $columns = array_merge(
             $this->getCustomItemColumns(),
-            []
+            $event->getStandardColumns(static::CUSTOM_ITEM_TABLE_PREFIX, ['description', 'publish_up', 'publish_down'])
         );
 
         /** @var CustomObject $customObject */
@@ -95,20 +96,14 @@ class ReportSubscriber implements EventSubscriberInterface
                     'display_name' => $customObject->getNamePlural(),
                     'columns' => $columns,
                 ],
-                static::CONTEXT_CUSTOM_OBJECTS
+                static::CUSTOM_OBJECTS_CONTEXT
             );
         }
     }
 
     private function getCustomItemColumns(): array
     {
-        $prefix = static::PREFIX . '.';
-
         $columns = [
-            $prefix . 'name' => [
-                'label' => 'custom.item.name.label',
-                'type' => 'string',
-            ]
         ];
 
         return $columns;
@@ -123,7 +118,15 @@ class ReportSubscriber implements EventSubscriberInterface
             return;
         }
 
+        $customObjectId = (int)preg_replace('/[^\d]/', '', $event->getContext());
+        if (1 > $customObjectId) {
+            throw new \RuntimeException('Custom Object is not defined.');
+        }
+
         $queryBuilder = $event->getQueryBuilder();
-        $queryBuilder->from($this->customItemRepository->getTableName(), static::PREFIX);
+        $queryBuilder
+            ->from($this->customItemRepository->getTableName(), static::CUSTOM_ITEM_TABLE_ALIAS)
+            ->andWhere(static::CUSTOM_ITEM_TABLE_PREFIX . 'custom_object_id = :customObjectId')
+            ->setParameter('customObjectId', $customObjectId);
     }
 }
