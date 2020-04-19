@@ -172,6 +172,16 @@ return [
                 'controller' => 'CustomObjectsBundle:Api\CustomObjectApi:newEntity',
                 'method'     => 'POST',
             ],
+            CustomObjectApiRouteProvider::ROUTE_LIST => [
+                'path'            => '/custom/objects',
+                'controller'      => 'CustomObjectsBundle:Api\CustomObjectApi:getEntities',
+                'method'          => 'GET',
+            ],
+            CustomObjectApiRouteProvider::ROUTE_VIEW => [
+                'path'            => '/custom/objects/{id}',
+                'controller'      => 'CustomObjectsBundle:Api\CustomObjectApi:getEntity',
+                'method'          => 'GET',
+            ],
         ],
     ],
 

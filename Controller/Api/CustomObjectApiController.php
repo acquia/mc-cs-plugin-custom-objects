@@ -21,9 +21,10 @@ class CustomObjectApiController  extends CommonApiController
     public function initialize(FilterControllerEvent $event)
     {
         $this->model            = $this->getModel(self::MODEL_ID);
-        $this->entityNameOne    = 'custom_object';
-        $this->entityNameMulti  = 'custom_objects';
-        $this->serializerGroups = ['customFields'];
+        $this->entityClass      = CustomObject::class;
+        $this->entityNameOne    = 'customObject';
+        $this->entityNameMulti  = 'customObjects';
+        $this->serializerGroups = ['customObjectBasicList'];
 
         parent::initialize($event);
     }

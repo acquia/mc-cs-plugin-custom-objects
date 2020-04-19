@@ -28,6 +28,8 @@ class CustomFieldApiController  extends CommonController
         $args = ['limit' => $limit, 'offset' => $offset];
         $customFields = $this->customFieldModel->fetchEntities($args);
         return $this->json($customFields);
+
+
     }
 
 }

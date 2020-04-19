@@ -17,17 +17,17 @@ use Symfony\Component\Routing\RouterInterface;
 
 class CustomObjectApiRouteProvider
 {
-    public const ROUTE_LIST   = 'mautic_customapi_object_list';
+    public const ROUTE_LIST   = 'mautic_api_customObjects_list';
 
-    public const ROUTE_VIEW   = 'mautic_customapi_object_view';
+    public const ROUTE_VIEW   = 'mautic_api_customObjects_getone';
 
-    public const ROUTE_NEW    = 'mautic_customapi_object_new';
+    public const ROUTE_NEW    = 'mautic_api_customObjects_new';
 
-    public const ROUTE_EDIT   = 'mautic_customapi_object_edit';
+    public const ROUTE_EDIT   = 'mautic_api_customObjects_edit';
 
-    public const ROUTE_DELETE = 'mautic_customapi_object_delete';
+    public const ROUTE_DELETE = 'mautic_api_customObjects_delete';
 
-    public const ROUTE_SAVE   = 'mautic_customapi_object_save';
+    public const ROUTE_SAVE   = 'mautic_api_customObjects_save';
 
     /**
      * @var RouterInterface

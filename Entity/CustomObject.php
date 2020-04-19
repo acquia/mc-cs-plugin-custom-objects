@@ -17,6 +17,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
@@ -341,5 +342,28 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         foreach ($deletedFields as $deletedField) {
             $this->addChange("customfield:{$deletedField['id']}", [null, 'deleted']);
         }
+    }
+
+    /**
+     * Prepares the metadata for API usage.
+     *
+     * @param $metadata
+     */
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('customObjectBasic')
+            ->addListProperties(
+                [
+                    'id',
+                    'alias',
+                    'nameSingular',
+                    'namePlural',
+                    'description',
+                    'language',
+                    'category',
+                    'customFields',
+                ]
+            )
+            ->build();
     }
 }
