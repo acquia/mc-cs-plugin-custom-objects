@@ -135,7 +135,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         $builder->addNamedField('namePlural', Type::STRING, 'name_plural');
         $builder->addNullableField('description', Type::STRING, 'description');
         $builder->addNullableField('language', Type::STRING, 'lang');
-        $builder->addNullableField('type', Type::INTEGER, 'type');
+        $builder->addNullableField('type', Type::INTEGER);
         $builder->addNullableField('relationship', Type::INTEGER, 'relationship');
 
         $builder->createOneToOne('masterObject', CustomObject::class)
@@ -188,41 +188,32 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         return $this->alias;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getType()
+    public function getType(): ?int
     {
         return $this->type;
     }
 
-    public function setType(int $type)
+    public function setType(int $type): void
     {
         $this->type = $type;
     }
 
-    /**
-     * @return int|null
-     */
-    public function getRelationship()
+    public function getRelationship(): ?int
     {
         return $this->relationship;
     }
 
-    public function setRelationship(int $relationship)
+    public function setRelationship(int $relationship): void
     {
         $this->relationship = $relationship;
     }
 
-    /**
-     * @return CustomObject|null
-     */
-    public function getMasterObject()
+    public function getMasterObject(): CustomObject
     {
         return $this->masterObject;
     }
 
-    public function setMasterObject($customObject)
+    public function setMasterObject(CustomObject $customObject): void
     {
         $this->masterObject = $customObject;
     }
