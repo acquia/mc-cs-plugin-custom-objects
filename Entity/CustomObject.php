@@ -208,7 +208,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         $this->relationship = $relationship;
     }
 
-    public function getMasterObject(): CustomObject
+    public function getMasterObject(): ?CustomObject
     {
         return $this->masterObject;
     }
