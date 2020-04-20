@@ -134,10 +134,10 @@ class ReportSubscriber implements EventSubscriberInterface
             ->andWhere(static::CUSTOM_ITEM_TABLE_PREFIX . 'custom_object_id = :customObjectId')
             ->setParameter('customObjectId', $customObjectId, ParameterType::INTEGER);
 
-        $contactsJoinExpression = sprintf('%sid = %scontact_id', static::CUSTOM_ITEM_TABLE_PREFIX, static::CUSTOM_ITEM_XREF_CONTACT_PREFIX);
+        $contactsJoinExpression = sprintf('%sid = %scustom_item_id', static::CUSTOM_ITEM_TABLE_PREFIX, static::CUSTOM_ITEM_XREF_CONTACT_PREFIX);
         $queryBuilder->leftJoin(static::CUSTOM_ITEM_TABLE_ALIAS, MAUTIC_TABLE_PREFIX . 'custom_item_xref_contact', static::CUSTOM_ITEM_XREF_CONTACT_ALIAS, $contactsJoinExpression);
 
-        $companiesJoinExpression = sprintf('%sid = %scompany_id', static::CUSTOM_ITEM_TABLE_PREFIX, static::CUSTOM_ITEM_XREF_COMPANY_PREFIX);
+        $companiesJoinExpression = sprintf('%sid = %scustom_item_id', static::CUSTOM_ITEM_TABLE_PREFIX, static::CUSTOM_ITEM_XREF_COMPANY_PREFIX);
         $queryBuilder->leftJoin(static::CUSTOM_ITEM_TABLE_ALIAS, MAUTIC_TABLE_PREFIX . 'custom_item_xref_company', static::CUSTOM_ITEM_XREF_COMPANY_ALIAS, $companiesJoinExpression);
     }
 }
