@@ -9,7 +9,7 @@ use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\IntegrationsBundle\Migration\AbstractMigration;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
-class Version_0_0_12 extends AbstractMigration
+class Version_0_0_11 extends AbstractMigration
 {
     /**
      * @var string
@@ -38,8 +38,9 @@ class Version_0_0_12 extends AbstractMigration
     protected function up(): void
     {
         $tableCustomObject = $this->concatPrefix($this->table);
+        $default = CustomObject::TYPE_MASTER;
 
-        $this->addSql("ALTER TABLE {$tableCustomObject} ADD type INT, ADD INDEX (type)");
+        $this->addSql("ALTER TABLE {$tableCustomObject} ADD type INT DEFAULT {$default}, ADD INDEX (type)");
 
         $this->addSql("ALTER TABLE {$tableCustomObject} ADD relationship INT, ADD INDEX (relationship)");
 
