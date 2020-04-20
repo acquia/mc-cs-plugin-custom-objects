@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
+use Doctrine\DBAL\ParameterType;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
@@ -26,6 +27,10 @@ class ReportSubscriber implements EventSubscriberInterface
     const CUSTOM_ITEM_TABLE_ALIAS = 'ci';
     const CUSTOM_ITEM_TABLE_PREFIX = self::CUSTOM_ITEM_TABLE_ALIAS . '.';
     const CUSTOM_OBJECTS_CONTEXT = 'custom.objects';
+    const CUSTOM_ITEM_XREF_CONTACT_ALIAS = 'cil';
+    const CUSTOM_ITEM_XREF_CONTACT_PREFIX = self::CUSTOM_ITEM_XREF_CONTACT_ALIAS . '.';
+    const CUSTOM_ITEM_XREF_COMPANY_ALIAS = 'cic';
+    const CUSTOM_ITEM_XREF_COMPANY_PREFIX = self::CUSTOM_ITEM_XREF_COMPANY_ALIAS . '.';
 
     private static $customObjects = null;
 
@@ -84,7 +89,7 @@ class ReportSubscriber implements EventSubscriberInterface
         }
 
         $columns = array_merge(
-            $this->getCustomItemColumns(),
+            $this->getContactColumns(),
             $event->getStandardColumns(static::CUSTOM_ITEM_TABLE_PREFIX, ['description', 'publish_up', 'publish_down'])
         );
 
@@ -101,7 +106,7 @@ class ReportSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function getCustomItemColumns(): array
+    private function getContactColumns(): array
     {
         $columns = [
         ];
@@ -120,13 +125,19 @@ class ReportSubscriber implements EventSubscriberInterface
 
         $customObjectId = (int)preg_replace('/[^\d]/', '', $event->getContext());
         if (1 > $customObjectId) {
-            throw new \RuntimeException('Custom Object is not defined.');
+            throw new \RuntimeException('Custom Object ID is not defined.');
         }
 
         $queryBuilder = $event->getQueryBuilder();
         $queryBuilder
             ->from($this->customItemRepository->getTableName(), static::CUSTOM_ITEM_TABLE_ALIAS)
             ->andWhere(static::CUSTOM_ITEM_TABLE_PREFIX . 'custom_object_id = :customObjectId')
-            ->setParameter('customObjectId', $customObjectId);
+            ->setParameter('customObjectId', $customObjectId, ParameterType::INTEGER);
+
+        $contactsJoinExpression = sprintf('%sid = %scontact_id', static::CUSTOM_ITEM_TABLE_PREFIX, static::CUSTOM_ITEM_XREF_CONTACT_PREFIX);
+        $queryBuilder->leftJoin(static::CUSTOM_ITEM_TABLE_ALIAS, MAUTIC_TABLE_PREFIX . 'custom_item_xref_contact', static::CUSTOM_ITEM_XREF_CONTACT_ALIAS, $contactsJoinExpression);
+
+        $companiesJoinExpression = sprintf('%sid = %scompany_id', static::CUSTOM_ITEM_TABLE_PREFIX, static::CUSTOM_ITEM_XREF_COMPANY_PREFIX);
+        $queryBuilder->leftJoin(static::CUSTOM_ITEM_TABLE_ALIAS, MAUTIC_TABLE_PREFIX . 'custom_item_xref_company', static::CUSTOM_ITEM_XREF_COMPANY_ALIAS, $companiesJoinExpression);
     }
 }
