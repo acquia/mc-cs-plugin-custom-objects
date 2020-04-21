@@ -31,6 +31,10 @@ class ReportSubscriber implements EventSubscriberInterface
     const CUSTOM_ITEM_XREF_CONTACT_PREFIX = self::CUSTOM_ITEM_XREF_CONTACT_ALIAS . '.';
     const CUSTOM_ITEM_XREF_COMPANY_ALIAS = 'cic';
     const CUSTOM_ITEM_XREF_COMPANY_PREFIX = self::CUSTOM_ITEM_XREF_COMPANY_ALIAS . '.';
+    const LEADS_TABLE_ALIAS = 'l';
+    const LEADS_TABLE_PREFIX = self::CUSTOM_ITEM_TABLE_ALIAS . '.';
+    const COMPANIES_TABLE_ALIAS = 'cp';
+    const COMPANIES_TABLE_PREFIX = self::CUSTOM_ITEM_TABLE_ALIAS . '.';
 
     private static $customObjects = null;
 
@@ -90,6 +94,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
         $columns = array_merge(
             $this->getContactColumns(),
+            $this->getCompanyColumns(),
             $event->getStandardColumns(static::CUSTOM_ITEM_TABLE_PREFIX, ['description', 'publish_up', 'publish_down'])
         );
 
@@ -109,6 +114,24 @@ class ReportSubscriber implements EventSubscriberInterface
     private function getContactColumns(): array
     {
         $columns = [
+            static::LEADS_TABLE_PREFIX.'id' => [
+                'label' => 'mautic.lead.report.contact_id',
+                'type'  => 'string',
+                'alias' => static::LEADS_TABLE_PREFIX . 'id',
+            ]
+        ];
+
+        return $columns;
+    }
+
+    private function getCompanyColumns(): array
+    {
+        $columns = [
+            static::COMPANIES_TABLE_PREFIX.'id' => [
+                'label' => 'mautic.core.company',
+                'type'  => 'string',
+                'alias' => static::COMPANIES_TABLE_PREFIX . 'id',
+            ]
         ];
 
         return $columns;
@@ -134,10 +157,16 @@ class ReportSubscriber implements EventSubscriberInterface
             ->andWhere(static::CUSTOM_ITEM_TABLE_PREFIX . 'custom_object_id = :customObjectId')
             ->setParameter('customObjectId', $customObjectId, ParameterType::INTEGER);
 
+        // Joining contacts tables
         $contactsJoinExpression = sprintf('%sid = %scustom_item_id', static::CUSTOM_ITEM_TABLE_PREFIX, static::CUSTOM_ITEM_XREF_CONTACT_PREFIX);
         $queryBuilder->leftJoin(static::CUSTOM_ITEM_TABLE_ALIAS, MAUTIC_TABLE_PREFIX . 'custom_item_xref_contact', static::CUSTOM_ITEM_XREF_CONTACT_ALIAS, $contactsJoinExpression);
+        $contactsTableJoinExpression = sprintf('%scontact_id = %sid', static::CUSTOM_ITEM_XREF_CONTACT_PREFIX, static::LEADS_TABLE_PREFIX);
+        $queryBuilder->leftJoin(static::CUSTOM_ITEM_XREF_CONTACT_ALIAS, MAUTIC_TABLE_PREFIX . 'leads', static::LEADS_TABLE_ALIAS, $contactsTableJoinExpression);
 
+        // Joining companies tables
         $companiesJoinExpression = sprintf('%sid = %scustom_item_id', static::CUSTOM_ITEM_TABLE_PREFIX, static::CUSTOM_ITEM_XREF_COMPANY_PREFIX);
         $queryBuilder->leftJoin(static::CUSTOM_ITEM_TABLE_ALIAS, MAUTIC_TABLE_PREFIX . 'custom_item_xref_company', static::CUSTOM_ITEM_XREF_COMPANY_ALIAS, $companiesJoinExpression);
+        $companiesTableJoinExpression = sprintf('%scompany_id = %sid', static::CUSTOM_ITEM_XREF_COMPANY_PREFIX, static::COMPANIES_TABLE_PREFIX);
+        $queryBuilder->leftJoin(static::CUSTOM_ITEM_XREF_COMPANY_ALIAS, MAUTIC_TABLE_PREFIX . 'companies', static::COMPANIES_TABLE_ALIAS, $companiesTableJoinExpression);
     }
 }
