@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Doctrine\DBAL\ParameterType;
+use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
@@ -25,16 +26,17 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
+    const CUSTOM_OBJECTS_CONTEXT_GROUP = 'custom.objects';
+
     const CUSTOM_ITEM_TABLE_ALIAS = 'ci';
     const CUSTOM_ITEM_TABLE_PREFIX = self::CUSTOM_ITEM_TABLE_ALIAS . '.';
-    const CUSTOM_OBJECTS_CONTEXT = 'custom.objects';
     const CUSTOM_ITEM_XREF_CONTACT_ALIAS = 'cil';
     const CUSTOM_ITEM_XREF_CONTACT_PREFIX = self::CUSTOM_ITEM_XREF_CONTACT_ALIAS . '.';
     const CUSTOM_ITEM_XREF_COMPANY_ALIAS = 'cic';
     const CUSTOM_ITEM_XREF_COMPANY_PREFIX = self::CUSTOM_ITEM_XREF_COMPANY_ALIAS . '.';
     const LEADS_TABLE_ALIAS = 'l';
     const LEADS_TABLE_PREFIX = self::LEADS_TABLE_ALIAS . '.';
-    const COMPANIES_TABLE_ALIAS = 'cp';
+    const COMPANIES_TABLE_ALIAS = 'comp';
     const COMPANIES_TABLE_PREFIX = self::COMPANIES_TABLE_ALIAS . '.';
 
     private static $customObjects = null;
@@ -54,11 +56,17 @@ class ReportSubscriber implements EventSubscriberInterface
      */
     private $fieldsBuilder;
 
-    public function __construct(CustomObjectRepository $customObjectRepository, CustomItemRepository $customItemRepository, FieldsBuilder $fieldsBuilder)
+    /**
+     * @var CompanyReportData
+     */
+    private $companyReportData;
+
+    public function __construct(CustomObjectRepository $customObjectRepository, CustomItemRepository $customItemRepository, FieldsBuilder $fieldsBuilder, CompanyReportData $companyReportData)
     {
         $this->customObjectRepository = $customObjectRepository;
         $this->customItemRepository = $customItemRepository;
         $this->fieldsBuilder = $fieldsBuilder;
+        $this->companyReportData = $companyReportData;
     }
 
     private function getCustomObjects(): array
@@ -85,7 +93,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
     private function getContext(CustomObject $customObject): string
     {
-        return static::CUSTOM_OBJECTS_CONTEXT . '.' . $customObject->getId();
+        return static::CUSTOM_OBJECTS_CONTEXT_GROUP . '.' . $customObject->getId();
     }
 
     public function getContexts(): array
@@ -101,7 +109,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
         $columns = array_merge(
             $this->fieldsBuilder->getLeadFieldsColumns(static::LEADS_TABLE_PREFIX),
-            $this->getCompanyColumns(),
+            $this->companyReportData->getCompanyData(),
             $event->getStandardColumns(static::CUSTOM_ITEM_TABLE_PREFIX, ['description', 'publish_up', 'publish_down'])
         );
 
@@ -113,22 +121,9 @@ class ReportSubscriber implements EventSubscriberInterface
                     'display_name' => $customObject->getNamePlural(),
                     'columns' => $columns,
                 ],
-                static::CUSTOM_OBJECTS_CONTEXT
+                static::CUSTOM_OBJECTS_CONTEXT_GROUP
             );
         }
-    }
-
-    private function getCompanyColumns(): array
-    {
-        $columns = [
-            static::COMPANIES_TABLE_PREFIX.'id' => [
-                'label' => 'mautic.core.company',
-                'type'  => 'string',
-                'alias' => static::COMPANIES_TABLE_PREFIX . 'id',
-            ]
-        ];
-
-        return $columns;
     }
 
     /**
