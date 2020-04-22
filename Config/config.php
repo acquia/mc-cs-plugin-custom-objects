@@ -631,6 +631,7 @@ return [
                 'arguments' => [
                     'custom_object.repository',
                     'custom_item.repository',
+                    'mautic.lead.reportbundle.fields_builder',
                 ],
             ],
             // There's a problem with multiple tags and arguments definition using array.

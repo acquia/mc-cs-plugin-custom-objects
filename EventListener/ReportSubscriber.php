@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Doctrine\DBAL\ParameterType;
+use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\ReportEvents;
@@ -32,9 +33,9 @@ class ReportSubscriber implements EventSubscriberInterface
     const CUSTOM_ITEM_XREF_COMPANY_ALIAS = 'cic';
     const CUSTOM_ITEM_XREF_COMPANY_PREFIX = self::CUSTOM_ITEM_XREF_COMPANY_ALIAS . '.';
     const LEADS_TABLE_ALIAS = 'l';
-    const LEADS_TABLE_PREFIX = self::CUSTOM_ITEM_TABLE_ALIAS . '.';
+    const LEADS_TABLE_PREFIX = self::LEADS_TABLE_ALIAS . '.';
     const COMPANIES_TABLE_ALIAS = 'cp';
-    const COMPANIES_TABLE_PREFIX = self::CUSTOM_ITEM_TABLE_ALIAS . '.';
+    const COMPANIES_TABLE_PREFIX = self::COMPANIES_TABLE_ALIAS . '.';
 
     private static $customObjects = null;
 
@@ -48,10 +49,16 @@ class ReportSubscriber implements EventSubscriberInterface
      */
     private $customItemRepository;
 
-    public function __construct(CustomObjectRepository $customObjectRepository, CustomItemRepository $customItemRepository)
+    /**
+     * @var FieldsBuilder
+     */
+    private $fieldsBuilder;
+
+    public function __construct(CustomObjectRepository $customObjectRepository, CustomItemRepository $customItemRepository, FieldsBuilder $fieldsBuilder)
     {
         $this->customObjectRepository = $customObjectRepository;
         $this->customItemRepository = $customItemRepository;
+        $this->fieldsBuilder = $fieldsBuilder;
     }
 
     private function getCustomObjects(): array
@@ -93,7 +100,7 @@ class ReportSubscriber implements EventSubscriberInterface
         }
 
         $columns = array_merge(
-            $this->getContactColumns(),
+            $this->fieldsBuilder->getLeadFieldsColumns(static::LEADS_TABLE_PREFIX),
             $this->getCompanyColumns(),
             $event->getStandardColumns(static::CUSTOM_ITEM_TABLE_PREFIX, ['description', 'publish_up', 'publish_down'])
         );
@@ -109,19 +116,6 @@ class ReportSubscriber implements EventSubscriberInterface
                 static::CUSTOM_OBJECTS_CONTEXT
             );
         }
-    }
-
-    private function getContactColumns(): array
-    {
-        $columns = [
-            static::LEADS_TABLE_PREFIX.'id' => [
-                'label' => 'mautic.lead.report.contact_id',
-                'type'  => 'string',
-                'alias' => static::LEADS_TABLE_PREFIX . 'id',
-            ]
-        ];
-
-        return $columns;
     }
 
     private function getCompanyColumns(): array
