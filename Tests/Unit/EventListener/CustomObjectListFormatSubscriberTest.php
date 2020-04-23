@@ -22,7 +22,8 @@ class CustomObjectListFormatSubscriberTest extends TestCase
         $this->subscriber = new CustomObjectListFormatSubscriber();
     }
 
-    public function testInvalidFormat(): void {
+    public function testInvalidFormat(): void
+    {
         $event = new CustomObjectListFormatEvent(['value1'], 'A BAD FORMAT');
         $this->subscriber->formatCustomObjectsList($event);
 
@@ -30,14 +31,16 @@ class CustomObjectListFormatSubscriberTest extends TestCase
         $this->assertEquals('', $event->getFormattedString());
     }
 
-    public function testNoValues(): void {
+    public function testNoValues(): void
+    {
         $event = new CustomObjectListFormatEvent([], 'default');
         $this->subscriber->formatCustomObjectsList($event);
 
         $this->assertFalse($event->hasBeenFormatted());
     }
 
-    public function testFormatValues(): void {
+    public function testFormatValues(): void
+    {
         $values = ['value1', 'value2', 'value3'];
 
         // Test default formatter
@@ -54,5 +57,4 @@ class CustomObjectListFormatSubscriberTest extends TestCase
         $this->assertTrue($event2->hasBeenFormatted());
         $this->assertEquals($expected, $event2->getFormattedString());
     }
-
 }

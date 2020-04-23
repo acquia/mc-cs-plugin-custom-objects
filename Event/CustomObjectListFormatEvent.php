@@ -34,26 +34,31 @@ class CustomObjectListFormatEvent extends Event
         $this->format = $format;
     }
 
-    public function getCustomObjectValues(): array {
+    public function getCustomObjectValues(): array
+    {
         return $this->customObjectValues;
     }
 
-    public function getFormat(): string {
+    public function getFormat(): string
+    {
         return $this->format;
     }
 
-    public function getFormattedString(): string {
+    public function getFormattedString(): string
+    {
         return $this->formattedString;
     }
 
-    public function setFormattedString(string $formattedString): void {
+    public function setFormattedString(string $formattedString): void
+    {
         if ('' !== $formattedString) {
             $this->hasBeenFormatted = true;
             $this->formattedString = $formattedString;
         }
     }
 
-    public function hasBeenFormatted(): bool {
+    public function hasBeenFormatted(): bool
+    {
         return $this->hasBeenFormatted;
     }
 }

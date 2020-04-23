@@ -16,7 +16,8 @@ class CustomObjectTokenFormatterTest extends TestCase
 
     private $noValues = [];
 
-    public function testFormatFunction(): void {
+    public function testFormatFunction(): void
+    {
         $this->expectException(InvalidCustomObjectFormatListException::class);
         Formatter::format($this->manyValues, 'A BAD FORMAT');
 
@@ -34,7 +35,8 @@ class CustomObjectTokenFormatterTest extends TestCase
     /**
      * Make sure the formatter has at least the default format and that it is valid
      */
-    public function testDefaultFormat(): void {
+    public function testDefaultFormat(): void
+    {
         // Check the list of formats isn't empty
         $this->assertGreaterThan(0, count(Formatter::FORMATS));
 
@@ -60,7 +62,8 @@ class CustomObjectTokenFormatterTest extends TestCase
         $this->assertEquals($expected, Formatter::formatDefault($this->manyValues));
     }
 
-    public function testFormatOrList(): void {
+    public function testFormatOrList(): void
+    {
         // With no values
         $this->assertEquals('', Formatter::formatOrList($this->noValues));
 
@@ -72,7 +75,8 @@ class CustomObjectTokenFormatterTest extends TestCase
         $this->assertEquals($expected, Formatter::formatOrList($this->manyValues));
     }
 
-    public function testFormatAndList(): void {
+    public function testFormatAndList(): void
+    {
         // With no values
         $this->assertEquals('', Formatter::formatAndList($this->noValues));
 
@@ -84,7 +88,8 @@ class CustomObjectTokenFormatterTest extends TestCase
         $this->assertEquals($expected, Formatter::formatAndList($this->manyValues));
     }
 
-    public function testFormatBulletList(): void {
+    public function testFormatBulletList(): void
+    {
         // With no values
         $this->assertEquals('', Formatter::formatBulletList($this->noValues));
 
@@ -97,7 +102,8 @@ class CustomObjectTokenFormatterTest extends TestCase
         $this->assertEquals($expected, Formatter::formatBulletList($this->manyValues));
     }
 
-    public function testFormatOrderedList(): void {
+    public function testFormatOrderedList(): void
+    {
         // With no values
         $this->assertEquals('', Formatter::formatOrderedList($this->noValues));
 
@@ -110,11 +116,11 @@ class CustomObjectTokenFormatterTest extends TestCase
         $this->assertEquals($expected, Formatter::formatOrderedList($this->manyValues));
     }
 
-    public function testFormatIsValidFunction(): void {
+    public function testFormatIsValidFunction(): void
+    {
         // Make sure our invalid key actually doesn't exists
         $this->assertFalse(array_key_exists('AN INVALID FORMAT', Formatter::FORMATS));
 
         $this->assertFalse(Formatter::isValidFormat('AN INVALID FORMAT'));
     }
-
 }

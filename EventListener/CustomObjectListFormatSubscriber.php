@@ -11,13 +11,15 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CustomObjectListFormatSubscriber implements EventSubscriberInterface
 {
-    public static function getSubscribedEvents(): array {
+    public static function getSubscribedEvents(): array
+    {
         return [
             CustomObjectEvents::ON_CUSTOM_OBJECT_LIST_FORMAT => 'formatCustomObjectsList',
         ];
     }
 
-    public function formatCustomObjectsList(CustomObjectListFormatEvent $event): void {
+    public function formatCustomObjectsList(CustomObjectListFormatEvent $event): void
+    {
         $format = $event->getFormat();
         if (CustomObjectTokenFormatter::isValidFormat($format)) {
             $values = $event->getCustomObjectValues();

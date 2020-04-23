@@ -9,7 +9,8 @@ use \PHPUnit\Framework\TestCase;
 
 class CustomObjectListFormatEventTest extends TestCase
 {
-    public function testIsFormattedFlag(): void {
+    public function testIsFormattedFlag(): void
+    {
         $event = new CustomObjectListFormatEvent([], 'format');
         $this->assertFalse($event->hasBeenFormatted());
         $this->assertEquals('', $event->getFormattedString());

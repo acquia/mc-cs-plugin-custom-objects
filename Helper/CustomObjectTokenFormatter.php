@@ -26,7 +26,8 @@ class CustomObjectTokenFormatter
         self::ORDERED_LIST_FORMAT => 'formatOrderedList'
     );
 
-    public static function format(array $values, string $format): string {
+    public static function format(array $values, string $format): string
+    {
         if (0 === count($values)) {
             return '';
         }
@@ -40,7 +41,8 @@ class CustomObjectTokenFormatter
         return self::$method($values);
     }
 
-    public static function isValidFormat(string $format): bool {
+    public static function isValidFormat(string $format): bool
+    {
         if (!array_key_exists($format, self::FORMATS)) {
             return false;
         }
@@ -52,7 +54,8 @@ class CustomObjectTokenFormatter
         return true;
     }
 
-    public static function formatDefault(array $values): string {
+    public static function formatDefault(array $values): string
+    {
         if (0 === count($values)) {
             return '';
         }
@@ -60,23 +63,28 @@ class CustomObjectTokenFormatter
         return implode(", ", $values);
     }
 
-    public static function formatOrList(array $values): string {
+    public static function formatOrList(array $values): string
+    {
         return self::conjunctionList($values, 'or');
     }
 
-    public static function formatAndList(array $values): string {
+    public static function formatAndList(array $values): string
+    {
         return self::conjunctionList($values, 'and');
     }
 
-    public static function formatBulletList(array $values): string {
+    public static function formatBulletList(array $values): string
+    {
         return self::htmlList($values, "ul");
     }
 
-    public static function formatOrderedList(array $values): string {
+    public static function formatOrderedList(array $values): string
+    {
         return self::htmlList($values, "ol");
     }
     
-    private static function conjunctionList(array $values, string $conjunction): string {
+    private static function conjunctionList(array $values, string $conjunction): string
+    {
         if (0 === count($values)) {
             return '';
         }
@@ -90,7 +98,8 @@ class CustomObjectTokenFormatter
         return implode(", ", $values) . " $conjunction $lastItem";
     }
 
-    private static function htmlList(array $values, string $tag): string {
+    private static function htmlList(array $values, string $tag): string
+    {
         if (0 === count($values)) {
             return '';
         }

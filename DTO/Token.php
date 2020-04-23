@@ -95,11 +95,13 @@ class Token
         $this->where = $where;
     }
 
-    public function getFormat(): string {
+    public function getFormat(): string
+    {
         return $this->format;
     }
 
-    public function setFormat(string $format): void {
+    public function setFormat(string $format): void
+    {
         $this->format = $format;
     }
 
