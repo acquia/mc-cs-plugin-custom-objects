@@ -16,7 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\DTO;
 /**
  * Object that represents parsed token like this one:.
  *
- * {custom-object=product:sku | where=segment-filter |order=latest|limit=1 | default=Nothing to see here}
+ * {custom-object=product:sku | where=segment-filter |order=latest|limit=1 | default=Nothing to see here | format=or-list}
  */
 class Token
 {
@@ -44,6 +44,11 @@ class Token
      * @var string
      */
     private $defaultValue = '';
+
+    /**
+     * @var string
+     */
+    private $format = '';
 
     /**
      * @var string
@@ -88,6 +93,14 @@ class Token
     public function setWhere(string $where): void
     {
         $this->where = $where;
+    }
+
+    public function getFormat(): string {
+        return $this->format;
+    }
+
+    public function setFormat(string $format): void {
+        $this->format = $format;
     }
 
     public function getLimit(): int

@@ -26,7 +26,7 @@ class TokenParserTest extends \PHPUnit\Framework\TestCase
 a bunch of content goes {custom-object=order:due-date | where=due-date > today | order= -due-date|limit=10 | default=No order is due}here <br />
 with lots of HTML tags and JS scripts
 
-{custom-object=product : sku | where=segment-filter |order=latest|limit=1 | default=Nothing to see here}
+{custom-object=product : sku | where=segment-filter |order=latest|limit=1 | default=Nothing to see here | format=default}
 {custom-object= product : sku}
 
 
@@ -66,6 +66,7 @@ TEXT;
         $this->assertSame(1, $token2->getLimit());
         $this->assertSame('latest', $token2->getOrder());
         $this->assertSame('segment-filter', $token2->getWhere());
+        $this->assertSame('default', $token2->getFormat());
 
         $tokens->next();
 

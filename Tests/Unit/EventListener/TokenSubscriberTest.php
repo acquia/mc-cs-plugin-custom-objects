@@ -41,6 +41,7 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
@@ -73,6 +74,8 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private $subscriber;
 
+    private $eventDispatcher;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -87,6 +90,7 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->builderEvent                 = $this->createMock(BuilderEvent::class);
         $this->emailSendEvent               = $this->createMock(EmailSendEvent::class);
         $this->customItemListDbalQueryEvent = $this->createMock(CustomItemListDbalQueryEvent::class);
+        $this->eventDispatcher              = $this->createMock(EventDispatcher::class);
         $this->subscriber                   = new TokenSubscriber(
             $this->configProvider,
             $this->queryFilterHelper,
@@ -94,7 +98,8 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->customObjectModel,
             $this->customItemModel,
             $this->tokenParser,
-            $this->eventModel
+            $this->eventModel,
+            $this->eventDispatcher
         );
     }
 
@@ -158,11 +163,11 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('addToken')
             ->withConsecutive(
                 [
-                    '{custom-object=product:name | where=segment-filter | order=latest | limit=1 | default=}',
+                    '{custom-object=product:name | where=segment-filter | order=latest | limit=1 | default= | format=default}',
                     'Product: Name',
                 ],
                 [
-                    '{custom-object=product:sku | where=segment-filter | order=latest | limit=1 | default=}',
+                    '{custom-object=product:sku | where=segment-filter | order=latest | limit=1 | default= | format=default}',
                     'Product: SKU',
                 ]
             );
