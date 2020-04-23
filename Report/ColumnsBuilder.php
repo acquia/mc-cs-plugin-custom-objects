@@ -27,7 +27,7 @@ class ColumnsBuilder
     /**
      * @var array
      */
-    private $columns;
+    private $columns = [];
 
     public function __construct(CustomObject $customObject)
     {
@@ -56,10 +56,14 @@ class ColumnsBuilder
         return substr(md5($customField->getAlias()), 0, 8);
     }
 
-    public function prepareQuery(QueryBuilder $queryBuilder): void
+    public function prepareQuery(QueryBuilder $queryBuilder, string $customItemsTableAlias): void
     {
+
         foreach ($this->customObject->getCustomFields() as $customField) {
             $tableAlias = $this->getTableAlias($customField);
+            $tableName = $tableAlias . '.' . $customField->getTypeObject()->getTableName();
+            $joinExpression = sprintf('%sid = %sid', static::CUSTOM_ITEM_XREF_COMPANY_PREFIX, static::COMPANIES_TABLE_PREFIX);
+            $queryBuilder->leftJoin(static::CUSTOM_ITEM_XREF_COMPANY_ALIAS, $tableName, $tableAlias, $companiesTableJoinExpression);
         }
     }
 }
