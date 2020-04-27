@@ -349,4 +349,18 @@ class CustomObjectModel extends FormModel
 
         return $customObject;
     }
+
+    /**
+     * Find custom objects with a particular relationship type
+     * i.e Master or Relationship
+     */
+    public function getMasterCustomObjects(): array {
+        return array_filter(
+            $this->fetchAllPublishedEntities(),
+            function ($item) {
+                $type = $item->getType();
+                return CustomObject::TYPE_MASTER === $type || null === $type;
+            }
+        );
+    }
 }
