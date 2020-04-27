@@ -57,4 +57,13 @@ final class CustomObjectEvents
      * @var string
      */
     public const ON_CUSTOM_OBJECT_POST_DELETE = 'custom.object.on_post_delete';
+
+    /**
+     * The custom.object.list.format event is fired when a list of custom object values needs to be formatted
+     *
+     * The event listener receives a MauticPlugin\CustomObjectsBundle\Event\CustomObjectListFormatEvent
+     *
+     * @var string
+     */
+    public const ON_CUSTOM_OBJECT_LIST_FORMAT = 'custom.object.list.format';
 }

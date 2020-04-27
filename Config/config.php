@@ -760,6 +760,7 @@ return [
                     'mautic.custom.model.item',
                     'custom_object.token.parser',
                     'mautic.campaign.model.event',
+                    'event_dispatcher',
                 ],
             ],
             'custom_object.segments.decorator_delegate.subscriber'   => [
@@ -767,6 +768,9 @@ return [
                 'arguments'=> [
                     'custom_object.segment_decorator_multiselect',
                 ],
+            ],
+            'custom_object.tokens.list_format.subscriber' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectListFormatSubscriber::class,
             ],
         ],
         'forms' => [

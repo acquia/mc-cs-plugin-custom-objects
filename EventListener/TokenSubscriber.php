@@ -22,14 +22,18 @@ use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\LeadBundle\Entity\LeadList;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
+use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\DTO\Token;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomObjectListFormatEvent;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidCustomObjectFormatListException;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Helper\CustomObjectTokenFormatter;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryBuilderManipulatorTrait;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Helper\TokenParser;
@@ -37,6 +41,7 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -82,6 +87,11 @@ class TokenSubscriber implements EventSubscriberInterface
      */
     private $eventModel;
 
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
     public function __construct(
         ConfigProvider $configProvider,
         QueryFilterHelper $queryFilterHelper,
@@ -89,7 +99,8 @@ class TokenSubscriber implements EventSubscriberInterface
         CustomObjectModel $customObjectModel,
         CustomItemModel $customItemModel,
         TokenParser $tokenParser,
-        EventModel $eventModel
+        EventModel $eventModel,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->configProvider     = $configProvider;
         $this->queryFilterHelper  = $queryFilterHelper;
@@ -98,6 +109,7 @@ class TokenSubscriber implements EventSubscriberInterface
         $this->customItemModel    = $customItemModel;
         $this->tokenParser        = $tokenParser;
         $this->eventModel         = $eventModel;
+        $this->eventDispatcher    = $eventDispatcher;
     }
 
     /**
@@ -161,7 +173,25 @@ class TokenSubscriber implements EventSubscriberInterface
             }
 
             $fieldValues = $this->getCustomFieldValues($customObject, $token, $event);
-            $result      = empty($fieldValues) ? $token->getDefaultValue() : implode(', ', $fieldValues);
+
+            if (empty($fieldValues)) {
+                $result = $token->getDefaultValue();
+            } else {
+                if (!empty($token->getFormat())) {
+                    try {
+                        $formatEvent = $this->eventDispatcher->dispatch(
+                            CustomObjectEvents::ON_CUSTOM_OBJECT_LIST_FORMAT,
+                            new CustomObjectListFormatEvent($fieldValues, $token->getFormat())
+                        );
+
+                        $result = $formatEvent->hasBeenFormatted() ? $formatEvent->getFormattedString() : CustomObjectTokenFormatter::formatDefault($fieldValues);
+                    } catch (InvalidCustomObjectFormatListException $e) {
+                        $result = CustomObjectTokenFormatter::formatDefault($fieldValues);
+                    }
+                } else {
+                    $result = CustomObjectTokenFormatter::formatDefault($fieldValues);
+                }
+            }
 
             $event->addToken($token->getToken(), $result);
         });
