@@ -24,6 +24,8 @@ spec:
       limits:
         memory: "6000Mi"
         cpu: "4"
+  - name: redis
+    image: redis:latest
 """
     }
   }
@@ -161,8 +163,9 @@ spec:
           changeRequest()
         }
         anyOf {
-          branch 'beta'
-          branch 'staging';
+          branch 'beta';
+          /* Disabling automatic releasing to production until custom objects goes GA */
+          /*branch 'staging';*/
         }
       }
       steps {
@@ -205,6 +208,7 @@ spec:
             'anton-vlasenko':'anton.vlasenko',
             'dongilbert':'don.gilbert',
             'escopecz':'jan.linhart',
+            'fedys':'miroslav.fedeles',
             'Gregy':'petr.gregor',
             'hluchas':'lukas.drahy',
             'lukassykora':'lukas.sykora',

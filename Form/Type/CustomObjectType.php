@@ -92,7 +92,8 @@ class CustomObjectType extends AbstractType
                 'required'   => true,
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class' => 'form-control',
+                    'class'   => 'form-control',
+                    'tooltip' => 'custom.object.help.name.singular',
                 ],
             ]
         );
@@ -105,7 +106,8 @@ class CustomObjectType extends AbstractType
                 'required'   => true,
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
-                    'class' => 'form-control',
+                    'class'   => 'form-control',
+                    'tooltip' => 'custom.object.help.name.plural',
                 ],
             ]
         );
