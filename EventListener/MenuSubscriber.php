@@ -65,13 +65,7 @@ class MenuSubscriber implements EventSubscriberInterface
 
     private function addMainMenuItems(MenuEvent $event): void
     {
-        $customObjects = array_filter(
-            $this->customObjectModel->fetchAllPublishedEntities(),
-            function ($item) {
-                $type = $item->getType();
-                return CustomObject::TYPE_MASTER === $type || null === $type;
-            }
-        );
+        $customObjects = $this->customObjectModel->getMasterCustomObjects();
 
         if (!$customObjects) {
             return;

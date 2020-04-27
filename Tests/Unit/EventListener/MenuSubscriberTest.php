@@ -86,7 +86,7 @@ class MenuSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn('main');
 
         $this->customObjectModel->expects($this->once())
-            ->method('fetchAllPublishedEntities')
+            ->method('getMasterCustomObjects')
             ->willReturn([]);
 
         $this->menuEvent->expects($this->never())
@@ -117,7 +117,7 @@ class MenuSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn('main');
 
         $this->customObjectModel->expects($this->once())
-            ->method('fetchAllPublishedEntities')
+            ->method('getMasterCustomObjects')
             ->willReturn([$customObject1, $customObject2]);
 
         $this->menuEvent->expects($this->at(0))

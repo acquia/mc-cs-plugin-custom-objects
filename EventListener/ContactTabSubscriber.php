@@ -88,13 +88,7 @@ class ContactTabSubscriber implements EventSubscriberInterface
 
         if ($event->checkContext('MauticLeadBundle:Lead:lead.html.php', 'tabs')) {
             $vars    = $event->getVars();
-            $objects = array_filter(
-                $this->getCustomObjects(),
-                function ($item) {
-                    $type = $item->getType();
-                    return CustomObject::TYPE_MASTER === $type || null === $type;
-                }
-            );
+            $objects = $this->customObjectModel->getMasterCustomObjects();
 
             /** @var Lead $contact */
             $contact = $vars['lead'];

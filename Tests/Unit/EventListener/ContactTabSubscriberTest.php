@@ -86,7 +86,7 @@ class ContactTabSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getNamePlural')
             ->willReturn('Object A');
 
-        $customObject1->expects($this->once())
+        $customObject1->expects($this->any())
             ->method('getType')
             ->willReturn(CustomObject::TYPE_MASTER);
 
@@ -124,8 +124,8 @@ class ContactTabSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn(false);
 
         $this->customObjectModel->expects($this->once())
-            ->method('fetchAllPublishedEntities')
-            ->willReturn([$customObject1, $customObject2]);
+            ->method('getMasterCustomObjects')
+            ->willReturn([$customObject1]);
 
         $this->customItemRepository->expects($this->once())
             ->method('countItemsLinkedToContact')
