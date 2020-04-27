@@ -24,6 +24,8 @@ spec:
       limits:
         memory: "6000Mi"
         cpu: "4"
+  - name: redis
+    image: redis:latest
 """
     }
   }
