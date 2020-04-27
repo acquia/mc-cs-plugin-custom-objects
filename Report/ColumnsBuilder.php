@@ -32,6 +32,7 @@ class ColumnsBuilder
     public function __construct(CustomObject $customObject)
     {
         $this->customObject = $customObject;
+        $this->joinCustomFieldTable();
         $this->buildColumns();
     }
 
@@ -39,7 +40,7 @@ class ColumnsBuilder
     {
         /** @var CustomField $customField */
         foreach ($this->customObject->getCustomFields() as $customField) {
-            $this->columns[$this->getTableAlias($customField)] = [
+            $this->columns[$this->getHash($customField) . '.value'] = [
                 'label' => $customField->getLabel(),
                 'type' => 'string',
             ];
@@ -51,19 +52,28 @@ class ColumnsBuilder
         return $this->columns;
     }
 
-    private function getTableAlias(CustomField $customField): string
+    private function getHash(CustomField $customField): string
     {
-        return substr(md5($customField->getAlias()), 0, 8);
+        return substr(md5((string)$customField->getId()), 0, 8);
     }
 
-    public function prepareQuery(QueryBuilder $queryBuilder, string $customItemsTableAlias): void
+    private function joinCustomFieldTable(): void
     {
+        if (1 > $this->customObject->getCustomFields()->count()) {
+            return;
+        }
 
+
+    }
+
+    public function prepareQuery(QueryBuilder $queryBuilder): void
+    {
         foreach ($this->customObject->getCustomFields() as $customField) {
-            $tableAlias = $this->getTableAlias($customField);
-            $tableName = $tableAlias . '.' . $customField->getTypeObject()->getTableName();
-            $joinExpression = sprintf('%sid = %sid', static::CUSTOM_ITEM_XREF_COMPANY_PREFIX, static::COMPANIES_TABLE_PREFIX);
-            $queryBuilder->leftJoin(static::CUSTOM_ITEM_XREF_COMPANY_ALIAS, $tableName, $tableAlias, $companiesTableJoinExpression);
+            $hash = $this->getHash($customField);
+            //$valueTableName = $customField->getTypeObject()->getTableName();
+            //$joinExpression = sprintf('%s.id = %s.custom_field_id', static::CUSTOM_ITEM_XREF_COMPANY_PREFIX, static::COMPANIES_TABLE_PREFIX);
+            //$queryBuilder->leftJoin(static::CUSTOM_ITEM_XREF_COMPANY_ALIAS, $tableName, $tableAlias, $joinExpression);
+            //$queryBuilder->where()
         }
     }
 }
