@@ -354,7 +354,8 @@ class CustomObjectModel extends FormModel
      * Find custom objects with a particular relationship type
      * i.e Master or Relationship
      */
-    public function getMasterCustomObjects(): array {
+    public function getMasterCustomObjects(): array
+    {
         return array_filter(
             $this->fetchAllPublishedEntities(),
             function ($item) {

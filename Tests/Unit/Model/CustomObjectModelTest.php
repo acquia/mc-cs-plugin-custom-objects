@@ -637,7 +637,8 @@ class CustomObjectModelTest extends \PHPUnit\Framework\TestCase
         $this->customObjectModel->removeCustomFieldById($this->customObject, 1);
     }
 
-    public function testGetMasterCustomObjects() {
+    public function testGetMasterCustomObjects()
+    {
         $customObject1 = new CustomObject();
         $customObject1->setType(CustomObject::TYPE_MASTER);
         $customObject1->setAlias('master');
