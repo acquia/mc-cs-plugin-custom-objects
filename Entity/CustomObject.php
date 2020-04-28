@@ -23,6 +23,7 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Form\Validator\Constraints\CustomObjectTypeValues;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -151,6 +152,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         $metadata->addPropertyConstraint('namePlural', new Assert\NotBlank());
         $metadata->addPropertyConstraint('namePlural', new Assert\Length(['max' => 255]));
         $metadata->addPropertyConstraint('description', new Assert\Length(['max' => 255]));
+        $metadata->addConstraint(new CustomObjectTypeValues());
     }
 
     /**
@@ -203,7 +205,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         return $this->relationship;
     }
 
-    public function setRelationship(int $relationship): void
+    public function setRelationship(?int $relationship): void
     {
         $this->relationship = $relationship;
     }
@@ -213,7 +215,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         return $this->masterObject;
     }
 
-    public function setMasterObject(CustomObject $customObject): void
+    public function setMasterObject(?CustomObject $customObject): void
     {
         $this->masterObject = $customObject;
     }
