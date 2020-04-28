@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
 use Doctrine\ORM\EntityManager;
-use FOS\RestBundle\Form\Transformer\EntityToIdObjectTransformer;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\DataTransformer\IdToEntityModelTransformer;
 use Mautic\CoreBundle\Form\EventListener\CleanFormSubscriber;
@@ -148,7 +147,9 @@ class CustomObjectType extends AbstractType
             ChoiceType::class,
             [
                 'label'      => 'custom.object.relationship.label',
-                'required'   => false,
+                'required'   => true,
+                'placeholder' => '',
+                'empty_data' => null,
                 'label_attr' => ['class' => 'control-label'],
                 'attr'       => [
                     'class'        => 'form-control',
@@ -170,7 +171,9 @@ class CustomObjectType extends AbstractType
             [
                 'label'         => 'custom.object.relationship.master_object.label',
                 'class'         => CustomObject::class,
-                'required'      => false,
+                'required'      => true,
+                'placeholder'   => '',
+                'empty_data'    => null,
                 'label_attr'    => ['class' => 'control-label'],
                 'attr'          => [
                     'class'        => 'form-control',
