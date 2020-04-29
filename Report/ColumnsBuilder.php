@@ -29,6 +29,11 @@ class ColumnsBuilder
      */
     private $columns = [];
 
+    /**
+     * @var \Closure
+     */
+    private $callback;
+
     public function __construct(CustomObject $customObject)
     {
         $this->customObject = $customObject;
@@ -40,7 +45,7 @@ class ColumnsBuilder
     {
         /** @var CustomField $customField */
         foreach ($this->customObject->getCustomFields() as $customField) {
-            $this->columns[$this->getHash($customField) . '.value'] = [
+            $this->columns[$this->getColumnName($customField)] = [
                 'label' => $customField->getLabel(),
                 'type' => 'string',
             ];
@@ -57,18 +62,41 @@ class ColumnsBuilder
         return substr(md5((string)$customField->getId()), 0, 8);
     }
 
+    private function getColumnName(CustomField $customField): string
+    {
+        return $this->getHash($customField) . '.value';
+    }
+
     private function joinCustomFieldTable(): void
     {
         if (1 > $this->customObject->getCustomFields()->count()) {
             return;
         }
+    }
 
+    public function setValidateColumnCallback(\Closure $callback): ColumnsBuilder
+    {
+        $this->callback = $callback;
+        return $this;
+    }
 
+    private function checkIfColumnHasToBeJoined(CustomField $customField): bool
+    {
+        if (!is_callable($this->callback)) {
+            return true;
+        }
+
+        return call_user_func($this->callback, $this->getColumnName($customField));
     }
 
     public function prepareQuery(QueryBuilder $queryBuilder, string $customItemTableAlias): void
     {
+        /** @var CustomField $customField */
         foreach ($this->customObject->getCustomFields() as $customField) {
+            if (!$this->checkIfColumnHasToBeJoined($customField)) {
+                continue;
+            }
+
             $hash = $this->getHash($customField);
             $valueTableName = $customField->getTypeObject()->getTableName();
             $joinCondition = sprintf('%s.id = %s.custom_item_id AND %s.custom_field_id = %s', $customItemTableAlias, $hash, $hash, $customField->getId());

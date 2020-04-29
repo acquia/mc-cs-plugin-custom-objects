@@ -122,7 +122,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
-    public function onReportGenerate(ReportGeneratorEvent $event)
+    public function onReportGenerate(ReportGeneratorEvent $event): void
     {
         if (!$event->checkContext($this->getContexts())) {
             return;
@@ -156,6 +156,12 @@ class ReportSubscriber implements EventSubscriberInterface
 
         // Join custom objects tables
         $columnsBuilder = new ColumnsBuilder($customObject);
-        $columnsBuilder->prepareQuery($queryBuilder, static::CUSTOM_ITEM_TABLE_ALIAS);
+        $callback = function(string $columnName) use ($event): bool {
+            return $event->hasColumn($columnName);
+        };
+
+        $columnsBuilder
+            ->setValidateColumnCallback($callback)
+            ->prepareQuery($queryBuilder, static::CUSTOM_ITEM_TABLE_ALIAS);
     }
 }
