@@ -14,7 +14,7 @@ class CustomObjectListFormatSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CustomObjectEvents::ON_CUSTOM_OBJECT_LIST_FORMAT => 'formatCustomObjectsList',
+            CustomObjectEvents::ON_CUSTOM_OBJECT_LIST_FORMAT => ['formatCustomObjectsList', 0],
         ];
     }
 

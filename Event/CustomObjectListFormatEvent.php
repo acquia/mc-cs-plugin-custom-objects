@@ -9,22 +9,22 @@ use Symfony\Component\EventDispatcher\Event;
 class CustomObjectListFormatEvent extends Event
 {
     /**
-     * @var array $customObjectValues
+     * @var array
      */
     private $customObjectValues;
 
     /**
-     * @var string $format
+     * @var string
      */
     private $format;
 
     /**
-     * @var string $formattedString
+     * @var string
      */
     private $formattedString = '';
 
     /**
-     * @var bool $hasBeenFormatted
+     * @var bool
      */
     private $hasBeenFormatted = false;
 
