@@ -23,6 +23,9 @@ use Mautic\LeadBundle\Entity\Company;
 
 class CustomItemXrefCompany implements CustomItemXrefInterface
 {
+    public const TABLE_NAME  = 'custom_item_xref_company';
+    public const TABLE_ALIAS = 'CustomItemXrefCompany';
+
     /**
      * @var Company
      */
@@ -49,7 +52,7 @@ class CustomItemXrefCompany implements CustomItemXrefInterface
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('custom_item_xref_company');
+        $builder->setTable(static::TABLE_NAME);
 
         $builder->createManyToOne('customItem', CustomItem::class)
             ->addJoinColumn('custom_item_id', 'id', false, false, 'CASCADE')

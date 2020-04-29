@@ -626,15 +626,6 @@ return [
                     'lazy'  => true,
                 ],
             ],
-            'custom_object.report.subscriber' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\ReportSubscriber::class,
-                'arguments' => [
-                    'custom_object.repository',
-                    'custom_item.repository',
-                    'mautic.lead.reportbundle.fields_builder',
-                    'mautic.lead.model.company_report_data',
-                ],
-            ],
             // There's a problem with multiple tags and arguments definition using array.
             // So subscriber above should contain subscriber method below. But it is not possible now.
             'custom_field.pre_save.subscriber' => [

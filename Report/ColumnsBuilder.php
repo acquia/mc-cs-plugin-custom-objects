@@ -66,14 +66,13 @@ class ColumnsBuilder
 
     }
 
-    public function prepareQuery(QueryBuilder $queryBuilder): void
+    public function prepareQuery(QueryBuilder $queryBuilder, string $customItemTableAlias): void
     {
         foreach ($this->customObject->getCustomFields() as $customField) {
             $hash = $this->getHash($customField);
-            //$valueTableName = $customField->getTypeObject()->getTableName();
-            //$joinExpression = sprintf('%s.id = %s.custom_field_id', static::CUSTOM_ITEM_XREF_COMPANY_PREFIX, static::COMPANIES_TABLE_PREFIX);
-            //$queryBuilder->leftJoin(static::CUSTOM_ITEM_XREF_COMPANY_ALIAS, $tableName, $tableAlias, $joinExpression);
-            //$queryBuilder->where()
+            $valueTableName = $customField->getTypeObject()->getTableName();
+            $joinCondition = sprintf('%s.id = %s.custom_item_id AND %s.custom_field_id = %s', $customItemTableAlias, $hash, $hash, $customField->getId());
+            $queryBuilder->leftJoin($customItemTableAlias, $valueTableName, $hash, $joinCondition);
         }
     }
 }
