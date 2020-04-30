@@ -14,12 +14,15 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Doctrine\DBAL\ParameterType;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Report\FieldsBuilder;
+use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Event\ReportQueryEvent;
 use Mautic\ReportBundle\ReportEvents;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCompany;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
@@ -55,6 +58,11 @@ class ReportSubscriber implements EventSubscriberInterface
      * @var CompanyReportData
      */
     private $companyReportData;
+
+    /**
+     * @var ColumnsBuilder
+     */
+    private $columnsBuilder;
 
     public function __construct(CustomObjectRepository $customObjectRepository, FieldsBuilder $fieldsBuilder, CompanyReportData $companyReportData)
     {
@@ -126,16 +134,9 @@ class ReportSubscriber implements EventSubscriberInterface
         return MAUTIC_TABLE_PREFIX . $table;
     }
 
-    /**
-     * Initialize the QueryBuilder object to generate reports from.
-     */
-    public function onReportGenerate(ReportGeneratorEvent $event): void
+    private function initializeCustomObject(string $context): CustomObject
     {
-        if (!$event->checkContext($this->getContexts())) {
-            return;
-        }
-
-        $customObjectId = explode('.', $event->getContext());
+        $customObjectId = explode('.', $context);
         $customObjectId = (int)end($customObjectId);
         if (1 > $customObjectId) {
             throw new \Exception('Custom Object ID is not defined.');
@@ -146,6 +147,20 @@ class ReportSubscriber implements EventSubscriberInterface
         if (!($customObject instanceof CustomObject)) {
             throw new \Exception('Custom Object doesn\'t exist');
         }
+
+        return $customObject;
+    }
+
+    /**
+     * Initialize the QueryBuilder object to generate reports from.
+     */
+    public function onReportGenerate(ReportGeneratorEvent $event): void
+    {
+        if (!$event->checkContext($this->getContexts())) {
+            return;
+        }
+
+        $customObject = $this->initializeCustomObject($event->getContext());
 
         $queryBuilder = $event->getQueryBuilder();
         $queryBuilder
@@ -166,18 +181,37 @@ class ReportSubscriber implements EventSubscriberInterface
         $queryBuilder->leftJoin(static::CUSTOM_ITEM_XREF_COMPANY_ALIAS, $this->addTablePrefix('companies'), static::COMPANIES_TABLE_ALIAS, $companiesTableJoinCondition);
 
         // Join custom objects tables
-        $columnsBuilder = new ColumnsBuilder($customObject);
+        $this->columnsBuilder = new ColumnsBuilder($customObject);
         $callback = function(string $columnName) use ($event): bool {
             return $event->hasColumn($columnName) || $event->hasFilter($columnName);
         };
 
-        $columnsBuilder
+        $this->columnsBuilder
             ->setValidateColumnCallback($callback)
             ->prepareQuery($queryBuilder, static::CUSTOM_ITEM_TABLE_ALIAS);
     }
 
-    public function onReportPreExecute(ReportQueryEvent $event)
+    public function onReportPreExecute(ReportQueryEvent $event): void
     {
+        $context = $event->getReport()->getSource();
+        if (!$event->checkContext($context)) {
+            return;
+        }
+
+        $customObject = $this->initializeCustomObject($context);
+
+        /** @var QueryBuilder $query */
         $query = $event->getQuery();
+        $wherePart = $query->getQueryPart('where');
+        if (!($wherePart instanceof CompositeExpression)) {
+            return;
+        }
+
+        /** @var CustomField $customField */
+        foreach ($customObject->getCustomFields() as $customField) {
+            $a = 5;
+        }
+
+
     }
 }
