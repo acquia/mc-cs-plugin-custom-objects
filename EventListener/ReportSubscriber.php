@@ -18,6 +18,7 @@ use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
+use Mautic\ReportBundle\Event\ReportQueryEvent;
 use Mautic\ReportBundle\ReportEvents;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCompany;
@@ -81,6 +82,7 @@ class ReportSubscriber implements EventSubscriberInterface
         return [
             ReportEvents::REPORT_ON_BUILD => ['onReportBuilder', 0],
             ReportEvents::REPORT_ON_GENERATE => ['onReportGenerate', 0],
+            ReportEvents::REPORT_QUERY_PRE_EXECUTE => ['onReportPreExecute', 0],
         ];
     }
 
@@ -166,11 +168,16 @@ class ReportSubscriber implements EventSubscriberInterface
         // Join custom objects tables
         $columnsBuilder = new ColumnsBuilder($customObject);
         $callback = function(string $columnName) use ($event): bool {
-            return $event->hasColumn($columnName);
+            return $event->hasColumn($columnName) || $event->hasFilter($columnName);
         };
 
         $columnsBuilder
             ->setValidateColumnCallback($callback)
             ->prepareQuery($queryBuilder, static::CUSTOM_ITEM_TABLE_ALIAS);
+    }
+
+    public function onReportPreExecute(ReportQueryEvent $event)
+    {
+        $query = $event->getQuery();
     }
 }
