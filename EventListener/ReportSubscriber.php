@@ -119,6 +119,11 @@ class ReportSubscriber implements EventSubscriberInterface
         }
     }
 
+    private function addTablePrefix(string $table): string
+    {
+        return MAUTIC_TABLE_PREFIX . $table;
+    }
+
     /**
      * Initialize the QueryBuilder object to generate reports from.
      */
@@ -128,31 +133,35 @@ class ReportSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $customObjectId = (int)preg_replace('/[^\d]/', '', $event->getContext());
+        $customObjectId = explode('.', $event->getContext());
+        $customObjectId = (int)end($customObjectId);
         if (1 > $customObjectId) {
-            throw new \RuntimeException('Custom Object ID is not defined.');
+            throw new \Exception('Custom Object ID is not defined.');
         }
 
         /** @var CustomObject $customObject */
         $customObject = $this->customObjectRepository->find($customObjectId);
+        if (!($customObject instanceof CustomObject)) {
+            throw new \Exception('Custom Object doesn\'t exist');
+        }
 
         $queryBuilder = $event->getQueryBuilder();
         $queryBuilder
-            ->from(MAUTIC_TABLE_PREFIX . CustomItem::TABLE_NAME, static::CUSTOM_ITEM_TABLE_ALIAS)
+            ->from($this->addTablePrefix(CustomItem::TABLE_NAME), static::CUSTOM_ITEM_TABLE_ALIAS)
             ->andWhere(static::CUSTOM_ITEM_TABLE_ALIAS . '.custom_object_id = :customObjectId')
             ->setParameter('customObjectId', $customObject->getId(), ParameterType::INTEGER);
 
         // Joining contacts tables
         $contactsJoinCondition = sprintf('%s.id = %s.custom_item_id', static::CUSTOM_ITEM_TABLE_ALIAS, static::CUSTOM_ITEM_XREF_CONTACT_ALIAS);
-        $queryBuilder->leftJoin(static::CUSTOM_ITEM_TABLE_ALIAS, MAUTIC_TABLE_PREFIX . CustomItemXrefContact::TABLE_NAME, static::CUSTOM_ITEM_XREF_CONTACT_ALIAS, $contactsJoinCondition);
+        $queryBuilder->leftJoin(static::CUSTOM_ITEM_TABLE_ALIAS, $this->addTablePrefix(CustomItemXrefContact::TABLE_NAME), static::CUSTOM_ITEM_XREF_CONTACT_ALIAS, $contactsJoinCondition);
         $contactsTableJoinCondition = sprintf('%s.contact_id = %s.id', static::CUSTOM_ITEM_XREF_CONTACT_ALIAS, static::LEADS_TABLE_ALIAS);
-        $queryBuilder->leftJoin(static::CUSTOM_ITEM_XREF_CONTACT_ALIAS, MAUTIC_TABLE_PREFIX . 'leads', static::LEADS_TABLE_ALIAS, $contactsTableJoinCondition);
+        $queryBuilder->leftJoin(static::CUSTOM_ITEM_XREF_CONTACT_ALIAS, $this->addTablePrefix('leads'), static::LEADS_TABLE_ALIAS, $contactsTableJoinCondition);
 
         // Joining companies tables
         $companiesJoinCondition = sprintf('%s.id = %s.custom_item_id', static::CUSTOM_ITEM_TABLE_ALIAS, static::CUSTOM_ITEM_XREF_COMPANY_ALIAS);
-        $queryBuilder->leftJoin(static::CUSTOM_ITEM_TABLE_ALIAS, MAUTIC_TABLE_PREFIX . CustomItemXrefCompany::TABLE_NAME, static::CUSTOM_ITEM_XREF_COMPANY_ALIAS, $companiesJoinCondition);
+        $queryBuilder->leftJoin(static::CUSTOM_ITEM_TABLE_ALIAS, $this->addTablePrefix(CustomItemXrefCompany::TABLE_NAME), static::CUSTOM_ITEM_XREF_COMPANY_ALIAS, $companiesJoinCondition);
         $companiesTableJoinCondition = sprintf('%s.company_id = %s.id', static::CUSTOM_ITEM_XREF_COMPANY_ALIAS, static::COMPANIES_TABLE_ALIAS);
-        $queryBuilder->leftJoin(static::CUSTOM_ITEM_XREF_COMPANY_ALIAS, MAUTIC_TABLE_PREFIX . 'companies', static::COMPANIES_TABLE_ALIAS, $companiesTableJoinCondition);
+        $queryBuilder->leftJoin(static::CUSTOM_ITEM_XREF_COMPANY_ALIAS, $this->addTablePrefix('companies'), static::COMPANIES_TABLE_ALIAS, $companiesTableJoinCondition);
 
         // Join custom objects tables
         $columnsBuilder = new ColumnsBuilder($customObject);
