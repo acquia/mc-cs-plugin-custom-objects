@@ -18,7 +18,7 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldType\MultiselectType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
-class ColumnsBuilder
+class ReportColumnsBuilder
 {
     /**
      * @var CustomObject
@@ -76,7 +76,7 @@ class ColumnsBuilder
         return sprintf('%s.value', $this->getHash($customField));
     }
 
-    public function setValidateColumnCallback(\Closure $callback): ColumnsBuilder
+    public function setValidateColumnCallback(\Closure $callback): ReportColumnsBuilder
     {
         $this->callback = $callback;
 

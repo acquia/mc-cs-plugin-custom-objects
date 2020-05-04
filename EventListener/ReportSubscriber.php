@@ -23,7 +23,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCompany;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Report\ColumnsBuilder;
+use MauticPlugin\CustomObjectsBundle\Report\ReportColumnsBuilder;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -112,7 +112,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 $this->getContext($customObject),
                 [
                     'display_name' => $customObject->getNamePlural(),
-                    'columns'      => array_merge($columns, (new ColumnsBuilder($customObject))->getColumns()),
+                    'columns'      => array_merge($columns, (new ReportColumnsBuilder($customObject))->getColumns()),
                 ],
                 static::CUSTOM_OBJECTS_CONTEXT_GROUP
             );
@@ -173,12 +173,12 @@ class ReportSubscriber implements EventSubscriberInterface
         $queryBuilder->leftJoin(static::CUSTOM_ITEM_XREF_COMPANY_ALIAS, $this->addTablePrefix('companies'), static::COMPANIES_TABLE_ALIAS, $companiesTableJoinCondition);
 
         // Join custom objects tables
-        $columnsBuilder = new ColumnsBuilder($customObject);
+        $reportColumnsBuilder = new ReportColumnsBuilder($customObject);
         $callback             = function (string $columnName) use ($event): bool {
             return $event->hasColumn($columnName) || $event->hasFilter($columnName);
         };
 
-        $columnsBuilder
+        $reportColumnsBuilder
             ->setValidateColumnCallback($callback)
             ->prepareQuery($queryBuilder, static::CUSTOM_ITEM_TABLE_ALIAS);
     }
