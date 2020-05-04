@@ -55,11 +55,6 @@ class ReportSubscriber implements EventSubscriberInterface
      */
     private $companyReportData;
 
-    /**
-     * @var ColumnsBuilder
-     */
-    private $columnsBuilder;
-
     public function __construct(CustomObjectRepository $customObjectRepository, FieldsBuilder $fieldsBuilder, CompanyReportData $companyReportData)
     {
         $this->customObjectRepository = $customObjectRepository;
@@ -178,12 +173,12 @@ class ReportSubscriber implements EventSubscriberInterface
         $queryBuilder->leftJoin(static::CUSTOM_ITEM_XREF_COMPANY_ALIAS, $this->addTablePrefix('companies'), static::COMPANIES_TABLE_ALIAS, $companiesTableJoinCondition);
 
         // Join custom objects tables
-        $this->columnsBuilder = new ColumnsBuilder($customObject);
+        $columnsBuilder = new ColumnsBuilder($customObject);
         $callback             = function (string $columnName) use ($event): bool {
             return $event->hasColumn($columnName) || $event->hasFilter($columnName);
         };
 
-        $this->columnsBuilder
+        $columnsBuilder
             ->setValidateColumnCallback($callback)
             ->prepareQuery($queryBuilder, static::CUSTOM_ITEM_TABLE_ALIAS);
     }
