@@ -105,7 +105,7 @@ class ColumnsBuilder
                 $joinQueryBuilder
                     ->from($customField->getTypeObject()->getTableName())
                     ->select('custom_item_id', 'GROUP_CONCAT(value separator \', \') AS value')
-                    ->andWhere('custom_field_id = ' . $customField->getId())
+                    ->andWhere('custom_field_id = ' . ((int)$customField->getId()))
                     ->groupBy('custom_item_id');
                 $valueTableName = sprintf('(%s)', $joinQueryBuilder->getSQL());
                 $joinCondition = sprintf('%s.id = %s.custom_item_id', $customItemTableAlias, $hash);
