@@ -14,11 +14,11 @@ class CustomObjectListFormatSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CustomObjectEvents::ON_CUSTOM_OBJECT_LIST_FORMAT => ['formatCustomObjectsList', 0],
+            CustomObjectEvents::ON_CUSTOM_OBJECT_LIST_FORMAT => ['onFormatList', 0],
         ];
     }
 
-    public function formatCustomObjectsList(CustomObjectListFormatEvent $event): void
+    public function onFormatList(CustomObjectListFormatEvent $event): void
     {
         $format = $event->getFormat();
         if (CustomObjectTokenFormatter::isValidFormat($format)) {
