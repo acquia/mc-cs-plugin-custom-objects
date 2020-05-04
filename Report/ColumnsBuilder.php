@@ -73,7 +73,7 @@ class ColumnsBuilder
 
     private function getColumnName(CustomField $customField): string
     {
-        return $this->getHash($customField) . '.value';
+        return sprintf('%s.value', $this->getHash($customField));
     }
 
     public function setValidateColumnCallback(\Closure $callback): ColumnsBuilder
@@ -107,8 +107,8 @@ class ColumnsBuilder
                     ->select('custom_item_id', 'GROUP_CONCAT(value separator \', \') AS value')
                     ->andWhere('custom_field_id = ' . $customField->getId())
                     ->groupBy('custom_item_id');
-                $joinCondition = sprintf('%s.id = %s.custom_item_id', $customItemTableAlias, $hash);
                 $valueTableName = sprintf('(%s)', $joinQueryBuilder->getSQL());
+                $joinCondition = sprintf('%s.id = %s.custom_item_id', $customItemTableAlias, $hash);
             }
             else {
                 $valueTableName = $customField->getTypeObject()->getTableName();
