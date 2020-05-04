@@ -31,12 +31,12 @@ class ReportSubscriber implements EventSubscriberInterface
 {
     const CUSTOM_OBJECTS_CONTEXT_GROUP = 'custom.objects';
 
-    const CUSTOM_ITEM_TABLE_ALIAS = 'ci';
+    const CUSTOM_ITEM_TABLE_ALIAS        = 'ci';
     const CUSTOM_ITEM_XREF_CONTACT_ALIAS = 'cil';
     const CUSTOM_ITEM_XREF_COMPANY_ALIAS = 'cic';
-    const LEADS_TABLE_ALIAS = 'l';
-    const LEADS_TABLE_PREFIX = self::LEADS_TABLE_ALIAS . '.';
-    const COMPANIES_TABLE_ALIAS = 'comp';
+    const LEADS_TABLE_ALIAS              = 'l';
+    const LEADS_TABLE_PREFIX             = self::LEADS_TABLE_ALIAS.'.';
+    const COMPANIES_TABLE_ALIAS          = 'comp';
 
     private static $customObjects = null;
 
@@ -63,8 +63,8 @@ class ReportSubscriber implements EventSubscriberInterface
     public function __construct(CustomObjectRepository $customObjectRepository, FieldsBuilder $fieldsBuilder, CompanyReportData $companyReportData)
     {
         $this->customObjectRepository = $customObjectRepository;
-        $this->fieldsBuilder = $fieldsBuilder;
-        $this->companyReportData = $companyReportData;
+        $this->fieldsBuilder          = $fieldsBuilder;
+        $this->companyReportData      = $companyReportData;
     }
 
     private function getCustomObjects(): array
@@ -84,14 +84,14 @@ class ReportSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ReportEvents::REPORT_ON_BUILD => ['onReportBuilder', 0],
+            ReportEvents::REPORT_ON_BUILD    => ['onReportBuilder', 0],
             ReportEvents::REPORT_ON_GENERATE => ['onReportGenerate', 0],
         ];
     }
 
     private function getContext(CustomObject $customObject): string
     {
-        return static::CUSTOM_OBJECTS_CONTEXT_GROUP . '.' . $customObject->getId();
+        return static::CUSTOM_OBJECTS_CONTEXT_GROUP.'.'.$customObject->getId();
     }
 
     public function getContexts(): array
@@ -108,7 +108,7 @@ class ReportSubscriber implements EventSubscriberInterface
         $columns = array_merge(
             $this->fieldsBuilder->getLeadFieldsColumns(static::LEADS_TABLE_PREFIX),
             $this->companyReportData->getCompanyData(),
-            $event->getStandardColumns(static::CUSTOM_ITEM_TABLE_ALIAS . '.', ['description', 'publish_up', 'publish_down'])
+            $event->getStandardColumns(static::CUSTOM_ITEM_TABLE_ALIAS.'.', ['description', 'publish_up', 'publish_down'])
         );
 
         /** @var CustomObject $customObject */
@@ -117,7 +117,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 $this->getContext($customObject),
                 [
                     'display_name' => $customObject->getNamePlural(),
-                    'columns' => array_merge($columns, (new ColumnsBuilder($customObject))->getColumns()),
+                    'columns'      => array_merge($columns, (new ColumnsBuilder($customObject))->getColumns()),
                 ],
                 static::CUSTOM_OBJECTS_CONTEXT_GROUP
             );
@@ -126,13 +126,13 @@ class ReportSubscriber implements EventSubscriberInterface
 
     private function addTablePrefix(string $table): string
     {
-        return MAUTIC_TABLE_PREFIX . $table;
+        return MAUTIC_TABLE_PREFIX.$table;
     }
 
     private function initializeCustomObject(string $context): CustomObject
     {
         $customObjectId = explode('.', $context);
-        $customObjectId = (int)end($customObjectId);
+        $customObjectId = (int) end($customObjectId);
         if (1 > $customObjectId) {
             throw new \Exception('Custom Object ID is not defined.');
         }
@@ -160,7 +160,7 @@ class ReportSubscriber implements EventSubscriberInterface
         $queryBuilder = $event->getQueryBuilder();
         $queryBuilder
             ->from($this->addTablePrefix(CustomItem::TABLE_NAME), static::CUSTOM_ITEM_TABLE_ALIAS)
-            ->andWhere(static::CUSTOM_ITEM_TABLE_ALIAS . '.custom_object_id = :customObjectId')
+            ->andWhere(static::CUSTOM_ITEM_TABLE_ALIAS.'.custom_object_id = :customObjectId')
             ->setParameter('customObjectId', $customObject->getId(), ParameterType::INTEGER);
 
         // Joining contacts tables
@@ -177,7 +177,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
         // Join custom objects tables
         $this->columnsBuilder = new ColumnsBuilder($customObject);
-        $callback = function(string $columnName) use ($event): bool {
+        $callback             = function (string $columnName) use ($event): bool {
             return $event->hasColumn($columnName) || $event->hasFilter($columnName);
         };
 

@@ -46,7 +46,7 @@ class ColumnsBuilder
         foreach ($this->customObject->getCustomFields() as $customField) {
             $this->columns[$this->getColumnName($customField)] = [
                 'label' => $customField->getLabel(),
-                'type' => 'string',
+                'type'  => 'string',
             ];
         }
     }
@@ -68,7 +68,7 @@ class ColumnsBuilder
     private function getHash(CustomField $customField): string
     {
         // This should always return same hash for same columns
-        return substr(md5((string)$customField->getId()), 0, 8);
+        return substr(md5((string) $customField->getId()), 0, 8);
     }
 
     private function getColumnName(CustomField $customField): string
@@ -79,6 +79,7 @@ class ColumnsBuilder
     public function setValidateColumnCallback(\Closure $callback): ColumnsBuilder
     {
         $this->callback = $callback;
+
         return $this;
     }
 
@@ -105,14 +106,13 @@ class ColumnsBuilder
                 $joinQueryBuilder
                     ->from($customField->getTypeObject()->getTableName())
                     ->select('custom_item_id', 'GROUP_CONCAT(value separator \', \') AS value')
-                    ->andWhere('custom_field_id = ' . ((int)$customField->getId()))
+                    ->andWhere('custom_field_id = '.((int) $customField->getId()))
                     ->groupBy('custom_item_id');
                 $valueTableName = sprintf('(%s)', $joinQueryBuilder->getSQL());
-                $joinCondition = sprintf('%s.id = %s.custom_item_id', $customItemTableAlias, $hash);
-            }
-            else {
+                $joinCondition  = sprintf('%s.id = %s.custom_item_id', $customItemTableAlias, $hash);
+            } else {
                 $valueTableName = $customField->getTypeObject()->getTableName();
-                $joinCondition = sprintf('%s.id = %s.custom_item_id AND %s.custom_field_id = %s', $customItemTableAlias, $hash, $hash, $customField->getId());
+                $joinCondition  = sprintf('%s.id = %s.custom_item_id AND %s.custom_field_id = %s', $customItemTableAlias, $hash, $hash, $customField->getId());
             }
 
             $queryBuilder->leftJoin($customItemTableAlias, $valueTableName, $hash, $joinCondition);
