@@ -38,37 +38,30 @@ class ColumnsBuilder
     public function __construct(CustomObject $customObject)
     {
         $this->customObject = $customObject;
-        $this->joinCustomFieldTable();
-        $this->buildColumns();
     }
 
     private function buildColumns(): void
     {
         /** @var CustomField $customField */
         foreach ($this->customObject->getCustomFields() as $customField) {
-            $parameters = [
+            $this->columns[$this->getColumnName($customField)] = [
                 'label' => $customField->getLabel(),
                 'type' => 'string',
-                'alias' => $this->getHash($customField),
             ];
-
-            $columnName = $this->getColumnName($customField);
-            if ($this->checkIfCustomFieldCanHaveMultipleValues($customField)) {
-                $parameters['formula'] = sprintf("GROUP_CONCAT(%s ORDER BY %s ASC SEPARATOR ',')", $columnName, $columnName);
-                $parameters['filterFormula'] = $columnName;
-            }
-
-            $this->columns[$columnName] = $parameters;
         }
     }
 
-    private function checkIfCustomFieldCanHaveMultipleValues(CustomField $customField): bool
+    private function isMultiSelectTypeCustomField(CustomField $customField): bool
     {
         return $customField->getTypeObject() instanceof MultiselectType;
     }
 
     public function getColumns(): array
     {
+        if (1 > count($this->columns)) {
+            $this->buildColumns();
+        }
+
         return $this->columns;
     }
 
@@ -81,13 +74,6 @@ class ColumnsBuilder
     private function getColumnName(CustomField $customField): string
     {
         return $this->getHash($customField) . '.value';
-    }
-
-    private function joinCustomFieldTable(): void
-    {
-        if (1 > $this->customObject->getCustomFields()->count()) {
-            return;
-        }
     }
 
     public function setValidateColumnCallback(\Closure $callback): ColumnsBuilder
@@ -107,22 +93,29 @@ class ColumnsBuilder
 
     public function prepareQuery(QueryBuilder $queryBuilder, string $customItemTableAlias): void
     {
-        $hasToBeGroupedByCustomItemId = false;
-
         /** @var CustomField $customField */
         foreach ($this->customObject->getCustomFields() as $customField) {
             if (!$this->checkIfColumnHasToBeJoined($customField)) {
                 continue;
             }
-            $hasToBeGroupedByCustomItemId |= $this->checkIfCustomFieldCanHaveMultipleValues($customField);
-            $hash = $this->getHash($customField);
-            $valueTableName = $customField->getTypeObject()->getTableName();
-            $joinCondition = sprintf('%s.id = %s.custom_item_id AND %s.custom_field_id = %s', $customItemTableAlias, $hash, $hash, $customField->getId());
-            $queryBuilder->leftJoin($customItemTableAlias, $valueTableName, $hash, $joinCondition);
-        }
 
-        if ($hasToBeGroupedByCustomItemId) {
-            $queryBuilder->groupBy($customItemTableAlias . '.id');
+            $hash = $this->getHash($customField);
+            if ($this->isMultiSelectTypeCustomField($customField)) {
+                $joinQueryBuilder = new QueryBuilder($queryBuilder->getConnection());
+                $joinQueryBuilder
+                    ->from($customField->getTypeObject()->getTableName())
+                    ->select('custom_item_id', 'GROUP_CONCAT(value separator \', \') AS value')
+                    ->andWhere('custom_field_id = ' . $customField->getId())
+                    ->groupBy('custom_item_id');
+                $joinCondition = sprintf('%s.id = %s.custom_item_id', $customItemTableAlias, $hash);
+                $valueTableName = sprintf('(%s)', $joinQueryBuilder->getSQL());
+            }
+            else {
+                $valueTableName = $customField->getTypeObject()->getTableName();
+                $joinCondition = sprintf('%s.id = %s.custom_item_id AND %s.custom_field_id = %s', $customItemTableAlias, $hash, $hash, $customField->getId());
+            }
+
+            $queryBuilder->leftJoin($customItemTableAlias, $valueTableName, $hash, $joinCondition);
         }
     }
 }
