@@ -35,12 +35,14 @@ use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
 use MauticPlugin\CustomObjectsBundle\EventListener\TokenSubscriber;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Helper\CustomObjectTokenFormatter;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Helper\TokenParser;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -76,6 +78,11 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private $eventDispatcher;
 
+    /**
+     * @var CustomObjectTokenFormatter|MockObject
+     */
+    private $tokenFormatter;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -91,6 +98,7 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->emailSendEvent               = $this->createMock(EmailSendEvent::class);
         $this->customItemListDbalQueryEvent = $this->createMock(CustomItemListDbalQueryEvent::class);
         $this->eventDispatcher              = $this->createMock(EventDispatcher::class);
+        $this->tokenFormatter               = $this->createMock(CustomObjectTokenFormatter::class);
         $this->subscriber                   = new TokenSubscriber(
             $this->configProvider,
             $this->queryFilterHelper,
@@ -99,7 +107,8 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->customItemModel,
             $this->tokenParser,
             $this->eventModel,
-            $this->eventDispatcher
+            $this->eventDispatcher,
+            $this->tokenFormatter
         );
     }
 
