@@ -92,6 +92,11 @@ class TokenSubscriber implements EventSubscriberInterface
      */
     private $eventDispatcher;
 
+    /**
+     * @var CustomObjectTokenFormatter
+     */
+    private $tokenFormatter;
+
     public function __construct(
         ConfigProvider $configProvider,
         QueryFilterHelper $queryFilterHelper,
@@ -100,7 +105,8 @@ class TokenSubscriber implements EventSubscriberInterface
         CustomItemModel $customItemModel,
         TokenParser $tokenParser,
         EventModel $eventModel,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        CustomObjectTokenFormatter $tokenFormatter
     ) {
         $this->configProvider     = $configProvider;
         $this->queryFilterHelper  = $queryFilterHelper;
@@ -110,6 +116,7 @@ class TokenSubscriber implements EventSubscriberInterface
         $this->tokenParser        = $tokenParser;
         $this->eventModel         = $eventModel;
         $this->eventDispatcher    = $eventDispatcher;
+        $this->tokenFormatter     = $tokenFormatter;
     }
 
     /**
@@ -184,12 +191,12 @@ class TokenSubscriber implements EventSubscriberInterface
                             new CustomObjectListFormatEvent($fieldValues, $token->getFormat())
                         );
 
-                        $result = $formatEvent->hasBeenFormatted() ? $formatEvent->getFormattedString() : CustomObjectTokenFormatter::formatDefault($fieldValues);
+                        $result = $formatEvent->hasBeenFormatted() ? $formatEvent->getFormattedString() : $this->tokenFormatter->formatDefault($fieldValues);
                     } catch (InvalidCustomObjectFormatListException $e) {
-                        $result = CustomObjectTokenFormatter::formatDefault($fieldValues);
+                        $result = $this->tokenFormatter->formatDefault($fieldValues);
                     }
                 } else {
-                    $result = CustomObjectTokenFormatter::formatDefault($fieldValues);
+                    $result = $this->tokenFormatter->formatDefault($fieldValues);
                 }
             }
 

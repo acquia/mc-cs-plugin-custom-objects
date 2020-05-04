@@ -761,6 +761,7 @@ return [
                     'custom_object.token.parser',
                     'mautic.campaign.model.event',
                     'event_dispatcher',
+                    'custom_object.helper.token_formatter',
                 ],
             ],
             'custom_object.segments.decorator_delegate.subscriber'   => [
@@ -771,6 +772,9 @@ return [
             ],
             'custom_object.tokens.list_format.subscriber' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectListFormatSubscriber::class,
+                'arguments' => [
+                    'custom_object.helper.token_formatter'
+                ]
             ],
         ],
         'forms' => [
@@ -1027,6 +1031,10 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper::class,
                 'arguments' => ['custom_field.type.provider'],
             ],
+            'custom_object.helper.token_formatter' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Helper\CustomObjectTokenFormatter::class,
+            ],
+
         ],
     ],
     'parameters' => [
