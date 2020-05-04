@@ -49,12 +49,13 @@ class ColumnsBuilder
             $parameters = [
                 'label' => $customField->getLabel(),
                 'type' => 'string',
+                'alias' => $this->getHash($customField),
             ];
 
             $columnName = $this->getColumnName($customField);
             if ($this->checkIfCustomFieldCanHaveMultipleValues($customField)) {
                 $parameters['formula'] = sprintf("GROUP_CONCAT(%s ORDER BY %s ASC SEPARATOR ',')", $columnName, $columnName);
-                $parameters['groupByFormula'] = $columnName;
+                $parameters['filterFormula'] = $columnName;
             }
 
             $this->columns[$columnName] = $parameters;

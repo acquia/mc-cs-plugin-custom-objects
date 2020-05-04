@@ -14,15 +14,11 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Doctrine\DBAL\ParameterType;
-use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Report\FieldsBuilder;
-use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
-use Mautic\ReportBundle\Event\ReportQueryEvent;
 use Mautic\ReportBundle\ReportEvents;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCompany;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
@@ -90,7 +86,6 @@ class ReportSubscriber implements EventSubscriberInterface
         return [
             ReportEvents::REPORT_ON_BUILD => ['onReportBuilder', 0],
             ReportEvents::REPORT_ON_GENERATE => ['onReportGenerate', 0],
-            ReportEvents::REPORT_QUERY_PRE_EXECUTE => ['onReportPreExecute', 0],
         ];
     }
 
@@ -189,29 +184,5 @@ class ReportSubscriber implements EventSubscriberInterface
         $this->columnsBuilder
             ->setValidateColumnCallback($callback)
             ->prepareQuery($queryBuilder, static::CUSTOM_ITEM_TABLE_ALIAS);
-    }
-
-    public function onReportPreExecute(ReportQueryEvent $event): void
-    {
-        $context = $event->getReport()->getSource();
-        if (!$event->checkContext($context)) {
-            return;
-        }
-
-        $customObject = $this->initializeCustomObject($context);
-
-        /** @var QueryBuilder $query */
-        $query = $event->getQuery();
-        $wherePart = $query->getQueryPart('where');
-        if (!($wherePart instanceof CompositeExpression)) {
-            return;
-        }
-
-        /** @var CustomField $customField */
-        foreach ($customObject->getCustomFields() as $customField) {
-            $a = 5;
-        }
-
-
     }
 }
