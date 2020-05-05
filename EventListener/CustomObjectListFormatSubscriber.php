@@ -6,17 +6,17 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomObjectListFormatEvent;
-use MauticPlugin\CustomObjectsBundle\Helper\CustomObjectTokenFormatter;
+use MauticPlugin\CustomObjectsBundle\Helper\TokenFormatter;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CustomObjectListFormatSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var CustomObjectTokenFormatter
+     * @var TokenFormatter
      */
     private $tokenFormatter;
 
-    public function __construct(CustomObjectTokenFormatter $tokenFormatter)
+    public function __construct(TokenFormatter $tokenFormatter)
     {
         $this->tokenFormatter = $tokenFormatter;
     }

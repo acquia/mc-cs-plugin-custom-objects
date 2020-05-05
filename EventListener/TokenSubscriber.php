@@ -33,9 +33,9 @@ use MauticPlugin\CustomObjectsBundle\Event\CustomObjectListFormatEvent;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidCustomObjectFormatListException;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Helper\CustomObjectTokenFormatter;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryBuilderManipulatorTrait;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
+use MauticPlugin\CustomObjectsBundle\Helper\TokenFormatter;
 use MauticPlugin\CustomObjectsBundle\Helper\TokenParser;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
@@ -93,7 +93,7 @@ class TokenSubscriber implements EventSubscriberInterface
     private $eventDispatcher;
 
     /**
-     * @var CustomObjectTokenFormatter
+     * @var TokenFormatter
      */
     private $tokenFormatter;
 
@@ -106,7 +106,7 @@ class TokenSubscriber implements EventSubscriberInterface
         TokenParser $tokenParser,
         EventModel $eventModel,
         EventDispatcherInterface $eventDispatcher,
-        CustomObjectTokenFormatter $tokenFormatter
+        TokenFormatter $tokenFormatter
     ) {
         $this->configProvider     = $configProvider;
         $this->queryFilterHelper  = $queryFilterHelper;

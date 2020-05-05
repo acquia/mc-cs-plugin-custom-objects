@@ -35,8 +35,8 @@ use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
 use MauticPlugin\CustomObjectsBundle\EventListener\TokenSubscriber;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Helper\CustomObjectTokenFormatter;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
+use MauticPlugin\CustomObjectsBundle\Helper\TokenFormatter;
 use MauticPlugin\CustomObjectsBundle\Helper\TokenParser;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
@@ -101,7 +101,7 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->tokenParser,
             $this->eventModel,
             $this->eventDispatcher,
-            new CustomObjectTokenFormatter()
+            new TokenFormatter()
         );
     }
 
