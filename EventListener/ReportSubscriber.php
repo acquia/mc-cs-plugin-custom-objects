@@ -166,9 +166,14 @@ class ReportSubscriber implements EventSubscriberInterface
             $event->addLeadIpAddressLeftJoin($queryBuilder);
         }
 
-        if ($event->usesColumn([static::USERS_TABLE_ALIAS.'.first_name', static::USERS_TABLE_ALIAS.'.last_name'])) {
+        $userColumns = [
+            sprintf('%s.first_name', static::USERS_TABLE_ALIAS),
+            sprintf('%s.last_name', static::USERS_TABLE_ALIAS),
+        ];
+
+        if ($event->usesColumn($userColumns)) {
             $usersJoinCondition = sprintf('%s.id = %s.owner_id', static::USERS_TABLE_ALIAS, static::LEADS_TABLE_ALIAS);
-            $queryBuilder->leftJoin(static::LEADS_TABLE_ALIAS, MAUTIC_TABLE_PREFIX.'users', static::USERS_TABLE_ALIAS, $usersJoinCondition);
+            $queryBuilder->leftJoin(static::LEADS_TABLE_ALIAS, $this->addTablePrefix('users'), static::USERS_TABLE_ALIAS, $usersJoinCondition);
         }
 
         $event->applyDateFilters($queryBuilder, 'date_added', static::CUSTOM_ITEM_TABLE_ALIAS);
