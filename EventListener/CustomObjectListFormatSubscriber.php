@@ -11,6 +11,16 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CustomObjectListFormatSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var CustomObjectTokenFormatter
+     */
+    private $tokenFormatter;
+
+    public function __construct(CustomObjectTokenFormatter $tokenFormatter)
+    {
+        $this->tokenFormatter = $tokenFormatter;
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [
@@ -21,9 +31,9 @@ class CustomObjectListFormatSubscriber implements EventSubscriberInterface
     public function onFormatList(CustomObjectListFormatEvent $event): void
     {
         $format = $event->getFormat();
-        if (CustomObjectTokenFormatter::isValidFormat($format)) {
+        if ($this->tokenFormatter->isValidFormat($format)) {
             $values = $event->getCustomObjectValues();
-            $event->setFormattedString(CustomObjectTokenFormatter::format($values, $format));
+            $event->setFormattedString($this->tokenFormatter->format($values, $format));
         }
     }
 }

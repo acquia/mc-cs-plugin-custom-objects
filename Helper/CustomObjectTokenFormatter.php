@@ -8,17 +8,17 @@ use MauticPlugin\CustomObjectsBundle\Exception\InvalidCustomObjectFormatListExce
 
 class CustomObjectTokenFormatter
 {
-    const DEFAULT_FORMAT = 'default';
-    const OR_LIST_FORMAT = 'or-list';
-    const AND_LIST_FORMAT = 'and-list';
-    const BULLET_LIST_FORMAT = 'bullet-list';
-    const ORDERED_LIST_FORMAT = 'ordered-list';
+    public const DEFAULT_FORMAT = 'default';
+    public const OR_LIST_FORMAT = 'or-list';
+    public const AND_LIST_FORMAT = 'and-list';
+    public const BULLET_LIST_FORMAT = 'bullet-list';
+    public const ORDERED_LIST_FORMAT = 'ordered-list';
 
     /**
      * Key = Name of a format
      * Value = Function to perform the formatting
      */
-    const FORMATS = array(
+    public const FORMATS = array(
         self::DEFAULT_FORMAT => 'formatDefault',
         self::OR_LIST_FORMAT => 'formatOrList',
         self::AND_LIST_FORMAT => 'formatAndList',
@@ -26,22 +26,25 @@ class CustomObjectTokenFormatter
         self::ORDERED_LIST_FORMAT => 'formatOrderedList'
     );
 
-    public static function format(array $values, string $format): string
+    /**
+     * @throws InvalidCustomObjectFormatListException
+     */
+    public function format(array $values, string $format): string
     {
         if (0 === count($values)) {
             return '';
         }
 
-        if (!self::isValidFormat($format)) {
+        if (!$this->isValidFormat($format)) {
             throw new InvalidCustomObjectFormatListException($format);
         }
 
         $method = self::FORMATS[$format];
 
-        return self::$method($values);
+        return $this->$method($values);
     }
 
-    public static function isValidFormat(string $format): bool
+    public function isValidFormat(string $format): bool
     {
         if (!array_key_exists($format, self::FORMATS)) {
             return false;
@@ -54,36 +57,36 @@ class CustomObjectTokenFormatter
         return true;
     }
 
-    public static function formatDefault(array $values): string
+    public function formatDefault(array $values): string
     {
         if (0 === count($values)) {
             return '';
         }
 
-        return implode(", ", $values);
+        return implode(', ', $values);
     }
 
-    public static function formatOrList(array $values): string
+    public function formatOrList(array $values): string
     {
-        return self::conjunctionList($values, 'or');
+        return $this->conjunctionList($values, 'or');
     }
 
-    public static function formatAndList(array $values): string
+    public function formatAndList(array $values): string
     {
-        return self::conjunctionList($values, 'and');
+        return $this->conjunctionList($values, 'and');
     }
 
-    public static function formatBulletList(array $values): string
+    public function formatBulletList(array $values): string
     {
-        return self::htmlList($values, "ul");
+        return $this->htmlList($values, 'ul');
     }
 
-    public static function formatOrderedList(array $values): string
+    public function formatOrderedList(array $values): string
     {
-        return self::htmlList($values, "ol");
+        return $this->htmlList($values, 'ol');
     }
     
-    private static function conjunctionList(array $values, string $conjunction): string
+    private function conjunctionList(array $values, string $conjunction): string
     {
         if (0 === count($values)) {
             return '';
@@ -95,10 +98,10 @@ class CustomObjectTokenFormatter
 
         $lastItem = array_pop($values);
 
-        return implode(", ", $values) . " $conjunction $lastItem";
+        return implode(', ', $values) . " $conjunction $lastItem";
     }
 
-    private static function htmlList(array $values, string $tag): string
+    private function htmlList(array $values, string $tag): string
     {
         if (0 === count($values)) {
             return '';
@@ -106,7 +109,7 @@ class CustomObjectTokenFormatter
 
         $list = "<$tag>";
         foreach ($values as $item) {
-            $list .= "<li>" . $item . "</li>";
+            $list .= '<li>' . $item . '</li>';
         }
         $list .= "</$tag>";
 
