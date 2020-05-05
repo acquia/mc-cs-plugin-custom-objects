@@ -39,7 +39,10 @@ class ReportSubscriber implements EventSubscriberInterface
     const USERS_TABLE_ALIAS              = 'u';
     const COMPANIES_TABLE_ALIAS          = 'comp';
 
-    private static $customObjects = null;
+    /**
+     * @var array
+     */
+    private static $customObjects;
 
     /**
      * @var CustomObjectRepository

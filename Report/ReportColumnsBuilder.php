@@ -20,6 +20,8 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 class ReportColumnsBuilder
 {
+    const DEFAULT_COLUMN_TYPE = 'string';
+
     /**
      * @var CustomObject
      */
@@ -35,9 +37,21 @@ class ReportColumnsBuilder
      */
     private $callback;
 
+    /**
+     * @var array
+     */
+    protected $columnTypeMapping = [
+        'int' => 'int',
+        'date' => 'date',
+        'datetime' => 'datetime',
+    ];
+
     public function __construct(CustomObject $customObject)
     {
         $this->customObject = $customObject;
+        $this->callback = function(CustomField $customField): bool {
+            return true;
+        };
     }
 
     private function buildColumns(): void
@@ -46,9 +60,14 @@ class ReportColumnsBuilder
         foreach ($this->customObject->getCustomFields() as $customField) {
             $this->columns[$this->getColumnName($customField)] = [
                 'label' => $customField->getLabel(),
-                'type'  => 'string',
+                'type'  => $this->resolveColumnType($customField),
             ];
         }
+    }
+
+    private function resolveColumnType(CustomField $customField): string
+    {
+        return $this->columnTypeMapping[$customField->getType()] ?? static::DEFAULT_COLUMN_TYPE;
     }
 
     private function isMultiSelectTypeCustomField(CustomField $customField): bool
@@ -83,10 +102,6 @@ class ReportColumnsBuilder
 
     private function checkIfColumnHasToBeJoined(CustomField $customField): bool
     {
-        if (!is_callable($this->callback)) {
-            return true;
-        }
-
         return call_user_func($this->callback, $this->getColumnName($customField));
     }
 
