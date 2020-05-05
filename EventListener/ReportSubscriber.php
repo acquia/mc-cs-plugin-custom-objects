@@ -158,6 +158,10 @@ class ReportSubscriber implements EventSubscriberInterface
             ->andWhere(static::CUSTOM_ITEM_TABLE_ALIAS.'.custom_object_id = :customObjectId')
             ->setParameter('customObjectId', $customObject->getId(), ParameterType::INTEGER);
 
+        if ($event->usesColumn('i.ip_address')) {
+            $event->addLeadIpAddressLeftJoin($queryBuilder);
+        }
+
         $event->applyDateFilters($queryBuilder, 'date_added', static::CUSTOM_ITEM_TABLE_ALIAS);
 
         // Joining contacts tables
