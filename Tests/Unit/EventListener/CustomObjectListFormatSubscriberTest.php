@@ -7,7 +7,6 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 use MauticPlugin\CustomObjectsBundle\Event\CustomObjectListFormatEvent;
 use MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectListFormatSubscriber;
 use MauticPlugin\CustomObjectsBundle\Helper\CustomObjectTokenFormatter;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class CustomObjectListFormatSubscriberTest extends TestCase
@@ -17,18 +16,11 @@ class CustomObjectListFormatSubscriberTest extends TestCase
      */
     private $subscriber;
 
-    /**
-     * @var CustomObjectTokenFormatter|MockObject
-     */
-    private $tokenFormatter;
-
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
-        $this->tokenFormatter = $this->createMock(CustomObjectTokenFormatter::class);
-
-        $this->subscriber = new CustomObjectListFormatSubscriber($this->tokenFormatter);
+        $this->subscriber = new CustomObjectListFormatSubscriber(new CustomObjectTokenFormatter());
     }
 
     public function testInvalidFormat(): void
