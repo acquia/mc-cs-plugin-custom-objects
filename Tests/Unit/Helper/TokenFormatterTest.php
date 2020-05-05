@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Helper;
 
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidCustomObjectFormatListException;
-use MauticPlugin\CustomObjectsBundle\Helper\CustomObjectTokenFormatter as Formatter;
+use MauticPlugin\CustomObjectsBundle\Helper\TokenFormatter;
 use PHPUnit\Framework\TestCase;
 
-class CustomObjectTokenFormatterTest extends TestCase
+class TokenFormatterTest extends TestCase
 {
     /**
-     * @var Formatter
+     * @var TokenFormatter
      */
     private $formatter;
 
@@ -23,7 +23,7 @@ class CustomObjectTokenFormatterTest extends TestCase
 
     public function setUp(): void
     {
-        $this->formatter = new Formatter();
+        $this->formatter = new TokenFormatter();
     }
 
     public function testFormatFunction(): void
@@ -48,13 +48,13 @@ class CustomObjectTokenFormatterTest extends TestCase
     public function testDefaultFormat(): void
     {
         // Check the list of formats isn't empty
-        $this->assertGreaterThan(0, count(Formatter::FORMATS));
+        $this->assertGreaterThan(0, count(TokenFormatter::FORMATS));
 
         // Check that one of the formats is the default one
-        $this->assertTrue(array_key_exists('default', Formatter::FORMATS));
+        $this->assertTrue(array_key_exists('default', TokenFormatter::FORMATS));
 
         // the default format method should stay the same
-        $this->assertEquals('formatDefault', Formatter::FORMATS[Formatter::DEFAULT_FORMAT]);
+        $this->assertEquals('formatDefault', TokenFormatter::FORMATS[TokenFormatter::DEFAULT_FORMAT]);
 
         // Check that the default format is valid
         $this->assertTrue($this->formatter->isValidFormat('default'));
@@ -129,7 +129,7 @@ class CustomObjectTokenFormatterTest extends TestCase
     public function testFormatIsValidFunction(): void
     {
         // Make sure our invalid key actually doesn't exists
-        $this->assertFalse(array_key_exists('AN INVALID FORMAT', Formatter::FORMATS));
+        $this->assertFalse(array_key_exists('AN INVALID FORMAT', TokenFormatter::FORMATS));
 
         $this->assertFalse($this->formatter->isValidFormat('AN INVALID FORMAT'));
     }

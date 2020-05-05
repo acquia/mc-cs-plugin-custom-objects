@@ -6,7 +6,7 @@ namespace MauticPlugin\CustomObjectsBundle\Helper;
 
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidCustomObjectFormatListException;
 
-class CustomObjectTokenFormatter
+class TokenFormatter
 {
     public const DEFAULT_FORMAT = 'default';
     public const OR_LIST_FORMAT = 'or-list';

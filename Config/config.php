@@ -1032,7 +1032,7 @@ return [
                 'arguments' => ['custom_field.type.provider'],
             ],
             'custom_object.helper.token_formatter' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Helper\CustomObjectTokenFormatter::class,
+                'class'     => \MauticPlugin\CustomObjectsBundle\Helper\TokenFormatter::class,
             ],
 
         ],
