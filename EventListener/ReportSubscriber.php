@@ -36,6 +36,7 @@ class ReportSubscriber implements EventSubscriberInterface
     const CUSTOM_ITEM_XREF_COMPANY_ALIAS = 'cic';
     const LEADS_TABLE_ALIAS              = 'l';
     const LEADS_TABLE_PREFIX             = self::LEADS_TABLE_ALIAS.'.';
+    const USERS_TABLE_ALIAS              = 'u';
     const COMPANIES_TABLE_ALIAS          = 'comp';
 
     private static $customObjects = null;
@@ -165,8 +166,9 @@ class ReportSubscriber implements EventSubscriberInterface
             $event->addLeadIpAddressLeftJoin($queryBuilder);
         }
 
-        if ($event->usesColumn(['u.first_name', 'u.last_name'])) {
-            $queryBuilder->leftJoin('l', MAUTIC_TABLE_PREFIX.'users', 'u', 'u.id = l.owner_id');
+        if ($event->usesColumn([static::USERS_TABLE_ALIAS.'.first_name', static::USERS_TABLE_ALIAS.'.last_name'])) {
+            $usersJoinCondition = sprintf('%s.id = %s.owner_id', static::USERS_TABLE_ALIAS, static::LEADS_TABLE_ALIAS);
+            $queryBuilder->leftJoin(static::LEADS_TABLE_ALIAS, MAUTIC_TABLE_PREFIX.'users', static::USERS_TABLE_ALIAS, $usersJoinCondition);
         }
 
         $event->applyDateFilters($queryBuilder, 'date_added', static::CUSTOM_ITEM_TABLE_ALIAS);
