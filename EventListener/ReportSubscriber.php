@@ -194,8 +194,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
         // Join custom objects tables
         $reportColumnsBuilder = new ReportColumnsBuilder($customObject);
-        $reportColumnsBuilder
-            ->setFilterColumnsCallback([$event, 'usesColumn'])
-            ->prepareQuery($queryBuilder, static::CUSTOM_ITEM_TABLE_ALIAS);
+        $reportColumnsBuilder->setFilterColumnsCallback([$event, 'usesColumn']);
+        $reportColumnsBuilder->joinReportColumns($queryBuilder, static::CUSTOM_ITEM_TABLE_ALIAS);
     }
 }
