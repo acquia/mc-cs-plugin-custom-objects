@@ -76,7 +76,7 @@ class ReportColumnsBuilder
         return sprintf('%s.value', $this->getHash($customField));
     }
 
-    public function setValidateColumnCallback(\Closure $callback): ReportColumnsBuilder
+    public function setFilterColumnsCallback(callable $callback): ReportColumnsBuilder
     {
         $this->callback = $callback;
 
