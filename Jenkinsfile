@@ -212,7 +212,6 @@ spec:
             'Gregy':'petr.gregor',
             'hluchas':'lukas.drahy',
             'lukassykora':'lukas.sykora',
-            'mtshaw3':'mike.shaw',
             'pavel-hladik':'pavel.hladik'
           ]
           if (githubToSlackMap.("${env.CHANGE_AUTHOR}")) {
