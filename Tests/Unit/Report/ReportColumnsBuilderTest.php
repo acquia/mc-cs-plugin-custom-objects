@@ -14,10 +14,17 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Report;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\MultiselectType;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 use MauticPlugin\CustomObjectsBundle\Report\ReportColumnsBuilder;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ReportColumnsBuilderTest extends TestCase
 {
@@ -31,39 +38,78 @@ class ReportColumnsBuilderTest extends TestCase
      */
     private $reportColumnsBuilder;
 
+    /**
+     * @var QueryBuilder
+     */
+    private $queryBuilder;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translatorInterface;
+
+    /**
+     * @var FilterOperatorProviderInterface
+     */
+    private $filterOperatorProviderInterface;
+
+    /**
+     * @var CsvHelper
+     */
+    private $csvHelper;
+
+    /**
+     * @var Connection
+     */
+    private $connection;
+
     protected function setUp()
     {
         parent::setUp();
 
+        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
+
         $this->customObject = $this->createMock(CustomObject::class);
         $this->reportColumnsBuilder = new ReportColumnsBuilder($this->customObject);
+        $this->connection = $this->createMock(Connection::class);
+        $this->queryBuilder = $this->createMock(QueryBuilder::class);
+        $this->translatorInterface = $this->createMock(TranslatorInterface::class);
+        $this->filterOperatorProviderInterface = $this->createMock(FilterOperatorProviderInterface::class);
+        $this->csvHelper  = $this->createMock(CsvHelper::class);
     }
 
-    private function getCustomFieldsCollection(): array
+    protected function tearDown()
+    {
+        parent::tearDown();
+    }
+
+    private function getCustomFieldsCollection(): ArrayCollection
     {
         $label1 = uniqid();
         $customField1 = new CustomField();
         $customField1->setId(1);
         $customField1->setLabel($label1);
-        $customField1->setType('string');
+        $typeObject1 = new TextType($this->translatorInterface, $this->filterOperatorProviderInterface);
+        $customField1->setTypeObject($typeObject1);
+        $customField1->setType($typeObject1->getKey());
 
         $label2 = uniqid();
         $customField2 = new CustomField();
         $customField2->setId(2);
         $customField2->setLabel($label2);
-        $customField2->setType('int');
+        $typeObject2 = new MultiselectType($this->translatorInterface, $this->filterOperatorProviderInterface, $this->csvHelper);
+        $customField2->setTypeObject($typeObject2);
+        $customField2->setType($typeObject2->getKey());
 
-        $collection = new ArrayCollection([
+        return new ArrayCollection([
             $customField1,
             $customField2,
         ]);
-
-        return [$collection, $label1, $label2];
     }
 
     public function testThatGetColumnsMethodReturnsCorrectColumns(): void
     {
-        [$collection, $label1, $label2] = $this->getCustomFieldsCollection();
+        $collection = $this->getCustomFieldsCollection();
 
         $this->customObject->expects($this->once())
             ->method('getCustomFields')
@@ -73,13 +119,32 @@ class ReportColumnsBuilderTest extends TestCase
 
         $this->assertSame($columns, [
             'c4ca4238.value' => [
-                'label' => $label1,
+                'label' => $collection->get(0)->getLabel(),
                 'type' => 'string',
             ],
             'c81e728d.value' => [
-                'label' => $label2,
-                'type' => 'int',
+                'label' => $collection->get(1)->getLabel(),
+                'type' => 'string',
             ],
         ]);
+    }
+
+    public function testThatOnReportGenerateMethodBuildsCorrectQuery()
+    {
+        $collection = $this->getCustomFieldsCollection();
+
+        $this->customObject->expects($this->once())
+            ->method('getCustomFields')
+            ->willReturn($collection);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('getConnection')
+            ->willReturn($this->connection);
+
+        $this->queryBuilder->expects($this->exactly(2))
+            ->method('leftJoin');
+
+        $this->reportColumnsBuilder->joinReportColumns($this->queryBuilder, 'someAlias');
+
     }
 }

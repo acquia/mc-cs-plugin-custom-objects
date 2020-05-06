@@ -110,7 +110,7 @@ class ReportSubscriber implements EventSubscriberInterface
             $event->getStandardColumns(static::CUSTOM_ITEM_TABLE_ALIAS.'.', ['description', 'publish_up', 'publish_down'])
         );
 
-        // We don't need this field because we fetch company/lead relationship via custom objects
+        // We don't need this column because we fetch company/lead relationships via custom objects
         unset($columns['companies_lead.is_primary']);
 
         /** @var CustomObject $customObject */
