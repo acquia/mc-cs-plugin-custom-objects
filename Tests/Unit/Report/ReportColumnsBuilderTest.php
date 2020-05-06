@@ -64,10 +64,8 @@ class ReportColumnsBuilderTest extends TestCase
      */
     private $connection;
 
-    protected function setUp()
+    protected function setUp(): void
     {
-        parent::setUp();
-
         defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
 
         $this->customObject                    = $this->createMock(CustomObject::class);
@@ -77,11 +75,6 @@ class ReportColumnsBuilderTest extends TestCase
         $this->translatorInterface             = $this->createMock(TranslatorInterface::class);
         $this->filterOperatorProviderInterface = $this->createMock(FilterOperatorProviderInterface::class);
         $this->csvHelper                       = $this->createMock(CsvHelper::class);
-    }
-
-    protected function tearDown()
-    {
-        parent::tearDown();
     }
 
     private function getCustomFieldsCollection(): ArrayCollection
@@ -148,7 +141,7 @@ class ReportColumnsBuilderTest extends TestCase
         return 'eccbc87e.value' != $columnName;
     }
 
-    public function testThatOnReportGenerateMethodBuildsCorrectQuery()
+    public function testThatOnReportGenerateMethodBuildsCorrectQuery(): void
     {
         $collection = $this->getCustomFieldsCollection();
 
@@ -166,7 +159,7 @@ class ReportColumnsBuilderTest extends TestCase
         $this->reportColumnsBuilder->joinReportColumns($this->queryBuilder, 'someAlias');
     }
 
-    public function testThatCallbackMethodAllowsToControlWhatColumnsWillBeJoined()
+    public function testThatCallbackMethodAllowsToControlWhatColumnsWillBeJoined(): void
     {
         $collection = $this->getCustomFieldsCollection();
 
