@@ -41,18 +41,14 @@ class ReportColumnsBuilder
      * @var array
      */
     protected $columnTypeMapping = [
-        'int' => 'int',
-        'date' => 'date',
+        'int'      => 'int',
+        'date'     => 'date',
         'datetime' => 'datetime',
     ];
 
     public function __construct(CustomObject $customObject)
     {
         $this->customObject = $customObject;
-        // Join all columns by default
-        $this->callback = function(string $column): bool {
-            return true;
-        };
     }
 
     private function buildColumns(): void
@@ -103,6 +99,11 @@ class ReportColumnsBuilder
 
     private function checkIfColumnHasToBeJoined(CustomField $customField): bool
     {
+        if (!is_callable($this->callback)) {
+            // Join all columns by default
+            return true;
+        }
+
         return call_user_func($this->callback, $this->getColumnName($customField));
     }
 
@@ -120,7 +121,7 @@ class ReportColumnsBuilder
                 $joinQueryBuilder
                     ->from($customField->getTypeObject()->getTableName())
                     ->select('custom_item_id', 'GROUP_CONCAT(value separator \', \') AS value')
-                    ->andWhere('custom_field_id = '. $customField->getId())
+                    ->andWhere('custom_field_id = '.$customField->getId())
                     ->groupBy('custom_item_id');
                 $valueTableName = sprintf('(%s)', $joinQueryBuilder->getSQL());
                 $joinCondition  = sprintf('%s.id = %s.custom_item_id', $customItemTableAlias, $hash);
