@@ -15,6 +15,8 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Report\FieldsBuilder;
+use Mautic\ReportBundle\ReportEvents;
+use MauticPlugin\CustomObjectsBundle\EventListener\ReportSubscriber;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use PHPUnit\Framework\TestCase;
 
@@ -35,15 +37,26 @@ class ReportSubscriberTest extends TestCase
      */
     private $companyReportData;
 
-    protected function setUp(CustomObjectRepository $customObjectRepository, FieldsBuilder $fieldsBuilder, CompanyReportData $companyReportData): void
+    /**
+     * @var ReportSubscriber
+     */
+    private $reportSubscriber;
+
+    protected function setUp(): void
     {
         $this->customObjectRepository = $this->createMock(CustomObjectRepository::class);
         $this->fieldsBuilder          = $this->createMock(FieldsBuilder::class);
         $this->companyReportData      = $this->createMock(CompanyReportData::class);
+
+        $this->reportSubscriber = new ReportSubscriber($this->customObjectRepository, $this->fieldsBuilder, $this->companyReportData);
     }
 
     public function testThatEventListenersAreSpecified()
     {
-
+        $events = ReportSubscriber::getSubscribedEvents();
+        $this->assertArrayHasKey(ReportEvents::REPORT_ON_BUILD, $events);
+        $this->assertArrayHasKey(ReportEvents::REPORT_ON_GENERATE, $events);
+        $this->assertContains('onReportBuilder', $events[ReportEvents::REPORT_ON_BUILD]);
+        $this->assertContains('onReportGenerate', $events[ReportEvents::REPORT_ON_GENERATE]);
     }
 }
