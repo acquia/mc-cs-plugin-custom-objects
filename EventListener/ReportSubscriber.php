@@ -93,7 +93,7 @@ class ReportSubscriber implements EventSubscriberInterface
         return static::CUSTOM_OBJECTS_CONTEXT_GROUP.'.'.$customObject->getId();
     }
 
-    public function getContexts(): array
+    private function getContexts(): array
     {
         return array_map([$this, 'getContext'], $this->getCustomObjects());
     }
