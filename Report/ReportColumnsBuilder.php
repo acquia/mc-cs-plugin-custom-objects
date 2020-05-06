@@ -33,7 +33,7 @@ class ReportColumnsBuilder
     private $columns = [];
 
     /**
-     * @var \Closure
+     * @var callable
      */
     private $callback;
 
@@ -49,7 +49,8 @@ class ReportColumnsBuilder
     public function __construct(CustomObject $customObject)
     {
         $this->customObject = $customObject;
-        $this->callback = function(CustomField $customField): bool {
+        // Join all columns by default
+        $this->callback = function(string $column): bool {
             return true;
         };
     }
