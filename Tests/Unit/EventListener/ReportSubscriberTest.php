@@ -84,11 +84,11 @@ class ReportSubscriberTest extends TestCase
         $this->csvHelper                       = $this->createMock(CsvHelper::class);
     }
 
-    private function getCustomFieldsCollection(): ArrayCollection
+    private function getCustomFieldsCollection(int $batch = 1): ArrayCollection
     {
         $label1       = uniqid();
         $customField1 = new CustomField();
-        $customField1->setId(1);
+        $customField1->setId(1 * $batch);
         $customField1->setLabel($label1);
         $typeObject1 = new TextType($this->translatorInterface, $this->filterOperatorProviderInterface);
         $customField1->setTypeObject($typeObject1);
@@ -96,7 +96,7 @@ class ReportSubscriberTest extends TestCase
 
         $label2       = uniqid();
         $customField2 = new CustomField();
-        $customField2->setId(2);
+        $customField2->setId(2 * $batch);
         $customField2->setLabel($label2);
         $typeObject2 = new MultiselectType($this->translatorInterface, $this->filterOperatorProviderInterface, $this->csvHelper);
         $customField2->setTypeObject($typeObject2);
@@ -104,7 +104,7 @@ class ReportSubscriberTest extends TestCase
 
         $label3       = uniqid();
         $customField3 = new CustomField();
-        $customField3->setId(3);
+        $customField3->setId(3 * $batch);
         $customField3->setLabel($label3);
         $typeObject3 = new DateTimeType($this->translatorInterface, $this->filterOperatorProviderInterface);
         $customField3->setTypeObject($typeObject3);
@@ -119,9 +119,16 @@ class ReportSubscriberTest extends TestCase
 
     private function getCustomObjectsCollection(): array
     {
-        $customObject = new CustomObject();
-        $customObject->setCustomFields($this->getCustomFieldsCollection());
-        return [$customObject];
+        $customObject1 = new CustomObject();
+        $customObject1->setCustomFields($this->getCustomFieldsCollection());
+        $customObject1->setNamePlural('Custom Objects #1');
+        $customObject2 = new CustomObject();
+        $customObject2->setCustomFields($this->getCustomFieldsCollection());
+        $customObject2->setNamePlural('Custom Objects #2');
+        return [
+            $customObject1,
+            $customObject2
+        ];
     }
 
     public function testThatEventListenersAreSpecified(): void
@@ -155,7 +162,7 @@ class ReportSubscriberTest extends TestCase
             ->method('getStandardColumns')
             ->willReturn([]);
 
-        $this->reportBuilderEvent->expects($this->once())
+        $this->reportBuilderEvent->expects($this->exactly(2))
             ->method('addTable');
 
         $this->reportSubscriber->onReportBuilder($this->reportBuilderEvent);
