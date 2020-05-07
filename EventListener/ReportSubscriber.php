@@ -183,7 +183,7 @@ class ReportSubscriber implements EventSubscriberInterface
             sprintf('%s.last_name', static::USERS_TABLE_ALIAS),
         ];
 
-        $usesLeadsColumns = $event->usesColumn($this->getLeadColumns());
+        $usesLeadsColumns = $event->usesColumn(array_keys($this->getLeadColumns()));
         $usesUserColumns = $event->usesColumn($userColumns);
         $usesIpAddressColumn = $event->usesColumn('i.ip_address');
 
