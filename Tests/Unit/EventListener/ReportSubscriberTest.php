@@ -15,6 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\LeadBundle\Model\CompanyReportData;
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\ReportEvents;
@@ -22,9 +23,12 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateTimeType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\MultiselectType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\EventListener\ReportSubscriber;
+use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ReportSubscriberTest extends TestCase
 {
@@ -53,14 +57,31 @@ class ReportSubscriberTest extends TestCase
      */
     private $reportBuilderEvent;
 
+    /**
+     * @var TranslatorInterface
+     */
+    private $translatorInterface;
+
+    /**
+     * @var FilterOperatorProviderInterface
+     */
+    private $filterOperatorProviderInterface;
+
+    /**
+     * @var CsvHelper
+     */
+    private $csvHelper;
+
     protected function setUp(): void
     {
         $this->customObjectRepository = $this->createMock(CustomObjectRepository::class);
         $this->fieldsBuilder          = $this->createMock(FieldsBuilder::class);
         $this->companyReportData      = $this->createMock(CompanyReportData::class);
         $this->reportSubscriber = new ReportSubscriber($this->customObjectRepository, $this->fieldsBuilder, $this->companyReportData);
-
         $this->reportBuilderEvent = $this->createMock(ReportBuilderEvent::class);
+        $this->translatorInterface             = $this->createMock(TranslatorInterface::class);
+        $this->filterOperatorProviderInterface = $this->createMock(FilterOperatorProviderInterface::class);
+        $this->csvHelper                       = $this->createMock(CsvHelper::class);
     }
 
     private function getCustomFieldsCollection(): ArrayCollection
@@ -89,11 +110,18 @@ class ReportSubscriberTest extends TestCase
         $customField3->setTypeObject($typeObject3);
         $customField3->setType($typeObject3->getKey());
 
-        return [
+        return new ArrayCollection([
             $customField1,
             $customField2,
             $customField3,
-        ];
+        ]);
+    }
+
+    private function getCustomObjectsCollection(): array
+    {
+        $customObject = new CustomObject();
+        $customObject->setCustomFields($this->getCustomFieldsCollection());
+        return [$customObject];
     }
 
     public function testThatEventListenersAreSpecified(): void
@@ -107,6 +135,54 @@ class ReportSubscriberTest extends TestCase
 
     public function testOnReportBuilderMethod(): void
     {
+        $this->customObjectRepository->expects($this->once())
+            ->method('findAll')
+            ->willReturn($this->getCustomObjectsCollection());
+
+        $this->reportBuilderEvent->expects($this->once())
+            ->method('checkContext')
+            ->willReturn(true);
+
+        $this->fieldsBuilder->expects($this->once())
+            ->method('getLeadFieldsColumns')
+            ->willReturn([]);
+
+        $this->companyReportData->expects($this->once())
+            ->method('getCompanyData')
+            ->willReturn([]);
+
+        $this->reportBuilderEvent->expects($this->once())
+            ->method('getStandardColumns')
+            ->willReturn([]);
+
+        $this->reportBuilderEvent->expects($this->once())
+            ->method('addTable');
+
+        $this->reportSubscriber->onReportBuilder($this->reportBuilderEvent);
+    }
+
+    public function testThatWeDontProcessWrongContexts(): void
+    {
+        $this->customObjectRepository->expects($this->once())
+            ->method('findAll')
+            ->willReturn($this->getCustomObjectsCollection());
+
+        $this->reportBuilderEvent->expects($this->once())
+            ->method('checkContext')
+            ->willReturn(false);
+
+        $this->fieldsBuilder->expects($this->never())
+            ->method('getLeadFieldsColumns');
+
+        $this->companyReportData->expects($this->never())
+            ->method('getCompanyData');
+
+        $this->reportBuilderEvent->expects($this->never())
+            ->method('getStandardColumns');
+
+        $this->reportBuilderEvent->expects($this->never())
+            ->method('addTable');
+
         $this->reportSubscriber->onReportBuilder($this->reportBuilderEvent);
     }
 }

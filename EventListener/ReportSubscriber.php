@@ -42,7 +42,7 @@ class ReportSubscriber implements EventSubscriberInterface
     /**
      * @var array
      */
-    private static $customObjects;
+    private $customObjects;
 
     /**
      * @var CustomObjectRepository
@@ -68,16 +68,16 @@ class ReportSubscriber implements EventSubscriberInterface
 
     private function getCustomObjects(): array
     {
-        if (null !== static::$customObjects) {
-            return static::$customObjects;
+        if (null !== $this->customObjects) {
+            return $this->customObjects;
         }
 
-        static::$customObjects = $this->customObjectRepository->findAll();
-        usort(static::$customObjects, function (CustomObject $a, CustomObject $b): int {
+        $this->customObjects = $this->customObjectRepository->findAll();
+        usort($this->customObjects, function (CustomObject $a, CustomObject $b): int {
             return strnatcmp($a->getNamePlural(), $b->getNamePlural());
         });
 
-        return static::$customObjects;
+        return $this->customObjects;
     }
 
     public static function getSubscribedEvents(): array
@@ -202,8 +202,8 @@ class ReportSubscriber implements EventSubscriberInterface
         $event->applyDateFilters($queryBuilder, 'date_added', static::CUSTOM_ITEM_TABLE_ALIAS);
 
         $userColumns = [
-            sprintf('%s.first_name', static::USERS_TABLE_ALIAS),
-            sprintf('%s.last_name', static::USERS_TABLE_ALIAS),
+            static::USERS_TABLE_ALIAS . '.first_name',
+            static::USERS_TABLE_ALIAS . '.last_name',
         ];
 
         $usesLeadsColumns = $event->usesColumn(array_keys($this->getLeadColumns()));
