@@ -246,13 +246,9 @@ class ReportSubscriberTest extends TestCase
             ->method('getCompanyData')
             ->willReturn([]);
 
-        $this->reportBuilderEvent->expects($this->once())
-            ->method('getStandardColumns')
-            ->willReturn([]);
-
-        $this->reportGeneratorEvent->expects($this->exactly(3))
+        $this->reportGeneratorEvent->expects($this->exactly(6))
             ->method('usesColumn')
-            ->willReturnOnConsecutiveCalls(true, true, true);
+            ->willReturnOnConsecutiveCalls(true, true, true, true, true, false);
 
         $this->reportSubscriber->onReportGenerate($this->reportGeneratorEvent);
     }
