@@ -105,8 +105,8 @@ class ReportSubscriber implements EventSubscriberInterface
         }
 
         $columns = array_merge(
-            $this->fieldsBuilder->getLeadFieldsColumns(static::LEADS_TABLE_PREFIX),
-            $this->companyReportData->getCompanyData(),
+            $this->getLeadColumns(),
+            $this->getCompanyColumns(),
             $event->getStandardColumns(static::CUSTOM_ITEM_TABLE_ALIAS.'.', ['description', 'publish_up', 'publish_down'])
         );
 
@@ -124,6 +124,18 @@ class ReportSubscriber implements EventSubscriberInterface
                 static::CUSTOM_OBJECTS_CONTEXT_GROUP
             );
         }
+    }
+
+    private function getLeadColumns(): array
+    {
+        return $this->fieldsBuilder->getLeadFieldsColumns(static::LEADS_TABLE_PREFIX);
+    }
+
+    private function getCompanyColumns(): array
+    {
+        $companyColumns = $this->companyReportData->getCompanyData();
+        unset($companyColumns['companies_lead.is_primary']);
+        return $companyColumns;
     }
 
     private function addTablePrefix(string $table): string
@@ -165,27 +177,33 @@ class ReportSubscriber implements EventSubscriberInterface
             ->andWhere(static::CUSTOM_ITEM_TABLE_ALIAS.'.custom_object_id = :customObjectId')
             ->setParameter('customObjectId', $customObject->getId(), ParameterType::INTEGER);
 
-        if ($event->usesColumn('i.ip_address')) {
-            $event->addLeadIpAddressLeftJoin($queryBuilder);
-        }
+        $event->applyDateFilters($queryBuilder, 'date_added', static::CUSTOM_ITEM_TABLE_ALIAS);
 
         $userColumns = [
             sprintf('%s.first_name', static::USERS_TABLE_ALIAS),
             sprintf('%s.last_name', static::USERS_TABLE_ALIAS),
         ];
 
-        if ($event->usesColumn($userColumns)) {
+        $usesLeadsColumns = $event->usesColumn($this->getLeadColumns());
+        $usesUserColumns = $event->usesColumn($userColumns);
+        $usesIpAddressColumn = $event->usesColumn('i.ip_address');
+
+        if ($usesLeadsColumns || $usesUserColumns || $usesIpAddressColumn) {
+            // Joining contacts tables
+            $contactsJoinCondition = sprintf('%s.id = %s.custom_item_id', static::CUSTOM_ITEM_TABLE_ALIAS, static::CUSTOM_ITEM_XREF_CONTACT_ALIAS);
+            $queryBuilder->leftJoin(static::CUSTOM_ITEM_TABLE_ALIAS, $this->addTablePrefix(CustomItemXrefContact::TABLE_NAME), static::CUSTOM_ITEM_XREF_CONTACT_ALIAS, $contactsJoinCondition);
+            $contactsTableJoinCondition = sprintf('%s.contact_id = %s.id', static::CUSTOM_ITEM_XREF_CONTACT_ALIAS, static::LEADS_TABLE_ALIAS);
+            $queryBuilder->leftJoin(static::CUSTOM_ITEM_XREF_CONTACT_ALIAS, $this->addTablePrefix('leads'), static::LEADS_TABLE_ALIAS, $contactsTableJoinCondition);
+        }
+
+        if ($usesUserColumns) {
             $usersJoinCondition = sprintf('%s.id = %s.owner_id', static::USERS_TABLE_ALIAS, static::LEADS_TABLE_ALIAS);
             $queryBuilder->leftJoin(static::LEADS_TABLE_ALIAS, $this->addTablePrefix('users'), static::USERS_TABLE_ALIAS, $usersJoinCondition);
         }
 
-        $event->applyDateFilters($queryBuilder, 'date_added', static::CUSTOM_ITEM_TABLE_ALIAS);
-
-        // Joining contacts tables
-        $contactsJoinCondition = sprintf('%s.id = %s.custom_item_id', static::CUSTOM_ITEM_TABLE_ALIAS, static::CUSTOM_ITEM_XREF_CONTACT_ALIAS);
-        $queryBuilder->leftJoin(static::CUSTOM_ITEM_TABLE_ALIAS, $this->addTablePrefix(CustomItemXrefContact::TABLE_NAME), static::CUSTOM_ITEM_XREF_CONTACT_ALIAS, $contactsJoinCondition);
-        $contactsTableJoinCondition = sprintf('%s.contact_id = %s.id', static::CUSTOM_ITEM_XREF_CONTACT_ALIAS, static::LEADS_TABLE_ALIAS);
-        $queryBuilder->leftJoin(static::CUSTOM_ITEM_XREF_CONTACT_ALIAS, $this->addTablePrefix('leads'), static::LEADS_TABLE_ALIAS, $contactsTableJoinCondition);
+        if ($usesIpAddressColumn) {
+            $event->addLeadIpAddressLeftJoin($queryBuilder);
+        }
 
         if ($this->companyReportData->eventHasCompanyColumns($event)) {
             // Joining companies tables
