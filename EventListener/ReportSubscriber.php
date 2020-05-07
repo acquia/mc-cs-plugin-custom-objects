@@ -110,9 +110,6 @@ class ReportSubscriber implements EventSubscriberInterface
             $event->getStandardColumns(static::CUSTOM_ITEM_TABLE_ALIAS.'.', ['description', 'publish_up', 'publish_down'])
         );
 
-        // We don't need this column because we fetch company/lead relationships via custom objects
-        unset($columns['companies_lead.is_primary']);
-
         /** @var CustomObject $customObject */
         foreach ($this->getCustomObjects() as $customObject) {
             $event->addTable(
@@ -134,6 +131,7 @@ class ReportSubscriber implements EventSubscriberInterface
     private function getCompanyColumns(): array
     {
         $companyColumns = $this->companyReportData->getCompanyData();
+        // We don't need this column because we fetch company/lead relationships via custom objects
         unset($companyColumns['companies_lead.is_primary']);
         return $companyColumns;
     }
