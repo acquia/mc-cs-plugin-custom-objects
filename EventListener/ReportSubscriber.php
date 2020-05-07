@@ -35,7 +35,6 @@ class ReportSubscriber implements EventSubscriberInterface
     const CUSTOM_ITEM_XREF_CONTACT_ALIAS = 'cil';
     const CUSTOM_ITEM_XREF_COMPANY_ALIAS = 'cic';
     const LEADS_TABLE_ALIAS              = 'l';
-    const LEADS_TABLE_PREFIX             = self::LEADS_TABLE_ALIAS.'.';
     const USERS_TABLE_ALIAS              = 'u';
     const COMPANIES_TABLE_ALIAS          = 'comp';
 
@@ -128,7 +127,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
     private function getLeadColumns(): array
     {
-        return $this->fieldsBuilder->getLeadFieldsColumns(static::LEADS_TABLE_PREFIX);
+        return $this->fieldsBuilder->getLeadFieldsColumns(static::LEADS_TABLE_ALIAS.'.');
     }
 
     private function getCompanyColumns(): array
