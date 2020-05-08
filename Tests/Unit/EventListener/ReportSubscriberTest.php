@@ -81,6 +81,11 @@ class ReportSubscriberTest extends TestCase
     private $reportGeneratorEvent;
 
     /**
+     * @var QueryBuilder
+     */
+    private $queryBuilder;
+
+    /**
      * @var Connection
      */
     private $connection;
@@ -98,7 +103,8 @@ class ReportSubscriberTest extends TestCase
         $this->filterOperatorProviderInterface = $this->createMock(FilterOperatorProviderInterface::class);
         $this->csvHelper                       = $this->createMock(CsvHelper::class);
         $this->reportGeneratorEvent = $this->createMock(ReportGeneratorEvent::class);
-        $this->connection                      = $this->createMock(Connection::class);
+        $this->queryBuilder                    = $this->createMock(QueryBuilder::class);
+        $this->connection =     $this->createMock(Connection::class);
     }
 
     private function getCustomFieldsCollection(int $batch = 1): ArrayCollection
@@ -236,15 +242,20 @@ class ReportSubscriberTest extends TestCase
 
         $this->reportGeneratorEvent->expects($this->once())
             ->method('getQueryBuilder')
-            ->willReturn(new QueryBuilder($this->connection));
+            ->willReturn($this->queryBuilder);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('getConnection')
+            ->willReturn($this->connection);
 
         $this->fieldsBuilder->expects($this->once())
             ->method('getLeadFieldsColumns')
             ->willReturn([]);
 
         $this->companyReportData->expects($this->once())
-            ->method('getCompanyData')
-            ->willReturn([]);
+            ->method('eventHasCompanyColumns')
+            ->with($this->reportGeneratorEvent)
+            ->willReturn(true);
 
         $this->reportGeneratorEvent->expects($this->exactly(6))
             ->method('usesColumn')
