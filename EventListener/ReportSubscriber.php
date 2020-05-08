@@ -194,10 +194,9 @@ class ReportSubscriber implements EventSubscriberInterface
         $customObject = $this->initializeCustomObject($event->getContext());
 
         $queryBuilder = $event->getQueryBuilder();
-        $queryBuilder
-            ->from($this->addTablePrefix(CustomItem::TABLE_NAME), static::CUSTOM_ITEM_TABLE_ALIAS)
-            ->andWhere(static::CUSTOM_ITEM_TABLE_ALIAS.'.custom_object_id = :customObjectId')
-            ->setParameter('customObjectId', $customObject->getId(), ParameterType::INTEGER);
+        $queryBuilder->from($this->addTablePrefix(CustomItem::TABLE_NAME), static::CUSTOM_ITEM_TABLE_ALIAS);
+        $queryBuilder->andWhere(static::CUSTOM_ITEM_TABLE_ALIAS.'.custom_object_id = :customObjectId');
+        $queryBuilder->setParameter('customObjectId', $customObject->getId(), ParameterType::INTEGER);
 
         $event->applyDateFilters($queryBuilder, 'date_added', static::CUSTOM_ITEM_TABLE_ALIAS);
 
