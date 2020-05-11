@@ -17,6 +17,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\AbstractMultivalueType;
@@ -30,6 +31,8 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Swagger\Annotations as SWG;
 
 class CustomField extends FormEntity implements UniqueEntityInterface
 {
@@ -38,11 +41,13 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var int|null
+     * @SWG\Property(description="The unique identifier of the user.")
      */
     private $id;
 
     /**
      * @var string|null
+     * @SWG\Property(type="string", maxLength=255)
      */
     private $label;
 
@@ -494,5 +499,25 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         }
 
         return $placeholder;
+    }
+
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('fetch')
+            ->addListProperties(
+                [
+                    'id',
+                    'label',
+                    'alias',
+                ]
+            )
+            ->setGroupPrefix('update')
+            ->addListProperties(
+                [
+                    'label',
+                    'alias',
+                ]
+            )
+            ->build();
     }
 }
