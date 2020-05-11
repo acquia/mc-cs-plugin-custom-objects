@@ -237,10 +237,6 @@ class ReportSubscriberTest extends TestCase
             ->willReturn($customObjectsCollection[0]);
 
         $this->reportGeneratorEvent->expects($this->once())
-            ->method('getContext')
-            ->willReturn('custom.object.1');
-
-        $this->reportGeneratorEvent->expects($this->once())
             ->method('getQueryBuilder')
             ->willReturn($this->queryBuilder);
 
@@ -260,6 +256,33 @@ class ReportSubscriberTest extends TestCase
         $this->reportGeneratorEvent->expects($this->exactly(6))
             ->method('usesColumn')
             ->willReturnOnConsecutiveCalls(true, true, true, true, true, false);
+
+        $this->queryBuilder->expects($this->exactly(7))
+            ->method('leftJoin');
+
+        $this->queryBuilder->expects($this->once())
+            ->method('andWhere');
+
+        $this->queryBuilder->expects($this->once())
+            ->method('setParameter');
+
+        $this->reportSubscriber->onReportGenerate($this->reportGeneratorEvent);
+    }
+
+    public function testThatOnReportGenerateMethodDoesntProcessWrongContexts()
+    {
+        $customObjectsCollection = $this->getCustomObjectsCollection();
+
+        $this->reportGeneratorEvent->expects($this->once())
+            ->method('checkContext')
+            ->willReturn(false);
+
+        $this->customObjectRepository->expects($this->once())
+            ->method('findAll')
+            ->willReturn($customObjectsCollection);
+
+        $this->reportGeneratorEvent->expects($this->never())
+            ->method('getContext');
 
         $this->reportSubscriber->onReportGenerate($this->reportGeneratorEvent);
     }
