@@ -286,4 +286,46 @@ class ReportSubscriberTest extends TestCase
 
         $this->reportSubscriber->onReportGenerate($this->reportGeneratorEvent);
     }
+
+    public function testThatIdDoesntProcessContextsWithEmptyOrNotIntCustomObjectsID()
+    {
+        $customObjectsCollection = $this->getCustomObjectsCollection();
+
+        $this->reportGeneratorEvent->expects($this->once())
+            ->method('checkContext')
+            ->willReturn(true);
+
+        $this->customObjectRepository->expects($this->once())
+            ->method('findAll')
+            ->willReturn($customObjectsCollection);
+
+        $this->reportGeneratorEvent->expects($this->once())
+            ->method('getContext')
+            ->willReturn('custom.object.');
+
+        $this->expectException(\Exception::class);
+
+        $this->reportSubscriber->onReportGenerate($this->reportGeneratorEvent);
+    }
+
+    public function testThatIdDoesntProcessNotExistingCustomObjects()
+    {
+        $customObjectsCollection = $this->getCustomObjectsCollection();
+
+        $this->reportGeneratorEvent->expects($this->once())
+            ->method('checkContext')
+            ->willReturn(true);
+
+        $this->customObjectRepository->expects($this->once())
+            ->method('findAll')
+            ->willReturn($customObjectsCollection);
+
+        $this->reportGeneratorEvent->expects($this->once())
+            ->method('getContext')
+            ->willReturn('custom.object.1');
+
+        $this->expectException(\Exception::class);
+
+        $this->reportSubscriber->onReportGenerate($this->reportGeneratorEvent);
+    }
 }
