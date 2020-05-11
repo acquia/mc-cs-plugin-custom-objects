@@ -53,12 +53,12 @@ class Token
     /**
      * @var string
      */
-    private $customFieldAlias;
+    private $customFieldAlias = '';
 
     /**
      * @var string
      */
-    private $customObjectAlias;
+    private $customObjectAlias = '';
 
     public function __construct(string $token)
     {
