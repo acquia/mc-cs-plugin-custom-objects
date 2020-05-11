@@ -133,6 +133,7 @@ class ReportSubscriber implements EventSubscriberInterface
         $companyColumns = $this->companyReportData->getCompanyData();
         // We don't need this column because we fetch company/lead relationships via custom objects
         unset($companyColumns['companies_lead.is_primary']);
+
         return $companyColumns;
     }
 
@@ -201,12 +202,12 @@ class ReportSubscriber implements EventSubscriberInterface
         $event->applyDateFilters($queryBuilder, 'date_added', static::CUSTOM_ITEM_TABLE_ALIAS);
 
         $userColumns = [
-            static::USERS_TABLE_ALIAS . '.first_name',
-            static::USERS_TABLE_ALIAS . '.last_name',
+            static::USERS_TABLE_ALIAS.'.first_name',
+            static::USERS_TABLE_ALIAS.'.last_name',
         ];
 
-        $usesLeadsColumns = $event->usesColumn(array_keys($this->getLeadColumns()));
-        $usesUserColumns = $event->usesColumn($userColumns);
+        $usesLeadsColumns    = $event->usesColumn(array_keys($this->getLeadColumns()));
+        $usesUserColumns     = $event->usesColumn($userColumns);
         $usesIpAddressColumn = $event->usesColumn('i.ip_address');
 
         if ($usesLeadsColumns || $usesUserColumns || $usesIpAddressColumn) {

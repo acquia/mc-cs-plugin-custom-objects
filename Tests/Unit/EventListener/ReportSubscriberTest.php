@@ -94,17 +94,17 @@ class ReportSubscriberTest extends TestCase
     {
         defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
 
-        $this->customObjectRepository = $this->createMock(CustomObjectRepository::class);
-        $this->fieldsBuilder          = $this->createMock(FieldsBuilder::class);
-        $this->companyReportData      = $this->createMock(CompanyReportData::class);
-        $this->reportSubscriber = new ReportSubscriber($this->customObjectRepository, $this->fieldsBuilder, $this->companyReportData);
-        $this->reportBuilderEvent = $this->createMock(ReportBuilderEvent::class);
+        $this->customObjectRepository          = $this->createMock(CustomObjectRepository::class);
+        $this->fieldsBuilder                   = $this->createMock(FieldsBuilder::class);
+        $this->companyReportData               = $this->createMock(CompanyReportData::class);
+        $this->reportSubscriber                = new ReportSubscriber($this->customObjectRepository, $this->fieldsBuilder, $this->companyReportData);
+        $this->reportBuilderEvent              = $this->createMock(ReportBuilderEvent::class);
         $this->translatorInterface             = $this->createMock(TranslatorInterface::class);
         $this->filterOperatorProviderInterface = $this->createMock(FilterOperatorProviderInterface::class);
         $this->csvHelper                       = $this->createMock(CsvHelper::class);
-        $this->reportGeneratorEvent = $this->createMock(ReportGeneratorEvent::class);
+        $this->reportGeneratorEvent            = $this->createMock(ReportGeneratorEvent::class);
         $this->queryBuilder                    = $this->createMock(QueryBuilder::class);
-        $this->connection =     $this->createMock(Connection::class);
+        $this->connection                      =     $this->createMock(Connection::class);
     }
 
     private function getCustomFieldsCollection(int $batch = 1): ArrayCollection
@@ -148,6 +148,7 @@ class ReportSubscriberTest extends TestCase
         $customObject2 = new CustomObject();
         $customObject2->setCustomFields($this->getCustomFieldsCollection(2));
         $customObject2->setNamePlural('Custom Objects #2');
+
         return [
             $customObject1,
             $customObject2,
