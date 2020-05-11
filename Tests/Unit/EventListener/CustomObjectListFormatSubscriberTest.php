@@ -37,7 +37,7 @@ class CustomObjectListFormatSubscriberTest extends TestCase
         parent::setUp();
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $this->assertSame(
             [CustomObjectEvents::ON_CUSTOM_OBJECT_LIST_FORMAT => ['onFormatList', 0]],
@@ -45,7 +45,7 @@ class CustomObjectListFormatSubscriberTest extends TestCase
         );
     }
 
-    public function testOnFormatInvalid()
+    public function testOnFormatInvalid(): void
     {
         $format = 'format';
 
@@ -68,7 +68,7 @@ class CustomObjectListFormatSubscriberTest extends TestCase
         $this->subscriber->onFormatList($this->eventMock);
     }
 
-    public function testOnFormat()
+    public function testOnFormat(): void
     {
         $format = 'format';
         $values = ['values'];

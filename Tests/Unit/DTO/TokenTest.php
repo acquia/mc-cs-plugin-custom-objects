@@ -14,7 +14,7 @@ use MauticPlugin\CustomObjectsBundle\DTO\Token;
 
 class TokenTest extends \PHPUnit\Framework\TestCase
 {
-    public function testAll()
+    public function testAll(): void
     {
         $tokenString = '{}';
 
