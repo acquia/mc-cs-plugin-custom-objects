@@ -88,7 +88,7 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->queryFilterFactory = $this->createMock(QueryFilterFactory::class);
         $this->customObjectModel  = $this->createMock(CustomObjectModel::class);
         $this->customItemModel    = $this->createMock(CustomItemModel::class);
-        $this->tokenParser        = new TokenParser();
+        $this->tokenParser        = $this->createMock( TokenParser::class);
         $this->eventModel         = $this->createMock(EventModel::class);
         $this->eventDispatcher    = $this->createMock(EventDispatcher::class);
         $this->subscriber         = new TokenSubscriber(
@@ -152,6 +152,11 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnBuilderBuild(): void
     {
+        $coAlias = 'coAlias';
+        $coName = 'coName';
+        $cfAlias = 'cfAlias';
+        $cfLabel = 'cfLabel';
+
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
             ->willReturn(true);
@@ -168,23 +173,33 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getCustomFields')
             ->willReturn([$customField]);
 
-        $customObject->method('getAlias')->willReturn('product');
-        $customObject->method('getName')->willReturn('Product');
-        $customField->method('getAlias')->willReturn('sku');
-        $customField->method('getLabel')->willReturn('SKU');
+        $this->customObjectModel->expects($this->once())
+            ->method('fetchAllPublishedEntities')
+            ->willReturn([$customObject]);
 
-        $this->builderEvent->expects($this->exactly(2))
+        // Build data structures for loops
+        $customObject->method('getAlias')->willReturn($coAlias);
+        $customObject->method('getName')->willReturn($coName);
+        $customField->method('getAlias')->willReturn($cfAlias);
+        $customField->method('getLabel')->willReturn($cfLabel);
+
+        $this->tokenParser
+            ->method('buildTokenWithDefaultOptions')
+            ->withConsecutive([$coAlias, 'name'], [$coAlias, $cfAlias])
+            ->willReturnOnConsecutiveCalls('token', 'token1');
+
+        $this->tokenParser
+            ->method('buildTokenLabel')
+            ->withConsecutive([$coName, 'Name'], [$coName, $cfLabel])
+            ->willReturn('tokenLabel', 'tokenLabel1');
+
+        $this->builderEvent
             ->method('addToken')
-            ->withConsecutive(
-                [
-                    '{custom-object=product:name | where=segment-filter | order=latest | limit=1 | default= | format=default}',
-                    'Product: Name',
-                ],
-                [
-                    '{custom-object=product:sku | where=segment-filter | order=latest | limit=1 | default= | format=default}',
-                    'Product: SKU',
-                ]
-            );
+            ->withConsecutive(['token', 'tokenLabel'], ['token1', 'tokenLabel1']);
+
+        $this->builderEvent
+            ->method('addToken')
+            ->withConsecutive(['token', 'tokenLabel'], ['token1', 'tokenLabel1']);
 
         $this->subscriber->onBuilderBuild($this->builderEvent);
     }
