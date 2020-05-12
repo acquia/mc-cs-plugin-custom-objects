@@ -11,8 +11,9 @@
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\DTO;
 
 use MauticPlugin\CustomObjectsBundle\DTO\Token;
+use PHPUnit\Framework\TestCase;
 
-class TokenTest extends \PHPUnit\Framework\TestCase
+class TokenTest extends TestCase
 {
     public function testAll(): void
     {
@@ -52,5 +53,4 @@ class TokenTest extends \PHPUnit\Framework\TestCase
         $token->setCustomObjectAlias('someCuastomFieldObjectAlias');
         $this->assertSame('someCuastomFieldObjectAlias', $token->getCustomObjectAlias());
     }
-
 }
