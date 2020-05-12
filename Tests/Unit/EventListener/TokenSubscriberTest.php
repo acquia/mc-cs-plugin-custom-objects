@@ -57,12 +57,19 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private $customItemModel;
 
-    private $eventModel;
-
     /**
      * @var TokenParser
      */
     private $tokenParser;
+
+    private $eventModel;
+
+    private $eventDispatcher;
+
+    /**
+     * @var TokenSubscriber
+     */
+    private $subscriber;
 
     private $builderEvent;
 
@@ -70,29 +77,19 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private $customItemListDbalQueryEvent;
 
-    /**
-     * @var TokenSubscriber
-     */
-    private $subscriber;
-
-    private $eventDispatcher;
-
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->configProvider               = $this->createMock(ConfigProvider::class);
-        $this->queryFilterHelper            = $this->createMock(QueryFilterHelper::class);
-        $this->queryFilterFactory           = $this->createMock(QueryFilterFactory::class);
-        $this->customObjectModel            = $this->createMock(CustomObjectModel::class);
-        $this->customItemModel              = $this->createMock(CustomItemModel::class);
-        $this->eventModel                   = $this->createMock(EventModel::class);
-        $this->tokenParser                  = new TokenParser();
-        $this->builderEvent                 = $this->createMock(BuilderEvent::class);
-        $this->emailSendEvent               = $this->createMock(EmailSendEvent::class);
-        $this->customItemListDbalQueryEvent = $this->createMock(CustomItemListDbalQueryEvent::class);
-        $this->eventDispatcher              = $this->createMock(EventDispatcher::class);
-        $this->subscriber                   = new TokenSubscriber(
+        $this->configProvider     = $this->createMock(ConfigProvider::class);
+        $this->queryFilterHelper  = $this->createMock(QueryFilterHelper::class);
+        $this->queryFilterFactory = $this->createMock(QueryFilterFactory::class);
+        $this->customObjectModel  = $this->createMock(CustomObjectModel::class);
+        $this->customItemModel    = $this->createMock(CustomItemModel::class);
+        $this->tokenParser        = new TokenParser();
+        $this->eventModel         = $this->createMock(EventModel::class);
+        $this->eventDispatcher    = $this->createMock(EventDispatcher::class);
+        $this->subscriber         = new TokenSubscriber(
             $this->configProvider,
             $this->queryFilterHelper,
             $this->queryFilterFactory,
@@ -103,6 +100,10 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->eventDispatcher,
             new TokenFormatter()
         );
+
+        $this->builderEvent                 = $this->createMock(BuilderEvent::class);
+        $this->emailSendEvent               = $this->createMock(EmailSendEvent::class);
+        $this->customItemListDbalQueryEvent = $this->createMock(CustomItemListDbalQueryEvent::class);
     }
 
     public function testOnBuilderBuildWhenPluginDisabled(): void
