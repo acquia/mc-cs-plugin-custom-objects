@@ -21,118 +21,129 @@ class TokenFormatterTest extends TestCase
 
     private $noValues = [];
 
+    private $availableFormats = [
+        TokenFormatter::DEFAULT_FORMAT => 'formatDefault',
+        TokenFormatter::OR_LIST_FORMAT => 'formatOrList',
+        TokenFormatter::AND_LIST_FORMAT => 'formatAndList',
+        TokenFormatter::BULLET_LIST_FORMAT => 'formatBulletList',
+        TokenFormatter::ORDERED_LIST_FORMAT => 'formatOrderedList',
+    ];
+
+
     public function setUp(): void
     {
         $this->formatter = new TokenFormatter();
     }
 
-    public function testFormatFunction(): void
+    public function testFormatFail(): void
     {
+        $this->assertSame(
+            '',
+            $this->formatter->format($this->noValues, 'A BAD FORMAT')
+        );
+
+
         $this->expectException(InvalidCustomObjectFormatListException::class);
         $this->formatter->format($this->manyValues, 'A BAD FORMAT');
-
-        // With no values
-        $this->assertEquals('', $this->formatter->format($this->noValues, 'or-list'));
-
-        // With one value
-        $this->assertEquals('oneValue', $this->formatter->format($this->oneValue, 'and-list'));
-
-        // With many values
-        $expected = 'value1, value2 and value3';
-        $this->assertEquals($expected, $this->formatter->format($this->manyValues, 'and-list'));
     }
 
-    /**
-     * Make sure the formatter has at least the default format and that it is valid
-     */
-    public function testDefaultFormat(): void
+    public function testFormatOneValue()
     {
-        // Check the list of formats isn't empty
-        $this->assertGreaterThan(0, count(TokenFormatter::FORMATS));
+        $this->assertEquals(
+            'oneValue',
+            $this->formatter->format($this->oneValue, TokenFormatter::AND_LIST_FORMAT)
+        );
+    }
 
-        // Check that one of the formats is the default one
-        $this->assertTrue(array_key_exists('default', TokenFormatter::FORMATS));
+    public function testFormatManyValues()
+    {
+        $this->assertEquals(
+            'value1, value2 and value3',
+            $this->formatter->format($this->manyValues, TokenFormatter::AND_LIST_FORMAT)
+        );
+    }
 
-        // the default format method should stay the same
-        $this->assertEquals('formatDefault', TokenFormatter::FORMATS[TokenFormatter::DEFAULT_FORMAT]);
+    public function testAvailableFormats()
+    {
+        $this->assertSame(
+            $this->availableFormats,
+            TokenFormatter::FORMATS
+        );
+    }
 
-        // Check that the default format is valid
-        $this->assertTrue($this->formatter->isValidFormat('default'));
+    public function testIsValidFormat()
+    {
+        foreach ($this->availableFormats as $format => $methodName) {
+            $this->assertTrue($this->formatter->isValidFormat($format));
+        }
 
-        // Actually check the output of the format
+        $this->assertFalse($this->formatter->isValidFormat('noFormat'));
+    }
 
+    public function testFormatDefault(): void
+    {
         // With no values
-        $this->assertEquals('', $this->formatter->formatDefault($this->noValues));
+        $this->assertEquals('', $this->formatter->format($this->noValues, TokenFormatter::DEFAULT_FORMAT));
 
         // With one value
-        $this->assertEquals('oneValue', $this->formatter->formatDefault($this->oneValue));
+        $this->assertEquals('oneValue', $this->formatter->format($this->oneValue, TokenFormatter::DEFAULT_FORMAT));
 
         // With many values
         $expected = 'value1, value2, value3';
-        $this->assertEquals($expected, $this->formatter->formatDefault($this->manyValues));
+        $this->assertEquals($expected, $this->formatter->format($this->manyValues, TokenFormatter::DEFAULT_FORMAT));
     }
 
     public function testFormatOrList(): void
     {
         // With no values
-        $this->assertEquals('', $this->formatter->formatOrList($this->noValues));
+        $this->assertEquals('', $this->formatter->format($this->noValues, TokenFormatter::OR_LIST_FORMAT));
 
         // With one value
-        $this->assertEquals('oneValue', $this->formatter->formatOrList($this->oneValue));
+        $this->assertEquals('oneValue', $this->formatter->format($this->oneValue, TokenFormatter::OR_LIST_FORMAT));
 
         // With many values
         $expected = 'value1, value2 or value3';
-        $this->assertEquals($expected, $this->formatter->formatOrList($this->manyValues));
+        $this->assertEquals($expected, $this->formatter->format($this->manyValues, TokenFormatter::OR_LIST_FORMAT));
     }
 
     public function testFormatAndList(): void
     {
         // With no values
-        $this->assertEquals('', $this->formatter->formatAndList($this->noValues));
+        $this->assertEquals('', $this->formatter->format($this->noValues, TokenFormatter::AND_LIST_FORMAT));
 
         // With one value
-        $this->assertEquals('oneValue', $this->formatter->formatAndList($this->oneValue));
+        $this->assertEquals('oneValue', $this->formatter->format($this->oneValue, TokenFormatter::AND_LIST_FORMAT));
 
         // With many values
         $expected = 'value1, value2 and value3';
-        $this->assertEquals($expected, $this->formatter->formatAndList($this->manyValues));
+        $this->assertEquals($expected, $this->formatter->format($this->manyValues, TokenFormatter::AND_LIST_FORMAT));
     }
 
     public function testFormatBulletList(): void
     {
         // With no values
-        $this->assertEquals('', $this->formatter->formatBulletList($this->noValues));
+        $this->assertEquals('', $this->formatter->format($this->noValues, TokenFormatter::BULLET_LIST_FORMAT));
 
         // With one value
         $expected = '<ul><li>oneValue</li></ul>';
-        $this->assertEquals($expected, $this->formatter->formatBulletList($this->oneValue));
+        $this->assertEquals($expected, $this->formatter->format($this->oneValue, TokenFormatter::BULLET_LIST_FORMAT));
 
         // With many values
         $expected = '<ul><li>value1</li><li>value2</li><li>value3</li></ul>';
-        $this->assertEquals($expected, $this->formatter->formatBulletList($this->manyValues));
+        $this->assertEquals($expected, $this->formatter->format($this->manyValues, TokenFormatter::BULLET_LIST_FORMAT));
     }
 
     public function testFormatOrderedList(): void
     {
         // With no values
-        $this->assertEquals('', $this->formatter->formatOrderedList($this->noValues));
+        $this->assertEquals('', $this->formatter->format($this->noValues, TokenFormatter::ORDERED_LIST_FORMAT));
 
         // With one value
         $expected = '<ol><li>oneValue</li></ol>';
-        $this->assertEquals($expected, $this->formatter->formatOrderedList($this->oneValue));
+        $this->assertEquals($expected, $this->formatter->format($this->oneValue, TokenFormatter::ORDERED_LIST_FORMAT));
 
         // With many values
         $expected = '<ol><li>value1</li><li>value2</li><li>value3</li></ol>';
-        $this->assertEquals($expected, $this->formatter->formatOrderedList($this->manyValues));
+        $this->assertEquals($expected, $this->formatter->format($this->manyValues, TokenFormatter::ORDERED_LIST_FORMAT));
     }
-
-    public function testFormatIsValidFunction(): void
-    {
-        // Make sure our invalid key actually doesn't exists
-        $this->assertFalse(array_key_exists('AN INVALID FORMAT', TokenFormatter::FORMATS));
-
-        $this->assertFalse($this->formatter->isValidFormat('AN INVALID FORMAT'));
-    }
-
-    // @todo test InvalidCustomObjectFormatListException
 }

@@ -2,6 +2,15 @@
 
 declare(strict_types=1);
 
+/*
+ * @copyright   2020 Mautic Contributors. All rights reserved
+ * @author      Mautic, Inc
+ *
+ * @link        https://mautic.com
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
+
 namespace MauticPlugin\CustomObjectsBundle\Helper;
 
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidCustomObjectFormatListException;
@@ -18,13 +27,13 @@ class TokenFormatter
      * Key = Name of a format
      * Value = Function to perform the formatting
      */
-    public const FORMATS = array(
+    public const FORMATS = [
         self::DEFAULT_FORMAT => 'formatDefault',
         self::OR_LIST_FORMAT => 'formatOrList',
         self::AND_LIST_FORMAT => 'formatAndList',
         self::BULLET_LIST_FORMAT => 'formatBulletList',
-        self::ORDERED_LIST_FORMAT => 'formatOrderedList'
-    );
+        self::ORDERED_LIST_FORMAT => 'formatOrderedList',
+    ];
 
     /**
      * @throws InvalidCustomObjectFormatListException
@@ -57,7 +66,7 @@ class TokenFormatter
         return true;
     }
 
-    public function formatDefault(array $values): string
+    private function formatDefault(array $values): string
     {
         if (0 === count($values)) {
             return '';
@@ -66,22 +75,22 @@ class TokenFormatter
         return implode(', ', $values);
     }
 
-    public function formatOrList(array $values): string
+    private function formatOrList(array $values): string
     {
         return $this->conjunctionList($values, 'or');
     }
 
-    public function formatAndList(array $values): string
+    private function formatAndList(array $values): string
     {
         return $this->conjunctionList($values, 'and');
     }
 
-    public function formatBulletList(array $values): string
+    private function formatBulletList(array $values): string
     {
         return $this->htmlList($values, 'ul');
     }
 
-    public function formatOrderedList(array $values): string
+    private function formatOrderedList(array $values): string
     {
         return $this->htmlList($values, 'ol');
     }

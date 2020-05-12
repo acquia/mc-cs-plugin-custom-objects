@@ -191,12 +191,14 @@ class TokenSubscriber implements EventSubscriberInterface
                             new CustomObjectListFormatEvent($fieldValues, $token->getFormat())
                         );
 
-                        $result = $formatEvent->hasBeenFormatted() ? $formatEvent->getFormattedString() : $this->tokenFormatter->formatDefault($fieldValues);
+                        $result = $formatEvent->hasBeenFormatted() ?
+                            $formatEvent->getFormattedString() :
+                            $this->tokenFormatter->format($fieldValues, TokenFormatter::DEFAULT_FORMAT);
                     } catch (InvalidCustomObjectFormatListException $e) {
-                        $result = $this->tokenFormatter->formatDefault($fieldValues);
+                        $result = $this->tokenFormatter->format($fieldValues, TokenFormatter::DEFAULT_FORMAT);
                     }
                 } else {
-                    $result = $this->tokenFormatter->formatDefault($fieldValues);
+                    $result = $this->tokenFormatter->format($fieldValues, TokenFormatter::DEFAULT_FORMAT);
                 }
             }
 
@@ -274,8 +276,6 @@ class TokenSubscriber implements EventSubscriberInterface
     /**
      * This method searches for the right custom items and the right custom field values.
      * The custom field filters are actually added in the method `onListQuery` above.
-     *
-     * @param EmEmailSendEventil $event
      *
      * @return mixed[]
      */
