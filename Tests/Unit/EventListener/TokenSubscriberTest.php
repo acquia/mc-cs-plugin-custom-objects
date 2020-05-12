@@ -19,12 +19,14 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Event\CampaignEvent;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Event\BuilderEvent;
+use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentBuilder;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
+use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\DTO\Token;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
@@ -42,6 +44,7 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -57,12 +60,24 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private $customItemModel;
 
-    private $eventModel;
-
     /**
      * @var TokenParser
      */
     private $tokenParser;
+
+    private $eventModel;
+
+    private $eventDispatcher;
+
+    /**
+     * @var TokenFormatter|MockObject
+     */
+    private $tokenFormatter;
+
+    /**
+     * @var TokenSubscriber
+     */
+    private $subscriber;
 
     private $builderEvent;
 
@@ -70,29 +85,20 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private $customItemListDbalQueryEvent;
 
-    /**
-     * @var TokenSubscriber
-     */
-    private $subscriber;
-
-    private $eventDispatcher;
-
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->configProvider               = $this->createMock(ConfigProvider::class);
-        $this->queryFilterHelper            = $this->createMock(QueryFilterHelper::class);
-        $this->queryFilterFactory           = $this->createMock(QueryFilterFactory::class);
-        $this->customObjectModel            = $this->createMock(CustomObjectModel::class);
-        $this->customItemModel              = $this->createMock(CustomItemModel::class);
-        $this->eventModel                   = $this->createMock(EventModel::class);
-        $this->tokenParser                  = new TokenParser();
-        $this->builderEvent                 = $this->createMock(BuilderEvent::class);
-        $this->emailSendEvent               = $this->createMock(EmailSendEvent::class);
-        $this->customItemListDbalQueryEvent = $this->createMock(CustomItemListDbalQueryEvent::class);
-        $this->eventDispatcher              = $this->createMock(EventDispatcher::class);
-        $this->subscriber                   = new TokenSubscriber(
+        $this->configProvider     = $this->createMock(ConfigProvider::class);
+        $this->queryFilterHelper  = $this->createMock(QueryFilterHelper::class);
+        $this->queryFilterFactory = $this->createMock(QueryFilterFactory::class);
+        $this->customObjectModel  = $this->createMock(CustomObjectModel::class);
+        $this->customItemModel    = $this->createMock(CustomItemModel::class);
+        $this->tokenParser        = $this->createMock(TokenParser::class);
+        $this->eventModel         = $this->createMock(EventModel::class);
+        $this->eventDispatcher    = $this->createMock(EventDispatcher::class);
+        $this->tokenFormatter     = $this->createMock(TokenFormatter::class);
+        $this->subscriber         = new TokenSubscriber(
             $this->configProvider,
             $this->queryFilterHelper,
             $this->queryFilterFactory,
@@ -101,7 +107,24 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->tokenParser,
             $this->eventModel,
             $this->eventDispatcher,
-            new TokenFormatter()
+            $this->tokenFormatter
+        );
+
+        $this->builderEvent                 = $this->createMock(BuilderEvent::class);
+        $this->emailSendEvent               = $this->createMock(EmailSendEvent::class);
+        $this->customItemListDbalQueryEvent = $this->createMock(CustomItemListDbalQueryEvent::class);
+    }
+
+    public function testGetSubscribedEvents()
+    {
+        $this->assertEquals(
+            [
+                EmailEvents::EMAIL_ON_BUILD                      => ['onBuilderBuild', 0],
+                EmailEvents::EMAIL_ON_SEND                       => ['decodeTokens', 0],
+                EmailEvents::EMAIL_ON_DISPLAY                    => ['decodeTokens', 0],
+                CustomItemEvents::ON_CUSTOM_ITEM_LIST_DBAL_QUERY => ['onListQuery', -1],
+            ],
+            TokenSubscriber::getSubscribedEvents()
         );
     }
 
@@ -136,6 +159,11 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnBuilderBuild(): void
     {
+        $coAlias = 'coAlias';
+        $coName  = 'coName';
+        $cfAlias = 'cfAlias';
+        $cfLabel = 'cfLabel';
+
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
             ->willReturn(true);
@@ -148,31 +176,37 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
         $customObject = $this->createMock(CustomObject::class);
         $customField  = $this->createMock(CustomField::class);
 
-        $this->customObjectModel->expects($this->once())
-            ->method('fetchAllPublishedEntities')
-            ->willReturn([$customObject]);
-
         $customObject->expects($this->once())
             ->method('getCustomFields')
             ->willReturn([$customField]);
 
-        $customObject->method('getAlias')->willReturn('product');
-        $customObject->method('getName')->willReturn('Product');
-        $customField->method('getAlias')->willReturn('sku');
-        $customField->method('getLabel')->willReturn('SKU');
+        $this->customObjectModel->expects($this->once())
+            ->method('fetchAllPublishedEntities')
+            ->willReturn([$customObject]);
 
-        $this->builderEvent->expects($this->exactly(2))
+        // Build data structures for loops
+        $customObject->method('getAlias')->willReturn($coAlias);
+        $customObject->method('getName')->willReturn($coName);
+        $customField->method('getAlias')->willReturn($cfAlias);
+        $customField->method('getLabel')->willReturn($cfLabel);
+
+        $this->tokenParser
+            ->method('buildTokenWithDefaultOptions')
+            ->withConsecutive([$coAlias, 'name'], [$coAlias, $cfAlias])
+            ->willReturnOnConsecutiveCalls('token', 'token1');
+
+        $this->tokenParser
+            ->method('buildTokenLabel')
+            ->withConsecutive([$coName, 'Name'], [$coName, $cfLabel])
+            ->willReturn('tokenLabel', 'tokenLabel1');
+
+        $this->builderEvent
             ->method('addToken')
-            ->withConsecutive(
-                [
-                    '{custom-object=product:name | where=segment-filter | order=latest | limit=1 | default= | format=default}',
-                    'Product: Name',
-                ],
-                [
-                    '{custom-object=product:sku | where=segment-filter | order=latest | limit=1 | default= | format=default}',
-                    'Product: SKU',
-                ]
-            );
+            ->withConsecutive(['token', 'tokenLabel'], ['token1', 'tokenLabel1']);
+
+        $this->builderEvent
+            ->method('addToken')
+            ->withConsecutive(['token', 'tokenLabel'], ['token1', 'tokenLabel1']);
 
         $this->subscriber->onBuilderBuild($this->builderEvent);
     }
@@ -191,85 +225,69 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testDecodeTokensWithNoTokens(): void
     {
-        $html = '<!DOCTYPE html>
-        <html>
-        <head>
-        <title>{subject}</title>
-        </head>
-        <body>
-        Hello, here is the thing:
-        Unicorn
-        Regards
-        </body>
-        </html>
-        ';
-        $email          = new Email();
-        $emailSendEvent = new EmailSendEvent(
-            null,
-            [
-                'subject'          => 'CO segment test',
-                'content'          => $html,
-                'conplainTexttent' => '',
-                'email'            => $email,
-                'lead'             => ['id' => 2345, 'email' => 'john@doe.email'],
-                'source'           => null,
-            ]
-        );
-
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
             ->willReturn(true);
 
-        $this->subscriber->decodeTokens($emailSendEvent);
+        $event = $this->createMock(EmailSendEvent::class);
+        $event->expects($this->once())
+            ->method('getContent')
+            ->willReturn('eventContent');
 
-        $this->assertSame(
-            [],
-            $emailSendEvent->getTokens()
-        );
+        $tokens = $this->createMock(ArrayCollection::class);
+
+        $this->tokenParser->expects($this->once())
+            ->method('findTokens')
+            ->with('eventContent')
+            ->willReturn($tokens);
+
+        $tokens->expects($this->once())
+            ->method('count')
+            ->willReturn(0);
+
+        $tokens->expects($this->never())
+            ->method('map');
+
+        $this->subscriber->decodeTokens($event);
     }
 
     public function testDecodeTokensWithWhenCustomObjectNotFound(): void
     {
-        $html = '<!DOCTYPE html>
-        <html>
-        <head>
-        <title>{subject}</title>
-        </head>
-        <body>
-        Hello, here is the thing:
-        {custom-object=product:sku | where=segment-filter |order=latest|limit=1 | default=No thing} 
-        Regards
-        </body>
-        </html>
-        ';
-        $email          = new Email();
-        $emailSendEvent = new EmailSendEvent(
-            null,
-            [
-                'subject'          => 'CO segment test',
-                'content'          => $html,
-                'conplainTexttent' => '',
-                'email'            => $email,
-                'lead'             => ['id' => 2345, 'email' => 'john@doe.email'],
-                'source'           => null,
-            ]
-        );
+        $coAlias = 'coAlias';
 
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
             ->willReturn(true);
 
+        $event = $this->createMock(EmailSendEvent::class);
+        $event->expects($this->once())
+            ->method('getContent')
+            ->willReturn('eventContent');
+
+        $token = $this->createMock(Token::class);
+        $token->expects($this->once())
+            ->method('getCustomObjectAlias')
+            ->willReturn($coAlias);
+
+        $tokens = new ArrayCollection([$token]);
+
+        $this->tokenParser->expects($this->once())
+            ->method('findTokens')
+            ->with('eventContent')
+            ->willReturn($tokens);
+
         $this->customObjectModel->expects($this->once())
             ->method('fetchEntityByAlias')
-            ->will($this->throwException(new NotFoundException('Custom Object Not Found')));
+            ->with($coAlias)
+            ->willThrowException(new NotFoundException());
 
-        $this->subscriber->decodeTokens($emailSendEvent);
-
-        $this->assertSame([], $emailSendEvent->getTokens());
+        $this->subscriber->decodeTokens($event);
     }
 
     public function testDecodeTokensWithDefaultValueWhenNoCustomItemFound(): void
     {
+        $this->constructWithDependencies();
+
         $html = '<!DOCTYPE html>
         <html>
         <head>
@@ -314,6 +332,8 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testDecodeTokensWithItemName(): void
     {
+        $this->constructWithDependencies();
+
         $html = '<!DOCTYPE html>
         <html>
         <head>
@@ -362,6 +382,8 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testDecodeTokensWithFoundFieldValue(): void
     {
+        $this->constructWithDependencies();
+
         $html = '<!DOCTYPE html>
         <html>
         <head>
@@ -511,6 +533,8 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnListQueryIfNotContactQuery(): void
     {
+        $this->constructWithDependencies();
+
         $tableConfig  = new TableConfig(10, 1, 'CustomItem.dateAdded', 'DESC');
         $tableConfig->addParameter('customObjectId', 123);
         $tableConfig->addParameter('filterEntityType', 'company');
@@ -528,6 +552,8 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnListQueryForSegmentFilterWithSegmentEmail(): void
     {
+        $this->constructWithDependencies();
+
         $segmentBuilder = $this->createMock(SegmentBuilder::class);
         $queryBuilder   = $this->createMock(QueryBuilder::class);
         $token          = $this->tokenParser->findTokens('{custom-object=product:sku | where=segment-filter |order=latest|limit=1 | default=No thing}')->current();
@@ -640,6 +666,8 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnListQueryForSegmentFilterWithCampaignEmailWhenEventDoesNotExist(): void
     {
+        $this->constructWithDependencies();
+
         $queryBuilder  = $this->createMock(QueryBuilder::class);
         $campaignEvent = $this->createMock(CampaignEvent::class);
         $token         = $this->tokenParser->findTokens('{custom-object=product:sku | where=segment-filter |order=latest|limit=1 | default=No thing}')->current();
@@ -679,6 +707,8 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnListQueryForSegmentFilterWithCampaignEmailWhenNoSegmentExists(): void
     {
+        $this->constructWithDependencies();
+
         $queryBuilder  = $this->createMock(QueryBuilder::class);
         $campaignEvent = $this->createMock(CampaignEvent::class);
         $token         = $this->tokenParser->findTokens('{custom-object=product:sku | where=segment-filter |order=latest|limit=1 | default=No thing}')->current();
@@ -721,6 +751,8 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnListQueryForSegmentFilterWithCampaignEmail(): void
     {
+        $this->constructWithDependencies();
+
         $segmentBuilder1 = $this->createMock(SegmentBuilder::class);
         $segmentBuilder2 = $this->createMock(SegmentBuilder::class);
         $queryBuilder    = $this->createMock(QueryBuilder::class);
@@ -868,5 +900,33 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->subscriber->onListQuery($this->customItemListDbalQueryEvent);
+    }
+
+    /**
+     * This keeps badly constructed subscriber to keep non unit test (behavioral) functionality for cases where it is used.
+     *
+     * @todo Rewrite these cases to be unit test cases
+     */
+    private function constructWithDependencies()
+    {
+        $this->configProvider     = $this->createMock(ConfigProvider::class);
+        $this->queryFilterHelper  = $this->createMock(QueryFilterHelper::class);
+        $this->queryFilterFactory = $this->createMock(QueryFilterFactory::class);
+        $this->customObjectModel  = $this->createMock(CustomObjectModel::class);
+        $this->customItemModel    = $this->createMock(CustomItemModel::class);
+        $this->tokenParser        = new TokenParser();
+        $this->eventModel         = $this->createMock(EventModel::class);
+        $this->eventDispatcher    = $this->createMock(EventDispatcher::class);
+        $this->subscriber         = new TokenSubscriber(
+            $this->configProvider,
+            $this->queryFilterHelper,
+            $this->queryFilterFactory,
+            $this->customObjectModel,
+            $this->customItemModel,
+            $this->tokenParser,
+            $this->eventModel,
+            $this->eventDispatcher,
+            new TokenFormatter()
+        );
     }
 }
