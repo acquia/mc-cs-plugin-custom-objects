@@ -19,12 +19,14 @@ use Mautic\CampaignBundle\Entity\Campaign;
 use Mautic\CampaignBundle\Event\CampaignEvent;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Event\BuilderEvent;
+use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentBuilder;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
+use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\DTO\Token;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
@@ -106,6 +108,19 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->customItemListDbalQueryEvent = $this->createMock(CustomItemListDbalQueryEvent::class);
     }
 
+    public function testGetSubscribedEvents()
+    {
+        $this->assertEquals(
+            [
+                EmailEvents::EMAIL_ON_BUILD                      => ['onBuilderBuild', 0],
+                EmailEvents::EMAIL_ON_SEND                       => ['decodeTokens', 0],
+                EmailEvents::EMAIL_ON_DISPLAY                    => ['decodeTokens', 0],
+                CustomItemEvents::ON_CUSTOM_ITEM_LIST_DBAL_QUERY => ['onListQuery', -1],
+            ],
+            TokenSubscriber::getSubscribedEvents()
+        );
+    }
+
     public function testOnBuilderBuildWhenPluginDisabled(): void
     {
         $this->configProvider->expects($this->once())
@@ -148,10 +163,6 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $customObject = $this->createMock(CustomObject::class);
         $customField  = $this->createMock(CustomField::class);
-
-        $this->customObjectModel->expects($this->once())
-            ->method('fetchAllPublishedEntities')
-            ->willReturn([$customObject]);
 
         $customObject->expects($this->once())
             ->method('getCustomFields')
