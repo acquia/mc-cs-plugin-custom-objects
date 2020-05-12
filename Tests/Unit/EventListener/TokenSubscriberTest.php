@@ -94,7 +94,7 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->queryFilterFactory = $this->createMock(QueryFilterFactory::class);
         $this->customObjectModel  = $this->createMock(CustomObjectModel::class);
         $this->customItemModel    = $this->createMock(CustomItemModel::class);
-        $this->tokenParser        = $this->createMock( TokenParser::class);
+        $this->tokenParser        = $this->createMock(TokenParser::class);
         $this->eventModel         = $this->createMock(EventModel::class);
         $this->eventDispatcher    = $this->createMock(EventDispatcher::class);
         $this->tokenFormatter     = $this->createMock(TokenFormatter::class);
@@ -160,7 +160,7 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testOnBuilderBuild(): void
     {
         $coAlias = 'coAlias';
-        $coName = 'coName';
+        $coName  = 'coName';
         $cfAlias = 'cfAlias';
         $cfLabel = 'cfLabel';
 
@@ -279,7 +279,7 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->customObjectModel->expects($this->once())
             ->method('fetchEntityByAlias')
             ->with($coAlias)
-            ->willThrowException(new NotFoundException);
+            ->willThrowException(new NotFoundException());
 
         $this->subscriber->decodeTokens($event);
     }
@@ -904,6 +904,7 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
     /**
      * This keeps badly constructed subscriber to keep non unit test (behavioral) functionality for cases where it is used.
+     *
      * @todo Rewrite these cases to be unit test cases
      */
     private function constructWithDependencies()
