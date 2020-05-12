@@ -32,52 +32,59 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 /**
  *@ApiResource(
  *     collectionOperations={"get", "post"},
- *     itemOperations={
- *          "get"={
- *              "normalization_context"={"groups"={"cheese_listing:read", "cheese_listing:item:get"}},
- *          },
- *          "put"
- *     },
+ *     itemOperations={"get", "put", "delete"},
  *     shortName="custom_objects",
- *     normalizationContext={"groups"={"cheese_listing:read"}, "swagger_definition_name"="Read"},
- *     denormalizationContext={"groups"={"cheese_listing:write"}, "swagger_definition_name"="Write"},
+ *     normalizationContext={"groups"={"custom_object:read"}, "swagger_definition_name"="Read"},
+ *     denormalizationContext={"groups"={"custom_object:write"}, "swagger_definition_name"="Write"},
  *     attributes={
  *          "pagination_items_per_page"=10,
  *          "formats"={"jsonld", "json", "html", "csv"={"text/csv"}}
  *     }
  * )
+ * @ORM\Entity(repositoryClass="MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository")
  */
 class CustomObject extends FormEntity implements UniqueEntityInterface
 {
     const TABLE_NAME  = 'custom_object';
     const TABLE_ALIAS = 'CustomObject';
 
+    /**
+     * @var int
+     */
     private $id;
 
+    /**
+     * @Groups({"custom_object:read", "custom_object:write"})
+     * @var string|null
+     */
     private $alias;
 
     /**
-     * @Groups({"cheese_listing:read"})
-     * @var string|null
+     * @Groups({"custom_object:read", "custom_object:write"})
+     * @var string
      */
     private $nameSingular;
 
     /**
+     * @Groups({"custom_object:read", "custom_object:write"})
      * @var string|null
      */
     private $namePlural;
 
     /**
+     * @Groups({"custom_object:read", "custom_object:write"})
      * @var string|null
      */
     private $description;
 
     /**
+     * @Groups({"custom_object:read", "custom_object:write"})
      * @var string|null
      */
     private $language;
 
     /**
+     * @Groups({"custom_object:read", "custom_object:write"})
      * @var Category|null
      **/
     private $category;
