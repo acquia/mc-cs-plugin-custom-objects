@@ -44,6 +44,7 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -69,6 +70,11 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
     private $eventDispatcher;
 
     /**
+     * @var TokenFormatter|MockObject
+     */
+    private $tokenFormatter;
+
+    /**
      * @var TokenSubscriber
      */
     private $subscriber;
@@ -91,6 +97,7 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->tokenParser        = $this->createMock( TokenParser::class);
         $this->eventModel         = $this->createMock(EventModel::class);
         $this->eventDispatcher    = $this->createMock(EventDispatcher::class);
+        $this->tokenFormatter     = $this->createMock(TokenFormatter::class);
         $this->subscriber         = new TokenSubscriber(
             $this->configProvider,
             $this->queryFilterHelper,
@@ -100,7 +107,7 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->tokenParser,
             $this->eventModel,
             $this->eventDispatcher,
-            new TokenFormatter()
+            $this->tokenFormatter
         );
 
         $this->builderEvent                 = $this->createMock(BuilderEvent::class);
@@ -897,7 +904,7 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
     /**
      * This keeps badly constructed subscriber to keep non unit test (behavioral) functionality for cases where it is used.
-     * @todo Rewrite these cases
+     * @todo Rewrite these cases to be unit test cases
      */
     private function constructWithDependencies()
     {
