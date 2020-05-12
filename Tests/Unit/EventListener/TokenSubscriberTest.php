@@ -218,41 +218,30 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testDecodeTokensWithNoTokens(): void
     {
-        $html = '<!DOCTYPE html>
-        <html>
-        <head>
-        <title>{subject}</title>
-        </head>
-        <body>
-        Hello, here is the thing:
-        Unicorn
-        Regards
-        </body>
-        </html>
-        ';
-        $email          = new Email();
-        $emailSendEvent = new EmailSendEvent(
-            null,
-            [
-                'subject'          => 'CO segment test',
-                'content'          => $html,
-                'conplainTexttent' => '',
-                'email'            => $email,
-                'lead'             => ['id' => 2345, 'email' => 'john@doe.email'],
-                'source'           => null,
-            ]
-        );
-
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
             ->willReturn(true);
 
-        $this->subscriber->decodeTokens($emailSendEvent);
+        $event = $this->createMock(EmailSendEvent::class);
+        $event->expects($this->once())
+            ->method('getContent')
+            ->willReturn('eventContent');
 
-        $this->assertSame(
-            [],
-            $emailSendEvent->getTokens()
-        );
+        $tokens = $this->createMock(ArrayCollection::class);
+
+        $this->tokenParser->expects($this->once())
+            ->method('findTokens')
+            ->with('eventContent')
+            ->willReturn($tokens);
+
+        $tokens->expects($this->once())
+            ->method('count')
+            ->willReturn(0);
+
+        $tokens->expects($this->never())
+            ->method('map');
+
+        $this->subscriber->decodeTokens($event);
     }
 
     public function testDecodeTokensWithWhenCustomObjectNotFound(): void
