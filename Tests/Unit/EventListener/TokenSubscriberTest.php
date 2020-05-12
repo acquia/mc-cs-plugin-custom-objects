@@ -246,42 +246,35 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testDecodeTokensWithWhenCustomObjectNotFound(): void
     {
-        $html = '<!DOCTYPE html>
-        <html>
-        <head>
-        <title>{subject}</title>
-        </head>
-        <body>
-        Hello, here is the thing:
-        {custom-object=product:sku | where=segment-filter |order=latest|limit=1 | default=No thing} 
-        Regards
-        </body>
-        </html>
-        ';
-        $email          = new Email();
-        $emailSendEvent = new EmailSendEvent(
-            null,
-            [
-                'subject'          => 'CO segment test',
-                'content'          => $html,
-                'conplainTexttent' => '',
-                'email'            => $email,
-                'lead'             => ['id' => 2345, 'email' => 'john@doe.email'],
-                'source'           => null,
-            ]
-        );
+        $coAlias = 'coAlias';
 
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
             ->willReturn(true);
 
+        $event = $this->createMock(EmailSendEvent::class);
+        $event->expects($this->once())
+            ->method('getContent')
+            ->willReturn('eventContent');
+
+        $token = $this->createMock(Token::class);
+        $token->expects($this->once())
+            ->method('getCustomObjectAlias')
+            ->willReturn($coAlias);
+
+        $tokens = new ArrayCollection([$token]);
+
+        $this->tokenParser->expects($this->once())
+            ->method('findTokens')
+            ->with('eventContent')
+            ->willReturn($tokens);
+
         $this->customObjectModel->expects($this->once())
             ->method('fetchEntityByAlias')
-            ->will($this->throwException(new NotFoundException('Custom Object Not Found')));
+            ->with($coAlias)
+            ->willThrowException(new NotFoundException);
 
-        $this->subscriber->decodeTokens($emailSendEvent);
-
-        $this->assertSame([], $emailSendEvent->getTokens());
+        $this->subscriber->decodeTokens($event);
     }
 
     public function testDecodeTokensWithDefaultValueWhenNoCustomItemFound(): void
