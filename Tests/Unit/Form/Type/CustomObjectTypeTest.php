@@ -95,10 +95,13 @@ class CustomObjectTypeTest extends TestCase
 
     private function buildForm(bool $isNewObject, string $coNameSingular, string $coAlias, string $action)
     {
-        $customObject = new CustomObject();
-        $customObject->setNew($isNewObject);
-        $customObject->setNameSingular($coNameSingular);
-        $customObject->setAlias($coAlias);
+        $customObject = $this->createMock(CustomObject::class);
+        $customObject->method('isNew')
+            ->willReturn($isNewObject);
+        $customObject->method('getNameSingular')
+            ->willReturn($coNameSingular);
+        $customObject->method('getAlias')
+            ->willReturn($coAlias);
 
         $options = [
             'data'   => $customObject,
