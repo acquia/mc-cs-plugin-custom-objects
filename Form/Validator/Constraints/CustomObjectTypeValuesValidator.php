@@ -11,8 +11,7 @@ use Symfony\Component\Validator\ConstraintValidator;
 class CustomObjectTypeValuesValidator extends ConstraintValidator
 {
     /**
-     * @param CustomObject      $customObject
-     * @param CustomObjectTypeValues $constraint
+     * @param CustomObject $customObject
      */
     public function validate($customObject, Constraint $constraint)
     {
