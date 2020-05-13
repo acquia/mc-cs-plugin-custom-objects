@@ -155,6 +155,4 @@ class CustomObjectTest extends \PHPUnit\Framework\TestCase
 
         $object->getCustomFieldByOrder(3);
     }
-
-
 }
