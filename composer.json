@@ -4,7 +4,7 @@
     "type": "mautic-plugin",
     "version": "1.0-dev",
     "config": {
-        "process-timeout": 2000
+        "process-timeout": 6000
     },
     "keywords": [
         "custom",
