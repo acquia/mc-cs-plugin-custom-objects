@@ -66,6 +66,10 @@ class TokenParser
                 if ('default' === $keyword) {
                     $token->setDefaultValue($value);
                 }
+
+                if ('format' === $keyword) {
+                    $token->setFormat($value);
+                }
             }
 
             $tokens->set($token->getToken(), $token);
@@ -76,7 +80,7 @@ class TokenParser
 
     public function buildTokenWithDefaultOptions(string $customObjectAlias, string $customFieldAlias): string
     {
-        return "{custom-object={$customObjectAlias}:{$customFieldAlias} | where=segment-filter | order=latest | limit=1 | default=}";
+        return "{custom-object={$customObjectAlias}:{$customFieldAlias} | where=segment-filter | order=latest | limit=1 | default= | format=default}";
     }
 
     public function buildTokenLabel(string $customObjectName, string $customFieldLabel): string
@@ -113,8 +117,11 @@ class TokenParser
      */
     private function trimArrayElements(array $array): array
     {
-        return array_map(function ($part) {
-            return trim($part);
-        }, $array);
+        return array_map(
+            function ($part) {
+                return trim($part);
+            },
+            $array
+        );
     }
 }
