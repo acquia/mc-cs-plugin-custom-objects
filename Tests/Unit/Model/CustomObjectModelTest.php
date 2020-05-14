@@ -636,4 +636,31 @@ class CustomObjectModelTest extends \PHPUnit\Framework\TestCase
 
         $this->customObjectModel->removeCustomFieldById($this->customObject, 1);
     }
+
+    public function testGetMasterCustomObjects()
+    {
+        $customObject1 = new CustomObject();
+        $customObject1->setType(CustomObject::TYPE_MASTER);
+        $customObject1->setAlias('master');
+
+        $customObject2 = new CustomObject();
+        $customObject2->setType(CustomObject::TYPE_RELATIONSHIP);
+        $customObject2->setAlias('relationship');
+
+        // Leave type = null
+        $customObject3 = new CustomObject();
+        $customObject3->setAlias('null');
+
+        $customObjects = [
+            $customObject1, $customObject2, $customObject3,
+        ];
+
+        $this->customObjectRepository->method('getEntities')->willReturn($customObjects);
+
+        $masterObjects = $this->customObjectModel->getMasterCustomObjects();
+
+        $this->assertEquals(2, count($masterObjects));
+        $this->assertEquals($masterObjects[0]->getAlias(), 'master');
+        $this->assertEquals($masterObjects[2]->getAlias(), 'null');
+    }
 }

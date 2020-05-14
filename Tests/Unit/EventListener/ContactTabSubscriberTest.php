@@ -75,16 +75,24 @@ class ContactTabSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testForTabsContext(): void
     {
-        $customObject = $this->createMock(CustomObject::class);
         $contact      = $this->createMock(Lead::class);
+        $customObject1 = $this->createMock(CustomObject::class);
 
-        $customObject->expects($this->once())
+        $customObject1->expects($this->once())
             ->method('getId')
             ->willReturn(555);
 
-        $customObject->expects($this->once())
+        $customObject1->expects($this->once())
             ->method('getNamePlural')
             ->willReturn('Object A');
+
+        $customObject1->expects($this->any())
+            ->method('getType')
+            ->willReturn(CustomObject::TYPE_MASTER);
+
+        // Custom objects of type RELATIONSHIP should not get a tab
+        $customObject2 = $this->createMock(CustomObject::class);
+        $customObject2->method('getType')->willReturn(CustomObject::TYPE_RELATIONSHIP);
 
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
@@ -116,12 +124,12 @@ class ContactTabSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn(false);
 
         $this->customObjectModel->expects($this->once())
-            ->method('fetchAllPublishedEntities')
-            ->willReturn([$customObject]);
+            ->method('getMasterCustomObjects')
+            ->willReturn([$customObject1]);
 
         $this->customItemRepository->expects($this->once())
             ->method('countItemsLinkedToContact')
-            ->with($customObject, $contact)
+            ->with($customObject1, $contact)
             ->willReturn(13);
 
         $this->tabSubscriber->injectTabs($this->customContentEvent);

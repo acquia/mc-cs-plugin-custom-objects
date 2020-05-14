@@ -105,7 +105,7 @@ class CustomItemTabSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn(false);
 
         $this->customObjectModel->expects($this->once())
-            ->method('fetchAllPublishedEntities')
+            ->method('getMasterCustomObjects')
             ->willReturn([$this->customObject]);
 
         $this->customItemRepository->expects($this->once())
@@ -147,7 +147,7 @@ class CustomItemTabSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn(false);
 
         $this->customObjectModel->expects($this->once())
-            ->method('fetchAllPublishedEntities')
+            ->method('getMasterCustomObjects')
             ->willReturn([$this->customObject]);
 
         $this->customItemRepository->expects($this->never())

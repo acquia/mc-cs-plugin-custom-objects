@@ -46,10 +46,17 @@ $view['slots']->set('headerTitle', $header);
                 <div class="tab-content pa-md">
                     <div class="tab-pane fade in active bdr-w-0" id="details-container">
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <?php echo $view['form']->row($form['nameSingular']); ?>
                                 <?php echo $view['form']->row($form['namePlural']); ?>
+
+                            </div>
+                            <div class="col-md-6">
                                 <?php echo $view['form']->row($form['alias']); ?>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
                                 <?php echo $view['form']->row($form['description']); ?>
                             </div>
                         </div>
@@ -102,6 +109,9 @@ $view['slots']->set('headerTitle', $header);
 
     <div class="col-md-3 bg-white height-auto">
         <div class="pr-lg pl-lg pt-md pb-md">
+            <?php echo $view['form']->row($form['type']); ?>
+            <?php echo $view['form']->row($form['relationship']); ?>
+            <?php echo $view['form']->row($form['masterObject']); ?>
             <?php echo $view['form']->row($form['category']); ?>
             <?php echo $view['form']->row($form['isPublished']); ?>
         </div>

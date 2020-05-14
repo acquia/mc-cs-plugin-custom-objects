@@ -86,7 +86,7 @@ class MenuSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn('main');
 
         $this->customObjectModel->expects($this->once())
-            ->method('fetchAllPublishedEntities')
+            ->method('getMasterCustomObjects')
             ->willReturn([]);
 
         $this->menuEvent->expects($this->never())
@@ -97,9 +97,16 @@ class MenuSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testSomeCustomObjects(): void
     {
-        $customObject = $this->createMock(CustomObject::class);
-        $customObject->method('getName')->willReturn('Test Object');
-        $customObject->method('getId')->willReturn(333);
+        $customObject1 = $this->createMock(CustomObject::class);
+        $customObject1->method('getName')->willReturn('Test Object 1');
+        $customObject1->method('getId')->willReturn(333);
+        $customObject1->method('getType')->willReturn(CustomObject::TYPE_MASTER);
+
+        // Custom Objects of type 'Relationship' should not appear in the menu
+        $customObject2 = $this->createMock(CustomObject::class);
+        $customObject2->method('getName')->willReturn('Test Object 2');
+        $customObject2->method('getId')->willReturn(123);
+        $customObject2->method('getType')->willReturn(CustomObject::TYPE_RELATIONSHIP);
 
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
@@ -110,8 +117,8 @@ class MenuSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn('main');
 
         $this->customObjectModel->expects($this->once())
-            ->method('fetchAllPublishedEntities')
-            ->willReturn([$customObject]);
+            ->method('getMasterCustomObjects')
+            ->willReturn([$customObject1, $customObject2]);
 
         $this->menuEvent->expects($this->at(0))
             ->method('addMenuItems')

@@ -76,7 +76,7 @@ class CustomItemTabSubscriber implements EventSubscriberInterface
     {
         if ($event->checkContext('CustomObjectsBundle:CustomItem:detail.html.php', 'tabs')) {
             $vars    = $event->getVars();
-            $objects = $this->getCustomObjects();
+            $objects = $this->customObjectModel->getMasterCustomObjects();
 
             /** @var CustomItem $item */
             $item = $vars['item'];

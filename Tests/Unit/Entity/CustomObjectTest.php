@@ -61,12 +61,19 @@ class CustomObjectTest extends \PHPUnit\Framework\TestCase
         $fields   = new ArrayCollection();
 
         $object->setCategory($category);
-        $object->setLanguage('sk');
-        $object->setCustomFields($fields);
-
         $this->assertSame($category, $object->getCategory());
+        $object->setLanguage('sk');
         $this->assertSame('sk', $object->getLanguage());
+        $object->setCustomFields($fields);
         $this->assertSame($fields, $object->getCustomFields());
+        $object->setType(1);
+        $this->assertSame(1, $object->getType());
+        $object->setRelationship(2);
+        $this->assertSame(2, $object->getRelationship(2));
+
+        $co = $this->createMock(CustomObject::class);
+        $object->setMasterObject($co);
+        $this->assertSame($co, $object->getMasterObject());
     }
 
     public function testCustomFieldChanges(): void

@@ -23,6 +23,7 @@ use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Form\Validator\Constraints\CustomObjectTypeValues;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -31,6 +32,14 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
 {
     const TABLE_NAME  = 'custom_object';
     const TABLE_ALIAS = 'CustomObject';
+
+    // Object type constants for $type field
+    const TYPE_MASTER = 0;
+    const TYPE_RELATIONSHIP = 1;
+
+    // Relationship type constants for $relationship field
+    const RELATIONSHIP_MANY_TO_MANY = 0;
+    const RELATIONSHIP_ONE_TO_ONE = 1;
 
     /**
      * @var int|null
@@ -73,6 +82,21 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     private $customFields;
 
     /**
+     * @var integer|null
+     */
+    private $type = self::TYPE_MASTER;
+
+    /**
+     * @var integer|null
+     */
+    private $relationship;
+
+    /**
+     * @var CustomObject|null
+     */
+    private $masterObject;
+
+    /**
      * @var mixed[]
      */
     private $initialCustomFields = [];
@@ -112,6 +136,12 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         $builder->addNamedField('namePlural', Type::STRING, 'name_plural');
         $builder->addNullableField('description', Type::STRING, 'description');
         $builder->addNullableField('language', Type::STRING, 'lang');
+        $builder->addNullableField('type', Type::INTEGER);
+        $builder->addNullableField('relationship', Type::INTEGER, 'relationship');
+
+        $builder->createOneToOne('masterObject', CustomObject::class)
+            ->addJoinColumn('master_object', 'id')
+            ->build();
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -122,6 +152,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         $metadata->addPropertyConstraint('namePlural', new Assert\NotBlank());
         $metadata->addPropertyConstraint('namePlural', new Assert\Length(['max' => 255]));
         $metadata->addPropertyConstraint('description', new Assert\Length(['max' => 255]));
+        $metadata->addConstraint(new CustomObjectTypeValues());
     }
 
     /**
@@ -157,6 +188,36 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     public function getAlias()
     {
         return $this->alias;
+    }
+
+    public function getType(): ?int
+    {
+        return $this->type;
+    }
+
+    public function setType(int $type): void
+    {
+        $this->type = $type;
+    }
+
+    public function getRelationship(): ?int
+    {
+        return $this->relationship;
+    }
+
+    public function setRelationship(?int $relationship): void
+    {
+        $this->relationship = $relationship;
+    }
+
+    public function getMasterObject(): ?CustomObject
+    {
+        return $this->masterObject;
+    }
+
+    public function setMasterObject(?CustomObject $customObject): void
+    {
+        $this->masterObject = $customObject;
     }
 
     /**
