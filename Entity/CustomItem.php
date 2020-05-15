@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\Groups;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
@@ -26,6 +28,20 @@ use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+/**
+ *@ApiResource(
+ *     collectionOperations={"get", "post"},
+ *     itemOperations={"get", "put", "patch", "delete"},
+ *     shortName="custom_items",
+ *     normalizationContext={"groups"={"custom_item:read"}, "swagger_definition_name"="Read"},
+ *     denormalizationContext={"groups"={"custom_item:write"}, "swagger_definition_name"="Write"},
+ *     attributes={
+ *          "pagination_items_per_page"=10,
+ *          "formats"={"jsonld", "json", "html", "csv"={"text/csv"}}
+ *     }
+ * )
+ * @ORM\Entity(repositoryClass="MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository")
+ */
 class CustomItem extends FormEntity implements UniqueEntityInterface
 {
     public const TABLE_NAME  = 'custom_item';
@@ -38,46 +54,55 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var string|null
+     * @Groups({"custom_item:read", "custom_item:write"})
      */
     private $name;
 
     /**
      * @var CustomObject
+     * @Groups({"custom_item:read", "custom_item:write"})
      */
     private $customObject;
 
     /**
      * @var string|null
+     * @Groups({"custom_item:read", "custom_item:write"})
      */
     private $language;
 
     /**
      * @var Category|null
+     * @Groups({"custom_item:read", "custom_item:write"})
      **/
     private $category;
 
     /**
      * @var ArrayCollection
+     * @Groups({"custom_item:read", "custom_item:write"})
      */
     private $customFieldValues;
 
     /**
      * @var mixed[]
+     * @Groups({"custom_item:read", "custom_item:write"})
      */
     private $initialCustomFieldValues = [];
 
     /**
      * @var ArrayCollection
+     * @Groups({"custom_item:read", "custom_item:write"})
      */
     private $contactReferences;
 
     /**
      * @var ArrayCollection
+     * @Groups({"custom_item:read", "custom_item:write"})
      */
     private $companyReferences;
 
     /**
      * @var ArrayCollection
+     * @Groups({"custom_item:read", "custom_item:write"})
      */
     private $customItemReferences;
 

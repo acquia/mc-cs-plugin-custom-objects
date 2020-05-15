@@ -13,12 +13,21 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+/**
+ *@ApiResource(
+ *     collectionOperations={},
+ *     itemOperations={},
+ *     shortName="custom_field_options",
+ * )
+ */
 class CustomFieldOption implements \ArrayAccess
 {
     /**
@@ -28,16 +37,19 @@ class CustomFieldOption implements \ArrayAccess
 
     /**
      * @var string|null
+     * @Groups({"custom_object:read", "custom_object:write", "custom_field:read", "custom_field:write"})
      */
     private $label;
 
     /**
      * @var string|null
+     * @Groups({"custom_object:read", "custom_object:write", "custom_field:read", "custom_field:write"})
      */
     private $value;
 
     /**
      * @var int|null
+     * @Groups({"custom_object:read", "custom_object:write", "custom_field:read", "custom_field:write"})
      */
     private $order;
 

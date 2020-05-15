@@ -13,10 +13,13 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\ManyToOne;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
@@ -28,71 +31,102 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Nelmio\ApiDocBundle\Annotation\Model;
-use Swagger\Annotations as SWG;
 
+/**
+ *@ApiResource(
+ *     collectionOperations={"get", "post"},
+ *     itemOperations={"get", "put", "patch", "delete"},
+ *     shortName="custom_fields",
+ *     normalizationContext={"groups"={"custom_field:read"}, "swagger_definition_name"="Read"},
+ *     denormalizationContext={"groups"={"custom_field:write"}, "swagger_definition_name"="Write"},
+ *     attributes={
+ *          "pagination_items_per_page"=10,
+ *          "formats"={"jsonld", "json", "html", "csv"={"text/csv"}}
+ *     }
+ * )
+ * @ORM\Entity(repositoryClass="MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository")
+ */
 class CustomField extends FormEntity implements UniqueEntityInterface
 {
     public const TABLE_NAME  = 'custom_field';
     public const TABLE_ALIAS = 'CustomField';
 
     /**
-     * @var int|null
-     * @SWG\Property(description="The unique identifier of the user.")
+     * @var int
      */
     private $id;
 
     /**
      * @var string|null
-     * @SWG\Property(type="string", maxLength=255)
+     * @Groups({"custom_object:read", "custom_object:write", "custom_field:read", "custom_field:write"})
      */
     private $label;
 
     /**
      * @var string|null
+     * @Groups({"custom_object:read", "custom_object:write", "custom_field:read", "custom_field:write"})
      */
     private $alias;
 
     /**
      * @var string|null
+     * @Groups({"custom_object:read", "custom_object:write", "custom_field:read", "custom_field:write"})
+     * @ApiProperty(
+     *     attributes={
+     *         "openapi_context"={
+     *             "type"="string",
+     *             "maxLength"=255
+     *         }
+     *     }
+     * )
      */
     private $type;
 
     /**
      * @var CustomFieldTypeInterface|null
+     * @Groups({"custom_object:read", "custom_object:write", "custom_field:read", "custom_field:write"})
      */
     private $typeObject;
 
     /**
      * @var CustomObject|null
+     * @ManyToOne(targetEntity="CustomObject")
+     * @Groups({"custom_field:read", "custom_field:write"})
+     *
      */
     private $customObject;
 
     /**
      * @var int|null
+     * @Groups({"custom_object:read", "custom_object:write", "custom_field:read", "custom_field:write"})
      */
     private $order;
 
     /**
      * @var bool
+     * @Groups({"custom_object:read", "custom_object:write", "custom_field:read", "custom_field:write"})
      */
     private $required = false;
 
     /**
      * @var mixed
+     * @Groups({"custom_object:read", "custom_object:write", "custom_field:read", "custom_field:write"})
      */
     private $defaultValue;
 
     /**
      * @var Collection|CustomFieldOption[]
+     * @Groups({"custom_object:read", "custom_object:write", "custom_field:read", "custom_field:write"})
      */
     private $options;
 
     /**
      * @var Params|string[]
+     * @Groups({"custom_object:read", "custom_object:write", "custom_field:read", "custom_field:write"})
      */
     private $params;
 

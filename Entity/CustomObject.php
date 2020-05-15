@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -32,7 +33,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 /**
  *@ApiResource(
  *     collectionOperations={"get", "post"},
- *     itemOperations={"get", "put", "delete"},
+ *     itemOperations={"get", "put", "patch", "delete"},
  *     shortName="custom_objects",
  *     normalizationContext={"groups"={"custom_object:read"}, "swagger_definition_name"="Read"},
  *     denormalizationContext={"groups"={"custom_object:write"}, "swagger_definition_name"="Write"},
@@ -86,10 +87,12 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @Groups({"custom_object:read", "custom_object:write"})
      * @var Category|null
+     * @Assert\Valid
      **/
     private $category;
 
     /**
+     * @Groups({"custom_object:read", "custom_object:write"})
      * @var ArrayCollection
      */
     private $customFields;
