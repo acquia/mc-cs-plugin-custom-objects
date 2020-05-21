@@ -58,6 +58,11 @@ return [
                 'controller' => 'CustomObjectsBundle:CustomItem\Form:new',
                 'method'     => 'GET',
             ],
+            CustomItemRouteProvider::ROUTE_NEW_REDIRECT_TO_CONTACT => [
+                'path'       => '/custom/object/{objectId}/item/contact/{contactId}/new',
+                'controller' => 'CustomObjectsBundle:CustomItem\Form:newWithRedirectToContact',
+                'method'     => 'GET',
+            ],
             CustomItemRouteProvider::ROUTE_EDIT => [
                 'path'       => '/custom/object/{objectId}/item/edit/{itemId}',
                 'controller' => 'CustomObjectsBundle:CustomItem\Form:edit',
