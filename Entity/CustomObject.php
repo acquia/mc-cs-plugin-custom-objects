@@ -32,8 +32,16 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  *@ApiResource(
- *     collectionOperations={"get", "post"},
- *     itemOperations={"get", "put", "patch", "delete"},
+ *     collectionOperations={
+ *          "get"={"security"="'custom_objects:custom_objects:viewother'"},
+ *          "post"={"security"="'custom_objects:custom_objects:create'"}
+ *     },
+ *     itemOperations={
+ *          "get"={"security"="'custom_objects:custom_objects:view'"},
+ *          "put"={"security"="'custom_objects:custom_objects:edit'"},
+ *          "patch"={"security"="'custom_objects:custom_objects:edit'"},
+ *          "delete"={"security"="'custom_objects:custom_objects:delete'"}
+ *     },
  *     shortName="custom_objects",
  *     normalizationContext={"groups"={"custom_object:read"}, "swagger_definition_name"="Read"},
  *     denormalizationContext={"groups"={"custom_object:write"}, "swagger_definition_name"="Write"},
@@ -366,5 +374,9 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         foreach ($deletedFields as $deletedField) {
             $this->addChange("customfield:{$deletedField['id']}", [null, 'deleted']);
         }
+    }
+
+    public function getAccess(){
+        return true;
     }
 }
