@@ -59,7 +59,7 @@ return [
                 'method'     => 'GET',
             ],
             CustomItemRouteProvider::ROUTE_NEW_REDIRECT_TO_CONTACT => [
-                'path'       => '/custom/object/{objectId}/item/contact/{contactId}/new',
+                'path'       => '/custom/object/{objectId}/contact/{contactId}/item/new',
                 'controller' => 'CustomObjectsBundle:CustomItem\Form:newWithRedirectToContact',
                 'method'     => 'GET',
             ],
