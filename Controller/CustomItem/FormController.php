@@ -98,7 +98,7 @@ class FormController extends AbstractFormController
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        return $this->renderFormForItem($customItem, $customObject, $this->routeProvider->buildNewRoute($objectId), $contactId);
+        return $this->renderFormForItem($customItem, $customObject, $this->routeProvider->buildNewRouteWithRedirectToContact($objectId, $contactId), $contactId);
     }
 
     public function editAction(int $objectId, int $itemId): Response
@@ -166,7 +166,6 @@ class FormController extends AbstractFormController
                 'passthroughVars' => [
                     'mauticContent' => 'customItem',
                     'route'         => $route,
-                    'contactId'     => $contactId
                 ],
             ]
         );
