@@ -152,7 +152,6 @@ class FormController extends AbstractFormController
             'action' => $action,
             'objectId' => $customObject->getId(),
         ];
-
         $form   = $this->formFactory->create(
             CustomItemType::class,
             $customItem,
