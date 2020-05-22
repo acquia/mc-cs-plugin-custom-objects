@@ -148,11 +148,18 @@ class FormController extends AbstractFormController
     private function renderFormForItem(CustomItem $customItem, CustomObject $customObject, string $route, ?int $contactId = null): Response
     {
         $action = $this->routeProvider->buildSaveRoute($customObject->getId(), $customItem->getId());
+        $options = [
+            'action' => $action,
+            'objectId' => $customObject->getId(),
+        ];
+
         $form   = $this->formFactory->create(
             CustomItemType::class,
             $customItem,
-            ['action' => $action, 'objectId' => $customObject->getId()]
+            $options
         );
+
+        $form->get('contact_id')->setData($contactId);
 
         return $this->delegateView(
             [
