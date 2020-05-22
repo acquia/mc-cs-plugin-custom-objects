@@ -158,7 +158,9 @@ class FormController extends AbstractFormController
             $options
         );
 
-        $form->get('contact_id')->setData($contactId);
+        if (0 < $contactId) {
+            $form->get('contact_id')->setData($contactId);
+        }
 
         return $this->delegateView(
             [
