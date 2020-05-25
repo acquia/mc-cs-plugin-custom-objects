@@ -146,7 +146,9 @@ class SaveController extends AbstractFormController
 
             if (0 < $contactId) {
                 $this->customItemModel->linkEntity($customItem, 'contact', $contactId);
-                return $this->redirectToRoute('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $contactId]);
+                if ($saveClicked) {
+                    return $this->redirectToRoute('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $contactId]);
+                }
             }
 
             $request->setMethod(Request::METHOD_GET);

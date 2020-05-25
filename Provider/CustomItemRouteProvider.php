@@ -107,6 +107,11 @@ class CustomItemRouteProvider
         return $this->router->generate(static::ROUTE_DELETE, ['objectId' => $objectId, 'itemId' => $itemId]);
     }
 
+    public function buildContactViewRoute(int $contactId): string
+    {
+        return $this->router->generate('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $contactId]);
+    }
+
     /**
      * @param ?string $entityType
      * @param ?int    $entityId

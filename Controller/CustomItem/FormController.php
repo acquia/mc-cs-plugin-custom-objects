@@ -151,16 +151,15 @@ class FormController extends AbstractFormController
         $options = [
             'action' => $action,
             'objectId' => $customObject->getId(),
+            'contactId' => $contactId,
+            'cancelUrl' => 0 < $contactId ? $this->routeProvider->buildContactViewRoute($contactId) : null,
         ];
-        $form   = $this->formFactory->create(
+
+        $form = $this->formFactory->create(
             CustomItemType::class,
             $customItem,
             $options
         );
-
-        if (0 < $contactId) {
-            $form->get('contact_id')->setData($contactId);
-        }
 
         return $this->delegateView(
             [
