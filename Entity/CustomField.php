@@ -38,8 +38,16 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  *@ApiResource(
- *     collectionOperations={"get", "post"},
- *     itemOperations={"get", "put", "patch", "delete"},
+ *     collectionOperations={
+ *          "get"={"security"="'custom_objects:custom_fields:viewother'"},
+ *          "post"={"security"="'custom_objects:custom_fields:create'"}
+ *     },
+ *     itemOperations={
+ *          "get"={"security"="'custom_objects:custom_fields:view'"},
+ *          "put"={"security"="'custom_objects:custom_fields:edit'"},
+ *          "patch"={"security"="'custom_objects:custom_fields:edit'"},
+ *          "delete"={"security"="'custom_objects:custom_fields:delete'"}
+ *     },
  *     shortName="custom_fields",
  *     normalizationContext={"groups"={"custom_field:read"}, "swagger_definition_name"="Read"},
  *     denormalizationContext={"groups"={"custom_field:write"}, "swagger_definition_name"="Write"},
@@ -63,12 +71,32 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @var string|null
      * @Groups({"custom_object:read", "custom_object:write", "custom_field:read", "custom_field:write"})
+     * @ApiProperty(
+     *     attributes={
+     *         "openapi_context"={
+     *             "type"="string",
+     *             "maxLength"=255,
+     *             "nullable"=false,
+     *             "example"="City"
+     *         }
+     *     }
+     * )
      */
     private $label;
 
     /**
      * @var string|null
      * @Groups({"custom_object:read", "custom_object:write", "custom_field:read", "custom_field:write"})
+     * @ApiProperty(
+     *     attributes={
+     *         "openapi_context"={
+     *             "type"="string",
+     *             "maxLength"=255,
+     *             "nullable"=false,
+     *             "example"="city"
+     *         }
+     *     }
+     * )
      */
     private $alias;
 
@@ -79,7 +107,9 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      *     attributes={
      *         "openapi_context"={
      *             "type"="string",
-     *             "maxLength"=255
+     *             "maxLength"=255,
+     *             "nullable"=false,
+     *             "example"="text"
      *         }
      *     }
      * )
@@ -88,7 +118,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var CustomFieldTypeInterface|null
-     * @Groups({"custom_object:read", "custom_object:write", "custom_field:read", "custom_field:write"})
+     * @Groups({"custom_object:read", "custom_field:read"})
      */
     private $typeObject;
 
@@ -103,6 +133,15 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @var int|null
      * @Groups({"custom_object:read", "custom_object:write", "custom_field:read", "custom_field:write"})
+     * @ApiProperty(
+     *     attributes={
+     *         "openapi_context"={
+     *             "type"="integer",
+     *             "nullable"=true,
+     *             "example"=42
+     *         }
+     *     }
+     * )
      */
     private $order;
 
@@ -120,7 +159,6 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var Collection|CustomFieldOption[]
-     * @Groups({"custom_object:read", "custom_object:write", "custom_field:read", "custom_field:write"})
      */
     private $options;
 

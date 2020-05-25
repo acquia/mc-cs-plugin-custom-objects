@@ -13,12 +13,15 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\ManyToOne;
 use JMS\Serializer\Annotation\Groups;
+use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
@@ -30,17 +33,24 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  *@ApiResource(
- *     collectionOperations={"get", "post"},
- *     itemOperations={"get", "put", "patch", "delete"},
+ *     collectionOperations={
+ *          "get"={"security"="'custom_objects:custom_items:viewother'"},
+ *          "post"={"security"="'custom_objects:custom_items:create'"}
+ *     },
+ *     itemOperations={
+ *          "get"={"security"="'custom_objects:custom_items:view'"},
+ *          "put"={"security"="'custom_objects:custom_items:edit'"},
+ *          "patch"={"security"="'custom_objects:custom_items:edit'"},
+ *          "delete"={"security"="'custom_objects:custom_items:delete'"}
+ *     },
  *     shortName="custom_items",
- *     normalizationContext={"groups"={"custom_item:read"}, "swagger_definition_name"="Read"},
- *     denormalizationContext={"groups"={"custom_item:write"}, "swagger_definition_name"="Write"},
+ *     normalizationContext={"groups"={"custom_i:read"}, "swagger_definition_name"="Read"},
+ *     denormalizationContext={"groups"={"custom_i:write"}, "swagger_definition_name"="Write"},
  *     attributes={
  *          "pagination_items_per_page"=10,
  *          "formats"={"jsonld", "json", "html", "csv"={"text/csv"}}
  *     }
  * )
- * @ORM\Entity(repositoryClass="MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository")
  */
 class CustomItem extends FormEntity implements UniqueEntityInterface
 {
@@ -54,55 +64,66 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var string|null
-     * @Groups({"custom_item:read", "custom_item:write"})
+     * @Groups({"custom_i:read", "custom_i:write"})
+     * @ApiProperty(
+     *     attributes={
+     *         "openapi_context"={
+     *             "type"="string",
+     *             "maxLength"=255,
+     *             "nullable"=false,
+     *             "example"="city"
+     *         }
+     *     }
+     * )
      */
     private $name;
 
     /**
      * @var CustomObject
-     * @Groups({"custom_item:read", "custom_item:write"})
+     * @ManyToOne(targetEntity="CustomObject")
+     * @Groups({"custom_i:read", "custom_i:write"})
      */
     private $customObject;
 
     /**
      * @var string|null
-     * @Groups({"custom_item:read", "custom_item:write"})
+     *
      */
     private $language;
 
     /**
      * @var Category|null
-     * @Groups({"custom_item:read", "custom_item:write"})
+     *
      **/
     private $category;
 
     /**
      * @var ArrayCollection
-     * @Groups({"custom_item:read", "custom_item:write"})
+     *
      */
     private $customFieldValues;
 
     /**
      * @var mixed[]
-     * @Groups({"custom_item:read", "custom_item:write"})
+     *
      */
     private $initialCustomFieldValues = [];
 
     /**
      * @var ArrayCollection
-     * @Groups({"custom_item:read", "custom_item:write"})
+     *
      */
     private $contactReferences;
 
     /**
      * @var ArrayCollection
-     * @Groups({"custom_item:read", "custom_item:write"})
+     *
      */
     private $companyReferences;
 
     /**
      * @var ArrayCollection
-     * @Groups({"custom_item:read", "custom_item:write"})
+     *
      */
     private $customItemReferences;
 
@@ -430,5 +451,24 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     public function getCustomItemReferences()
     {
         return $this->customItemReferences;
+    }
+
+    public static function loadApiMetadata(ApiMetadataDriver $metadata)
+    {
+        $metadata->setGroupPrefix('fetch')
+            ->addListProperties(
+                [
+                    'id',
+                    'name',
+                ]
+            )
+            ->setGroupPrefix('update')
+            ->addListProperties(
+                [
+                    'id',
+                    'name',
+                ]
+            )
+            ->build();
     }
 }
