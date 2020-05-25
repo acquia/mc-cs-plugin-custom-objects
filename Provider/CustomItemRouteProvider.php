@@ -31,6 +31,8 @@ class CustomItemRouteProvider
 
     public const ROUTE_NEW           = 'mautic_custom_item_new';
 
+    public const ROUTE_NEW_REDIRECT_TO_CONTACT = 'mautic_custom_item_new_redirect_to_contact';
+
     public const ROUTE_CANCEL        = 'mautic_custom_item_cancel';
 
     public const ROUTE_SAVE          = 'mautic_custom_item_save';
@@ -73,6 +75,11 @@ class CustomItemRouteProvider
     public function buildNewRoute(int $objectId): string
     {
         return $this->router->generate(static::ROUTE_NEW, ['objectId' => $objectId]);
+    }
+
+    public function buildNewRouteWithRedirectToContact(int $objectId, int $contactId): string
+    {
+        return $this->router->generate(static::ROUTE_NEW_REDIRECT_TO_CONTACT, ['objectId' => $objectId, 'contactId' => $contactId]);
     }
 
     public function buildSaveRoute(int $objectId, ?int $itemId = null): string

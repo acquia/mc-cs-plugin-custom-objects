@@ -172,7 +172,7 @@ class ContactTabSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn('lookup/route');
 
         $this->customItemRouteProvider->expects($this->once())
-            ->method('buildNewRoute')
+            ->method('buildNewRouteWithRedirectToContact')
             ->with(555)
             ->willReturn('new/route');
 

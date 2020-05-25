@@ -88,6 +88,19 @@ class FormController extends AbstractFormController
         return $this->renderFormForItem($customItem, $customObject, $this->routeProvider->buildNewRoute($objectId));
     }
 
+    public function newWithRedirectToContactAction(int $objectId, int $contactId): Response
+    {
+        try {
+            $this->permissionProvider->canCreate($objectId);
+            $customObject = $this->customObjectModel->fetchEntity($objectId);
+            $customItem   = $this->customItemModel->populateCustomFields(new CustomItem($customObject));
+        } catch (ForbiddenException $e) {
+            return $this->accessDenied(false, $e->getMessage());
+        }
+
+        return $this->renderFormForItem($customItem, $customObject, $this->routeProvider->buildNewRouteWithRedirectToContact($objectId, $contactId), $contactId);
+    }
+
     public function editAction(int $objectId, int $itemId): Response
     {
         try {
@@ -132,14 +145,22 @@ class FormController extends AbstractFormController
         return $this->renderFormForItem($customItem, $customItem->getCustomObject(), $this->routeProvider->buildCloneRoute($objectId, $itemId));
     }
 
-    private function renderFormForItem(CustomItem $customItem, CustomObject $customObject, string $route): Response
+    private function renderFormForItem(CustomItem $customItem, CustomObject $customObject, string $route, ?int $contactId = null): Response
     {
         $action = $this->routeProvider->buildSaveRoute($customObject->getId(), $customItem->getId());
+        $options = [
+            'action' => $action,
+            'objectId' => $customObject->getId(),
+        ];
         $form   = $this->formFactory->create(
             CustomItemType::class,
             $customItem,
-            ['action' => $action, 'objectId' => $customObject->getId()]
+            $options
         );
+
+        if (0 < $contactId) {
+            $form->get('contact_id')->setData($contactId);
+        }
 
         return $this->delegateView(
             [

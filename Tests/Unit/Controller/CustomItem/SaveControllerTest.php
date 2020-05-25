@@ -180,6 +180,16 @@ class SaveControllerTest extends ControllerTestCase
             ->with('save')
             ->willReturn($this->createMock(ClickableInterface::class));
 
+        $contactId = $this->createMock(FormInterface::class);
+        $this->form->expects($this->at(4))
+            ->method('get')
+            ->with('contact_id')
+            ->willReturn($contactId);
+
+        $contactId->expects($this->once())
+            ->method('getData')
+            ->willReturn(0);
+
         $this->customItemModel->expects($this->once())
             ->method('save')
             ->with($this->customItem);
