@@ -62,7 +62,7 @@ class CustomItemType extends AbstractType
             HiddenType::class,
             [
                 'mapped' => false,
-                'data'   => $options['contactId'] ?: null,
+                'data'   => empty($options['contactId']) ? null : $options['contactId'],
             ]
         );
 
@@ -70,7 +70,7 @@ class CustomItemType extends AbstractType
         $builder->add('isPublished', YesNoButtonGroupType::class);
 
         $cancelOnclickUrl = "mQuery('form[name=custom_item]').attr('method', 'get').attr('action', mQuery('form[name=custom_item]').attr('action').replace('/save', '/cancel'));";
-        if ($options['cancelUrl']) {
+        if (!empty($options['cancelUrl'])) {
             $cancelOnclickUrl = sprintf("mQuery('form[name=custom_item]').attr('method', 'get').attr('action', %s);", json_encode($options['cancelUrl']));
         }
 
@@ -92,8 +92,6 @@ class CustomItemType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => CustomItem::class,
-            'cancelUrl'  => null,
-            'contactId'  => null,
         ]);
         $resolver->setRequired(['objectId']);
         $resolver->setDefined(['contactId', 'cancelUrl']);
