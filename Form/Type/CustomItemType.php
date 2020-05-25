@@ -62,7 +62,7 @@ class CustomItemType extends AbstractType
             HiddenType::class,
             [
                 'mapped' => false,
-                'data' => $options['contactId'] ?: null,
+                'data'   => $options['contactId'] ?: null,
             ]
         );
 
@@ -92,8 +92,8 @@ class CustomItemType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => CustomItem::class,
-            'cancelUrl' => null,
-            'contactId' => null,
+            'cancelUrl'  => null,
+            'contactId'  => null,
         ]);
         $resolver->setRequired(['objectId']);
         $resolver->setDefined(['contactId', 'cancelUrl']);

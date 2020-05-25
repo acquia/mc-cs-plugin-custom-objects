@@ -140,7 +140,7 @@ class SaveController extends AbstractFormController
             );
 
             $saveClicked = $form->get('buttons')->get('save')->isClicked();
-            $contactId = (int)$form->get('contact_id')->getData();
+            $contactId   = (int) $form->get('contact_id')->getData();
             $detailView  = 'CustomObjectsBundle:CustomItem\View:view';
             $formView    = 'CustomObjectsBundle:CustomItem\Form:edit';
 
