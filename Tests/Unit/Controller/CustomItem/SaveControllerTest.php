@@ -80,7 +80,6 @@ class SaveControllerTest extends ControllerTestCase
             $this->lockFlashMessageHelper
         );
 
-        //$this->saveController->setContainer($this->container);
         $this->addSymfonyDependencies($this->saveController);
     }
 
@@ -227,7 +226,7 @@ class SaveControllerTest extends ControllerTestCase
             ->method('fetchEntity')
             ->willReturn($this->customItem);
 
-        $this->permissionProvider->expects($this->exactly(2))
+        $this->permissionProvider->expects($this->once())
             ->method('canEdit');
 
         $this->permissionProvider->expects($this->never())

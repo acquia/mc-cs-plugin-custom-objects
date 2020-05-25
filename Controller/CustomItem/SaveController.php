@@ -145,7 +145,6 @@ class SaveController extends AbstractFormController
             $formView    = 'CustomObjectsBundle:CustomItem\Form:edit';
 
             if (0 < $contactId) {
-                $this->permissionProvider->canEdit($customItem);
                 $this->customItemModel->linkEntity($customItem, 'contact', $contactId);
                 return $this->redirectToRoute('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $contactId]);
             }
