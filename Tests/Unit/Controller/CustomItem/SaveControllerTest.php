@@ -272,10 +272,15 @@ class SaveControllerTest extends ControllerTestCase
             ->with('buttons')
             ->willReturnSelf();
 
+        $clickable = $this->createMock(ClickableInterface::class);
         $this->form->expects($this->at(3))
             ->method('get')
             ->with('save')
-            ->willReturn($this->createMock(ClickableInterface::class));
+            ->willReturn($clickable);
+
+        $clickable->expects($this->once())
+            ->method('isClicked')
+            ->willReturn(true);
 
         $contactId = $this->createMock(FormInterface::class);
         $this->form->expects($this->at(4))
