@@ -116,7 +116,14 @@ class FormController extends AbstractFormController
         }
 
         if ($this->customItemModel->isLocked($customItem)) {
-            return $this->addFlashMessage($customItem, $objectId, $itemId);
+            $this->lockFlashMessageHelper->addFlash(
+                $customItem,
+                $this->routeProvider->buildEditRoute($objectId, $itemId),
+                $this->canEdit($customItem),
+                'custom.item'
+            );
+
+            return $this->redirect($this->routeProvider->buildViewRoute($objectId, $itemId));
         }
 
         $this->customItemModel->lockEntity($customItem);
@@ -134,7 +141,14 @@ class FormController extends AbstractFormController
         }
 
         if ($this->customItemModel->isLocked($customItem)) {
-            return $this->addFlashMessage($customItem, $objectId, $itemId);
+            $this->lockFlashMessageHelper->addFlash(
+                $customItem,
+                $this->routeProvider->buildEditRouteWithRedirectToContact($objectId, $itemId, $contactId),
+                $this->canEdit($customItem),
+                'custom.item'
+            );
+
+            return $this->redirect($this->routeProvider->buildViewRoute($objectId, $itemId));
         }
 
         $this->customItemModel->lockEntity($customItem);
@@ -147,18 +161,6 @@ class FormController extends AbstractFormController
         $customItem   = $this->customItemModel->fetchEntity($itemId);
         $this->permissionProvider->canEdit($customItem);
         return [$customObject, $customItem];
-    }
-
-    private function addFlashMessage(CustomItem $customItem, int $objectId, int $itemId): Response
-    {
-        $this->lockFlashMessageHelper->addFlash(
-            $customItem,
-            $this->routeProvider->buildEditRoute($objectId, $itemId),
-            $this->canEdit($customItem),
-            'custom.item'
-        );
-
-        return $this->redirect($this->routeProvider->buildViewRoute($objectId, $itemId));
     }
 
     public function cloneAction(int $objectId, int $itemId): Response

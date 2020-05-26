@@ -15,6 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller;
 
 use Mautic\CoreBundle\Controller\MauticController;
 use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Templating\Engine\PhpEngine;
@@ -52,6 +53,11 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase
      */
     protected $container;
 
+    /**
+     * @var UserHelper
+     */
+    protected $userHelper;
+
 
     protected function addSymfonyDependencies(Controller $controller): void
     {
@@ -68,6 +74,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase
         $security          = $this->createMock(CorePermissions::class);
         $translator        = $this->createMock(TranslatorInterface::class);
         $this->router      = $this->createMock(RouterInterface::class);
+        $this->userHelper  = $this->createMock(UserHelper::class);
 
         $this->container->method('get')->will($this->returnValueMap([
             ['request_stack', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $requestStack],
@@ -77,6 +84,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase
             ['session', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $session],
             ['mautic.security', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $security],
             ['router', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->router],
+            ['mautic.helper.user', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->userHelper],
         ]));
 
         $phpEngine->method('renderResponse')->willReturn($response);
