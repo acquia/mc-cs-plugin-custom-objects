@@ -70,7 +70,7 @@ return [
             ],
             CustomItemRouteProvider::ROUTE_EDIT_REDIRECT_TO_CONTACT => [
                 'path'       => '/custom/object/{objectId}/item/edit/{itemId}/contact/{contactId}',
-                'controller' => 'CustomObjectsBundle:CustomItem\Form:edit',
+                'controller' => 'CustomObjectsBundle:CustomItem\Form:editWithRedirectToContact',
                 'method'     => 'GET',
             ],
             CustomItemRouteProvider::ROUTE_CLONE => [
