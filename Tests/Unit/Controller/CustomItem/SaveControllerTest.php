@@ -218,7 +218,7 @@ class SaveControllerTest extends ControllerTestCase
             ->method('getName')
             ->willReturn('Umpalumpa');
 
-        $this->customItem->expects($this->once())
+        $this->customItem->expects($this->exactly(2))
             ->method('getId')
             ->willReturn(self::ITEM_ID);
 
