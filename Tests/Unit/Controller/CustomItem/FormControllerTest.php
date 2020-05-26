@@ -280,7 +280,12 @@ class FormControllerTest extends ControllerTestCase
             ->with(
                 CustomItemType::class,
                 $this->customItem,
-                ['action' => 'https://list.items', 'objectId' => self::OBJECT_ID]
+                [
+                    'action' => 'https://list.items',
+                    'objectId' => self::OBJECT_ID,
+                    'contactId' => null,
+                    'cancelUrl' => null,
+                ]
             )
             ->willReturn($this->form);
     }
