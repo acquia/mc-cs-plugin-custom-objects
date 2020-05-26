@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -56,14 +57,28 @@ class CustomItemType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'contact_id',
+            HiddenType::class,
+            [
+                'mapped' => false,
+                'data'   => empty($options['contactId']) ? null : $options['contactId'],
+            ]
+        );
+
         $builder->add('category', CategoryListType::class, ['bundle' => 'global']);
         $builder->add('isPublished', YesNoButtonGroupType::class);
+
+        $cancelOnclickUrl = "mQuery('form[name=custom_item]').attr('method', 'get').attr('action', mQuery('form[name=custom_item]').attr('action').replace('/save', '/cancel'));";
+        if (!empty($options['cancelUrl'])) {
+            $cancelOnclickUrl = sprintf("mQuery('form[name=custom_item]').attr('method', 'get').attr('action', %s);", json_encode($options['cancelUrl']));
+        }
 
         $builder->add(
             'buttons',
             FormButtonsType::class,
             [
-                'cancel_onclick' => "mQuery('form[name=custom_item]').attr('method', 'get').attr('action', mQuery('form[name=custom_item]').attr('action').replace('/save', '/cancel'));",
+                'cancel_onclick' => $cancelOnclickUrl,
             ]
         );
 
@@ -75,7 +90,10 @@ class CustomItemType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(['data_class' => CustomItem::class]);
+        $resolver->setDefaults([
+            'data_class' => CustomItem::class,
+        ]);
         $resolver->setRequired(['objectId']);
+        $resolver->setDefined(['contactId', 'cancelUrl']);
     }
 }

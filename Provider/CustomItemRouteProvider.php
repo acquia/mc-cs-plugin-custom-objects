@@ -23,6 +23,8 @@ class CustomItemRouteProvider
 
     public const ROUTE_EDIT          = 'mautic_custom_item_edit';
 
+    public const ROUTE_NEW_REDIRECT_TO_CONTACT = 'mautic_custom_item_edit_redirect_to_contact';
+
     public const ROUTE_CLONE         = 'mautic_custom_item_clone';
 
     public const ROUTE_DELETE        = 'mautic_custom_item_delete';
@@ -30,6 +32,8 @@ class CustomItemRouteProvider
     public const ROUTE_BATCH_DELETE  = 'mautic_custom_item_batch_delete';
 
     public const ROUTE_NEW           = 'mautic_custom_item_new';
+
+    public const ROUTE_EDIT_REDIRECT_TO_CONTACT = 'mautic_custom_item_new_redirect_to_contact';
 
     public const ROUTE_CANCEL        = 'mautic_custom_item_cancel';
 
@@ -75,6 +79,11 @@ class CustomItemRouteProvider
         return $this->router->generate(static::ROUTE_NEW, ['objectId' => $objectId]);
     }
 
+    public function buildNewRouteWithRedirectToContact(int $objectId, int $contactId): string
+    {
+        return $this->router->generate(static::ROUTE_NEW_REDIRECT_TO_CONTACT, ['objectId' => $objectId, 'contactId' => $contactId]);
+    }
+
     public function buildSaveRoute(int $objectId, ?int $itemId = null): string
     {
         return $this->router->generate(static::ROUTE_SAVE, ['objectId' => $objectId, 'itemId' => $itemId]);
@@ -90,6 +99,11 @@ class CustomItemRouteProvider
         return $this->router->generate(static::ROUTE_EDIT, ['objectId' => $objectId, 'itemId' => $itemId]);
     }
 
+    public function buildEditRouteWithRedirectToContact(int $objectId, int $itemId, int $contactId): string
+    {
+        return $this->router->generate(static::ROUTE_EDIT_REDIRECT_TO_CONTACT, ['objectId' => $objectId, 'itemId' => $itemId, 'contactId' => $contactId]);
+    }
+
     public function buildCloneRoute(int $objectId, int $itemId): string
     {
         return $this->router->generate(static::ROUTE_CLONE, ['objectId' => $objectId, 'itemId' => $itemId]);
@@ -98,6 +112,11 @@ class CustomItemRouteProvider
     public function buildDeleteRoute(int $objectId, int $itemId): string
     {
         return $this->router->generate(static::ROUTE_DELETE, ['objectId' => $objectId, 'itemId' => $itemId]);
+    }
+
+    public function buildContactViewRoute(int $contactId): string
+    {
+        return $this->router->generate('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $contactId]);
     }
 
     /**

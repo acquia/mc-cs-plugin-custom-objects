@@ -172,4 +172,34 @@ class CustomItemRouteProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->customItemRouteProvider->buildListImportRoute(self::OBJECT_ID);
     }
+
+    public function testThatBuildNewRouteWithRedirectToContactReturnsCorrectUrl()
+    {
+        $this->router->expects($this->once())
+            ->method('generate')
+            ->with(CustomItemRouteProvider::ROUTE_NEW_REDIRECT_TO_CONTACT, ['objectId' => 1, 'contactId' => 1])
+            ->willReturn('the/generated/route');
+
+        $this->customItemRouteProvider->buildNewRouteWithRedirectToContact(1, 1);
+    }
+
+    public function testThatBuildEditRouteWithRedirectToContactReturnsCorrectUrl()
+    {
+        $this->router->expects($this->once())
+            ->method('generate')
+            ->with(CustomItemRouteProvider::ROUTE_EDIT_REDIRECT_TO_CONTACT, ['objectId' => 1, 'itemId' => 1, 'contactId' => 1])
+            ->willReturn('the/generated/route');
+
+        $this->customItemRouteProvider->buildEditRouteWithRedirectToContact(1, 1, 1);
+    }
+
+    public function testThatBuildContactViewRouteReturnsCorrectUrl()
+    {
+        $this->router->expects($this->once())
+            ->method('generate')
+            ->with('mautic_contact_action', ['objectAction' => 'view', 'objectId' => 1])
+            ->willReturn('the/generated/route');
+
+        $this->customItemRouteProvider->buildContactViewRoute(1);
+    }
 }
