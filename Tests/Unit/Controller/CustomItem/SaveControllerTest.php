@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomItem;
 
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\UserBundle\Entity\User;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\SaveController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
@@ -25,7 +26,6 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -81,6 +81,11 @@ class SaveControllerTest extends ControllerTestCase
         );
 
         $this->addSymfonyDependencies($this->saveController);
+
+        $saveControllerReflectionObject = new \ReflectionObject($this->saveController);
+        $reflectionProperty = $saveControllerReflectionObject->getProperty('permissionBase');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($this->saveController, 'somePermissionBase');
     }
 
     public function testSaveActionIfExistingCustomItemNotFound(): void
@@ -140,6 +145,16 @@ class SaveControllerTest extends ControllerTestCase
             ->method('isLocked')
             ->with($this->customItem)
             ->willReturn(false);
+
+        $clickable = $this->createMock(ClickableInterface::class);
+        $this->form->expects($this->at(3))
+            ->method('get')
+            ->with('save')
+            ->willReturn($clickable);
+
+        $clickable->expects($this->once())
+            ->method('isClicked')
+            ->willReturn(true);
 
         $this->routeProvider->expects($this->exactly(2))
             ->method('buildEditRoute')
@@ -359,5 +374,39 @@ class SaveControllerTest extends ControllerTestCase
             ->method('save');
 
         $this->saveController->saveAction(self::OBJECT_ID);
+    }
+
+    public function testSaveActionWhenTheItemIsLocked(): void
+    {
+        $this->customItemModel->expects($this->once())
+            ->method('fetchEntity')
+            ->willReturn($this->customItem);
+
+        $this->permissionProvider->expects($this->once())
+            ->method('canEdit');
+
+        $this->permissionProvider->expects($this->never())
+            ->method('canCreate');
+
+        $this->customObjectModel->expects($this->once())
+            ->method('isLocked')
+            ->with($this->customItem)
+            ->willReturn(true);
+
+        $userMock = $this->createMock(User::class);
+        $this->userHelper->expects($this->once())
+            ->method('getUser')
+            ->willReturn($userMock);
+
+        $userMock->expects($this->once())
+            ->method('isAdmin')
+            ->willReturn(true);
+
+        $this->routeProvider->expects($this->once())
+            ->method('buildViewRoute')
+            ->with(static::OBJECT_ID, static::ITEM_ID)
+            ->willReturn('https://redirect.url');
+
+        $this->saveController->saveAction(self::OBJECT_ID, self::ITEM_ID);
     }
 }
