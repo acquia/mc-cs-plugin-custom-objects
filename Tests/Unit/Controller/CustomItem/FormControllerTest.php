@@ -36,6 +36,10 @@ class FormControllerTest extends ControllerTestCase
 
     private const ITEM_ID = 22;
 
+    private const CONTACT_ID = 11;
+
+    private const CANCEL_URL = 'https://cancel.url';
+
     private $customItemModel;
     private $customObjectModel;
     private $formFactory;
@@ -102,6 +106,26 @@ class FormControllerTest extends ControllerTestCase
         $this->formController->newAction(self::OBJECT_ID);
     }
 
+    public function testNewWithRedirectToContactActionIfForbidden(): void
+    {
+        $this->permissionProvider->expects($this->once())
+            ->method('canCreate')
+            ->will($this->throwException(new ForbiddenException('create')));
+
+        $this->customObjectModel->expects($this->never())
+            ->method('fetchEntity');
+
+        $this->customItemModel->expects($this->never())
+            ->method('fetchEntity');
+
+        $this->routeProvider->expects($this->never())
+            ->method('buildNewRouteWithRedirectToContact');
+
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $this->formController->newWithRedirectToContactAction(static::OBJECT_ID, static::CONTACT_ID);
+    }
+
     public function testNewAction(): void
     {
         $this->permissionProvider->expects($this->once())
@@ -123,6 +147,29 @@ class FormControllerTest extends ControllerTestCase
         $this->assertRenderFormForItem();
 
         $this->formController->newAction(self::OBJECT_ID);
+    }
+
+    public function testNewWithRedirectToContactAction(): void
+    {
+        $this->permissionProvider->expects($this->once())
+            ->method('canCreate');
+
+        $this->customObjectModel->expects($this->once())
+            ->method('fetchEntity')
+            ->with(self::OBJECT_ID)
+            ->willReturn($this->customObject);
+
+        $this->customItemModel->expects($this->once())
+            ->method('populateCustomFields')
+            ->willReturn($this->customItem);
+
+        $this->routeProvider->expects($this->once())
+            ->method('buildNewRouteWithRedirectToContact')
+            ->with(self::OBJECT_ID);
+
+        $this->assertRenderFormForItem(static::CONTACT_ID);
+
+        $this->formController->newWithRedirectToContactAction(static::OBJECT_ID, static::CONTACT_ID);
     }
 
     public function testEditActionIfCustomObjectNotFound(): void
@@ -264,7 +311,7 @@ class FormControllerTest extends ControllerTestCase
         $this->formController->cloneAction(self::OBJECT_ID, self::ITEM_ID);
     }
 
-    private function assertRenderFormForItem(): void
+    private function assertRenderFormForItem(?int $contactId = null): void
     {
         $this->routeProvider->expects($this->once())
             ->method('buildSaveRoute')
@@ -283,7 +330,7 @@ class FormControllerTest extends ControllerTestCase
                 [
                     'action' => 'https://list.items',
                     'objectId' => self::OBJECT_ID,
-                    'contactId' => null,
+                    'contactId' => $contactId,
                     'cancelUrl' => null,
                 ]
             )
