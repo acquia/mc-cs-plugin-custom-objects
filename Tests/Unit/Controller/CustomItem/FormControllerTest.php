@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomItem;
 
+use Mautic\UserBundle\Entity\User;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\FormController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
@@ -84,6 +85,10 @@ class FormControllerTest extends ControllerTestCase
         $this->customItem->method('getId')->willReturn(self::ITEM_ID);
         $this->request->method('isXmlHttpRequest')->willReturn(true);
         $this->request->method('getRequestUri')->willReturn('https://a.b');
+        $formControllerReflectionObject = new \ReflectionObject($this->formController);
+        $reflectionProperty = $formControllerReflectionObject->getProperty('permissionBase');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($this->formController, 'somePermissionBase');
     }
 
     public function testNewActionIfForbidden(): void
@@ -328,6 +333,80 @@ class FormControllerTest extends ControllerTestCase
         $this->expectException(AccessDeniedHttpException::class);
 
         $this->formController->editWithRedirectToContactAction(self::OBJECT_ID, self::ITEM_ID, static::CONTACT_ID);
+    }
+
+    public function testEditWithRedirectToContactActionWhenTheItemIsLocked()
+    {
+        $this->customObjectModel->expects($this->once())
+            ->method('fetchEntity')
+            ->with(self::OBJECT_ID)
+            ->willReturn($this->customObject);
+
+        $this->customItemModel->expects($this->once())
+            ->method('fetchEntity')
+            ->willReturn($this->customItem);
+
+        $this->customItemModel->expects($this->once())
+            ->method('isLocked')
+            ->with($this->customItem)
+            ->willReturn(true);
+
+        $this->routeProvider->expects($this->once())
+            ->method('buildEditRouteWithRedirectToContact')
+            ->with(self::OBJECT_ID, self::ITEM_ID, static::CONTACT_ID);
+
+        $userMock = $this->createMock(User::class);
+        $this->userHelper->expects($this->once())
+            ->method('getUser')
+            ->willReturn($userMock);
+
+        $userMock->expects($this->once())
+            ->method('isAdmin')
+            ->willReturn(true);
+
+        $this->routeProvider->expects($this->once())
+            ->method('buildViewRoute')
+            ->with(static::OBJECT_ID, static::ITEM_ID)
+            ->willReturn('https://redirect.url');
+
+        $this->formController->editWithRedirectToContactAction(self::OBJECT_ID, self::ITEM_ID, static::CONTACT_ID);
+    }
+
+    public function testEditActionWhenTheItemIsLocked()
+    {
+        $this->customObjectModel->expects($this->once())
+            ->method('fetchEntity')
+            ->with(self::OBJECT_ID)
+            ->willReturn($this->customObject);
+
+        $this->customItemModel->expects($this->once())
+            ->method('fetchEntity')
+            ->willReturn($this->customItem);
+
+        $this->customItemModel->expects($this->once())
+            ->method('isLocked')
+            ->with($this->customItem)
+            ->willReturn(true);
+
+        $this->routeProvider->expects($this->once())
+            ->method('buildEditRoute')
+            ->with(self::OBJECT_ID, self::ITEM_ID);
+
+        $userMock = $this->createMock(User::class);
+        $this->userHelper->expects($this->once())
+            ->method('getUser')
+            ->willReturn($userMock);
+
+        $userMock->expects($this->once())
+            ->method('isAdmin')
+            ->willReturn(true);
+
+        $this->routeProvider->expects($this->once())
+            ->method('buildViewRoute')
+            ->with(static::OBJECT_ID, static::ITEM_ID)
+            ->willReturn('https://redirect.url');
+
+        $this->formController->editAction(self::OBJECT_ID, self::ITEM_ID);
     }
 
     public function testCloneAction(): void
