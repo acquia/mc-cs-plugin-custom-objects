@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
+use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomContentEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
@@ -198,5 +199,11 @@ class ContactTabSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn([$customObject]);
 
         $this->tabSubscriber->injectTabs($this->customContentEvent);
+    }
+
+    public function testSubscriberEvents()
+    {
+        $events = ContactTabSubscriber::getSubscribedEvents();
+        $this->assertArrayHasKey(CoreEvents::VIEW_INJECT_CUSTOM_CONTENT, $events);
     }
 }
