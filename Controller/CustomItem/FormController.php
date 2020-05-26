@@ -78,9 +78,7 @@ class FormController extends AbstractFormController
     public function newAction(int $objectId): Response
     {
         try {
-            $this->permissionProvider->canCreate($objectId);
-            $customObject = $this->customObjectModel->fetchEntity($objectId);
-            $customItem   = $this->customItemModel->populateCustomFields(new CustomItem($customObject));
+            [$customObject, $customItem] = $this->performNewAction($objectId);
         } catch (ForbiddenException $e) {
             return $this->accessDenied(false, $e->getMessage());
         }
@@ -91,9 +89,7 @@ class FormController extends AbstractFormController
     public function newWithRedirectToContactAction(int $objectId, int $contactId): Response
     {
         try {
-            $this->permissionProvider->canCreate($objectId);
-            $customObject = $this->customObjectModel->fetchEntity($objectId);
-            $customItem   = $this->customItemModel->populateCustomFields(new CustomItem($customObject));
+            [$customObject, $customItem] = $this->performNewAction($objectId);
         } catch (ForbiddenException $e) {
             return $this->accessDenied(false, $e->getMessage());
         }
@@ -101,12 +97,18 @@ class FormController extends AbstractFormController
         return $this->renderFormForItem($customItem, $customObject, $this->routeProvider->buildNewRouteWithRedirectToContact($objectId, $contactId), $contactId);
     }
 
+    private function performNewAction(int $objectId): array
+    {
+        $this->permissionProvider->canCreate($objectId);
+        $customObject = $this->customObjectModel->fetchEntity($objectId);
+        $customItem   = $this->customItemModel->populateCustomFields(new CustomItem($customObject));
+        return [$customObject, $customItem];
+    }
+
     public function editAction(int $objectId, int $itemId): Response
     {
         try {
-            $customObject = $this->customObjectModel->fetchEntity($objectId);
-            $customItem   = $this->customItemModel->fetchEntity($itemId);
-            $this->permissionProvider->canEdit($customItem);
+            [$customObject, $customItem] = $this->performEditAction($objectId, $itemId);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
@@ -114,19 +116,49 @@ class FormController extends AbstractFormController
         }
 
         if ($this->customItemModel->isLocked($customItem)) {
-            $this->lockFlashMessageHelper->addFlash(
-                $customItem,
-                $this->routeProvider->buildEditRoute($objectId, $itemId),
-                $this->canEdit($customItem),
-                'custom.item'
-            );
-
-            return $this->redirect($this->routeProvider->buildViewRoute($objectId, $itemId));
+            return $this->addFlashMessage($customItem, $objectId, $itemId);
         }
 
         $this->customItemModel->lockEntity($customItem);
-
         return $this->renderFormForItem($customItem, $customObject, $this->routeProvider->buildEditRoute($objectId, $itemId));
+    }
+
+    public function editWithRedirectToContactAction(int $objectId, int $itemId, int $contactId): Response
+    {
+        try {
+            [$customObject, $customItem] = $this->performEditAction($objectId, $itemId);
+        } catch (NotFoundException $e) {
+            return $this->notFound($e->getMessage());
+        } catch (ForbiddenException $e) {
+            return $this->accessDenied(false, $e->getMessage());
+        }
+
+        if ($this->customItemModel->isLocked($customItem)) {
+            return $this->addFlashMessage($customItem, $objectId, $itemId);
+        }
+
+        $this->customItemModel->lockEntity($customItem);
+        return $this->renderFormForItem($customItem, $customObject, $this->routeProvider->buildEditRouteWithRedirectToContact($objectId, $itemId, $contactId), $contactId);
+    }
+
+    private function performEditAction(int $objectId, int $itemId): array
+    {
+        $customObject = $this->customObjectModel->fetchEntity($objectId);
+        $customItem   = $this->customItemModel->fetchEntity($itemId);
+        $this->permissionProvider->canEdit($customItem);
+        return [$customObject, $customItem];
+    }
+
+    private function addFlashMessage(CustomItem $customItem, int $objectId, int $itemId): Response
+    {
+        $this->lockFlashMessageHelper->addFlash(
+            $customItem,
+            $this->routeProvider->buildEditRoute($objectId, $itemId),
+            $this->canEdit($customItem),
+            'custom.item'
+        );
+
+        return $this->redirect($this->routeProvider->buildViewRoute($objectId, $itemId));
     }
 
     public function cloneAction(int $objectId, int $itemId): Response
