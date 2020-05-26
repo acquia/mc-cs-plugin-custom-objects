@@ -259,6 +259,77 @@ class FormControllerTest extends ControllerTestCase
         $this->formController->editAction(self::OBJECT_ID, self::ITEM_ID);
     }
 
+    public function testEditWithRedirectToContactAction(): void
+    {
+        $this->customObjectModel->expects($this->once())
+            ->method('fetchEntity')
+            ->with(self::OBJECT_ID)
+            ->willReturn($this->customObject);
+
+        $this->customItemModel->expects($this->once())
+            ->method('fetchEntity')
+            ->willReturn($this->customItem);
+
+        $this->permissionProvider->expects($this->once())
+            ->method('canEdit')
+            ->with($this->customItem);
+
+        $this->customItemModel->expects($this->once())
+            ->method('isLocked')
+            ->willReturn(false);
+
+        $this->customItemModel->expects($this->once())
+            ->method('lockEntity');
+
+        $this->routeProvider->expects($this->once())
+            ->method('buildEditRouteWithRedirectToContact')
+            ->with(self::OBJECT_ID, self::ITEM_ID, static::CONTACT_ID);
+
+        $this->assertRenderFormForItem(static::CONTACT_ID);
+
+        $this->formController->editWithRedirectToContactAction(self::OBJECT_ID, self::ITEM_ID, static::CONTACT_ID);
+    }
+
+    public function testEditWithRedirectToContactActionIfCustomItemNotFound(): void
+    {
+        $this->customObjectModel->expects($this->once())
+            ->method('fetchEntity')
+            ->with(self::OBJECT_ID)
+            ->willReturn($this->customObject);
+
+        $this->customItemModel->expects($this->once())
+            ->method('fetchEntity')
+            ->will($this->throwException(new NotFoundException()));
+
+        $this->routeProvider->expects($this->never())
+            ->method('buildEditRouteWithRedirectToContact');
+
+        $this->formController->editWithRedirectToContactAction(self::OBJECT_ID, self::ITEM_ID, static::CONTACT_ID);
+    }
+
+    public function testEditWithRedirectToContactActionIfCustomItemForbidden(): void
+    {
+        $this->customObjectModel->expects($this->once())
+            ->method('fetchEntity')
+            ->with(self::OBJECT_ID)
+            ->willReturn($this->customObject);
+
+        $this->customItemModel->expects($this->once())
+            ->method('fetchEntity')
+            ->willReturn($this->customItem);
+
+        $this->permissionProvider->expects($this->once())
+            ->method('canEdit')
+            ->will($this->throwException(new ForbiddenException('edit')));
+
+        $this->routeProvider->expects($this->never())
+            ->method('buildEditRouteWithRedirectToContact');
+
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $this->formController->editWithRedirectToContactAction(self::OBJECT_ID, self::ITEM_ID, static::CONTACT_ID);
+    }
+
     public function testCloneAction(): void
     {
         $this->customItem->expects($this->once())
