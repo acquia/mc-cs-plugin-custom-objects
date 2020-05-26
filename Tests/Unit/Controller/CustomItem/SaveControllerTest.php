@@ -39,6 +39,8 @@ class SaveControllerTest extends ControllerTestCase
 
     private const ITEM_ID = 22;
 
+    private const CONTACT_ID = 11;
+
     private $formFactory;
     private $customItemModel;
     private $customObjectModel;
@@ -406,6 +408,112 @@ class SaveControllerTest extends ControllerTestCase
             ->method('buildViewRoute')
             ->with(static::OBJECT_ID, static::ITEM_ID)
             ->willReturn('https://redirect.url');
+
+        $this->saveController->saveAction(self::OBJECT_ID, self::ITEM_ID);
+    }
+
+    public function testThatUserIsGettingRedirectedWhenWeEditCustomItemAndContactIdIsSpecified(): void
+    {
+        $this->customItem->expects($this->once())
+            ->method('getName')
+            ->willReturn('Umpalumpa');
+
+        $this->customItem->expects($this->exactly(2))
+            ->method('getId')
+            ->willReturn(self::ITEM_ID);
+
+        $this->customItemModel->expects($this->once())
+            ->method('fetchEntity')
+            ->willReturn($this->customItem);
+
+        $this->permissionProvider->expects($this->once())
+            ->method('canEdit');
+
+        $this->permissionProvider->expects($this->never())
+            ->method('canCreate');
+
+        $this->customObjectModel->expects($this->once())
+            ->method('isLocked')
+            ->with($this->customItem)
+            ->willReturn(false);
+
+        $clickable = $this->createMock(ClickableInterface::class);
+        $this->form->expects($this->at(3))
+            ->method('get')
+            ->with('save')
+            ->willReturn($clickable);
+
+        $clickable->expects($this->once())
+            ->method('isClicked')
+            ->willReturn(false);
+
+        $this->routeProvider->expects($this->exactly(2))
+            ->method('buildEditRoute')
+            ->with(self::OBJECT_ID, self::ITEM_ID)
+            ->willReturn('https://edit.item');
+
+        $this->routeProvider->expects($this->once())
+            ->method('buildSaveRoute')
+            ->with(self::OBJECT_ID, self::ITEM_ID)
+            ->willReturn('https://save.item');
+
+        $this->formFactory->expects($this->once())
+            ->method('create')
+            ->with(
+                CustomItemType::class,
+                $this->customItem,
+                [
+                    'action'   => 'https://save.item',
+                    'objectId' => self::OBJECT_ID,
+                ]
+            )
+            ->willReturn($this->form);
+
+        $this->form->expects($this->at(0))
+            ->method('handleRequest')
+            ->with($this->request);
+
+        $this->form->expects($this->at(1))
+            ->method('isValid')
+            ->willReturn(true);
+
+        $this->form->expects($this->at(2))
+            ->method('get')
+            ->with('buttons')
+            ->willReturnSelf();
+
+        $this->form->expects($this->at(3))
+            ->method('get')
+            ->with('save')
+            ->willReturn($this->createMock(ClickableInterface::class));
+
+        $contactId = $this->createMock(FormInterface::class);
+        $this->form->expects($this->at(4))
+            ->method('get')
+            ->with('contact_id')
+            ->willReturn($contactId);
+
+        $contactId->expects($this->once())
+            ->method('getData')
+            ->willReturn(static::CONTACT_ID);
+
+        $this->customItemModel->expects($this->once())
+            ->method('save')
+            ->with($this->customItem);
+
+        $this->flashBag->expects($this->once())
+            ->method('add')
+            ->with(
+                'mautic.core.notice.updated',
+                [
+                    '%name%' => 'Umpalumpa',
+                    '%url%'  => 'https://edit.item',
+                ]
+            );
+
+        $this->request->expects($this->once())
+            ->method('setMethod')
+            ->with(Request::METHOD_GET);
 
         $this->saveController->saveAction(self::OBJECT_ID, self::ITEM_ID);
     }
