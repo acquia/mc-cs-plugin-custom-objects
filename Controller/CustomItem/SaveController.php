@@ -144,11 +144,19 @@ class SaveController extends AbstractFormController
             $detailView  = 'CustomObjectsBundle:CustomItem\View:view';
             $formView    = 'CustomObjectsBundle:CustomItem\Form:edit';
 
+            $pathParameters = [
+                'objectId' => $objectId,
+                'itemId' => $customItem->getId(),
+            ];
+
             if (0 < $contactId) {
                 $this->customItemModel->linkEntity($customItem, 'contact', $contactId);
                 if ($saveClicked) {
                     return $this->redirectToRoute('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $contactId]);
                 }
+
+                $formView = 'CustomObjectsBundle:CustomItem\Form:editWithRedirectToContact';
+                $pathParameters['contactId'] = $contactId;
             }
 
             $request->setMethod(Request::METHOD_GET);
@@ -159,7 +167,7 @@ class SaveController extends AbstractFormController
 
             return $this->forward(
                 $saveClicked ? $detailView : $formView,
-                ['objectId' => $objectId, 'itemId' => $customItem->getId()]
+                $pathParameters
             );
         }
 

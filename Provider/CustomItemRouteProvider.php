@@ -23,6 +23,8 @@ class CustomItemRouteProvider
 
     public const ROUTE_EDIT          = 'mautic_custom_item_edit';
 
+    public const ROUTE_NEW_REDIRECT_TO_CONTACT = 'mautic_custom_item_edit_redirect_to_contact';
+
     public const ROUTE_CLONE         = 'mautic_custom_item_clone';
 
     public const ROUTE_DELETE        = 'mautic_custom_item_delete';
@@ -31,7 +33,7 @@ class CustomItemRouteProvider
 
     public const ROUTE_NEW           = 'mautic_custom_item_new';
 
-    public const ROUTE_NEW_REDIRECT_TO_CONTACT = 'mautic_custom_item_new_redirect_to_contact';
+    public const ROUTE_EDIT_REDIRECT_TO_CONTACT = 'mautic_custom_item_new_redirect_to_contact';
 
     public const ROUTE_CANCEL        = 'mautic_custom_item_cancel';
 
@@ -95,6 +97,11 @@ class CustomItemRouteProvider
     public function buildEditRoute(int $objectId, int $itemId): string
     {
         return $this->router->generate(static::ROUTE_EDIT, ['objectId' => $objectId, 'itemId' => $itemId]);
+    }
+
+    public function buildEditRouteWithRedirectToContact(int $objectId, int $itemId, int $contactId): string
+    {
+        return $this->router->generate(static::ROUTE_EDIT_REDIRECT_TO_CONTACT, ['objectId' => $objectId, 'itemId' => $itemId, 'contactId' => $contactId]);
     }
 
     public function buildCloneRoute(int $objectId, int $itemId): string

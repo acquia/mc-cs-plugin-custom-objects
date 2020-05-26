@@ -68,6 +68,11 @@ return [
                 'controller' => 'CustomObjectsBundle:CustomItem\Form:edit',
                 'method'     => 'GET',
             ],
+            CustomItemRouteProvider::ROUTE_EDIT_REDIRECT_TO_CONTACT => [
+                'path'       => '/custom/object/{objectId}/item/edit/{itemId}/contact/{contactId}',
+                'controller' => 'CustomObjectsBundle:CustomItem\Form:edit',
+                'method'     => 'GET',
+            ],
             CustomItemRouteProvider::ROUTE_CLONE => [
                 'path'       => '/custom/object/{objectId}/item/clone/{itemId}',
                 'controller' => 'CustomObjectsBundle:CustomItem\Form:clone',
