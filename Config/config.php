@@ -19,7 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 return [
     'name'        => 'Custom Objects',
     'description' => 'Adds custom objects and fields features to Mautic',
-    'version'     => '0.0.11',
+    'version'     => '0.0.12',
     'author'      => 'Mautic, Inc.',
 
     'routes' => [
@@ -792,6 +792,12 @@ return [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectListFormatSubscriber::class,
                 'arguments' => [
                     'custom_object.helper.token_formatter'
+                ]
+            ],
+            'custom_object.post_save.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectPostSaveSubscriber::class,
+                'arguments' => [
+                    'mautic.custom.model.object',
                 ]
             ],
         ],
