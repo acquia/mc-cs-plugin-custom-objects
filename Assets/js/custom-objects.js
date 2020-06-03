@@ -90,13 +90,18 @@ CustomObjects = {
     },
 
     // Called from tab content HTML:
-    initTabShowingLinkedItems(customObjectId, currentEntityId, currentEntityType, tabId) {
+    initTabShowingLinkedItems(customObjectId, currentEntityId, currentEntityType, tabId, relationshipObjectId) {
         let input = mQuery('#'+tabId+'-container [data-toggle="typeahead"]');
         CustomObjects.initCustomItemTypeahead(input, customObjectId, function(selectedItem) {
-            CustomObjects.linkCustomItemWithEntity(selectedItem.id, currentEntityId, currentEntityType, function() {
-                CustomObjects.reloadItemsTable(customObjectId, currentEntityId, currentEntityType, tabId);
-                input.val('');
-            });
+            if (relationshipObjectId) {
+                let itemLinkUrl = mauticBaseUrl+'s/custom/item/'+selectedItem.id+'/link-form/'+currentEntityType+'/'+currentEntityId;
+                Mautic.loadAjaxModal('#MauticSharedModal', itemLinkUrl, 'GET', '');
+            } else {
+                CustomObjects.linkCustomItemWithEntity(selectedItem.id, currentEntityId, currentEntityType, function() {
+                    CustomObjects.reloadItemsTable(customObjectId, currentEntityId, currentEntityType, tabId);
+                    input.val('');
+                });
+            }
         });
         CustomObjects.reloadItemsTable(customObjectId, currentEntityId, currentEntityType, tabId);
     },
@@ -198,10 +203,19 @@ CustomObjects = {
         });
     },
 
-    linkCustomItemWithEntity(customItemId, entitytId, entityType, callback) {
+    linkCustomItemWithEntityThroughRelationshipModal(customItemId, entityId, entityType, callback) {
+        mQuery.ajax({
+            type: 'GET',
+            url: mauticBaseUrl+'s/custom/item/'+customItemId+'/link/'+entityType+'/'+entityId+'.json',
+            success: callback,
+            showLoadingBar: true
+        });
+    },
+
+    linkCustomItemWithEntity(customItemId, entityId, entityType, callback) {
         mQuery.ajax({
             type: 'POST',
-            url: mauticBaseUrl+'s/custom/item/'+customItemId+'/link/'+entityType+'/'+entitytId+'.json',
+            url: mauticBaseUrl+'s/custom/item/'+customItemId+'/link/'+entityType+'/'+entityId+'.json',
             success: callback,
             showLoadingBar: true,
         });
@@ -228,4 +242,14 @@ CustomObjects = {
             showLoadingBar: true,
         });
     },
+};
+
+Mautic.customItemLinkFormPostSubmit = function(response) {
+    let target = mQuery('#MauticSharedModal');
+    let content = mQuery(response.newContent);
+
+    target.find('.modal-title').html(content.find('.page-header h3').html());
+    content.find('.page-header').remove();
+    target.find('.modal-body').html(content);
+    Mautic.onPageLoad('#MauticSharedModal', response, true);
 };

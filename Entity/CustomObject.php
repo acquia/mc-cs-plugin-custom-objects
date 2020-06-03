@@ -146,6 +146,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
 
         $builder->createOneToOne('relationshipObject', CustomObject::class)
             ->addJoinColumn('relationship_object', 'id')
+            ->fetchExtraLazy()
             ->build();
 
         $builder->createOneToOne('masterObject', CustomObject::class)

@@ -115,16 +115,16 @@ class ContactTabSubscriber implements EventSubscriberInterface
             /** @var CustomObject $object */
             foreach ($objects as $object) {
                 $data = [
-                    'customObjectId'              => $object->getId(),
-                    'customObjectHasRelationship' => null === $object->getRelationship(),
-                    'currentEntityId'             => $contact->getId(),
-                    'currentEntityType'           => 'contact',
-                    'tabId'                       => "custom-object-{$object->getId()}",
-                    'page'                        => 1,
-                    'search'                      => '',
-                    'placeholder'                 => $this->translator->trans('custom.item.link.search.placeholder', ['%object%' => $object->getNameSingular()]),
-                    'lookupRoute'                 => $this->customItemRouteProvider->buildLookupRoute((int) $object->getId(), 'contact', (int) $contact->getId()),
-                    'newRoute'                    => $this->customItemRouteProvider->buildNewRouteWithRedirectToContact((int) $object->getId(), (int) $contact->getId()),
+                    'customObjectId'       => $object->getId(),
+                    'relationshipObjectId' => $object->getRelationshipObject() ? $object->getRelationshipObject()->getId() : null,
+                    'currentEntityId'      => $contact->getId(),
+                    'currentEntityType'    => 'contact',
+                    'tabId'                => "custom-object-{$object->getId()}",
+                    'page'                 => 1,
+                    'search'               => '',
+                    'placeholder'          => $this->translator->trans('custom.item.link.search.placeholder', ['%object%' => $object->getNameSingular()]),
+                    'lookupRoute'          => $this->customItemRouteProvider->buildLookupRoute((int) $object->getId(), 'contact', (int) $contact->getId()),
+                    'newRoute'             => $this->customItemRouteProvider->buildNewRouteWithRedirectToContact((int) $object->getId(), (int) $contact->getId()),
                 ];
 
                 $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:content.html.php', $data);

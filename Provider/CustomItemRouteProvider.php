@@ -43,6 +43,10 @@ class CustomItemRouteProvider
 
     public const ROUTE_LINK          = 'mautic_custom_item_link';
 
+    public const ROUTE_LINK_FORM     = 'mautic_custom_item_link_form';
+
+    public const ROUTE_LINK_FORM_SAVE  = 'mautic_custom_item_link_form_save';
+
     public const ROUTE_UNLINK        = 'mautic_custom_item_unlink';
 
     public const ROUTE_IMPORT_ACTION = 'mautic_import_action';
@@ -134,6 +138,16 @@ class CustomItemRouteProvider
     public function buildBatchDeleteRoute(int $objectId): string
     {
         return $this->router->generate(static::ROUTE_BATCH_DELETE, ['objectId' => $objectId]);
+    }
+
+    public function buildLinkFormRoute(int $itemId, string $entityType, int $entityId): string
+    {
+        return $this->router->generate(static::ROUTE_LINK_FORM, ['itemId' => $itemId, 'entityType' => $entityType, 'entityId' => $entityId]);
+    }
+
+    public function buildLinkFormSaveRoute(int $itemId, string $entityType, int $entityId): string
+    {
+        return $this->router->generate(static::ROUTE_LINK_FORM_SAVE, ['itemId' => $itemId, 'entityType' => $entityType, 'entityId' => $entityId]);
     }
 
     public function buildNewImportRoute(int $objectId): string
