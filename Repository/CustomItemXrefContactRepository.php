@@ -51,7 +51,7 @@ class CustomItemXrefContactRepository extends CommonRepository
     }
 
     /**
-     * Used by internal Mautic methods. Use the contstant directly instead.
+     * Used by internal Mautic methods. Use the constant directly instead.
      */
     public function getTableAlias(): string
     {
