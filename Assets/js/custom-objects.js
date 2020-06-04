@@ -250,6 +250,9 @@ Mautic.customItemLinkFormPostSubmit = function(response) {
 
     target.find('.modal-title').html(content.find('.page-header h3').html());
     content.find('.page-header').remove();
+    content.find('.box-layout > .bg-auto').removeClass('bg-auto');
+    // Remove as we auto-generate relationship item names
+    content.find('#custom_item_name').closest('.row').remove();
     target.find('.modal-body').html(content);
     Mautic.onPageLoad('#MauticSharedModal', response, true);
 };

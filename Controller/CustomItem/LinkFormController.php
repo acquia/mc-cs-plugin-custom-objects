@@ -89,7 +89,15 @@ class LinkFormController extends AbstractFormController
 
             $this->permissionProvider->canEdit($customItem);
 
-            $relationshipItem = $this->customItemModel->populateCustomFields(new CustomItem($relationshipObject));
+            // Have this here so I can put a breakpoint for xdebug to see what is in the custom item references
+//            $customItem->getCustomItemReferences()->map(function($item) {
+//                return $item;
+//            });
+
+
+            // Here I need to EITHER create a new custom item OR get the existing one from the $customItem
+            //$relationshipItem = $this->customItemModel->populateCustomFields(new CustomItem($relationshipObject));
+            $relationshipItem = $this->customItemModel->fetchEntity(34);
 
             $form = $this->formFactory->create(
                 CustomItemType::class,
@@ -98,6 +106,7 @@ class LinkFormController extends AbstractFormController
                     'action'    => $this->routeProvider->buildLinkFormSaveRoute($customItem->getId(), $entityType, $entityId),
                     'objectId'  => $relationshipObject->getId(),
                     'contactId' => $entityId,
+                    'cancelUrl' => ''
                 ]
             );
 
@@ -141,6 +150,18 @@ class LinkFormController extends AbstractFormController
             $this->permissionProvider->canCreate($relationshipObject->getId());
 
             $relationshipItem = $this->customItemModel->populateCustomFields(new CustomItem($relationshipObject));
+
+            // Generate a default name for relationship forms as the name is hidden from the form.
+            $submittedFormValues                        = $this->request->request->all();
+            $submittedFormValues['custom_item']['name'] = sprintf('relationship-between-%s-%d-and-%s-%d',
+                $entityType,
+                $entityId,
+                $customItem->getCustomObject()->getAlias(),
+                $customItem->getCustomObject()->getId()
+            );
+
+            // Overwrite the request params with the new ones containing the generated title.
+            $this->request->request->add($submittedFormValues);
 
             $form = $this->formFactory->create(
                 CustomItemType::class,

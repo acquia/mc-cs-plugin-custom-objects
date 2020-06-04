@@ -22,6 +22,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use function GuzzleHttp\Psr7\parse_header;
 
 class CustomItemButtonSubscriber implements EventSubscriberInterface
 {
@@ -77,6 +78,14 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
                                 ButtonHelper::LOCATION_LIST_ACTIONS,
                                 $event->getRoute()
                             );
+
+                            if (null !== $customItem->getCustomObject()->getRelationshipObject()) {
+                                $event->addButton(
+                                    $this->defineEditLinkFormButton($customItem, $filterEntityType, (int) $filterEntityId),
+                                    ButtonHelper::LOCATION_LIST_ACTIONS,
+                                    $event->getRoute()
+                                );
+                            }
                         }
                     } else {
                         $this->addEntityButtons($event, ButtonHelper::LOCATION_LIST_ACTIONS, $customObjectId);
@@ -152,6 +161,23 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
         return [
             'attr' => [
                 'href' => $this->routeProvider->buildEditRoute($customObjectId, $customItem->getId()),
+            ],
+            'btnText'   => 'mautic.core.form.edit',
+            'iconClass' => 'fa fa-pencil-square-o',
+            'priority'  => 500,
+        ];
+    }
+
+    private function defineEditLinkFormButton(CustomItem $customItem, string $entityType, int $entityId): array
+    {
+        $this->permissionProvider->canEdit($customItem);
+
+        return [
+            'attr' => [
+                'href' => $this->routeProvider->buildLinkFormRoute($customItem->getId(), $entityType, $entityId),
+                'data-target' => '#MauticSharedModal',
+                'data-toggle' => 'ajaxmodal',
+                'data-header' => 'mautic.core.form.edit',
             ],
             'btnText'   => 'mautic.core.form.edit',
             'iconClass' => 'fa fa-pencil-square-o',
