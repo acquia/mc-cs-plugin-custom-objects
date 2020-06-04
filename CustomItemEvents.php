@@ -22,7 +22,7 @@ final class CustomItemEvents
      * The custom.item.on_pre_save event is fired when a custom item is about to be saved.
      *
      * The event listener receives a
-     * MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent
+     * @see \MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent
      *
      * @var string
      */
@@ -32,7 +32,7 @@ final class CustomItemEvents
      * The custom.item.on_post_save event is fired when a custom item is saved.
      *
      * The event listener receives a
-     * MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent
+     * @see \MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent
      *
      * @var string
      */
@@ -42,7 +42,7 @@ final class CustomItemEvents
      * The custom.item.on_pre_delete event is fired when a custom item is about to be deleted.
      *
      * The event listener receives a
-     * MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent
+     * @see \MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent
      *
      * @var string
      */
@@ -52,7 +52,7 @@ final class CustomItemEvents
      * The custom.item.on_post_delete event is fired when a custom item is deleted.
      *
      * The event listener receives a
-     * MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent
+     * @see \MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent
      *
      * @var string
      */
@@ -62,7 +62,7 @@ final class CustomItemEvents
      * The custom.item.on_item_dbal_list_query event is fired when custom items list DBAL query is being build.
      *
      * The event listener receives a
-     * MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent
+     * @see \MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent
      *
      * @var string
      */
@@ -72,7 +72,7 @@ final class CustomItemEvents
      * The custom.item.on_item_orm_list_query event is fired when custom items list ORM query is being build.
      *
      * The event listener receives a
-     * MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent
+     * @see \MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent
      *
      * @var string
      */
@@ -82,7 +82,7 @@ final class CustomItemEvents
      * The custom.item.on_item_lookup_query event is fired when custom items lookup query is being build.
      *
      * The event listener receives a
-     * MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent
+     * @see \MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent
      *
      * @var string
      */
@@ -92,7 +92,7 @@ final class CustomItemEvents
      * The custom.item.on_link_entity_id event is fired when a custom item is about to be connected to an (at that time) unknown entity.
      *
      * The event listener receives a
-     * MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent
+     * @see \MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent
      *
      * @var string
      */
@@ -102,7 +102,7 @@ final class CustomItemEvents
      * The custom.item.on_link_entity event is fired when a custom item is connected to an entity.
      *
      * The event listener receives a
-     * MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent
+     * @see \MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent
      *
      * @var string
      */
@@ -112,7 +112,7 @@ final class CustomItemEvents
      * The custom.item.on_unlink_entity event is fired when a custom item is disconnected from an entity.
      *
      * The event listener receives a
-     * MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent
+     * @see \MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent
      *
      * @var string
      */
@@ -122,7 +122,7 @@ final class CustomItemEvents
      * The custom.item.on_campaign_trigger_action event is fired when the campaign action triggers.
      *
      * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     * @see \Mautic\CampaignBundle\Event\CampaignExecutionEvent
      *
      * @var string
      */
@@ -132,7 +132,7 @@ final class CustomItemEvents
      * The custom.item.on_campaign_trigger_condition event is fired when the campaign condition triggers.
      *
      * The event listener receives a
-     * Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     * @see \Mautic\CampaignBundle\Event\CampaignExecutionEvent
      *
      * @var string
      */
