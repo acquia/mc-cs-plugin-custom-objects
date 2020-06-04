@@ -1,5 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
+/*
+ * @copyright   2020 Mautic, Inc. All rights reserved
+ * @author      Mautic, Inc.
+ *
+ * @link        https://mautic.com
+ *
+ * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
+ */
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
@@ -10,6 +20,7 @@ use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\CustomObjectsBundle\EventListener\SegmentFiltersChoicesGenerateSubscriber;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
@@ -20,33 +31,47 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class SegmentFiltersChoicesGenerateSubscriberTest extends TestCase
 {
-    /** @var SegmentFiltersChoicesGenerateSubscriber */
-    private $segmentFiltersChoicesGenerateSubscriber;
-
-    /** @var TranslatorInterface|MockObject */
-    private $translator;
-
-    /** @var ConfigProvider|MockObject */
-    private $configProvider;
-
-    /** @var CustomFieldTypeProvider|MockObject */
-    private $fieldTypeProvider;
-
-    /** @var CustomObjectRepository|MockObject */
+    /**
+     * @var CustomObjectRepository|MockObject
+     */
     private $customObjectRepository;
 
-    /** @var FilterOperatorProviderInterface|MockObject */
+    /**
+     * @var MockObject|TranslatorInterface
+     */
+    private $translator;
+
+    /**
+     * @var ConfigProvider|MockObject
+     */
+    private $configProvider;
+
+    /**
+     * @var CustomFieldTypeProvider|MockObject
+     */
+    private $fieldTypeProvider;
+
+    /**
+     * @var SegmentFiltersChoicesGenerateSubscriber
+     */
+    private $subscriber;
+
+    /**
+     * @var FilterOperatorProviderInterface|MockObject
+     */
     private $filterOperatorProvider;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
+        parent::setUp();
+
         $this->customObjectRepository = $this->createMock(CustomObjectRepository::class);
         $this->translator             = $this->createMock(TranslatorInterface::class);
         $this->configProvider         = $this->createMock(ConfigProvider::class);
         $this->fieldTypeProvider      = $this->createMock(CustomFieldTypeProvider::class);
         $this->filterOperatorProvider = $this->createMock(FilterOperatorProviderInterface::class);
 
-        $this->segmentFiltersChoicesGenerateSubscriber = new SegmentFiltersChoicesGenerateSubscriber(
+        $this->subscriber = new SegmentFiltersChoicesGenerateSubscriber(
             $this->customObjectRepository,
             $this->translator,
             $this->configProvider,
@@ -62,7 +87,7 @@ class SegmentFiltersChoicesGenerateSubscriberTest extends TestCase
         $customObject->setNamePlural('Products');
         $customObject->setIsPublished(true);
 
-        $intType     = new IntType($this->translator, $this->filterOperatorProvider);
+        $intType = new IntType($this->translator, $this->filterOperatorProvider);
         $customField = new CustomField();
         $customField->setId(1);
         $customField->setType('int');
@@ -76,151 +101,151 @@ class SegmentFiltersChoicesGenerateSubscriberTest extends TestCase
         $criteria = new Criteria(Criteria::expr()->eq('isPublished', 1));
 
         $keyTypeMapping = [
-            'custom.field.type.int'  => 'int',
+            'custom.field.type.int' => 'int',
             'custom.field.type.text' => 'text',
         ];
 
         $allOperators = [
-            '='                   =>
+            '=' =>
                 [
-                    'label'       => 'equals',
-                    'expr'        => 'eq',
+                    'label' => 'equals',
+                    'expr' => 'eq',
                     'negate_expr' => 'neq',
                 ],
-            '!='                  =>
+            '!=' =>
                 [
-                    'label'       => 'not equal',
-                    'expr'        => 'neq',
+                    'label' => 'not equal',
+                    'expr' => 'neq',
                     'negate_expr' => 'eq',
                 ],
-            'gt'                  =>
+            'gt' =>
                 [
-                    'label'       => 'greater than',
-                    'expr'        => 'gt',
+                    'label' => 'greater than',
+                    'expr' => 'gt',
                     'negate_expr' => 'lt',
                 ],
-            'gte'                 =>
+            'gte' =>
                 [
-                    'label'       => 'greater than or equal',
-                    'expr'        => 'gte',
+                    'label' => 'greater than or equal',
+                    'expr' => 'gte',
                     'negate_expr' => 'lt',
                 ],
-            'lt'                  =>
+            'lt' =>
                 [
-                    'label'       => 'less than',
-                    'expr'        => 'lt',
+                    'label' => 'less than',
+                    'expr' => 'lt',
                     'negate_expr' => 'gt',
                 ],
-            'lte'                 =>
+            'lte' =>
                 [
-                    'label'       => 'less than or equal',
-                    'expr'        => 'lte',
+                    'label' => 'less than or equal',
+                    'expr' => 'lte',
                     'negate_expr' => 'gt',
                 ],
-            'empty'               =>
+            'empty' =>
                 [
-                    'label'       => 'empty',
-                    'expr'        => 'empty',
+                    'label' => 'empty',
+                    'expr' => 'empty',
                     'negate_expr' => 'notEmpty',
                 ],
-            '!empty'              =>
+            '!empty' =>
                 [
-                    'label'       => 'not empty',
-                    'expr'        => 'notEmpty',
+                    'label' => 'not empty',
+                    'expr' => 'notEmpty',
                     'negate_expr' => 'empty',
                 ],
-            'like'                =>
+            'like' =>
                 [
-                    'label'       => 'like',
-                    'expr'        => 'like',
+                    'label' => 'like',
+                    'expr' => 'like',
                     'negate_expr' => 'notLike',
                 ],
-            '!like'               =>
+            '!like' =>
                 [
-                    'label'       => 'not like',
-                    'expr'        => 'notLike',
+                    'label' => 'not like',
+                    'expr' => 'notLike',
                     'negate_expr' => 'like',
                 ],
-            'between'             =>
+            'between' =>
                 [
-                    'label'       => 'between',
-                    'expr'        => 'between',
+                    'label' => 'between',
+                    'expr' => 'between',
                     'negate_expr' => 'notBetween',
-                    'hide'        => true,
+                    'hide' => true,
                 ],
-            '!between'            =>
+            '!between' =>
                 [
-                    'label'       => 'not between',
-                    'expr'        => 'notBetween',
+                    'label' => 'not between',
+                    'expr' => 'notBetween',
                     'negate_expr' => 'between',
-                    'hide'        => true,
+                    'hide' => true,
                 ],
-            'in'                  =>
+            'in' =>
                 [
-                    'label'       => 'including',
-                    'expr'        => 'in',
+                    'label' => 'including',
+                    'expr' => 'in',
                     'negate_expr' => 'notIn',
                 ],
-            '!in'                 =>
+            '!in' =>
                 [
-                    'label'       => 'excluding',
-                    'expr'        => 'notIn',
+                    'label' => 'excluding',
+                    'expr' => 'notIn',
                     'negate_expr' => 'in',
                 ],
-            'regexp'              =>
+            'regexp' =>
                 [
-                    'label'       => 'regexp',
-                    'expr'        => 'regexp',
+                    'label' => 'regexp',
+                    'expr' => 'regexp',
                     'negate_expr' => 'notRegexp',
                 ],
-            '!regexp'             =>
+            '!regexp' =>
                 [
-                    'label'       => 'not regexp',
-                    'expr'        => 'notRegexp',
+                    'label' => 'not regexp',
+                    'expr' => 'notRegexp',
                     'negate_expr' => 'regexp',
                 ],
-            'date'                =>
+            'date' =>
                 [
-                    'label'       => 'date',
-                    'expr'        => 'date',
+                    'label' => 'date',
+                    'expr' => 'date',
                     'negate_expr' => 'date',
-                    'hide'        => true,
+                    'hide' => true,
                 ],
-            'startsWith'          =>
+            'startsWith' =>
                 [
-                    'label'       => 'starts with',
-                    'expr'        => 'startsWith',
+                    'label' => 'starts with',
+                    'expr' => 'startsWith',
                     'negate_expr' => 'startsWith',
                 ],
-            'endsWith'            =>
+            'endsWith' =>
                 [
-                    'label'       => 'ends with',
-                    'expr'        => 'endsWith',
+                    'label' => 'ends with',
+                    'expr' => 'endsWith',
                     'negate_expr' => 'endsWith',
                 ],
-            'contains'            =>
+            'contains' =>
                 [
-                    'label'       => 'contains',
-                    'expr'        => 'contains',
+                    'label' => 'contains',
+                    'expr' => 'contains',
                     'negate_expr' => 'contains',
                 ],
             'withinCustomObjects' =>
                 [
-                    'label'       => 'within custom objects',
-                    'expr'        => 'withinCustomObjects',
+                    'label' => 'within custom objects',
+                    'expr' => 'withinCustomObjects',
                     'negate_expr' => 'notWithinCustomObjects',
                 ],
         ];
 
         $fieldOperators = [
-            'equals'                => '=',
-            'not equal'             => '!=',
-            'greater than'          => 'gt',
+            'equals' => '=',
+            'not equal' => '!=',
+            'greater than' => 'gt',
             'greater than or equal' => 'gte',
-            'less than'             => 'lt',
-            'less than or equal'    => 'lte',
-            'empty'                 => 'empty',
-            'not empty'             => '!empty',
+            'less than' => 'lt',
+            'less than or equal' => 'lte',
+            'empty' => 'empty',
+            'not empty' => '!empty',
         ];
 
         $event = new LeadListFiltersChoicesEvent([], [], $this->translator);
@@ -303,7 +328,7 @@ class SegmentFiltersChoicesGenerateSubscriberTest extends TestCase
             ->method('getAllOperators')
             ->willReturn($allOperators);
 
-        $this->segmentFiltersChoicesGenerateSubscriber->onGenerateSegmentFilters($event);
+        $this->subscriber->onGenerateSegmentFilters($event);
 
         $choices = $event->getChoices();
         $this->assertIsArray($choices);
@@ -313,5 +338,43 @@ class SegmentFiltersChoicesGenerateSubscriberTest extends TestCase
         $this->assertSame('Products Mobile', $choices['custom_object']['cmo_1']['label']);
         $this->assertSame('Products : Price', $choices['custom_object']['cmf_1']['label']);
         $this->assertSame($fieldOperators, $choices['custom_object']['cmf_1']['operators']);
+    }
+
+    public function testGetSubscribedEvents(): void
+    {
+        $this->assertSame(
+            [LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE => 'onGenerateSegmentFilters'],
+            SegmentFiltersChoicesGenerateSubscriber::getSubscribedEvents()
+        );
+    }
+
+    public function testOnGenerateSegmentFiltersPluginDisabled(): void
+    {
+        $this->configProvider->expects($this->once())
+            ->method('pluginIsEnabled')
+            ->willReturn(false);
+
+        $this->fieldTypeProvider->expects($this->never())
+            ->method('getKeyTypeMapping');
+
+        $event = new LeadListFiltersChoicesEvent([], [], $this->translator);
+        $this->subscriber->onGenerateSegmentFilters($event);
+    }
+
+    public function testOnGenerateSegmentFiltersPluginEnabled(): void
+    {
+        $this->configProvider->expects($this->once())
+            ->method('pluginIsEnabled')
+            ->willReturn(true);
+
+        $this->fieldTypeProvider->expects($this->once())
+            ->method('getKeyTypeMapping');
+
+        $this->customObjectRepository->expects($this->once())
+            ->method('matching')
+            ->willReturn(new ArrayCollection());
+
+        $event = new LeadListFiltersChoicesEvent([], [], $this->translator);
+        $this->subscriber->onGenerateSegmentFilters($event);
     }
 }
