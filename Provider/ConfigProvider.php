@@ -20,7 +20,8 @@ class ConfigProvider
     /**
      * @var string
      */
-    public const CONFIG_PARAM_ENABLED = 'custom_objects_enabled';
+    public const CONFIG_PARAM_ENABLED                              = 'custom_objects_enabled';
+    public const CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT = 'custom_object_item_value_to_contact_relation_limit';
 
     /**
      * @var CoreParametersHelper
