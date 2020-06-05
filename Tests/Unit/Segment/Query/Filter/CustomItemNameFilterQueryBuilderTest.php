@@ -64,6 +64,11 @@ class CustomItemNameFilterQueryBuilderTest extends TestCase
         );
     }
 
+    public function testGetServiceId(): void
+    {
+        $this->assertSame('mautic.lead.query.builder.custom_item.value', CustomItemNameFilterQueryBuilder::getServiceId());
+    }
+
     /**
      * @dataProvider parameterValueProvider
      * @param $parameterValue
@@ -112,8 +117,8 @@ class CustomItemNameFilterQueryBuilderTest extends TestCase
     public function parameterValueProvider()
     {
         return [
-          ['mautic'],
-          [10],
+            ['mautic'],
+            [10],
         ];
     }
 }
