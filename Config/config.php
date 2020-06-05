@@ -1026,6 +1026,7 @@ return [
                     'mautic.lead.model.random_parameter_name',
                     'event_dispatcher',
                     'custom_object.query.filter.helper',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.lead.query.builder.custom_item.value'  => [
@@ -1056,5 +1057,6 @@ return [
     ],
     'parameters' => [
         ConfigProvider::CONFIG_PARAM_ENABLED => true,
+        ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT => 2,
     ],
 ];
