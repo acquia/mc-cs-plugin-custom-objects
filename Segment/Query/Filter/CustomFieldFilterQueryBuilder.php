@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Segment\Query\Filter;
 
 use Doctrine\DBAL\DBALException;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -21,6 +22,7 @@ use Mautic\LeadBundle\Segment\RandomParameterName;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
+use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
@@ -30,13 +32,23 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
      */
     private $filterHelper;
 
+    /**
+     * @see ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT
+     *
+     * @var int
+     */
+    private $relationLimit;
+
     public function __construct(
         RandomParameterName $randomParameterNameService,
         EventDispatcherInterface $dispatcher,
-        QueryFilterHelper $filterHelper
+        QueryFilterHelper $filterHelper,
+        CoreParametersHelper $coreParametersHelper
     ) {
         parent::__construct($randomParameterNameService, $dispatcher);
-        $this->filterHelper = $filterHelper;
+
+        $this->filterHelper  = $filterHelper;
+        $this->relationLimit = $coreParametersHelper->get(ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT);
     }
 
     /** {@inheritdoc} */
