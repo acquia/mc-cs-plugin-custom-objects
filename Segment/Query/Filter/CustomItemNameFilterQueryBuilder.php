@@ -86,20 +86,4 @@ class CustomItemNameFilterQueryBuilder extends BaseFilterQueryBuilder
 
         return $queryBuilder;
     }
-
-    /**
-     * @param string[]|string $filterParameters
-     *
-     * @return string[]|string
-     */
-    public function getParametersAliases($filterParameters)
-    {
-        if (is_array($filterParameters)) {
-            return array_map(function () {
-                return $this->generateRandomParameterName();
-            }, $filterParameters);
-        }
-
-        return $this->generateRandomParameterName();
-    }
 }
