@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -47,7 +48,7 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
     /**
      * @throws DBALException
      * @throws InvalidArgumentException
-     * @throws \MauticPlugin\CustomObjectsBundle\Exception\NotFoundException
+     * @throws NotFoundException
      */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
