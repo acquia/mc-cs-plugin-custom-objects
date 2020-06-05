@@ -48,10 +48,10 @@ class QueryFilterHelper
     ): QueryBuilder {
         $queryBuilder      = new QueryBuilder($connection);
         $fieldType         = $fieldType ?: $this->getCustomFieldType($queryBuilder, $fieldId);
-        $valueQueryBuilder = $this->getBasicItemQueryBuilder($queryBuilder, $builderAlias);
-        $this->addCustomFieldValueJoin($valueQueryBuilder, $builderAlias, $fieldType, $fieldId);
+        $queryBuilder      = $this->getBasicItemQueryBuilder($queryBuilder, $builderAlias);
+        $this->addCustomFieldValueJoin($queryBuilder, $builderAlias, $fieldType, $fieldId);
 
-        return $valueQueryBuilder;
+        return $queryBuilder;
     }
 
     public function createItemNameQueryBuilder(Connection $connection, string $queryBuilderAlias): QueryBuilder
