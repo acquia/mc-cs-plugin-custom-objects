@@ -72,5 +72,8 @@ class CustomItemPostSaveSubscriber implements EventSubscriberInterface
 
         // Links the relationship object item to the master object item
         $this->customItemModel->linkEntity($relationshipObjectItem, 'customItem', $masterObjectItem->getId());
+
+        // Links the relationship object item to the entityType defined in the request. eg: contact
+        $this->customItemModel->linkEntity($relationshipObjectItem, $entityType, $entityId);
     }
 }

@@ -177,7 +177,7 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
                 'href' => $this->routeProvider->buildLinkFormRoute($customItem->getId(), $entityType, $entityId),
                 'data-target' => '#MauticSharedModal',
                 'data-toggle' => 'ajaxmodal',
-                'data-header' => 'mautic.core.form.edit',
+                'data-header' => $this->translator->trans('mautic.core.form.edit'),
             ],
             'btnText'   => 'mautic.core.form.edit',
             'iconClass' => 'fa fa-pencil-square-o',

@@ -17,6 +17,8 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Service\FlashBag;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Exception\NoRelationshipException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
@@ -89,17 +91,8 @@ class LinkFormController extends AbstractFormController
 
             $this->permissionProvider->canEdit($customItem);
 
-            // Have this here so I can put a breakpoint for xdebug to see what is in the custom item references
-//            $customItem->getCustomItemReferences()->map(function($item) {
-//                return $item;
-//            });
-
-
-            // Here I need to EITHER create a new custom item OR get the existing one from the $customItem
-            //$relationshipItem = $this->customItemModel->populateCustomFields(new CustomItem($relationshipObject));
-            $relationshipItem = $this->customItemModel->fetchEntity(34);
-
-            $form = $this->formFactory->create(
+            $relationshipItem = $this->getRelationshipItem($relationshipObject, $customItem, $entityType, $entityId);
+            $form             = $this->formFactory->create(
                 CustomItemType::class,
                 $relationshipItem,
                 $options = [
@@ -149,7 +142,7 @@ class LinkFormController extends AbstractFormController
 
             $this->permissionProvider->canCreate($relationshipObject->getId());
 
-            $relationshipItem = $this->customItemModel->populateCustomFields(new CustomItem($relationshipObject));
+            $relationshipItem = $this->getRelationshipItem($relationshipObject, $customItem, $entityType, $entityId);
 
             // Generate a default name for relationship forms as the name is hidden from the form.
             $submittedFormValues                        = $this->request->request->all();
@@ -186,7 +179,7 @@ class LinkFormController extends AbstractFormController
                 return new JsonResponse($responseData);
             }
 
-        } catch (ForbiddenException | NoRelationshipException $e) {
+        } catch (ForbiddenException | NoRelationshipException | NotFoundException $e) {
             $this->flashBag->add($e->getMessage(), [], FlashBag::LEVEL_ERROR);
         }
 
@@ -207,6 +200,24 @@ class LinkFormController extends AbstractFormController
                     'route'         => $this->routeProvider->buildLinkFormRoute($itemId, $entityType, $entityId),
                 ],
             ]
+        );
+    }
+
+    protected function getRelationshipItem(CustomObject $relationshipObject, CustomItem $customItem, string $entityType, int $entityId): CustomItem
+    {
+        /** @var CustomItemXrefCustomItem|null $relationshipItemXref */
+        $relationshipItemXref = $customItem->getCustomItemReferences()
+            ->filter(function(CustomItemXrefCustomItem $item) use ($entityType, $entityId) {
+                $higher = $item->getCustomItemHigher();
+
+                return $higher->getRelationsByType($entityType)
+                        ->filter(function($relation) use ($entityType, $entityId)  {
+                            return (int) $relation->getLinkedEntity()->getId() === (int) $entityId;
+                        })->count() > 0;
+            })->first();
+
+        return $this->customItemModel->populateCustomFields(
+            $relationshipItemXref ? $relationshipItemXref->getCustomItemHigher() : new CustomItem($relationshipObject)
         );
     }
 }
