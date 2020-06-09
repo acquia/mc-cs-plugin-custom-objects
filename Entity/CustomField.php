@@ -19,6 +19,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -56,7 +57,6 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  *          "formats"={"jsonld", "json", "html", "csv"={"text/csv"}}
  *     }
  * )
- * @ORM\Entity(repositoryClass="MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository")
  */
 class CustomField extends FormEntity implements UniqueEntityInterface
 {
@@ -70,7 +70,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var string|null
-     * @Groups({"custom_object:read", "custom_object:write", "custom_field:read", "custom_field:write"})
+     * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
      * @ApiProperty(
      *     attributes={
      *         "openapi_context"={
@@ -86,7 +86,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var string|null
-     * @Groups({"custom_object:read", "custom_object:write", "custom_field:read", "custom_field:write"})
+     * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
      * @ApiProperty(
      *     attributes={
      *         "openapi_context"={
@@ -102,7 +102,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var string|null
-     * @Groups({"custom_object:read", "custom_object:write", "custom_field:read", "custom_field:write"})
+     * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
      * @ApiProperty(
      *     attributes={
      *         "openapi_context"={
@@ -118,21 +118,20 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var CustomFieldTypeInterface|null
-     * @Groups({"custom_object:read", "custom_field:read"})
      */
     private $typeObject;
 
     /**
      * @var CustomObject|null
-     * @ManyToOne(targetEntity="CustomObject")
-     * @Groups({"custom_field:read", "custom_field:write"})
-     *
+     * @ManyToOne(targetEntity="CustomObject", inversedBy="customFields")
+     * @JoinColumn(name="custom_object_id", referencedColumnName="id")
+     * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
      */
     private $customObject;
 
     /**
      * @var int|null
-     * @Groups({"custom_object:read", "custom_object:write", "custom_field:read", "custom_field:write"})
+     * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
      * @ApiProperty(
      *     attributes={
      *         "openapi_context"={
@@ -147,13 +146,13 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var bool
-     * @Groups({"custom_object:read", "custom_object:write", "custom_field:read", "custom_field:write"})
+     * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
      */
     private $required = false;
 
     /**
      * @var mixed
-     * @Groups({"custom_object:read", "custom_object:write", "custom_field:read", "custom_field:write"})
+     * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
      */
     private $defaultValue;
 
@@ -164,9 +163,10 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var Params|string[]
-     * @Groups({"custom_object:read", "custom_object:write", "custom_field:read", "custom_field:write"})
+     * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
      */
     private $params;
+
 
     public function __construct()
     {
@@ -257,9 +257,13 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
     /**
      * Allow different field types to validate the value.
+     * @throws NotFoundException
      */
     public function validateDefaultValue(ExecutionContextInterface $context): void
     {
+        if (!$this->getTypeObject()) {
+            return;
+        }
         try {
             $this->getTypeObject()->validateValue($this, $this->defaultValue);
         } catch (\UnexpectedValueException $e) {
@@ -409,6 +413,14 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @return mixed
      */
+    public function getRawDefaultValue()
+    {
+        return $this->defaultValue;
+    }
+
+    /**
+     * @return mixed
+     */
     public function getDefaultValue()
     {
         try {
@@ -425,6 +437,10 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      */
     public function setDefaultValue($defaultValue): void
     {
+        if (!$this->getTypeObject()) {
+            $this->defaultValue = $defaultValue;
+            return;
+        }
         try {
             $this->defaultValue = $this->getTypeObject()->createDefaultValueTransformer()->reverseTransform($defaultValue);
 
@@ -591,5 +607,42 @@ class CustomField extends FormEntity implements UniqueEntityInterface
                 ]
             )
             ->build();
+    }
+
+    /**
+     * @Groups({"custom_field:read", "custom_object:read"})
+     */
+    public function getIsPublished():?bool
+    {
+        return parent::getIsPublished();
+    }
+
+    /**
+     * @Groups({"custom_field:read", "custom_object:read"})
+     */
+    public function getDateAdded():?\DateTime
+    {
+        return parent::getDateAdded();
+    }
+
+    /**
+     * @Groups({"custom_field:read", "custom_object:read"})
+     */
+    public function getDateModified():?\DateTime
+    {
+        return parent::getDateModified();
+    }
+
+    /**
+     * @Groups({"custom_field:write", "custom_object:write"})
+     * @param bool $isPublished
+     *
+     * @return $this
+     */
+    public function setIsPublished($isPublished)
+    {
+        parent::setIsPublished($isPublished);
+
+        return $this;
     }
 }

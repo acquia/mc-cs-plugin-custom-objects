@@ -768,6 +768,12 @@ return [
                     'custom_object.segment_decorator_multiselect',
                 ],
             ],
+            'custom_object.custom_field.api.pre_validate.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldPreValidateApiSubscriber::class,
+                'arguments' => [
+                    'custom_field.type.provider',
+                ],
+            ],
         ],
         'forms' => [
             'custom_item.item.form' => [

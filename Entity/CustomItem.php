@@ -19,8 +19,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\ManyToOne;
-use JMS\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -44,8 +43,8 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  *          "delete"={"security"="'custom_objects:custom_items:delete'"}
  *     },
  *     shortName="custom_items",
- *     normalizationContext={"groups"={"custom_i:read"}, "swagger_definition_name"="Read"},
- *     denormalizationContext={"groups"={"custom_i:write"}, "swagger_definition_name"="Write"},
+ *     normalizationContext={"groups"={"custom_item:read"}, "swagger_definition_name"="Read"},
+ *     denormalizationContext={"groups"={"custom_item:write"}, "swagger_definition_name"="Write"},
  *     attributes={
  *          "pagination_items_per_page"=10,
  *          "formats"={"jsonld", "json", "html", "csv"={"text/csv"}}
@@ -58,13 +57,13 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     public const TABLE_ALIAS = 'CustomItem';
 
     /**
-     * @var int|null
+     * @var int
      */
     private $id;
 
     /**
      * @var string|null
-     * @Groups({"custom_i:read", "custom_i:write"})
+     * @Groups({"custom_item:read", "custom_item:write"})
      * @ApiProperty(
      *     attributes={
      *         "openapi_context"={
@@ -80,8 +79,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var CustomObject
-     * @ManyToOne(targetEntity="CustomObject")
-     * @Groups({"custom_i:read", "custom_i:write"})
+     *
      */
     private $customObject;
 
