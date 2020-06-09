@@ -184,10 +184,6 @@ return [
                 'controller' => 'CustomObjectsBundle:CustomObject\Delete:delete',
                 'method'     => 'GET|POST',
             ],
-            CustomObjectRouteProvider::ROUTE_LINK => [
-                'path'       => '/custom/object/{objectId}/item/{itemId}/link/{entityType}/{entityId}',
-                'controller' => 'CustomObjectsBundle:CustomObject\Link:form'
-            ],
         ],
     ],
 
