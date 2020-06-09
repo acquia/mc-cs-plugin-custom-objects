@@ -113,7 +113,7 @@ class LinkFormController extends AbstractFormController
                     ],
                     'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.php',
                     'passthroughVars' => [
-                        'callback'      => 'customItemLinkFormPostSubmit',
+                        'callback'      => 'customItemLinkFormLoad',
                         'mauticContent' => 'customItem',
                         'route'         => $this->routeProvider->buildNewRoute($relationshipObject->getId()),
                     ],
@@ -173,6 +173,7 @@ class LinkFormController extends AbstractFormController
 
                 $responseData = [
                     'closeModal' => true,
+                    'callback'   => 'customItemLinkFormPostSubmit',
                     'flashes'    => $this->renderView('MauticCoreBundle:Notification:flash_messages.html.php'),
                 ];
 

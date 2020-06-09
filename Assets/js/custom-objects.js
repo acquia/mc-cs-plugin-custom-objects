@@ -6,6 +6,7 @@ mQuery(function() {
 });
 
 CustomObjects = {
+    activeModal: {},
 
     onCampaignEventModalLoaded(callback) {
         mQuery(document).ajaxComplete(function(event, request, settings) {
@@ -94,8 +95,14 @@ CustomObjects = {
         let input = mQuery('#'+tabId+'-container [data-toggle="typeahead"]');
         CustomObjects.initCustomItemTypeahead(input, customObjectId, function(selectedItem) {
             if (relationshipObjectId) {
+                CustomObjects.activeModal = {
+                    customObjectId: customObjectId,
+                    currentEntityId: currentEntityId,
+                    currentEntityType: currentEntityType,
+                    tabId: tabId
+                };
                 let itemLinkUrl = mauticBaseUrl+'s/custom/item/'+selectedItem.id+'/link-form/'+currentEntityType+'/'+currentEntityId;
-                Mautic.loadAjaxModal('#MauticSharedModal', itemLinkUrl, 'GET', '');
+                Mautic.loadAjaxModal('#MauticSharedModal', itemLinkUrl, 'GET');
             } else {
                 CustomObjects.linkCustomItemWithEntity(selectedItem.id, currentEntityId, currentEntityType, function() {
                     CustomObjects.reloadItemsTable(customObjectId, currentEntityId, currentEntityType, tabId);
@@ -203,15 +210,6 @@ CustomObjects = {
         });
     },
 
-    linkCustomItemWithEntityThroughRelationshipModal(customItemId, entityId, entityType, callback) {
-        mQuery.ajax({
-            type: 'GET',
-            url: mauticBaseUrl+'s/custom/item/'+customItemId+'/link/'+entityType+'/'+entityId+'.json',
-            success: callback,
-            showLoadingBar: true
-        });
-    },
-
     linkCustomItemWithEntity(customItemId, entityId, entityType, callback) {
         mQuery.ajax({
             type: 'POST',
@@ -244,7 +242,7 @@ CustomObjects = {
     },
 };
 
-Mautic.customItemLinkFormPostSubmit = function(response) {
+Mautic.customItemLinkFormLoad = function(response) {
     let target = mQuery('#MauticSharedModal');
     let content = mQuery(response.newContent);
 
@@ -258,4 +256,39 @@ Mautic.customItemLinkFormPostSubmit = function(response) {
     content.find('.btn-apply').remove();
     target.find('.modal-body').html(content);
     Mautic.onPageLoad('#MauticSharedModal', response, true);
+};
+
+Mautic.customItemLinkFormPostSubmit = function(response) {
+    mQuery('body').removeClass('noscroll');
+    mQuery('#MauticSharedModal').modal('hide');
+
+    Mautic.customObjectsCleanUpFormModal();
+};
+
+/**
+ * For setup of CustomObjects.activeModal property when loading
+ * the ajax modal from the edit link.
+ *
+ * @param el
+ */
+Mautic.customObjectsSetUpLinkFormModalFromEditLink = function(el) {
+    let element = mQuery(el);
+
+    CustomObjects.activeModal = {
+        customObjectId: element.attr('data-custom-object-id'),
+        currentEntityId: element.attr('data-current-entity-id'),
+        currentEntityType: element.attr('data-current-entity-type'),
+        tabId: element.attr('data-tab-id')
+    };
+};
+
+Mautic.customObjectsCleanUpFormModal = function() {
+    CustomObjects.reloadItemsTable(
+        CustomObjects.activeModal.customObjectId,
+        CustomObjects.activeModal.currentEntityId,
+        CustomObjects.activeModal.currentEntityType,
+        CustomObjects.activeModal.tabId
+    );
+    mQuery('#'+CustomObjects.activeModal.tabId+'-container').find('[data-toggle="typeahead"]').val('');
+    CustomObjects.activeModal = {};
 };
