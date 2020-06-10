@@ -115,6 +115,7 @@ class ListController extends CommonController
         $this->sessionProvider->setPageLimit($limit);
         $this->sessionProvider->setFilter($search);
 
+        $route    = $this->routeProvider->buildListRoute($objectId, $page);
         $response = [
             'viewParameters' => [
                 'searchValue'      => $search,
@@ -130,15 +131,14 @@ class ListController extends CommonController
             'contentTemplate' => 'CustomObjectsBundle:CustomItem:list.html.php',
             'passthroughVars' => [
                 'mauticContent' => 'customItem',
+                'route'         => $route,
             ],
         ];
 
         if ($request->isXmlHttpRequest()) {
             $response['viewParameters']['tmpl'] = $request->get('tmpl', 'index');
         } else {
-            $route                                = $this->routeProvider->buildListRoute($objectId, $page);
-            $response['returnUrl']                = $route;
-            $response['passthroughVars']['route'] = $route;
+            $response['returnUrl'] = $route;
         }
 
         return $this->delegateView($response);
