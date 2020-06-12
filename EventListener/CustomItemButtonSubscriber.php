@@ -22,7 +22,6 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
-use function GuzzleHttp\Psr7\parse_header;
 
 class CustomItemButtonSubscriber implements EventSubscriberInterface
 {
