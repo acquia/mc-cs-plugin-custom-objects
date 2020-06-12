@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Segment\Query\Filter;
 
 use Doctrine\ORM\EntityManager;
-use Liip\FunctionalTestBundle\Test\WebTestCase;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\MauticWebTestCase;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -87,7 +87,8 @@ class CustomFieldFilterQueryBuilderTest extends MauticWebTestCase
         $queryBuilderService = new CustomFieldFilterQueryBuilder(
             new RandomParameterName(),
             $dispatcher,
-            $queryHelper
+            $queryHelper,
+            new CoreParametersHelper()
         );
         $filterMock   = $this->createSegmentFilterMock('hate');
         $queryBuilder = $this->getLeadsQueryBuilder();
