@@ -17,7 +17,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Mautic\IntegrationsBundle\Migration\AbstractMigration;
 
-class Version_0_0_12 extends AbstractMigration
+class Version_0_0_13 extends AbstractMigration
 {
     /**
      * {@inheritdoc}
