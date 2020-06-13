@@ -15,6 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
 use Mautic\CoreBundle\Event\CustomButtonEvent;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\EventListener\CustomItemButtonSubscriber;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
@@ -91,6 +92,9 @@ class CustomItemButtonSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->event->expects($this->once())
             ->method('getItem')
             ->willReturn($this->customItem);
+
+        $this->customItem->method('getRelationshipObject')
+            ->willReturn(null);
 
         $this->event->expects($this->once())
             ->method('addButton')
