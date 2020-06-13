@@ -93,8 +93,8 @@ class CustomItemButtonSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getItem')
             ->willReturn($this->customItem);
 
-        $this->customItem->method('getRelationshipObject')
-            ->willReturn(null);
+        $this->customItem->method('getCustomObject')
+            ->willReturn(new CustomObject());
 
         $this->event->expects($this->once())
             ->method('addButton')
