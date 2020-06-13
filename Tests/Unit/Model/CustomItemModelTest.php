@@ -391,46 +391,6 @@ class CustomItemModelTest extends \PHPUnit\Framework\TestCase
         $this->customItemModel->getArrayTableData($tableConfig);
     }
 
-    public function testGetArrayTableDataWithSearch(): void
-    {
-        $tableConfig = new TableConfig(10, 1, 'column');
-        $tableConfig->addParameter('customObjectId', 44);
-        $tableConfig->addParameter('search', 'term');
-
-        $this->customItemPermissionProvider->expects($this->never())
-            ->method('isGranted');
-
-        // Model situation when the method is called from a command and user is unknown.
-        $this->user->expects($this->any())
-            ->method('getId')
-            ->willReturn(null);
-
-        $this->dbalQueryBuilder->expects($this->once())
-            ->method('select')
-            ->willReturn(CustomItem::TABLE_ALIAS.'.*');
-
-        $this->dbalQueryBuilder->expects($this->once())
-            ->method('execute')
-            ->willReturn($this->statement);
-
-        $this->dbalQueryBuilder->expects($this->exactly(2))
-            ->method('setParameter')
-            ->withConsecutive(
-                ['customObjectId', 44],
-                ['search', '%term%']
-            );
-
-        $this->statement->expects($this->once())
-            ->method('fetchAll')
-            ->willReturn([]);
-
-        $this->dispatcher->expects($this->once())
-            ->method('dispatch')
-            ->with(CustomItemEvents::ON_CUSTOM_ITEM_LIST_DBAL_QUERY);
-
-        $this->customItemModel->getArrayTableData($tableConfig);
-    }
-
     public function testGetCountForTable(): void
     {
         $expr        = $this->createMock(Expr::class);
@@ -506,6 +466,8 @@ class CustomItemModelTest extends \PHPUnit\Framework\TestCase
         $tableConfig->addParameter('customObjectId', 44);
         $tableConfig->addParameter('search', 'Item A');
 
+        $this->queryBuilder->method('expr')->willReturn(new Expr());
+
         $this->customItemPermissionProvider->expects($this->once())
             ->method('isGranted')
             ->will($this->throwException(new ForbiddenException('viewother')));
@@ -514,25 +476,27 @@ class CustomItemModelTest extends \PHPUnit\Framework\TestCase
             ->method('getId')
             ->willReturn(22);
 
-        $this->queryBuilder->expects($this->exactly(2))
+        $this->queryBuilder->expects($this->exactly(4))
             ->method('select')
             ->withConsecutive(
                 [CustomItem::TABLE_ALIAS],
+                ['1'],
+                ['1'],
                 ['CustomItem.name as value, CustomItem.id']
             );
 
-        $this->queryBuilder->expects($this->exactly(2))
+        $this->queryBuilder->expects($this->any())
             ->method('andWhere')
             ->withConsecutive(
-                [CustomItem::TABLE_ALIAS.'.name LIKE :search'],
-                [CustomItem::TABLE_ALIAS.'.createdBy', 22]
+                ['MATCH (ValueText.value) AGAINST (:search BOOLEAN) > 0'],
+                ['MATCH (ValueOption.value) AGAINST (:search BOOLEAN) > 0']
             );
 
         $this->queryBuilder->expects($this->exactly(2))
             ->method('setParameter')
             ->withConsecutive(
                 ['customObjectId', 44],
-                ['search', '%Item A%']
+                ['search', '(+Item* +A*) >"Item A"']
             );
 
         $this->queryBuilder->expects($this->once())

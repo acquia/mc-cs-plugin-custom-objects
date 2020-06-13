@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
@@ -22,6 +22,11 @@ use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
  */
 class CustomFieldValueOption extends AbstractCustomFieldValue
 {
+    /**
+     * @var int|null
+     */
+    private $id;
+
     /**
      * @var string[]|string|null
      */
@@ -40,12 +45,23 @@ class CustomFieldValueOption extends AbstractCustomFieldValue
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable('custom_field_value_option');
+        $builder->setTable('custom_field_value_option')
+            ->addUniqueConstraint(['value', 'custom_field_id', 'custom_item_id'], 'unique')
+            ->addFulltextIndex(['value'], 'value_fulltext');
 
-        parent::addReferenceColumns($builder);
+        $builder->addBigIntIdField();
 
-        $builder->createField('value', Type::STRING)
-            ->makePrimaryKey()
+        $builder->createManyToOne('customField', CustomField::class)
+            ->addJoinColumn('custom_field_id', 'id', false, false, 'CASCADE')
+            ->fetchExtraLazy()
+            ->build();
+
+        $builder->createManyToOne('customItem', CustomItem::class)
+            ->addJoinColumn('custom_item_id', 'id', false, false, 'CASCADE')
+            ->fetchExtraLazy()
+            ->build();
+
+        $builder->createField('value', Types::STRING)
             ->build();
     }
 

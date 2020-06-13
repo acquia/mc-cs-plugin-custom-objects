@@ -100,7 +100,8 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable(self::TABLE_NAME)
-            ->setCustomRepositoryClass(CustomItemRepository::class);
+            ->setCustomRepositoryClass(CustomItemRepository::class)
+            ->addFulltextIndex(['name'], 'name_fulltext');
 
         $builder->createManyToOne('customObject', CustomObject::class)
             ->addJoinColumn('custom_object_id', 'id', false, false, 'CASCADE')
