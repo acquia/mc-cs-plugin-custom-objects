@@ -146,7 +146,8 @@ class LinkFormController extends AbstractFormController
 
             // Generate a default name for relationship forms as the name is hidden from the form.
             $submittedFormValues                        = $this->request->request->all();
-            $submittedFormValues['custom_item']['name'] = sprintf('relationship-between-%s-%d-and-%s-%d',
+            $submittedFormValues['custom_item']['name'] = sprintf(
+                'relationship-between-%s-%d-and-%s-%d',
                 $entityType,
                 $entityId,
                 $customItem->getCustomObject()->getAlias(),
@@ -208,11 +209,11 @@ class LinkFormController extends AbstractFormController
     {
         /** @var CustomItemXrefCustomItem|null $relationshipItemXref */
         $relationshipItemXref = $customItem->getCustomItemReferences()
-            ->filter(function(CustomItemXrefCustomItem $item) use ($entityType, $entityId) {
+            ->filter(function (CustomItemXrefCustomItem $item) use ($entityType, $entityId) {
                 $higher = $item->getCustomItemHigher();
 
                 return $higher->getRelationsByType($entityType)
-                        ->filter(function($relation) use ($entityType, $entityId)  {
+                        ->filter(function ($relation) use ($entityType, $entityId)  {
                             return (int) $relation->getLinkedEntity()->getId() === (int) $entityId;
                         })->count() > 0;
             })->first();
