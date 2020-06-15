@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * @copyright   2018 Mautic, Inc. All rights reserved
+ * @copyright   2020 Mautic, Inc. All rights reserved
  * @author      Mautic, Inc.
  *
  * @link        https://mautic.com
@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
-use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Service\FlashBag;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
@@ -24,7 +23,6 @@ use MauticPlugin\CustomObjectsBundle\Exception\NoRelationshipException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use Symfony\Component\Form\FormFactory;
@@ -45,11 +43,6 @@ class LinkFormController extends AbstractFormController
     private $customItemModel;
 
     /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    /**
      * @var CustomItemPermissionProvider
      */
     private $permissionProvider;
@@ -67,14 +60,12 @@ class LinkFormController extends AbstractFormController
     public function __construct(
         FormFactory $formFactory,
         CustomItemModel $customItemModel,
-        CustomObjectModel $customObjectModel,
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $customItemRouteProvider,
         FlashBag $flashBag
     ) {
         $this->formFactory        = $formFactory;
         $this->customItemModel    = $customItemModel;
-        $this->customObjectModel  = $customObjectModel;
         $this->permissionProvider = $permissionProvider;
         $this->routeProvider      = $customItemRouteProvider;
         $this->flashBag           = $flashBag;
@@ -95,7 +86,7 @@ class LinkFormController extends AbstractFormController
             $form             = $this->formFactory->create(
                 CustomItemType::class,
                 $relationshipItem,
-                $options = [
+                [
                     'action'    => $this->routeProvider->buildLinkFormSaveRoute($customItem->getId(), $entityType, $entityId),
                     'objectId'  => $relationshipObject->getId(),
                     'contactId' => $entityId,
@@ -160,7 +151,7 @@ class LinkFormController extends AbstractFormController
             $form = $this->formFactory->create(
                 CustomItemType::class,
                 $relationshipItem,
-                $options = [
+                [
                     'action'    => $this->routeProvider->buildLinkFormSaveRoute($customItem->getId(), $entityType, $entityId),
                     'objectId'  => $relationshipObject->getId(),
                     'contactId' => $entityId,

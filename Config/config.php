@@ -369,7 +369,6 @@ return [
                 'arguments' => [
                     'form.factory',
                     'mautic.custom.model.item',
-                    'mautic.custom.model.object',
                     'custom_item.permission.provider',
                     'custom_item.route.provider',
                     'mautic.core.service.flashbag',
