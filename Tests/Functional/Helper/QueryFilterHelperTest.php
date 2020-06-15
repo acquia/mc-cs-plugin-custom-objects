@@ -46,6 +46,7 @@ class QueryFilterHelperTest extends MauticWebTestCase
             $fixturesDirectory.'/custom_items.yml',
             $fixturesDirectory.'/custom_xref.yml',
             $fixturesDirectory.'/custom_values.yml',
+            $fixturesDirectory.'/custom-item-relation-filter-query-builder-fixture.yml',
         ], false, null, 'doctrine'); //,ORMPurger::PURGE_MODE_DELETE);
 
         $this->setFixtureObjects($objects);
@@ -69,6 +70,19 @@ class QueryFilterHelperTest extends MauticWebTestCase
             [
                 'filter' => ['glue' => 'and', 'field' => 'cmf_'.$this->getFixtureById('custom_field1')->getId(), 'type' => 'custom_object', 'operator' => 'neq', 'value' => 'love'],
                 'match'  => '(test_value.value <> :test_value_value) OR (test_value.value IS NULL)',
+            ],
+            [
+                'filter' => [
+                    'glue' => 'and',
+                    'field' => 'cmf_'.$this->getFixtureById('custom_object_product')->getId(),
+                    'object' => 'custom_object',
+                    'type' => 'int',
+                    'operator' => 'gt',
+                    'properties' => [
+                        'filter' => '500',
+                    ],
+                ],
+                'match' => 'test_value.value > :test_value_value' // @TODO use right expression
             ],
         ];
 
