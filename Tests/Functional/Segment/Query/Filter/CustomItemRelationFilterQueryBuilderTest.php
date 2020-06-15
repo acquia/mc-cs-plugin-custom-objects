@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Segment\Query\Filter;
 
-use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Test\MauticWebTestCase;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
@@ -43,21 +42,21 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
 
         $fixturesDirectory = $this->getFixturesDirectory();
         $objects           = $this->loadFixtureFiles([
-            $fixturesDirectory . '/CustomItemRelationFilterQueryBuilderFixture.yml'
-        ], false, null, 'doctrine',ORMPurger::PURGE_MODE_DELETE);
+            $fixturesDirectory . '/custom-item-relation-filter-query-builder-fixture.yml'
+        ], false, null, 'doctrine');
 
         $this->setFixtureObjects($objects);
     }
 
     protected function tearDown(): void
     {
-//        foreach ($this->getFixturesInUnloadableOrder() as $entity) {
-//            $this->entityManager->remove($entity);
-//        }
-//
-//        $this->entityManager->flush();
-//
-//        parent::tearDown();
+        foreach ($this->getFixturesInUnloadableOrder() as $entity) {
+            $this->entityManager->remove($entity);
+        }
+
+        $this->entityManager->flush();
+
+        parent::tearDown();
     }
 
     public function testApplyQuery(): void
