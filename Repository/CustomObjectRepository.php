@@ -36,7 +36,8 @@ class CustomObjectRepository extends CommonRepository
 
     /**
      * Used for the CustomObjectType form to load masterObject choices.
-     * Should only load custom objects with type = TYPE_MASTER and that are not the current object being edited
+     * Should only load custom objects with type = TYPE_MASTER, that are not the current
+     * object being edited, and that do not already have a relationship associated.
      */
     public function getMasterObjectQueryBuilder(CustomObject $customObject = null): QueryBuilder
     {
@@ -48,6 +49,11 @@ class CustomObjectRepository extends CommonRepository
             $qb->andWhere($qb->expr()->neq(CustomObject::TABLE_ALIAS.'.id', ':ignoreId'));
             $qb->setParameter('ignoreId', $customObject->getId());
         }
+
+        $sqb = $this->createQueryBuilder('subQuery');
+        $sqb->where('subQuery.masterObject = '.CustomObject::TABLE_ALIAS.'.id');
+
+        $qb->andWhere($qb->expr()->not($qb->expr()->exists($sqb->getDQL())));
 
         return $qb;
     }

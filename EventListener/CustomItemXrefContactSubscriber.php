@@ -24,6 +24,7 @@ use Mautic\LeadBundle\Entity\LeadEventLog;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
@@ -146,7 +147,9 @@ class CustomItemXrefContactSubscriber implements EventSubscriberInterface
 
     public function createNewEventLogForLinkedContact(CustomItemXrefEntityEvent $event): void
     {
-        if ($event->getXref() instanceof CustomItemXrefContact) {
+        if ($event->getXref() instanceof CustomItemXrefContact
+            && CustomObject::TYPE_MASTER === $event->getXref()->getCustomItem()->getCustomObject()->getType()
+        ) {
             $this->saveEventLog($event->getXref(), 'link');
         }
     }
@@ -169,7 +172,9 @@ class CustomItemXrefContactSubscriber implements EventSubscriberInterface
      */
     public function createNewEventLogForUnlinkedContact(CustomItemXrefEntityEvent $event): void
     {
-        if ($event->getXref() instanceof CustomItemXrefContact) {
+        if ($event->getXref() instanceof CustomItemXrefContact
+            && CustomObject::TYPE_MASTER === $event->getXref()->getCustomItem()->getCustomObject()->getType()
+        ) {
             $this->saveEventLog($event->getXref(), 'unlink');
         }
     }

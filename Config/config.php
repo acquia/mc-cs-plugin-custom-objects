@@ -19,7 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 return [
     'name'        => 'Custom Objects',
     'description' => 'Adds custom objects and fields features to Mautic',
-    'version'     => '0.0.12',
+    'version'     => '0.0.13',
     'author'      => 'Mautic, Inc.',
 
     'routes' => [
@@ -113,6 +113,16 @@ return [
                 'path'       => '/custom/item/{itemId}/link/{entityType}/{entityId}.json',
                 'controller' => 'CustomObjectsBundle:CustomItem\Link:save',
                 'method'     => 'POST',
+            ],
+            CustomItemRouteProvider::ROUTE_LINK_FORM => [
+                'path'       => '/custom/item/{itemId}/link-form/{entityType}/{entityId}',
+                'controller' => 'CustomObjectsBundle:CustomItem\LinkForm:form',
+                'method'     => 'GET'
+            ],
+            CustomItemRouteProvider::ROUTE_LINK_FORM_SAVE => [
+                'path'       => '/custom/item/{itemId}/link-form/{entityType}/{entityId}',
+                'controller' => 'CustomObjectsBundle:CustomItem\LinkForm:save',
+                'method'     => 'POST'
             ],
             CustomItemRouteProvider::ROUTE_UNLINK => [
                 'path'       => '/custom/item/{itemId}/unlink/{entityType}/{entityId}.json',
@@ -353,6 +363,22 @@ return [
                         '@service_container',
                     ],
                 ],
+            ],
+            'custom_item.link_form_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\LinkFormController::class,
+                'arguments' => [
+                    'form.factory',
+                    'mautic.custom.model.item',
+                    'mautic.custom.model.object',
+                    'custom_item.permission.provider',
+                    'custom_item.route.provider',
+                    'mautic.core.service.flashbag',
+                ],
+                'methodCalls' => [
+                    'setContainer' => [
+                        '@service_container',
+                    ]
+                ]
             ],
             'custom_item.unlink_controller' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\UnlinkController::class,
@@ -694,6 +720,13 @@ return [
                     'custom_object.config.provider',
                 ],
             ],
+            'custom_item.post_save.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomItemPostSaveSubscriber::class,
+                'arguments' => [
+                    'mautic.custom.model.item',
+                    'request_stack'
+                ]
+            ],
             'custom_object.audit.log.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\AuditLogSubscriber::class,
                 'arguments' => [
@@ -792,6 +825,12 @@ return [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectListFormatSubscriber::class,
                 'arguments' => [
                     'custom_object.helper.token_formatter'
+                ]
+            ],
+            'custom_object.post_save.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectPostSaveSubscriber::class,
+                'arguments' => [
+                    'mautic.custom.model.object',
                 ]
             ],
         ],

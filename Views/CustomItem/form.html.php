@@ -9,6 +9,10 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+
+/** @var CustomObject $customObject */
+
 $view->extend('MauticCoreBundle:Default:content.html.php');
 
 $view['slots']->set('mauticContent', 'customItem');
@@ -29,6 +33,8 @@ if ($entity->getId()) {
 }
 
 $view['slots']->set('headerTitle', $header);
+
+$hideCategories = CustomObject::TYPE_RELATIONSHIP === $customObject->getType() ? 'hide' : null;
 ?>
 
 <?php echo $view['form']->start($form); ?>
@@ -47,7 +53,7 @@ $view['slots']->set('headerTitle', $header);
             </div>
         </div>
     </div>
-    <div class="col-md-3 bg-white height-auto">
+    <div class="col-md-3 bg-white height-auto <?php echo $hideCategories ?>">
         <div class="pr-lg pl-lg pt-md pb-md">
             <?php echo $view['form']->row($form['category']); ?>
             <?php echo $view['form']->row($form['isPublished']); ?>

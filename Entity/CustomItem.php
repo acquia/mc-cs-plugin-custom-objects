@@ -123,7 +123,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         $builder->createOneToMany('customItemReferences', CustomItemXrefCustomItem::class)
             ->addJoinColumn('id', 'custom_item_id_lower', false, false, 'CASCADE')
             ->addJoinColumn('id', 'custom_item_id_higher', false, false, 'CASCADE')
-            ->mappedBy('customItem')
+            ->mappedBy('customItemLower')
             ->fetchExtraLazy()
             ->build();
 
@@ -406,5 +406,19 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     public function getCustomItemReferences()
     {
         return $this->customItemReferences;
+    }
+
+    public function getRelationsByType(string $entityType): Collection
+    {
+        switch ($entityType) {
+            case 'contact':
+                return $this->getContactReferences();
+            case 'company':
+                return $this->getCompanyReferences();
+            case 'customItem':
+                return $this->getCustomItemReferences();
+            default:
+                return new ArrayCollection([]);
+        }
     }
 }

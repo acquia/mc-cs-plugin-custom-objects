@@ -6,6 +6,7 @@ mQuery(function() {
 });
 
 CustomObjects = {
+    activeModal: {},
 
     onCampaignEventModalLoaded(callback) {
         mQuery(document).ajaxComplete(function(event, request, settings) {
@@ -90,13 +91,24 @@ CustomObjects = {
     },
 
     // Called from tab content HTML:
-    initTabShowingLinkedItems(customObjectId, currentEntityId, currentEntityType, tabId) {
+    initTabShowingLinkedItems(customObjectId, currentEntityId, currentEntityType, tabId, relationshipObjectId) {
         let input = mQuery('#'+tabId+'-container [data-toggle="typeahead"]');
         CustomObjects.initCustomItemTypeahead(input, customObjectId, function(selectedItem) {
-            CustomObjects.linkCustomItemWithEntity(selectedItem.id, currentEntityId, currentEntityType, function() {
-                CustomObjects.reloadItemsTable(customObjectId, currentEntityId, currentEntityType, tabId);
-                input.val('');
-            });
+            if (relationshipObjectId) {
+                CustomObjects.activeModal = {
+                    customObjectId: customObjectId,
+                    currentEntityId: currentEntityId,
+                    currentEntityType: currentEntityType,
+                    tabId: tabId
+                };
+                let itemLinkUrl = mauticBaseUrl+'s/custom/item/'+selectedItem.id+'/link-form/'+currentEntityType+'/'+currentEntityId;
+                Mautic.loadAjaxModal('#MauticSharedModal', itemLinkUrl, 'GET');
+            } else {
+                CustomObjects.linkCustomItemWithEntity(selectedItem.id, currentEntityId, currentEntityType, function() {
+                    CustomObjects.reloadItemsTable(customObjectId, currentEntityId, currentEntityType, tabId);
+                    input.val('');
+                });
+            }
         });
         CustomObjects.reloadItemsTable(customObjectId, currentEntityId, currentEntityType, tabId);
     },
@@ -198,10 +210,10 @@ CustomObjects = {
         });
     },
 
-    linkCustomItemWithEntity(customItemId, entitytId, entityType, callback) {
+    linkCustomItemWithEntity(customItemId, entityId, entityType, callback) {
         mQuery.ajax({
             type: 'POST',
-            url: mauticBaseUrl+'s/custom/item/'+customItemId+'/link/'+entityType+'/'+entitytId+'.json',
+            url: mauticBaseUrl+'s/custom/item/'+customItemId+'/link/'+entityType+'/'+entityId+'.json',
             success: callback,
             showLoadingBar: true,
         });
@@ -228,4 +240,55 @@ CustomObjects = {
             showLoadingBar: true,
         });
     },
+};
+
+Mautic.customItemLinkFormLoad = function(response) {
+    let target = mQuery('#MauticSharedModal');
+    let content = mQuery(response.newContent);
+
+    target.find('.modal-title').html(content.find('.page-header h3').html());
+    content.find('.page-header').remove();
+    content.find('.box-layout > .bg-auto').removeClass('bg-auto');
+    // Remove name field as we auto-generate relationship item names
+    content.find('#custom_item_name').closest('.row').remove();
+    // Remove cancel & apply buttons
+    content.find('.btn-cancel').remove();
+    content.find('.btn-apply').remove();
+    target.find('.modal-body').html(content);
+    Mautic.onPageLoad('#MauticSharedModal', response, true);
+};
+
+Mautic.customItemLinkFormPostSubmit = function(response) {
+    mQuery('body').removeClass('noscroll');
+    mQuery('#MauticSharedModal').modal('hide');
+
+    Mautic.customObjectsCleanUpFormModal();
+};
+
+/**
+ * For setup of CustomObjects.activeModal property when loading
+ * the ajax modal from the edit link.
+ *
+ * @param el
+ */
+Mautic.customObjectsSetUpLinkFormModalFromEditLink = function(el) {
+    let element = mQuery(el);
+
+    CustomObjects.activeModal = {
+        customObjectId: element.attr('data-custom-object-id'),
+        currentEntityId: element.attr('data-current-entity-id'),
+        currentEntityType: element.attr('data-current-entity-type'),
+        tabId: element.attr('data-tab-id')
+    };
+};
+
+Mautic.customObjectsCleanUpFormModal = function() {
+    CustomObjects.reloadItemsTable(
+        CustomObjects.activeModal.customObjectId,
+        CustomObjects.activeModal.currentEntityId,
+        CustomObjects.activeModal.currentEntityType,
+        CustomObjects.activeModal.tabId
+    );
+    mQuery('#'+CustomObjects.activeModal.tabId+'-container').find('[data-toggle="typeahead"]').val('');
+    CustomObjects.activeModal = {};
 };

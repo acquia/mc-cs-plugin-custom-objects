@@ -97,6 +97,11 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     private $masterObject;
 
     /**
+     * @var CustomObject|null
+     */
+    private $relationshipObject;
+
+    /**
      * @var mixed[]
      */
     private $initialCustomFields = [];
@@ -138,6 +143,11 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         $builder->addNullableField('language', Type::STRING, 'lang');
         $builder->addNullableField('type', Type::INTEGER);
         $builder->addNullableField('relationship', Type::INTEGER, 'relationship');
+
+        $builder->createOneToOne('relationshipObject', CustomObject::class)
+            ->addJoinColumn('relationship_object', 'id')
+            ->fetchExtraLazy()
+            ->build();
 
         $builder->createOneToOne('masterObject', CustomObject::class)
             ->addJoinColumn('master_object', 'id')
@@ -218,6 +228,16 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     public function setMasterObject(?CustomObject $customObject): void
     {
         $this->masterObject = $customObject;
+    }
+
+    public function getRelationshipObject(): ?CustomObject
+    {
+        return $this->relationshipObject;
+    }
+
+    public function setRelationshipObject(?CustomObject $customObject): void
+    {
+        $this->relationshipObject = $customObject;
     }
 
     /**

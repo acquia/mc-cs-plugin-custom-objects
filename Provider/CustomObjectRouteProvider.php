@@ -33,6 +33,8 @@ class CustomObjectRouteProvider
 
     public const ROUTE_SAVE   = 'mautic_custom_object_save';
 
+    public const ROUTE_LINK   = 'mautic_custom_object_link';
+
     /**
      * @var RouterInterface
      */
