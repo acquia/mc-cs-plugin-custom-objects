@@ -180,7 +180,6 @@ class LinkFormController extends AbstractFormController
 
                 return new JsonResponse($responseData);
             }
-
         } catch (ForbiddenException | NoRelationshipException | NotFoundException $e) {
             $this->flashBag->add($e->getMessage(), [], FlashBag::LEVEL_ERROR);
         }
@@ -213,7 +212,7 @@ class LinkFormController extends AbstractFormController
                 $higher = $item->getCustomItemHigher();
 
                 return $higher->getRelationsByType($entityType)
-                        ->filter(function ($relation) use ($entityType, $entityId)  {
+                        ->filter(function ($relation) use ($entityId) {
                             return (int) $relation->getLinkedEntity()->getId() === (int) $entityId;
                         })->count() > 0;
             })->first();
