@@ -83,5 +83,7 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
             $count,
             "Segment 'price-greater-500' should have one contact"
         );
+
+        // @todo contact with email rich@toaster.net must be in this segment
     }
 }
