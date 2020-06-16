@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Helper;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Test\MauticWebTestCase;
+use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
@@ -18,24 +18,29 @@ class QueryFilterHelperTest extends MauticWebTestCase
     use DatabaseSchemaTrait;
 
     /**
-     * @var EntityManager
+     * @var ContactSegmentFilterFactory
      */
-    private $entityManager;
-
     private $filterFactory;
+
+    /**
+     * @var QueryFilterHelper
+     */
+    private $filterHelper;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        /** @var EntityManager $entityManager */
-        $entityManager       = $this->getContainer()->get('doctrine.orm.entity_manager');
-        $this->entityManager = $entityManager;
         $this->filterFactory = $this->getContainer()->get('mautic.lead.model.lead_segment_filter_factory');
-        $fixturesDirectory   = $this->getFixturesDirectory();
 
-        $this->createFreshDatabaseSchema($entityManager);
+        /** @var CustomFieldTypeProvider $fieldTypeProvider */
+        $fieldTypeProvider  = $this->getContainer()->get('custom_field.type.provider');
+        $this->filterHelper = new QueryFilterHelper($fieldTypeProvider);
+
+
+        $this->createFreshDatabaseSchema($this->em);
         $this->postFixtureSetup();
+        $fixturesDirectory = $this->getFixturesDirectory();
 
         $objects = $this->loadFixtureFiles([
             $fixturesDirectory.'/roles.yml',
@@ -47,56 +52,72 @@ class QueryFilterHelperTest extends MauticWebTestCase
             $fixturesDirectory.'/custom_xref.yml',
             $fixturesDirectory.'/custom_values.yml',
             $fixturesDirectory.'/custom-item-relation-filter-query-builder-fixture.yml',
-        ], false, null, 'doctrine'); //,ORMPurger::PURGE_MODE_DELETE);
+        ], false, null, 'doctrine');
 
         $this->setFixtureObjects($objects);
     }
 
     public function testGetCustomValueValueExpression(): void
     {
-        /** @var CustomFieldTypeProvider $fieldTypeProvider */
-        $fieldTypeProvider = $this->getContainer()->get('custom_field.type.provider');
-        $filterHelper      = new QueryFilterHelper($fieldTypeProvider);
+        $this->assertMatchWhere(
+            'test_value.value = :test_value_value',
+            [
+                'glue' => 'and',
+                'field' => 'cmf_'.$this->getFixtureById('custom_field1')->getId(),
+                'type' => 'custom_object',
+                'operator' => 'eq',
+                'value' => 'love',
+            ]
+        );
 
-        $filters = [
+        $this->assertMatchWhere(
+            'test_value.value LIKE :test_value_value',
             [
-                'filter' => ['glue' => 'and', 'field' => 'cmf_'.$this->getFixtureById('custom_field1')->getId(), 'type' => 'custom_object', 'operator' => 'eq', 'value' => 'love'],
-                'match'  => 'test_value.value = :test_value_value',
-            ],
+                'glue' => 'and',
+                'field' => 'cmf_'.$this->getFixtureById('custom_field1')->getId(),
+                'type' => 'custom_object',
+                'operator' => 'like',
+                'value' => 'love',
+            ]
+        );
+
+        $this->assertMatchWhere(
+            '(test_value.value <> :test_value_value) OR (test_value.value IS NULL)',
             [
-                'filter' => ['glue' => 'and', 'field' => 'cmf_'.$this->getFixtureById('custom_field1')->getId(), 'type' => 'custom_object', 'operator' => 'like', 'value' => 'love'],
-                'match'  => 'test_value.value LIKE :test_value_value',
-            ],
+                'glue' => 'and',
+                'field' => 'cmf_'.$this->getFixtureById('custom_field1')->getId(),
+                'type' => 'custom_object',
+                'operator' => 'neq',
+                'value' => 'love',
+            ]
+        );
+
+        $this->assertMatchWhere(
+            'test_value.value > :test_value_value', // @TODO use right expression
             [
-                'filter' => ['glue' => 'and', 'field' => 'cmf_'.$this->getFixtureById('custom_field1')->getId(), 'type' => 'custom_object', 'operator' => 'neq', 'value' => 'love'],
-                'match'  => '(test_value.value <> :test_value_value) OR (test_value.value IS NULL)',
-            ],
-            [
-                'filter' => [
-                    'glue' => 'and',
-                    'field' => 'cmf_'.$this->getFixtureById('custom_object_product')->getId(),
-                    'object' => 'custom_object',
-                    'type' => 'int',
-                    'operator' => 'gt',
-                    'properties' => [
-                        'filter' => '500',
-                    ],
+                'glue' => 'and',
+                'field' => 'cmf_'.$this->getFixtureById('custom_object_product')->getId(),
+                'object' => 'custom_object',
+                'type' => 'int',
+                'operator' => 'gt',
+                'properties' => [
+                    'filter' => '500',
                 ],
-                'match' => 'test_value.value > :test_value_value' // @TODO use right expression
-            ],
-        ];
+            ]
+        );
+    }
 
-        foreach ($filters as $filter) {
-            $queryBuilder = new QueryBuilder($this->entityManager->getConnection());
+    protected function assertMatchWhere(string $expectedWhere, array $filter): void
+    {
+        $queryBuilder = new QueryBuilder($this->em->getConnection());
 
-            $filterHelper->addCustomFieldValueExpressionFromSegmentFilter(
-                $queryBuilder,
-                'test',
-                $this->filterFactory->factorSegmentFilter($filter['filter'])
-            );
+        $this->filterHelper->addCustomFieldValueExpressionFromSegmentFilter(
+            $queryBuilder,
+            'test',
+            $this->filterFactory->factorSegmentFilter($filter)
+        );
 
-            $whereResponse = (string) $queryBuilder->getQueryPart('where');
-            $this->assertSame($filter['match'], $whereResponse);
-        }
+        $whereResponse = (string) $queryBuilder->getQueryPart('where');
+        $this->assertSame($expectedWhere, $whereResponse);
     }
 }
