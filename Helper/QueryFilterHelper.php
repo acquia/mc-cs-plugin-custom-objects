@@ -99,6 +99,9 @@ class QueryFilterHelper
         );
     }
 
+    /**
+     * @todo remove me as unused
+     */
     public function addCustomObjectNameExpressionFromSegmentFilter(QueryBuilder $queryBuilder, string $tableAlias, ContactSegmentFilter $filter): void
     {
         $expression = $this->getCustomObjectNameExpression($queryBuilder, $tableAlias, $filter->getOperator());
@@ -109,6 +112,7 @@ class QueryFilterHelper
      * Limit the result of query builder to given value of in CustomFieldValue.
      *
      * @param array|string|CompositeExpression $value
+     * @todo remove me as unused
      */
     public function addCustomFieldValueExpression(QueryBuilder $queryBuilder, string $tableAlias, string $operator, $value): void
     {
@@ -173,6 +177,7 @@ class QueryFilterHelper
      * Limit the result of queryBuilder to result of customQuery.
      *
      * @throws DBALException
+     * @todo remove me as unused
      */
     public function addValueExpressionFromQueryBuilder(
         QueryBuilder $queryBuilder,
