@@ -7,7 +7,7 @@ Mautic\LeadBundle\Entity\Lead:
     lastname: 'Toaster'
     is_published: true
     date_added: '<dateTimeBetween("-1 days","-10 hours")>'
-    email: '<email()>'
+    email: 'rich@toaster.net'
 
   contact_poor:
     firstname: 'Poor'
