@@ -16,7 +16,6 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Segment\Query\Filter
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Test\MauticWebTestCase;
 use Mautic\LeadBundle\Entity\LeadListRepository;
-use Mautic\LeadBundle\Segment\ContactSegmentService;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
@@ -73,8 +72,6 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
             ['--env' => 'test']
         );
 
-        /** @var ContactSegmentService $contactSegmentService */
-        $contactSegmentService = $this->container->get('mautic.lead.model.lead_segment_service');
         /** @var LeadListRepository $segmentRepository */
         $segmentRepository     = $this->container->get('mautic.lead.repository.lead_list');
         $segment               = $segmentRepository->findOneBy(['alias' => 'price-greater-500']);
