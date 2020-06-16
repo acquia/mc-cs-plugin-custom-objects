@@ -87,19 +87,20 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact:
 # custom_field_value_option
 # custom_field_value_text
 
-#Mautic\LeadBundle\Entity\LeadList:
+Mautic\LeadBundle\Entity\LeadList:
 
-#  lead_list_filter:
-#    is_published: true
-#    name: 'Price > 500'
-#    alias: 'price_greater_500'
-#    filters:
-#      glue : 'and'
-#      field: 'cmf_1000'
-#      object: 'custom_object'
-#      type: 'int'
-#      operator: 'gt'
-#      properties:
-#        filter: '500'
-#    is_global: true
-#    is_preference_center: false
+  price-greater-500:
+    is_published: true
+    name: 'Price > 500'
+    alias: 'price-greater-500'
+    filters: # a:1:{i:0;a:6:{s:4:"glue";s:3:"and";s:5:"field";s:5:"cmf_1";s:6:"object";s:13:"custom_object";s:4:"type";s:3:"int";s:8:"operator";s:2:"gt";s:10:"properties";a:1:{s:6:"filter";s:3:"500";}}}
+      0:
+        glue : 'and'
+        field: 'cmf'
+        object: 'custom_object'
+        type: 'int'
+        operator: 'gt'
+        properties:
+          filter: '500'
+    is_global: true
+    is_preference_center: false
