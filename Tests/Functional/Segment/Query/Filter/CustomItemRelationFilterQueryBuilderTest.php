@@ -15,6 +15,8 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Segment\Query\Filter
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Test\MauticWebTestCase;
+use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Segment\ContactSegmentService;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
@@ -41,9 +43,14 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
         $this->postFixtureSetup();
 
         $fixturesDirectory = $this->getFixturesDirectory();
-        $objects           = $this->loadFixtureFiles([
-            $fixturesDirectory . '/custom-item-relation-filter-query-builder-fixture.yml'
-        ], false, null, 'doctrine');
+        $objects           = $this->loadFixtureFiles(
+            [
+                $fixturesDirectory . '/custom-item-relation-filter-query-builder-fixture.yml'
+            ],
+            false,
+            null,
+            'doctrine'
+        );
 
         $this->setFixtureObjects($objects);
     }
@@ -61,6 +68,23 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
 
     public function testApplyQuery(): void
     {
-        $this->assertTrue(true);
+        $this->runCommand(
+            'mautic:segments:update',
+            ['--env' => 'test']
+        );
+
+        /** @var ContactSegmentService $contactSegmentService */
+        $contactSegmentService = $this->container->get('mautic.lead.model.lead_segment_service');
+        /** @var LeadListRepository $segmentRepository */
+        $segmentRepository     = $this->container->get('mautic.lead.repository.lead_list');
+        $segment               = $segmentRepository->findOneBy(['alias' => 'price-greater-500']);
+        $count                 = $segmentRepository->getLeadCount([$segment->getId()]);
+        $count                 = $count[$segment->getId()];
+
+        $this->assertSame(
+            1,
+            $count,
+            "Segment 'price-greater-500' should have one contact"
+        );
     }
 }
