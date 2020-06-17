@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Segment\Query\Filter;
 
 use Doctrine\ORM\EntityManager;
-use Liip\FunctionalTestBundle\Test\WebTestCase;
 use Mautic\CoreBundle\Test\MauticWebTestCase;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -78,7 +77,7 @@ class CustomItemNameFilterQueryBuilderTest extends MauticWebTestCase
         /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = $this->getContainer()->get('event_dispatcher');
 
-        $filterHelper        = new QueryFilterHelper($fieldTypeProvider);
+        $filterHelper        = new QueryFilterHelper($fieldTypeProvider, $this->em);
         $queryBuilderService = new CustomItemNameFilterQueryBuilder(
             new RandomParameterName(),
             $filterHelper,
