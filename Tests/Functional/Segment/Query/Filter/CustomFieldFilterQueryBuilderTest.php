@@ -88,7 +88,7 @@ class CustomFieldFilterQueryBuilderTest extends MauticWebTestCase
             new RandomParameterName(),
             $dispatcher,
             $queryHelper,
-            new CoreParametersHelper()
+            new CoreParametersHelper($this->container)
         );
         $filterMock   = $this->createSegmentFilterMock('hate');
         $queryBuilder = $this->getLeadsQueryBuilder();
