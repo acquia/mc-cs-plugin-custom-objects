@@ -76,7 +76,7 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
         $segmentRepository     = $this->container->get('mautic.lead.repository.lead_list');
         $segment               = $segmentRepository->findOneBy(['alias' => 'price-greater-500']);
         $count                 = $segmentRepository->getLeadCount([$segment->getId()]);
-        $count                 = $count[$segment->getId()];
+        $count                 = (int) $count[$segment->getId()];
 
         $this->assertSame(
             1,
