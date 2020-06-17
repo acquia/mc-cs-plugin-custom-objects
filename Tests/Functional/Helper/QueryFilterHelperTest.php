@@ -35,7 +35,7 @@ class QueryFilterHelperTest extends MauticWebTestCase
 
         /** @var CustomFieldTypeProvider $fieldTypeProvider */
         $fieldTypeProvider  = $this->getContainer()->get('custom_field.type.provider');
-        $this->filterHelper = new QueryFilterHelper($fieldTypeProvider, $this->em);
+        $this->filterHelper = new QueryFilterHelper($fieldTypeProvider);
 
 
         $this->createFreshDatabaseSchema($this->em);
