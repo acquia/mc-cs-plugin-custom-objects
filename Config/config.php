@@ -1101,7 +1101,10 @@ return [
             ],
             'custom_object.query.filter.helper'            => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper::class,
-                'arguments' => ['custom_field.type.provider'],
+                'arguments' => [
+                    'custom_field.type.provider',
+                    'doctrine.orm.entity_manager',
+                ],
             ],
             'custom_object.helper.token_formatter' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Helper\TokenFormatter::class,
