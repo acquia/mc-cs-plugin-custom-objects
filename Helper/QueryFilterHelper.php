@@ -15,6 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Helper;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
+use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -32,9 +33,15 @@ class QueryFilterHelper
      */
     private $fieldTypeProvider;
 
-    public function __construct(CustomFieldTypeProvider $fieldTypeProvider)
+    /**
+     * @var EntityManager
+     */
+    private $entityManager;
+
+    public function __construct(CustomFieldTypeProvider $fieldTypeProvider, EntityManager $entityManager)
     {
         $this->fieldTypeProvider = $fieldTypeProvider;
+        $this->entityManager = $entityManager;
     }
 
     /**
@@ -338,13 +345,31 @@ class QueryFilterHelper
     ): QueryBuilder {
         $dataTable = $this->fieldTypeProvider->getType($fieldType)->getTableName();
 
+        $subSelect1 = $customFieldQueryBuilder->createQueryBuilder($this->entityManager->getConnection())
+            ->select('custom_item_id_lower')
+            ->from('custom_item_xref_custom_item')
+            ->where("custom_item_id_higher = {$alias}_item.id")
+            ->getSQL();
+
+        $subSelect2 = $customFieldQueryBuilder->createQueryBuilder($this->entityManager->getConnection())
+            ->select('custom_item_id_higher')
+            ->from('custom_item_xref_custom_item')
+            ->where("custom_item_id_lower = {$alias}_item.id")
+            ->getSQL();
+
         $customFieldQueryBuilder->leftJoin(
             $alias.'_item',
             $dataTable,
             $alias.'_value',
-            $customFieldQueryBuilder->expr()->andX(
-                $alias.'_value.custom_item_id = '.$alias.'_item.id',
-                $customFieldQueryBuilder->expr()->eq($alias.'_value.custom_field_id', ":{$alias}_custom_field_id")
+            $customFieldQueryBuilder->expr()->orX(
+                $customFieldQueryBuilder->expr()->andX(
+                    $alias.'_value.custom_item_id = '.$alias.'_item.id',
+                    $customFieldQueryBuilder->expr()->eq($alias.'_value.custom_field_id', ":{$alias}_custom_field_id")
+                ),
+                $customFieldQueryBuilder->expr()->in(
+                    $alias.'_value.custom_item_id ',
+                    ["($subSelect1)", "($subSelect2)"]
+                )
             )
         );
 
