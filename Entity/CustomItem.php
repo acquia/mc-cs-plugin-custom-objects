@@ -47,6 +47,11 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     private $customObject;
 
     /**
+     * @var CustomItem|null
+     */
+    private $childCustomItem;
+
+    /**
      * @var string|null
      */
     private $language;
@@ -215,6 +220,32 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     {
         $this->isChanged('language', $language);
         $this->language = $language;
+    }
+
+    public function setChildCustomItem(CustomItem $childCustomItem): void
+    {
+        $this->childCustomItem = $childCustomItem;
+    }
+
+    public function getChildCustomItem(): ?CustomItem
+    {
+        return $this->childCustomItem;
+    }
+
+    public function getChildCustomFieldValues(): ArrayCollection
+    {
+        if ($this->childCustomItem) {
+            return $this->childCustomItem->getCustomFieldValues();
+        }
+
+        return new ArrayCollection();
+    }
+
+    public function generateNameForChildObject(string $entityType, int $entityId, CustomItem $parentCustomItem): void
+    {
+        $this->setName(
+            "relationship-between-{$entityType}-{$entityId}-and-{$parentCustomItem->getCustomObject()->getAlias()}-{$parentCustomItem->getId()}"
+        );
     }
 
     /**

@@ -123,13 +123,29 @@ class SaveController extends AbstractFormController
             return $this->redirect($this->routeProvider->buildViewRoute($objectId, $itemId));
         }
 
-        $request = $this->requestStack->getCurrentRequest();
-        $action  = $this->routeProvider->buildSaveRoute($objectId, $itemId);
-        $form    = $this->formFactory->create(CustomItemType::class, $customItem, ['action' => $action, 'objectId' => $objectId]);
+        $request        = $this->requestStack->getCurrentRequest();
+        $customItemData = $request->request->get('custom_item');
+        $contactId      = intval($customItemData['contact_id'] ?? 0);
+        $action         = $this->routeProvider->buildSaveRoute($objectId, $itemId);
+        
+        if (!$customItem->getId() && $customItem->getCustomObject()->getRelationshipObject() && $contactId) {
+            $customItem->setChildCustomItem(
+                $this->customItemModel->populateCustomFields(
+                    new CustomItem($customItem->getCustomObject()->getRelationshipObject())
+                )
+            );
+        }
+        $form = $this->formFactory->create(CustomItemType::class, $customItem, ['action' => $action, 'objectId' => $objectId]);
+
         $form->handleRequest($request);
 
         if ($form->isValid()) {
             $this->customItemModel->save($customItem);
+
+            if ($customItem->getChildCustomItem()) {
+                $customItem->getChildCustomItem()->generateNameForChildObject('contact', $contactId, $customItem);
+                $this->customItemModel->save($customItem->getChildCustomItem());
+            }
 
             $this->flashBag->add(
                 $message,
@@ -140,7 +156,6 @@ class SaveController extends AbstractFormController
             );
 
             $saveClicked = $form->get('buttons')->get('save')->isClicked();
-            $contactId   = (int) $form->get('contact_id')->getData();
             $detailView  = 'CustomObjectsBundle:CustomItem\View:view';
             $formView    = 'CustomObjectsBundle:CustomItem\Form:edit';
 
@@ -150,7 +165,15 @@ class SaveController extends AbstractFormController
             ];
 
             if (0 < $contactId) {
+                // For parent-child items we want to link both items together and the child item with the contact.
+                if ($customItem->getChildCustomItem()) {
+                    $this->customItemModel->linkEntity($customItem->getChildCustomItem(), 'contact', $contactId);
+                    $this->customItemModel->linkEntity($customItem->getChildCustomItem(), 'customItem', $customItem->getId());
+                }
+
+                // For parent items we want to connect the parent item directly to the contact.
                 $this->customItemModel->linkEntity($customItem, 'contact', $contactId);
+
                 if ($saveClicked) {
                     return $this->redirectToRoute('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $contactId]);
                 }

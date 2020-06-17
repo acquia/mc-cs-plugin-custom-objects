@@ -32,6 +32,9 @@ class CustomItemType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        /** @var CustomItem $customItem */
+        $customItem = $builder->getData();
+
         $builder->add(
             'name',
             TextType::class,
@@ -52,10 +55,26 @@ class CustomItemType extends AbstractType
                 'constraints'   => [new Valid()],
                 'entry_options' => [
                     'label'      => false,
-                    'customItem' => $builder->getData(),
+                    'customItem' => $customItem,
                 ],
             ]
         );
+
+        if (!$customItem->getId() && $customItem->getChildCustomItem()) {
+            $builder->add(
+                'child_custom_field_values',
+                CollectionType::class,
+                [
+                    'entry_type'    => CustomFieldValueType::class,
+                    'label'         => false,
+                    'constraints'   => [new Valid()],
+                    'entry_options' => [
+                        'label'      => false,
+                        'customItem' => $customItem->getChildCustomItem(),
+                    ],
+                ]
+            );
+        }
 
         $builder->add(
             'contact_id',

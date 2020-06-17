@@ -94,6 +94,14 @@ class FormController extends AbstractFormController
             return $this->accessDenied(false, $e->getMessage());
         }
 
+        if ($customItem->getCustomObject()->getRelationshipObject()) {
+            $customItem->setChildCustomItem(
+                $this->customItemModel->populateCustomFields(
+                    new CustomItem($customItem->getCustomObject()->getRelationshipObject())
+                )
+            );
+        }
+
         return $this->renderFormForItem($customItem, $customObject, $this->routeProvider->buildNewRouteWithRedirectToContact($objectId, $contactId), $contactId);
     }
 
