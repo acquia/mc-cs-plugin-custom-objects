@@ -336,6 +336,22 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         return $filteredValues->first();
     }
 
+    public function findChildCustomItem(): CustomItem
+    {
+        /** @var CustomItemXrefCustomItem|null $childXref */
+        $childXref = $this->getCustomItemReferences()
+            ->filter(function (CustomItemXrefCustomItem $xref) {
+                // The child custom item's object must have the same ID as the current custom item child object.
+                return $xref->getCustomItemLinkedTo($this)->getCustomObject()->getMasterObject()->getId() === $this->getCustomObject()->getId();
+            })->first();
+
+        if ($childXref) {
+            return $childXref->getCustomItemLinkedTo($this);
+        }
+
+        throw new NotFoundException("Custom item {$this->getId()} does not have a child custom item");
+    }
+
     /**
      * @param mixed $value
      *

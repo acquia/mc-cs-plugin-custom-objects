@@ -89,6 +89,7 @@ class FormController extends AbstractFormController
     public function newWithRedirectToContactAction(int $objectId, int $contactId): Response
     {
         try {
+            /** @var CustomItem $customItem */
             [$customObject, $customItem] = $this->performNewAction($objectId);
         } catch (ForbiddenException $e) {
             return $this->accessDenied(false, $e->getMessage());
