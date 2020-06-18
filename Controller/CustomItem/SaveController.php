@@ -93,18 +93,26 @@ class SaveController extends AbstractFormController
 
     public function saveAction(int $objectId, ?int $itemId = null): Response
     {
+        $request        = $this->requestStack->getCurrentRequest();
+        $customItemData = $request->request->get('custom_item');
+        $contactId      = intval($customItemData['contact_id'] ?? 0);
+
         try {
             if ($itemId) {
-                $customItem = $this->customItemModel->fetchEntity($itemId);
-                $route      = $this->routeProvider->buildEditRoute($objectId, $itemId);
                 $message    = 'mautic.core.notice.updated';
+                $customItem = $this->customItemModel->fetchEntity($itemId);
+                $route      = 0 < $contactId
+                    ? $this->routeProvider->buildEditRouteWithRedirectToContact($objectId, $itemId, $contactId)
+                    : $this->routeProvider->buildEditRoute($objectId, $itemId);
                 $this->permissionProvider->canEdit($customItem);
             } else {
                 $this->permissionProvider->canCreate($objectId);
-                $customObject = $this->customObjectModel->fetchEntity($objectId);
                 $message      = 'mautic.core.notice.created';
-                $route        = $this->routeProvider->buildNewRoute($objectId);
+                $customObject = $this->customObjectModel->fetchEntity($objectId);
                 $customItem   = $this->customItemModel->populateCustomFields(new CustomItem($customObject));
+                $route        = 0 < $contactId
+                    ? $this->routeProvider->buildNewRouteWithRedirectToContact($objectId, $contactId)
+                    : $this->routeProvider->buildNewRoute($objectId);
             }
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
@@ -122,11 +130,8 @@ class SaveController extends AbstractFormController
 
             return $this->redirect($this->routeProvider->buildViewRoute($objectId, $itemId));
         }
-
-        $request        = $this->requestStack->getCurrentRequest();
-        $customItemData = $request->request->get('custom_item');
-        $contactId      = intval($customItemData['contact_id'] ?? 0);
-        $action         = $this->routeProvider->buildSaveRoute($objectId, $itemId);
+        
+        $action = $this->routeProvider->buildSaveRoute($objectId, $itemId);
         
         if (!$customItem->getId() && $customItem->getCustomObject()->getRelationshipObject() && $contactId) {
             $customItem->setChildCustomItem(
