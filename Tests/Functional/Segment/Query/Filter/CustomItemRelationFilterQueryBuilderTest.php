@@ -27,6 +27,10 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
     use DatabaseSchemaTrait;
 
     /**
+     * Duplicate with parent::$em
+     * Must be here otherwise it throws
+     * Doctrine\ORM\ORMInvalidArgumentException : Detached entity Mautic\LeadBundle\Entity\Lead with ID #1 cannot be removed
+     *
      * @var EntityManager
      */
     private $entityManager;
