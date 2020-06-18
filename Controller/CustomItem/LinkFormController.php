@@ -83,6 +83,8 @@ class LinkFormController extends AbstractFormController
             $this->permissionProvider->canEdit($customItem);
 
             $relationshipItem = $this->getRelationshipItem($relationshipObject, $customItem, $entityType, $entityId);
+            $relationshipItem->generateNameForChildObject($entityType, $entityId, $customItem);
+
             $form             = $this->formFactory->create(
                 CustomItemType::class,
                 $relationshipItem,
@@ -134,6 +136,8 @@ class LinkFormController extends AbstractFormController
             $this->permissionProvider->canCreate($relationshipObject->getId());
 
             $relationshipItem = $this->getRelationshipItem($relationshipObject, $customItem, $entityType, $entityId);
+            $relationshipItem->generateNameForChildObject($entityType, $entityId, $customItem);
+
             $form             = $this->formFactory->create(
                 CustomItemType::class,
                 $relationshipItem,
@@ -147,7 +151,6 @@ class LinkFormController extends AbstractFormController
             $form->handleRequest($this->request);
 
             if ($form->isValid()) {
-                $relationshipItem->generateNameForChildObject($entityType, $entityId, $customItem);
                 $this->customItemModel->save($relationshipItem);
 
                 $responseData = [
