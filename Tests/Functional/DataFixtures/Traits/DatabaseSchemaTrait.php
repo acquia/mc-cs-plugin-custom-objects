@@ -18,6 +18,9 @@ use Doctrine\ORM\Tools\SchemaTool;
 
 trait DatabaseSchemaTrait
 {
+    /**
+     * @todo Some table columns are missing then. Like `leads.attribution*`
+     */
     private function createFreshDatabaseSchema(EntityManager $entityManager): void
     {
         $metadata   = $entityManager->getMetadataFactory()->getAllMetadata();
