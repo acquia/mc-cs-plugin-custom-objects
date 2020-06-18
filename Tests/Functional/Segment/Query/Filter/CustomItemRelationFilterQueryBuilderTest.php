@@ -15,7 +15,9 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Segment\Query\Filter
 
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Test\MauticWebTestCase;
+use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
@@ -76,6 +78,7 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
             ['--env' => 'test']
         );
 
+        // Segment 'price-greater-500' has exactly one contact
         /** @var LeadListRepository $segmentRepository */
         $segmentRepository     = $this->container->get('mautic.lead.repository.lead_list');
         $segment               = $segmentRepository->findOneBy(['alias' => 'price-greater-500']);
@@ -85,9 +88,26 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
         $this->assertSame(
             1,
             $count,
-            "Segment 'price-greater-500' should have one contact"
+            "Segment with alias 'price-greater-500' should have one contact with email 'rich@toaster.net'"
         );
 
-        // @todo contact with email rich@toaster.net must be in this segment
+        // Contact with email 'rich@toaster.net' must be in 'price-greater-500' segment
+        /** @var LeadRepository $ccontactRepository */
+        $contactRepository = $this->container->get('mautic.lead.repository.lead');
+        $contact           = $contactRepository->findOneByEmail('rich@toaster.net');
+        /** @var LeadList[] $segments */
+        $segments          = $segmentRepository->getLeadLists($contact);
+
+        $this->assertSame(
+            1,
+            count($segments),
+            "Contact with email 'rich@toaster.net' must be in exactly one segment"
+        );
+
+        $this->assertSame(
+            'price-greater-500',
+            $segments[1]->getAlias(),
+            "Contact with email 'rich@toaster.net' must be in segment with alias 'price-greater-500'"
+        );
     }
 }
