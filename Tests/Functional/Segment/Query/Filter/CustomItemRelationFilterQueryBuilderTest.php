@@ -37,12 +37,28 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
      */
     private $entityManager;
 
+    /**
+     * @var LeadListRepository
+     */
+    private $segmentRepository;
+
+    /**
+     * @var \Doctrine\ORM\EntityRepository|null
+     */
+    private $contactRepository;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         /** @var EntityManager $entityManager */
         $this->entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
+
+        /** @var LeadListRepository $segmentRepository */
+        $this->segmentRepository     = $this->container->get('mautic.lead.repository.lead_list');
+
+        /** @var LeadRepository $contactRepository */
+        $this->contactRepository = $this->container->get('mautic.lead.repository.lead');
 
         $this->createFreshDatabaseSchema($this->entityManager);
         $this->postFixtureSetup();
@@ -79,35 +95,46 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
         );
 
         // Segment 'price-greater-500' has exactly one contact
-        /** @var LeadListRepository $segmentRepository */
-        $segmentRepository     = $this->container->get('mautic.lead.repository.lead_list');
-        $segment               = $segmentRepository->findOneBy(['alias' => 'price-greater-500']);
-        $count                 = $segmentRepository->getLeadCount([$segment->getId()]);
-        $count                 = (int) $count[$segment->getId()];
+        $this->assertLeadCountBySegmentAlias(1, 'price-greater-500');
+        // Contact with email 'rich@toaster.net' must be in 'price-greater-500' segment
+        $this->assertContactIsInSegment('rich@toaster.net', 'price-greater-500');
+
+        $this->assertLeadCountBySegmentAlias(1, 'price-eq-500');
+        $this->assertContactIsInSegment('poor@plug.net', 'price-eq-500');
+    }
+
+    private function assertLeadCountBySegmentAlias(int $expectedLeadCount, string $segmentAlias): void
+    {
+        $segment = $this->segmentRepository->findOneBy(['alias' => 'price-greater-500']);
+        $count   = $this->segmentRepository->getLeadCount([$segment->getId()]);
+        $count   = (int) $count[$segment->getId()];
 
         $this->assertSame(
             1,
             $count,
-            "Segment with alias 'price-greater-500' should have one contact with email 'rich@toaster.net'"
+            "Segment with alias '{$segmentAlias}' should have '{$expectedLeadCount}' contact count. Has '{$count}'"
         );
 
-        // Contact with email 'rich@toaster.net' must be in 'price-greater-500' segment
-        /** @var LeadRepository $ccontactRepository */
-        $contactRepository = $this->container->get('mautic.lead.repository.lead');
-        $contact           = $contactRepository->findOneByEmail('rich@toaster.net');
+    }
+
+    private function assertContactIsInSegment(string $contactEmail, string $segmentAlias): void
+    {
+        $contact  = $this->contactRepository->findOneByEmail($contactEmail);
         /** @var LeadList[] $segments */
-        $segments          = $segmentRepository->getLeadLists($contact);
+        $segments = $this->segmentRepository->getLeadLists($contact->getId());
 
-        $this->assertSame(
-            1,
-            count($segments),
-            "Contact with email 'rich@toaster.net' must be in exactly one segment"
-        );
+        $found = false;
 
-        $this->assertSame(
-            'price-greater-500',
-            $segments[1]->getAlias(),
-            "Contact with email 'rich@toaster.net' must be in segment with alias 'price-greater-500'"
+        foreach ($segments as $segment) {
+            if ($segment->getAlias() === $segmentAlias) {
+                $found = true;
+                break;
+            }
+        }
+
+        $this->assertTrue(
+            $found,
+            "Contact with email '{$contactEmail}' must be in segment with alias '{$segmentAlias}'"
         );
     }
 }

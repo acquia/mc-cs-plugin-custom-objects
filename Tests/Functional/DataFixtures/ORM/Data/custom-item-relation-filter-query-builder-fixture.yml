@@ -16,7 +16,7 @@ Mautic\LeadBundle\Entity\Lead:
     lastname: 'Plug'
     is_published: true
     date_added: '<dateTimeBetween("-1 days","-10 hours")>'
-    email: '<email()>'
+    email: 'poor@plug.net'
 
 MauticPlugin\CustomObjectsBundle\Entity\CustomObject:
 
@@ -110,6 +110,22 @@ Mautic\LeadBundle\Entity\LeadList:
         object: 'custom_object'
         type: 'int'
         operator: 'gt'
+        properties:
+          filter: '500'
+    is_global: true
+    is_preference_center: false
+
+  price-eq-500:
+    is_published: true
+    name: 'Price = 500'
+    alias: 'price-eq-500'
+    filters:
+      0:
+        glue : 'and'
+        field: 'cmf_1' # custom_field.id
+        object: 'custom_object'
+        type: 'int'
+        operator: 'eq'
         properties:
           filter: '500'
     is_global: true
