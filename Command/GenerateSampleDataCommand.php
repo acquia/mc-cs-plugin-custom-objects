@@ -157,9 +157,6 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
 
             $contact = $this->generateContact();
 
-            $this->entityManager->persist($contact);
-            $this->entityManager->flush();
-            $this->entityManager->clear();
             $progress->advance();
         }
 
@@ -169,6 +166,55 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         $io->success("Execution time: {$runTime}");
 
         return 0;
+    }
+
+    private function generateContact(): void
+    {
+        $contact = [
+            'firstname'    => $this->randomHelper->getWord(),
+            'lastname'     => $this->randomHelper->getWord(),
+            'email'        => $this->randomHelper->getEmail(),
+            'is_published' => true,
+            'points'       => 0,
+        ];
+
+        $this->insertInto('leads', $contact);
+    }
+
+    private function insertInto(string $table, array $row): void
+    {
+        $table       = MAUTIC_TABLE_PREFIX.$table;
+        $columnNames = implode(',', array_keys($row));
+        $values      = implode(
+            ',',
+            array_map(
+                function($value) {
+                    switch (gettype($value)) {
+                        case 'string' :
+                            return "'$value'";
+                            break;
+                        case 'integer' :
+                            return (string) $value;
+                            break;
+                        case 'boolean' :
+                            return (bool) $value;
+                            break;
+                        default:
+                            $type = gettype($value);
+                            throw new \InvalidArgumentException("Unsupported type '$type' for insert query");
+                    }
+                },
+                array_values($row)
+            )
+        );
+
+        $query = "
+            INSERT INTO `$table`($columnNames)
+            VALUES ($values)
+        ";
+
+        $this->entityManager->getConnection()->query($query)->execute();
+
     }
 
     private function generateCustomItem(CustomObject $customObject): CustomItem
@@ -192,16 +238,6 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         }
 
         return $customItem;
-    }
-
-    private function generateContact()
-    {
-        $contact = new Lead();
-        $contact->setFirstname($this->randomHelper->getWord());
-        $contact->setLastname($this->randomHelper->getWord());
-        $contact->setEmail($this->randomHelper->getEmail());
-
-        return $contact;
     }
 
     /**
