@@ -130,3 +130,52 @@ Mautic\LeadBundle\Entity\LeadList:
           filter: '500'
     is_global: true
     is_preference_center: false
+
+  price-greater-1000:
+    is_published: true
+    name: 'Price > 1000'
+    alias: 'price-greater-1000'
+    filters:
+      0:
+        glue : 'and'
+        field: 'cmf_1' # custom_field.id
+        object: 'custom_object'
+        type: 'int'
+        operator: 'gt'
+        properties:
+          filter: '1000'
+    is_global: true
+    is_preference_center: false
+
+  price-lte-1000:
+    is_published: true
+    name: 'Price <= 1000'
+    alias: 'price-lte-1000'
+    filters:
+      0:
+        glue : 'and'
+        field: 'cmf_1' # custom_field.id
+        object: 'custom_object'
+        type: 'int'
+        operator: 'lte'
+        properties:
+          filter: '1000'
+    is_global: true
+    is_preference_center: false
+
+  price-lt-500:
+    is_published: true
+    name: 'Price < 500'
+    alias: 'price-lt-500'
+    filters:
+      0:
+        glue : 'and'
+        field: 'cmf_1' # custom_field.id
+        object: 'custom_object'
+        type: 'int'
+        operator: 'lte'
+        properties:
+          filter: '500'
+    is_global: true
+    is_preference_center: false
+
