@@ -149,11 +149,17 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         $progress->start();
 
         for ($i = 1; $i <= $limit; ++$i) {
-            $customItem = $this->generateCustomItem($customObject);
-            $customItem = $this->generateCustomFieldValues($customItem, $customObject);
-            $customItem = $this->generateContactReferences($customItem);
-            $this->customItemModel->save($customItem);
-            $this->clearMemory($customItem);
+
+//            $customItem = $this->generateCustomItem($customObject);
+//            $customItem = $this->generateCustomFieldValues($customItem, $customObject);
+//            $customItem = $this->generateContactReferences($customItem);
+//            $this->customItemModel->save($customItem);
+
+            $contact = $this->generateContact();
+
+            $this->entityManager->persist($contact);
+            $this->entityManager->flush();
+            $this->entityManager->clear();
             $progress->advance();
         }
 
@@ -186,6 +192,16 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         }
 
         return $customItem;
+    }
+
+    private function generateContact()
+    {
+        $contact = new Lead();
+        $contact->setFirstname($this->randomHelper->getWord());
+        $contact->setLastname($this->randomHelper->getWord());
+        $contact->setEmail($this->randomHelper->getEmail());
+
+        return $contact;
     }
 
     /**
