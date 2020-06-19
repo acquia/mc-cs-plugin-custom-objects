@@ -114,7 +114,6 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
             $count,
             "Segment with alias '{$segmentAlias}' should have '{$expectedLeadCount}' contact count. Has '{$count}'"
         );
-
     }
 
     private function assertContactIsInSegment(string $contactEmail, string $segmentAlias): void
