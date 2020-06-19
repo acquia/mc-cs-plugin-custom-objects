@@ -86,10 +86,10 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact:
 MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem:
 
   custom_item_toaster_xref_order_toaster:
-    __construct: ['@custom_item_toaster', '@custom_item_order_toaster']
+    __construct: ['@custom_item_order_toaster', '@custom_item_toaster',]
 
   custom_item_plug_xref_order_plug:
-    __construct: ['@custom_item_plug', '@custom_item_order_plug']
+    __construct: ['@custom_item_order_plug', '@custom_item_plug']
 
 # TODO add these relations too
 # custom_field_value_date
