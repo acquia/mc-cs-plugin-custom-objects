@@ -361,7 +361,7 @@ class QueryFilterHelper
                 ),
                 $customFieldQueryBuilder->expr()->in(
                     $alias.'_value.custom_item_id ',
-                    ["($subSelect1)", "($subSelect2)"]
+                    ["$subSelect1 UNION $subSelect2"]
                 )
             )
         );
