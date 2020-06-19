@@ -160,6 +160,14 @@ class FormController extends AbstractFormController
             return $this->redirect($this->routeProvider->buildViewRoute($objectId, $itemId));
         }
 
+        if ($customItem->getCustomObject()->getRelationshipObject()) {
+            $customItem->setChildCustomItem(
+                $this->customItemModel->populateCustomFields(
+                    $customItem->findChildCustomItem()
+                )
+            );
+        }
+
         $this->customItemModel->lockEntity($customItem);
         return $this->renderFormForItem($customItem, $customObject, $this->routeProvider->buildEditRouteWithRedirectToContact($objectId, $itemId, $contactId), $contactId);
     }

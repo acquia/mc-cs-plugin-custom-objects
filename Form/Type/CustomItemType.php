@@ -63,7 +63,7 @@ class CustomItemType extends AbstractType
             ]
         );
 
-        if (!$customItem->getId() && $customItem->getChildCustomItem()) {
+        if ($customItem->getChildCustomItem()) {
             $builder->add(
                 'child_custom_field_values',
                 CollectionType::class,
