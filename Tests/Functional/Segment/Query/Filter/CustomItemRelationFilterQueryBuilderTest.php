@@ -101,6 +101,10 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
 
         $this->assertLeadCountBySegmentAlias(1, 'price-eq-500');
         $this->assertContactIsInSegment('poor@plug.net', 'price-eq-500');
+
+        $this->assertLeadCountBySegmentAlias(0, 'price-greater-1000');
+        $this->assertLeadCountBySegmentAlias(2, 'price-lte-1000');
+        $this->assertLeadCountBySegmentAlias(0, 'price-lt-500');
     }
 
     private function assertLeadCountBySegmentAlias(int $expectedLeadCount, string $segmentAlias): void
