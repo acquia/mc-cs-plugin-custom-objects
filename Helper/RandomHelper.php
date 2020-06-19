@@ -50,6 +50,11 @@ class RandomHelper
         return $randomWords[$randomKey];
     }
 
+    public function getEmail(): string
+    {
+        return uniqid('', true) . '@' . uniqid('', true) . '.net';
+    }
+
     /**
      * Loads the database of random words from a JSON file or cache if loaded already.
      *
