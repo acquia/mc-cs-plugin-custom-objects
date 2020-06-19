@@ -99,7 +99,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
                 '--force',
                 '-f',
                 InputOption::VALUE_OPTIONAL,
-                'Without confirmation'
+                'Without confirmation. Use --force=1'
             );
         ;
 
@@ -115,7 +115,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         $enquirer = $this->getHelper('question');
         $objectId = (int) $input->getOption('object-id');
         $limit    = (int) $input->getOption('limit');
-        $force    = (bool) $input->getOption('force');
+        $force    = (bool) (int) $input->getOption('force');
 
         if (!$limit) {
             $limit = 1000;
