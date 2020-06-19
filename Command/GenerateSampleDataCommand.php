@@ -181,22 +181,29 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         $this->insertInto('leads', $contact);
     }
 
-    private function insertInto(string $table, array $row): void
+    /**
+     * @param  string $table
+     * @param  array  $row
+     * @return int Last inserted row ID
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    private function insertInto(string $table, array $row): int
     {
         $table       = MAUTIC_TABLE_PREFIX.$table;
         $columnNames = implode(',', array_keys($row));
         $values      = implode(
             ',',
             array_map(
-                function($value) {
+                function ($value) {
                     switch (gettype($value)) {
-                        case 'string' :
+                        case 'string':
                             return "'$value'";
                             break;
-                        case 'integer' :
+                        case 'integer':
                             return (string) $value;
                             break;
-                        case 'boolean' :
+                        case 'boolean':
                             return (bool) $value;
                             break;
                         default:
@@ -213,8 +220,9 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
             VALUES ($values)
         ";
 
+        $connection = $this->entityManager->getConnection();
         $this->entityManager->getConnection()->query($query)->execute();
-
+        return (int) $connection->lastInsertId();
     }
 
     private function generateCustomItem(CustomObject $customObject): CustomItem
