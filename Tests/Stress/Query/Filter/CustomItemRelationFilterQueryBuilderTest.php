@@ -13,12 +13,26 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Stress\Query\Filter;
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Test\MauticWebTestCase;
+use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
+use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
 
 class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
 {
+    use FixtureObjectsTrait;
+    use DbalQueryTrait;
     use DatabaseSchemaTrait;
+
+    /**
+     * Duplicate with parent::$em
+     * Must be here otherwise it throws
+     * Doctrine\ORM\ORMInvalidArgumentException : Detached entity Mautic\LeadBundle\Entity\Lead with ID #1 cannot be removed
+     *
+     * @var EntityManager
+     */
+    private $entityManager;
 
     private $createdContactCount = 0;
 
@@ -26,21 +40,33 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
     {
         parent::setUp();
 
-        $this->createFreshDatabaseSchema($this->em);
+        /** @var EntityManager $entityManager */
+        $this->entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
+
+        $this->postFixtureSetup();
+
+        $fixturesDirectory = $this->getFixturesDirectory();
+        $objects           = $this->loadFixtureFiles(
+            [
+                $fixturesDirectory . '/custom-item-relation-filter-query-builder-fixture.yml'
+            ],
+            false,
+            null,
+            'doctrine'
+        );
     }
 
-    public function testApplyQuery(): void
+    /**
+     * Performance test with 5 and 10 millions of contacts, 10 and 20 millions of linked custom items linked to
+     * another object in 2 layers: contact - custom item - custom item.
+     */
+    public function test(): void
     {
-        $this->testSegmentBuildTime(10);
-        $this->testSegmentBuildTime(100);
-        $this->testSegmentBuildTime(1000);
-        $this->testSegmentBuildTime(100000);
-        $this->testSegmentBuildTime(1000000);
-        $this->testSegmentBuildTime(5000000);
-        $this->testSegmentBuildTime(10000000);
+        $this->generateContacts(5000000);
+        $this->buildSegment(1000);
     }
 
-    private function testSegmentBuildTime(int $contactLimit): void
+    private function buildSegment(int $contactLimit): void
     {
         $this->generateContacts($contactLimit);
 
@@ -57,8 +83,21 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
         echo "Segment for '{$this->createdContactCount}' created in '{$milliseconds}' milliseconds" . PHP_EOL;
     }
 
-    private function generateContacts(int $contactLimit): void
+    /**
+     * @todo Fix segment command to generate data as defined in custom-item-relation-filter-query-builder-fixture.yml
+     */
+    private function generateContacts(int $count): void
     {
-        sleep(1);
+        $this->runCommand(
+            'mautic:customobjects:generatesampledata',
+            [
+                '--env'       => 'test',
+                '--object-id' => 1,
+                '--limit'     => $count,
+                '--force'     => 1,
+            ]
+        );
+
+        $this->createdContactCount += $count;
     }
 }
