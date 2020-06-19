@@ -94,7 +94,14 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
                 '-l',
                 InputOption::VALUE_OPTIONAL,
                 'How many custom items to create. Defaults to 10'
+            )
+            ->addOption(
+                '--force',
+                '-f',
+                InputOption::VALUE_OPTIONAL,
+                'Without confirmation'
             );
+        ;
 
         parent::configure();
     }
@@ -108,6 +115,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         $enquirer = $this->getHelper('question');
         $objectId = (int) $input->getOption('object-id');
         $limit    = (int) $input->getOption('limit');
+        $force    = (bool) $input->getOption('force');
 
         if (!$limit) {
             $limit = 1000;
@@ -127,10 +135,12 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
             return 1;
         }
 
-        $confirmation = new ConfirmationQuestion("Do you really want to generate {$limit} sample {$customObject->getNamePlural()}? [Y/n] ", false);
+        if (!$force) {
+            $confirmation = new ConfirmationQuestion("Do you really want to generate {$limit} sample {$customObject->getNamePlural()}? [Y/n] ", false);
 
-        if (!$enquirer->ask($input, $output, $confirmation)) {
-            return 0;
+            if (!$enquirer->ask($input, $output, $confirmation)) {
+                return 0;
+            }
         }
 
         $startTime = microtime(true);
