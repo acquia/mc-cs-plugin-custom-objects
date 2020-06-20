@@ -41,6 +41,15 @@ class CustomItemXrefContactRepository extends CommonRepository
         return $q->getQuery()->getResult();
     }
 
+    public function deleteAllLinksForCustomItem(int $customItemId): void
+    {
+        $queryBuilder = $this->createQueryBuilder(CustomItemXrefContact::TABLE_ALIAS);
+        $queryBuilder->delete();
+        $queryBuilder->where(CustomItemXrefContact::TABLE_ALIAS.'.customItem = :customItemId');
+        $queryBuilder->setParameter('customItemId', $customItemId);
+        $queryBuilder->getQuery()->execute();
+    }
+
     /**
      * Used by internal Mautic methods. Use the contstant directly instead.
      */

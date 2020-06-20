@@ -20,6 +20,7 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use UnexpectedValueException;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefCustomItemRepository;
 
 /**
  * As the {custom item} - {custom item} table can store the IDs both ways (higher - lower, lower - higher)
@@ -31,6 +32,8 @@ use UnexpectedValueException;
  */
 class CustomItemXrefCustomItem implements CustomItemXrefInterface
 {
+    public const TABLE_ALIAS = 'CustomItemXrefCustomItem';
+
     /**
      * @var CustomItem
      */
@@ -71,6 +74,7 @@ class CustomItemXrefCustomItem implements CustomItemXrefInterface
         $builder = new ClassMetadataBuilder($metadata);
 
         $builder->setTable('custom_item_xref_custom_item');
+        $builder->setCustomRepositoryClass(CustomItemXrefCustomItemRepository::class);
 
         $builder->createManyToOne('customItemLower', CustomItem::class)
             ->addJoinColumn('custom_item_id_lower', 'id', false, false, 'CASCADE')
@@ -129,5 +133,15 @@ class CustomItemXrefCustomItem implements CustomItemXrefInterface
     public function getDateAdded()
     {
         return $this->dateAdded;
+    }
+
+    /**
+     * Take the ref custom item that has different ID than the provided item. Can be either lower or higher.
+     */
+    public function getCustomItemLinkedTo(CustomItem $customItem): CustomItem
+    {
+        return $this->getCustomItemHigher()->getId() === $customItem->getId()
+        ? $this->getCustomItemLower()
+        : $this->getCustomItemHigher();
     }
 }

@@ -47,6 +47,11 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     private $customObject;
 
     /**
+     * @var CustomItem|null
+     */
+    private $childCustomItem;
+
+    /**
      * @var string|null
      */
     private $language;
@@ -217,6 +222,32 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         $this->language = $language;
     }
 
+    public function setChildCustomItem(CustomItem $childCustomItem): void
+    {
+        $this->childCustomItem = $childCustomItem;
+    }
+
+    public function getChildCustomItem(): ?CustomItem
+    {
+        return $this->childCustomItem;
+    }
+
+    public function getChildCustomFieldValues(): ArrayCollection
+    {
+        if ($this->childCustomItem) {
+            return $this->childCustomItem->getCustomFieldValues();
+        }
+
+        return new ArrayCollection();
+    }
+
+    public function generateNameForChildObject(string $entityType, int $entityId, CustomItem $parentCustomItem): void
+    {
+        $this->setName(
+            "relationship-between-{$entityType}-{$entityId}-and-{$parentCustomItem->getCustomObject()->getAlias()}-{$parentCustomItem->getId()}"
+        );
+    }
+
     /**
      * @param CustomFieldValueInterface $customFieldValue
      */
@@ -303,6 +334,22 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         }
 
         return $filteredValues->first();
+    }
+
+    public function findChildCustomItem(): CustomItem
+    {
+        /** @var CustomItemXrefCustomItem|null $childXref */
+        $childXref = $this->getCustomItemReferences()
+            ->filter(function (CustomItemXrefCustomItem $xref) {
+                // The child custom item's object must have the same ID as the current custom item child object.
+                return $xref->getCustomItemLinkedTo($this)->getCustomObject()->getMasterObject()->getId() === $this->getCustomObject()->getId();
+            })->first();
+
+        if ($childXref) {
+            return $childXref->getCustomItemLinkedTo($this);
+        }
+
+        throw new NotFoundException("Custom item {$this->getId()} does not have a child custom item");
     }
 
     /**

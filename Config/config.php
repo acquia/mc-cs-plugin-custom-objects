@@ -600,6 +600,13 @@ return [
                     \MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact::class,
                 ],
             ],
+            'custom_item.xref.custom_item.repository' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefCustomItemRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem::class,
+                ],
+            ],
             'custom_object.segment_decorator_multiselect' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Decorator\MultiselectDecorator::class,
                 'arguments' => [
@@ -724,7 +731,14 @@ return [
                 'arguments' => [
                     'mautic.custom.model.item',
                     'request_stack'
-                ]
+                ],
+            ],
+            'custom_item.post_delete.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomItemPostDeleteSubscriber::class,
+                'arguments' => [
+                    'custom_item.xref.custom_item.repository',
+                    'custom_item.xref.contact.repository',
+                ],
             ],
             'custom_object.audit.log.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\AuditLogSubscriber::class,

@@ -39,9 +39,10 @@ class CustomObjectRepository extends CommonRepository
      * Should only load custom objects with type = TYPE_MASTER, that are not the current
      * object being edited, and that do not already have a relationship associated.
      */
-    public function getMasterObjectQueryBuilder(CustomObject $customObject = null): QueryBuilder
+    public function getMasterObjectChoices(CustomObject $customObject = null): array
     {
         $qb = $this->createQueryBuilder(CustomObject::TABLE_ALIAS);
+        $qb->select('partial '.CustomObject::TABLE_ALIAS.'.{id,nameSingular}');
         $qb->where($qb->expr()->eq(CustomObject::TABLE_ALIAS.'.type', ':type'));
         $qb->setParameter('type', CustomObject::TYPE_MASTER);
 
@@ -53,13 +54,26 @@ class CustomObjectRepository extends CommonRepository
         $sqb = $this->createQueryBuilder('subQuery');
         $sqb->where('subQuery.masterObject = '.CustomObject::TABLE_ALIAS.'.id');
 
+        if ($customObject && $customObject->getMasterObject()) {
+            $sqb->andWhere('subQuery.masterObject != :currentMasterObject');
+            $qb->setParameter('currentMasterObject', $customObject->getMasterObject()->getId());
+        }
+
         $qb->andWhere($qb->expr()->not($qb->expr()->exists($sqb->getDQL())));
 
-        return $qb;
+        $objects = $qb->getQuery()->getResult();
+        $choices = [];
+
+        /** @var CustomObject $object */
+        foreach ($objects as $object) {
+            $choices["{$object->getNameSingular()} ({$object->getAlias()})"] = $object->getId();
+        }
+
+        return $choices;
     }
 
     /**
-     * Used by internal Mautic methods. Use the contstant directly instead.
+     * Used by internal Mautic methods. Use the constant directly instead.
      */
     public function getTableAlias(): string
     {

@@ -100,7 +100,10 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase
         $request->query   = new ParameterBag();
         $request->headers = new HeaderBag();
 
-        $request->method('duplicate')->willReturnSelf();
+        if (method_exists($request, 'method')) { // This is terrible, we should not mock Request at all. Damn you old me!
+            $request->method('duplicate')->willReturnSelf();
+        }
+
         $httpKernel->method('handle')->willReturn($response);
         $notificationModel->method('getNotificationContent')->willReturn([[], '', '']);
         $requestStack->method('getCurrentRequest')->willReturn($request);
