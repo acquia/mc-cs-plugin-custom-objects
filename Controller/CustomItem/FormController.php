@@ -15,7 +15,6 @@ namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemType;
@@ -78,19 +77,18 @@ class FormController extends AbstractFormController
     public function newAction(int $objectId): Response
     {
         try {
-            [$customObject, $customItem] = $this->performNewAction($objectId);
+            $customItem = $this->performNewAction($objectId);
         } catch (ForbiddenException $e) {
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        return $this->renderFormForItem($customItem, $customObject, $this->routeProvider->buildNewRoute($objectId));
+        return $this->renderFormForItem($customItem, $this->routeProvider->buildNewRoute($objectId));
     }
 
     public function newWithRedirectToContactAction(int $objectId, int $contactId): Response
     {
         try {
-            /** @var CustomItem $customItem */
-            [$customObject, $customItem] = $this->performNewAction($objectId);
+            $customItem = $this->performNewAction($objectId);
         } catch (ForbiddenException $e) {
             return $this->accessDenied(false, $e->getMessage());
         }
@@ -103,21 +101,24 @@ class FormController extends AbstractFormController
             );
         }
 
-        return $this->renderFormForItem($customItem, $customObject, $this->routeProvider->buildNewRouteWithRedirectToContact($objectId, $contactId), $contactId);
+        return $this->renderFormForItem($customItem, $this->routeProvider->buildNewRouteWithRedirectToContact($objectId, $contactId), $contactId);
     }
 
-    private function performNewAction(int $objectId): array
+    private function performNewAction(int $objectId): CustomItem
     {
         $this->permissionProvider->canCreate($objectId);
-        $customObject = $this->customObjectModel->fetchEntity($objectId);
-        $customItem   = $this->customItemModel->populateCustomFields(new CustomItem($customObject));
-        return [$customObject, $customItem];
+
+        return $this->customItemModel->populateCustomFields(
+            new CustomItem(
+                $this->customObjectModel->fetchEntity($objectId)
+            )
+        );
     }
 
     public function editAction(int $objectId, int $itemId): Response
     {
         try {
-            [$customObject, $customItem] = $this->performEditAction($objectId, $itemId);
+            $customItem = $this->performEditAction($itemId);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
@@ -136,13 +137,13 @@ class FormController extends AbstractFormController
         }
 
         $this->customItemModel->lockEntity($customItem);
-        return $this->renderFormForItem($customItem, $customObject, $this->routeProvider->buildEditRoute($objectId, $itemId));
+        return $this->renderFormForItem($customItem, $this->routeProvider->buildEditRoute($objectId, $itemId));
     }
 
     public function editWithRedirectToContactAction(int $objectId, int $itemId, int $contactId): Response
     {
         try {
-            [$customObject, $customItem] = $this->performEditAction($objectId, $itemId);
+            $customItem = $this->performEditAction($itemId);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
@@ -169,15 +170,16 @@ class FormController extends AbstractFormController
         }
 
         $this->customItemModel->lockEntity($customItem);
-        return $this->renderFormForItem($customItem, $customObject, $this->routeProvider->buildEditRouteWithRedirectToContact($objectId, $itemId, $contactId), $contactId);
+        
+        return $this->renderFormForItem($customItem, $this->routeProvider->buildEditRouteWithRedirectToContact($objectId, $itemId, $contactId), $contactId);
     }
 
-    private function performEditAction(int $objectId, int $itemId): array
+    private function performEditAction(int $itemId): CustomItem
     {
-        $customObject = $this->customObjectModel->fetchEntity($objectId);
-        $customItem   = $this->customItemModel->fetchEntity($itemId);
+        $customItem = $this->customItemModel->fetchEntity($itemId);
         $this->permissionProvider->canEdit($customItem);
-        return [$customObject, $customItem];
+
+        return $customItem;
     }
 
     public function cloneAction(int $objectId, int $itemId): Response
@@ -193,15 +195,15 @@ class FormController extends AbstractFormController
 
         $customItem->setName($customItem->getName().' '.$this->translator->trans('mautic.core.form.clone'));
 
-        return $this->renderFormForItem($customItem, $customItem->getCustomObject(), $this->routeProvider->buildCloneRoute($objectId, $itemId));
+        return $this->renderFormForItem($customItem, $this->routeProvider->buildCloneRoute($objectId, $itemId));
     }
 
-    private function renderFormForItem(CustomItem $customItem, CustomObject $customObject, string $route, ?int $contactId = null): Response
+    private function renderFormForItem(CustomItem $customItem, string $route, ?int $contactId = null): Response
     {
-        $action  = $this->routeProvider->buildSaveRoute($customObject->getId(), $customItem->getId());
+        $action  = $this->routeProvider->buildSaveRoute($customItem->getCustomObject()->getId(), $customItem->getId());
         $options = [
             'action'    => $action,
-            'objectId'  => $customObject->getId(),
+            'objectId'  => $customItem->getCustomObject()->getId(),
             'contactId' => $contactId,
             'cancelUrl' => 0 < $contactId ? $this->routeProvider->buildContactViewRoute($contactId) : null,
         ];
@@ -214,10 +216,10 @@ class FormController extends AbstractFormController
 
         return $this->delegateView(
             [
-                'returnUrl'      => $this->routeProvider->buildListRoute($customObject->getId()),
+                'returnUrl'      => $this->routeProvider->buildListRoute($customItem->getCustomObject()->getId()),
                 'viewParameters' => [
                     'entity'       => $customItem,
-                    'customObject' => $customObject,
+                    'customObject' => $customItem->getCustomObject(),
                     'form'         => $form->createView(),
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.php',

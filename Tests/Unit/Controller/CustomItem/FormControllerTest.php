@@ -118,6 +118,7 @@ class FormControllerTest extends ControllerTestCase
 
         $this->customObject->method('getId')->willReturn(self::OBJECT_ID);
         $this->customItem->method('getId')->willReturn(self::ITEM_ID);
+        $this->customItem->method('getCustomObject')->willReturn($this->customObject);
         $this->request->method('isXmlHttpRequest')->willReturn(true);
         $this->request->method('getRequestUri')->willReturn('https://a.b');
         $formControllerReflectionObject = new \ReflectionObject($this->formController);
@@ -293,32 +294,11 @@ class FormControllerTest extends ControllerTestCase
         $this->formController->newWithRedirectToContactAction(static::OBJECT_ID, static::CONTACT_ID);
     }
 
-    public function testEditActionIfCustomObjectNotFound(): void
-    {
-        $this->customObjectModel->expects($this->once())
-            ->method('fetchEntity')
-            ->with(self::OBJECT_ID)
-            ->will($this->throwException(new NotFoundException('Item not found message')));
-
-        $this->customItemModel->expects($this->never())
-            ->method('fetchEntity');
-
-        $this->routeProvider->expects($this->never())
-            ->method('buildEditRoute');
-
-        $this->formController->editAction(self::OBJECT_ID, self::ITEM_ID);
-    }
-
     public function testEditActionIfCustomItemNotFound(): void
     {
-        $this->customObjectModel->expects($this->once())
-            ->method('fetchEntity')
-            ->with(self::OBJECT_ID)
-            ->willReturn($this->customObject);
-
         $this->customItemModel->expects($this->once())
             ->method('fetchEntity')
-            ->will($this->throwException(new NotFoundException()));
+            ->willThrowException(new NotFoundException());
 
         $this->routeProvider->expects($this->never())
             ->method('buildEditRoute');
@@ -328,11 +308,6 @@ class FormControllerTest extends ControllerTestCase
 
     public function testEditActionIfCustomItemForbidden(): void
     {
-        $this->customObjectModel->expects($this->once())
-            ->method('fetchEntity')
-            ->with(self::OBJECT_ID)
-            ->willReturn($this->customObject);
-
         $this->customItemModel->expects($this->once())
             ->method('fetchEntity')
             ->willReturn($this->customItem);
@@ -351,11 +326,6 @@ class FormControllerTest extends ControllerTestCase
 
     public function testEditAction(): void
     {
-        $this->customObjectModel->expects($this->once())
-            ->method('fetchEntity')
-            ->with(self::OBJECT_ID)
-            ->willReturn($this->customObject);
-
         $this->customItemModel->expects($this->once())
             ->method('fetchEntity')
             ->willReturn($this->customItem);
@@ -395,11 +365,6 @@ class FormControllerTest extends ControllerTestCase
                 return FormControllerTest::ITEM_ID;
             }
         };
-
-        $this->customObjectModel->expects($this->once())
-            ->method('fetchEntity')
-            ->with(self::OBJECT_ID)
-            ->willReturn($customObject);
 
         $this->customItemModel->expects($this->once())
             ->method('fetchEntity')
@@ -461,11 +426,6 @@ class FormControllerTest extends ControllerTestCase
             }
         };
 
-        $this->customObjectModel->expects($this->once())
-            ->method('fetchEntity')
-            ->with(self::OBJECT_ID)
-            ->willReturn($customObject);
-
         $this->customItemModel->expects($this->once())
             ->method('fetchEntity')
             ->willReturn($customItem);
@@ -506,11 +466,6 @@ class FormControllerTest extends ControllerTestCase
 
     public function testEditWithRedirectToContactActionIfCustomItemNotFound(): void
     {
-        $this->customObjectModel->expects($this->once())
-            ->method('fetchEntity')
-            ->with(self::OBJECT_ID)
-            ->willReturn($this->customObject);
-
         $this->customItemModel->expects($this->once())
             ->method('fetchEntity')
             ->will($this->throwException(new NotFoundException()));
@@ -523,11 +478,6 @@ class FormControllerTest extends ControllerTestCase
 
     public function testEditWithRedirectToContactActionIfCustomItemForbidden(): void
     {
-        $this->customObjectModel->expects($this->once())
-            ->method('fetchEntity')
-            ->with(self::OBJECT_ID)
-            ->willReturn($this->customObject);
-
         $this->customItemModel->expects($this->once())
             ->method('fetchEntity')
             ->willReturn($this->customItem);
@@ -546,11 +496,6 @@ class FormControllerTest extends ControllerTestCase
 
     public function testEditWithRedirectToContactActionWhenTheItemIsLocked()
     {
-        $this->customObjectModel->expects($this->once())
-            ->method('fetchEntity')
-            ->with(self::OBJECT_ID)
-            ->willReturn($this->customObject);
-
         $this->customItemModel->expects($this->once())
             ->method('fetchEntity')
             ->willReturn($this->customItem);
@@ -583,11 +528,6 @@ class FormControllerTest extends ControllerTestCase
 
     public function testEditActionWhenTheItemIsLocked()
     {
-        $this->customObjectModel->expects($this->once())
-            ->method('fetchEntity')
-            ->with(self::OBJECT_ID)
-            ->willReturn($this->customObject);
-
         $this->customItemModel->expects($this->once())
             ->method('fetchEntity')
             ->willReturn($this->customItem);
@@ -620,8 +560,7 @@ class FormControllerTest extends ControllerTestCase
 
     public function testCloneAction(): void
     {
-        $this->customItem->expects($this->once())
-            ->method('getCustomObject')
+        $this->customItem->method('getCustomObject')
             ->willReturn($this->customObject);
 
         $this->customItemModel->expects($this->once())
