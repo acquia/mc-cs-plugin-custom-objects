@@ -15,13 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Command;
 
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManager;
-use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInt;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Helper\RandomHelper;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
@@ -137,7 +131,9 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         [$coProductId, $cfPriceId, $coOrderId] = $this->createCustomObjectsWithItems();
 
         for ($i = 1; $i <= $limit; ++$i) {
+
             $this->generateContact($coProductId, $cfPriceId, $coOrderId, $limit);
+            $this->entityManager->clear();
 
             $progress->advance();
         }
@@ -301,61 +297,5 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         $this->connection->query($query);
 
         return (int) $this->connection->lastInsertId();
-    }
-
-    private function generateCustomItem(CustomObject $customObject): CustomItem
-    {
-        $customItem = new CustomItem($customObject);
-        $customItem->setName($this->randomHelper->getSentence(random_int(2, 6)));
-
-        return $customItem;
-    }
-
-    private function generateCustomFieldValues(CustomItem $customItem, CustomObject $customObject): CustomItem
-    {
-        foreach ($customObject->getCustomFields() as $field) {
-            if ('text' === $field->getType()) {
-                $customItem->addCustomFieldValue(new CustomFieldValueText($field, $customItem, $this->randomHelper->getSentence(random_int(0, 100))));
-            }
-
-            if ('int' === $field->getType()) {
-                $customItem->addCustomFieldValue(new CustomFieldValueInt($field, $customItem, random_int(0, 1000)));
-            }
-        }
-
-        return $customItem;
-    }
-
-    /**
-     * Generates up to 10 custom item - contact references and adds them to the CustomItem entity.
-     */
-    private function generateContactReferences(CustomItem $customItem): CustomItem
-    {
-        for ($i = 1; $i <= random_int(0, 10); ++$i) {
-            $contact   = new Lead();
-            $reference = new CustomItemXrefContact($customItem, $contact);
-            $contact->setFirstname(ucfirst($this->randomHelper->getWord()));
-            $contact->setLastname(ucfirst($this->randomHelper->getWord()));
-
-            $this->contactModel->saveEntity($contact);
-
-            $customItem->addContactReference($reference);
-        }
-
-        return $customItem;
-    }
-
-    private function clearMemory(CustomItem $customItem): void
-    {
-        foreach ($customItem->getCustomFieldValues() as $value) {
-            $this->entityManager->detach($value);
-        }
-
-        foreach ($customItem->getContactReferences() as $reference) {
-            $this->entityManager->detach($reference->getContact());
-            $this->entityManager->detach($reference);
-        }
-
-        $this->entityManager->detach($customItem);
     }
 }
