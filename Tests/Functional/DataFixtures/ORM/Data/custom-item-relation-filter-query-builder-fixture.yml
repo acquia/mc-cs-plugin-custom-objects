@@ -194,6 +194,22 @@ Mautic\LeadBundle\Entity\LeadList:
     is_global: true
     is_preference_center: false
 
+  date-lt-1990:
+    is_published: true
+    name: 'Date < 1990'
+    alias: 'date-lt-1990'
+    filters: # a:1:{i:0;a:6:{s:4:"glue";s:3:"and";s:5:"field";s:5:"cmf_2";s:6:"object";s:13:"custom_object";s:4:"type";s:4:"date";s:8:"operator";s:2:"lt";s:10:"properties";a:1:{s:6:"filter";s:4:"1990";}}}
+      0:
+        glue : 'and'
+        field: 'cmf_2' # custom_field.id
+        object: 'custom_object'
+        type: 'date'
+        operator: 'lt'
+        properties:
+          filter: '1990-01-01'
+    is_global: true
+    is_preference_center: false
+
   price-greater-500:
     is_published: true
     name: 'Price > 500'
@@ -275,7 +291,6 @@ Mautic\LeadBundle\Entity\LeadList:
     is_preference_center: false
 
 # TODO segments for these relations too
-# custom_field_value_date
 # custom_field_value_datetime
 # custom_field_value_option
 # custom_field_value_text
