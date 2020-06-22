@@ -35,6 +35,31 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomObject:
     alias: 'order'
 
 MauticPlugin\CustomObjectsBundle\Entity\CustomField:
+
+  custom_field_option:
+    custom_object: '@custom_object_product'
+    is_published: true
+    date_added: '<date_create()>'
+    label: 'Option'
+    alias: 'option'
+    type: 'option'
+
+  custom_field_date:
+    custom_object: '@custom_object_product'
+    is_published: true
+    date_added: '<date_create()>'
+    label: 'Date'
+    alias: 'date'
+    type: 'date'
+
+  custom_field_datetime:
+    custom_object: '@custom_object_product'
+    is_published: true
+    date_added: '<date_create()>'
+    label: 'DateTime'
+    alias: 'datetime'
+    type: 'datetime'
+
   custom_field_price:
     custom_object: '@custom_object_product'
     is_published: true
@@ -42,6 +67,26 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomField:
     label: 'Price'
     alias: 'price'
     type: 'int'
+
+  custom_field_text:
+    custom_object: '@custom_object_product'
+    is_published: true
+    date_added: '<date_create()>'
+    label: 'Text'
+    alias: 'text'
+    type: 'text'
+
+MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption:
+
+  custom_field_option_1:
+    custom_field: '@custom_field_option'
+    value: 1
+    label: 1
+
+  custom_field_option_2:
+    custom_field: '@custom_field_option'
+    value: 2
+    label: 2
 
 MauticPlugin\CustomObjectsBundle\Entity\CustomItem:
 
@@ -65,6 +110,26 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomItem:
     name: 'Ordered plug'
     __construct: ['@custom_object_order']
 
+MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueDate:
+
+  custom_field_toaster_date:
+    __construct: ['@custom_field_price', '@custom_item_toaster']
+    value: '1980-01-01'
+
+  custom_field_plug_date:
+    __construct: ['@custom_field_price', '@custom_item_plug']
+    value: '2020-07-01'
+
+MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueDateTime:
+
+  custom_field_toaster_datetime:
+    __construct: ['@custom_field_price', '@custom_item_toaster']
+    value: '1980-01-01 00:00:00'
+
+  custom_field_plug_datetime:
+    __construct: ['@custom_field_price', '@custom_item_plug']
+    value: '2020-07-01 00:00:00'
+
 MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInt:
 
   custom_field_toaster_price:
@@ -74,6 +139,26 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInt:
   custom_field_plug_price:
     __construct: ['@custom_field_price', '@custom_item_plug']
     value: 500
+
+MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption:
+
+  custom_field_toaster_option:
+    __construct: ['@custom_field_price', '@custom_item_toaster']
+    value: 1
+
+  custom_field_plug_option:
+    __construct: ['@custom_field_price', '@custom_item_plug']
+    value: 1
+
+MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText:
+
+  custom_field_toaster_text:
+    __construct: ['@custom_field_price', '@custom_item_toaster']
+    value: 'text'
+
+  custom_field_plug_text:
+    __construct: ['@custom_field_price', '@custom_item_plug']
+    value: 'text'
 
 MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact:
 
@@ -90,12 +175,6 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem:
 
   custom_item_plug_xref_order_plug:
     __construct: ['@custom_item_order_plug', '@custom_item_plug']
-
-# TODO add these relations too
-# custom_field_value_date
-# custom_field_value_datetime
-# custom_field_value_option
-# custom_field_value_text
 
 Mautic\LeadBundle\Entity\LeadList:
 
@@ -179,3 +258,8 @@ Mautic\LeadBundle\Entity\LeadList:
     is_global: true
     is_preference_center: false
 
+# TODO segments for these relations too
+# custom_field_value_date
+# custom_field_value_datetime
+# custom_field_value_option
+# custom_field_value_text
