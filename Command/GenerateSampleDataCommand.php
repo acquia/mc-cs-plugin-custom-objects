@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Command;
 
+use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
@@ -21,7 +22,6 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Helper\RandomHelper;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
@@ -84,12 +84,6 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         $this->setName('mautic:customobjects:generatesampledata')
             ->setDescription('Creates specified amount of custom items with random links to contacts, random names and random custom field values.')
             ->addOption(
-                '--object-id',
-                '-i',
-                InputOption::VALUE_REQUIRED,
-                'Set Custom Object ID to know what custom items to generated.'
-            )
-            ->addOption(
                 '--limit',
                 '-l',
                 InputOption::VALUE_OPTIONAL,
@@ -113,26 +107,11 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
     {
         $io       = new SymfonyStyle($input, $output);
         $enquirer = $this->getHelper('question');
-        $objectId = (int) $input->getOption('object-id');
         $limit    = (int) $input->getOption('limit');
         $force    = (bool) (int) $input->getOption('force');
 
         if (!$limit) {
             $limit = 1000;
-        }
-
-        if (!$objectId) {
-            $io->error('Provide a Custom Object ID for which you want to generate the custom items. Use --object-id=X');
-
-            return 1;
-        }
-
-        try {
-            $customObject = $this->customObjectModel->fetchEntity($objectId);
-        } catch (NotFoundException $e) {
-            $io->error($e->getMessage());
-
-            return 1;
         }
 
         if (!$force) {
@@ -148,14 +127,11 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         $progress->setFormat(' %current%/%max% [%bar%] | %percent:3s%% | Elapsed: %elapsed:6s% | Estimated: %estimated:-6s% | Memory Usage: %memory:6s%');
         $progress->start();
 
+        [$coProductId, $cfPrice, $coOrderId] = $this->createCustomObjectsWithItems();
+
         for ($i = 1; $i <= $limit; ++$i) {
 
-//            $customItem = $this->generateCustomItem($customObject);
-//            $customItem = $this->generateCustomFieldValues($customItem, $customObject);
-//            $customItem = $this->generateContactReferences($customItem);
-//            $this->customItemModel->save($customItem);
-
-            $contact = $this->generateContact();
+            $contactId = $this->generateContact();
 
             $progress->advance();
         }
@@ -166,6 +142,46 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         $io->success("Execution time: {$runTime}");
 
         return 0;
+    }
+
+    /**
+     * @return int[]
+     * @throws DBALException
+     */
+    private function createCustomObjectsWithItems(): array
+    {
+        $coProduct = [
+            'is_published' => true,
+            'alias' => 'product',
+            'name_singular' => 'Product',
+            'name_plural' => 'Products',
+            'type' => 0,
+        ];
+
+        $coProductId = $this->insertInto('custom_object', $coProduct);
+
+        $cfPrice = [
+            'is_published' => true,
+            'custom_object_id' => $coProductId,
+            'alias' => 'price',
+            'Label' => 'Price',
+            'type' => 'int',
+            'required' => 0,
+        ];
+
+        $cfPriceId = $this->insertInto('custom_field', $cfPrice);
+
+        $coOrder = [
+            'is_published' => true,
+            'alias' => 'order',
+            'name_singular' => 'Order',
+            'name_plural' => 'Orders',
+            'type' => 0,
+        ];
+
+        $coOrderId = $this->insertInto('custom_object', $coOrder);
+
+        return [$coProductId, $cfPriceId, $coOrderId];
     }
 
     private function generateContact(): void
@@ -186,7 +202,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
      * @param  array  $row
      * @return int Last inserted row ID
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     private function insertInto(string $table, array $row): int
     {
@@ -221,7 +237,8 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         ";
 
         $connection = $this->entityManager->getConnection();
-        $this->entityManager->getConnection()->query($query)->execute();
+        $query = $this->entityManager->getConnection()->query($query);
+
         return (int) $connection->lastInsertId();
     }
 
