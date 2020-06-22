@@ -15,11 +15,13 @@ namespace MauticPlugin\CustomObjectsBundle\Helper;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 
@@ -32,9 +34,15 @@ class QueryFilterHelper
      */
     private $fieldTypeProvider;
 
-    public function __construct(CustomFieldTypeProvider $fieldTypeProvider)
+    /**
+     * @var int
+     */
+    private $itemRelationLevelLimit;
+
+    public function __construct(CustomFieldTypeProvider $fieldTypeProvider, CoreParametersHelper $coreParametersHelper)
     {
         $this->fieldTypeProvider = $fieldTypeProvider;
+        $this->itemRelationLevelLimit = (int) $coreParametersHelper->get(ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT);
     }
 
     /**
@@ -328,7 +336,7 @@ class QueryFilterHelper
     }
 
     /**
-     * @throws NotFoundException
+     * @throws NotFoundException|DBALException
      */
     private function addCustomFieldValueJoin(
         QueryBuilder $customFieldQueryBuilder,
@@ -338,17 +346,35 @@ class QueryFilterHelper
     ): QueryBuilder {
         $dataTable = $this->fieldTypeProvider->getType($fieldType)->getTableName();
 
-        $subSelect1 = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
-            ->select('custom_item_id_lower')
-            ->from('custom_item_xref_custom_item')
-            ->where("custom_item_id_higher = {$alias}_item.id")
-            ->getSQL();
+        $subSelects =[];
 
-        $subSelect2 = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
-            ->select('custom_item_id_higher')
-            ->from('custom_item_xref_custom_item')
-            ->where("custom_item_id_lower = {$alias}_item.id")
-            ->getSQL();
+        if ($this->itemRelationLevelLimit > 2) {
+            throw new \RuntimeException("Level 1 is not implemented");
+        }
+
+        if ($this->itemRelationLevelLimit >= 2) {
+            $subSelects[1] = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
+                ->select('custom_item_id_lower')
+                ->from('custom_item_xref_custom_item')
+                ->where("custom_item_id_higher = {$alias}_item.id")
+                ->getSQL();
+
+            $subSelects[2] = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
+                ->select('custom_item_id_higher')
+                ->from('custom_item_xref_custom_item')
+                ->where("custom_item_id_lower = {$alias}_item.id")
+                ->getSQL();
+        }
+
+        $subSelectString = '';
+
+        if (count($subSelects)) {
+            $subSelectString = implode(' UNION ', $subSelects);
+        }
+
+        if ($this->itemRelationLevelLimit > 2) {
+            throw new \RuntimeException("Level higher than 2 is not implemented");
+        }
 
         $customFieldQueryBuilder->leftJoin(
             $alias.'_item',
@@ -361,7 +387,7 @@ class QueryFilterHelper
                 ),
                 $customFieldQueryBuilder->expr()->in(
                     $alias.'_value.custom_item_id ',
-                    ["$subSelect1 UNION $subSelect2"]
+                    [$subSelectString]
                 )
             )
         );
