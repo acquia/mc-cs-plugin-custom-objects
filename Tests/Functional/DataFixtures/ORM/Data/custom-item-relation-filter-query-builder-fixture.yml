@@ -148,7 +148,7 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption:
 
   custom_field_plug_option:
     __construct: ['@custom_field_price', '@custom_item_plug']
-    value: 1
+    value: 2
 
 MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText:
 
@@ -207,6 +207,22 @@ Mautic\LeadBundle\Entity\LeadList:
         operator: 'lt'
         properties:
           filter: '1990-01-01'
+    is_global: true
+    is_preference_center: false
+
+  datetime-gt-1990:
+    is_published: true
+    name: 'DateTime > 1990'
+    alias: 'datetime-gt-1990'
+    filters:
+      0:
+        glue : 'and'
+        field: 'cmf_2' # custom_field.id
+        object: 'custom_object'
+        type: 'datetime'
+        operator: 'gt'
+        properties:
+          filter: '1990-01-01 00:00:00'
     is_global: true
     is_preference_center: false
 
@@ -290,7 +306,35 @@ Mautic\LeadBundle\Entity\LeadList:
     is_global: true
     is_preference_center: false
 
-# TODO segments for these relations too
-# custom_field_value_datetime
-# custom_field_value_option
-# custom_field_value_text
+  option-in-1:
+    is_published: true
+    name: 'Multiselect = 1'
+    alias: 'option-in-1'
+    filters: # a:1:{i:0;a:6:{s:4:"glue";s:3:"and";s:5:"field";s:5:"cmf_1";s:6:"object";s:13:"custom_object";s:4:"type";s:6:"select";s:8:"operator";s:2:"in";s:10:"properties";a:1:{s:6:"filter";a:1:{i:0;s:1:"1";}}}}
+      0:
+        glue : 'and'
+        field: 'cmf_2' # custom_field.id
+        object: 'custom_object'
+        type: 'multiselect'
+        operator: 'in'
+        properties:
+          filter:
+            0: '1'
+    is_global: true
+    is_preference_center: false
+
+  text-eq-text:
+    is_published: true
+    name: 'Text = text'
+    alias: 'text-eq-text'
+    filters:
+      0:
+        glue : 'and'
+        field: 'cmf_2' # custom_field.id
+        object: 'custom_object'
+        type: 'text'
+        operator: '='
+        properties:
+          filter: 'text'
+    is_global: true
+    is_preference_center: false
