@@ -76,10 +76,10 @@ final class CustomFieldFunctionalTest extends MauticMysqlTestCase
         $clientCreateResponse = $this->createField($customObject);
         $this->assertEquals($httpCreated, $clientCreateResponse->getStatusCode());
         // RETRIEVE
-        $createdId = json_decode($clientCreateResponse->getContent())->{'@id'};
-        if ($createdId === null){
+        if (!property_exists(json_decode($clientCreateResponse->getContent()), '@id')) {
             return;
         }
+        $createdId = json_decode($clientCreateResponse->getContent())->{'@id'};
         $clientRetrieveResponse = $this->retrieveField($createdId);
         $this->assertEquals($httpRetrieved, $clientRetrieveResponse->getStatusCode());
         if ($retrievedLabel) {
@@ -123,7 +123,7 @@ final class CustomFieldFunctionalTest extends MauticMysqlTestCase
     {
         $payload = $this->getCreatePayload('/api/v2/custom_objects/'.$customObject->getId());
         $server = ['CONTENT_TYPE' => 'application/ld+json', 'ACCEPT' => 'application/ld+json'];
-        $this->client->request('POST', '/api/v2/custom_fields.jsonld', [], [], $server, json_encode($payload));
+        $this->client->request('POST', '/v2/api/custom_fields.jsonld', [], [], $server, json_encode($payload));
         return $this->client->getResponse();
     }
 
@@ -163,7 +163,7 @@ final class CustomFieldFunctionalTest extends MauticMysqlTestCase
                 "string1",
                 "string2"
             ],
-            "published"    => true
+            "published"    => false
         ];
     }
 
@@ -220,17 +220,6 @@ final class CustomFieldFunctionalTest extends MauticMysqlTestCase
                     null,
                     Response::HTTP_NO_CONTENT
                 ],
-              // It retrieves data even if no permission
-/*            "no_retrieve" =>
-                [
-                    ['editown', 'editother', 'create', 'deleteown', 'deleteother', 'publishown', 'publishother'],
-                    Response::HTTP_CREATED,
-                    Response::HTTP_FORBIDDEN,
-                    null,
-                    Response::HTTP_OK,
-                    "Edited Custom Field",
-                    Response::HTTP_NO_CONTENT
-                ],*/
             "no_create" =>
                 [
                     ['viewown', 'viewother', 'editown', 'editother', 'deleteown', 'deleteother', 'publishown', 'publishother'],
