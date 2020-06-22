@@ -78,13 +78,13 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
 
     protected function tearDown(): void
     {
-        foreach ($this->getFixturesInUnloadableOrder() as $entity) {
-            $this->entityManager->remove($entity);
-        }
-
-        $this->entityManager->flush();
-
-        parent::tearDown();
+//        foreach ($this->getFixturesInUnloadableOrder() as $entity) {
+//            $this->entityManager->remove($entity);
+//        }
+//
+//        $this->entityManager->flush();
+//
+//        parent::tearDown();
     }
 
     public function testApplyQuery(): void
@@ -98,9 +98,15 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
         $this->assertLeadCountBySegmentAlias(1, 'order-plug-name-eq');
         $this->assertContactIsInSegment('poor@plug.net', 'order-plug-name-eq');
 
+        # date
         $this->assertLeadCountBySegmentAlias(1, 'date-lt-1990');
         $this->assertContactIsInSegment('rich@toaster.net', 'date-lt-1990');
 
+        # datetime
+        $this->assertLeadCountBySegmentAlias(1, 'datetime-gt-1990');
+        $this->assertContactIsInSegment('poor@plug.net', 'datetime-gt-1990');
+
+        # int
         // Segment 'price-greater-500' has exactly one contact
         $this->assertLeadCountBySegmentAlias(1, 'price-greater-500');
         // Contact with email 'rich@toaster.net' must be in 'price-greater-500' segment
@@ -113,11 +119,13 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
         $this->assertLeadCountBySegmentAlias(2, 'price-lte-1000');
         $this->assertLeadCountBySegmentAlias(0, 'price-lt-500');
 
-        // @TODO add these relations too
-        // custom_field_value_date
-        // custom_field_value_datetime
-        // custom_field_value_option
-        // custom_field_value_text
+        # option - multiselect
+        $this->assertLeadCountBySegmentAlias(1, 'option-in-1');
+        $this->assertContactIsInSegment('rich@toaster.net', 'option-in-1');
+
+        # text
+        $this->assertLeadCountBySegmentAlias(1, 'text-eq-text');
+        $this->assertContactIsInSegment('rich@toaster.net', 'text-eq-text');
     }
 
     private function assertLeadCountBySegmentAlias(int $expectedLeadCount, string $segmentAlias): void
