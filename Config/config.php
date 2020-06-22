@@ -1047,7 +1047,10 @@ return [
             ],
             'custom_object.query.filter.helper'            => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper::class,
-                'arguments' => ['custom_field.type.provider'],
+                'arguments' => [
+                    'custom_field.type.provider',
+                    'mautic.helper.core_parameters',
+                ],
             ],
             'custom_object.helper.token_formatter' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Helper\TokenFormatter::class,
