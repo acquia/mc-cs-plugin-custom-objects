@@ -85,7 +85,6 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
         $this->entityManager->flush();
 
         parent::tearDown();
-
     }
 
     public function testApplyQuery(): void

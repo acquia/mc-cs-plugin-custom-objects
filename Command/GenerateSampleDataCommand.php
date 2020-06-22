@@ -60,6 +60,11 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
      */
     private $randomHelper;
 
+    /**
+     * @var \Doctrine\DBAL\Connection
+     */
+    private $connection;
+
     public function __construct(
         CustomObjectModel $customObjectModel,
         CustomItemModel $customItemModel,
@@ -74,6 +79,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         $this->contactModel      = $contactModel;
         $this->entityManager     = $entityManager;
         $this->randomHelper      = $randomHelper;
+        $this->connection        = $this->entityManager->getConnection();
     }
 
     /**
@@ -115,7 +121,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         }
 
         if (!$force) {
-            $confirmation = new ConfirmationQuestion("Do you really want to generate {$limit} sample {$customObject->getNamePlural()}? [Y/n] ", false);
+            $confirmation = new ConfirmationQuestion("Do you really want to ddelete current data and generate {$limit} sample of contacts? [Y/n] ", false);
 
             if (!$enquirer->ask($input, $output, $confirmation)) {
                 return 0;
@@ -127,11 +133,11 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         $progress->setFormat(' %current%/%max% [%bar%] | %percent:3s%% | Elapsed: %elapsed:6s% | Estimated: %estimated:-6s% | Memory Usage: %memory:6s%');
         $progress->start();
 
-        [$coProductId, $cfPrice, $coOrderId] = $this->createCustomObjectsWithItems();
+        $this->cleanupDB();
+        [$coProductId, $cfPriceId, $coOrderId] = $this->createCustomObjectsWithItems();
 
         for ($i = 1; $i <= $limit; ++$i) {
-
-            $contactId = $this->generateContact();
+            $this->generateContact($coProductId, $cfPriceId, $coOrderId, $limit);
 
             $progress->advance();
         }
@@ -184,7 +190,16 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         return [$coProductId, $cfPriceId, $coOrderId];
     }
 
-    private function generateContact(): void
+    private function cleanupDB()
+    {
+        $query = 'delete from leads where 1';
+        $this->connection->query($query);
+
+        $query = 'delete from custom_object where 1';
+        $this->connection->query($query);
+    }
+
+    private function generateContact(int $coProductId, int $cfPriceId, int $coOrderId, int $priceLimit): void
     {
         $contact = [
             'firstname'    => $this->randomHelper->getWord(),
@@ -194,7 +209,54 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
             'points'       => 0,
         ];
 
-        $this->insertInto('leads', $contact);
+        $contactId = $this->insertInto('leads', $contact);
+
+        $this->generateProductRelations($contactId, $coProductId, $cfPriceId, $coOrderId, $priceLimit);
+    }
+
+    private function generateProductRelations(int $contactId, int $coProductId, int $cfPriceId, int $coOrderId, int $priceLimit)
+    {
+        $ciProduct = [
+            'custom_object_id' => $coProductId,
+            'name' => $this->randomHelper->getWord(),
+            'is_published' => true,
+        ];
+
+        $ciProductId = $this->insertInto('custom_item', $ciProduct);
+
+        $ciValueInt = [
+            'custom_field_id' => $cfPriceId,
+            'custom_item_id'  => $ciProductId,
+            'value'           => rand(1, $priceLimit),
+        ];
+
+        $this->insertInto('custom_field_value_int', $ciValueInt);
+
+        $ciOrder = [
+            'custom_object_id' => $coOrderId,
+            'name' => $this->randomHelper->getWord(),
+            'is_published' => true,
+        ];
+
+        $ciOrderId = $this->insertInto('custom_item', $ciOrder);
+
+        $dateAdded = date("Y-m-d H:i:s");
+
+        $cixContact = [
+            'custom_item_id' => $ciProductId,
+            'contact_id' => $contactId,
+            'date_added' => $dateAdded,
+        ];
+
+        $this->insertInto('custom_item_xref_contact', $cixContact);
+
+        $cixci = [
+            'custom_item_id_lower' => $ciProductId,
+            'custom_item_id_higher' => $ciOrderId,
+            'date_added' => $dateAdded,
+        ];
+
+        $this->insertInto('custom_item_xref_custom_item', $cixci);
     }
 
     /**
@@ -232,14 +294,13 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         );
 
         $query = "
-            INSERT INTO `$table`($columnNames)
+            INSERT INTO `$table` ($columnNames)
             VALUES ($values)
         ";
 
-        $connection = $this->entityManager->getConnection();
-        $query = $this->entityManager->getConnection()->query($query);
+        $this->connection->query($query);
 
-        return (int) $connection->lastInsertId();
+        return (int) $this->connection->lastInsertId();
     }
 
     private function generateCustomItem(CustomObject $customObject): CustomItem
