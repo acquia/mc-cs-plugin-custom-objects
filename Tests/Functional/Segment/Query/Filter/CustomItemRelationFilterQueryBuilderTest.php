@@ -94,6 +94,9 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
             ['--env' => 'test']
         );
 
+        $this->assertLeadCountBySegmentAlias(1, 'order-plug-name-eq');
+        $this->assertContactIsInSegment('poor@plug.net', 'order-plug-name-eq');
+
         // Segment 'price-greater-500' has exactly one contact
         $this->assertLeadCountBySegmentAlias(1, 'price-greater-500');
         // Contact with email 'rich@toaster.net' must be in 'price-greater-500' segment
