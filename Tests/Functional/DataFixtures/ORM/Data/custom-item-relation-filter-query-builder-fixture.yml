@@ -40,9 +40,9 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomField:
     custom_object: '@custom_object_product'
     is_published: true
     date_added: '<date_create()>'
-    label: 'Option'
-    alias: 'option'
-    type: 'option'
+    label: 'Multiselect'
+    alias: 'multiselect'
+    type: 'multiselect'
 
   custom_field_date:
     custom_object: '@custom_object_product'
@@ -158,7 +158,7 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText:
 
   custom_field_plug_text:
     __construct: ['@custom_field_price', '@custom_item_plug']
-    value: 'text'
+    value: 'dummyValue'
 
 MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact:
 
@@ -177,6 +177,22 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem:
     __construct: ['@custom_item_order_plug', '@custom_item_plug']
 
 Mautic\LeadBundle\Entity\LeadList:
+
+  order-plug-name-eq:
+    is_published: true
+    name: 'Order name = Ordered plug'
+    alias: 'order-plug-name-eq'
+    filters: # a:1:{i:0;a:6:{s:4:"glue";s:3:"and";s:5:"field";s:5:"cmo_2";s:6:"object";s:13:"custom_object";s:4:"type";s:4:"text";s:8:"operator";s:1:"=";s:10:"properties";a:1:{s:6:"filter";s:12:"Ordered plug";}}}
+      0:
+        glue : 'and'
+        field: 'cmo_2' # custom_field.id
+        object: 'custom_object'
+        type: 'test'
+        operator: '='
+        properties:
+          filter: 'Ordered plug'
+    is_global: true
+    is_preference_center: false
 
   price-greater-500:
     is_published: true
