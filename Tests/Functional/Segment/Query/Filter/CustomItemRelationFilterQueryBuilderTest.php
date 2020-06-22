@@ -78,13 +78,13 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
 
     protected function tearDown(): void
     {
-//        foreach ($this->getFixturesInUnloadableOrder() as $entity) {
-//            $this->entityManager->remove($entity);
-//        }
-//
-//        $this->entityManager->flush();
-//
-//        parent::tearDown();
+        foreach ($this->getFixturesInUnloadableOrder() as $entity) {
+            $this->entityManager->remove($entity);
+        }
+
+        $this->entityManager->flush();
+
+        parent::tearDown();
     }
 
     public function testApplyQuery(): void
