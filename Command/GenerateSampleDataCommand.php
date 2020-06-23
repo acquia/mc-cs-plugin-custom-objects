@@ -131,7 +131,6 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         [$coProductId, $cfPriceId, $coOrderId] = $this->createCustomObjectsWithItems();
 
         for ($i = 1; $i <= $limit; ++$i) {
-
             $this->generateContact($coProductId, $cfPriceId, $coOrderId, $limit);
             $this->entityManager->clear();
 

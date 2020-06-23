@@ -73,13 +73,13 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
 
     protected function tearDown(): void
     {
-//        foreach ($this->getFixturesInUnloadableOrder() as $entity) {
-//            $this->entityManager->remove($entity);
-//        }
-//
-//        $this->entityManager->flush();
-//
-//        parent::tearDown();
+        foreach ($this->getFixturesInUnloadableOrder() as $entity) {
+            $this->entityManager->remove($entity);
+        }
+
+        $this->entityManager->flush();
+
+        parent::tearDown();
     }
 
     public function testApplyQuery(): void
@@ -116,7 +116,7 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
         $this->assertLeadCountBySegmentAlias(0, 'price-greater-1000');
         $this->assertLeadCountBySegmentAlias(3, 'price-lte-1000');
         // @todo there's no product Under 500 - FIX THIS
-//        $this->assertLeadCountBySegmentAlias(0, 'price-lt-500');
+        $this->assertLeadCountBySegmentAlias(0, 'price-lt-500');
 
         // option - multiselect
         $this->assertLeadCountBySegmentAlias(2, 'option-in-1');

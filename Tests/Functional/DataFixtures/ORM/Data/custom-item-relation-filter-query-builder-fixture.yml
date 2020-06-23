@@ -302,21 +302,21 @@ Mautic\LeadBundle\Entity\LeadList:
     is_global: true
     is_preference_center: false
 
-#  price-lt-500:
-#    is_published: true
-#    name: 'Price < 500'
-#    alias: 'price-lt-500'
-#    filters:
-#      0:
-#        glue : 'and'
-#        field: 'cmf_1' # custom_field.id
-#        object: 'custom_object'
-#        type: 'int'
-#        operator: 'lte'
-#        properties:
-#          filter: '500'
-#    is_global: true
-#    is_preference_center: false
+  price-lt-500:
+    is_published: true
+    name: 'Price < 500'
+    alias: 'price-lt-500'
+    filters:
+      0:
+        glue : 'and'
+        field: 'cmf_1' # custom_field.id
+        object: 'custom_object'
+        type: 'int'
+        operator: 'lt'
+        properties:
+          filter: '500'
+    is_global: true
+    is_preference_center: false
 
   option-in-1:
     is_published: true
