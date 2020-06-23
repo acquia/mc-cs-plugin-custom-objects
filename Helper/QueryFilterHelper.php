@@ -372,15 +372,15 @@ class QueryFilterHelper
                 ->getSQL();
         }
 
+        if ($this->itemRelationLevelLimit > 2) {
+            // @todo
+            throw new \RuntimeException("Level higher than 2 is not implemented");
+        }
+
         $subSelectString = '';
 
         if (count($subSelects)) {
             $subSelectString = implode(' UNION ', $subSelects);
-        }
-
-        if ($this->itemRelationLevelLimit > 2) {
-            // @todo
-            throw new \RuntimeException("Level higher than 2 is not implemented");
         }
 
         $customItemPart = $customFieldQueryBuilder->expr()->andX(
