@@ -348,18 +348,24 @@ class QueryFilterHelper
 
         $subSelects =[];
 
-        if ($this->itemRelationLevelLimit > 2) {
-            throw new \RuntimeException("Level 1 is not implemented");
-        }
+//        if ($this->itemRelationLevelLimit > 0) {
+//            // 1st level
+//            $subSelects[] = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
+//                ->select('custom_item_id')
+//                ->from('custom_item_xref_contact')
+//                ->where("custom_item_id = {$alias}_item.id")
+//                ->getSQL();
+//        }
 
-        if ($this->itemRelationLevelLimit >= 2) {
-            $subSelects[1] = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
+        if ($this->itemRelationLevelLimit > 1) {
+            // 2nd level
+            $subSelects[] = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
                 ->select('custom_item_id_lower')
                 ->from('custom_item_xref_custom_item')
                 ->where("custom_item_id_higher = {$alias}_item.id")
                 ->getSQL();
 
-            $subSelects[2] = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
+            $subSelects[] = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
                 ->select('custom_item_id_higher')
                 ->from('custom_item_xref_custom_item')
                 ->where("custom_item_id_lower = {$alias}_item.id")
@@ -373,23 +379,30 @@ class QueryFilterHelper
         }
 
         if ($this->itemRelationLevelLimit > 2) {
+            // @todo
             throw new \RuntimeException("Level higher than 2 is not implemented");
+        }
+
+        $customItemPart = $customFieldQueryBuilder->expr()->andX(
+            $alias.'_value.custom_item_id = '.$alias.'_item.id',
+            $customFieldQueryBuilder->expr()->eq($alias.'_value.custom_field_id', ":{$alias}_custom_field_id")
+        );
+
+        if ($this->itemRelationLevelLimit > 0) {
+            $customItemPart = $customFieldQueryBuilder->expr()->orX(
+                $customItemPart,
+                $customFieldQueryBuilder->expr()->in(
+                    $alias.'_value.custom_item_id ',
+                    [$subSelectString]
+                )
+            );
         }
 
         $customFieldQueryBuilder->leftJoin(
             $alias.'_item',
             $dataTable,
             $alias.'_value',
-            $customFieldQueryBuilder->expr()->orX(
-                $customFieldQueryBuilder->expr()->andX(
-                    $alias.'_value.custom_item_id = '.$alias.'_item.id',
-                    $customFieldQueryBuilder->expr()->eq($alias.'_value.custom_field_id', ":{$alias}_custom_field_id")
-                ),
-                $customFieldQueryBuilder->expr()->in(
-                    $alias.'_value.custom_item_id ',
-                    [$subSelectString]
-                )
-            )
+            $customItemPart
         );
 
         $customFieldQueryBuilder->setParameter("{$alias}_custom_field_id", $fieldId);
