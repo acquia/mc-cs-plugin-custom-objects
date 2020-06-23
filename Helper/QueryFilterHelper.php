@@ -398,7 +398,7 @@ class QueryFilterHelper
             );
         }
 
-        $customFieldQueryBuilder->leftJoin(
+        $customFieldQueryBuilder->innerJoin(
             $alias.'_item',
             $dataTable,
             $alias.'_value',
