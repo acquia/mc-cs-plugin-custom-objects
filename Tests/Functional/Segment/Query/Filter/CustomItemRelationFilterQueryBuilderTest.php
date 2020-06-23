@@ -94,8 +94,9 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
         $this->assertContactIsInSegment('poor@plug.net', 'order-plug-name-eq');
 
         // date
-//        $this->assertLeadCountBySegmentAlias(1, 'date-lt-1990');
-//        $this->assertContactIsInSegment('rich@toaster.net', 'date-lt-1990');
+        $this->assertLeadCountBySegmentAlias(2, 'date-lt-1990');
+        $this->assertContactIsInSegment('rich@toaster.net', 'date-lt-1990');
+        $this->assertContactIsInSegment('direct@relation.net', 'date-lt-1990');
 
         // datetime
         $this->assertLeadCountBySegmentAlias(1, 'datetime-gt-1990');
@@ -118,17 +119,24 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
 //        $this->assertLeadCountBySegmentAlias(0, 'price-lt-500');
 
         // option - multiselect
-//        $this->assertLeadCountBySegmentAlias(1, 'option-in-1');
-//        $this->assertContactIsInSegment('rich@toaster.net', 'option-in-1');
+        $this->assertLeadCountBySegmentAlias(2, 'option-in-1');
+        $this->assertContactIsInSegment('rich@toaster.net', 'option-in-1');
+        $this->assertContactIsInSegment('direct@relation.net', 'option-in-1');
 
         // text
-//        $this->assertLeadCountBySegmentAlias(1, 'text-eq-text');
-//        $this->assertContactIsInSegment('rich@toaster.net', 'text-eq-text');
+        $this->assertLeadCountBySegmentAlias(2, 'text-eq-text');
+        $this->assertContactIsInSegment('rich@toaster.net', 'text-eq-text');
+        $this->assertContactIsInSegment('direct@relation.net', 'text-eq-text');
     }
 
     private function assertLeadCountBySegmentAlias(int $expectedLeadCount, string $segmentAlias): void
     {
         $segment = $this->segmentRepository->findOneBy(['alias' => $segmentAlias]);
+
+        if (!$segment) {
+            throw new \InvalidArgumentException("No segment with alias '{$segmentAlias}' found");
+        }
+
         $count   = $this->segmentRepository->getLeadCount([$segment->getId()]);
         $count   = (int) $count[$segment->getId()];
 
