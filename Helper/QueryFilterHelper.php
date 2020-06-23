@@ -348,14 +348,14 @@ class QueryFilterHelper
 
         $subSelects =[];
 
-//        if ($this->itemRelationLevelLimit > 0) {
-//            // 1st level
-//            $subSelects[] = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
-//                ->select('custom_item_id')
-//                ->from('custom_item_xref_contact')
-//                ->where("custom_item_id = {$alias}_item.id")
-//                ->getSQL();
-//        }
+        if ($this->itemRelationLevelLimit > 0) {
+            // 1st level
+            $subSelects[] = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
+                ->select('custom_item_id')
+                ->from('custom_item_xref_contact')
+                ->where("custom_item_id = {$alias}_item.id")
+                ->getSQL();
+        }
 
         if ($this->itemRelationLevelLimit > 1) {
             // 2nd level
