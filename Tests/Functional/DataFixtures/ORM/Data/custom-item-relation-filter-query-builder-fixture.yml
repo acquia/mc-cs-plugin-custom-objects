@@ -18,6 +18,13 @@ Mautic\LeadBundle\Entity\Lead:
     date_added: '<dateTimeBetween("-1 days","-10 hours")>'
     email: 'poor@plug.net'
 
+#  contact_direct_to_ci:
+#    firstname: 'Direct'
+#    lastname: 'Relation'
+#    is_published: true
+#    date_added: '<dateTimeBetween("-1 days","-10 hours")>'
+#    email: 'direct@relation.net'
+
 MauticPlugin\CustomObjectsBundle\Entity\CustomObject:
 
   custom_object_product:
@@ -162,10 +169,15 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText:
 
 MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact:
 
-  custom_item_xref_contact_toaster_rich:
+#  # direct relation / one level / contact -> product
+#  custom_item_xref_contact_toaster_rich:
+#    __construct: ['@custom_item_toaster', '@contact_direct_to_ci']
+
+  # 2nd level relations / contact -> order -> product
+  custom_item_xref_order_contact_toaster_rich:
     __construct: ['@custom_item_order_toaster', '@contact_rich']
 
-  custom_item_xref_contact_plug_poor:
+  custom_item_xref_order_contact_plug_poor:
     __construct: ['@custom_item_order_plug', '@contact_poor']
 
 MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem:
