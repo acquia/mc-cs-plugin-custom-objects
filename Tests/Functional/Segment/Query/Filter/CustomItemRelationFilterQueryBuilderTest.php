@@ -43,7 +43,7 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
     private $segmentRepository;
 
     /**
-     * @var \Doctrine\ORM\EntityRepository|null
+     * @var LeadRepository
      */
     private $contactRepository;
 
@@ -51,13 +51,8 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
     {
         parent::setUp();
 
-        /** @var EntityManager $entityManager */
         $this->entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
-
-        /** @var LeadListRepository $segmentRepository */
-        $this->segmentRepository     = $this->container->get('mautic.lead.repository.lead_list');
-
-        /** @var LeadRepository $contactRepository */
+        $this->segmentRepository = $this->container->get('mautic.lead.repository.lead_list');
         $this->contactRepository = $this->container->get('mautic.lead.repository.lead');
 
         $this->createFreshDatabaseSchema($this->entityManager);
@@ -78,13 +73,13 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
 
     protected function tearDown(): void
     {
-        foreach ($this->getFixturesInUnloadableOrder() as $entity) {
-            $this->entityManager->remove($entity);
-        }
-
-        $this->entityManager->flush();
-
-        parent::tearDown();
+//        foreach ($this->getFixturesInUnloadableOrder() as $entity) {
+//            $this->entityManager->remove($entity);
+//        }
+//
+//        $this->entityManager->flush();
+//
+//        parent::tearDown();
     }
 
     public function testApplyQuery(): void
@@ -94,23 +89,25 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
             ['--env' => 'test']
         );
 
-        # custom item name
+        // custom item name
         $this->assertLeadCountBySegmentAlias(1, 'order-plug-name-eq');
         $this->assertContactIsInSegment('poor@plug.net', 'order-plug-name-eq');
 
-        # date
+        // date
         $this->assertLeadCountBySegmentAlias(1, 'date-lt-1990');
         $this->assertContactIsInSegment('rich@toaster.net', 'date-lt-1990');
 
-        # datetime
+        // datetime
         $this->assertLeadCountBySegmentAlias(1, 'datetime-gt-1990');
         $this->assertContactIsInSegment('poor@plug.net', 'datetime-gt-1990');
 
-        # int
+        // int
         // Segment 'price-greater-500' has exactly one contact
         $this->assertLeadCountBySegmentAlias(1, 'price-greater-500');
         // Contact with email 'rich@toaster.net' must be in 'price-greater-500' segment
         $this->assertContactIsInSegment('rich@toaster.net', 'price-greater-500');
+        // Direct relation of contact to product
+//        $this->assertContactIsInSegment('direct@relation.net', 'price-greater-500');
 
         $this->assertLeadCountBySegmentAlias(1, 'price-eq-500');
         $this->assertContactIsInSegment('poor@plug.net', 'price-eq-500');
@@ -119,11 +116,11 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
         $this->assertLeadCountBySegmentAlias(2, 'price-lte-1000');
         $this->assertLeadCountBySegmentAlias(0, 'price-lt-500');
 
-        # option - multiselect
+        // option - multiselect
         $this->assertLeadCountBySegmentAlias(1, 'option-in-1');
         $this->assertContactIsInSegment('rich@toaster.net', 'option-in-1');
 
-        # text
+        // text
         $this->assertLeadCountBySegmentAlias(1, 'text-eq-text');
         $this->assertContactIsInSegment('rich@toaster.net', 'text-eq-text');
     }
