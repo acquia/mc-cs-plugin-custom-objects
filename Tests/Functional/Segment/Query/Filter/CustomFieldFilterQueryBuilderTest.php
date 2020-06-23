@@ -83,7 +83,10 @@ class CustomFieldFilterQueryBuilderTest extends MauticWebTestCase
         /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = $this->getContainer()->get('event_dispatcher');
 
-        $queryHelper         = new QueryFilterHelper($fieldTypeProvider);
+        $queryHelper         = new QueryFilterHelper(
+            $fieldTypeProvider,
+            $this->getContainer()->get('mautic.helper.core_parameters')
+        );
         $queryBuilderService = new CustomFieldFilterQueryBuilder(
             new RandomParameterName(),
             $dispatcher,

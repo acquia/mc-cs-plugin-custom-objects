@@ -35,7 +35,10 @@ class QueryFilterHelperTest extends MauticWebTestCase
 
         /** @var CustomFieldTypeProvider $fieldTypeProvider */
         $fieldTypeProvider  = $this->getContainer()->get('custom_field.type.provider');
-        $this->filterHelper = new QueryFilterHelper($fieldTypeProvider);
+        $this->filterHelper = new QueryFilterHelper(
+            $fieldTypeProvider,
+            $this->getContainer()->get('mautic.helper.core_parameters')
+        );
 
 
         $this->createFreshDatabaseSchema($this->em);
@@ -93,7 +96,7 @@ class QueryFilterHelperTest extends MauticWebTestCase
         );
 
         $this->assertMatchWhere(
-            'test_value.value > :test_value_value', // @TODO use right expression
+            'test_value.value > :test_value_value',
             [
                 'glue' => 'and',
                 'field' => 'cmf_'.$this->getFixtureById('custom_object_product')->getId(),
