@@ -82,7 +82,7 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
         parent::tearDown();
     }
 
-    public function testApplyQuery(): void
+    public function testApplyQuery2ndLevel(): void
     {
         $this->runCommand(
             'mautic:segments:update',
