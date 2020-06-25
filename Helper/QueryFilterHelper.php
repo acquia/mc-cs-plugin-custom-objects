@@ -352,7 +352,7 @@ class QueryFilterHelper
             // 1st level
             $subSelects[] = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
                 ->select('custom_item_id')
-                ->from('custom_item_xref_contact')
+                ->from(MAUTIC_TABLE_PREFIX.'custom_item_xref_contact')
                 ->where("custom_item_id = {$alias}_item.id")
                 ->getSQL();
         }
@@ -361,13 +361,13 @@ class QueryFilterHelper
             // 2nd level
             $subSelects[] = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
                 ->select('custom_item_id_lower')
-                ->from('custom_item_xref_custom_item')
+                ->from(MAUTIC_TABLE_PREFIX.'custom_item_xref_custom_item')
                 ->where("custom_item_id_higher = {$alias}_item.id")
                 ->getSQL();
 
             $subSelects[] = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
                 ->select('custom_item_id_higher')
-                ->from('custom_item_xref_custom_item')
+                ->from(MAUTIC_TABLE_PREFIX.'custom_item_xref_custom_item')
                 ->where("custom_item_id_lower = {$alias}_item.id")
                 ->getSQL();
         }
