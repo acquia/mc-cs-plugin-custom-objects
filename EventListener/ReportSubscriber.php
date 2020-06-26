@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\Model\CompanyReportData;
@@ -66,18 +67,47 @@ class ReportSubscriber implements EventSubscriberInterface
         $this->companyReportData      = $companyReportData;
     }
 
-    private function getCustomObjects(): array
+    private function getCustomObjects(): ArrayCollection
     {
         if (null !== $this->customObjects) {
             return $this->customObjects;
         }
 
-        $this->customObjects = $this->customObjectRepository->findAll();
-        usort($this->customObjects, function (CustomObject $a, CustomObject $b): int {
+        $allCustomObjects = new ArrayCollection($this->customObjectRepository->findAll());
+        $parentCustomObjects = $allCustomObjects->filter(function(CustomObject $customObject): bool {
+            return CustomObject::TYPE_MASTER === $customObject->getType();
+        });
+        $parentCustomObjects = $this->sortCustomObjects($parentCustomObjects);
+
+        $this->customObjects = array();
+
+        foreach ($parentCustomObjects as $parentCustomObject) {
+            $this->customObjects[] = $parentCustomObject;
+            $childCustomObjects = $allCustomObjects->filter(function (CustomObject $childCustomObject) use ($parentCustomObject) : bool {
+                return $childCustomObject->getMasterObject() ?
+                    $parentCustomObject->getId() === $childCustomObject->getMasterObject()->getId()
+                    :
+                    false;
+            });
+
+            if (1 > $childCustomObjects->count()) {
+                continue;
+            }
+
+            $this->customObjects = new ArrayCollection(array_merge($this->customObjects, $this->sortCustomObjects($childCustomObjects)->toArray()));
+        }
+
+        return $this->customObjects;
+    }
+
+    private function sortCustomObjects(ArrayCollection $customObjects): ArrayCollection
+    {
+        $customObjects = $customObjects->toArray();
+        usort($customObjects, function (CustomObject $a, CustomObject $b): int {
             return strnatcmp($a->getNamePlural(), $b->getNamePlural());
         });
 
-        return $this->customObjects;
+        return new ArrayCollection($customObjects);
     }
 
     public static function getSubscribedEvents(): array
@@ -95,7 +125,9 @@ class ReportSubscriber implements EventSubscriberInterface
 
     private function getContexts(): array
     {
-        return array_map([$this, 'getContext'], $this->getCustomObjects());
+        return $this->getCustomObjects()
+            ->map([$this, 'getContext'])
+            ->toArray();
     }
 
     public function onReportBuilder(ReportBuilderEvent $event): void
