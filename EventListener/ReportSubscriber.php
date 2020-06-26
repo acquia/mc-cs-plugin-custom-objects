@@ -93,7 +93,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $childCustomObject->setNamePlural(' └─ ' . $childCustomObject->getNamePlural());
+            $childCustomObject->setNamePlural(str_repeat('&nbsp;', 4) . $childCustomObject->getNamePlural());
             $this->customObjects->add($childCustomObject);
         }
 
