@@ -82,6 +82,19 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
         parent::tearDown();
     }
 
+    public function testApplyQuery1stLevel(): void
+    {
+        $this->markTestSkipped('Multilevel testing not implemented yet');
+
+        $this->runCommand(
+            'mautic:segments:update',
+            ['--env' => 'test']
+        );
+
+        $this->assertLeadCountBySegmentAlias(1, 'price-eq-1000');
+        $this->assertContactIsInSegment('direct@relation.net', 'price-eq-1000');
+    }
+
     public function testApplyQuery2ndLevel(): void
     {
         $this->runCommand(
