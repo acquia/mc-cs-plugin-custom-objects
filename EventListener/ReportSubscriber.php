@@ -69,7 +69,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
     private function getCustomObjects(): ArrayCollection
     {
-        if (null !== $this->customObjects) {
+        if ($this->customObjects instanceof ArrayCollection) {
             return $this->customObjects;
         }
 
@@ -79,9 +79,9 @@ class ReportSubscriber implements EventSubscriberInterface
         });
         $parentCustomObjects = $this->sortCustomObjects($parentCustomObjects);
 
-        $customObjects = [];
+        $this->customObjects = new ArrayCollection();
         foreach ($parentCustomObjects as $parentCustomObject) {
-            $customObjects[] = $parentCustomObject;
+            $this->customObjects->add($parentCustomObject);
             $childCustomObject = $allCustomObjects->filter(function (CustomObject $childCustomObject) use ($parentCustomObject) : bool {
                 return $childCustomObject->getMasterObject() ?
                     $parentCustomObject->getId() === $childCustomObject->getMasterObject()->getId()
@@ -94,10 +94,9 @@ class ReportSubscriber implements EventSubscriberInterface
             }
 
             $childCustomObject->setNamePlural(' └─ ' . $childCustomObject->getNamePlural());
-            $customObjects[] = $childCustomObject;
+            $this->customObjects->add($childCustomObject);
         }
 
-        $this->customObjects = new ArrayCollection($customObjects);
         return $this->customObjects;
     }
 
