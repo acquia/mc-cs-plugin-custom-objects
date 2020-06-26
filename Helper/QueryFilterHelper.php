@@ -346,16 +346,7 @@ class QueryFilterHelper
     ): QueryBuilder {
         $dataTable = $this->fieldTypeProvider->getType($fieldType)->getTableName();
 
-        $subSelects =[];
-
-        if ($this->itemRelationLevelLimit > 0) {
-            // 1st level
-            $subSelects[] = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
-                ->select('custom_item_id')
-                ->from(MAUTIC_TABLE_PREFIX.'custom_item_xref_contact')
-                ->where("custom_item_id = {$alias}_item.id")
-                ->getSQL();
-        }
+        $subSelects = [];
 
         if ($this->itemRelationLevelLimit > 1) {
             // 2nd level
@@ -377,19 +368,13 @@ class QueryFilterHelper
             throw new \RuntimeException("Level higher than 2 is not implemented");
         }
 
-        $subSelectString = '';
+        $customItemPart = $alias.'_value.custom_item_id = '.$alias.'_item.id';
 
         if (count($subSelects)) {
+
             $subSelectString = implode(' UNION ', $subSelects);
-        }
 
-        $customItemPart = $customFieldQueryBuilder->expr()->andX(
-            $alias.'_value.custom_item_id = '.$alias.'_item.id',
-            $customFieldQueryBuilder->expr()->eq($alias.'_value.custom_field_id', ":{$alias}_custom_field_id")
-        );
-
-        if ($this->itemRelationLevelLimit > 0) {
-            $customItemPart = $customFieldQueryBuilder->expr()->orX(
+            $customItemPart = $customItemPart = $customFieldQueryBuilder->expr()->orX(
                 $customItemPart,
                 $customFieldQueryBuilder->expr()->in(
                     $alias.'_value.custom_item_id ',
@@ -397,6 +382,11 @@ class QueryFilterHelper
                 )
             );
         }
+
+        $customItemPart = $customFieldQueryBuilder->expr()->andX(
+            $customItemPart,
+            $customFieldQueryBuilder->expr()->eq($alias.'_value.custom_field_id', ":{$alias}_custom_field_id")
+        );
 
         $customFieldQueryBuilder->innerJoin(
             $alias.'_item',
