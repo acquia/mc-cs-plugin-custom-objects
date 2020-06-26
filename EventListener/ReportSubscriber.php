@@ -79,10 +79,9 @@ class ReportSubscriber implements EventSubscriberInterface
         });
         $parentCustomObjects = $this->sortCustomObjects($parentCustomObjects);
 
-        $this->customObjects = array();
-
+        $customObjects = [];
         foreach ($parentCustomObjects as $parentCustomObject) {
-            $this->customObjects[] = $parentCustomObject;
+            $customObjects[] = $parentCustomObject;
             $childCustomObjects = $allCustomObjects->filter(function (CustomObject $childCustomObject) use ($parentCustomObject) : bool {
                 return $childCustomObject->getMasterObject() ?
                     $parentCustomObject->getId() === $childCustomObject->getMasterObject()->getId()
@@ -94,10 +93,35 @@ class ReportSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $this->customObjects = new ArrayCollection(array_merge($this->customObjects, $this->sortCustomObjects($childCustomObjects)->toArray()));
+            $childCustomObjects = $this->sortCustomObjects($childCustomObjects);
+            $this->indentPluralNames($childCustomObjects);
+
+            $customObjects = array_merge($customObjects, $this->sortCustomObjects($childCustomObjects)->toArray());
         }
 
+        $this->customObjects = new ArrayCollection($customObjects);
         return $this->customObjects;
+    }
+
+    private function indentPluralNames(ArrayCollection $customObjects): void
+    {
+        if (1 > $customObjects->count()) {
+            return;
+        }
+
+        /** @var CustomObject $lastCustomObject */
+        $lastCustomObject = $customObjects->last();
+
+        foreach ($customObjects as $customObject) {
+            if ($lastCustomObject->getId() === $customObject->getId()) {
+                continue;
+            }
+
+            $pluralName = $customObject->getNamePlural();
+            $customObject->setNamePlural('├─ ' . $pluralName);
+        }
+
+        $lastCustomObject->setNamePlural('└─ ' . $lastCustomObject->getNamePlural());
     }
 
     private function sortCustomObjects(ArrayCollection $customObjects): ArrayCollection
@@ -126,7 +150,7 @@ class ReportSubscriber implements EventSubscriberInterface
     private function getContexts(): array
     {
         return $this->getCustomObjects()
-            ->map([$this, 'getContext'])
+            ->map(function(CustomObject $customObject) { return $this->getContext($customObject);})
             ->toArray();
     }
 
