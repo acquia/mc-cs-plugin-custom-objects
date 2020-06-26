@@ -41,7 +41,7 @@ class ReportSubscriber implements EventSubscriberInterface
     const COMPANIES_TABLE_ALIAS          = 'comp';
 
     /**
-     * @var array
+     * @var ArrayCollection
      */
     private $customObjects;
 
@@ -82,46 +82,23 @@ class ReportSubscriber implements EventSubscriberInterface
         $customObjects = [];
         foreach ($parentCustomObjects as $parentCustomObject) {
             $customObjects[] = $parentCustomObject;
-            $childCustomObjects = $allCustomObjects->filter(function (CustomObject $childCustomObject) use ($parentCustomObject) : bool {
+            $childCustomObject = $allCustomObjects->filter(function (CustomObject $childCustomObject) use ($parentCustomObject) : bool {
                 return $childCustomObject->getMasterObject() ?
                     $parentCustomObject->getId() === $childCustomObject->getMasterObject()->getId()
                     :
                     false;
-            });
+            })->first();
 
-            if (1 > $childCustomObjects->count()) {
+            if (!$childCustomObject) {
                 continue;
             }
 
-            $childCustomObjects = $this->sortCustomObjects($childCustomObjects);
-            $this->indentPluralNames($childCustomObjects);
-
-            $customObjects = array_merge($customObjects, $this->sortCustomObjects($childCustomObjects)->toArray());
+            $childCustomObject->setNamePlural(' └─ ' . $childCustomObject->getNamePlural());
+            $customObjects[] = $childCustomObject;
         }
 
         $this->customObjects = new ArrayCollection($customObjects);
         return $this->customObjects;
-    }
-
-    private function indentPluralNames(ArrayCollection $customObjects): void
-    {
-        if (1 > $customObjects->count()) {
-            return;
-        }
-
-        /** @var CustomObject $lastCustomObject */
-        $lastCustomObject = $customObjects->last();
-
-        foreach ($customObjects as $customObject) {
-            if ($lastCustomObject->getId() === $customObject->getId()) {
-                continue;
-            }
-
-            $pluralName = $customObject->getNamePlural();
-            $customObject->setNamePlural('├─ ' . $pluralName);
-        }
-
-        $lastCustomObject->setNamePlural('└─ ' . $lastCustomObject->getNamePlural());
     }
 
     private function sortCustomObjects(ArrayCollection $customObjects): ArrayCollection
