@@ -229,6 +229,22 @@ class CustomFieldType extends AbstractType
             }
         });
 
+        $builder->add(
+            'showInCustomObjectDetailList',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'custom.field.show_in_custom_object_detail_list.label',
+            ]
+        );
+
+        $builder->add(
+            'showInContactDetailList',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'custom.field.show_in_contact_detail_list.label',
+            ]
+        );
+
         $this->recreateDefaultValueBeforePost($builder);
 
         $builder->add(
@@ -267,6 +283,8 @@ class CustomFieldType extends AbstractType
         $builder->add('label', HiddenType::class);
         $builder->add('alias', HiddenType::class);
         $builder->add('required', HiddenType::class);
+        $builder->add('showInCustomObjectDetailList', HiddenType::class);
+        $builder->add('showInContactDetailList', HiddenType::class);
 
         $builder->add(
             $builder->create(

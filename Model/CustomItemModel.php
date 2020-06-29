@@ -28,6 +28,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefInterface;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
@@ -285,6 +286,26 @@ class CustomItemModel extends FormModel
         $customItem->createFieldValuesSnapshot();
 
         return $customItem;
+    }
+
+    /**
+     * @param CustomItem[] $customItems
+     */
+    public function getFieldListData(CustomObject $customObject, array $customItems, string $filterEntityType): ?CustomItemFieldListData
+    {
+        switch ($filterEntityType) {
+            case 'customItem':
+                $customFields = $customObject->getFieldsShowInCustomObjectDetailList();
+                break;
+            case 'contact':
+                $customFields = $customObject->getFieldsShowInContactDetailList();
+                break;
+            default:
+                $customFields = $customObject->getPublishedFields();
+                break;
+        }
+
+        return $this->customFieldValueModel->getItemsListData($customFields, $customItems);
     }
 
     /**

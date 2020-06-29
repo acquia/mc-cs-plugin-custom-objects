@@ -116,13 +116,14 @@ class ListController extends CommonController
         $this->sessionProvider->setFilter($search);
 
         $route    = $this->routeProvider->buildListRoute($objectId, $page);
+        $items    = $this->customItemModel->getTableData($tableConfig);
         $response = [
             'viewParameters' => [
                 'searchValue'      => $search,
                 'customObject'     => $customObject,
                 'filterEntityId'   => $filterEntityId,
                 'filterEntityType' => $filterEntityType,
-                'items'            => $this->customItemModel->getTableData($tableConfig),
+                'items'            => $items,
                 'itemCount'        => $this->customItemModel->getCountForTable($tableConfig),
                 'page'             => $page,
                 'limit'            => $limit,
@@ -134,6 +135,10 @@ class ListController extends CommonController
                 'route'         => $route,
             ],
         ];
+
+        if ($filterEntityId) {
+            $response['viewParameters']['fieldData'] = $this->customItemModel->getFieldListData($customObject, $items, $filterEntityType);
+        }
 
         if ($request->isXmlHttpRequest()) {
             $response['viewParameters']['tmpl'] = $request->get('tmpl', 'index');
