@@ -28,6 +28,11 @@ class ReportColumnsBuilder
     private $customObject;
 
     /**
+     * @var CustomObject
+     */
+    private $parentCustomObject;
+
+    /**
      * @var array
      */
     private $columns = [];
@@ -49,6 +54,9 @@ class ReportColumnsBuilder
     public function __construct(CustomObject $customObject)
     {
         $this->customObject = $customObject;
+        if (CustomObject::TYPE_RELATIONSHIP === $customObject->getType()) {
+            $this->parentCustomObject = $customObject->getMasterObject();
+        }
     }
 
     private function buildColumns(): void
@@ -58,6 +66,18 @@ class ReportColumnsBuilder
             $this->columns[$this->getColumnName($customField)] = [
                 'label' => $customField->getLabel(),
                 'type'  => $this->resolveColumnType($customField),
+            ];
+        }
+
+        if (!$this->parentCustomObject) {
+            return;
+        }
+
+        /** @var CustomField $parentCustomField */
+        foreach ($this->parentCustomObject->getCustomFields() as $parentCustomField) {
+            $this->columns[$this->getColumnName($parentCustomField)] = [
+                'label' => $parentCustomField->getLabel() . ' (parent)',
+                'type'  => $this->resolveColumnType($parentCustomField),
             ];
         }
     }
