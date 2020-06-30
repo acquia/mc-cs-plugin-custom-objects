@@ -76,7 +76,7 @@ class ReportColumnsBuilder
         /** @var CustomField $parentCustomField */
         foreach ($this->parentCustomObject->getCustomFields() as $parentCustomField) {
             $this->columns[$this->getColumnName($parentCustomField)] = [
-                'label' => $parentCustomField->getLabel(),
+                'label' => $parentCustomField->getLabel() . ' (parent)',
                 'type'  => $this->resolveColumnType($parentCustomField),
             ];
         }
@@ -127,42 +127,43 @@ class ReportColumnsBuilder
         return call_user_func($this->callback, $this->getColumnName($customField));
     }
 
+    private function getJoinableColumns(CustomObject $customObject): array
+    {
+        $columns = [];
+        foreach ($customObject->getCustomFields() as $customField) {
+            if ($this->checkIfColumnHasToBeJoined($customField)) {
+                $columns[] = $customField;
+            }
+        }
+
+        return $columns;
+    }
+
     public function joinReportColumns(QueryBuilder $queryBuilder, string $customItemTableAlias): void
     {
-        /** @var CustomField $customField */
-        foreach ($this->customObject->getCustomFields() as $customField) {
-            if (!$this->checkIfColumnHasToBeJoined($customField)) {
-                continue;
-            }
-
-            $hash = $this->getHash($customField);
-            if ($this->isMultiSelectTypeCustomField($customField)) {
-                $joinQueryBuilder = new QueryBuilder($queryBuilder->getConnection());
-                $joinQueryBuilder
-                    ->from($customField->getTypeObject()->getTableName())
-                    ->select('custom_item_id', 'GROUP_CONCAT(value separator \', \') AS value')
-                    ->andWhere('custom_field_id = '.$customField->getId())
-                    ->groupBy('custom_item_id');
-                $valueTableName = sprintf('(%s)', $joinQueryBuilder->getSQL());
-                $joinCondition  = sprintf('%s.id = %s.custom_item_id', $customItemTableAlias, $hash);
-            } else {
-                $valueTableName = $customField->getTypeObject()->getTableName();
-                $joinCondition  = sprintf('%s.id = %s.custom_item_id AND %s.custom_field_id = %s', $customItemTableAlias, $hash, $hash, $customField->getId());
-            }
-
-            $queryBuilder->leftJoin($customItemTableAlias, $valueTableName, $hash, $joinCondition);
+        $columns = $this->getJoinableColumns($this->customObject);
+        if (1 > count($columns)) {
+            return;
         }
+
+        $this->joinCustomObjectColumns($queryBuilder, $columns, $customItemTableAlias);
 
         if (!$this->parentCustomObject) {
             return;
         }
 
-        /** @var CustomField $customField */
-        foreach ($this->parentCustomObject->getCustomFields() as $customField) {
-            if (!$this->checkIfColumnHasToBeJoined($customField)) {
-                continue;
-            }
+        $parentColumns = $this->getJoinableColumns($this->parentCustomObject);
+        if (1 > count($parentColumns)) {
+            return;
+        }
 
+        $this->joinCustomObjectColumns($queryBuilder, $parentColumns, $customItemTableAlias);
+    }
+
+    private function joinCustomObjectColumns(QueryBuilder $queryBuilder, array $columns, string $customItemTableAlias)
+    {
+        /** @var CustomField $customField */
+        foreach ($columns as $customField) {
             $hash = $this->getHash($customField);
             if ($this->isMultiSelectTypeCustomField($customField)) {
                 $joinQueryBuilder = new QueryBuilder($queryBuilder->getConnection());
