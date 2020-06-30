@@ -76,7 +76,7 @@ class ReportColumnsBuilder
         /** @var CustomField $parentCustomField */
         foreach ($this->parentCustomObject->getCustomFields() as $parentCustomField) {
             $this->columns[$this->getColumnName($parentCustomField)] = [
-                'label' => $parentCustomField->getLabel() . ' (parent)',
+                'label' => $parentCustomField->getLabel(),
                 'type'  => $this->resolveColumnType($parentCustomField),
             ];
         }
@@ -131,6 +131,34 @@ class ReportColumnsBuilder
     {
         /** @var CustomField $customField */
         foreach ($this->customObject->getCustomFields() as $customField) {
+            if (!$this->checkIfColumnHasToBeJoined($customField)) {
+                continue;
+            }
+
+            $hash = $this->getHash($customField);
+            if ($this->isMultiSelectTypeCustomField($customField)) {
+                $joinQueryBuilder = new QueryBuilder($queryBuilder->getConnection());
+                $joinQueryBuilder
+                    ->from($customField->getTypeObject()->getTableName())
+                    ->select('custom_item_id', 'GROUP_CONCAT(value separator \', \') AS value')
+                    ->andWhere('custom_field_id = '.$customField->getId())
+                    ->groupBy('custom_item_id');
+                $valueTableName = sprintf('(%s)', $joinQueryBuilder->getSQL());
+                $joinCondition  = sprintf('%s.id = %s.custom_item_id', $customItemTableAlias, $hash);
+            } else {
+                $valueTableName = $customField->getTypeObject()->getTableName();
+                $joinCondition  = sprintf('%s.id = %s.custom_item_id AND %s.custom_field_id = %s', $customItemTableAlias, $hash, $hash, $customField->getId());
+            }
+
+            $queryBuilder->leftJoin($customItemTableAlias, $valueTableName, $hash, $joinCondition);
+        }
+
+        if (!$this->parentCustomObject) {
+            return;
+        }
+
+        /** @var CustomField $customField */
+        foreach ($this->parentCustomObject->getCustomFields() as $customField) {
             if (!$this->checkIfColumnHasToBeJoined($customField)) {
                 continue;
             }
