@@ -24,6 +24,7 @@ use Mautic\ReportBundle\ReportEvents;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCompany;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Report\ReportColumnsBuilder;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
@@ -34,8 +35,10 @@ class ReportSubscriber implements EventSubscriberInterface
     const CUSTOM_OBJECTS_CONTEXT_GROUP = 'custom.objects';
 
     const CUSTOM_ITEM_TABLE_ALIAS        = 'ci';
-    const CUSTOM_ITEM_XREF_CONTACT_ALIAS = 'cil';
-    const CUSTOM_ITEM_XREF_COMPANY_ALIAS = 'cic';
+    const PARENT_CUSTOM_ITEM_TABLE_ALIAS = 'pci';
+    const CUSTOM_ITEM_XREF_CUSTOM_ITEM_TABLE_ALIAS = 'cixci';
+    const CUSTOM_ITEM_XREF_CONTACT_TABLE_ALIAS = 'cil';
+    const CUSTOM_ITEM_XREF_COMPANY_TABLE_ALIAS = 'cic';
     const LEADS_TABLE_ALIAS              = 'l';
     const USERS_TABLE_ALIAS              = 'u';
     const COMPANIES_TABLE_ALIAS          = 'comp';
@@ -144,11 +147,18 @@ class ReportSubscriber implements EventSubscriberInterface
 
         /** @var CustomObject $customObject */
         foreach ($this->getCustomObjects() as $customObject) {
+            $customObjectColumns =  (new ReportColumnsBuilder($customObject))->getColumns();
+            if ($customObject->getMasterObject()) {
+                $standardParentCustomObjectColumns = $event->getStandardColumns(static::PARENT_CUSTOM_ITEM_TABLE_ALIAS.'.', ['description', 'publish_up', 'publish_down']);
+                $parentCustomObjectColumns = (new ReportColumnsBuilder($customObject->getMasterObject()))->getColumns();
+                $customObjectColumns = array_merge($customObjectColumns, $standardParentCustomObjectColumns, $parentCustomObjectColumns);
+            }
+
             $event->addTable(
                 $this->getContext($customObject),
                 [
                     'display_name' => $customObject->getNamePlural(),
-                    'columns'      => array_merge($columns, (new ReportColumnsBuilder($customObject))->getColumns()),
+                    'columns'      => array_merge($columns, $customObjectColumns),
                 ],
                 static::CUSTOM_OBJECTS_CONTEXT_GROUP
             );
@@ -194,10 +204,10 @@ class ReportSubscriber implements EventSubscriberInterface
     private function joinLeadColumns(QueryBuilder $queryBuilder): void
     {
         // Joining contacts tables
-        $contactsJoinCondition = sprintf('%s.id = %s.custom_item_id', static::CUSTOM_ITEM_TABLE_ALIAS, static::CUSTOM_ITEM_XREF_CONTACT_ALIAS);
-        $queryBuilder->leftJoin(static::CUSTOM_ITEM_TABLE_ALIAS, $this->addTablePrefix(CustomItemXrefContact::TABLE_NAME), static::CUSTOM_ITEM_XREF_CONTACT_ALIAS, $contactsJoinCondition);
-        $contactsTableJoinCondition = sprintf('%s.contact_id = %s.id', static::CUSTOM_ITEM_XREF_CONTACT_ALIAS, static::LEADS_TABLE_ALIAS);
-        $queryBuilder->leftJoin(static::CUSTOM_ITEM_XREF_CONTACT_ALIAS, $this->addTablePrefix('leads'), static::LEADS_TABLE_ALIAS, $contactsTableJoinCondition);
+        $contactsJoinCondition = sprintf('%s.id = %s.custom_item_id', static::CUSTOM_ITEM_TABLE_ALIAS, static::CUSTOM_ITEM_XREF_CONTACT_TABLE_ALIAS);
+        $queryBuilder->leftJoin(static::CUSTOM_ITEM_TABLE_ALIAS, $this->addTablePrefix(CustomItemXrefContact::TABLE_NAME), static::CUSTOM_ITEM_XREF_CONTACT_TABLE_ALIAS, $contactsJoinCondition);
+        $contactsTableJoinCondition = sprintf('%s.contact_id = %s.id', static::CUSTOM_ITEM_XREF_CONTACT_TABLE_ALIAS, static::LEADS_TABLE_ALIAS);
+        $queryBuilder->leftJoin(static::CUSTOM_ITEM_XREF_CONTACT_TABLE_ALIAS, $this->addTablePrefix('leads'), static::LEADS_TABLE_ALIAS, $contactsTableJoinCondition);
     }
 
     private function joinUsersColumns(QueryBuilder $queryBuilder): void
@@ -206,13 +216,22 @@ class ReportSubscriber implements EventSubscriberInterface
         $queryBuilder->leftJoin(static::LEADS_TABLE_ALIAS, $this->addTablePrefix('users'), static::USERS_TABLE_ALIAS, $usersJoinCondition);
     }
 
-    public function joinCompanyColumns(QueryBuilder $queryBuilder): void
+    private function joinCompanyColumns(QueryBuilder $queryBuilder): void
     {
         // Joining companies tables
-        $companiesJoinCondition = sprintf('%s.id = %s.custom_item_id', static::CUSTOM_ITEM_TABLE_ALIAS, static::CUSTOM_ITEM_XREF_COMPANY_ALIAS);
-        $queryBuilder->leftJoin(static::CUSTOM_ITEM_TABLE_ALIAS, $this->addTablePrefix(CustomItemXrefCompany::TABLE_NAME), static::CUSTOM_ITEM_XREF_COMPANY_ALIAS, $companiesJoinCondition);
-        $companiesTableJoinCondition = sprintf('%s.company_id = %s.id', static::CUSTOM_ITEM_XREF_COMPANY_ALIAS, static::COMPANIES_TABLE_ALIAS);
-        $queryBuilder->leftJoin(static::CUSTOM_ITEM_XREF_COMPANY_ALIAS, $this->addTablePrefix('companies'), static::COMPANIES_TABLE_ALIAS, $companiesTableJoinCondition);
+        $companiesJoinCondition = sprintf('%s.id = %s.custom_item_id', static::CUSTOM_ITEM_TABLE_ALIAS, static::CUSTOM_ITEM_XREF_COMPANY_TABLE_ALIAS);
+        $queryBuilder->leftJoin(static::CUSTOM_ITEM_TABLE_ALIAS, $this->addTablePrefix(CustomItemXrefCompany::TABLE_NAME), static::CUSTOM_ITEM_XREF_COMPANY_TABLE_ALIAS, $companiesJoinCondition);
+        $companiesTableJoinCondition = sprintf('%s.company_id = %s.id', static::CUSTOM_ITEM_XREF_COMPANY_TABLE_ALIAS, static::COMPANIES_TABLE_ALIAS);
+        $queryBuilder->leftJoin(static::CUSTOM_ITEM_XREF_COMPANY_TABLE_ALIAS, $this->addTablePrefix('companies'), static::COMPANIES_TABLE_ALIAS, $companiesTableJoinCondition);
+    }
+
+    private function joinParentCustomObjectStandardColumns(QueryBuilder $queryBuilder): void
+    {
+        // Joining companies tables
+        $relationshipTableJoinCondition = sprintf('%s.id = %s.custom_item_id_higher', static::CUSTOM_ITEM_TABLE_ALIAS, self::CUSTOM_ITEM_XREF_CUSTOM_ITEM_TABLE_ALIAS);
+        $queryBuilder->leftJoin(static::CUSTOM_ITEM_TABLE_ALIAS, $this->addTablePrefix(CustomItemXrefCustomItem::TABLE_NAME), static::CUSTOM_ITEM_XREF_CUSTOM_ITEM_TABLE_ALIAS, $relationshipTableJoinCondition);
+        $parentCustomItemTableJoinCondition = sprintf('%s.custom_item_id_lower = %s.id', static::CUSTOM_ITEM_XREF_CUSTOM_ITEM_TABLE_ALIAS, static::PARENT_CUSTOM_ITEM_TABLE_ALIAS);
+        $queryBuilder->leftJoin(static::CUSTOM_ITEM_XREF_CUSTOM_ITEM_TABLE_ALIAS, $this->addTablePrefix(CustomItem::TABLE_NAME), static::PARENT_CUSTOM_ITEM_TABLE_ALIAS, $parentCustomItemTableJoinCondition);
     }
 
     /**
@@ -225,15 +244,10 @@ class ReportSubscriber implements EventSubscriberInterface
         }
 
         $customObject = $this->initializeCustomObject($event->getContext());
-        $customObjectIds = [$customObject->getId()];
-
-        if ($customObject->getMasterObject()) {
-            $customObjectIds[] = $customObject->getMasterObject()->getId();
-        }
 
         $queryBuilder = $event->getQueryBuilder();
         $queryBuilder->from($this->addTablePrefix(CustomItem::TABLE_NAME), static::CUSTOM_ITEM_TABLE_ALIAS);
-        $queryBuilder->andWhere($queryBuilder->expr()->in(static::CUSTOM_ITEM_TABLE_ALIAS.'.custom_object_id', $customObjectIds));
+        $queryBuilder->andWhere($queryBuilder->expr()->eq(static::CUSTOM_ITEM_TABLE_ALIAS.'.custom_object_id', $customObject->getId()));
 
         $event->applyDateFilters($queryBuilder, 'date_added', static::CUSTOM_ITEM_TABLE_ALIAS);
 
@@ -266,5 +280,17 @@ class ReportSubscriber implements EventSubscriberInterface
         $reportColumnsBuilder = new ReportColumnsBuilder($customObject);
         $reportColumnsBuilder->setFilterColumnsCallback([$event, 'usesColumn']);
         $reportColumnsBuilder->joinReportColumns($queryBuilder, static::CUSTOM_ITEM_TABLE_ALIAS);
+
+        $parentCustomObject = $customObject->getMasterObject();
+        if (!($parentCustomObject instanceof CustomObject)) {
+            return;
+        }
+
+        $this->joinParentCustomObjectStandardColumns($queryBuilder);
+
+        // Join parent custom objects tables
+        $parentCustomObjectReportColumnsBuilder = new ReportColumnsBuilder($parentCustomObject);
+        $parentCustomObjectReportColumnsBuilder->setFilterColumnsCallback([$event, 'usesColumn']);
+        $parentCustomObjectReportColumnsBuilder->joinReportColumns($queryBuilder, static::PARENT_CUSTOM_ITEM_TABLE_ALIAS);
     }
 }
