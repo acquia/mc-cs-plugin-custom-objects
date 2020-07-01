@@ -348,6 +348,13 @@ class QueryFilterHelper
 
         $subSelects = [];
 
+        $subSelects[] = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
+            ->select('custom_item_id')
+            ->from('custom_item_xref_contact')
+            ->from(MAUTIC_TABLE_PREFIX.'custom_item_xref_contact')
+            ->where("custom_item_id = {$alias}_item.id")
+            ->getSQL();
+
         if ($this->itemRelationLevelLimit > 1) {
             // 2nd level
             $subSelects[] = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
@@ -368,24 +375,11 @@ class QueryFilterHelper
             throw new \RuntimeException("Level higher than 2 is not implemented");
         }
 
-        $customItemPart = $alias.'_value.custom_item_id = '.$alias.'_item.id';
+        $subSelectString = implode(' UNION ', $subSelects);
 
-        if (count($subSelects)) {
-
-            $subSelectString = implode(' UNION ', $subSelects);
-
-            $customItemPart = $customItemPart = $customFieldQueryBuilder->expr()->orX(
-                $customItemPart,
-                $customFieldQueryBuilder->expr()->in(
-                    $alias.'_value.custom_item_id ',
-                    [$subSelectString]
-                )
-            );
-        }
-
-        $customItemPart = $customFieldQueryBuilder->expr()->andX(
-            $customItemPart,
-            $customFieldQueryBuilder->expr()->eq($alias.'_value.custom_field_id', ":{$alias}_custom_field_id")
+        $customItemPart = $customFieldQueryBuilder->expr()->in(
+            $alias.'_value.custom_item_id ',
+            [$subSelectString]
         );
 
         $customFieldQueryBuilder->innerJoin(

@@ -82,6 +82,11 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
         parent::tearDown();
     }
 
+    /**
+     * Limit of relations must be set here to 1
+     * @see plugins/CustomObjectsBundle/Config/config.php::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT
+     * This is not possible right now, to change this value and rerun app.
+     */
     public function testApplyQuery1stLevel(): void
     {
         $this->markTestSkipped('Multilevel testing not implemented yet');
@@ -128,7 +133,7 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
 
         $this->assertLeadCountBySegmentAlias(0, 'price-greater-1000');
         $this->assertLeadCountBySegmentAlias(3, 'price-lte-1000');
-        // @todo there's no product Under 500 - FIX THIS
+
         $this->assertLeadCountBySegmentAlias(0, 'price-lt-500');
 
         // option - multiselect
