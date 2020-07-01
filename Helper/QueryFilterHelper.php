@@ -348,6 +348,7 @@ class QueryFilterHelper
 
         $subSelects = [];
 
+        // 1st level
         $subSelects[] = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
             ->select('custom_item_id')
             ->from('custom_item_xref_contact')
