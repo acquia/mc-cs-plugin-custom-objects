@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
+use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\ReportEvents;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCompany;
@@ -63,11 +63,17 @@ class ReportSubscriber implements EventSubscriberInterface
      */
     private $companyReportData;
 
-    public function __construct(CustomObjectRepository $customObjectRepository, FieldsBuilder $fieldsBuilder, CompanyReportData $companyReportData)
+    /**
+     * @var ReportHelper
+     */
+    private $reportHelper;
+
+    public function __construct(CustomObjectRepository $customObjectRepository, FieldsBuilder $fieldsBuilder, CompanyReportData $companyReportData, ReportHelper $reportHelper)
     {
         $this->customObjectRepository = $customObjectRepository;
         $this->fieldsBuilder          = $fieldsBuilder;
         $this->companyReportData      = $companyReportData;
+        $this->reportHelper           = $reportHelper;
     }
 
     private function getCustomObjects(): ArrayCollection
@@ -133,6 +139,11 @@ class ReportSubscriber implements EventSubscriberInterface
             ->toArray();
     }
 
+    private function getStandardColumns(string $prefix)
+    {
+        return $this->reportHelper->getStandardColumns($prefix, ['description', 'publish_up', 'publish_down']);
+    }
+
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext($this->getContexts())) {
@@ -142,14 +153,15 @@ class ReportSubscriber implements EventSubscriberInterface
         $columns = array_merge(
             $this->getLeadColumns(),
             $this->getCompanyColumns(),
-            $event->getStandardColumns(static::CUSTOM_ITEM_TABLE_ALIAS.'.', ['description', 'publish_up', 'publish_down'])
+            $this->getStandardColumns(static::CUSTOM_ITEM_TABLE_ALIAS.'.')
         );
+
+        $standardParentCustomObjectColumns = $this->getStandardColumns(static::PARENT_CUSTOM_ITEM_TABLE_ALIAS.'.');
 
         /** @var CustomObject $customObject */
         foreach ($this->getCustomObjects() as $customObject) {
             $customObjectColumns =  (new ReportColumnsBuilder($customObject))->getColumns();
             if ($customObject->getMasterObject()) {
-                $standardParentCustomObjectColumns = $event->getStandardColumns(static::PARENT_CUSTOM_ITEM_TABLE_ALIAS.'.', ['description', 'publish_up', 'publish_down']);
                 $parentCustomObjectColumns = (new ReportColumnsBuilder($customObject->getMasterObject()))->getColumns();
                 $customObjectColumns = array_merge($customObjectColumns, $standardParentCustomObjectColumns, $parentCustomObjectColumns);
             }
@@ -283,6 +295,24 @@ class ReportSubscriber implements EventSubscriberInterface
 
         $parentCustomObject = $customObject->getMasterObject();
         if (!($parentCustomObject instanceof CustomObject)) {
+            return;
+        }
+
+        $standardParentCustomObjectColumns = $this->getStandardColumns(static::PARENT_CUSTOM_ITEM_TABLE_ALIAS.'.');
+        $parentCustomObjectColumns = (new ReportColumnsBuilder($customObject->getMasterObject()))->getColumns();
+
+        $parentCustomObjectColumns = array_keys(array_merge($parentCustomObjectColumns, $standardParentCustomObjectColumns));
+
+        $usesParentCustomObjectsColumns = false;
+        foreach ($parentCustomObjectColumns as $column) {
+            if ($event->usesColumn($column)) {
+                $usesParentCustomObjectsColumns = true;
+                break;
+            }
+        }
+
+        if (!$usesParentCustomObjectsColumns) {
+            // No need to join parent custom object columns if we don't use them
             return;
         }
 
