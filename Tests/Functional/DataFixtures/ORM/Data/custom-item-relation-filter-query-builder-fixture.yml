@@ -190,6 +190,24 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem:
 
 Mautic\LeadBundle\Entity\LeadList:
 
+  # 1st level
+  price-eq-1000:
+    is_published: true
+    name: 'Price = 500'
+    alias: 'price-eq-1000'
+    filters:
+      0:
+        glue : 'and'
+        field: 'cmf_1' # custom_field.id
+        object: 'custom_object'
+        type: 'int'
+        operator: 'eq'
+        properties:
+          filter: '1000'
+    is_global: true
+    is_preference_center: false
+
+  # 2nd level
   order-plug-name-eq:
     is_published: true
     name: 'Order name = Ordered plug'
