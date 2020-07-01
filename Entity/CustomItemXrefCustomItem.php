@@ -31,6 +31,8 @@ use UnexpectedValueException;
  */
 class CustomItemXrefCustomItem implements CustomItemXrefInterface
 {
+    public const TABLE_NAME = 'custom_item_xref_custom_item';
+
     /**
      * @var CustomItem
      */
@@ -70,7 +72,7 @@ class CustomItemXrefCustomItem implements CustomItemXrefInterface
     {
         $builder = new ClassMetadataBuilder($metadata);
 
-        $builder->setTable('custom_item_xref_custom_item');
+        $builder->setTable(self::TABLE_NAME);
 
         $builder->createManyToOne('customItemLower', CustomItem::class)
             ->addJoinColumn('custom_item_id_lower', 'id', false, false, 'CASCADE')
