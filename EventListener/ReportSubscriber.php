@@ -164,7 +164,7 @@ class ReportSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $standardCustomObjectColumns = array_merge(
+        $leadAndCompanyCustomObjectColumns = array_merge(
             $this->getLeadColumns(),
             $this->getCompanyColumns()
         );
@@ -172,14 +172,14 @@ class ReportSubscriber implements EventSubscriberInterface
         /** @var CustomObject $customObject */
         foreach ($this->getCustomObjects() as $customObject) {
             $columns = array_merge(
-                $standardCustomObjectColumns,
+                $leadAndCompanyCustomObjectColumns,
                 $this->getCustomObjectColumns($customObject, static::CUSTOM_ITEM_TABLE_ALIAS.'.')
             );
 
             if ($customObject->getMasterObject()) {
                 // We only add optgroup if the current custom object has a parent custom object
                 $this->addOptgroup($columns, $customObject->getNamePlural());
-                $parentCustomObjectColumns = $this->getCustomObjectColumns($customObject, static::PARENT_CUSTOM_ITEM_TABLE_ALIAS . '.');
+                $parentCustomObjectColumns = $this->getCustomObjectColumns($customObject->getMasterObject(), static::PARENT_CUSTOM_ITEM_TABLE_ALIAS . '.');
                 $this->addOptgroup($parentCustomObjectColumns, $customObject->getMasterObject()->getNamePlural());
                 $columns = array_merge($columns, $parentCustomObjectColumns);
             }
