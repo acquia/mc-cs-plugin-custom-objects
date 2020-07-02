@@ -121,7 +121,7 @@ class QueryFilterHelper
      * @param CompositeExpression|string            $expression
      * @param array|string|CompositeExpression|null $value
      */
-    public function addOperatorExpression(
+    private function addOperatorExpression(
         QueryBuilder $queryBuilder,
         string $tableAlias,
         $expression,
