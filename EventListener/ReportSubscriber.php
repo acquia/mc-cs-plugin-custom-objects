@@ -144,33 +144,51 @@ class ReportSubscriber implements EventSubscriberInterface
         return $this->reportHelper->getStandardColumns($prefix, ['description', 'publish_up', 'publish_down']);
     }
 
+    private function addOptgroup(array &$columns, string $optgroup): void
+    {
+        foreach ($columns as $alias => $column) {
+            $columns[$alias]['optgroup'] = $optgroup;
+        }
+    }
+
+    private function getCustomObjectColumns(CustomObject $customObject, string $customItemTablePrefix): array
+    {
+        $standardColumns = $this->getStandardColumns($customItemTablePrefix);
+        $customFieldsColumns = (new ReportColumnsBuilder($customObject))->getColumns();
+        return array_merge($standardColumns, $customFieldsColumns);
+    }
+
     public function onReportBuilder(ReportBuilderEvent $event): void
     {
         if (!$event->checkContext($this->getContexts())) {
             return;
         }
 
-        $columns = array_merge(
+        $standardCustomObjectColumns = array_merge(
             $this->getLeadColumns(),
-            $this->getCompanyColumns(),
-            $this->getStandardColumns(static::CUSTOM_ITEM_TABLE_ALIAS.'.')
+            $this->getCompanyColumns()
         );
-
-        $standardParentCustomObjectColumns = $this->getStandardColumns(static::PARENT_CUSTOM_ITEM_TABLE_ALIAS.'.');
 
         /** @var CustomObject $customObject */
         foreach ($this->getCustomObjects() as $customObject) {
-            $customObjectColumns =  (new ReportColumnsBuilder($customObject))->getColumns();
+            $columns = array_merge(
+                $standardCustomObjectColumns,
+                $this->getCustomObjectColumns($customObject, static::CUSTOM_ITEM_TABLE_ALIAS.'.')
+            );
+
             if ($customObject->getMasterObject()) {
-                $parentCustomObjectColumns = (new ReportColumnsBuilder($customObject->getMasterObject()))->getColumns();
-                $customObjectColumns = array_merge($customObjectColumns, $standardParentCustomObjectColumns, $parentCustomObjectColumns);
+                // We only add optgroup if the current custom object has a parent custom object
+                $this->addOptgroup($columns, $customObject->getNamePlural());
+                $parentCustomObjectColumns = $this->getCustomObjectColumns($customObject, static::PARENT_CUSTOM_ITEM_TABLE_ALIAS . '.');
+                $this->addOptgroup($parentCustomObjectColumns, $customObject->getMasterObject()->getNamePlural());
+                $columns = array_merge($columns, $parentCustomObjectColumns);
             }
 
             $event->addTable(
                 $this->getContext($customObject),
                 [
                     'display_name' => $customObject->getNamePlural(),
-                    'columns'      => array_merge($columns, $customObjectColumns),
+                    'columns'      => $columns,
                 ],
                 static::CUSTOM_OBJECTS_CONTEXT_GROUP
             );
