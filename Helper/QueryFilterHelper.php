@@ -107,27 +107,6 @@ class QueryFilterHelper
         );
     }
 
-    /**
-     * @todo remove me as unused
-     */
-    public function addCustomObjectNameExpressionFromSegmentFilter(QueryBuilder $queryBuilder, string $tableAlias, ContactSegmentFilter $filter): void
-    {
-        $expression = $this->getCustomObjectNameExpression($queryBuilder, $tableAlias, $filter->getOperator());
-        $this->addOperatorExpression($queryBuilder, $tableAlias, $expression, $filter->getOperator(), $filter->getParameterValue());
-    }
-
-    /**
-     * Limit the result of query builder to given value of in CustomFieldValue.
-     *
-     * @param array|string|CompositeExpression $value
-     * @todo remove me as unused
-     */
-    public function addCustomFieldValueExpression(QueryBuilder $queryBuilder, string $tableAlias, string $operator, $value): void
-    {
-        $expression = $this->getCustomValueValueExpression($queryBuilder, $tableAlias, $operator);
-        $this->addOperatorExpression($queryBuilder, $tableAlias, $expression, $operator, $value);
-    }
-
     public function addCustomObjectNameExpression(
         QueryBuilder $queryBuilder,
         string $tableAlias,
@@ -179,34 +158,6 @@ class QueryFilterHelper
         if (isset($valueParameter)) {
             $queryBuilder->setParameter($valueParameter, $value, $valueType);
         }
-    }
-
-    /**
-     * Limit the result of queryBuilder to result of customQuery.
-     *
-     * @throws DBALException
-     * @todo remove me as unused
-     */
-    public function addValueExpressionFromQueryBuilder(
-        QueryBuilder $queryBuilder,
-        QueryBuilder $customQuery,
-        string $glue,
-        string $operator
-    ): void {
-        switch ($operator) {
-            case 'empty':
-            case 'notIn':
-            case 'neq':
-            case 'notLike':
-                $queryBuilder->addLogic($queryBuilder->expr()->notExists($customQuery->getSQL()), $glue);
-
-                break;
-            default:
-                $queryBuilder->addLogic($queryBuilder->expr()->exists($customQuery->getSQL()), $glue);
-
-                break;
-        }
-        $queryBuilder->setParametersPairs(array_keys($customQuery->getParameters()), array_values($customQuery->getParameters()));
     }
 
     private function getCustomFieldType(QueryBuilder $queryBuilder, int $customFieldId): string
