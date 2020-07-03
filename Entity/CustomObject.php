@@ -163,6 +163,12 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         return $this->id;
     }
 
+    public function setId(int $id)
+    {
+        $this->id = $id;
+        return $this;
+    }
+
     /**
      * This is alias method that is required by Mautic.
      *

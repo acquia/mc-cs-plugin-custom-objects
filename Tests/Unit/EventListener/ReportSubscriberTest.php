@@ -151,15 +151,36 @@ class ReportSubscriberTest extends TestCase
     private function getCustomObjectsCollection(): array
     {
         $customObject1 = new CustomObject();
-        $customObject1->setCustomFields($this->getCustomFieldsCollection());
+        $customObject1->setId(1);
+        $customObject1->setCustomFields($this->getCustomFieldsCollection(1));
         $customObject1->setNamePlural('Custom Objects #1');
+        $customObject1->setType(CustomObject::TYPE_MASTER);
+
         $customObject2 = new CustomObject();
+        $customObject2->setId(2);
         $customObject2->setCustomFields($this->getCustomFieldsCollection(2));
         $customObject2->setNamePlural('Custom Objects #2');
+        $customObject2->setType(CustomObject::TYPE_MASTER);
+
+        $customObject3 = new CustomObject();
+        $customObject3->setId(3);
+        $customObject3->setCustomFields($this->getCustomFieldsCollection(3));
+        $customObject3->setNamePlural('Opportunities');
+        $customObject3->setType(CustomObject::TYPE_MASTER);
+
+        $customObject4 = new CustomObject();
+        $customObject4->setId(4);
+        $customObject4->setCustomFields($this->getCustomFieldsCollection(4));
+        $customObject4->setNamePlural('Details');
+        $customObject4->setType(CustomObject::TYPE_RELATIONSHIP);
+
+        $customObject4->setMasterObject($customObject3);
 
         return [
             $customObject1,
             $customObject2,
+            $customObject3,
+            $customObject4,
         ];
     }
 
@@ -190,7 +211,7 @@ class ReportSubscriberTest extends TestCase
             ->method('getCompanyData')
             ->willReturn([]);
 
-        $this->reportBuilderEvent->expects($this->exactly(2))
+        $this->reportBuilderEvent->expects($this->exactly(3))
             ->method('addTable');
 
         $this->reportSubscriber->onReportBuilder($this->reportBuilderEvent);
