@@ -326,7 +326,7 @@ class QueryFilterHelper
             throw new \RuntimeException("Level higher than 2 is not implemented");
         }
 
-        $subSelectString = implode(' UNION ', $subSelects);
+        $subSelectString = implode(' UNION ALL ', $subSelects);
 
         $customItemPart = $customFieldQueryBuilder->expr()->in(
             $alias.'_value.custom_item_id ',
