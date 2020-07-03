@@ -104,7 +104,7 @@ class ReportSubscriberTest extends TestCase
         $this->customObjectRepository          = $this->createMock(CustomObjectRepository::class);
         $this->fieldsBuilder                   = $this->createMock(FieldsBuilder::class);
         $this->companyReportData               = $this->createMock(CompanyReportData::class);
-        $this->reportHelper = new ReportHelper();
+        $this->reportHelper                    = new ReportHelper();
         $this->translatorInterface             = $this->createMock(TranslatorInterface::class);
         $this->reportSubscriber                = new ReportSubscriber($this->customObjectRepository, $this->fieldsBuilder, $this->companyReportData, $this->reportHelper, $this->translatorInterface);
         $this->reportBuilderEvent              = $this->createMock(ReportBuilderEvent::class);
