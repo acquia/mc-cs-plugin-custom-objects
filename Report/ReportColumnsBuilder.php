@@ -107,14 +107,22 @@ class ReportColumnsBuilder
         return call_user_func($this->callback, $this->getColumnName($customField));
     }
 
+    public function getJoinableColumns(): array
+    {
+        $columns = [];
+        foreach ($this->customObject->getCustomFields() as $customField) {
+            if ($this->checkIfColumnHasToBeJoined($customField)) {
+                $columns[] = $customField;
+            }
+        }
+
+        return $columns;
+    }
+
     public function joinReportColumns(QueryBuilder $queryBuilder, string $customItemTableAlias): void
     {
         /** @var CustomField $customField */
-        foreach ($this->customObject->getCustomFields() as $customField) {
-            if (!$this->checkIfColumnHasToBeJoined($customField)) {
-                continue;
-            }
-
+        foreach ($this->getJoinableColumns() as $customField) {
             $hash = $this->getHash($customField);
             if ($this->isMultiSelectTypeCustomField($customField)) {
                 $joinQueryBuilder = new QueryBuilder($queryBuilder->getConnection());
