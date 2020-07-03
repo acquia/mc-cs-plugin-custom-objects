@@ -29,10 +29,12 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Report\ReportColumnsBuilder;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
     const CUSTOM_OBJECTS_CONTEXT_GROUP = 'custom.objects';
+    const CHILD_CUSTOM_OBJECT_NAME_PREFIX = '&nbsp;&nbsp;&nbsp;&nbsp;';
 
     const CUSTOM_ITEM_TABLE_ALIAS        = 'ci';
     const PARENT_CUSTOM_ITEM_TABLE_ALIAS = 'pci';
@@ -68,12 +70,18 @@ class ReportSubscriber implements EventSubscriberInterface
      */
     private $reportHelper;
 
-    public function __construct(CustomObjectRepository $customObjectRepository, FieldsBuilder $fieldsBuilder, CompanyReportData $companyReportData, ReportHelper $reportHelper)
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    public function __construct(CustomObjectRepository $customObjectRepository, FieldsBuilder $fieldsBuilder, CompanyReportData $companyReportData, ReportHelper $reportHelper, TranslatorInterface $translator)
     {
         $this->customObjectRepository = $customObjectRepository;
         $this->fieldsBuilder          = $fieldsBuilder;
         $this->companyReportData      = $companyReportData;
         $this->reportHelper           = $reportHelper;
+        $this->translator = $translator;
     }
 
     private function getCustomObjects(): ArrayCollection
@@ -102,7 +110,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $childCustomObject->setNamePlural(str_repeat('&nbsp;', 4) . $childCustomObject->getNamePlural());
+            $childCustomObject->setNamePlural(self::CHILD_CUSTOM_OBJECT_NAME_PREFIX . $childCustomObject->getNamePlural());
             $this->customObjects->add($childCustomObject);
         }
 
@@ -144,10 +152,14 @@ class ReportSubscriber implements EventSubscriberInterface
         return $this->reportHelper->getStandardColumns($prefix, ['description', 'publish_up', 'publish_down']);
     }
 
-    private function addOptgroup(array &$columns, string $optgroup): void
+    private function addPrefixToColumnLabel(array &$columns, CustomObject $customObject): void
     {
         foreach ($columns as $alias => $column) {
-            $columns[$alias]['optgroup'] = $optgroup;
+            $columns[$alias]['label'] = sprintf(
+                '%s %s',
+                str_replace(self::CHILD_CUSTOM_OBJECT_NAME_PREFIX, '', $customObject->getNamePlural()),
+                $this->translator->trans($columns[$alias]['label'])
+            );
         }
     }
 
@@ -178,9 +190,9 @@ class ReportSubscriber implements EventSubscriberInterface
 
             if ($customObject->getMasterObject()) {
                 // We only add optgroup if the current custom object has a parent custom object
-                $this->addOptgroup($columns, $customObject->getNamePlural());
+                $this->addPrefixToColumnLabel($columns, $customObject);
                 $parentCustomObjectColumns = $this->getCustomObjectColumns($customObject->getMasterObject(), static::PARENT_CUSTOM_ITEM_TABLE_ALIAS . '.');
-                $this->addOptgroup($parentCustomObjectColumns, $customObject->getMasterObject()->getNamePlural());
+                $this->addPrefixToColumnLabel($parentCustomObjectColumns, $customObject->getMasterObject());
                 $columns = array_merge($columns, $parentCustomObjectColumns);
             }
 

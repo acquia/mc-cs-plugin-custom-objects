@@ -643,6 +643,7 @@ return [
                     'mautic.lead.reportbundle.fields_builder',
                     'mautic.lead.model.company_report_data',
                     'mautic.report.helper.report',
+                    'translator',
                 ],
             ],
             // There's a problem with multiple tags and arguments definition using array.
