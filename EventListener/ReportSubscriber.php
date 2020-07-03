@@ -33,17 +33,17 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
-    const CUSTOM_OBJECTS_CONTEXT_GROUP = 'custom.objects';
+    const CUSTOM_OBJECTS_CONTEXT_GROUP    = 'custom.objects';
     const CHILD_CUSTOM_OBJECT_NAME_PREFIX = '&nbsp;&nbsp;&nbsp;&nbsp;';
 
-    const CUSTOM_ITEM_TABLE_ALIAS        = 'ci';
-    const PARENT_CUSTOM_ITEM_TABLE_ALIAS = 'pci';
+    const CUSTOM_ITEM_TABLE_ALIAS                  = 'ci';
+    const PARENT_CUSTOM_ITEM_TABLE_ALIAS           = 'pci';
     const CUSTOM_ITEM_XREF_CUSTOM_ITEM_TABLE_ALIAS = 'cixci';
-    const CUSTOM_ITEM_XREF_CONTACT_TABLE_ALIAS = 'cil';
-    const CUSTOM_ITEM_XREF_COMPANY_TABLE_ALIAS = 'cic';
-    const LEADS_TABLE_ALIAS              = 'l';
-    const USERS_TABLE_ALIAS              = 'u';
-    const COMPANIES_TABLE_ALIAS          = 'comp';
+    const CUSTOM_ITEM_XREF_CONTACT_TABLE_ALIAS     = 'cil';
+    const CUSTOM_ITEM_XREF_COMPANY_TABLE_ALIAS     = 'cic';
+    const LEADS_TABLE_ALIAS                        = 'l';
+    const USERS_TABLE_ALIAS                        = 'u';
+    const COMPANIES_TABLE_ALIAS                    = 'comp';
 
     /**
      * @var ArrayCollection
@@ -81,7 +81,7 @@ class ReportSubscriber implements EventSubscriberInterface
         $this->fieldsBuilder          = $fieldsBuilder;
         $this->companyReportData      = $companyReportData;
         $this->reportHelper           = $reportHelper;
-        $this->translator = $translator;
+        $this->translator             = $translator;
     }
 
     private function getCustomObjects(): ArrayCollection
@@ -90,8 +90,8 @@ class ReportSubscriber implements EventSubscriberInterface
             return $this->customObjects;
         }
 
-        $allCustomObjects = new ArrayCollection($this->customObjectRepository->findAll());
-        $parentCustomObjects = $allCustomObjects->filter(function(CustomObject $customObject): bool {
+        $allCustomObjects    = new ArrayCollection($this->customObjectRepository->findAll());
+        $parentCustomObjects = $allCustomObjects->filter(function (CustomObject $customObject): bool {
             return CustomObject::TYPE_MASTER === $customObject->getType();
         });
         $parentCustomObjects = $this->sortCustomObjects($parentCustomObjects);
@@ -99,7 +99,7 @@ class ReportSubscriber implements EventSubscriberInterface
         $this->customObjects = new ArrayCollection();
         foreach ($parentCustomObjects as $parentCustomObject) {
             $this->customObjects->add($parentCustomObject);
-            $childCustomObject = $allCustomObjects->filter(function (CustomObject $childCustomObject) use ($parentCustomObject) : bool {
+            $childCustomObject = $allCustomObjects->filter(function (CustomObject $childCustomObject) use ($parentCustomObject): bool {
                 return $childCustomObject->getMasterObject() ?
                     $parentCustomObject->getId() === $childCustomObject->getMasterObject()->getId()
                     :
@@ -110,7 +110,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $childCustomObject->setNamePlural(self::CHILD_CUSTOM_OBJECT_NAME_PREFIX . $childCustomObject->getNamePlural());
+            $childCustomObject->setNamePlural(self::CHILD_CUSTOM_OBJECT_NAME_PREFIX.$childCustomObject->getNamePlural());
             $this->customObjects->add($childCustomObject);
         }
 
@@ -143,7 +143,9 @@ class ReportSubscriber implements EventSubscriberInterface
     private function getContexts(): array
     {
         return $this->getCustomObjects()
-            ->map(function(CustomObject $customObject) { return $this->getContext($customObject);})
+            ->map(function (CustomObject $customObject) {
+                return $this->getContext($customObject);
+            })
             ->toArray();
     }
 
@@ -165,8 +167,9 @@ class ReportSubscriber implements EventSubscriberInterface
 
     private function getCustomObjectColumns(CustomObject $customObject, string $customItemTablePrefix): array
     {
-        $standardColumns = $this->getStandardColumns($customItemTablePrefix);
+        $standardColumns     = $this->getStandardColumns($customItemTablePrefix);
         $customFieldsColumns = (new ReportColumnsBuilder($customObject))->getColumns();
+
         return array_merge($standardColumns, $customFieldsColumns);
     }
 
@@ -191,7 +194,7 @@ class ReportSubscriber implements EventSubscriberInterface
             if ($customObject->getMasterObject()) {
                 // We only add optgroup if the current custom object has a parent custom object
                 $this->addPrefixToColumnLabel($columns, $customObject);
-                $parentCustomObjectColumns = $this->getCustomObjectColumns($customObject->getMasterObject(), static::PARENT_CUSTOM_ITEM_TABLE_ALIAS . '.');
+                $parentCustomObjectColumns = $this->getCustomObjectColumns($customObject->getMasterObject(), static::PARENT_CUSTOM_ITEM_TABLE_ALIAS.'.');
                 $this->addPrefixToColumnLabel($parentCustomObjectColumns, $customObject->getMasterObject());
                 $columns = array_merge($columns, $parentCustomObjectColumns);
             }
@@ -329,7 +332,7 @@ class ReportSubscriber implements EventSubscriberInterface
         }
 
         $standardParentCustomObjectColumns = $this->getStandardColumns(static::PARENT_CUSTOM_ITEM_TABLE_ALIAS.'.');
-        $parentCustomObjectColumns = (new ReportColumnsBuilder($customObject->getMasterObject()))->getColumns();
+        $parentCustomObjectColumns         = (new ReportColumnsBuilder($customObject->getMasterObject()))->getColumns();
 
         $parentCustomObjectColumns = array_keys(array_merge($parentCustomObjectColumns, $standardParentCustomObjectColumns));
 
