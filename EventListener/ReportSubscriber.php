@@ -39,6 +39,7 @@ class ReportSubscriber implements EventSubscriberInterface
     const CUSTOM_ITEM_TABLE_ALIAS                  = 'ci';
     const PARENT_CUSTOM_ITEM_TABLE_ALIAS           = 'pci';
     const CUSTOM_ITEM_XREF_CUSTOM_ITEM_TABLE_ALIAS = 'cixci';
+    const CUSTOM_ITEM_XREF_CUSTOM_ITEM_TABLE_NAME  = 'custom_item_xref_custom_item';
     const CUSTOM_ITEM_XREF_CONTACT_TABLE_ALIAS     = 'cil';
     const CUSTOM_ITEM_XREF_COMPANY_TABLE_ALIAS     = 'cic';
     const LEADS_TABLE_ALIAS                        = 'l';
@@ -274,7 +275,7 @@ class ReportSubscriber implements EventSubscriberInterface
     {
         // Joining companies tables
         $relationshipTableJoinCondition = sprintf('%s.id = %s.custom_item_id_higher', static::CUSTOM_ITEM_TABLE_ALIAS, self::CUSTOM_ITEM_XREF_CUSTOM_ITEM_TABLE_ALIAS);
-        $queryBuilder->leftJoin(static::CUSTOM_ITEM_TABLE_ALIAS, $this->addTablePrefix(CustomItemXrefCustomItem::TABLE_NAME), static::CUSTOM_ITEM_XREF_CUSTOM_ITEM_TABLE_ALIAS, $relationshipTableJoinCondition);
+        $queryBuilder->leftJoin(static::CUSTOM_ITEM_TABLE_ALIAS, $this->addTablePrefix(self::CUSTOM_ITEM_XREF_CUSTOM_ITEM_TABLE_NAME), static::CUSTOM_ITEM_XREF_CUSTOM_ITEM_TABLE_ALIAS, $relationshipTableJoinCondition);
         $parentCustomItemTableJoinCondition = sprintf('%s.custom_item_id_lower = %s.id', static::CUSTOM_ITEM_XREF_CUSTOM_ITEM_TABLE_ALIAS, static::PARENT_CUSTOM_ITEM_TABLE_ALIAS);
         $queryBuilder->leftJoin(static::CUSTOM_ITEM_XREF_CUSTOM_ITEM_TABLE_ALIAS, $this->addTablePrefix(CustomItem::TABLE_NAME), static::PARENT_CUSTOM_ITEM_TABLE_ALIAS, $parentCustomItemTableJoinCondition);
     }
