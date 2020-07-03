@@ -15,12 +15,14 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
+use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\ReportEvents;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateTimeType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\MultiselectType;
@@ -90,6 +92,11 @@ class ReportSubscriberTest extends TestCase
      */
     private $connection;
 
+    /**
+     * @var ReportHelper
+     */
+    private $reportHelper;
+
     protected function setUp(): void
     {
         defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
@@ -97,9 +104,10 @@ class ReportSubscriberTest extends TestCase
         $this->customObjectRepository          = $this->createMock(CustomObjectRepository::class);
         $this->fieldsBuilder                   = $this->createMock(FieldsBuilder::class);
         $this->companyReportData               = $this->createMock(CompanyReportData::class);
-        $this->reportSubscriber                = new ReportSubscriber($this->customObjectRepository, $this->fieldsBuilder, $this->companyReportData);
-        $this->reportBuilderEvent              = $this->createMock(ReportBuilderEvent::class);
+        $this->reportHelper = new ReportHelper();
         $this->translatorInterface             = $this->createMock(TranslatorInterface::class);
+        $this->reportSubscriber                = new ReportSubscriber($this->customObjectRepository, $this->fieldsBuilder, $this->companyReportData, $this->reportHelper, $this->translatorInterface);
+        $this->reportBuilderEvent              = $this->createMock(ReportBuilderEvent::class);
         $this->filterOperatorProviderInterface = $this->createMock(FilterOperatorProviderInterface::class);
         $this->csvHelper                       = $this->createMock(CsvHelper::class);
         $this->reportGeneratorEvent            = $this->createMock(ReportGeneratorEvent::class);
@@ -182,10 +190,6 @@ class ReportSubscriberTest extends TestCase
             ->method('getCompanyData')
             ->willReturn([]);
 
-        $this->reportBuilderEvent->expects($this->once())
-            ->method('getStandardColumns')
-            ->willReturn([]);
-
         $this->reportBuilderEvent->expects($this->exactly(2))
             ->method('addTable');
 
@@ -264,8 +268,14 @@ class ReportSubscriberTest extends TestCase
         $this->queryBuilder->expects($this->once())
             ->method('andWhere');
 
+        $expressionBuilder = $this->createMock(ExpressionBuilder::class);
         $this->queryBuilder->expects($this->once())
-            ->method('setParameter');
+            ->method('expr')
+            ->willReturn($expressionBuilder);
+
+        $expressionBuilder->expects($this->once())
+            ->method('eq')
+            ->willReturn($this->queryBuilder);
 
         $this->reportSubscriber->onReportGenerate($this->reportGeneratorEvent);
     }
