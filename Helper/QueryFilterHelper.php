@@ -333,6 +333,12 @@ class QueryFilterHelper
             [$subSelectString]
         );
 
+        $customItemPart = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
+            ->expr()->andX(
+                $customItemPart,
+                $customFieldQueryBuilder->expr()->eq($alias.'_value.custom_field_id', ":{$alias}_custom_field_id")
+            );
+
         $customFieldQueryBuilder->innerJoin(
             $alias.'_item',
             $dataTable,
