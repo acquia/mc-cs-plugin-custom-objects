@@ -99,7 +99,7 @@ class ImportSubscriberTest extends KernelTestCase
         $expectedValues                   = $csvRow;
         $expectedValues['datetime']       = new \DateTimeImmutable('2019-03-04 12:35:09');
         $expectedValues['date']           = new \DateTimeImmutable('2019-03-04 00:00:00');
-        $expectedValues['multiselect']    = ['option_a', 'option_b'];
+        $expectedValues['multiselect']    = ['option_b', 'option_a'];
 
         // Import the custom item
         $insertStatus = $this->importCsvRow($customObject, $csvRow);
@@ -137,7 +137,7 @@ class ImportSubscriberTest extends KernelTestCase
         $expectedUpdatedValues                   = $editCsvRow;
         $expectedUpdatedValues['datetime']       = new \DateTimeImmutable('2019-03-04 12:35:09');
         $expectedUpdatedValues['date']           = new \DateTimeImmutable('2019-05-24 00:00:00');
-        $expectedUpdatedValues['multiselect']    = ['option_a', 'option_b'];
+        $expectedUpdatedValues['multiselect']    = ['option_b', 'option_a'];
 
         $this->assertTrue($updateStatus);
 

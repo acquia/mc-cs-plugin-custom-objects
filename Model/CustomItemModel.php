@@ -16,6 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Model;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
+use Mautic\CoreBundle\Doctrine\Helper\FulltextKeyword;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -23,6 +24,8 @@ use Mautic\CoreBundle\Model\FormModel;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefInterface;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
@@ -321,8 +324,7 @@ class CustomItemModel extends FormModel
         $queryBuilder->setParameter('customObjectId', $customObjectId);
 
         if ($search) {
-            $queryBuilder->andWhere(CustomItem::TABLE_ALIAS.'.name LIKE :search');
-            $queryBuilder->setParameter('search', "%{$search}%");
+            $this->applySearchFilter($queryBuilder, $search);
         }
 
         return $this->applyOwnerFilter($queryBuilder, $customObjectId);
@@ -336,7 +338,6 @@ class CustomItemModel extends FormModel
         $this->validateTableConfig($tableConfig);
 
         $customObjectId = $tableConfig->getParameter('customObjectId');
-        $search         = $tableConfig->getParameter('search');
         $queryBuilder   = $this->entityManager->getConnection()->createQueryBuilder();
         $queryBuilder   = $tableConfig->configureDbalQueryBuilder($queryBuilder);
 
@@ -344,11 +345,6 @@ class CustomItemModel extends FormModel
         $queryBuilder->from(MAUTIC_TABLE_PREFIX.CustomItem::TABLE_NAME, CustomItem::TABLE_ALIAS);
         $queryBuilder->where(CustomItem::TABLE_ALIAS.'.custom_object_id = :customObjectId');
         $queryBuilder->setParameter('customObjectId', $customObjectId);
-
-        if ($search) {
-            $queryBuilder->andWhere(CustomItem::TABLE_ALIAS.'.name LIKE :search');
-            $queryBuilder->setParameter('search', "%{$search}%");
-        }
 
         return $this->applyOwnerFilter($queryBuilder, $customObjectId);
     }
@@ -386,5 +382,29 @@ class CustomItemModel extends FormModel
         }
 
         return $queryBuilder;
+    }
+
+    private function applySearchFilter(QueryBuilder $queryBuilder, string $search): void
+    {
+        $valueTextBuilder = $this->entityManager->createQueryBuilder();
+        $valueTextBuilder->select('1');
+        $valueTextBuilder->from(CustomFieldValueText::class, 'ValueText');
+        $valueTextBuilder->where(sprintf('ValueText.customItem = %s.id', CustomItem::TABLE_ALIAS));
+        $valueTextBuilder->andWhere('MATCH (ValueText.value) AGAINST (:search BOOLEAN) > 0');
+
+        $valueOptionBuilder = $this->entityManager->createQueryBuilder();
+        $valueOptionBuilder->select('1');
+        $valueOptionBuilder->from(CustomFieldValueOption::class, 'ValueOption');
+        $valueOptionBuilder->where(sprintf('ValueOption.customItem = %s.id', CustomItem::TABLE_ALIAS));
+        $valueOptionBuilder->andWhere('MATCH (ValueOption.value) AGAINST (:search BOOLEAN) > 0');
+
+        $exprBuilder = $queryBuilder->expr();
+        $orCondition = $exprBuilder->orX();
+        $orCondition->add('MATCH ('.CustomItem::TABLE_ALIAS.'.name) AGAINST (:search BOOLEAN) > 0');
+        $orCondition->add($exprBuilder->exists($valueTextBuilder->getDQL()));
+        $orCondition->add($exprBuilder->exists($valueOptionBuilder->getDQL()));
+
+        $queryBuilder->andWhere($orCondition);
+        $queryBuilder->setParameter('search', (string) new FulltextKeyword($search));
     }
 }
