@@ -155,12 +155,12 @@ class ReportSubscriber implements EventSubscriberInterface
         return $this->reportHelper->getStandardColumns($prefix, ['description', 'publish_up', 'publish_down']);
     }
 
-    private function addPrefixToColumnLabel(array &$columns, CustomObject $customObject): void
+    private function addPrefixToColumnLabel(array &$columns, string $prefix): void
     {
         foreach ($columns as $alias => $column) {
             $columns[$alias]['label'] = sprintf(
                 '%s %s',
-                str_replace(self::CHILD_CUSTOM_OBJECT_NAME_PREFIX, '', $customObject->getNamePlural()),
+                str_replace(self::CHILD_CUSTOM_OBJECT_NAME_PREFIX, '', $prefix),
                 $this->translator->trans($columns[$alias]['label'])
             );
         }
@@ -180,25 +180,29 @@ class ReportSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $leadAndCompanyCustomObjectColumns = array_merge(
-            $this->getLeadColumns(),
-            $this->getCompanyColumns()
-        );
+        $contactColumns = $this->getLeadColumns();
+        $companyColumns = $this->getCompanyColumns();
 
         /** @var CustomObject $customObject */
         foreach ($this->getCustomObjects() as $customObject) {
-            $columns = array_merge(
-                $leadAndCompanyCustomObjectColumns,
-                $this->getCustomObjectColumns($customObject, static::CUSTOM_ITEM_TABLE_ALIAS.'.')
-            );
+            $customObjectColumns = $this->getCustomObjectColumns($customObject, static::CUSTOM_ITEM_TABLE_ALIAS.'.');
+            $customObjectContactColumns = $contactColumns;
+            $parentCustomObjectColumns = [];
 
             if ($customObject->getMasterObject()) {
                 // We only add optgroup if the current custom object has a parent custom object
-                $this->addPrefixToColumnLabel($columns, $customObject);
+                $this->addPrefixToColumnLabel($customObjectColumns, $customObject->getNamePlural());
+                $this->addPrefixToColumnLabel($customObjectContactColumns, 'Contact');
                 $parentCustomObjectColumns = $this->getCustomObjectColumns($customObject->getMasterObject(), static::PARENT_CUSTOM_ITEM_TABLE_ALIAS.'.');
-                $this->addPrefixToColumnLabel($parentCustomObjectColumns, $customObject->getMasterObject());
-                $columns = array_merge($columns, $parentCustomObjectColumns);
+                $this->addPrefixToColumnLabel($parentCustomObjectColumns, $customObject->getMasterObject()->getNamePlural());
             }
+
+            $columns = array_merge(
+                $customObjectColumns,
+                $customObjectContactColumns,
+                $companyColumns,
+                $parentCustomObjectColumns
+            );
 
             $event->addTable(
                 $this->getContext($customObject),
