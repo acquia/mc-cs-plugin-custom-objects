@@ -38,8 +38,9 @@ class CustomFieldValueText extends AbstractCustomFieldValue
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
-        $builder->setTable('custom_field_value_text');
-        $builder->addNullableField('value', Type::TEXT);
+        $builder->setTable('custom_field_value_text')
+            ->addNullableField('value', Type::TEXT)
+            ->addFulltextIndex(['value'], 'value_fulltext');
 
         parent::addReferenceColumns($builder);
     }
