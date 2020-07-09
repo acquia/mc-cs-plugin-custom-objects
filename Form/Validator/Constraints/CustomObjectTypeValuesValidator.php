@@ -16,12 +16,6 @@ class CustomObjectTypeValuesValidator extends ConstraintValidator
     public function validate($customObject, Constraint $constraint)
     {
         if (CustomObject::TYPE_RELATIONSHIP === $customObject->getType()) {
-            if (null === $customObject->getRelationship()) {
-                $this->context->buildViolation($constraint->missingRelationshipTypeMessage)
-                    ->atPath('relationship')
-                    ->addViolation();
-            }
-
             if (null === $customObject->getMasterObject()) {
                 $this->context->buildViolation($constraint->missingMasterObject)
                     ->atPath('masterObject')

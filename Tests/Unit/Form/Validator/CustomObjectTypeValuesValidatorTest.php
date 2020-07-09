@@ -59,20 +59,15 @@ class CustomObjectTypeValuesValidatorTest extends \PHPUnit\Framework\TestCase
         $this->customObject->expects($this->once())
             ->method('getType')
             ->willReturn(999999);
-        $this->customObject->expects($this->never())
-            ->method('getRelationship');
 
         $this->validator->validate($this->customObject, $this->constraint);
     }
 
-    public function testValidateIgnoreRelationshipAndMasterObject()
+    public function testValidateIgnoreMasterObject()
     {
         $this->customObject->expects($this->once())
             ->method('getType')
             ->willReturn(CustomObject::TYPE_RELATIONSHIP);
-        $this->customObject->expects($this->once())
-            ->method('getRelationship')
-            ->willReturn(1);
         $this->customObject->expects($this->once())
             ->method('getMasterObject')
             ->willReturn(new CustomObject());
@@ -83,42 +78,12 @@ class CustomObjectTypeValuesValidatorTest extends \PHPUnit\Framework\TestCase
         $this->validator->validate($this->customObject, $this->constraint);
     }
 
-    public function testValidateNoRelationship()
-    {
-        $this->customObject->expects($this->once())
-            ->method('getType')
-            ->willReturn(CustomObject::TYPE_RELATIONSHIP);
-        $this->customObject->expects($this->once())
-            ->method('getRelationship')
-            ->willReturn(null);
-        $this->customObject->expects($this->once())
-            ->method('getMasterObject')
-            ->willReturn(new CustomObject());
-
-        $violationBuilder = $this->createMock(ConstraintViolationBuilderInterface::class);
-        $violationBuilder->expects($this->once())
-            ->method('atPath')
-            ->with('relationship')
-            ->willReturn($violationBuilder);
-        $violationBuilder->expects($this->once())
-            ->method('addViolation');
-
-        $this->context->expects($this->once())
-            ->method('buildViolation')
-            ->with($this->constraint->missingRelationshipTypeMessage)
-            ->willReturn($violationBuilder);
-
-        $this->validator->validate($this->customObject, $this->constraint);
-    }
-
     public function testValidateNoCustomObject()
     {
         $this->customObject->expects($this->once())
             ->method('getType')
             ->willReturn(CustomObject::TYPE_RELATIONSHIP);
-        $this->customObject->expects($this->once())
-            ->method('getRelationship')
-            ->willReturn(1);
+
         $this->customObject->expects($this->once())
             ->method('getMasterObject')
             ->willReturn(null);
@@ -132,38 +97,6 @@ class CustomObjectTypeValuesValidatorTest extends \PHPUnit\Framework\TestCase
             ->method('addViolation');
 
         $this->context->expects($this->once())
-            ->method('buildViolation')
-            ->with($this->constraint->missingMasterObject)
-            ->willReturn($violationBuilder);
-
-        $this->validator->validate($this->customObject, $this->constraint);
-    }
-
-    public function testValidateMissingBoth()
-    {
-        $this->customObject->expects($this->once())
-            ->method('getType')
-            ->willReturn(CustomObject::TYPE_RELATIONSHIP);
-        $this->customObject->expects($this->once())
-            ->method('getRelationship')
-            ->willReturn(null);
-        $this->customObject->expects($this->once())
-            ->method('getMasterObject')
-            ->willReturn(null);
-
-        $violationBuilder = $this->createMock(ConstraintViolationBuilderInterface::class);
-        $violationBuilder
-            ->method('atPath')
-            ->withConsecutive(['relationship'], ['masterObject'])
-            ->willReturnOnConsecutiveCalls($violationBuilder, $violationBuilder);
-        $violationBuilder->expects(new InvokedCountMatcher(2))
-            ->method('addViolation');
-
-        $this->context->expects($this->at(0))
-            ->method('buildViolation')
-            ->with($this->constraint->missingRelationshipTypeMessage)
-            ->willReturn($violationBuilder);
-        $this->context->expects($this->at(1))
             ->method('buildViolation')
             ->with($this->constraint->missingMasterObject)
             ->willReturn($violationBuilder);

@@ -68,8 +68,6 @@ class CustomObjectTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($fields, $object->getCustomFields());
         $object->setType(1);
         $this->assertSame(1, $object->getType());
-        $object->setRelationship(2);
-        $this->assertSame(2, $object->getRelationship(2));
 
         $co = $this->createMock(CustomObject::class);
         $object->setMasterObject($co);
