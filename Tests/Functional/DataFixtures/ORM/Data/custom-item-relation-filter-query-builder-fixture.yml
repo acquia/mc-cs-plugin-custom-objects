@@ -193,7 +193,7 @@ Mautic\LeadBundle\Entity\LeadList:
   # 1st level
   price-eq-1000:
     is_published: true
-    name: 'Price = 500'
+    name: 'Price = 1000'
     alias: 'price-eq-1000'
     filters:
       0:
