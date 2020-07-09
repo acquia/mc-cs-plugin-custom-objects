@@ -24,6 +24,8 @@ spec:
       limits:
         memory: "6000Mi"
         cpu: "4"
+  - name: redis
+    image: redis:latest
 """
     }
   }
@@ -161,8 +163,9 @@ spec:
           changeRequest()
         }
         anyOf {
-          branch 'beta'
-          branch 'staging';
+          branch 'beta';
+          /* Disabling automatic releasing to production until custom objects goes GA */
+          /*branch 'staging';*/
         }
       }
       steps {
@@ -208,9 +211,11 @@ spec:
             'fedys':'miroslav.fedeles',
             'Gregy':'petr.gregor',
             'hluchas':'lukas.drahy',
+            'lijupm':'liju.pm',
             'lukassykora':'lukas.sykora',
-            'mtshaw3':'mike.shaw',
-            'pavel-hladik':'pavel.hladik'
+            'pavel-hladik':'pavel.hladik',
+            'rohitp19':'rohit.pavaskar',
+            'shreyal009':'shreyal.mandot'
           ]
           if (githubToSlackMap.("${env.CHANGE_AUTHOR}")) {
             slackSend (channel: "@"+"${githubToSlackMap.("${env.CHANGE_AUTHOR}")}", color: '#FF0000', message: "${REPO_NAME} failed build on ${env.BRANCH_NAME} (${env.CHANGE_TITLE})\nchange: ${env.CHANGE_URL}\nbuild: ${env.BUILD_URL}console")
