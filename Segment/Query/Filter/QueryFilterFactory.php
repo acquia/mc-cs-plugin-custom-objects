@@ -64,11 +64,11 @@ class QueryFilterFactory
         $type = $segmentFilter->getQueryType();
 
         if (CustomFieldFilterQueryBuilder::getServiceId() === $type) {
-            $filterQueryBuilder = $this->queryFilterHelper->createValueQueryBuilder(
+            // @todo Return type was changed
+            $filterQueryBuilder = $this->queryFilterHelper->createValueQuery(
                 $this->connection,
                 $queryAlias,
-                (int) $segmentFilter->getField(),
-                $segmentFilter->getType()
+                $segmentFilter
             );
             $this->queryFilterHelper->addCustomFieldValueExpressionFromSegmentFilter($filterQueryBuilder, $queryAlias, $segmentFilter);
         } elseif (CustomItemNameFilterQueryBuilder::getServiceId() === $type) {
