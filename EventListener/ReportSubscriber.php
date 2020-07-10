@@ -158,10 +158,16 @@ class ReportSubscriber implements EventSubscriberInterface
     private function addPrefixToColumnLabel(array &$columns, string $prefix): void
     {
         foreach ($columns as $alias => $column) {
+            $columnLabel = $this->translator->trans($columns[$alias]['label']);
+            if (0 === strpos($columnLabel, $prefix)) {
+                // Don't add the prefix twice
+                continue;
+            }
+
             $columns[$alias]['label'] = sprintf(
                 '%s %s',
                 str_replace(self::CHILD_CUSTOM_OBJECT_NAME_PREFIX, '', $prefix),
-                $this->translator->trans($columns[$alias]['label'])
+                $columnLabel
             );
         }
     }
