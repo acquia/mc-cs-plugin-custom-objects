@@ -160,6 +160,7 @@ class ReportSubscriber implements EventSubscriberInterface
         foreach ($columns as $alias => $column) {
             $columnLabel = $this->translator->trans($columns[$alias]['label']);
             if (0 === strpos($columnLabel, $prefix)) {
+                $columns[$alias]['label'] = $columnLabel;
                 // Don't add the prefix twice
                 continue;
             }
