@@ -1048,6 +1048,7 @@ return [
             'custom_object.query.filter.helper'            => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper::class,
                 'arguments' => [
+                    'doctrine.orm.entity_manager',
                     'custom_field.type.provider',
                     'mautic.helper.core_parameters',
                 ],
