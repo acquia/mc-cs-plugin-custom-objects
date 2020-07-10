@@ -214,6 +214,9 @@ class ReportSubscriberTest extends TestCase
         $this->reportBuilderEvent->expects($this->exactly(4))
             ->method('addTable');
 
+        $this->translatorInterface->method('trans')
+            ->willReturn('Some string' . mt_rand(1, 100));
+
         $this->reportSubscriber->onReportBuilder($this->reportBuilderEvent);
     }
 
@@ -238,6 +241,9 @@ class ReportSubscriberTest extends TestCase
 
         $this->reportBuilderEvent->expects($this->never())
             ->method('addTable');
+
+        $this->translatorInterface->method('trans')
+            ->willReturn('Some string' . mt_rand(1, 100));
 
         $this->reportSubscriber->onReportBuilder($this->reportBuilderEvent);
     }
