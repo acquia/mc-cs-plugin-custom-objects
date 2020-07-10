@@ -47,6 +47,7 @@ class QueryFilterHelper
 
     /**
      * @throws NotFoundException
+     * @throws DBALException
      */
     public function createValueQueryBuilder(
         Connection $connection,
@@ -56,8 +57,7 @@ class QueryFilterHelper
     ): QueryBuilder {
         $queryBuilder      = new QueryBuilder($connection);
         $fieldType         = $fieldType ?: $this->getCustomFieldType($queryBuilder, $fieldId);
-        $queryBuilder      = $this->getBasicItemQueryBuilder($queryBuilder, $builderAlias);
-        $this->addCustomFieldValueJoin($queryBuilder, $builderAlias, $fieldType, $fieldId);
+        $this->getCustomFieldValueJoinQuery($queryBuilder, $builderAlias, $fieldType, $fieldId);
 
         return $queryBuilder;
     }
@@ -66,6 +66,7 @@ class QueryFilterHelper
     {
         $queryBuilder = new QueryBuilder($connection);
 
+        // @todo keep this functionality
         return $this->getBasicItemQueryBuilder($queryBuilder, $queryBuilderAlias);
     }
 
@@ -287,68 +288,73 @@ class QueryFilterHelper
     }
 
     /**
-     * @throws NotFoundException|DBALException
+     * @return string Query as string representation because of https://github.com/doctrine/orm/issues/5657#issuecomment-181228313
+     * @throws NotFoundException
+     * @throws DBALException
      */
-    private function addCustomFieldValueJoin(
-        QueryBuilder $customFieldQueryBuilder,
+    private function getCustomFieldValueJoinQuery(
+        QueryBuilder $qb,
         string $alias,
         string $fieldType,
         int $fieldId
-    ): QueryBuilder {
+    ): string {
+
+        if ($this->itemRelationLevelLimit > 2) {
+            // @todo
+            throw new \RuntimeException("Relationship level higher than 2 is not implemented yet");
+        }
+
         $dataTable = $this->fieldTypeProvider->getType($fieldType)->getTableName();
 
         $subSelects = [];
 
-        // 1st level
-        $subSelects[] = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
-            ->select('custom_item_id')
-            ->from(MAUTIC_TABLE_PREFIX.'custom_item_xref_contact')
-            ->where("custom_item_id = {$alias}_item.id")
-            ->getSQL();
-
-        if ($this->itemRelationLevelLimit > 1) {
-            // 2nd level
-            $subSelects[] = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
-                ->select('custom_item_id_lower')
-                ->from(MAUTIC_TABLE_PREFIX.'custom_item_xref_custom_item')
-                ->where("custom_item_id_higher = {$alias}_item.id")
-                ->getSQL();
-
-            $subSelects[] = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
-                ->select('custom_item_id_higher')
-                ->from(MAUTIC_TABLE_PREFIX.'custom_item_xref_custom_item')
-                ->where("custom_item_id_lower = {$alias}_item.id")
-                ->getSQL();
-        }
-
-        if ($this->itemRelationLevelLimit > 2) {
-            // @todo
-            throw new \RuntimeException("Level higher than 2 is not implemented");
-        }
-
-        $subSelectString = implode(' UNION ALL ', $subSelects);
-
-        $customItemPart = $customFieldQueryBuilder->expr()->in(
-            $alias.'_value.custom_item_id ',
-            [$subSelectString]
-        );
-
-        $customItemPart = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
-            ->expr()->andX(
-                $customItemPart,
-                $customFieldQueryBuilder->expr()->eq($alias.'_value.custom_field_id', ":{$alias}_custom_field_id")
+        $subSelects[] = $qb->createQueryBuilder($qb->getConnection())
+            ->select('contact_id')
+            ->from(MAUTIC_TABLE_PREFIX.$dataTable, "{$alias}_value")
+            ->innerJoin(
+                "{$alias}_value",
+                MAUTIC_TABLE_PREFIX.'custom_item_xref_contact',
+                "{$alias}_contact",
+                "{$alias}_value.custom_item_id = {$alias}_contact.custom_item_id"
+            )
+            ->andWhere(
+                $qb->expr()->eq('contact_id', 'L.id'),// @todo This should be dynamically added
+                $qb->expr()->eq("{$alias}_value.custom_field_id", ":{$alias}_custom_field_id"),
+                "{$alias}_value.value < 500" // @todo value parameter and operator
             );
 
-        $customFieldQueryBuilder->innerJoin(
-            $alias.'_item',
-            $dataTable,
-            $alias.'_value',
-            $customItemPart
-        );
+//        if ($this->itemRelationLevelLimit > 1) {
+//            // 2nd level
+//            $subSelects[] = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
+//                ->select('custom_item_id_lower')
+//                ->from(MAUTIC_TABLE_PREFIX.'custom_item_xref_custom_item')
+//                ->where("custom_item_id_higher = {$alias}_item.id")
+//                ->getSQL();
+//
+//            $subSelects[] = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
+//                ->select('custom_item_id_higher')
+//                ->from(MAUTIC_TABLE_PREFIX.'custom_item_xref_custom_item')
+//                ->where("custom_item_id_lower = {$alias}_item.id")
+//                ->getSQL();
+//        }
+//
+//
+//        $customFieldQueryBuilder->innerJoin(
+//            $alias.'_item',
+//            $dataTable,
+//            $alias.'_value',
+//            $customItemPart
+//        );
 
-        $customFieldQueryBuilder->setParameter("{$alias}_custom_field_id", $fieldId);
+        /** @var \Doctrine\DBAL\Query\QueryBuilder $subSelect */
+        foreach ($subSelects as $key => $subSelect) {
+            // Apply parameter values
+            $subSelect->setParameter("{$alias}_custom_field_id", $fieldId);
+            // Use string representation - https://github.com/doctrine/orm/issues/5657#issuecomment-181228313
+            $subSelects[$key] = $subSelect->getSQL();
+        }
 
-        return $customFieldQueryBuilder;
+        return implode(' UNION ALL ', $subSelects);
     }
 
     /**
@@ -367,6 +373,7 @@ class QueryFilterHelper
 
     /**
      * Get basic query builder with contact reference and item join.
+     * @todo unused, remove me
      */
     private function getBasicItemQueryBuilder(QueryBuilder $queryBuilder, string $alias): QueryBuilder
     {
