@@ -110,7 +110,6 @@ $view['slots']->set('headerTitle', $header);
     <div class="col-md-3 bg-white height-auto">
         <div class="pr-lg pl-lg pt-md pb-md">
             <?php echo $view['form']->row($form['type']); ?>
-            <?php echo $view['form']->row($form['relationship']); ?>
             <?php echo $view['form']->row($form['masterObject']); ?>
             <?php echo $view['form']->row($form['category']); ?>
             <?php echo $view['form']->row($form['isPublished']); ?>
