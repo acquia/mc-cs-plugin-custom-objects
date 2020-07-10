@@ -15,10 +15,11 @@ namespace MauticPlugin\CustomObjectsBundle\Helper;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
-use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
@@ -30,6 +31,11 @@ class QueryFilterHelper
     use DbalQueryTrait;
 
     /**
+     * @var EntityManager
+     */
+    private $entityManager;
+
+    /**
      * @var CustomFieldTypeProvider
      */
     private $fieldTypeProvider;
@@ -39,32 +45,99 @@ class QueryFilterHelper
      */
     private $itemRelationLevelLimit;
 
-    public function __construct(CustomFieldTypeProvider $fieldTypeProvider, CoreParametersHelper $coreParametersHelper)
+    public function __construct(EntityManager $entityManager, CustomFieldTypeProvider $fieldTypeProvider, CoreParametersHelper $coreParametersHelper)
     {
+        $this->entityManager = $entityManager;
         $this->fieldTypeProvider = $fieldTypeProvider;
         $this->itemRelationLevelLimit = (int) $coreParametersHelper->get(ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT);
     }
 
     /**
+     * @return array String representation of query because of https://github.com/doctrine/orm/issues/5657#issuecomment-181228313
      * @throws NotFoundException
      * @throws DBALException
      */
-    public function createValueQueryBuilder(
+    public function createValueQuery(
         Connection $connection,
-        string $builderAlias,
-        int $fieldId,
-        ?string $fieldType = null
-    ): QueryBuilder {
-        $queryBuilder      = new QueryBuilder($connection);
-        $fieldType         = $fieldType ?: $this->getCustomFieldType($queryBuilder, $fieldId);
-        $this->getCustomFieldValueJoinQuery($queryBuilder, $builderAlias, $fieldType, $fieldId);
+        string $alias,
+        ContactSegmentFilter $segmentFilter
+    ): array {
+        if ($this->itemRelationLevelLimit > 2) {
+            // @todo
+            throw new \RuntimeException("Relationship level higher than 2 is not implemented yet");
+        }
 
-        return $queryBuilder;
+        $segmentFilterFieldId   = (int) $segmentFilter->getField();
+        $segmentFilterFieldType = $segmentFilter->getType();
+        $segmentFilterFieldType = $segmentFilterFieldType ?: $this->getCustomFieldType($segmentFilterFieldId);
+        $dataTable              = $this->fieldTypeProvider->getType($segmentFilterFieldType)->getTableName();
+        $qb                     = new SegmentQueryBuilder($connection);
+
+        $subSelects = [];
+
+        $qb
+            ->select('contact_id')
+            ->from(MAUTIC_TABLE_PREFIX.$dataTable, "{$alias}_value")
+            ->innerJoin(
+                "{$alias}_value",
+                MAUTIC_TABLE_PREFIX.'custom_item_xref_contact',
+                "{$alias}_contact",
+                "{$alias}_value.custom_item_id = {$alias}_contact.custom_item_id"
+            )
+            ->andWhere(
+                $qb->expr()->eq('contact_id', 'L.id'),
+                $qb->expr()->eq("{$alias}_value.custom_field_id", ":{$alias}_custom_field_id"),
+            )
+            ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId)
+            ->setParameter(":{$alias}_value_value", $segmentFilter->getParameterValue())
+        ;
+
+        $this->addCustomFieldValueExpressionFromSegmentFilter($qb, $alias, $segmentFilter);
+
+        $subSelects[] = $qb;
+
+//        if ($this->itemRelationLevelLimit > 1) {
+//            // 2nd level
+//            $subSelects[] = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
+//                ->select('custom_item_id_lower')
+//                ->from(MAUTIC_TABLE_PREFIX.'custom_item_xref_custom_item')
+//                ->where("custom_item_id_higher = {$alias}_item.id")
+//                ->getSQL();
+//
+//            $subSelects[] = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
+//                ->select('custom_item_id_higher')
+//                ->from(MAUTIC_TABLE_PREFIX.'custom_item_xref_custom_item')
+//                ->where("custom_item_id_lower = {$alias}_item.id")
+//                ->getSQL();
+//        }
+//
+//
+//        $customFieldQueryBuilder->innerJoin(
+//            $alias.'_item',
+//            $dataTable,
+//            $alias.'_value',
+//            $customItemPart
+//        );
+
+        $parameters = [];
+
+        /** @var SegmentQueryBuilder $subSelect */
+        foreach ($subSelects as $key => $subSelect) {
+            // Apply parameter values
+            $parameters = array_merge($parameters, $subSelect->getParameters());
+            // Use string representation - https://github.com/doctrine/orm/issues/5657#issuecomment-181228313
+            $subSelects[$key] = $subSelect->getSQL();
+        }
+
+        return [
+            implode(' UNION ALL ', $subSelects),
+            $parameters,
+        ];
     }
 
-    public function createItemNameQueryBuilder(Connection $connection, string $queryBuilderAlias): QueryBuilder
+    public function createItemNameQueryBuilder(Connection $connection, string $queryBuilderAlias): SegmentQueryBuilder
     {
-        $queryBuilder = new QueryBuilder($connection);
+        $queryBuilder = new SegmentQueryBuilder($connection);
 
         // @todo keep this functionality
         return $this->getBasicItemQueryBuilder($queryBuilder, $queryBuilderAlias);
@@ -76,11 +149,11 @@ class QueryFilterHelper
      *
      * @throws InvalidArgumentException
      */
-    public function addContactIdRestriction(QueryBuilder $queryBuilder, string $queryAlias, int $contactId): void
+    public function addContactIdRestriction(SegmentQueryBuilder $queryBuilder, string $queryAlias, int $contactId): void
     {
         if (!in_array($queryAlias.'_contact', $this->getQueryJoinAliases($queryBuilder), true)) {
             if (!in_array($queryAlias.'_item', $this->getQueryJoinAliases($queryBuilder), true)) {
-                throw new InvalidArgumentException('QueryBuilder contains no usable tables for contact restriction.');
+                throw new InvalidArgumentException('SegmentQueryBuilder contains no usable tables for contact restriction.');
             }
             $tableAlias = $queryAlias.'_item.contact_id';
         } else {
@@ -93,7 +166,7 @@ class QueryFilterHelper
     }
 
     public function addCustomFieldValueExpressionFromSegmentFilter(
-        QueryBuilder $queryBuilder,
+        SegmentQueryBuilder $queryBuilder,
         string $tableAlias,
         ContactSegmentFilter $filter
     ): void {
@@ -109,7 +182,7 @@ class QueryFilterHelper
     }
 
     public function addCustomObjectNameExpression(
-        QueryBuilder $queryBuilder,
+        SegmentQueryBuilder $queryBuilder,
         string $tableAlias,
         string $operator,
         ?string $value
@@ -123,7 +196,7 @@ class QueryFilterHelper
      * @param array|string|CompositeExpression|null $value
      */
     private function addOperatorExpression(
-        QueryBuilder $queryBuilder,
+        SegmentQueryBuilder $queryBuilder,
         string $tableAlias,
         $expression,
         string $operator,
@@ -161,10 +234,10 @@ class QueryFilterHelper
         }
     }
 
-    private function getCustomFieldType(QueryBuilder $queryBuilder, int $customFieldId): string
+    private function getCustomFieldType(int $customFieldId): string
     {
-        $qb = $queryBuilder->getConnection()->createQueryBuilder();
-        $qb = $qb->select('f.type')
+        $queryBuilder = $this->entityManager->createQueryBuilder()
+            ->select('f.type')
             ->from(MAUTIC_TABLE_PREFIX.'custom_field', 'f')
             ->where($qb->expr()->eq('f.id', $customFieldId));
 
@@ -178,7 +251,7 @@ class QueryFilterHelper
      *
      * @return CompositeExpression|string
      */
-    private function getCustomValueValueExpression(QueryBuilder $customQuery, string $tableAlias, string $operator)
+    private function getCustomValueValueExpression(SegmentQueryBuilder $customQuery, string $tableAlias, string $operator)
     {
         switch ($operator) {
             case 'empty':
@@ -239,7 +312,7 @@ class QueryFilterHelper
      *
      * @return CompositeExpression|string
      */
-    private function getCustomObjectNameExpression(QueryBuilder $customQuery, string $tableAlias, string $operator)
+    private function getCustomObjectNameExpression(SegmentQueryBuilder $customQuery, string $tableAlias, string $operator)
     {
         switch ($operator) {
             case 'empty':
@@ -288,81 +361,11 @@ class QueryFilterHelper
     }
 
     /**
-     * @return string Query as string representation because of https://github.com/doctrine/orm/issues/5657#issuecomment-181228313
-     * @throws NotFoundException
-     * @throws DBALException
-     */
-    private function getCustomFieldValueJoinQuery(
-        QueryBuilder $qb,
-        string $alias,
-        string $fieldType,
-        int $fieldId
-    ): string {
-
-        if ($this->itemRelationLevelLimit > 2) {
-            // @todo
-            throw new \RuntimeException("Relationship level higher than 2 is not implemented yet");
-        }
-
-        $dataTable = $this->fieldTypeProvider->getType($fieldType)->getTableName();
-
-        $subSelects = [];
-
-        $subSelects[] = $qb->createQueryBuilder($qb->getConnection())
-            ->select('contact_id')
-            ->from(MAUTIC_TABLE_PREFIX.$dataTable, "{$alias}_value")
-            ->innerJoin(
-                "{$alias}_value",
-                MAUTIC_TABLE_PREFIX.'custom_item_xref_contact',
-                "{$alias}_contact",
-                "{$alias}_value.custom_item_id = {$alias}_contact.custom_item_id"
-            )
-            ->andWhere(
-                $qb->expr()->eq('contact_id', 'L.id'),// @todo This should be dynamically added
-                $qb->expr()->eq("{$alias}_value.custom_field_id", ":{$alias}_custom_field_id"),
-                "{$alias}_value.value < 500" // @todo value parameter and operator
-            );
-
-//        if ($this->itemRelationLevelLimit > 1) {
-//            // 2nd level
-//            $subSelects[] = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
-//                ->select('custom_item_id_lower')
-//                ->from(MAUTIC_TABLE_PREFIX.'custom_item_xref_custom_item')
-//                ->where("custom_item_id_higher = {$alias}_item.id")
-//                ->getSQL();
-//
-//            $subSelects[] = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
-//                ->select('custom_item_id_higher')
-//                ->from(MAUTIC_TABLE_PREFIX.'custom_item_xref_custom_item')
-//                ->where("custom_item_id_lower = {$alias}_item.id")
-//                ->getSQL();
-//        }
-//
-//
-//        $customFieldQueryBuilder->innerJoin(
-//            $alias.'_item',
-//            $dataTable,
-//            $alias.'_value',
-//            $customItemPart
-//        );
-
-        /** @var \Doctrine\DBAL\Query\QueryBuilder $subSelect */
-        foreach ($subSelects as $key => $subSelect) {
-            // Apply parameter values
-            $subSelect->setParameter("{$alias}_custom_field_id", $fieldId);
-            // Use string representation - https://github.com/doctrine/orm/issues/5657#issuecomment-181228313
-            $subSelects[$key] = $subSelect->getSQL();
-        }
-
-        return implode(' UNION ALL ', $subSelects);
-    }
-
-    /**
      * Get all tables currently registered in the queryBuilder.
      *
      * @return mixed[]
      */
-    private function getQueryJoinAliases(QueryBuilder $queryBuilder): array
+    private function getQueryJoinAliases(SegmentQueryBuilder $queryBuilder): array
     {
         $joins    = array_column($queryBuilder->getQueryParts()['join'], 0);
         $tables   = array_column($joins, 'joinAlias');
@@ -375,7 +378,7 @@ class QueryFilterHelper
      * Get basic query builder with contact reference and item join.
      * @todo unused, remove me
      */
-    private function getBasicItemQueryBuilder(QueryBuilder $queryBuilder, string $alias): QueryBuilder
+    private function getBasicItemQueryBuilder(SegmentQueryBuilder $queryBuilder, string $alias): SegmentQueryBuilder
     {
         $customFieldQueryBuilder = $queryBuilder->createQueryBuilder();
 

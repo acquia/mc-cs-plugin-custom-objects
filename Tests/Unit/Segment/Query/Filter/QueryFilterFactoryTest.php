@@ -113,7 +113,7 @@ class QueryFilterFactoryTest extends \PHPUnit\Framework\TestCase
             ->willReturn($fieldType);
 
         $this->queryFilterHelper->expects($this->once())
-            ->method('createValueQueryBuilder')
+            ->method('createValueQuery')
             ->with(
                 $this->connection,
                 $queryAlias,

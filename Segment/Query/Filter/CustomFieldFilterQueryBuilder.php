@@ -17,7 +17,7 @@ use Doctrine\DBAL\DBALException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
-use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
@@ -62,39 +62,32 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
      * @throws InvalidArgumentException
      * @throws NotFoundException
      */
-    public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
+    public function applyQuery(SegmentQueryBuilder $queryBuilder, ContactSegmentFilter $filter): SegmentQueryBuilder
     {
         $filterOperator = $filter->getOperator();
-        $filterFieldId  = $filter->getField();
 
         $tableAlias = 'cfwq_'.(int) $filter->getField();
 
-        $filterQueryBuilder = $this->filterHelper->createValueQueryBuilder(
+        [$queryString, $parameters] = $this->filterHelper->createValueQuery(
             $queryBuilder->getConnection(),
             $tableAlias,
-            (int) $filter->getField(),
-            $filter->getType()
+            $filter
         );
-        $this->filterHelper->addCustomFieldValueExpressionFromSegmentFilter($filterQueryBuilder, $tableAlias, $filter);
-
-        $filterQueryBuilder->select($tableAlias.'_contact.contact_id as lead_id');
-        $filterQueryBuilder->andWhere('l.id = '.$tableAlias.'_contact.contact_id');
-
-        $queryBuilder->setParameter('customFieldId_'.$tableAlias, (int) $filterFieldId);
 
         switch ($filterOperator) {
             case 'empty':
             case 'neq':
             case 'notLike':
             case '!multiselect':
-                $queryBuilder->addLogic($queryBuilder->expr()->notExists($filterQueryBuilder->getSQL()), $filter->getGlue());
+                $queryBuilder->addLogic($queryBuilder->expr()->notExists($queryString), $filter->getGlue());
 
                 break;
             default:
-                $queryBuilder->addLogic($queryBuilder->expr()->exists($filterQueryBuilder->getSQL()), $filter->getGlue());
+                $queryBuilder->addLogic($queryBuilder->expr()->exists($queryString), $filter->getGlue());
         }
 
-        $queryBuilder->setParameters($filterQueryBuilder->getParameters(), $filterQueryBuilder->getParameterTypes());
+
+        $queryBuilder->setParameters($parameters);
 
         return $queryBuilder;
     }
