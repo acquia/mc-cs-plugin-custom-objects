@@ -236,12 +236,13 @@ class QueryFilterHelper
 
     private function getCustomFieldType(int $customFieldId): string
     {
-        $queryBuilder = $this->entityManager->createQueryBuilder()
+        $qb = $this->entityManager->createQueryBuilder();
+        $qb = $qb
             ->select('f.type')
             ->from(MAUTIC_TABLE_PREFIX.'custom_field', 'f')
             ->where($qb->expr()->eq('f.id', $customFieldId));
 
-        $customFieldType = $this->executeSelect($queryBuilder)->fetchColumn();
+        $customFieldType = $this->executeSelect($qb)->fetchColumn();
 
         return is_string($customFieldType) ? $customFieldType : '';
     }
