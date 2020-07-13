@@ -182,15 +182,16 @@ class ContactTabSubscriberTest extends \PHPUnit\Framework\TestCase
             ->with(
                 'CustomObjectsBundle:SubscribedEvents/Tab:content.html.php',
                 [
-                    'page'              => 1,
-                    'search'            => '',
-                    'customObjectId'    => 555,
-                    'currentEntityId'   => 45,
-                    'currentEntityType' => 'contact',
-                    'tabId'             => 'custom-object-555',
-                    'placeholder'       => 'translated placeholder',
-                    'lookupRoute'       => 'lookup/route',
-                    'newRoute'          => 'new/route',
+                    'page'                 => 1,
+                    'search'               => '',
+                    'customObjectId'       => 555,
+                    'currentEntityId'      => 45,
+                    'currentEntityType'    => 'contact',
+                    'tabId'                => 'custom-object-555',
+                    'placeholder'          => 'translated placeholder',
+                    'lookupRoute'          => 'lookup/route',
+                    'newRoute'             => 'new/route',
+                    'relationshipObjectId' => null,
                 ]
             );
 

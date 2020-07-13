@@ -15,12 +15,14 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use Mautic\LeadBundle\Report\FieldsBuilder;
 use Mautic\ReportBundle\Event\ReportBuilderEvent;
 use Mautic\ReportBundle\Event\ReportGeneratorEvent;
+use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\ReportEvents;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateTimeType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\MultiselectType;
@@ -90,6 +92,11 @@ class ReportSubscriberTest extends TestCase
      */
     private $connection;
 
+    /**
+     * @var ReportHelper
+     */
+    private $reportHelper;
+
     protected function setUp(): void
     {
         defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
@@ -97,9 +104,10 @@ class ReportSubscriberTest extends TestCase
         $this->customObjectRepository          = $this->createMock(CustomObjectRepository::class);
         $this->fieldsBuilder                   = $this->createMock(FieldsBuilder::class);
         $this->companyReportData               = $this->createMock(CompanyReportData::class);
-        $this->reportSubscriber                = new ReportSubscriber($this->customObjectRepository, $this->fieldsBuilder, $this->companyReportData);
-        $this->reportBuilderEvent              = $this->createMock(ReportBuilderEvent::class);
+        $this->reportHelper                    = new ReportHelper();
         $this->translatorInterface             = $this->createMock(TranslatorInterface::class);
+        $this->reportSubscriber                = new ReportSubscriber($this->customObjectRepository, $this->fieldsBuilder, $this->companyReportData, $this->reportHelper, $this->translatorInterface);
+        $this->reportBuilderEvent              = $this->createMock(ReportBuilderEvent::class);
         $this->filterOperatorProviderInterface = $this->createMock(FilterOperatorProviderInterface::class);
         $this->csvHelper                       = $this->createMock(CsvHelper::class);
         $this->reportGeneratorEvent            = $this->createMock(ReportGeneratorEvent::class);
@@ -143,15 +151,36 @@ class ReportSubscriberTest extends TestCase
     private function getCustomObjectsCollection(): array
     {
         $customObject1 = new CustomObject();
-        $customObject1->setCustomFields($this->getCustomFieldsCollection());
+        $customObject1->setId(1);
+        $customObject1->setCustomFields($this->getCustomFieldsCollection(1));
         $customObject1->setNamePlural('Custom Objects #1');
+        $customObject1->setType(CustomObject::TYPE_MASTER);
+
         $customObject2 = new CustomObject();
+        $customObject2->setId(2);
         $customObject2->setCustomFields($this->getCustomFieldsCollection(2));
         $customObject2->setNamePlural('Custom Objects #2');
+        $customObject2->setType(CustomObject::TYPE_MASTER);
+
+        $customObject3 = new CustomObject();
+        $customObject3->setId(3);
+        $customObject3->setCustomFields($this->getCustomFieldsCollection(3));
+        $customObject3->setNamePlural('Opportunities');
+        $customObject3->setType(CustomObject::TYPE_MASTER);
+
+        $customObject4 = new CustomObject();
+        $customObject4->setId(4);
+        $customObject4->setCustomFields($this->getCustomFieldsCollection(4));
+        $customObject4->setNamePlural('Details');
+        $customObject4->setType(CustomObject::TYPE_RELATIONSHIP);
+
+        $customObject4->setMasterObject($customObject3);
 
         return [
             $customObject1,
             $customObject2,
+            $customObject3,
+            $customObject4,
         ];
     }
 
@@ -182,12 +211,11 @@ class ReportSubscriberTest extends TestCase
             ->method('getCompanyData')
             ->willReturn([]);
 
-        $this->reportBuilderEvent->expects($this->once())
-            ->method('getStandardColumns')
-            ->willReturn([]);
-
-        $this->reportBuilderEvent->expects($this->exactly(2))
+        $this->reportBuilderEvent->expects($this->exactly(4))
             ->method('addTable');
+
+        $this->translatorInterface->method('trans')
+            ->willReturn('Some string' . mt_rand(1, 100));
 
         $this->reportSubscriber->onReportBuilder($this->reportBuilderEvent);
     }
@@ -213,6 +241,9 @@ class ReportSubscriberTest extends TestCase
 
         $this->reportBuilderEvent->expects($this->never())
             ->method('addTable');
+
+        $this->translatorInterface->method('trans')
+            ->willReturn('Some string' . mt_rand(1, 100));
 
         $this->reportSubscriber->onReportBuilder($this->reportBuilderEvent);
     }
@@ -264,8 +295,14 @@ class ReportSubscriberTest extends TestCase
         $this->queryBuilder->expects($this->once())
             ->method('andWhere');
 
+        $expressionBuilder = $this->createMock(ExpressionBuilder::class);
         $this->queryBuilder->expects($this->once())
-            ->method('setParameter');
+            ->method('expr')
+            ->willReturn($expressionBuilder);
+
+        $expressionBuilder->expects($this->once())
+            ->method('eq')
+            ->willReturn($this->queryBuilder);
 
         $this->reportSubscriber->onReportGenerate($this->reportGeneratorEvent);
     }
@@ -326,6 +363,124 @@ class ReportSubscriberTest extends TestCase
             ->willReturn('custom.object.1');
 
         $this->expectException(\Exception::class);
+
+        $this->reportSubscriber->onReportGenerate($this->reportGeneratorEvent);
+    }
+
+    public function testThatOnReportGenerateMethodCorrectlyProcessesChildCustomObjects(): void
+    {
+        $customObjectsCollection = $this->getCustomObjectsCollection();
+
+        $this->customObjectRepository->expects($this->once())
+            ->method('findAll')
+            ->willReturn($customObjectsCollection);
+
+        $this->reportGeneratorEvent->expects($this->once())
+            ->method('checkContext')
+            ->willReturn(true);
+
+        $this->reportGeneratorEvent->expects($this->once())
+            ->method('getContext')
+            ->willReturn('custom.object.1');
+
+        $this->customObjectRepository->expects($this->once())
+            ->method('find')
+            ->willReturn($customObjectsCollection[3]);
+
+        $this->reportGeneratorEvent->expects($this->once())
+            ->method('getQueryBuilder')
+            ->willReturn($this->queryBuilder);
+
+        $this->queryBuilder->expects($this->exactly(2))
+            ->method('getConnection')
+            ->willReturn($this->connection);
+
+        $this->fieldsBuilder->expects($this->once())
+            ->method('getLeadFieldsColumns')
+            ->willReturn([]);
+
+        $this->companyReportData->expects($this->once())
+            ->method('eventHasCompanyColumns')
+            ->with($this->reportGeneratorEvent)
+            ->willReturn(true);
+
+        $this->reportGeneratorEvent->expects($this->exactly(10))
+            ->method('usesColumn')
+            ->willReturnOnConsecutiveCalls(true, true, true, true, true, false, true, true, true, true, true, true, true, true, true, true);
+
+        $this->queryBuilder->expects($this->exactly(12))
+            ->method('leftJoin');
+
+        $this->queryBuilder->expects($this->once())
+            ->method('andWhere');
+
+        $expressionBuilder = $this->createMock(ExpressionBuilder::class);
+        $this->queryBuilder->expects($this->once())
+            ->method('expr')
+            ->willReturn($expressionBuilder);
+
+        $expressionBuilder->expects($this->once())
+            ->method('eq')
+            ->willReturn($this->queryBuilder);
+
+        $this->reportSubscriber->onReportGenerate($this->reportGeneratorEvent);
+    }
+
+    public function testThatOnReportGenerateMethodDoesntJoinUnnecessaryColumnsWhenProcessesChildCustomObjects(): void
+    {
+        $customObjectsCollection = $this->getCustomObjectsCollection();
+
+        $this->customObjectRepository->expects($this->once())
+            ->method('findAll')
+            ->willReturn($customObjectsCollection);
+
+        $this->reportGeneratorEvent->expects($this->once())
+            ->method('checkContext')
+            ->willReturn(true);
+
+        $this->reportGeneratorEvent->expects($this->once())
+            ->method('getContext')
+            ->willReturn('custom.object.1');
+
+        $this->customObjectRepository->expects($this->once())
+            ->method('find')
+            ->willReturn($customObjectsCollection[3]);
+
+        $this->reportGeneratorEvent->expects($this->once())
+            ->method('getQueryBuilder')
+            ->willReturn($this->queryBuilder);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('getConnection')
+            ->willReturn($this->connection);
+
+        $this->fieldsBuilder->expects($this->once())
+            ->method('getLeadFieldsColumns')
+            ->willReturn([]);
+
+        $this->companyReportData->expects($this->once())
+            ->method('eventHasCompanyColumns')
+            ->with($this->reportGeneratorEvent)
+            ->willReturn(true);
+
+        $this->reportGeneratorEvent->expects($this->exactly(16))
+            ->method('usesColumn')
+            ->willReturnOnConsecutiveCalls(true, true, true, true, true, false, false, false, false, false, false, false, false, false, false, false);
+
+        $this->queryBuilder->expects($this->exactly(7))
+            ->method('leftJoin');
+
+        $this->queryBuilder->expects($this->once())
+            ->method('andWhere');
+
+        $expressionBuilder = $this->createMock(ExpressionBuilder::class);
+        $this->queryBuilder->expects($this->once())
+            ->method('expr')
+            ->willReturn($expressionBuilder);
+
+        $expressionBuilder->expects($this->once())
+            ->method('eq')
+            ->willReturn($this->queryBuilder);
 
         $this->reportSubscriber->onReportGenerate($this->reportGeneratorEvent);
     }

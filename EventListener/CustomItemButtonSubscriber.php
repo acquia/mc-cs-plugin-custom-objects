@@ -77,6 +77,14 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
                                 ButtonHelper::LOCATION_LIST_ACTIONS,
                                 $event->getRoute()
                             );
+
+                            if (null !== $customItem->getCustomObject()->getRelationshipObject()) {
+                                $event->addButton(
+                                    $this->defineEditLinkFormButton($customItem, $customObjectId, $filterEntityType, (int) $filterEntityId),
+                                    ButtonHelper::LOCATION_LIST_ACTIONS,
+                                    $event->getRoute()
+                                );
+                            }
                         }
                     } else {
                         $this->addEntityButtons($event, ButtonHelper::LOCATION_LIST_ACTIONS, $customObjectId);
@@ -152,6 +160,29 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
         return [
             'attr' => [
                 'href' => $this->routeProvider->buildEditRoute($customObjectId, $customItem->getId()),
+            ],
+            'btnText'   => 'mautic.core.form.edit',
+            'iconClass' => 'fa fa-pencil-square-o',
+            'priority'  => 500,
+        ];
+    }
+
+    private function defineEditLinkFormButton(CustomItem $customItem, int $customObjectId, string $entityType, int $entityId): array
+    {
+        $this->permissionProvider->canEdit($customItem);
+
+        return [
+            'attr' => [
+                'href' => $this->routeProvider->buildLinkFormRoute($customItem->getId(), $entityType, $entityId),
+                'data-target'               => '#MauticSharedModal',
+                'data-toggle'               => 'ajaxmodal',
+                'data-header'               => $this->translator->trans('mautic.core.form.edit'),
+                'data-modal-open-callback'  => 'customObjectsSetUpLinkFormModalFromEditLink',
+                'data-modal-close-callback' => 'customObjectsCleanUpFormModal',
+                'data-current-entity-id'    => $entityId,
+                'data-current-entity-type'  => $entityType,
+                'data-tab-id'               => sprintf('custom-object-%d', $customObjectId),
+                'data-custom-object-id'     => $customObjectId
             ],
             'btnText'   => 'mautic.core.form.edit',
             'iconClass' => 'fa fa-pencil-square-o',

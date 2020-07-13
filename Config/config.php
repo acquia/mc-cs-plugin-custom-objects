@@ -19,7 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 return [
     'name'        => 'Custom Objects',
     'description' => 'Adds custom objects and fields features to Mautic',
-    'version'     => '0.0.14',
+    'version'     => '0.0.15',
     'author'      => 'Mautic, Inc.',
 
     'routes' => [
@@ -113,6 +113,16 @@ return [
                 'path'       => '/custom/item/{itemId}/link/{entityType}/{entityId}.json',
                 'controller' => 'CustomObjectsBundle:CustomItem\Link:save',
                 'method'     => 'POST',
+            ],
+            CustomItemRouteProvider::ROUTE_LINK_FORM => [
+                'path'       => '/custom/item/{itemId}/link-form/{entityType}/{entityId}',
+                'controller' => 'CustomObjectsBundle:CustomItem\LinkForm:form',
+                'method'     => 'GET'
+            ],
+            CustomItemRouteProvider::ROUTE_LINK_FORM_SAVE => [
+                'path'       => '/custom/item/{itemId}/link-form/{entityType}/{entityId}',
+                'controller' => 'CustomObjectsBundle:CustomItem\LinkForm:save',
+                'method'     => 'POST'
             ],
             CustomItemRouteProvider::ROUTE_UNLINK => [
                 'path'       => '/custom/item/{itemId}/unlink/{entityType}/{entityId}.json',
@@ -354,6 +364,21 @@ return [
                     ],
                 ],
             ],
+            'custom_item.link_form_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\LinkFormController::class,
+                'arguments' => [
+                    'form.factory',
+                    'mautic.custom.model.item',
+                    'custom_item.permission.provider',
+                    'custom_item.route.provider',
+                    'mautic.core.service.flashbag',
+                ],
+                'methodCalls' => [
+                    'setContainer' => [
+                        '@service_container',
+                    ]
+                ]
+            ],
             'custom_item.unlink_controller' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\UnlinkController::class,
                 'arguments' => [
@@ -575,6 +600,13 @@ return [
                     \MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact::class,
                 ],
             ],
+            'custom_item.xref.custom_item.repository' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefCustomItemRepository::class,
+                'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
+                'arguments' => [
+                    \MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem::class,
+                ],
+            ],
             'custom_object.segment_decorator_multiselect' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Decorator\MultiselectDecorator::class,
                 'arguments' => [
@@ -642,6 +674,8 @@ return [
                     'custom_object.repository',
                     'mautic.lead.reportbundle.fields_builder',
                     'mautic.lead.model.company_report_data',
+                    'mautic.report.helper.report',
+                    'translator',
                 ],
             ],
             // There's a problem with multiple tags and arguments definition using array.
@@ -692,6 +726,20 @@ return [
                     'custom_item.route.provider',
                     'mautic.custom.model.item',
                     'custom_object.config.provider',
+                ],
+            ],
+            'custom_item.post_save.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomItemPostSaveSubscriber::class,
+                'arguments' => [
+                    'mautic.custom.model.item',
+                    'request_stack'
+                ],
+            ],
+            'custom_item.post_delete.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomItemPostDeleteSubscriber::class,
+                'arguments' => [
+                    'custom_item.xref.custom_item.repository',
+                    'custom_item.xref.contact.repository',
                 ],
             ],
             'custom_object.audit.log.subscriber' => [
@@ -792,6 +840,12 @@ return [
                 'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectListFormatSubscriber::class,
                 'arguments' => [
                     'custom_object.helper.token_formatter'
+                ]
+            ],
+            'custom_object.post_save.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectPostSaveSubscriber::class,
+                'arguments' => [
+                    'mautic.custom.model.object',
                 ]
             ],
         ],

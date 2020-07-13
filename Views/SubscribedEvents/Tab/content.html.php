@@ -47,6 +47,8 @@ declare(strict_types=1);
         <?php echo $customObjectId; ?>,
         <?php echo $currentEntityId; ?>,
         '<?php echo $currentEntityType; ?>',
-        '<?php echo $tabId; ?>'
+        '<?php echo $tabId; ?>',
+        <?php echo $relationshipObjectId ? $relationshipObjectId : 'null'; ?>
+
     );
 </script>

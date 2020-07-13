@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\SaveController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemType;
@@ -32,23 +33,60 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Assert;
 
 class SaveControllerTest extends ControllerTestCase
 {
-    private const OBJECT_ID = 33;
+    public const OBJECT_ID = 33;
 
-    private const ITEM_ID = 22;
+    public const ITEM_ID = 22;
 
-    private const CONTACT_ID = 11;
+    public const CONTACT_ID = 11;
 
+    /**
+     * @var MockObject|FormFactoryInterface
+     */
     private $formFactory;
+
+    /**
+     * @var MockObject|CustomItemModel
+     */
     private $customItemModel;
+
+    /**
+     * @var MockObject|CustomObjectModel
+     */
     private $customObjectModel;
+
+    /**
+     * @var MockObject|FlashBag
+     */
     private $flashBag;
+
+    /**
+     * @var MockObject|CustomItemPermissionProvider
+     */
     private $permissionProvider;
+
+    /**
+     * @var MockObject|CustomItemRouteProvider
+     */
     private $routeProvider;
+
+    /**
+     * @var MockObject|LockFlashMessageHelper
+     */
     private $lockFlashMessageHelper;
+
+    /**
+     * @var MockObject|CustomItem
+     */
     private $customItem;
+
+    /**
+     * @var MockObject|FormInterface
+     */
     private $form;
 
     /**
@@ -68,7 +106,7 @@ class SaveControllerTest extends ControllerTestCase
         $this->routeProvider           = $this->createMock(CustomItemRouteProvider::class);
         $this->lockFlashMessageHelper  = $this->createMock(LockFlashMessageHelper::class);
         $this->requestStack            = $this->createMock(RequestStack::class);
-        $this->request                 = $this->createMock(Request::class);
+        $this->request                 = new Request();
         $this->customItem              = $this->createMock(CustomItem::class);
         $this->form                    = $this->createMock(FormInterface::class);
         $this->saveController          = new SaveController(
@@ -125,12 +163,20 @@ class SaveControllerTest extends ControllerTestCase
 
     public function testSaveActionForExistingCustomItemWithValidForm(): void
     {
+        $this->request->initialize(
+            [],
+            [
+                'custom_item' => [
+                    'contact_id' => self::CONTACT_ID,
+                ],
+            ]
+        );
+
         $this->customItem->expects($this->once())
             ->method('getName')
             ->willReturn('Umpalumpa');
 
-        $this->customItem->expects($this->exactly(2))
-            ->method('getId')
+        $this->customItem->method('getId')
             ->willReturn(self::ITEM_ID);
 
         $this->customItemModel->expects($this->once())
@@ -158,13 +204,11 @@ class SaveControllerTest extends ControllerTestCase
             ->method('isClicked')
             ->willReturn(true);
 
-        $this->routeProvider->expects($this->exactly(2))
-            ->method('buildEditRoute')
+        $this->routeProvider->method('buildEditRoute')
             ->with(self::OBJECT_ID, self::ITEM_ID)
             ->willReturn('https://edit.item');
 
-        $this->routeProvider->expects($this->once())
-            ->method('buildSaveRoute')
+        $this->routeProvider->method('buildSaveRoute')
             ->with(self::OBJECT_ID, self::ITEM_ID)
             ->willReturn('https://save.item');
 
@@ -198,16 +242,6 @@ class SaveControllerTest extends ControllerTestCase
             ->with('save')
             ->willReturn($this->createMock(ClickableInterface::class));
 
-        $contactId = $this->createMock(FormInterface::class);
-        $this->form->expects($this->at(4))
-            ->method('get')
-            ->with('contact_id')
-            ->willReturn($contactId);
-
-        $contactId->expects($this->once())
-            ->method('getData')
-            ->willReturn(0);
-
         $this->customItemModel->expects($this->once())
             ->method('save')
             ->with($this->customItem);
@@ -222,21 +256,31 @@ class SaveControllerTest extends ControllerTestCase
                 ]
             );
 
-        $this->request->expects($this->once())
-            ->method('setMethod')
-            ->with(Request::METHOD_GET);
+        $this->router->expects($this->once())
+            ->method('generate')
+            ->willReturn('someRedirectUrl');
+
+        Assert::assertSame(Request::METHOD_GET, $this->request->getMethod());
 
         $this->saveController->saveAction(self::OBJECT_ID, self::ITEM_ID);
     }
 
     public function testThatSaveActionRedirectToContactViewPageWhenContactIdIsSet(): void
     {
+        $this->request->initialize(
+            [],
+            [
+                'custom_item' => [
+                    'contact_id' => self::CONTACT_ID,
+                ],
+            ]
+        );
+
         $this->customItem->expects($this->once())
             ->method('getName')
             ->willReturn('Umpalumpa');
 
-        $this->customItem->expects($this->exactly(2))
-            ->method('getId')
+        $this->customItem->method('getId')
             ->willReturn(self::ITEM_ID);
 
         $this->customItemModel->expects($this->once())
@@ -254,13 +298,11 @@ class SaveControllerTest extends ControllerTestCase
             ->with($this->customItem)
             ->willReturn(false);
 
-        $this->routeProvider->expects($this->exactly(2))
-            ->method('buildEditRoute')
+        $this->routeProvider->method('buildEditRoute')
             ->with(self::OBJECT_ID, self::ITEM_ID)
             ->willReturn('https://edit.item');
 
-        $this->routeProvider->expects($this->once())
-            ->method('buildSaveRoute')
+        $this->routeProvider->method('buildSaveRoute')
             ->with(self::OBJECT_ID, self::ITEM_ID)
             ->willReturn('https://save.item');
 
@@ -299,16 +341,6 @@ class SaveControllerTest extends ControllerTestCase
             ->method('isClicked')
             ->willReturn(true);
 
-        $contactId = $this->createMock(FormInterface::class);
-        $this->form->expects($this->at(4))
-            ->method('get')
-            ->with('contact_id')
-            ->willReturn($contactId);
-
-        $contactId->expects($this->once())
-            ->method('getData')
-            ->willReturn(1);
-
         $this->router->expects($this->once())
             ->method('generate')
             ->willReturn('someRedirectUrl');
@@ -318,6 +350,15 @@ class SaveControllerTest extends ControllerTestCase
 
     public function testSaveActionIfNewCustomItemIsForbidden(): void
     {
+        $this->request->initialize(
+            [],
+            [
+                'custom_item' => [
+                    'contact_id' => self::CONTACT_ID,
+                ],
+            ]
+        );
+
         $this->customItemModel->expects($this->never())
             ->method('fetchEntity');
 
@@ -352,11 +393,102 @@ class SaveControllerTest extends ControllerTestCase
             ->with(self::OBJECT_ID, null)
             ->willReturn('https://save.item');
 
+        $this->customItem->method('getCustomObject')
+            ->willReturn(new CustomObject());
+
         $this->formFactory->expects($this->once())
             ->method('create')
             ->with(
                 CustomItemType::class,
                 $this->customItem,
+                [
+                    'action'   => 'https://save.item',
+                    'objectId' => self::OBJECT_ID,
+                ]
+            )
+            ->willReturn($this->form);
+
+        $this->form->expects($this->at(0))
+            ->method('handleRequest')
+            ->with($this->request);
+
+        $this->form->expects($this->at(1))
+            ->method('isValid')
+            ->willReturn(false);
+
+        $this->customItemModel->expects($this->never())
+            ->method('save');
+
+        $this->saveController->saveAction(self::OBJECT_ID);
+    }
+
+    public function testSaveActionForNewCustomItemWithChildItemWhenInvalidForm(): void
+    {
+        $this->request->initialize(
+            [],
+            [
+                'custom_item' => [
+                    'contact_id' => self::CONTACT_ID,
+                ],
+            ]
+        );
+
+        $this->customItemModel->expects($this->exactly(2))
+            ->method('populateCustomFields')
+            ->willReturnCallback(
+                function () {
+                    return func_get_arg(0);
+                }
+            );
+
+        $this->permissionProvider->expects($this->never())
+            ->method('canEdit');
+
+        $this->permissionProvider->expects($this->once())
+            ->method('canCreate');
+
+        $this->routeProvider->method('buildNewRoute')
+            ->with(self::OBJECT_ID)
+            ->willReturn('https://create.item');
+
+        $this->routeProvider->method('buildSaveRoute')
+            ->with(self::OBJECT_ID, null)
+            ->willReturn('https://save.item');
+
+        $this->customObjectModel->expects($this->once())
+            ->method('fetchEntity')
+            ->with(self::OBJECT_ID)
+            ->willReturn(
+                new class() extends CustomObject {
+                    public function getId()
+                    {
+                        return SaveControllerTest::OBJECT_ID;
+                    }
+
+                    public function getRelationshipObject(): CustomObject
+                    {
+                        return new class() extends CustomObject {
+                            public function getId()
+                            {
+                                return 6668;
+                            }
+                        };
+                    }
+                }
+            );
+
+        $this->formFactory->expects($this->once())
+            ->method('create')
+            ->with(
+                CustomItemType::class,
+                $this->callback(
+                    function (CustomItem $customItem) {
+                        Assert::assertSame(self::OBJECT_ID, $customItem->getCustomObject()->getId());
+                        Assert::assertSame(6668, $customItem->getChildCustomItem()->getCustomObject()->getId());
+    
+                        return true;
+                    }
+                ),
                 [
                     'action'   => 'https://save.item',
                     'objectId' => self::OBJECT_ID,
@@ -414,12 +546,20 @@ class SaveControllerTest extends ControllerTestCase
 
     public function testThatUserIsGettingRedirectedWhenWeEditCustomItemAndContactIdIsSpecified(): void
     {
+        $this->request->initialize(
+            [],
+            [
+                'custom_item' => [
+                    'contact_id' => self::CONTACT_ID,
+                ],
+            ]
+        );
+
         $this->customItem->expects($this->once())
             ->method('getName')
             ->willReturn('Umpalumpa');
 
-        $this->customItem->expects($this->exactly(2))
-            ->method('getId')
+        $this->customItem->method('getId')
             ->willReturn(self::ITEM_ID);
 
         $this->customItemModel->expects($this->once())
@@ -447,13 +587,11 @@ class SaveControllerTest extends ControllerTestCase
             ->method('isClicked')
             ->willReturn(false);
 
-        $this->routeProvider->expects($this->exactly(2))
-            ->method('buildEditRoute')
+        $this->routeProvider->method('buildEditRoute')
             ->with(self::OBJECT_ID, self::ITEM_ID)
             ->willReturn('https://edit.item');
 
-        $this->routeProvider->expects($this->once())
-            ->method('buildSaveRoute')
+        $this->routeProvider->method('buildSaveRoute')
             ->with(self::OBJECT_ID, self::ITEM_ID)
             ->willReturn('https://save.item');
 
@@ -487,16 +625,6 @@ class SaveControllerTest extends ControllerTestCase
             ->with('save')
             ->willReturn($this->createMock(ClickableInterface::class));
 
-        $contactId = $this->createMock(FormInterface::class);
-        $this->form->expects($this->at(4))
-            ->method('get')
-            ->with('contact_id')
-            ->willReturn($contactId);
-
-        $contactId->expects($this->once())
-            ->method('getData')
-            ->willReturn(static::CONTACT_ID);
-
         $this->customItemModel->expects($this->once())
             ->method('save')
             ->with($this->customItem);
@@ -511,9 +639,7 @@ class SaveControllerTest extends ControllerTestCase
                 ]
             );
 
-        $this->request->expects($this->once())
-            ->method('setMethod')
-            ->with(Request::METHOD_GET);
+        Assert::assertSame(Request::METHOD_GET, $this->request->getMethod());
 
         $this->saveController->saveAction(self::OBJECT_ID, self::ITEM_ID);
     }

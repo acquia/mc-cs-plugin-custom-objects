@@ -36,10 +36,6 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     const TYPE_MASTER = 0;
     const TYPE_RELATIONSHIP = 1;
 
-    // Relationship type constants for $relationship field
-    const RELATIONSHIP_MANY_TO_MANY = 0;
-    const RELATIONSHIP_ONE_TO_ONE = 1;
-
     /**
      * @var int|null
      */
@@ -86,14 +82,14 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     private $type = self::TYPE_MASTER;
 
     /**
-     * @var integer|null
+     * @var CustomObject|null
      */
-    private $relationship;
+    private $masterObject;
 
     /**
      * @var CustomObject|null
      */
-    private $masterObject;
+    private $relationshipObject;
 
     /**
      * @var mixed[]
@@ -136,7 +132,11 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         $builder->addNullableField('description', Type::STRING, 'description');
         $builder->addNullableField('language', Type::STRING, 'lang');
         $builder->addNullableField('type', Type::INTEGER);
-        $builder->addNullableField('relationship', Type::INTEGER, 'relationship');
+
+        $builder->createOneToOne('relationshipObject', CustomObject::class)
+            ->addJoinColumn('relationship_object', 'id')
+            ->fetchExtraLazy()
+            ->build();
 
         $builder->createOneToOne('masterObject', CustomObject::class)
             ->addJoinColumn('master_object', 'id')
@@ -160,6 +160,12 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     public function getId()
     {
         return $this->id;
+    }
+
+    public function setId(int $id)
+    {
+        $this->id = $id;
+        return $this;
     }
 
     /**
@@ -199,16 +205,6 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         $this->type = $type;
     }
 
-    public function getRelationship(): ?int
-    {
-        return $this->relationship;
-    }
-
-    public function setRelationship(?int $relationship): void
-    {
-        $this->relationship = $relationship;
-    }
-
     public function getMasterObject(): ?CustomObject
     {
         return $this->masterObject;
@@ -217,6 +213,16 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     public function setMasterObject(?CustomObject $customObject): void
     {
         $this->masterObject = $customObject;
+    }
+
+    public function getRelationshipObject(): ?CustomObject
+    {
+        return $this->relationshipObject;
+    }
+
+    public function setRelationshipObject(?CustomObject $customObject): void
+    {
+        $this->relationshipObject = $customObject;
     }
 
     /**

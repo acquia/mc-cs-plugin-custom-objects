@@ -9,6 +9,10 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+
+/** @var CustomObject $customObject */
+
 $view->extend('MauticCoreBundle:Default:content.html.php');
 
 $view['slots']->set('mauticContent', 'customItem');
@@ -29,6 +33,8 @@ if ($entity->getId()) {
 }
 
 $view['slots']->set('headerTitle', $header);
+
+$hideCategories = CustomObject::TYPE_RELATIONSHIP === $customObject->getType() ? 'hide' : null;
 ?>
 
 <?php echo $view['form']->start($form); ?>
@@ -40,14 +46,15 @@ $view['slots']->set('headerTitle', $header);
         <div class="pa-md">
             <div class="row">
                 <div class="col-md-4">
-                    <?php echo $view['form']->row($form['name']); ?>
+                    <?php echo $view['form']->rowIfExists($form, 'name'); ?>
                     <?php echo $view['form']->row($form['custom_field_values']); ?>
+                    <?php echo $view['form']->rowIfExists($form, 'child_custom_field_values'); ?>
                     <?php echo $view['form']->row($form['contact_id']); ?>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3 bg-white height-auto">
+    <div class="col-md-3 bg-white height-auto <?php echo $hideCategories ?>">
         <div class="pr-lg pl-lg pt-md pb-md">
             <?php echo $view['form']->row($form['category']); ?>
             <?php echo $view['form']->row($form['isPublished']); ?>
