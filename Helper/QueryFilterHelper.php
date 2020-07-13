@@ -71,10 +71,10 @@ class QueryFilterHelper
         $segmentFilterFieldType = $segmentFilter->getType();
         $segmentFilterFieldType = $segmentFilterFieldType ?: $this->getCustomFieldType($segmentFilterFieldId);
         $dataTable              = $this->fieldTypeProvider->getType($segmentFilterFieldType)->getTableName();
-        $qb                     = new SegmentQueryBuilder($connection);
 
         $subSelects = [];
 
+        $qb = new SegmentQueryBuilder($connection);
         $qb
             ->select('contact_id')
             ->from(MAUTIC_TABLE_PREFIX.$dataTable, "{$alias}_value")
@@ -93,31 +93,63 @@ class QueryFilterHelper
         ;
 
         $this->addCustomFieldValueExpressionFromSegmentFilter($qb, $alias, $segmentFilter);
-
         $subSelects[] = $qb;
 
-//        if ($this->itemRelationLevelLimit > 1) {
-//            // 2nd level
-//            $subSelects[] = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
-//                ->select('custom_item_id_lower')
-//                ->from(MAUTIC_TABLE_PREFIX.'custom_item_xref_custom_item')
-//                ->where("custom_item_id_higher = {$alias}_item.id")
-//                ->getSQL();
-//
-//            $subSelects[] = $customFieldQueryBuilder->createQueryBuilder($customFieldQueryBuilder->getConnection())
-//                ->select('custom_item_id_higher')
-//                ->from(MAUTIC_TABLE_PREFIX.'custom_item_xref_custom_item')
-//                ->where("custom_item_id_lower = {$alias}_item.id")
-//                ->getSQL();
-//        }
-//
-//
-//        $customFieldQueryBuilder->innerJoin(
-//            $alias.'_item',
-//            $dataTable,
-//            $alias.'_value',
-//            $customItemPart
-//        );
+        if ($this->itemRelationLevelLimit > 1) {
+            $qb = new SegmentQueryBuilder($connection);
+            $qb
+                ->select('contact_id')
+                ->from(MAUTIC_TABLE_PREFIX.$dataTable, "{$alias}_value")
+                ->innerJoin(
+                    "{$alias}_value",
+                    MAUTIC_TABLE_PREFIX.'custom_item_xref_custom_item',
+                    "{$alias}_item_xref",
+                    "{$alias}_item_xref.custom_item_id_lower = {$alias}_value.custom_item_id"
+                )
+                ->innerJoin(
+                    "{$alias}_value",
+                    MAUTIC_TABLE_PREFIX.'custom_item_xref_contact',
+                    "{$alias}_contact",
+                    "{$alias}_item_xref.custom_item_id_higher = {$alias}_contact.custom_item_id"
+                )
+                ->andWhere(
+                    $qb->expr()->eq('contact_id', 'L.id'),
+                    $qb->expr()->eq("{$alias}_value.custom_field_id", ":{$alias}_custom_field_id")
+                )
+                ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId)
+                ->setParameter(":{$alias}_value_value", $segmentFilter->getParameterValue())
+            ;
+
+            $this->addCustomFieldValueExpressionFromSegmentFilter($qb, $alias, $segmentFilter);
+            $subSelects[] = $qb;
+
+            $qb = new SegmentQueryBuilder($connection);
+            $qb
+                ->select('contact_id')
+                ->from(MAUTIC_TABLE_PREFIX.$dataTable, "{$alias}_value")
+                ->innerJoin(
+                    "{$alias}_value",
+                    MAUTIC_TABLE_PREFIX.'custom_item_xref_custom_item',
+                    "{$alias}_item_xref",
+                    "{$alias}_item_xref.custom_item_id_higher = {$alias}_value.custom_item_id"
+                )
+                ->innerJoin(
+                    "{$alias}_value",
+                    MAUTIC_TABLE_PREFIX.'custom_item_xref_contact',
+                    "{$alias}_contact",
+                    "{$alias}_item_xref.custom_item_id_lower = {$alias}_contact.custom_item_id"
+                )
+                ->andWhere(
+                    $qb->expr()->eq('contact_id', 'L.id'),
+                    $qb->expr()->eq("{$alias}_value.custom_field_id", ":{$alias}_custom_field_id")
+                )
+                ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId)
+                ->setParameter(":{$alias}_value_value", $segmentFilter->getParameterValue())
+            ;
+
+            $this->addCustomFieldValueExpressionFromSegmentFilter($qb, $alias, $segmentFilter);
+            $subSelects[] = $qb;
+        }
 
         $parameters = [];
 
