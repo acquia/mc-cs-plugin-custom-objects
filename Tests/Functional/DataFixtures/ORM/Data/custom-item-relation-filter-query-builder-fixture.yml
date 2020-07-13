@@ -45,6 +45,9 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomObject:
 
 MauticPlugin\CustomObjectsBundle\Entity\CustomField:
 
+  # IDs can't be set directly as autoincrement is expected by code inserting this to DB
+  # Take a look at Mautic\LeadBundle\Entity\LeadList.price-eq-1000.filters.0.field: 'cmf_4' # @custom_field_price ID
+  # ID 1
   custom_field_option:
     custom_object: '@custom_object_product'
     is_published: true
@@ -53,6 +56,7 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomField:
     alias: 'multiselect'
     type: 'multiselect'
 
+  # ID 2
   custom_field_date:
     custom_object: '@custom_object_product'
     is_published: true
@@ -61,6 +65,7 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomField:
     alias: 'date'
     type: 'date'
 
+  # ID 3
   custom_field_datetime:
     custom_object: '@custom_object_product'
     is_published: true
@@ -69,6 +74,7 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomField:
     alias: 'datetime'
     type: 'datetime'
 
+  # ID 4
   custom_field_price:
     custom_object: '@custom_object_product'
     is_published: true
@@ -77,6 +83,7 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomField:
     alias: 'price'
     type: 'int'
 
+  # ID 5
   custom_field_text:
     custom_object: '@custom_object_product'
     is_published: true
@@ -192,7 +199,7 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem:
 
 Mautic\LeadBundle\Entity\LeadList:
 
-  # 1st level
+  # 1st level - 1 contact / 2nd level - 2 contacts
   price-eq-1000:
     is_published: true
     name: 'Price = 1000'
