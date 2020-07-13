@@ -158,7 +158,12 @@ class CustomItemTabSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testForTabContentsContext(): void
     {
+        $otherCustomObject = $this->createMock(CustomObject::class);
+        $otherCustomObject->method('getId')->willReturn(111);
+
         $this->customItem->method('getId')->willReturn(45);
+        $this->customItem->method('getCustomObject')
+            ->willReturn($otherCustomObject);
         $this->customObject->method('getId')->willReturn(555);
 
         $this->customContentEvent->expects($this->at(0))
@@ -177,7 +182,7 @@ class CustomItemTabSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->translator->expects($this->once())
             ->method('trans')
-            ->with('custom.item.link.search.placeholder')
+            ->with('custom.item.link.search.placeholder.custom_object')
             ->willReturn('translated placeholder');
 
         $this->customItemRouteProvider->expects($this->once())

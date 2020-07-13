@@ -52,11 +52,17 @@ $showProperties = isset($form['options']) || $customField->getTypeObject()->useP
                     <div class="col-md-6" >
                         <?php echo $view['form']->row($form['label']); ?>
                     </div>
+                    <div class="col-md-6 chosen-showInCustomObjectDetailList">
+                        <?php echo $view['form']->row($form['showInCustomObjectDetailList']); ?>
+                    </div>
                 </div>
 
                 <div class="row">
                     <div class="col-md-6">
                         <?php echo $view['form']->row($form['alias']); ?>
+                    </div>
+                    <div class="col-md-6 chosen-showInContactDetailList">
+                        <?php echo $view['form']->row($form['showInContactDetailList']); ?>
                     </div>
                 </div>
 

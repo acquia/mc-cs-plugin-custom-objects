@@ -164,7 +164,7 @@ class ContactTabSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->translator->expects($this->once())
             ->method('trans')
-            ->with('custom.item.link.search.placeholder')
+            ->with('custom.item.link.search.placeholder.contact')
             ->willReturn('translated placeholder');
 
         $this->customItemRouteProvider->expects($this->once())

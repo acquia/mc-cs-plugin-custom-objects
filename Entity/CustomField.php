@@ -91,6 +91,16 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      */
     private $params;
 
+    /**
+     * @var bool
+     */
+    private $showInCustomObjectDetailList = true;
+
+    /**
+     * @var bool
+     */
+    private $showInContactDetailList = true;
+
     public function __construct()
     {
         $this->options = new ArrayCollection();
@@ -162,6 +172,16 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
         $builder->createField('params', Type::JSON_ARRAY)
             ->columnName('params')
+            ->nullable()
+            ->build();
+
+        $builder->createField('showInCustomObjectDetailList', Type::BOOLEAN)
+            ->columnName('show_in_custom_object_detail_list')
+            ->nullable()
+            ->build();
+
+        $builder->createField('showInContactDetailList', Type::BOOLEAN)
+            ->columnName('show_in_contact_detail_list')
             ->nullable()
             ->build();
     }
@@ -436,10 +456,10 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         $choices = $this->getChoices();
         $label   = array_search($value, $choices, true);
 
-        if ($label === false) {
+        if (false === $label) {
             throw new NotFoundException("Label was not found for value {$value}");
         }
-        
+
         return $label;
     }
 
@@ -466,6 +486,26 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     public function setParams($params): void
     {
         $this->params = $params;
+    }
+
+    public function isShowInCustomObjectDetailList(): bool
+    {
+        return $this->showInCustomObjectDetailList;
+    }
+
+    public function setShowInCustomObjectDetailList(?bool $showInCustomObjectDetailList): void
+    {
+        $this->showInCustomObjectDetailList = (bool) $showInCustomObjectDetailList;
+    }
+
+    public function isShowInContactDetailList(): bool
+    {
+        return $this->showInContactDetailList;
+    }
+
+    public function setShowInContactDetailList(?bool $showInContactDetailList): void
+    {
+        $this->showInContactDetailList = (bool) $showInContactDetailList;
     }
 
     public function isChoiceType(): bool

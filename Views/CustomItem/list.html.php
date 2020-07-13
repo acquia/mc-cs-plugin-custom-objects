@@ -10,7 +10,11 @@
 */
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemFieldListData;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+
+/** @var CustomItemFieldListData|null $fieldData */
+$fieldData = $fieldData ?? null;
 
 if ('index' === $tmpl) {
     $view->extend('CustomObjectsBundle:CustomItem:index.html.php');
@@ -60,12 +64,16 @@ $routeSelf = $view['router']->path(
                         'sessionVar' => 'custom.item',
                         'orderBy'    => CustomItem::TABLE_ALIAS.'.id',
                         'text'       => 'mautic.core.id',
-                        'class'      => 'visible-md visible-lg col-asset-id',
                         'default'    => true,
                         'baseUrl'    => $routeSelf,
                     ]
                 );
                 ?>
+                <?php if ($fieldData): ?>
+                    <?php foreach ($fieldData->getColumnLabels() as $columnLabel): ?>
+                        <?php echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', ['text' => $columnLabel]); ?>
+                    <?php endforeach; ?>
+                <?endif; ?>
             </tr>
             </thead>
             <tbody>
@@ -89,6 +97,13 @@ $routeSelf = $view['router']->path(
                         </div>
                     </td>
                     <td><?php echo $item->getId(); ?></td>
+                    <?php if ($fieldData): ?>
+                        <?php foreach ($fieldData->getFields($item->getId()) as $fieldValue): ?>
+                            <td>
+                                <?php echo $view->render('CustomObjectsBundle:CustomField:value.html.php', ['fieldValue'  => $fieldValue]); ?>
+                            </td>
+                        <?php endforeach; ?>
+                    <?endif; ?>
                 </tr>
             <?php endforeach; ?>
             </tbody>
