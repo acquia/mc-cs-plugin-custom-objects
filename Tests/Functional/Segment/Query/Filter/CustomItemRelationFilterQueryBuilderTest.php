@@ -73,13 +73,13 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
 
     protected function tearDown(): void
     {
-//        foreach ($this->getFixturesInUnloadableOrder() as $entity) {
-//            $this->entityManager->remove($entity);
-//        }
-//
-//        $this->entityManager->flush();
-//
-//        parent::tearDown();
+        foreach ($this->getFixturesInUnloadableOrder() as $entity) {
+            $this->entityManager->remove($entity);
+        }
+
+        $this->entityManager->flush();
+
+        parent::tearDown();
     }
 
     /**
@@ -89,12 +89,16 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
      */
     public function testApplyQuery1stLevel(): void
     {
-//        $this->markTestSkipped('Multilevel testing not implemented yet');
+        $this->markTestSkipped('Multilevel testing not implemented yet');
 
         $this->runCommand(
             'mautic:segments:update',
             ['--env' => 'test']
         );
+
+        // custom item name
+        $this->assertLeadCountBySegmentAlias(1, 'order-plug-name-eq');
+        $this->assertContactIsInSegment('poor@plug.net', 'order-plug-name-eq');
 
         $this->assertLeadCountBySegmentAlias(1, 'price-eq-1000');
         $this->assertContactIsInSegment('direct@relation.net', 'price-eq-1000');
