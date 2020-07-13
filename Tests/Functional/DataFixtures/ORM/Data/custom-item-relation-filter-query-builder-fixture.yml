@@ -129,21 +129,21 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomItem:
 MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueDate:
 
   custom_field_toaster_date:
-    __construct: ['@custom_field_price', '@custom_item_toaster']
+    __construct: ['@custom_field_date', '@custom_item_toaster']
     value: '1980-01-01'
 
   custom_field_plug_date:
-    __construct: ['@custom_field_price', '@custom_item_plug']
+    __construct: ['@custom_field_date', '@custom_item_plug']
     value: '2020-07-01'
 
 MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueDateTime:
 
   custom_field_toaster_datetime:
-    __construct: ['@custom_field_price', '@custom_item_toaster']
+    __construct: ['@custom_field_datetime', '@custom_item_toaster']
     value: '1980-01-01 00:00:00'
 
   custom_field_plug_datetime:
-    __construct: ['@custom_field_price', '@custom_item_plug']
+    __construct: ['@custom_field_datetime', '@custom_item_plug']
     value: '2020-07-01 00:00:00'
 
 MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInt:
@@ -159,21 +159,21 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInt:
 MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption:
 
   custom_field_toaster_option:
-    __construct: ['@custom_field_price', '@custom_item_toaster']
+    __construct: ['@custom_field_option', '@custom_item_toaster']
     value: 1
 
   custom_field_plug_option:
-    __construct: ['@custom_field_price', '@custom_item_plug']
+    __construct: ['@custom_field_option', '@custom_item_plug']
     value: 2
 
 MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText:
 
   custom_field_toaster_text:
-    __construct: ['@custom_field_price', '@custom_item_toaster']
+    __construct: ['@custom_field_text', '@custom_item_toaster']
     value: 'text'
 
   custom_field_plug_text:
-    __construct: ['@custom_field_price', '@custom_item_plug']
+    __construct: ['@custom_field_text', '@custom_item_plug']
     value: 'dummyValue'
 
 MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact:
@@ -349,7 +349,7 @@ Mautic\LeadBundle\Entity\LeadList:
     is_published: true
     name: 'Multiselect = 1'
     alias: 'option-in-1'
-    filters: # a:1:{i:0;a:6:{s:4:"glue";s:3:"and";s:5:"field";s:5:"cmf_1";s:6:"object";s:13:"custom_object";s:4:"type";s:6:"select";s:8:"operator";s:2:"in";s:10:"properties";a:1:{s:6:"filter";a:1:{i:0;s:1:"1";}}}}
+    filters: # a:1:{i:0;a:8:{s:6:"object";s:13:"custom_object";s:4:"glue";s:3:"and";s:5:"field";s:5:"cmf_1";s:4:"type";s:11:"multiselect";s:8:"operator";s:2:"in";s:10:"properties";a:1:{s:6:"filter";a:1:{i:0;s:1:"1";}}s:6:"filter";a:1:{i:0;s:1:"1";}s:7:"display";N;}}
       0:
         glue : 'and'
         field: 'cmf_1' # custom_field.id
@@ -359,6 +359,8 @@ Mautic\LeadBundle\Entity\LeadList:
         properties:
           filter:
             0: '1'
+        filter: # this seems to be bug, but it describes current behavior
+          0: '1'
     is_global: true
     is_preference_center: false
 
