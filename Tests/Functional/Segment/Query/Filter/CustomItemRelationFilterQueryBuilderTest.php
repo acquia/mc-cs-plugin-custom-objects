@@ -73,13 +73,13 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
 
     protected function tearDown(): void
     {
-        foreach ($this->getFixturesInUnloadableOrder() as $entity) {
-            $this->entityManager->remove($entity);
-        }
-
-        $this->entityManager->flush();
-
-        parent::tearDown();
+//        foreach ($this->getFixturesInUnloadableOrder() as $entity) {
+//            $this->entityManager->remove($entity);
+//        }
+//
+//        $this->entityManager->flush();
+//
+//        parent::tearDown();
     }
 
     /**
@@ -89,7 +89,7 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
      */
     public function testApplyQuery1stLevel(): void
     {
-        $this->markTestSkipped('Multilevel testing not implemented yet');
+//        $this->markTestSkipped('Multilevel testing not implemented yet');
 
         $this->runCommand(
             'mautic:segments:update',
