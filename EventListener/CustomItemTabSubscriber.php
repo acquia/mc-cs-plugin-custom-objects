@@ -106,6 +106,10 @@ class CustomItemTabSubscriber implements EventSubscriberInterface
 
             /** @var CustomObject $object */
             foreach ($objects as $object) {
+                if ($object->getId() === $item->getCustomObject()->getId()) {
+                    continue;
+                }
+
                 $data = [
                     'customObjectId'    => $object->getId(),
                     'currentEntityId'   => $item->getId(),
@@ -113,7 +117,7 @@ class CustomItemTabSubscriber implements EventSubscriberInterface
                     'tabId'             => "custom-object-{$object->getId()}",
                     'page'              => 1,
                     'search'            => '',
-                    'placeholder'       => $this->translator->trans('custom.item.link.search.placeholder', ['%object%' => $object->getNameSingular()]),
+                    'placeholder'       => $this->translator->trans('custom.item.link.search.placeholder.custom_object', ['%object%' => $object->getNameSingular()]),
                     'lookupRoute'       => $this->customItemRouteProvider->buildLookupRoute((int) $object->getId(), 'customItem', (int) $item->getId()),
                     'newRoute'          => $this->customItemRouteProvider->buildNewRoute((int) $object->getId()),
                 ];
