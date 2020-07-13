@@ -12,20 +12,20 @@ Mautic\LeadBundle\Entity\Lead:
     date_added: '<dateTimeBetween("-1 days","-10 hours")>'
     email: 'direct@relation.net'
 
-#  # 2nd level relations / contact -> order -> product
-#  contact_rich:
-#    firstname: 'Rich'
-#    lastname: 'Toaster'
-#    is_published: true
-#    date_added: '<dateTimeBetween("-1 days","-10 hours")>'
-#    email: 'rich@toaster.net'
-#
-#  contact_poor:
-#    firstname: 'Poor'
-#    lastname: 'Plug'
-#    is_published: true
-#    date_added: '<dateTimeBetween("-1 days","-10 hours")>'
-#    email: 'poor@plug.net'
+  # 2nd level relations / contact -> order -> product
+  contact_rich:
+    firstname: 'Rich'
+    lastname: 'Toaster'
+    is_published: true
+    date_added: '<dateTimeBetween("-1 days","-10 hours")>'
+    email: 'rich@toaster.net'
+
+  contact_poor:
+    firstname: 'Poor'
+    lastname: 'Plug'
+    is_published: true
+    date_added: '<dateTimeBetween("-1 days","-10 hours")>'
+    email: 'poor@plug.net'
 
 MauticPlugin\CustomObjectsBundle\Entity\CustomObject:
 
@@ -36,38 +36,38 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomObject:
     name_plural: 'Products'
     alias: 'product'
 
-#  custom_object_order:
-#    is_published: true
-#    date_added: '<dateTimeBetween("-20 days","-2 days")>'
-#    name_singular: 'Order'
-#    name_plural: 'Orders'
-#    alias: 'order'
+  custom_object_order:
+    is_published: true
+    date_added: '<dateTimeBetween("-20 days","-2 days")>'
+    name_singular: 'Order'
+    name_plural: 'Orders'
+    alias: 'order'
 
 MauticPlugin\CustomObjectsBundle\Entity\CustomField:
 
-#  custom_field_option:
-#    custom_object: '@custom_object_product'
-#    is_published: true
-#    date_added: '<date_create()>'
-#    label: 'Multiselect'
-#    alias: 'multiselect'
-#    type: 'multiselect'
-#
-#  custom_field_date:
-#    custom_object: '@custom_object_product'
-#    is_published: true
-#    date_added: '<date_create()>'
-#    label: 'Date'
-#    alias: 'date'
-#    type: 'date'
-#
-#  custom_field_datetime:
-#    custom_object: '@custom_object_product'
-#    is_published: true
-#    date_added: '<date_create()>'
-#    label: 'DateTime'
-#    alias: 'datetime'
-#    type: 'datetime'
+  custom_field_option:
+    custom_object: '@custom_object_product'
+    is_published: true
+    date_added: '<date_create()>'
+    label: 'Multiselect'
+    alias: 'multiselect'
+    type: 'multiselect'
+
+  custom_field_date:
+    custom_object: '@custom_object_product'
+    is_published: true
+    date_added: '<date_create()>'
+    label: 'Date'
+    alias: 'date'
+    type: 'date'
+
+  custom_field_datetime:
+    custom_object: '@custom_object_product'
+    is_published: true
+    date_added: '<date_create()>'
+    label: 'DateTime'
+    alias: 'datetime'
+    type: 'datetime'
 
   custom_field_price:
     custom_object: '@custom_object_product'
@@ -77,25 +77,25 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomField:
     alias: 'price'
     type: 'int'
 
-#  custom_field_text:
-#    custom_object: '@custom_object_product'
-#    is_published: true
-#    date_added: '<date_create()>'
-#    label: 'Text'
-#    alias: 'text'
-#    type: 'text'
+  custom_field_text:
+    custom_object: '@custom_object_product'
+    is_published: true
+    date_added: '<date_create()>'
+    label: 'Text'
+    alias: 'text'
+    type: 'text'
 
-#MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption:
+MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption:
 
-#  custom_field_option_1:
-#    custom_field: '@custom_field_option'
-#    value: 1
-#    label: 1
-#
-#  custom_field_option_2:
-#    custom_field: '@custom_field_option'
-#    value: 2
-#    label: 2
+  custom_field_option_1:
+    custom_field: '@custom_field_option'
+    value: 1
+    label: 1
+
+  custom_field_option_2:
+    custom_field: '@custom_field_option'
+    value: 2
+    label: 2
 
 MauticPlugin\CustomObjectsBundle\Entity\CustomItem:
 
@@ -104,40 +104,40 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomItem:
     name: 'Toaster'
     __construct: ['@custom_object_product']
 
-#  custom_item_plug:
-#    is_published: true
-#    name: 'Plug'
-#    __construct: ['@custom_object_product']
+  custom_item_plug:
+    is_published: true
+    name: 'Plug'
+    __construct: ['@custom_object_product']
 
-#  custom_item_order_toaster:
-#    is_published: true
-#    name: 'Ordered toaster'
-#    __construct: ['@custom_object_order']
-#
-#  custom_item_order_plug:
-#    is_published: true
-#    name: 'Ordered plug'
-#    __construct: ['@custom_object_order']
+  custom_item_order_toaster:
+    is_published: true
+    name: 'Ordered toaster'
+    __construct: ['@custom_object_order']
 
-#MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueDate:
-#
-#  custom_field_toaster_date:
-#    __construct: ['@custom_field_price', '@custom_item_toaster']
-#    value: '1980-01-01'
-#
-#  custom_field_plug_date:
-#    __construct: ['@custom_field_price', '@custom_item_plug']
-#    value: '2020-07-01'
-#
-#MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueDateTime:
-#
-#  custom_field_toaster_datetime:
-#    __construct: ['@custom_field_price', '@custom_item_toaster']
-#    value: '1980-01-01 00:00:00'
-#
-#  custom_field_plug_datetime:
-#    __construct: ['@custom_field_price', '@custom_item_plug']
-#    value: '2020-07-01 00:00:00'
+  custom_item_order_plug:
+    is_published: true
+    name: 'Ordered plug'
+    __construct: ['@custom_object_order']
+
+MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueDate:
+
+  custom_field_toaster_date:
+    __construct: ['@custom_field_price', '@custom_item_toaster']
+    value: '1980-01-01'
+
+  custom_field_plug_date:
+    __construct: ['@custom_field_price', '@custom_item_plug']
+    value: '2020-07-01'
+
+MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueDateTime:
+
+  custom_field_toaster_datetime:
+    __construct: ['@custom_field_price', '@custom_item_toaster']
+    value: '1980-01-01 00:00:00'
+
+  custom_field_plug_datetime:
+    __construct: ['@custom_field_price', '@custom_item_plug']
+    value: '2020-07-01 00:00:00'
 
 MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInt:
 
@@ -145,29 +145,29 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInt:
     __construct: ['@custom_field_price', '@custom_item_toaster']
     value: 1000
 
-#  custom_field_plug_price:
-#    __construct: ['@custom_field_price', '@custom_item_plug']
-#    value: 500
+  custom_field_plug_price:
+    __construct: ['@custom_field_price', '@custom_item_plug']
+    value: 500
 
-#MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption:
-#
-#  custom_field_toaster_option:
-#    __construct: ['@custom_field_price', '@custom_item_toaster']
-#    value: 1
-#
-#  custom_field_plug_option:
-#    __construct: ['@custom_field_price', '@custom_item_plug']
-#    value: 2
+MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption:
 
-#MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText:
-#
-#  custom_field_toaster_text:
-#    __construct: ['@custom_field_price', '@custom_item_toaster']
-#    value: 'text'
-#
-#  custom_field_plug_text:
-#    __construct: ['@custom_field_price', '@custom_item_plug']
-#    value: 'dummyValue'
+  custom_field_toaster_option:
+    __construct: ['@custom_field_price', '@custom_item_toaster']
+    value: 1
+
+  custom_field_plug_option:
+    __construct: ['@custom_field_price', '@custom_item_plug']
+    value: 2
+
+MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText:
+
+  custom_field_toaster_text:
+    __construct: ['@custom_field_price', '@custom_item_toaster']
+    value: 'text'
+
+  custom_field_plug_text:
+    __construct: ['@custom_field_price', '@custom_item_plug']
+    value: 'dummyValue'
 
 MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact:
 
@@ -175,20 +175,20 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact:
   custom_item_xref_contact_toaster_rich:
     __construct: ['@custom_item_toaster', '@contact_direct_to_ci']
 
-#  # 2nd level relations / contact -> order -> product
-#  custom_item_xref_order_contact_toaster_rich:
-#    __construct: ['@custom_item_order_toaster', '@contact_rich']
-#
-#  custom_item_xref_order_contact_plug_poor:
-#    __construct: ['@custom_item_order_plug', '@contact_poor']
+  # 2nd level relations / contact -> order -> product
+  custom_item_xref_order_contact_toaster_rich:
+    __construct: ['@custom_item_order_toaster', '@contact_rich']
 
-#MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem:
-#
-#  custom_item_toaster_xref_order_toaster:
-#    __construct: ['@custom_item_order_toaster', '@custom_item_toaster',]
-#
-#  custom_item_plug_xref_order_plug:
-#    __construct: ['@custom_item_order_plug', '@custom_item_plug']
+  custom_item_xref_order_contact_plug_poor:
+    __construct: ['@custom_item_order_plug', '@contact_poor']
+
+MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem:
+
+  custom_item_toaster_xref_order_toaster:
+    __construct: ['@custom_item_order_toaster', '@custom_item_toaster',]
+
+  custom_item_plug_xref_order_plug:
+    __construct: ['@custom_item_order_plug', '@custom_item_plug']
 
 Mautic\LeadBundle\Entity\LeadList:
 
@@ -200,7 +200,7 @@ Mautic\LeadBundle\Entity\LeadList:
     filters:
       0:
         glue : 'and'
-        field: 'cmf_1' # custom_field.id
+        field: 'cmf_4' # @custom_field_price
         object: 'custom_object'
         type: 'int'
         operator: 'eq'
@@ -209,164 +209,164 @@ Mautic\LeadBundle\Entity\LeadList:
     is_global: true
     is_preference_center: false
 
-#  # 2nd level
-#  order-plug-name-eq:
-#    is_published: true
-#    name: 'Order name = Ordered plug'
-#    alias: 'order-plug-name-eq'
-#    filters: # a:1:{i:0;a:6:{s:4:"glue";s:3:"and";s:5:"field";s:5:"cmo_2";s:6:"object";s:13:"custom_object";s:4:"type";s:4:"text";s:8:"operator";s:1:"=";s:10:"properties";a:1:{s:6:"filter";s:12:"Ordered plug";}}}
-#      0:
-#        glue : 'and'
-#        field: 'cmo_2' # custom_field.id
-#        object: 'custom_object'
-#        type: 'test'
-#        operator: '='
-#        properties:
-#          filter: 'Ordered plug'
-#    is_global: true
-#    is_preference_center: false
-#
-#  date-lt-1990:
-#    is_published: true
-#    name: 'Date < 1990'
-#    alias: 'date-lt-1990'
-#    filters: # a:1:{i:0;a:6:{s:4:"glue";s:3:"and";s:5:"field";s:5:"cmf_2";s:6:"object";s:13:"custom_object";s:4:"type";s:4:"date";s:8:"operator";s:2:"lt";s:10:"properties";a:1:{s:6:"filter";s:4:"1990";}}}
-#      0:
-#        glue : 'and'
-#        field: 'cmf_2' # custom_field.id
-#        object: 'custom_object'
-#        type: 'date'
-#        operator: 'lt'
-#        properties:
-#          filter: '1990-01-01'
-#    is_global: true
-#    is_preference_center: false
-#
-#  datetime-gt-1990:
-#    is_published: true
-#    name: 'DateTime > 1990'
-#    alias: 'datetime-gt-1990'
-#    filters:
-#      0:
-#        glue : 'and'
-#        field: 'cmf_2' # custom_field.id
-#        object: 'custom_object'
-#        type: 'datetime'
-#        operator: 'gt'
-#        properties:
-#          filter: '1990-01-01 00:00:00'
-#    is_global: true
-#    is_preference_center: false
-#
-#  price-greater-500:
-#    is_published: true
-#    name: 'Price > 500'
-#    alias: 'price-greater-500'
-#    filters: # a:1:{i:0;a:6:{s:4:"glue";s:3:"and";s:5:"field";s:5:"cmf_1";s:6:"object";s:13:"custom_object";s:4:"type";s:3:"int";s:8:"operator";s:2:"gt";s:10:"properties";a:1:{s:6:"filter";s:3:"500";}}}
-#      0:
-#        glue : 'and'
-#        field: 'cmf_1' # custom_field.id
-#        object: 'custom_object'
-#        type: 'int'
-#        operator: 'gt'
-#        properties:
-#          filter: '500'
-#    is_global: true
-#    is_preference_center: false
-#
-#  price-eq-500:
-#    is_published: true
-#    name: 'Price = 500'
-#    alias: 'price-eq-500'
-#    filters:
-#      0:
-#        glue : 'and'
-#        field: 'cmf_1' # custom_field.id
-#        object: 'custom_object'
-#        type: 'int'
-#        operator: 'eq'
-#        properties:
-#          filter: '500'
-#    is_global: true
-#    is_preference_center: false
-#
-#  price-greater-1000:
-#    is_published: true
-#    name: 'Price > 1000'
-#    alias: 'price-greater-1000'
-#    filters:
-#      0:
-#        glue : 'and'
-#        field: 'cmf_1' # custom_field.id
-#        object: 'custom_object'
-#        type: 'int'
-#        operator: 'gt'
-#        properties:
-#          filter: '1000'
-#    is_global: true
-#    is_preference_center: false
-#
-#  price-lte-1000:
-#    is_published: true
-#    name: 'Price <= 1000'
-#    alias: 'price-lte-1000'
-#    filters:
-#      0:
-#        glue : 'and'
-#        field: 'cmf_1' # custom_field.id
-#        object: 'custom_object'
-#        type: 'int'
-#        operator: 'lte'
-#        properties:
-#          filter: '1000'
-#    is_global: true
-#    is_preference_center: false
-#
-#  price-lt-500:
-#    is_published: true
-#    name: 'Price < 500'
-#    alias: 'price-lt-500'
-#    filters:
-#      0:
-#        glue : 'and'
-#        field: 'cmf_1' # custom_field.id
-#        object: 'custom_object'
-#        type: 'int'
-#        operator: 'lt'
-#        properties:
-#          filter: '500'
-#    is_global: true
-#    is_preference_center: false
-#
-#  option-in-1:
-#    is_published: true
-#    name: 'Multiselect = 1'
-#    alias: 'option-in-1'
-#    filters: # a:1:{i:0;a:6:{s:4:"glue";s:3:"and";s:5:"field";s:5:"cmf_1";s:6:"object";s:13:"custom_object";s:4:"type";s:6:"select";s:8:"operator";s:2:"in";s:10:"properties";a:1:{s:6:"filter";a:1:{i:0;s:1:"1";}}}}
-#      0:
-#        glue : 'and'
-#        field: 'cmf_2' # custom_field.id
-#        object: 'custom_object'
-#        type: 'multiselect'
-#        operator: 'in'
-#        properties:
-#          filter:
-#            0: '1'
-#    is_global: true
-#    is_preference_center: false
-#
-#  text-eq-text:
-#    is_published: true
-#    name: 'Text = text'
-#    alias: 'text-eq-text'
-#    filters:
-#      0:
-#        glue : 'and'
-#        field: 'cmf_2' # custom_field.id
-#        object: 'custom_object'
-#        type: 'text'
-#        operator: '='
-#        properties:
-#          filter: 'text'
-#    is_global: true
-#    is_preference_center: false
+  # 2nd level
+  order-plug-name-eq:
+    is_published: true
+    name: 'Order name = Ordered plug'
+    alias: 'order-plug-name-eq'
+    filters: # a:1:{i:0;a:6:{s:4:"glue";s:3:"and";s:5:"field";s:5:"cmo_2";s:6:"object";s:13:"custom_object";s:4:"type";s:4:"text";s:8:"operator";s:1:"=";s:10:"properties";a:1:{s:6:"filter";s:12:"Ordered plug";}}}
+      0:
+        glue : 'and'
+        field: 'cmo_2' # custom_field.id
+        object: 'custom_object'
+        type: 'test'
+        operator: '='
+        properties:
+          filter: 'Ordered plug'
+    is_global: true
+    is_preference_center: false
+
+  date-lt-1990:
+    is_published: true
+    name: 'Date < 1990'
+    alias: 'date-lt-1990'
+    filters: # a:1:{i:0;a:6:{s:4:"glue";s:3:"and";s:5:"field";s:5:"cmf_2";s:6:"object";s:13:"custom_object";s:4:"type";s:4:"date";s:8:"operator";s:2:"lt";s:10:"properties";a:1:{s:6:"filter";s:4:"1990";}}}
+      0:
+        glue : 'and'
+        field: 'cmf_2' # custom_field.id
+        object: 'custom_object'
+        type: 'date'
+        operator: 'lt'
+        properties:
+          filter: '1990-01-01'
+    is_global: true
+    is_preference_center: false
+
+  datetime-gt-1990:
+    is_published: true
+    name: 'DateTime > 1990'
+    alias: 'datetime-gt-1990'
+    filters:
+      0:
+        glue : 'and'
+        field: 'cmf_3' # custom_field.id
+        object: 'custom_object'
+        type: 'datetime'
+        operator: 'gt'
+        properties:
+          filter: '1990-01-01 00:00:00'
+    is_global: true
+    is_preference_center: false
+
+  price-greater-500:
+    is_published: true
+    name: 'Price > 500'
+    alias: 'price-greater-500'
+    filters: # a:1:{i:0;a:6:{s:4:"glue";s:3:"and";s:5:"field";s:5:"cmf_1";s:6:"object";s:13:"custom_object";s:4:"type";s:3:"int";s:8:"operator";s:2:"gt";s:10:"properties";a:1:{s:6:"filter";s:3:"500";}}}
+      0:
+        glue : 'and'
+        field: 'cmf_4' # custom_field.id
+        object: 'custom_object'
+        type: 'int'
+        operator: 'gt'
+        properties:
+          filter: '500'
+    is_global: true
+    is_preference_center: false
+
+  price-eq-500:
+    is_published: true
+    name: 'Price = 500'
+    alias: 'price-eq-500'
+    filters:
+      0:
+        glue : 'and'
+        field: 'cmf_4' # custom_field.id
+        object: 'custom_object'
+        type: 'int'
+        operator: 'eq'
+        properties:
+          filter: '500'
+    is_global: true
+    is_preference_center: false
+
+  price-greater-1000:
+    is_published: true
+    name: 'Price > 1000'
+    alias: 'price-greater-1000'
+    filters:
+      0:
+        glue : 'and'
+        field: 'cmf_4' # custom_field.id
+        object: 'custom_object'
+        type: 'int'
+        operator: 'gt'
+        properties:
+          filter: '1000'
+    is_global: true
+    is_preference_center: false
+
+  price-lte-1000:
+    is_published: true
+    name: 'Price <= 1000'
+    alias: 'price-lte-1000'
+    filters:
+      0:
+        glue : 'and'
+        field: 'cmf_4' # custom_field.id
+        object: 'custom_object'
+        type: 'int'
+        operator: 'lte'
+        properties:
+          filter: '1000'
+    is_global: true
+    is_preference_center: false
+
+  price-lt-500:
+    is_published: true
+    name: 'Price < 500'
+    alias: 'price-lt-500'
+    filters:
+      0:
+        glue : 'and'
+        field: 'cmf_4' # custom_field.id
+        object: 'custom_object'
+        type: 'int'
+        operator: 'lt'
+        properties:
+          filter: '500'
+    is_global: true
+    is_preference_center: false
+
+  option-in-1:
+    is_published: true
+    name: 'Multiselect = 1'
+    alias: 'option-in-1'
+    filters: # a:1:{i:0;a:6:{s:4:"glue";s:3:"and";s:5:"field";s:5:"cmf_1";s:6:"object";s:13:"custom_object";s:4:"type";s:6:"select";s:8:"operator";s:2:"in";s:10:"properties";a:1:{s:6:"filter";a:1:{i:0;s:1:"1";}}}}
+      0:
+        glue : 'and'
+        field: 'cmf_1' # custom_field.id
+        object: 'custom_object'
+        type: 'multiselect'
+        operator: 'in'
+        properties:
+          filter:
+            0: '1'
+    is_global: true
+    is_preference_center: false
+
+  text-eq-text:
+    is_published: true
+    name: 'Text = text'
+    alias: 'text-eq-text'
+    filters:
+      0:
+        glue : 'and'
+        field: 'cmf_5' # custom_field.id
+        object: 'custom_object'
+        type: 'text'
+        operator: '='
+        properties:
+          filter: 'text'
+    is_global: true
+    is_preference_center: false
