@@ -89,7 +89,7 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
      */
     public function testApplyQuery1stLevel(): void
     {
-        $this->markTestSkipped('Multilevel testing not implemented yet');
+        $this->markTestSkipped('Multilevel testing not implemented yet.');
 
         $this->runCommand(
             'mautic:segments:update',

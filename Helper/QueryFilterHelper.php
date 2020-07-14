@@ -25,6 +25,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
+use RuntimeException;
 
 class QueryFilterHelper
 {
@@ -56,6 +57,7 @@ class QueryFilterHelper
      * @return array String representation of query because of https://github.com/doctrine/orm/issues/5657#issuecomment-181228313
      * @throws NotFoundException
      * @throws DBALException
+     * @throws RuntimeException
      */
     public function createValueQuery(
         Connection $connection,
@@ -64,7 +66,7 @@ class QueryFilterHelper
     ): array {
         if ($this->itemRelationLevelLimit > 2) {
             // @todo
-            throw new \RuntimeException("Relationship level higher than 2 is not implemented yet");
+            throw new RuntimeException("Relationship level higher than 2 is not implemented yet");
         }
 
         $segmentFilterFieldId   = (int) $segmentFilter->getField();
@@ -151,12 +153,13 @@ class QueryFilterHelper
             $subSelects[] = $qb;
         }
 
-        $parameters = [];
+        $parameters = $parameterTypes = [];
 
         /** @var SegmentQueryBuilder $subSelect */
         foreach ($subSelects as $key => $subSelect) {
             // Apply parameter values
             $parameters = array_merge($parameters, $subSelect->getParameters());
+            $parameterTypes = array_merge($parameterTypes, $subSelect->getParameterTypes());
             // Use string representation - https://github.com/doctrine/orm/issues/5657#issuecomment-181228313
             $subSelects[$key] = $subSelect->getSQL();
         }
@@ -164,6 +167,7 @@ class QueryFilterHelper
         return [
             implode(' UNION ALL ', $subSelects),
             $parameters,
+            $parameterTypes,
         ];
     }
 
