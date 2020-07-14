@@ -140,10 +140,10 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
 
         $this->assertLeadCountBySegmentAlias(0, 'price-lt-500');
 
-//        // option - multiselect
-//        $this->assertLeadCountBySegmentAlias(2, 'option-in-1');
-//        $this->assertContactIsInSegment('rich@toaster.net', 'option-in-1');
-//        $this->assertContactIsInSegment('direct@relation.net', 'option-in-1');
+        // option - multiselect
+        $this->assertLeadCountBySegmentAlias(2, 'option-in-1');
+        $this->assertContactIsInSegment('rich@toaster.net', 'option-in-1');
+        $this->assertContactIsInSegment('direct@relation.net', 'option-in-1');
 
         // text
         $this->assertLeadCountBySegmentAlias(2, 'text-eq-text');

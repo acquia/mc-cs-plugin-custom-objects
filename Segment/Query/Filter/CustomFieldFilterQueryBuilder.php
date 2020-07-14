@@ -13,13 +13,11 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Segment\Query\Filter;
 
-use Doctrine\DBAL\DBALException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
-use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
@@ -58,8 +56,6 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
     }
 
     /**
-     * @throws DBALException
-     * @throws InvalidArgumentException
      * @throws NotFoundException
      */
     public function applyQuery(SegmentQueryBuilder $queryBuilder, ContactSegmentFilter $filter): SegmentQueryBuilder
@@ -68,7 +64,7 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $tableAlias = 'cfwq_'.(int) $filter->getField();
 
-        [$queryString, $parameters, $parameterTypes] = $this->filterHelper->createValueQuery(
+        $unionQueryContainer = $this->filterHelper->createValueQuery(
             $queryBuilder->getConnection(),
             $tableAlias,
             $filter
@@ -79,19 +75,20 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
             case 'neq':
             case 'notLike':
             case '!multiselect':
-                $queryBuilder->addLogic($queryBuilder->expr()->notExists($queryString), $filter->getGlue());
+                $queryBuilder->addLogic(
+                    $queryBuilder->expr()->notExists($unionQueryContainer->getMergedQueryString()),
+                    $filter->getGlue()
+                );
 
                 break;
             default:
-                $queryBuilder->addLogic($queryBuilder->expr()->exists($queryString), $filter->getGlue());
+                $queryBuilder->addLogic(
+                    $queryBuilder->expr()->exists($unionQueryContainer->getMergedQueryString()),
+                    $filter->getGlue()
+                );
         }
 
-        foreach ($parameters as $key => $value) {
-            $parameterType = $parameterTypes[$key] ?? null;
-            $queryBuilder->setParameter($key, $value, $parameterType);
-        }
-
-        $queryBuilder->setParameters($parameters);
+        $queryBuilder->setParameters($unionQueryContainer->getParameters(), $unionQueryContainer->getParameterTypes());
 
         return $queryBuilder;
     }
