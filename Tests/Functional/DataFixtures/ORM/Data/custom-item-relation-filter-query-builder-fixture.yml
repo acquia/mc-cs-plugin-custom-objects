@@ -358,9 +358,10 @@ Mautic\LeadBundle\Entity\LeadList:
         operator: 'in'
         properties:
           filter:
-            0: '1'
+            0: '1' # ID of custom_field_toaster_option
         filter: # this seems to be bug, but it describes current behavior
-          0: '1'
+          0: '1' # ID of custom_field_toaster_option
+        display: null
     is_global: true
     is_preference_center: false
 

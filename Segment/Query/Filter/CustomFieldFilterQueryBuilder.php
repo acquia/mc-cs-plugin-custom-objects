@@ -68,7 +68,7 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $tableAlias = 'cfwq_'.(int) $filter->getField();
 
-        [$queryString, $parameters] = $this->filterHelper->createValueQuery(
+        [$queryString, $parameters, $parameterTypes] = $this->filterHelper->createValueQuery(
             $queryBuilder->getConnection(),
             $tableAlias,
             $filter
@@ -86,6 +86,10 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
                 $queryBuilder->addLogic($queryBuilder->expr()->exists($queryString), $filter->getGlue());
         }
 
+        foreach ($parameters as $key => $value) {
+            $parameterType = $parameterTypes[$key] ?? null;
+            $queryBuilder->setParameter($key, $value, $parameterType);
+        }
 
         $queryBuilder->setParameters($parameters);
 
