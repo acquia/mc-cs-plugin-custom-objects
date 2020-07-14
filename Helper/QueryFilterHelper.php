@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Helper;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
@@ -25,6 +24,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
+use MauticPlugin\CustomObjectsBundle\Segment\Query\UnionQueryContainer;
 use RuntimeException;
 
 class QueryFilterHelper
@@ -56,14 +56,13 @@ class QueryFilterHelper
     /**
      * @return array String representation of query because of https://github.com/doctrine/orm/issues/5657#issuecomment-181228313
      * @throws NotFoundException
-     * @throws DBALException
      * @throws RuntimeException
      */
     public function createValueQuery(
         Connection $connection,
         string $alias,
         ContactSegmentFilter $segmentFilter
-    ): array {
+    ): UnionQueryContainer {
         if ($this->itemRelationLevelLimit > 2) {
             // @todo
             throw new RuntimeException("Relationship level higher than 2 is not implemented yet");
@@ -74,7 +73,7 @@ class QueryFilterHelper
         $segmentFilterFieldType = $segmentFilterFieldType ?: $this->getCustomFieldType($segmentFilterFieldId);
         $dataTable              = $this->fieldTypeProvider->getType($segmentFilterFieldType)->getTableName();
 
-        $subSelects = [];
+        $unionQueryContainer = new UnionQueryContainer();
 
         $qb = new SegmentQueryBuilder($connection);
         $qb
@@ -91,11 +90,10 @@ class QueryFilterHelper
                 $qb->expr()->eq("{$alias}_value.custom_field_id", ":{$alias}_custom_field_id")
             )
             ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId)
-            ->setParameter(":{$alias}_value_value", $segmentFilter->getParameterValue())
-        ;
+            ->setParameter(":{$alias}_value_value", $segmentFilter->getParameterValue());
 
         $this->addCustomFieldValueExpressionFromSegmentFilter($qb, $alias, $segmentFilter);
-        $subSelects[] = $qb;
+        $unionQueryContainer->addQuery($qb);
 
         if ($this->itemRelationLevelLimit > 1) {
             $qb = new SegmentQueryBuilder($connection);
@@ -119,11 +117,10 @@ class QueryFilterHelper
                     $qb->expr()->eq("{$alias}_value.custom_field_id", ":{$alias}_custom_field_id")
                 )
                 ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId)
-                ->setParameter(":{$alias}_value_value", $segmentFilter->getParameterValue())
-            ;
+                ->setParameter(":{$alias}_value_value", $segmentFilter->getParameterValue());
 
             $this->addCustomFieldValueExpressionFromSegmentFilter($qb, $alias, $segmentFilter);
-            $subSelects[] = $qb;
+            $unionQueryContainer->addQuery($qb);
 
             $qb = new SegmentQueryBuilder($connection);
             $qb
@@ -146,29 +143,13 @@ class QueryFilterHelper
                     $qb->expr()->eq("{$alias}_value.custom_field_id", ":{$alias}_custom_field_id")
                 )
                 ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId)
-                ->setParameter(":{$alias}_value_value", $segmentFilter->getParameterValue())
-            ;
+                ->setParameter(":{$alias}_value_value", $segmentFilter->getParameterValue());
 
             $this->addCustomFieldValueExpressionFromSegmentFilter($qb, $alias, $segmentFilter);
-            $subSelects[] = $qb;
+            $unionQueryContainer->addQuery($qb);
         }
 
-        $parameters = $parameterTypes = [];
-
-        /** @var SegmentQueryBuilder $subSelect */
-        foreach ($subSelects as $key => $subSelect) {
-            // Apply parameter values
-            $parameters = array_merge($parameters, $subSelect->getParameters());
-            $parameterTypes = array_merge($parameterTypes, $subSelect->getParameterTypes());
-            // Use string representation - https://github.com/doctrine/orm/issues/5657#issuecomment-181228313
-            $subSelects[$key] = $subSelect->getSQL();
-        }
-
-        return [
-            implode(' UNION ALL ', $subSelects),
-            $parameters,
-            $parameterTypes,
-        ];
+        return $unionQueryContainer;
     }
 
     public function createItemNameQueryBuilder(Connection $connection, string $queryBuilderAlias): SegmentQueryBuilder
