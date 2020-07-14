@@ -27,7 +27,7 @@ class Version_0_0_14 extends AbstractMigration
      */
     protected function up(): void
     {
-        $this->addSql("ALTER TABLE {$this->concatPrefix('custom_field')} ADD show_in_custom_object_detail_list TINYINT(1) DEFAULT NULL, ADD show_in_contact_detail_list TINYINT(1) DEFAULT NULL");
+        $this->addSql("ALTER TABLE {$this->concatPrefix('custom_field')} ADD show_in_custom_object_detail_list TINYINT(1) DEFAULT 1 NOT NULL, ADD show_in_contact_detail_list TINYINT(1) DEFAULT 1 NOT NULL");
         $this->addSql("UPDATE {$this->concatPrefix('custom_field')} SET show_in_custom_object_detail_list = 1, show_in_contact_detail_list = 1");
     }
 }

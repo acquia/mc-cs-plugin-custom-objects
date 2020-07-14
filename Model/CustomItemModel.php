@@ -22,6 +22,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
+use MauticPlugin\CustomObjectsBundle\DTO\CustomItemFieldListData;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption;

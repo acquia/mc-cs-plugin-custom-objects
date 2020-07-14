@@ -9,8 +9,8 @@
 * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
 */
 
+use MauticPlugin\CustomObjectsBundle\DTO\CustomItemFieldListData;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemFieldListData;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 
 /** @var CustomItemFieldListData|null $fieldData */
@@ -73,7 +73,7 @@ $routeSelf = $view['router']->path(
                     <?php foreach ($fieldData->getColumnLabels() as $columnLabel): ?>
                         <?php echo $view->render('MauticCoreBundle:Helper:tableheader.html.php', ['text' => $columnLabel]); ?>
                     <?php endforeach; ?>
-                <?endif; ?>
+                <?php endif; ?>
             </tr>
             </thead>
             <tbody>
@@ -103,7 +103,7 @@ $routeSelf = $view['router']->path(
                                 <?php echo $view->render('CustomObjectsBundle:CustomField:value.html.php', ['fieldValue'  => $fieldValue]); ?>
                             </td>
                         <?php endforeach; ?>
-                    <?endif; ?>
+                    <?php endif; ?>
                 </tr>
             <?php endforeach; ?>
             </tbody>

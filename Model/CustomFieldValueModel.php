@@ -17,6 +17,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use MauticPlugin\CustomObjectsBundle\DTO\CustomItemFieldListData;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption;
