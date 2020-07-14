@@ -177,12 +177,12 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
         $builder->createField('showInCustomObjectDetailList', Type::BOOLEAN)
             ->columnName('show_in_custom_object_detail_list')
-            ->nullable()
+            ->option('default', true)
             ->build();
 
         $builder->createField('showInContactDetailList', Type::BOOLEAN)
             ->columnName('show_in_contact_detail_list')
-            ->nullable()
+            ->option('default', true)
             ->build();
     }
 

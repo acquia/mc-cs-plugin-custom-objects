@@ -11,7 +11,7 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\CustomObjectsBundle\Model;
+namespace MauticPlugin\CustomObjectsBundle\DTO;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 
@@ -27,9 +27,6 @@ class CustomItemFieldListData
      */
     private $data;
 
-    /**
-     * CustomItemFieldListData constructor.
-     */
     public function __construct(array $columns, array $data)
     {
         $this->columns = $columns;
