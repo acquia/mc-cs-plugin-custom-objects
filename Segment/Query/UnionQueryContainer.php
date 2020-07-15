@@ -42,9 +42,16 @@ class UnionQueryContainer implements \Iterator
      */
     private $position = 0;
 
-    public function addQuery(SegmentQueryBuilder $queryBuilder): void
+    /**
+     * Whether parameters needs to be rebuild.
+     * @var bool
+     */
+    private $needsRebuild = false;
+
+    public function add(SegmentQueryBuilder $queryBuilder): void
     {
-        $this->queries[]      = $queryBuilder;
+        $this->queries[]    = $queryBuilder;
+        $this->needsRebuild = true;
     }
 
     /**
@@ -56,19 +63,29 @@ class UnionQueryContainer implements \Iterator
         foreach ($this->queries as $query) {
             $this->parameters     = array_merge($this->parameters, $query->getParameters());
             $this->parameterTypes = array_merge($this->parameterTypes, $query->getParameterTypes());
-            $queries[] = $query->getSQL();
+            $queries[]            = $query->getSQL();
         }
+
+        $this->needsRebuild = false;
 
         return implode(' UNION ALL ', $queries);
     }
 
+    /**
+     * @throws \RuntimeException
+     */
     public function getParameters(): array
     {
+        $this->checkRebuildStatus();
         return $this->parameters;
     }
 
+    /**
+     * @throws \RuntimeException
+     */
     public function getParameterTypes(): array
     {
+        $this->checkRebuildStatus();
         return $this->parameterTypes;
     }
 
@@ -97,5 +114,16 @@ class UnionQueryContainer implements \Iterator
     public function rewind(): void
     {
         $this->position = 0;
+    }
+
+    /**
+     * This checks development workflow to prevent bugs
+     * @throws \RuntimeException
+     */
+    private function checkRebuildStatus(): void
+    {
+        if ($this->needsRebuild) {
+            throw new \RuntimeException('Use getMergedQueryString() method at first to rebuild parameters and types');
+        }
     }
 }
