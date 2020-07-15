@@ -50,10 +50,7 @@ class CustomItemNameFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $tableAlias = 'cin_'.(int) $filter->getField();
 
-        $filterQueryBuilder = $this->filterHelper->createItemNameQueryBuilder(
-            $queryBuilder->getConnection(),
-            $tableAlias
-        );
+        $filterQueryBuilder = $this->filterHelper->createItemNameQueryBuilder($tableAlias);
 
         $filterQueryBuilder->andWhere(
             $filterQueryBuilder->expr()->eq($tableAlias.'_item.custom_object_id', ':'.$tableAlias.'ObjectId')
