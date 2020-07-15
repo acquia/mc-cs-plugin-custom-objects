@@ -66,7 +66,7 @@ class UnionQueryContainerTest extends TestCase
             ->where('column1 > :param1')
             ->setParameter('param1', 1);
 
-        $this->unionQueryContainer->addQuery($qb);
+        $this->unionQueryContainer->add($qb);
 
         $this->assertEquals(
             'SELECT table_1 WHERE column1 > :param1',
@@ -92,7 +92,7 @@ class UnionQueryContainerTest extends TestCase
             ->where('column2 = :param2')
             ->setParameter('param2', [2, 3], Connection::PARAM_INT_ARRAY);
 
-        $this->unionQueryContainer->addQuery($qb);
+        $this->unionQueryContainer->add($qb);
 
         $this->assertEquals(
             'SELECT table_1 WHERE column1 > :param1 UNION ALL SELECT table_2 WHERE column2 = :param2',
@@ -125,5 +125,30 @@ class UnionQueryContainerTest extends TestCase
         }
 
         $this->assertTrue($iterable, 'Could not iterate content with foreach');
+    }
+
+    public function testParametersCheck()
+    {
+        $this->unionQueryContainer->getParameters();
+
+        $qb = new SegmentQueryBuilder($this->connection);
+        $qb->select('table')->where('column = :param');
+        $this->unionQueryContainer->add($qb);
+
+        $this->expectException(\RuntimeException::class);
+        $this->unionQueryContainer->getParameters();
+        $this->unionQueryContainer->getParameterTypes();
+    }
+
+    public function testParameterTypesCheck()
+    {
+        $this->unionQueryContainer->getParameterTypes();
+
+        $qb = new SegmentQueryBuilder($this->connection);
+        $qb->select('table')->where('column = :param');
+        $this->unionQueryContainer->add($qb);
+
+        $this->expectException(\RuntimeException::class);
+        $this->unionQueryContainer->getParameterTypes();
     }
 }
