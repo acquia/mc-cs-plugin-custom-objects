@@ -65,7 +65,6 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
         $tableAlias = 'cfwq_'.(int) $filter->getField();
 
         $unionQueryContainer = $this->filterHelper->createValueQuery(
-            $queryBuilder->getConnection(),
             $tableAlias,
             $filter
         );

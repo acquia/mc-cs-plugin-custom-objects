@@ -59,7 +59,6 @@ class QueryFilterHelper
      * @throws RuntimeException
      */
     public function createValueQuery(
-        Connection $connection,
         string $alias,
         ContactSegmentFilter $segmentFilter
     ): UnionQueryContainer {
@@ -75,7 +74,7 @@ class QueryFilterHelper
 
         $unionQueryContainer = new UnionQueryContainer();
 
-        $qb = new SegmentQueryBuilder($connection);
+        $qb = new SegmentQueryBuilder($this->entityManager->getConnection());
         $qb
             ->select('contact_id')
             ->from(MAUTIC_TABLE_PREFIX.$dataTable, "{$alias}_value")
@@ -96,7 +95,7 @@ class QueryFilterHelper
         $unionQueryContainer->addQuery($qb);
 
         if ($this->itemRelationLevelLimit > 1) {
-            $qb = new SegmentQueryBuilder($connection);
+            $qb = new SegmentQueryBuilder($this->entityManager->getConnection());
             $qb
                 ->select('contact_id')
                 ->from(MAUTIC_TABLE_PREFIX.$dataTable, "{$alias}_value")
@@ -122,7 +121,7 @@ class QueryFilterHelper
             $this->addCustomFieldValueExpressionFromSegmentFilter($qb, $alias, $segmentFilter);
             $unionQueryContainer->addQuery($qb);
 
-            $qb = new SegmentQueryBuilder($connection);
+            $qb = new SegmentQueryBuilder($this->entityManager->getConnection());
             $qb
                 ->select('contact_id')
                 ->from(MAUTIC_TABLE_PREFIX.$dataTable, "{$alias}_value")
@@ -152,9 +151,9 @@ class QueryFilterHelper
         return $unionQueryContainer;
     }
 
-    public function createItemNameQueryBuilder(Connection $connection, string $queryBuilderAlias): SegmentQueryBuilder
+    public function createItemNameQueryBuilder(string $queryBuilderAlias): SegmentQueryBuilder
     {
-        $queryBuilder = new SegmentQueryBuilder($connection);
+        $queryBuilder = new SegmentQueryBuilder($this->entityManager->getConnection());
 
         // @todo keep this functionality
         return $this->getBasicItemQueryBuilder($queryBuilder, $queryBuilderAlias);
@@ -229,7 +228,7 @@ class QueryFilterHelper
             case 'notIn':
             case 'multiselect':
             case 'in':
-                $valueType      = $queryBuilder->getConnection()::PARAM_STR_ARRAY;
+                $valueType      = Connection::PARAM_STR_ARRAY;
                 $valueParameter = $tableAlias.'_value_value';
 
                 break;
