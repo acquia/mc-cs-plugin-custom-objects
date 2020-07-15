@@ -44,8 +44,6 @@ class UnionQueryContainer implements \Iterator
 
     public function addQuery(SegmentQueryBuilder $queryBuilder): void
     {
-        $this->parameters     = array_merge($this->parameters, $queryBuilder->getParameters());
-        $this->parameterTypes = array_merge($this->parameterTypes, $queryBuilder->getParameterTypes());
         $this->queries[]      = $queryBuilder;
     }
 
@@ -56,6 +54,8 @@ class UnionQueryContainer implements \Iterator
     {
         $queries = [];
         foreach ($this->queries as $query) {
+            $this->parameters     = array_merge($this->parameters, $query->getParameters());
+            $this->parameterTypes = array_merge($this->parameterTypes, $query->getParameterTypes());
             $queries[] = $query->getSQL();
         }
 
