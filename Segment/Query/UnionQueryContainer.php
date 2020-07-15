@@ -20,7 +20,7 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
  * This is covering impossibility to use union in Doctrine QueryBuilder
  * @see https://github.com/doctrine/orm/issues/5657#issuecomment-181228313
  */
-class UnionQueryContainer
+class UnionQueryContainer implements \Iterator
 {
     /**
      * @var SegmentQueryBuilder[]
@@ -36,6 +36,11 @@ class UnionQueryContainer
      * @var array
      */
     private $parameterTypes = [];
+
+    /**
+     * @var int
+     */
+    private $position = 0;
 
     public function addQuery(SegmentQueryBuilder $queryBuilder): void
     {
@@ -65,5 +70,32 @@ class UnionQueryContainer
     public function getParameterTypes(): array
     {
         return $this->parameterTypes;
+    }
+
+    // Iterator methods
+
+    public function current(): SegmentQueryBuilder
+    {
+        return $this->queries[$this->position];
+    }
+
+    public function next(): void
+    {
+        ++$this->position;
+    }
+
+    public function key(): int
+    {
+        return $this->position;
+    }
+
+    public function valid(): bool
+    {
+        return isset($this->queries[$this->position]);
+    }
+
+    public function rewind(): void
+    {
+        $this->position = 0;
     }
 }
