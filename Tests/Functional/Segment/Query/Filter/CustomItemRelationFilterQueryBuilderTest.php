@@ -85,7 +85,7 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
     /**
      * Limit of relations must be set here to 1
      * @see plugins/CustomObjectsBundle/Config/config.php::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT
-     * This is not possible right now, to change this value and rerun app.
+     * This is not possible right now, to change this value and rerun configured app with container
      */
     public function testApplyQuery1stLevel(): void
     {
