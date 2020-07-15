@@ -116,5 +116,14 @@ class UnionQueryContainerTest extends TestCase
             ],
             $this->unionQueryContainer->getParameterTypes()
         );
+
+        $iterable = false;
+        foreach ($this->unionQueryContainer as $segmentQueryBuilder) {
+            $this->assertInstanceOf(SegmentQueryBuilder::class, $segmentQueryBuilder);
+            $iterable = true;
+            break;
+        }
+
+        $this->assertTrue($iterable, 'Could not iterate content with foreach');
     }
 }
