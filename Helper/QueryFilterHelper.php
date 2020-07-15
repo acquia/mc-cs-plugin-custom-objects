@@ -91,7 +91,7 @@ class QueryFilterHelper
             ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId)
             ->setParameter(":{$alias}_value_value", $segmentFilter->getParameterValue());
 
-        $unionQueryContainer->addQuery($qb);
+        $unionQueryContainer->add($qb);
 
         if ($this->itemRelationLevelLimit > 1) {
             $qb = new SegmentQueryBuilder($this->entityManager->getConnection());
@@ -117,7 +117,7 @@ class QueryFilterHelper
                 ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId)
                 ->setParameter(":{$alias}_value_value", $segmentFilter->getParameterValue());
 
-            $unionQueryContainer->addQuery($qb);
+            $unionQueryContainer->add($qb);
 
             $qb = new SegmentQueryBuilder($this->entityManager->getConnection());
             $qb
@@ -142,7 +142,7 @@ class QueryFilterHelper
                 ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId)
                 ->setParameter(":{$alias}_value_value", $segmentFilter->getParameterValue());
 
-            $unionQueryContainer->addQuery($qb);
+            $unionQueryContainer->add($qb);
         }
 
         $this->addCustomFieldValueExpressionFromSegmentFilter($unionQueryContainer, $alias, $segmentFilter);
