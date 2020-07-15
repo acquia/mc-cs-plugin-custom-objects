@@ -87,6 +87,7 @@ class UnionQueryContainerTest extends TestCase
 
         # Test two queries
 
+        $qb = new SegmentQueryBuilder($this->connection);
         $qb->select('table_2')
             ->where('column2 = :param2')
             ->setParameter('param2', [2, 3], Connection::PARAM_INT_ARRAY);

@@ -23,7 +23,7 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
 class UnionQueryContainer
 {
     /**
-     * @var string[]
+     * @var SegmentQueryBuilder[]
      */
     private $queries = [];
 
@@ -37,20 +37,24 @@ class UnionQueryContainer
      */
     private $parameterTypes = [];
 
-    /**
-     * @throws DBALException
-     */
     public function addQuery(SegmentQueryBuilder $queryBuilder): void
     {
         $this->parameters     = array_merge($this->parameters, $queryBuilder->getParameters());
         $this->parameterTypes = array_merge($this->parameterTypes, $queryBuilder->getParameterTypes());
-
-        $this->queries[] = $queryBuilder->getSQL();
+        $this->queries[]      = $queryBuilder;
     }
 
+    /**
+     * @throws DBALException
+     */
     public function getMergedQueryString(): string
     {
-        return implode(' UNION ALL ', $this->queries);
+        $queries = [];
+        foreach ($this->queries as $query) {
+            $queries[] = $query->getSQL();
+        }
+
+        return implode(' UNION ALL ', $queries);
     }
 
     public function getParameters(): array
