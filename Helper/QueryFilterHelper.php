@@ -91,7 +91,6 @@ class QueryFilterHelper
             ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId)
             ->setParameter(":{$alias}_value_value", $segmentFilter->getParameterValue());
 
-        $this->addCustomFieldValueExpressionFromSegmentFilter($qb, $alias, $segmentFilter);
         $unionQueryContainer->addQuery($qb);
 
         if ($this->itemRelationLevelLimit > 1) {
@@ -118,7 +117,6 @@ class QueryFilterHelper
                 ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId)
                 ->setParameter(":{$alias}_value_value", $segmentFilter->getParameterValue());
 
-            $this->addCustomFieldValueExpressionFromSegmentFilter($qb, $alias, $segmentFilter);
             $unionQueryContainer->addQuery($qb);
 
             $qb = new SegmentQueryBuilder($this->entityManager->getConnection());
@@ -144,9 +142,10 @@ class QueryFilterHelper
                 ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId)
                 ->setParameter(":{$alias}_value_value", $segmentFilter->getParameterValue());
 
-            $this->addCustomFieldValueExpressionFromSegmentFilter($qb, $alias, $segmentFilter);
             $unionQueryContainer->addQuery($qb);
         }
+
+        $this->addCustomFieldValueExpressionFromSegmentFilter($unionQueryContainer, $alias, $segmentFilter);
 
         return $unionQueryContainer;
     }
@@ -182,19 +181,21 @@ class QueryFilterHelper
     }
 
     public function addCustomFieldValueExpressionFromSegmentFilter(
-        SegmentQueryBuilder $queryBuilder,
+        UnionQueryContainer $unionQueryContainer,
         string $tableAlias,
         ContactSegmentFilter $filter
     ): void {
-        $expression = $this->getCustomValueValueExpression($queryBuilder, $tableAlias, $filter->getOperator());
+        foreach ($unionQueryContainer as $segmentQueryBuilder){
+            $expression = $this->getCustomValueValueExpression($segmentQueryBuilder, $tableAlias, $filter->getOperator());
 
-        $this->addOperatorExpression(
-            $queryBuilder,
-            $tableAlias,
-            $expression,
-            $filter->getOperator(),
-            $filter->getParameterValue()
-        );
+            $this->addOperatorExpression(
+                $segmentQueryBuilder,
+                $tableAlias,
+                $expression,
+                $filter->getOperator(),
+                $filter->getParameterValue()
+            );
+        }
     }
 
     public function addCustomObjectNameExpression(
@@ -212,7 +213,7 @@ class QueryFilterHelper
      * @param array|string|CompositeExpression|null $value
      */
     private function addOperatorExpression(
-        SegmentQueryBuilder $queryBuilder,
+        SegmentQueryBuilder $segmentQueryBuilder,
         string $tableAlias,
         $expression,
         string $operator,
@@ -240,13 +241,13 @@ class QueryFilterHelper
             case 'notIn':
                 break;
             default:
-                $queryBuilder->andWhere($expression);
+                $segmentQueryBuilder->andWhere($expression);
 
                 break;
         }
 
         if (isset($valueParameter)) {
-            $queryBuilder->setParameter($valueParameter, $value, $valueType);
+            $segmentQueryBuilder->setParameter($valueParameter, $value, $valueType);
         }
     }
 
