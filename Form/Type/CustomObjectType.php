@@ -142,27 +142,6 @@ class CustomObjectType extends AbstractType
             ]
         );
 
-        $builder->add(
-            'relationship',
-            ChoiceType::class,
-            [
-                'label'      => 'custom.object.relationship.label',
-                'required'   => true,
-                'placeholder' => '',
-                'empty_data' => null,
-                'label_attr' => ['class' => 'control-label'],
-                'attr'       => [
-                    'class'        => 'form-control',
-                    'data-show-on' => '{"custom_object_type":["'.CustomObject::TYPE_RELATIONSHIP.'"]}',
-                ],
-                'choices'    => [
-                    'custom.object.relationship.many_to_many' => CustomObject::RELATIONSHIP_MANY_TO_MANY,
-                    'custom.object.relationship.one_to_one'   => CustomObject::RELATIONSHIP_ONE_TO_ONE,
-                ],
-                'disabled'   => !$isNewObject,
-            ]
-        );
-
         $transformer = new IdToEntityModelTransformer($this->entityManager, CustomObject::class);
 
         $builder->add(

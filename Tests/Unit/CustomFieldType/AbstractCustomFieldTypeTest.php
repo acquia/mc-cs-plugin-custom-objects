@@ -94,10 +94,10 @@ class AbstractCustomFieldTypeTest extends \PHPUnit\Framework\TestCase
         $this->filterOperatorProvider->expects($this->once())
             ->method('getAllOperators')
             ->willReturn([
-                'empty'  => [],
-                '!empty' => [],
-                '='      => [],
-                '!='     => [],
+                'empty'  => ['label' => 'empty'],
+                '!empty' => ['label' => 'not empty'],
+                '='      => ['label' => 'equal'],
+                '!='     => ['label' => 'not equal'],
             ]);
 
         $this->assertArrayHasKey('=', $this->fieldType->getOperatorOptions());

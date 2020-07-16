@@ -25,7 +25,6 @@ class Version_0_0_11 extends AbstractMigration
 
         try {
             return !$schema->getTable($tableCustomObject)->hasColumn('type') ||
-                !$schema->getTable($tableCustomObject)->hasColumn('relationship') ||
                 !$schema->getTable($tableCustomObject)->hasColumn('master_object');
         } catch (SchemaException $e) {
             return false;
@@ -41,9 +40,6 @@ class Version_0_0_11 extends AbstractMigration
         $default = CustomObject::TYPE_MASTER;
 
         $this->addSql("ALTER TABLE {$tableCustomObject} ADD type INT DEFAULT {$default}, ADD INDEX (type)");
-
-        $this->addSql("ALTER TABLE {$tableCustomObject} ADD relationship INT, ADD INDEX (relationship)");
-
         $this->addSql("ALTER TABLE {$tableCustomObject} ADD master_object INT, ADD INDEX (master_object)");
     }
 }
