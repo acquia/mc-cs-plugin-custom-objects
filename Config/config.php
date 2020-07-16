@@ -1094,7 +1094,6 @@ return [
             'custom_object.query.filter.factory' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory::class,
                 'arguments' => [
-                    'database_connection',
                     'mautic.lead.model.lead_segment_filter_factory',
                     'custom_object.query.filter.helper',
                 ],
