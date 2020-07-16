@@ -21,7 +21,6 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\ArrayHelper;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Form\Validator\Constraints\CustomObjectTypeValues;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
@@ -328,17 +327,31 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         throw new NotFoundException("Custom field with order index '${order}' not found.");
     }
 
-    /**
-     * @return Collection
-     */
-    public function getPublishedFields()
+    public function getPublishedFields(): Collection
     {
-        return $this->getCustomFields()
-            ->filter(
-                function (\MauticPlugin\CustomObjectsBundle\Entity\CustomField $customField) {
-                    return $customField->isPublished();
-                }
-            );
+        return $this->customFields->filter(
+            function (CustomField $customField) {
+                return $customField->isPublished();
+            }
+        );
+    }
+
+    public function getFieldsShowInCustomObjectDetailList(): Collection
+    {
+        return $this->customFields->filter(
+            function (CustomField $customField) {
+                return $customField->isShowInCustomObjectDetailList();
+            }
+        );
+    }
+
+    public function getFieldsShowInContactDetailList(): Collection
+    {
+        return $this->customFields->filter(
+            function (CustomField $customField) {
+                return $customField->isShowInContactDetailList();
+            }
+        );
     }
 
     /**

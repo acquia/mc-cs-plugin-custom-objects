@@ -121,7 +121,7 @@ class ContactTabSubscriber implements EventSubscriberInterface
                     'tabId'             => "custom-object-{$object->getId()}",
                     'page'              => 1,
                     'search'            => '',
-                    'placeholder'       => $this->translator->trans('custom.item.link.search.placeholder', ['%object%' => $object->getNameSingular()]),
+                    'placeholder'       => $this->translator->trans('custom.item.link.search.placeholder.contact', ['%object%' => $object->getNameSingular()]),
                     'lookupRoute'       => $this->customItemRouteProvider->buildLookupRoute((int) $object->getId(), 'contact', (int) $contact->getId()),
                     'newRoute'          => $this->customItemRouteProvider->buildNewRouteWithRedirectToContact((int) $object->getId(), (int) $contact->getId()),
                 ];

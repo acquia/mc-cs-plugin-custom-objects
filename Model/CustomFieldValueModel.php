@@ -15,7 +15,9 @@ namespace MauticPlugin\CustomObjectsBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
+use MauticPlugin\CustomObjectsBundle\DTO\CustomItemFieldListData;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption;
@@ -117,6 +119,23 @@ class CustomFieldValueModel
     }
 
     /**
+     * @param CustomItem[] $customItems
+     */
+    public function getItemsListData(Collection $customFields, array $customItems): ?CustomItemFieldListData
+    {
+        if (0 === count($customFields) || 0 === count($customItems)) {
+            return null;
+        }
+
+        $columns = $customFields->map(function (CustomField $customField) {
+            return $customField->getLabel();
+        });
+        $data = $this->buildItemsListData($customFields->toArray(), $customItems);
+
+        return new CustomItemFieldListData($columns->toArray(), $data);
+    }
+
+    /**
      * @return int Number of deleted rows
      */
     private function deleteOptionsForField(CustomFieldValueInterface $customFieldValue): int
@@ -155,13 +174,20 @@ class CustomFieldValueModel
         $valueRows->map(function (array $row) use ($customFieldValues): void {
             /** @var CustomFieldValueInterface */
             $customFieldValue = $customFieldValues->get((int) $row['custom_field_id']);
-
-            if ($customFieldValue->getCustomField()->canHaveMultipleValues()) {
-                $customFieldValue->addValue($row['value']);
-            } else {
-                $customFieldValue->setValue($row['value']);
-            }
+            $this->setValueToField($customFieldValue, $row['value']);
         });
+    }
+
+    /**
+     * @param mixed $value
+     */
+    private function setValueToField(CustomFieldValueInterface $customFieldValue, $value): void
+    {
+        if ($customFieldValue->getCustomField()->canHaveMultipleValues()) {
+            $customFieldValue->addValue($value);
+        } else {
+            $customFieldValue->setValue($value);
+        }
     }
 
     private function fetchValues(Collection $queries): ArrayCollection
@@ -196,5 +222,103 @@ class CustomFieldValueModel
 
             return $queryBuilder->getSQL();
         });
+    }
+
+    /**
+     * @param CustomField[] $customFields
+     * @param CustomItem[]  $customItems
+     */
+    private function buildItemsListData(array $customFields, array $customItems): array
+    {
+        $result = $this->fetchItemsListData($customFields, $customItems);
+        $result = $this->transformItemsListDataResult($result);
+
+        return array_reduce($customItems, function (array $data, CustomItem $customItem) use ($customFields, $result) {
+            $fields = [];
+
+            foreach ($customFields as $customField) {
+                $customFieldValue = $customField->getTypeObject()->createValueEntity($customField, $customItem);
+
+                foreach ($result[$customItem->getId()][$customField->getId()] ?? [] as $value) {
+                    $this->setValueToField($customFieldValue, $value);
+                }
+
+                $fields[$customField->getId()] = $customFieldValue;
+            }
+
+            $data[$customItem->getId()] = $fields;
+
+            return $data;
+        }, []);
+    }
+
+    /**
+     * @param CustomField[] $customFields
+     * @param CustomItem[]  $customItems
+     */
+    private function fetchItemsListData(array $customFields, array $customItems): array
+    {
+        // create a map [tableName] = [fieldId, fieldId, ...] for creating queries
+        $tableToCustomFieldIds = array_reduce($customFields, function (array $tables, CustomField $customField) {
+            $tableName = $customField->getTypeObject()->getTableName();
+
+            if (!isset($tables[$tableName])) {
+                $tables[$tableName] = [];
+            }
+
+            $tables[$tableName][] = $customField->getId();
+
+            return $tables;
+        }, []);
+
+        // create queries for fetching field values via union
+        $queries = array_map(function (string $table) {
+            $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
+            $queryBuilder->select('custom_item_id, custom_field_id, value');
+            $queryBuilder->from($table);
+            $queryBuilder->where('custom_item_id IN (:itemIds)');
+            $queryBuilder->andWhere("custom_field_id IN (:{$table})");
+
+            return $queryBuilder->getSQL();
+        }, array_keys($tableToCustomFieldIds));
+
+        // extract item IDs
+        $itemIds = array_map(function (CustomItem $customItem) {
+            return $customItem->getId();
+        }, $customItems);
+
+        $params = ['itemIds' => $itemIds];
+        $types  = ['itemIds' => Connection::PARAM_INT_ARRAY];
+
+        foreach ($tableToCustomFieldIds as $table => $customFieldIds) {
+            $params[$table] = $customFieldIds;
+            $types[$table]  = Connection::PARAM_INT_ARRAY;
+        }
+
+        return $this->entityManager->getConnection()->fetchAll(implode(' UNION ALL ', $queries), $params, $types);
+    }
+
+    /**
+     * Transforms DB result into the following structure:
+     *     $result[itemId][fieldId] = [value1, value2, ...].
+     */
+    private function transformItemsListDataResult(array $result): array
+    {
+        return array_reduce($result, function (array $result, array $row) {
+            $itemId = $row['custom_item_id'];
+            $fieldId = $row['custom_field_id'];
+
+            if (!isset($result[$itemId])) {
+                $result[$itemId] = [];
+            }
+
+            if (!isset($result[$itemId][$fieldId])) {
+                $result[$itemId][$fieldId] = [];
+            }
+
+            $result[$itemId][$fieldId][] = $row['value'];
+
+            return $result;
+        }, []);
     }
 }
