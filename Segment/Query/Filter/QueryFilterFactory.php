@@ -41,11 +41,12 @@ class QueryFilterFactory
     }
 
     /**
+     * @return UnionQueryContainer|SegmentQueryBuilder
      * @throws InvalidSegmentFilterException
      * @throws NotFoundException
-     * @throws \Exception
+     * @throws Exception
      */
-    public function configureQueryBuilderFromSegmentFilterForField(array $segmentFilter, string $queryAlias): UnionQueryContainer
+    public function configureQueryBuilderFromSegmentFilter(array $segmentFilter, string $queryAlias)
     {
         $segmentFilter = $this->contactSegmentFilterFactory->factorSegmentFilter($segmentFilter);
 
@@ -55,50 +56,29 @@ class QueryFilterFactory
 
         $type = $segmentFilter->getQueryType();
 
-        if (CustomFieldFilterQueryBuilder::getServiceId() !== $type) {
-            throw new InvalidSegmentFilterException("{$type} filter query type cannot be processed.");
-        };
+        if (CustomFieldFilterQueryBuilder::getServiceId() === $type) {
+            $queryBuilder = $this->queryFilterHelper->createValueQuery(
+                $queryAlias,
+                $segmentFilter
+            );
+            $this->queryFilterHelper->addCustomFieldValueExpressionFromSegmentFilter(
+                $queryBuilder,
+                $queryAlias,
+                $segmentFilter
+            );
+        } elseif (CustomItemNameFilterQueryBuilder::getServiceId() === $type) {
+            $queryBuilder = $this->queryFilterHelper->createItemNameQueryBuilder($queryAlias);
 
-        $unionQueryContainer = $this->queryFilterHelper->createValueQuery(
-            $queryAlias,
-            $segmentFilter
-        );
-        $this->queryFilterHelper->addCustomFieldValueExpressionFromSegmentFilter(
-            $unionQueryContainer,
-            $queryAlias,
-            $segmentFilter
-        );
-
-        return $unionQueryContainer;
-    }
-
-    /**
-     * @throws InvalidSegmentFilterException
-     * @throws \Exception
-     */
-    public function configureQueryBuilderFromSegmentFilterForName(array $segmentFilter, string $queryAlias): SegmentQueryBuilder
-    {
-        $segmentFilter = $this->contactSegmentFilterFactory->factorSegmentFilter($segmentFilter);
-
-        if ($segmentFilter->getTable() !== MAUTIC_TABLE_PREFIX.'custom_objects') {
-            throw new InvalidSegmentFilterException("{$segmentFilter->getTable()} filter table cannot be processed.");
-        }
-
-        $type = $segmentFilter->getQueryType();
-
-        if (CustomItemNameFilterQueryBuilder::getServiceId() !== $type) {
+            $this->queryFilterHelper->addCustomObjectNameExpression(
+                $queryBuilder,
+                $queryAlias,
+                $segmentFilter->getOperator(),
+                $segmentFilter->getParameterValue()
+            );
+        } else {
             throw new InvalidSegmentFilterException("{$type} filter query type cannot be processed.");
         }
 
-        $filterQueryBuilder = $this->queryFilterHelper->createItemNameQueryBuilder($queryAlias);
-
-        $this->queryFilterHelper->addCustomObjectNameExpression(
-            $filterQueryBuilder,
-            $queryAlias,
-            $segmentFilter->getOperator(),
-            $segmentFilter->getParameterValue()
-        );
-
-        return $filterQueryBuilder;
+        return $queryBuilder;
     }
 }
