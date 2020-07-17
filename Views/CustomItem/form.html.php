@@ -57,9 +57,9 @@ $hideCategories = CustomObject::TYPE_RELATIONSHIP === $customObject->getType() ?
                         <div class="panel-heading">
                             <h3 class="panel-title">
                                 <?php echo $view['translator']->trans(
-                                    'custom.item.new',
-                                    ['%object%' => $view['translator']->trans($customObject->getRelationshipObject()->getNameSingular())]
-                                ); ?>
+    'custom.item.new',
+    ['%object%' => $view['translator']->trans($customObject->getRelationshipObject()->getNameSingular())]
+); ?>
                             </h3>
                         </div>
                         <div class="panel-body">
