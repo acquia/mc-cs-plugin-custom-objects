@@ -92,7 +92,7 @@ class QueryFilterFactoryTest extends \PHPUnit\Framework\TestCase
 
         $this->expectException(InvalidSegmentFilterException::class);
 
-        $this->factory->configureQueryBuilderFromSegmentFilter($segmentFilter, $queryAlias);
+        $this->factory->configureQueryBuilderFromSegmentFilterForField($segmentFilter, $queryAlias);
     }
 
     public function testConfigureQueryBuilderFromSegmentFilterForCustomField(): void
@@ -149,7 +149,7 @@ class QueryFilterFactoryTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame(
             $this->unionQueryContainer,
-            $this->factory->configureQueryBuilderFromSegmentFilter($segmentFilter, $queryAlias)
+            $this->factory->configureQueryBuilderFromSegmentFilterForField($segmentFilter, $queryAlias)
         );
     }
 
@@ -207,7 +207,7 @@ class QueryFilterFactoryTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame(
             $this->segmentQueryBuilder,
-            $this->factory->configureQueryBuilderFromSegmentFilter($segmentFilter, $queryAlias)
+            $this->factory->configureQueryBuilderFromSegmentFilterForName($segmentFilter, $queryAlias)
         );
     }
 
@@ -238,6 +238,6 @@ class QueryFilterFactoryTest extends \PHPUnit\Framework\TestCase
             ->willReturn('unicorn');
 
         $this->expectException(InvalidSegmentFilterException::class);
-        $this->factory->configureQueryBuilderFromSegmentFilter($segmentFilter, $queryAlias);
+        $this->factory->configureQueryBuilderFromSegmentFilterForField($segmentFilter, $queryAlias);
     }
 }
