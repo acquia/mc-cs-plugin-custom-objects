@@ -92,7 +92,7 @@ class QueryFilterFactoryTest extends \PHPUnit\Framework\TestCase
 
         $this->expectException(InvalidSegmentFilterException::class);
 
-        $this->factory->configureQueryBuilderFromSegmentFilterForField($segmentFilter, $queryAlias);
+        $this->factory->configureQueryBuilderFromSegmentFilter($segmentFilter, $queryAlias);
     }
 
     public function testConfigureQueryBuilderFromSegmentFilterForCustomField(): void
@@ -123,14 +123,6 @@ class QueryFilterFactoryTest extends \PHPUnit\Framework\TestCase
             ->method('getQueryType')
             ->willReturn(CustomFieldFilterQueryBuilder::getServiceId());
 
-        $this->contactSegmentFilter->expects($this->once())
-            ->method('getField')
-            ->willReturn($fieldId);
-
-        $this->contactSegmentFilter->expects($this->once())
-            ->method('getType')
-            ->willReturn($fieldType);
-
         $this->queryFilterHelper->expects($this->once())
             ->method('createValueQuery')
             ->with(
@@ -149,7 +141,7 @@ class QueryFilterFactoryTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame(
             $this->unionQueryContainer,
-            $this->factory->configureQueryBuilderFromSegmentFilterForField($segmentFilter, $queryAlias)
+            $this->factory->configureQueryBuilderFromSegmentFilter($segmentFilter, $queryAlias)
         );
     }
 
@@ -207,7 +199,7 @@ class QueryFilterFactoryTest extends \PHPUnit\Framework\TestCase
 
         $this->assertSame(
             $this->segmentQueryBuilder,
-            $this->factory->configureQueryBuilderFromSegmentFilterForName($segmentFilter, $queryAlias)
+            $this->factory->configureQueryBuilderFromSegmentFilter($segmentFilter, $queryAlias)
         );
     }
 
@@ -238,6 +230,6 @@ class QueryFilterFactoryTest extends \PHPUnit\Framework\TestCase
             ->willReturn('unicorn');
 
         $this->expectException(InvalidSegmentFilterException::class);
-        $this->factory->configureQueryBuilderFromSegmentFilterForField($segmentFilter, $queryAlias);
+        $this->factory->configureQueryBuilderFromSegmentFilter($segmentFilter, $queryAlias);
     }
 }
