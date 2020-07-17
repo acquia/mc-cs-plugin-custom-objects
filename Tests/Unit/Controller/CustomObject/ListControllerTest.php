@@ -20,6 +20,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\SessionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -45,15 +46,16 @@ class ListControllerTest extends ControllerTestCase
     {
         parent::setUp();
 
+        $sessionProviderFactory   = $this->createMock(SessionProviderFactory::class);
         $this->requestStack       = $this->createMock(RequestStack::class);
         $this->customObjectModel  = $this->createMock(CustomObjectModel::class);
-        $this->sessionProvider    = $this->createMock(SessionProviderFactory::class);
+        $this->sessionProvider    = $this->createMock(SessionProvider::class);
         $this->permissionProvider = $this->createMock(CustomObjectPermissionProvider::class);
         $this->routeProvider      = $this->createMock(CustomObjectRouteProvider::class);
         $this->request            = $this->createMock(Request::class);
         $this->listController     = new ListController(
             $this->requestStack,
-            $this->sessionProvider,
+            $sessionProviderFactory,
             $this->customObjectModel,
             $this->permissionProvider,
             $this->routeProvider
@@ -62,6 +64,7 @@ class ListControllerTest extends ControllerTestCase
         $this->addSymfonyDependencies($this->listController);
 
         $this->requestStack->method('getCurrentRequest')->willReturn($this->request);
+        $sessionProviderFactory->method('createObjectProvider')->willReturn($this->sessionProvider);
     }
 
     public function testListActionIfForbidden(): void

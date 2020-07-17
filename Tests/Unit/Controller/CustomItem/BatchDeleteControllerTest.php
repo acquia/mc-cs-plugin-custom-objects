@@ -22,6 +22,7 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -29,7 +30,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class BatchDeleteControllerTest extends ControllerTestCase
 {
     private $customItemModel;
-    private $sessionprovider;
+    private $sessionProvider;
     private $flashBag;
     private $permissionProvider;
     private $routeProvider;
@@ -43,9 +44,10 @@ class BatchDeleteControllerTest extends ControllerTestCase
     {
         parent::setUp();
 
+        $sessionProviderFactory      = $this->createMock(SessionProviderFactory::class);
         $this->requestStack          = $this->createMock(RequestStack::class);
         $this->customItemModel       = $this->createMock(CustomItemModel::class);
-        $this->sessionprovider       = $this->createMock(SessionProvider::class);
+        $this->sessionProvider       = $this->createMock(SessionProvider::class);
         $this->flashBag              = $this->createMock(FlashBag::class);
         $this->permissionProvider    = $this->createMock(CustomItemPermissionProvider::class);
         $this->routeProvider         = $this->createMock(CustomItemRouteProvider::class);
@@ -53,7 +55,7 @@ class BatchDeleteControllerTest extends ControllerTestCase
         $this->batchDeleteController = new BatchDeleteController(
             $this->requestStack,
             $this->customItemModel,
-            $this->sessionprovider,
+            $sessionProviderFactory,
             $this->permissionProvider,
             $this->routeProvider,
             $this->flashBag
@@ -62,6 +64,7 @@ class BatchDeleteControllerTest extends ControllerTestCase
         $this->addSymfonyDependencies($this->batchDeleteController);
 
         $this->request->method('isXmlHttpRequest')->willReturn(true);
+        $sessionProviderFactory->method('createItemProvider')->willReturn($this->sessionProvider);
     }
 
     public function testDeleteActionIfCustomItemNotFound(): void
@@ -142,7 +145,7 @@ class BatchDeleteControllerTest extends ControllerTestCase
             ->method('add')
             ->with('mautic.core.notice.batch_deleted', ['%count%' => 2]);
 
-        $this->sessionprovider->expects($this->once())
+        $this->sessionProvider->expects($this->once())
             ->method('getPage')
             ->willReturn(3);
 

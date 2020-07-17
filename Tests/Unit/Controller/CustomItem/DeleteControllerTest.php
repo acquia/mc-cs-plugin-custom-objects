@@ -22,6 +22,7 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -33,7 +34,7 @@ class DeleteControllerTest extends ControllerTestCase
     private const ITEM_ID = 22;
 
     private $customItemModel;
-    private $sessionprovider;
+    private $sessionProvider;
     private $flashBag;
     private $permissionProvider;
     private $routeProvider;
@@ -47,15 +48,16 @@ class DeleteControllerTest extends ControllerTestCase
     {
         parent::setUp();
 
+        $sessionProviderFactory   = $this->createMock(SessionProviderFactory::class);
         $this->customItemModel    = $this->createMock(CustomItemModel::class);
-        $this->sessionprovider    = $this->createMock(SessionProvider::class);
+        $this->sessionProvider    = $this->createMock(SessionProvider::class);
         $this->flashBag           = $this->createMock(FlashBag::class);
         $this->permissionProvider = $this->createMock(CustomItemPermissionProvider::class);
         $this->routeProvider      = $this->createMock(CustomItemRouteProvider::class);
         $this->request            = $this->createMock(Request::class);
         $this->deleteController   = new DeleteController(
             $this->customItemModel,
-            $this->sessionprovider,
+            $sessionProviderFactory,
             $this->flashBag,
             $this->permissionProvider,
             $this->routeProvider
@@ -65,6 +67,7 @@ class DeleteControllerTest extends ControllerTestCase
 
         $this->request->method('isXmlHttpRequest')->willReturn(true);
         $this->request->method('getRequestUri')->willReturn('https://a.b');
+        $sessionProviderFactory->method('createItemProvider')->willReturn($this->sessionProvider);
     }
 
     public function testDeleteActionIfCustomItemNotFound(): void
@@ -122,7 +125,7 @@ class DeleteControllerTest extends ControllerTestCase
             ->method('add')
             ->with('mautic.core.notice.deleted');
 
-        $this->sessionprovider->expects($this->once())
+        $this->sessionProvider->expects($this->once())
             ->method('getPage')
             ->willReturn(3);
 

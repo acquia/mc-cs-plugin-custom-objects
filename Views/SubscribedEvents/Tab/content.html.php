@@ -20,7 +20,7 @@ $listId = 'custom-item-list-'.$customObjectId;
                 [
                     'searchValue' => $searchValue,
                     'action'      => $searchRoute,
-                    'searchId'    => 'list-search-'.$customObjectId,
+                    'searchId'    => $searchId,
                     'target'      => '#'.$listId,
                     'searchHelp'  => '',
                 ]
