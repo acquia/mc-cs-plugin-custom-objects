@@ -86,7 +86,7 @@ class QueryFilterHelper
                 "{$alias}_value.custom_item_id = {$alias}_contact.custom_item_id"
             )
             ->andWhere(
-                $qb->expr()->eq('contact_id', 'L.id'),
+                $qb->expr()->eq("{$alias}_contact.contact_id", 'L.id'),
                 $qb->expr()->eq("{$alias}_value.custom_field_id", ":{$alias}_custom_field_id")
             )
             ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId)
@@ -112,7 +112,7 @@ class QueryFilterHelper
                     "{$alias}_item_xref.custom_item_id_higher = {$alias}_contact.custom_item_id"
                 )
                 ->andWhere(
-                    $qb->expr()->eq('contact_id', 'L.id'),
+                    $qb->expr()->eq("{$alias}_contact.contact_id", 'L.id'),
                     $qb->expr()->eq("{$alias}_value.custom_field_id", ":{$alias}_custom_field_id")
                 )
                 ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId)
@@ -137,7 +137,7 @@ class QueryFilterHelper
                     "{$alias}_item_xref.custom_item_id_lower = {$alias}_contact.custom_item_id"
                 )
                 ->andWhere(
-                    $qb->expr()->eq('contact_id', 'L.id'),
+                    $qb->expr()->eq("{$alias}_contact.contact_id", 'L.id'),
                     $qb->expr()->eq("{$alias}_value.custom_field_id", ":{$alias}_custom_field_id")
                 )
                 ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId)
