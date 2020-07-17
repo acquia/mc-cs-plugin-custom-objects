@@ -70,6 +70,7 @@ class QueryFilterHelper
         $segmentFilterFieldId   = (int) $segmentFilter->getField();
         $segmentFilterFieldType = $segmentFilter->getType();
         $segmentFilterFieldType = $segmentFilterFieldType ?: $this->getCustomFieldType($segmentFilterFieldId);
+        // This value is prefixed
         $dataTable              = $this->fieldTypeProvider->getType($segmentFilterFieldType)->getTableName();
 
         $unionQueryContainer = new UnionQueryContainer();
@@ -77,7 +78,7 @@ class QueryFilterHelper
         $qb = new SegmentQueryBuilder($this->entityManager->getConnection());
         $qb
             ->select('contact_id')
-            ->from(MAUTIC_TABLE_PREFIX.$dataTable, "{$alias}_value")
+            ->from($dataTable, "{$alias}_value")
             ->innerJoin(
                 "{$alias}_value",
                 MAUTIC_TABLE_PREFIX.'custom_item_xref_contact',
@@ -97,7 +98,7 @@ class QueryFilterHelper
             $qb = new SegmentQueryBuilder($this->entityManager->getConnection());
             $qb
                 ->select('contact_id')
-                ->from(MAUTIC_TABLE_PREFIX.$dataTable, "{$alias}_value")
+                ->from($dataTable, "{$alias}_value")
                 ->innerJoin(
                     "{$alias}_value",
                     MAUTIC_TABLE_PREFIX.'custom_item_xref_custom_item',
@@ -122,7 +123,7 @@ class QueryFilterHelper
             $qb = new SegmentQueryBuilder($this->entityManager->getConnection());
             $qb
                 ->select('contact_id')
-                ->from(MAUTIC_TABLE_PREFIX.$dataTable, "{$alias}_value")
+                ->from($dataTable, "{$alias}_value")
                 ->innerJoin(
                     "{$alias}_value",
                     MAUTIC_TABLE_PREFIX.'custom_item_xref_custom_item',
