@@ -22,7 +22,7 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemSessionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\SessionProvider;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -53,7 +53,7 @@ class ListControllerTest extends ControllerTestCase
         $this->requestStack       = $this->createMock(RequestStack::class);
         $this->customItemModel    = $this->createMock(CustomItemModel::class);
         $this->customObjectModel  = $this->createMock(CustomObjectModel::class);
-        $this->sessionProvider    = $this->createMock(CustomItemSessionProvider::class);
+        $this->sessionProvider    = $this->createMock(SessionProvider::class);
         $this->permissionProvider = $this->createMock(CustomItemPermissionProvider::class);
         $this->routeProvider      = $this->createMock(CustomItemRouteProvider::class);
         $this->request            = $this->createMock(Request::class);

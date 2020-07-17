@@ -18,7 +18,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemSessionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\SessionProvider;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 
 class CancelControllerTest extends ControllerTestCase
@@ -38,7 +38,7 @@ class CancelControllerTest extends ControllerTestCase
     {
         parent::setUp();
 
-        $this->sessionProvider  = $this->createMock(CustomItemSessionProvider::class);
+        $this->sessionProvider  = $this->createMock(SessionProvider::class);
         $this->routeProvider    = $this->createMock(CustomItemRouteProvider::class);
         $this->customItemModel  = $this->createMock(CustomItemModel::class);
 

@@ -20,7 +20,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectSessionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -44,7 +44,7 @@ class DeleteControllerTest extends ControllerTestCase
         parent::setUp();
 
         $this->customObjectModel  = $this->createMock(CustomObjectModel::class);
-        $this->sessionprovider    = $this->createMock(CustomObjectSessionProvider::class);
+        $this->sessionprovider    = $this->createMock(SessionProviderFactory::class);
         $this->flashBag           = $this->createMock(FlashBag::class);
         $this->permissionProvider = $this->createMock(CustomObjectPermissionProvider::class);
         $this->request            = $this->createMock(Request::class);

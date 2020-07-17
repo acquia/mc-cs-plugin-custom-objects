@@ -20,7 +20,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemSessionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use Symfony\Component\HttpFoundation\Response;
 
 class DeleteController extends CommonController
@@ -31,9 +31,9 @@ class DeleteController extends CommonController
     private $customItemModel;
 
     /**
-     * @var CustomItemSessionProvider
+     * @var SessionProviderFactory
      */
-    private $sessionProvider;
+    private $sessionProviderFactory;
 
     /**
      * @var CustomItemPermissionProvider
@@ -52,16 +52,16 @@ class DeleteController extends CommonController
 
     public function __construct(
         CustomItemModel $customItemModel,
-        CustomItemSessionProvider $sessionProvider,
+        SessionProviderFactory $sessionProviderFactory,
         FlashBag $flashBag,
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider
     ) {
-        $this->customItemModel    = $customItemModel;
-        $this->sessionProvider    = $sessionProvider;
-        $this->flashBag           = $flashBag;
-        $this->permissionProvider = $permissionProvider;
-        $this->routeProvider      = $routeProvider;
+        $this->customItemModel        = $customItemModel;
+        $this->sessionProviderFactory = $sessionProviderFactory;
+        $this->flashBag               = $flashBag;
+        $this->permissionProvider     = $permissionProvider;
+        $this->routeProvider          = $routeProvider;
     }
 
     public function deleteAction(int $objectId, int $itemId): Response
@@ -85,7 +85,8 @@ class DeleteController extends CommonController
             ]
         );
 
-        $page = $this->sessionProvider->getPage();
+        $page = $this->sessionProviderFactory->createItemProvider($objectId)
+            ->getPage();
 
         return $this->postActionRedirect(
             [
