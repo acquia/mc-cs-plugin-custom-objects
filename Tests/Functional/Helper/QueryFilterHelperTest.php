@@ -9,6 +9,7 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
+use MauticPlugin\CustomObjectsBundle\Segment\Query\UnionQueryContainer;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
 
@@ -112,15 +113,18 @@ class QueryFilterHelperTest extends MauticWebTestCase
 
     protected function assertMatchWhere(string $expectedWhere, array $filter): void
     {
-        $queryBuilder = new QueryBuilder($this->em->getConnection());
+        $unionQueryContainer = new UnionQueryContainer();
+        $qb = new QueryBuilder($this->em->getConnection());
+        $unionQueryContainer->add($qb);
 
         $this->filterHelper->addCustomFieldValueExpressionFromSegmentFilter(
-            $queryBuilder,
+            $unionQueryContainer,
             'test',
             $this->filterFactory->factorSegmentFilter($filter)
         );
 
-        $whereResponse = (string) $queryBuilder->getQueryPart('where');
+        $unionQueryContainer->rewind();
+        $whereResponse = (string) $unionQueryContainer->current()->getQueryPart('where');
         $this->assertSame($expectedWhere, $whereResponse);
     }
 }
