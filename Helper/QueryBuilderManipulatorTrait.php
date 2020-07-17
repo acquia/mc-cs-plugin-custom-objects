@@ -15,12 +15,17 @@ namespace MauticPlugin\CustomObjectsBundle\Helper;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
+use MauticPlugin\CustomObjectsBundle\Segment\Query\UnionQueryContainer;
 
 /**
  * Two subscribers used these private helper methods so this trait provides them from one place to both.
  */
 trait QueryBuilderManipulatorTrait
 {
+    /**
+     * @param QueryBuilder|UnionQueryContainer $fromQueryBuilder
+     * @param QueryBuilder $toQueryBuilder
+     */
     private function copyParams(QueryBuilder $fromQueryBuilder, QueryBuilder $toQueryBuilder): void
     {
         foreach ($fromQueryBuilder->getParameters() as $key => $value) {
