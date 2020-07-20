@@ -20,7 +20,8 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectSessionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\SessionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -30,7 +31,7 @@ class DeleteControllerTest extends ControllerTestCase
     private const OBJECT_ID = 33;
 
     private $customObjectModel;
-    private $sessionprovider;
+    private $sessionProvider;
     private $flashBag;
     private $permissionProvider;
 
@@ -43,14 +44,15 @@ class DeleteControllerTest extends ControllerTestCase
     {
         parent::setUp();
 
+        $sessionProviderFactory   = $this->createMock(SessionProviderFactory::class);
         $this->customObjectModel  = $this->createMock(CustomObjectModel::class);
-        $this->sessionprovider    = $this->createMock(CustomObjectSessionProvider::class);
+        $this->sessionProvider    = $this->createMock(SessionProvider::class);
         $this->flashBag           = $this->createMock(FlashBag::class);
         $this->permissionProvider = $this->createMock(CustomObjectPermissionProvider::class);
         $this->request            = $this->createMock(Request::class);
         $this->deleteController   = new DeleteController(
             $this->customObjectModel,
-            $this->sessionprovider,
+            $sessionProviderFactory,
             $this->flashBag,
             $this->permissionProvider
         );
@@ -59,6 +61,7 @@ class DeleteControllerTest extends ControllerTestCase
 
         $this->request->method('isXmlHttpRequest')->willReturn(true);
         $this->request->method('getRequestUri')->willReturn('https://a.b');
+        $sessionProviderFactory->method('createObjectProvider')->willReturn($this->sessionProvider);
     }
 
     public function testDeleteActionIfCustomObjectNotFound(): void
@@ -116,7 +119,7 @@ class DeleteControllerTest extends ControllerTestCase
             ->method('add')
             ->with('mautic.core.notice.deleted');
 
-        $this->sessionprovider->expects($this->once())
+        $this->sessionProvider->expects($this->once())
             ->method('getPage')
             ->willReturn(3);
 

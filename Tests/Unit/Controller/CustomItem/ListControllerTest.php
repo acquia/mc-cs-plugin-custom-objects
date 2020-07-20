@@ -22,7 +22,8 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemSessionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\SessionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
@@ -50,16 +51,17 @@ class ListControllerTest extends ControllerTestCase
     {
         parent::setUp();
 
+        $sessionProviderFactory   = $this->createMock(SessionProviderFactory::class);
         $this->requestStack       = $this->createMock(RequestStack::class);
         $this->customItemModel    = $this->createMock(CustomItemModel::class);
         $this->customObjectModel  = $this->createMock(CustomObjectModel::class);
-        $this->sessionProvider    = $this->createMock(CustomItemSessionProvider::class);
+        $this->sessionProvider    = $this->createMock(SessionProvider::class);
         $this->permissionProvider = $this->createMock(CustomItemPermissionProvider::class);
         $this->routeProvider      = $this->createMock(CustomItemRouteProvider::class);
         $this->request            = $this->createMock(Request::class);
         $this->listController     = new ListController(
             $this->requestStack,
-            $this->sessionProvider,
+            $sessionProviderFactory,
             $this->customItemModel,
             $this->customObjectModel,
             $this->permissionProvider,
@@ -69,6 +71,7 @@ class ListControllerTest extends ControllerTestCase
         $this->addSymfonyDependencies($this->listController);
 
         $this->requestStack->method('getCurrentRequest')->willReturn($this->request);
+        $sessionProviderFactory->method('createItemProvider')->willReturn($this->sessionProvider);
     }
 
     public function testListActionIfCustomObjectNotFound(): void
@@ -157,9 +160,10 @@ class ListControllerTest extends ControllerTestCase
         $this->listController->listAction(self::OBJECT_ID, self::PAGE);
     }
 
-    public function testListActionWithOrderByQueryParamAndAjax(): void
+    public function testListActionWithQueryParamAndAjax(): void
     {
         $pageLimit    = 10;
+        $search       = 'Search some';
         $customObject = $this->createMock(CustomObject::class);
 
         $this->request->query = new ParameterBag(
@@ -170,6 +174,7 @@ class ListControllerTest extends ControllerTestCase
 
         $this->request->method('get')->will($this->returnValueMap([
             ['limit', $pageLimit, $pageLimit],
+            ['search', '', $search],
         ]));
 
         $this->request->method('isXmlHttpRequest')
@@ -202,7 +207,7 @@ class ListControllerTest extends ControllerTestCase
             ->method('setOrderByDir')
             ->willReturn('ASC');
 
-        $assertTableConfig = function (TableConfig $tableConfig) {
+        $assertTableConfig = function (TableConfig $tableConfig) use ($search) {
             $this->assertSame(10, $tableConfig->getLimit());
             $this->assertSame(20, $tableConfig->getOffset());
             $this->assertSame('e.name', $tableConfig->getOrderBy());
@@ -210,7 +215,7 @@ class ListControllerTest extends ControllerTestCase
             $this->assertSame(self::OBJECT_ID, $tableConfig->getParameter('customObjectId'));
             $this->assertSame('', $tableConfig->getParameter('filterEntityType'));
             $this->assertSame(0, $tableConfig->getParameter('filterEntityId'));
-            $this->assertSame('', $tableConfig->getParameter('search'));
+            $this->assertSame($search, $tableConfig->getParameter('search'));
 
             return true;
         };

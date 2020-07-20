@@ -40,7 +40,12 @@ class CustomItemRouteProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->router->expects($this->once())
             ->method('generate')
-            ->with(CustomItemRouteProvider::ROUTE_LIST, ['objectId' => self::OBJECT_ID, 'page' => 3])
+            ->with(CustomItemRouteProvider::ROUTE_LIST, [
+                'objectId'         => self::OBJECT_ID,
+                'page'             => 3,
+                'filterEntityType' => null,
+                'filterEntityId'   => null,
+            ])
             ->willReturn('the/generated/route');
 
         $this->customItemRouteProvider->buildListRoute(self::OBJECT_ID, 3);

@@ -21,7 +21,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectSessionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -33,9 +33,9 @@ class ListController extends CommonController
     private $requestStack;
 
     /**
-     * @var CustomObjectSessionProvider
+     * @var SessionProviderFactory
      */
-    private $sessionProvider;
+    private $sessionProviderFactory;
 
     /**
      * @var CustomObjectModel
@@ -54,16 +54,16 @@ class ListController extends CommonController
 
     public function __construct(
         RequestStack $requestStack,
-        CustomObjectSessionProvider $sessionProvider,
+        SessionProviderFactory $sessionProviderFactory,
         CustomObjectModel $customObjectModel,
         CustomObjectPermissionProvider $permissionProvider,
         CustomObjectRouteProvider $routeProvider
     ) {
-        $this->requestStack       = $requestStack;
-        $this->sessionProvider    = $sessionProvider;
-        $this->customObjectModel  = $customObjectModel;
-        $this->permissionProvider = $permissionProvider;
-        $this->routeProvider      = $routeProvider;
+        $this->requestStack              = $requestStack;
+        $this->sessionProviderFactory    = $sessionProviderFactory;
+        $this->customObjectModel         = $customObjectModel;
+        $this->permissionProvider        = $permissionProvider;
+        $this->routeProvider             = $routeProvider;
     }
 
     public function listAction(int $page = 1): Response
@@ -74,25 +74,26 @@ class ListController extends CommonController
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        $request    = $this->requestStack->getCurrentRequest();
-        $search     = InputHelper::clean($request->get('search', $this->sessionProvider->getFilter()));
-        $limit      = (int) $request->get('limit', $this->sessionProvider->getPageLimit());
-        $orderBy    = $this->sessionProvider->getOrderBy(CustomObject::TABLE_ALIAS.'.id');
-        $orderByDir = $this->sessionProvider->getOrderByDir('ASC');
-        $route      = $this->routeProvider->buildListRoute($page);
+        $request         = $this->requestStack->getCurrentRequest();
+        $sessionProvider = $this->sessionProviderFactory->createObjectProvider();
+        $search          = InputHelper::clean($request->get('search', $sessionProvider->getFilter()));
+        $limit           = (int) $request->get('limit', $sessionProvider->getPageLimit());
+        $orderBy         = $sessionProvider->getOrderBy(CustomObject::TABLE_ALIAS.'.id');
+        $orderByDir      = $sessionProvider->getOrderByDir('ASC');
+        $route           = $this->routeProvider->buildListRoute($page);
 
         if ($request->query->has('orderby')) {
             $orderBy    = InputHelper::clean($request->query->get('orderby'), true);
             $orderByDir = 'ASC' === $orderByDir ? 'DESC' : 'ASC';
-            $this->sessionProvider->setOrderBy($orderBy);
-            $this->sessionProvider->setOrderByDir($orderByDir);
+            $sessionProvider->setOrderBy($orderBy);
+            $sessionProvider->setOrderByDir($orderByDir);
         }
 
         $tableConfig = new TableConfig($limit, $page, $orderBy, $orderByDir);
 
-        $this->sessionProvider->setPage($page);
-        $this->sessionProvider->setPageLimit($limit);
-        $this->sessionProvider->setFilter($search);
+        $sessionProvider->setPage($page);
+        $sessionProvider->setPageLimit($limit);
+        $sessionProvider->setFilter($search);
 
         return $this->delegateView(
             [

@@ -20,7 +20,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderInterface;
+use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -37,9 +37,9 @@ class BatchDeleteController extends CommonController
     private $customItemModel;
 
     /**
-     * @var SessionProviderInterface
+     * @var SessionProviderFactory
      */
-    private $sessionProvider;
+    private $sessionProviderFactory;
 
     /**
      * @var CustomItemPermissionProvider
@@ -59,24 +59,24 @@ class BatchDeleteController extends CommonController
     public function __construct(
         RequestStack $requestStack,
         CustomItemModel $customItemModel,
-        SessionProviderInterface $sessionProvider,
+        SessionProviderFactory $sessionProviderFactory,
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider,
         FlashBag $flashBag
     ) {
-        $this->requestStack       = $requestStack;
-        $this->customItemModel    = $customItemModel;
-        $this->sessionProvider    = $sessionProvider;
-        $this->permissionProvider = $permissionProvider;
-        $this->routeProvider      = $routeProvider;
-        $this->flashBag           = $flashBag;
+        $this->requestStack           = $requestStack;
+        $this->customItemModel        = $customItemModel;
+        $this->sessionProviderFactory = $sessionProviderFactory;
+        $this->permissionProvider     = $permissionProvider;
+        $this->routeProvider          = $routeProvider;
+        $this->flashBag               = $flashBag;
     }
 
     public function deleteAction(int $objectId): Response
     {
         $request  = $this->requestStack->getCurrentRequest();
         $itemIds  = json_decode($request->get('ids', '[]'), true);
-        $page     = $this->sessionProvider->getPage();
+        $page     = $this->sessionProviderFactory->createItemProvider($objectId)->getPage();
         $notFound = [];
         $denied   = [];
         $deleted  = [];

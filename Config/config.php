@@ -230,7 +230,7 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ListController::class,
                 'arguments' => [
                     'request_stack',
-                    'custom_item.session.provider',
+                    'custom_object.session.provider_factory',
                     'mautic.custom.model.item',
                     'mautic.custom.model.object',
                     'custom_item.permission.provider',
@@ -297,7 +297,7 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\DeleteController::class,
                 'arguments' => [
                     'mautic.custom.model.item',
-                    'custom_item.session.provider',
+                    'custom_object.session.provider_factory',
                     'mautic.core.service.flashbag',
                     'custom_item.permission.provider',
                     'custom_item.route.provider',
@@ -313,7 +313,7 @@ return [
                 'arguments' => [
                     'request_stack',
                     'mautic.custom.model.item',
-                    'custom_item.session.provider',
+                    'custom_object.session.provider_factory',
                     'custom_item.permission.provider',
                     'custom_item.route.provider',
                     'mautic.core.service.flashbag',
@@ -327,7 +327,7 @@ return [
             'custom_item.cancel_controller' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\CancelController::class,
                 'arguments' => [
-                    'custom_item.session.provider',
+                    'custom_object.session.provider_factory',
                     'custom_item.route.provider',
                     'mautic.custom.model.item',
                 ],
@@ -406,7 +406,7 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\ListController::class,
                 'arguments' => [
                     'request_stack',
-                    'custom_object.session.provider',
+                    'custom_object.session.provider_factory',
                     'mautic.custom.model.object',
                     'custom_object.permission.provider',
                     'custom_object.route.provider',
@@ -475,7 +475,7 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\DeleteController::class,
                 'arguments' => [
                     'mautic.custom.model.object',
-                    'custom_object.session.provider',
+                    'custom_object.session.provider_factory',
                     'mautic.core.service.flashbag',
                     'custom_object.permission.provider',
                 ],
@@ -488,7 +488,7 @@ return [
             'custom_object.cancel_controller' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomObject\CancelController::class,
                 'arguments' => [
-                    'custom_object.session.provider',
+                    'custom_object.session.provider_factory',
                     'custom_object.route.provider',
                     'mautic.custom.model.object',
                 ],
@@ -646,6 +646,7 @@ return [
                     'custom_object.config.provider',
                     'translator',
                     'custom_item.route.provider',
+                    'custom_object.session.provider_factory',
                 ],
             ],
             'custom_object.custom_item.tab.subscriber' => [
@@ -655,6 +656,7 @@ return [
                     'custom_item.repository',
                     'translator',
                     'custom_item.route.provider',
+                    'custom_object.session.provider_factory',
                 ],
             ],
             'custom_field.post_load.subscriber' => [
@@ -1029,15 +1031,8 @@ return [
                     'mautic.security',
                 ],
             ],
-            'custom_item.session.provider' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Provider\CustomItemSessionProvider::class,
-                'arguments' => [
-                    'session',
-                    'mautic.helper.core_parameters',
-                ],
-            ],
-            'custom_object.session.provider' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Provider\CustomObjectSessionProvider::class,
+            'custom_object.session.provider_factory' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory::class,
                 'arguments' => [
                     'session',
                     'mautic.helper.core_parameters',
