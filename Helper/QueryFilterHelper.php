@@ -167,8 +167,8 @@ class QueryFilterHelper
      */
     public function addContactIdRestriction(SegmentQueryBuilder $queryBuilder, string $queryAlias, int $contactId): void
     {
-        if (!in_array($queryAlias.'_contact', $this->getQueryJoinAliases($queryBuilder), true)) {
-            if (!in_array($queryAlias.'_item', $this->getQueryJoinAliases($queryBuilder), true)) {
+        if (!$this->hasQueryJoinAlias($queryBuilder, $queryAlias.'_contact')){
+            if (!$this->hasQueryJoinAlias($queryBuilder, $queryAlias.'_item')) {
                 throw new InvalidArgumentException('SegmentQueryBuilder contains no usable tables for contact restriction.');
             }
             $tableAlias = $queryAlias.'_item.contact_id';
@@ -380,17 +380,17 @@ class QueryFilterHelper
     }
 
     /**
-     * Get all tables currently registered in the queryBuilder.
+     * Get all tables currently registered in the queryBuilder and check is alias is present
      *
-     * @return mixed[]
+     * @return bool
      */
-    private function getQueryJoinAliases(SegmentQueryBuilder $queryBuilder): array
+    private function hasQueryJoinAlias(SegmentQueryBuilder $queryBuilder, $alias): bool
     {
         $joins    = array_column($queryBuilder->getQueryParts()['join'], 0);
         $tables   = array_column($joins, 'joinAlias');
         $tables[] = $queryBuilder->getQueryParts()['from'][0]['alias'];
 
-        return $tables;
+        return in_array($alias, $tables, true);
     }
 
     /**
