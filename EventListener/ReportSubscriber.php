@@ -41,7 +41,7 @@ class ReportSubscriber implements EventSubscriberInterface
     const CUSTOM_ITEM_XREF_CUSTOM_ITEM_TABLE_ALIAS = 'cixci';
     const CUSTOM_ITEM_XREF_CUSTOM_ITEM_TABLE_NAME  = 'custom_item_xref_custom_item';
     const CUSTOM_ITEM_XREF_CONTACT_TABLE_ALIAS     = 'cil';
-    const CONTACTS_COMPANIES_XREF     = 'cic';
+    const CONTACTS_COMPANIES_XREF                  = 'cic';
     const LEADS_TABLE_ALIAS                        = 'l';
     const USERS_TABLE_ALIAS                        = 'u';
     const COMPANIES_TABLE_ALIAS                    = 'comp';
