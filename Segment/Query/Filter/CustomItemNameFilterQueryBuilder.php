@@ -65,7 +65,7 @@ class CustomItemNameFilterQueryBuilder extends BaseFilterQueryBuilder
             $filterQueryBuilder,
             $tableAlias,
             $filter->getOperator(),
-            $filter->getParameterValue()
+            (string) $filter->getParameterValue()
         );
 
         $filterQueryBuilder->select($tableAlias.'_contact.contact_id as lead_id');
