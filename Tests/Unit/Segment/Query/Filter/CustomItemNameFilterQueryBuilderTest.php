@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Segment\Query\Filter;
 
 use Doctrine\DBAL\Connection;
-use Mautic\LeadBundle\{Segment\ContactSegmentFilter,
-    Segment\Query\Expression\ExpressionBuilder,
-    Segment\Query\Filter\FilterQueryBuilderInterface,
-    Segment\Query\QueryBuilder,
-    Segment\RandomParameterName};
+use Mautic\LeadBundle\Segment\ContactSegmentFilter;
+use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
+use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use Mautic\LeadBundle\Segment\RandomParameterName;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemNameFilterQueryBuilder;
