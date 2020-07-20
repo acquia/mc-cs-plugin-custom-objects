@@ -32,8 +32,7 @@ class QueryFilterHelperTest extends TestCase
     {
         parent::setUp();
 
-        $customFieldTypeProvider = $this->createMock(CustomFieldTypeProvider::class);
-        $this->queryFilterHelper = new QueryFilterHelper($customFieldTypeProvider);
+        $this->queryFilterHelper = new QueryFilterHelper(new CustomFieldTypeProvider());
         $this->queryBuilder = $this->createMock(QueryBuilder::class);
         $this->expressionBuilder = $this->createMock(ExpressionBuilder::class);
     }
