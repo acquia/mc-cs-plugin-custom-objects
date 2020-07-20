@@ -16,15 +16,15 @@ $listId = 'custom-item-list-'.$customObjectId;
     <div class="row">
         <div class="col-md-3">
             <?php echo $view->render(
-                'MauticCoreBundle:Helper:search.html.php',
-                [
-                    'searchValue' => $searchValue,
-                    'action'      => $searchRoute,
-                    'searchId'    => $searchId,
-                    'target'      => '#'.$listId,
-                    'searchHelp'  => '',
-                ]
-            ); ?>
+    'MauticCoreBundle:Helper:search.html.php',
+    [
+        'searchValue' => $searchValue,
+        'action'      => $searchRoute,
+        'searchId'    => $searchId,
+        'target'      => '#'.$listId,
+        'searchHelp'  => '',
+    ]
+); ?>
         </div>
         <div class="col-md-6">
             <div class="panel">
