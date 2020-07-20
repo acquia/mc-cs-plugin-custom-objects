@@ -41,7 +41,7 @@ class ReportSubscriber implements EventSubscriberInterface
     const CUSTOM_ITEM_XREF_CUSTOM_ITEM_TABLE_ALIAS = 'cixci';
     const CUSTOM_ITEM_XREF_CUSTOM_ITEM_TABLE_NAME  = 'custom_item_xref_custom_item';
     const CUSTOM_ITEM_XREF_CONTACT_TABLE_ALIAS     = 'cil';
-    const CUSTOM_ITEM_XREF_COMPANY_TABLE_ALIAS     = 'cic';
+    const CONTACTS_COMPANIES_XREF     = 'cic';
     const LEADS_TABLE_ALIAS                        = 'l';
     const USERS_TABLE_ALIAS                        = 'u';
     const COMPANIES_TABLE_ALIAS                    = 'comp';
@@ -283,10 +283,10 @@ class ReportSubscriber implements EventSubscriberInterface
     private function joinCompanyColumns(QueryBuilder $queryBuilder): void
     {
         // Joining companies tables
-        $companiesJoinCondition = sprintf('%s.id = %s.custom_item_id', static::CUSTOM_ITEM_TABLE_ALIAS, static::CUSTOM_ITEM_XREF_COMPANY_TABLE_ALIAS);
-        $queryBuilder->leftJoin(static::CUSTOM_ITEM_TABLE_ALIAS, $this->addTablePrefix(CustomItemXrefCompany::TABLE_NAME), static::CUSTOM_ITEM_XREF_COMPANY_TABLE_ALIAS, $companiesJoinCondition);
-        $companiesTableJoinCondition = sprintf('%s.company_id = %s.id', static::CUSTOM_ITEM_XREF_COMPANY_TABLE_ALIAS, static::COMPANIES_TABLE_ALIAS);
-        $queryBuilder->leftJoin(static::CUSTOM_ITEM_XREF_COMPANY_TABLE_ALIAS, $this->addTablePrefix('companies'), static::COMPANIES_TABLE_ALIAS, $companiesTableJoinCondition);
+        $companiesJoinCondition = sprintf('%s.id = %s.lead_id', static::LEADS_TABLE_ALIAS, static::CONTACTS_COMPANIES_XREF);
+        $queryBuilder->leftJoin(static::LEADS_TABLE_ALIAS, $this->addTablePrefix('companies_leads'), static::CONTACTS_COMPANIES_XREF, $companiesJoinCondition);
+        $companiesTableJoinCondition = sprintf('%s.company_id = %s.id', static::CONTACTS_COMPANIES_XREF, static::COMPANIES_TABLE_ALIAS);
+        $queryBuilder->leftJoin(static::CONTACTS_COMPANIES_XREF, $this->addTablePrefix('companies'), static::COMPANIES_TABLE_ALIAS, $companiesTableJoinCondition);
     }
 
     private function joinParentCustomObjectStandardColumns(QueryBuilder $queryBuilder): void
