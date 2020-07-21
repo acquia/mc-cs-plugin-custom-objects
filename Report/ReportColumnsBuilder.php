@@ -81,10 +81,13 @@ class ReportColumnsBuilder
         return $this->columns;
     }
 
+    /**
+     * This should always return same hash for same columns.
+     * The hash prefix is to ensure MySql won't think hashes started with 8e* are number.
+     */
     private function getHash(CustomField $customField): string
     {
-        // This should always return same hash for same columns
-        return substr(md5((string) $customField->getId()), 0, 8);
+        return '_'.substr(md5((string) $customField->getId()), 0, 8);
     }
 
     private function getColumnName(CustomField $customField): string
