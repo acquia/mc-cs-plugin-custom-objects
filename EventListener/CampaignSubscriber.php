@@ -269,7 +269,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             CustomItem::TABLE_ALIAS,
             "({$innerQuery->getSQL()})",
             $queryAlias,
-            CustomItem::TABLE_ALIAS.".id = {$queryAlias}.id"
+            CustomItem::TABLE_ALIAS.".id = {$queryAlias}.custom_item_id"
         );
 
         $queryBuilder->setParameters($innerQuery->getParameters(), $innerQuery->getParameterTypes());
