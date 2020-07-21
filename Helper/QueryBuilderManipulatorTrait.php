@@ -26,7 +26,7 @@ trait QueryBuilderManipulatorTrait
      * @param QueryBuilder|UnionQueryContainer $fromQueryBuilder
      * @param QueryBuilder $toQueryBuilder
      */
-    private function copyParams(QueryBuilder $fromQueryBuilder, QueryBuilder $toQueryBuilder): void
+    private function copyParams($fromQueryBuilder, QueryBuilder $toQueryBuilder): void
     {
         foreach ($fromQueryBuilder->getParameters() as $key => $value) {
             $paramType = is_array($value) ? $toQueryBuilder->getConnection()::PARAM_STR_ARRAY : null;
