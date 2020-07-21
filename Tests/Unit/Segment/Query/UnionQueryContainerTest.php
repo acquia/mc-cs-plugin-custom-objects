@@ -46,7 +46,7 @@ class UnionQueryContainerTest extends TestCase
         # Test no query
         $this->assertEquals(
             '',
-            $this->unionQueryContainer->getMergedQueryString()
+            $this->unionQueryContainer->getSQL()
         );
 
         $this->assertEquals(
@@ -70,7 +70,7 @@ class UnionQueryContainerTest extends TestCase
 
         $this->assertEquals(
             'SELECT table_1 WHERE column1 > :param1',
-            $this->unionQueryContainer->getMergedQueryString()
+            $this->unionQueryContainer->getSQL()
         );
 
         $this->assertEquals(
@@ -96,7 +96,7 @@ class UnionQueryContainerTest extends TestCase
 
         $this->assertEquals(
             'SELECT table_1 WHERE column1 > :param1 UNION ALL SELECT table_2 WHERE column2 = :param2',
-            $this->unionQueryContainer->getMergedQueryString()
+            $this->unionQueryContainer->getSQL()
         );
 
         $this->assertEquals(

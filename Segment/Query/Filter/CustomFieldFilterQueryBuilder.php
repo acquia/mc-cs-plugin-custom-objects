@@ -75,14 +75,14 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
             case 'notLike':
             case '!multiselect':
                 $queryBuilder->addLogic(
-                    $queryBuilder->expr()->notExists($unionQueryContainer->getMergedQueryString()),
+                    $queryBuilder->expr()->notExists($unionQueryContainer->getSQL()),
                     $filter->getGlue()
                 );
 
                 break;
             default:
                 $queryBuilder->addLogic(
-                    $queryBuilder->expr()->exists($unionQueryContainer->getMergedQueryString()),
+                    $queryBuilder->expr()->exists($unionQueryContainer->getSQL()),
                     $filter->getGlue()
                 );
         }
