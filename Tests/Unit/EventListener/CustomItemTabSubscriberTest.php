@@ -19,10 +19,14 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\EventListener\CustomItemTabSubscriber;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\SessionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class CustomItemTabSubscriberTest extends \PHPUnit\Framework\TestCase
+class CustomItemTabSubscriberTest extends TestCase
 {
     private $customObjectModel;
 
@@ -43,6 +47,11 @@ class CustomItemTabSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     private $tabSubscriber;
 
+    /**
+     * @var SessionProviderFactory|MockObject
+     */
+    private $sessionProviderFactory;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -54,11 +63,13 @@ class CustomItemTabSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->customContentEvent      = $this->createMock(CustomContentEvent::class);
         $this->customObject            = $this->createMock(CustomObject::class);
         $this->customItem              = $this->createMock(CustomItem::class);
+        $this->sessionProviderFactory  = $this->createMock(SessionProviderFactory::class);
         $this->tabSubscriber           = new CustomItemTabSubscriber(
             $this->customObjectModel,
             $this->customItemRepository,
             $this->translator,
-            $this->customItemRouteProvider
+            $this->customItemRouteProvider,
+            $this->sessionProviderFactory
         );
     }
 
@@ -195,13 +206,24 @@ class CustomItemTabSubscriberTest extends \PHPUnit\Framework\TestCase
             ->with(555)
             ->willReturn('new/route');
 
+        $this->customItemRouteProvider->expects($this->once())
+            ->method('buildListRoute')
+            ->with(555, 1, 'customItem', 45)
+            ->willReturn('search/route');
+
+        $sessionProvider = $this->createMock(SessionProvider::class);
+        $sessionProvider->method('getFilter')->willReturn('Search something');
+
+        $this->sessionProviderFactory->expects($this->once())
+            ->method('createItemProvider')
+            ->with(555, 'customItem', 45)
+            ->willReturn($sessionProvider);
+
         $this->customContentEvent->expects($this->at(3))
             ->method('addTemplate')
             ->with(
                 'CustomObjectsBundle:SubscribedEvents/Tab:content.html.php',
                 [
-                    'page'              => 1,
-                    'search'            => '',
                     'customObjectId'    => 555,
                     'currentEntityId'   => 45,
                     'currentEntityType' => 'customItem',
@@ -209,6 +231,9 @@ class CustomItemTabSubscriberTest extends \PHPUnit\Framework\TestCase
                     'placeholder'       => 'translated placeholder',
                     'lookupRoute'       => 'lookup/route',
                     'newRoute'          => 'new/route',
+                    'searchId'          => 'list-search-555',
+                    'searchValue'       => 'Search something',
+                    'searchRoute'       => 'search/route',
                 ]
             );
 

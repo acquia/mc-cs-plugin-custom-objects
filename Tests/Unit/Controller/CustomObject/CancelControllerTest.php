@@ -17,7 +17,8 @@ use MauticPlugin\CustomObjectsBundle\Controller\CustomObject\CancelController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectSessionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\SessionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 
 class CancelControllerTest extends ControllerTestCase
@@ -35,17 +36,19 @@ class CancelControllerTest extends ControllerTestCase
     {
         parent::setUp();
 
-        $this->sessionProvider   = $this->createMock(CustomObjectSessionProvider::class);
+        $sessionProviderFactory  = $this->createMock(SessionProviderFactory::class);
+        $this->sessionProvider   = $this->createMock(SessionProvider::class);
         $this->routeProvider     = $this->createMock(CustomObjectRouteProvider::class);
         $this->customObjectModel = $this->createMock(CustomObjectModel::class);
 
         $this->cancelController = new CancelController(
-            $this->sessionProvider,
+            $sessionProviderFactory,
             $this->routeProvider,
             $this->customObjectModel
         );
 
         $this->addSymfonyDependencies($this->cancelController);
+        $sessionProviderFactory->method('createObjectProvider')->willReturn($this->sessionProvider);
     }
 
     public function testCancelAction(): void

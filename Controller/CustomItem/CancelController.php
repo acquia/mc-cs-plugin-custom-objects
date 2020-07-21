@@ -17,15 +17,15 @@ use Mautic\CoreBundle\Controller\CommonController;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemSessionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use Symfony\Component\HttpFoundation\Response;
 
 class CancelController extends CommonController
 {
     /**
-     * @var CustomItemSessionProvider
+     * @var SessionProviderFactory
      */
-    private $sessionProvider;
+    private $sessionProviderFactory;
 
     /**
      * @var CustomItemRouteProvider
@@ -38,13 +38,13 @@ class CancelController extends CommonController
     private $customItemModel;
 
     public function __construct(
-        CustomItemSessionProvider $sessionProvider,
+        SessionProviderFactory $sessionProviderFactory,
         CustomItemRouteProvider $routeProvider,
         CustomItemModel $customItemModel
     ) {
-        $this->sessionProvider = $sessionProvider;
-        $this->routeProvider   = $routeProvider;
-        $this->customItemModel = $customItemModel;
+        $this->sessionProviderFactory = $sessionProviderFactory;
+        $this->routeProvider          = $routeProvider;
+        $this->customItemModel        = $customItemModel;
     }
 
     /**
@@ -52,7 +52,7 @@ class CancelController extends CommonController
      */
     public function cancelAction(int $objectId, ?int $itemId = null): Response
     {
-        $page = $this->sessionProvider->getPage();
+        $page = $this->sessionProviderFactory->createItemProvider($objectId)->getPage();
 
         if ($itemId) {
             $customItem = $this->customItemModel->fetchEntity($itemId);

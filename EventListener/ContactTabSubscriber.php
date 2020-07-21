@@ -20,6 +20,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -29,7 +30,7 @@ class ContactTabSubscriber implements EventSubscriberInterface
     /**
      * @var TranslatorInterface
      */
-    protected $translator;
+    private $translator;
 
     /**
      * @var CustomObjectModel
@@ -56,18 +57,25 @@ class ContactTabSubscriber implements EventSubscriberInterface
      */
     private $customObjects = [];
 
+    /**
+     * @var SessionProviderFactory
+     */
+    private $sessionProviderFactory;
+
     public function __construct(
         CustomObjectModel $customObjectModel,
         CustomItemRepository $customItemRepository,
         ConfigProvider $configProvider,
         TranslatorInterface $translator,
-        CustomItemRouteProvider $customItemRouteProvider
+        CustomItemRouteProvider $customItemRouteProvider,
+        SessionProviderFactory $sessionProviderFactory
     ) {
         $this->customObjectModel       = $customObjectModel;
         $this->customItemRepository    = $customItemRepository;
         $this->configProvider          = $configProvider;
         $this->translator              = $translator;
         $this->customItemRouteProvider = $customItemRouteProvider;
+        $this->sessionProviderFactory  = $sessionProviderFactory;
     }
 
     /**
@@ -110,20 +118,24 @@ class ContactTabSubscriber implements EventSubscriberInterface
             $objects = $this->getCustomObjects();
 
             /** @var Lead $contact */
-            $contact = $vars['lead'];
+            $contact    = $vars['lead'];
+            $entityType = 'contact';
 
             /** @var CustomObject $object */
             foreach ($objects as $object) {
-                $data = [
-                    'customObjectId'    => $object->getId(),
-                    'currentEntityId'   => $contact->getId(),
-                    'currentEntityType' => 'contact',
-                    'tabId'             => "custom-object-{$object->getId()}",
-                    'page'              => 1,
-                    'search'            => '',
+                $objectId  = (int) $object->getId();
+                $contactId = (int) $contact->getId();
+                $data      = [
+                    'customObjectId'    => $objectId,
+                    'currentEntityId'   => $contactId,
+                    'currentEntityType' => $entityType,
+                    'tabId'             => "custom-object-{$objectId}",
+                    'searchId'          => "list-search-{$objectId}",
+                    'searchValue'       => $this->sessionProviderFactory->createItemProvider($objectId, $entityType, $contactId)->getFilter(),
                     'placeholder'       => $this->translator->trans('custom.item.link.search.placeholder.contact', ['%object%' => $object->getNameSingular()]),
-                    'lookupRoute'       => $this->customItemRouteProvider->buildLookupRoute((int) $object->getId(), 'contact', (int) $contact->getId()),
-                    'newRoute'          => $this->customItemRouteProvider->buildNewRouteWithRedirectToContact((int) $object->getId(), (int) $contact->getId()),
+                    'searchRoute'       => $this->customItemRouteProvider->buildListRoute($objectId, 1, $entityType, $contactId),
+                    'lookupRoute'       => $this->customItemRouteProvider->buildLookupRoute($objectId, $entityType, $contactId),
+                    'newRoute'          => $this->customItemRouteProvider->buildNewRouteWithRedirectToContact($objectId, $contactId),
                 ];
 
                 $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:content.html.php', $data);

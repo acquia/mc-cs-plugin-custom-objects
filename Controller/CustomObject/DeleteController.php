@@ -19,7 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectSessionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -31,9 +31,9 @@ class DeleteController extends CommonController
     private $customObjectModel;
 
     /**
-     * @var CustomObjectSessionProvider
+     * @var SessionProviderFactory
      */
-    private $sessionProvider;
+    private $sessionProviderFactory;
 
     /**
      * @var FlashBag
@@ -47,14 +47,14 @@ class DeleteController extends CommonController
 
     public function __construct(
         CustomObjectModel $customObjectModel,
-        CustomObjectSessionProvider $sessionProvider,
+        SessionProviderFactory $sessionProviderFactory,
         FlashBag $flashBag,
         CustomObjectPermissionProvider $permissionProvider
     ) {
-        $this->customObjectModel  = $customObjectModel;
-        $this->sessionProvider    = $sessionProvider;
-        $this->flashBag           = $flashBag;
-        $this->permissionProvider = $permissionProvider;
+        $this->customObjectModel      = $customObjectModel;
+        $this->sessionProviderFactory = $sessionProviderFactory;
+        $this->flashBag               = $flashBag;
+        $this->permissionProvider     = $permissionProvider;
     }
 
     /**
@@ -83,7 +83,7 @@ class DeleteController extends CommonController
 
         return $this->forward(
             'CustomObjectsBundle:CustomObject\List:list',
-            ['page' => $this->sessionProvider->getPage()]
+            ['page' => $this->sessionProviderFactory->createObjectProvider()->getPage()]
         );
     }
 }

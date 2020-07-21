@@ -61,9 +61,14 @@ class CustomItemRouteProvider
         $this->router = $router;
     }
 
-    public function buildListRoute(int $objectId, int $page = 1): string
+    public function buildListRoute(int $objectId, int $page = 1, string $filterEntityType = null, int $filterEntityId = null): string
     {
-        return $this->router->generate(static::ROUTE_LIST, ['objectId' => $objectId, 'page' => $page]);
+        return $this->router->generate(static::ROUTE_LIST, [
+            'objectId'         => $objectId,
+            'page'             => $page,
+            'filterEntityType' => $filterEntityType,
+            'filterEntityId'   => $filterEntityId,
+        ]);
     }
 
     public function buildUnlinkRoute(int $customItemId, string $entityType, int $entityId): string
@@ -84,7 +89,7 @@ class CustomItemRouteProvider
         return $this->router->generate(static::ROUTE_NEW_REDIRECT_TO_CONTACT, ['objectId' => $objectId, 'contactId' => $contactId]);
     }
 
-    public function buildSaveRoute(int $objectId, ?int $itemId = null): string
+    public function buildSaveRoute(int $objectId, int $itemId = null): string
     {
         return $this->router->generate(static::ROUTE_SAVE, ['objectId' => $objectId, 'itemId' => $itemId]);
     }
@@ -119,11 +124,7 @@ class CustomItemRouteProvider
         return $this->router->generate('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $contactId]);
     }
 
-    /**
-     * @param ?string $entityType
-     * @param ?int    $entityId
-     */
-    public function buildLookupRoute(int $objectId, ?string $entityType = null, ?int $entityId = null): string
+    public function buildLookupRoute(int $objectId, string $entityType = null, int $entityId = null): string
     {
         return $this->router->generate(
             static::ROUTE_LOOKUP,
