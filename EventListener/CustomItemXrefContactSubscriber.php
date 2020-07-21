@@ -28,6 +28,7 @@ use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CustomItemXrefContactSubscriber implements EventSubscriberInterface
@@ -42,12 +43,19 @@ class CustomItemXrefContactSubscriber implements EventSubscriberInterface
      */
     private $userHelper;
 
+    /**
+     * @var CustomItemRepository
+     */
+    private $customItemRepository;
+
     public function __construct(
         EntityManager $entityManager,
-        UserHelper $userHelper
+        UserHelper $userHelper,
+        CustomItemRepository $customItemRepository
     ) {
-        $this->entityManager = $entityManager;
-        $this->userHelper    = $userHelper;
+        $this->entityManager        = $entityManager;
+        $this->userHelper           = $userHelper;
+        $this->customItemRepository = $customItemRepository;
     }
 
     /**
@@ -91,10 +99,7 @@ class CustomItemXrefContactSubscriber implements EventSubscriberInterface
     {
         $tableConfig = $event->getTableConfig();
         if ('contact' === $tableConfig->getParameter('filterEntityType') && $tableConfig->getParameter('filterEntityId')) {
-            $queryBuilder = $event->getQueryBuilder();
-            $queryBuilder->leftJoin(CustomItem::TABLE_ALIAS.'.contactReferences', CustomItemXrefContact::TABLE_ALIAS);
-            $queryBuilder->andWhere(CustomItemXrefContact::TABLE_ALIAS.'.contact = :contactId');
-            $queryBuilder->setParameter('contactId', (int) $tableConfig->getParameter('filterEntityId'));
+            $this->customItemRepository->includeItemsLinkedToContact($event->getQueryBuilder(), $tableConfig->getParameter('filterEntityId'));
         }
     }
 
@@ -102,12 +107,7 @@ class CustomItemXrefContactSubscriber implements EventSubscriberInterface
     {
         $tableConfig = $event->getTableConfig();
         if ('contact' === $tableConfig->getParameter('filterEntityType') && $tableConfig->getParameter('filterEntityId')) {
-            $queryBuilder = $event->getQueryBuilder();
-            $queryBuilder->leftJoin(CustomItem::TABLE_ALIAS.'.contactReferences', CustomItemXrefContact::TABLE_ALIAS);
-            $queryBuilder->andWhere($queryBuilder->expr()->orX(
-                $queryBuilder->expr()->neq(CustomItemXrefContact::TABLE_ALIAS.'.contact', $tableConfig->getParameter('filterEntityId')),
-                $queryBuilder->expr()->isNull(CustomItemXrefContact::TABLE_ALIAS.'.contact')
-            ));
+            $this->customItemRepository->excludeItemsLinkedToContact($event->getQueryBuilder(), $tableConfig->getParameter('filterEntityId'));
         }
     }
 
@@ -146,8 +146,9 @@ class CustomItemXrefContactSubscriber implements EventSubscriberInterface
 
     public function createNewEventLogForLinkedContact(CustomItemXrefEntityEvent $event): void
     {
-        if ($event->getXref() instanceof CustomItemXrefContact) {
-            $this->saveEventLog($event->getXref(), 'link');
+        $xref = $event->getXref();
+        if ($xref instanceof CustomItemXrefContact) {
+            $this->saveEventLog($xref, 'link');
         }
     }
 
@@ -169,8 +170,9 @@ class CustomItemXrefContactSubscriber implements EventSubscriberInterface
      */
     public function createNewEventLogForUnlinkedContact(CustomItemXrefEntityEvent $event): void
     {
-        if ($event->getXref() instanceof CustomItemXrefContact) {
-            $this->saveEventLog($event->getXref(), 'unlink');
+        $xref = $event->getXref();
+        if ($xref instanceof CustomItemXrefContact) {
+            $this->saveEventLog($xref, 'unlink');
         }
     }
 

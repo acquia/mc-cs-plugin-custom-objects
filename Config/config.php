@@ -669,12 +669,14 @@ return [
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.helper.user',
+                    'custom_item.repository',
                 ],
             ],
             'custom_item.xref_item.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomItemXrefCustomItemSubscriber::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
+                    'custom_item.repository',
                 ],
             ],
             'custom_item.import.subscriber' => [
@@ -944,7 +946,7 @@ return [
         ],
         'other' => [
             'custom_object.config.provider' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider::class,
+                'class'     => ConfigProvider::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
                 ],
@@ -962,13 +964,13 @@ return [
                 ],
             ],
             'custom_field.route.provider' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider::class,
+                'class'     => CustomFieldRouteProvider::class,
                 'arguments' => [
                     'router',
                 ],
             ],
             'custom_item.route.provider' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider::class,
+                'class'     => CustomItemRouteProvider::class,
                 'arguments' => [
                     'router',
                 ],
@@ -987,7 +989,7 @@ return [
                 ],
             ],
             'custom_object.route.provider' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider::class,
+                'class'     => CustomObjectRouteProvider::class,
                 'arguments' => [
                     'router',
                 ],

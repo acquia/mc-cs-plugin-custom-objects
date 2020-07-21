@@ -13,10 +13,11 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Repository;
 
-use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
@@ -26,37 +27,56 @@ class CustomItemRepository extends CommonRepository
 
     public function countItemsLinkedToContact(CustomObject $customObject, Lead $contact): int
     {
-        $queryBuilder = $this->createQueryBuilder('ci', 'ci.id');
-        $queryBuilder->select($queryBuilder->expr()->countDistinct('ci.id'));
-        $queryBuilder->innerJoin('ci.contactReferences', 'cixctct');
-        $queryBuilder->where('ci.customObject = :customObjectId');
-        $queryBuilder->andWhere('cixctct.contact = :contactId');
+        $queryBuilder = $this->createQueryBuilder(CustomItem::TABLE_ALIAS);
+        $queryBuilder->select($queryBuilder->expr()->countDistinct(CustomItem::TABLE_ALIAS.'.id'));
+        $queryBuilder->where(CustomItem::TABLE_ALIAS.'.customObject = :customObjectId');
         $queryBuilder->setParameter('customObjectId', $customObject->getId());
-        $queryBuilder->setParameter('contactId', $contact->getId());
+        $this->includeItemsLinkedToContact($queryBuilder, (int) $contact->getId());
 
         return (int) $queryBuilder->getQuery()->getSingleScalarResult();
     }
 
     public function countItemsLinkedToAnotherItem(CustomObject $customObject, CustomItem $customItem): int
     {
-        $queryBuilder = $this->createQueryBuilder('ci', 'ci.id');
-        $queryBuilder->select($queryBuilder->expr()->countDistinct('ci.id'));
-        $queryBuilder->innerJoin(
-            CustomItemXrefCustomItem::class,
-            'cixci',
-            Join::WITH,
-            'ci.id = cixci.customItemLower OR ci.id = cixci.customItemHigher'
-        );
-        $queryBuilder->where('ci.customObject = :customObjectId');
-        $queryBuilder->andWhere('ci.id != :customItemId');
-        $queryBuilder->andWhere($queryBuilder->expr()->orX(
-            $queryBuilder->expr()->eq('cixci.customItemLower', ':customItemId'),
-            $queryBuilder->expr()->eq('cixci.customItemHigher', ':customItemId')
-        ));
+        $queryBuilder = $this->createQueryBuilder(CustomItem::TABLE_ALIAS);
+        $queryBuilder->select($queryBuilder->expr()->countDistinct(CustomItem::TABLE_ALIAS.'.id'));
+        $queryBuilder->where(CustomItem::TABLE_ALIAS.'.customObject = :customObjectId');
         $queryBuilder->setParameter('customObjectId', $customObject->getId());
-        $queryBuilder->setParameter('customItemId', $customItem->getId());
+        $this->includeItemsLinkedToAnotherItem($queryBuilder, $customItem->getId());
 
         return (int) $queryBuilder->getQuery()->getSingleScalarResult();
+    }
+
+    public function includeItemsLinkedToContact(QueryBuilder $queryBuilder, int $contactId): void
+    {
+        $queryBuilder->andWhere($queryBuilder->expr()->in(CustomItem::TABLE_ALIAS.'.id', $this->createContactReferencesBuilder()->getDQL()));
+        $queryBuilder->setParameter('contactId', $contactId);
+    }
+
+    public function excludeItemsLinkedToContact(QueryBuilder $queryBuilder, int $contactId): void
+    {
+        $queryBuilder->andWhere($queryBuilder->expr()->notIn(CustomItem::TABLE_ALIAS.'.id', $this->createContactReferencesBuilder()->getDQL()));
+        $queryBuilder->setParameter('contactId', $contactId);
+    }
+
+    public function includeItemsLinkedToAnotherItem(QueryBuilder $queryBuilder, int $customItemId): void
+    {
+        $exprBuilder = $queryBuilder->expr();
+
+        $queryBuilder->andWhere($exprBuilder->orX(
+            $exprBuilder->in(CustomItem::TABLE_ALIAS.'.id', $this->createLowerItemReferencesBuilder()->getDQL()),
+            $exprBuilder->in(CustomItem::TABLE_ALIAS.'.id', $this->createHigherItemReferencesBuilder()->getDQL())
+        ));
+        $queryBuilder->setParameter('customItemId', $customItemId);
+    }
+
+    public function excludeItemsLinkedToAnotherItem(QueryBuilder $queryBuilder, int $customItemId): void
+    {
+        $exprBuilder = $queryBuilder->expr();
+
+        $queryBuilder->andWhere($exprBuilder->notIn(CustomItem::TABLE_ALIAS.'.id', $this->createLowerItemReferencesBuilder()->getDQL()));
+        $queryBuilder->andWhere($exprBuilder->notIn(CustomItem::TABLE_ALIAS.'.id', $this->createHigherItemReferencesBuilder()->getDQL()));
+        $queryBuilder->setParameter('customItemId', $customItemId);
     }
 
     /**
@@ -65,5 +85,35 @@ class CustomItemRepository extends CommonRepository
     public function getTableAlias(): string
     {
         return CustomItem::TABLE_ALIAS;
+    }
+
+    private function createContactReferencesBuilder(): QueryBuilder
+    {
+        $queryBuilder = $this->getEntityManager()->createQueryBuilder();
+        $queryBuilder->select('IDENTITY(contactReference.customItem)');
+        $queryBuilder->from(CustomItemXrefContact::class, 'contactReference');
+        $queryBuilder->where('contactReference.contact = :contactId');
+
+        return $queryBuilder;
+    }
+
+    private function createLowerItemReferencesBuilder(): QueryBuilder
+    {
+        $queryBuilder = $this->getEntityManager()->createQueryBuilder();
+        $queryBuilder->select('IDENTITY(lower.customItemLower)');
+        $queryBuilder->from(CustomItemXrefCustomItem::class, 'lower');
+        $queryBuilder->where('lower.customItemHigher = :customItemId');
+
+        return $queryBuilder;
+    }
+
+    private function createHigherItemReferencesBuilder(): QueryBuilder
+    {
+        $queryBuilder = $this->getEntityManager()->createQueryBuilder();
+        $queryBuilder->select('IDENTITY(higher.customItemHigher)');
+        $queryBuilder->from(CustomItemXrefCustomItem::class, 'higher');
+        $queryBuilder->where('higher.customItemLower = :customItemId');
+
+        return $queryBuilder;
     }
 }
