@@ -54,7 +54,6 @@ class QueryFilterHelper
     }
 
     /**
-     * @return array String representation of query because of https://github.com/doctrine/orm/issues/5657#issuecomment-181228313
      * @throws NotFoundException
      * @throws RuntimeException
      */
@@ -86,7 +85,7 @@ class QueryFilterHelper
                 "{$alias}_value.custom_item_id = {$alias}_contact.custom_item_id"
             )
             ->andWhere(
-                $qb->expr()->eq("{$alias}_contact.contact_id", 'L.id'),
+//                $qb->expr()->eq("{$alias}_contact.contact_id", 'L.id'),
                 $qb->expr()->eq("{$alias}_value.custom_field_id", ":{$alias}_custom_field_id")
             )
             ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId)
@@ -112,7 +111,7 @@ class QueryFilterHelper
                     "{$alias}_item_xref.custom_item_id_higher = {$alias}_contact.custom_item_id"
                 )
                 ->andWhere(
-                    $qb->expr()->eq("{$alias}_contact.contact_id", 'L.id'),
+//                    $qb->expr()->eq("{$alias}_contact.contact_id", 'L.id'),
                     $qb->expr()->eq("{$alias}_value.custom_field_id", ":{$alias}_custom_field_id")
                 )
                 ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId)
@@ -137,7 +136,7 @@ class QueryFilterHelper
                     "{$alias}_item_xref.custom_item_id_lower = {$alias}_contact.custom_item_id"
                 )
                 ->andWhere(
-                    $qb->expr()->eq("{$alias}_contact.contact_id", 'L.id'),
+//                    $qb->expr()->eq("{$alias}_contact.contact_id", 'L.id'),
                     $qb->expr()->eq("{$alias}_value.custom_field_id", ":{$alias}_custom_field_id")
                 )
                 ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId)
@@ -168,10 +167,10 @@ class QueryFilterHelper
     public function addContactIdRestriction(SegmentQueryBuilder $queryBuilder, string $queryAlias, int $contactId): void
     {
         if (!$this->hasQueryJoinAlias($queryBuilder, $queryAlias.'_contact')){
-            if (!$this->hasQueryJoinAlias($queryBuilder, $queryAlias.'_item')) {
+            if (!$this->hasQueryJoinAlias($queryBuilder, $queryAlias.'_value')) {
                 throw new InvalidArgumentException('SegmentQueryBuilder contains no usable tables for contact restriction.');
             }
-            $tableAlias = $queryAlias.'_item.contact_id';
+            $tableAlias = $queryAlias.'_contact.contact_id';
         } else {
             $tableAlias = $queryAlias.'_contact.contact_id';
         }

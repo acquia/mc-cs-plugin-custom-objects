@@ -251,7 +251,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     private function applyParamsToQuery(SegmentQueryBuilder $innerQueryBuilder, string $queryAlias, Lead $contact, string $operator): void
     {
-        $innerQueryBuilder->select($queryAlias.'_item.id');
+        $innerQueryBuilder->select($queryAlias.'_value.custom_item_id');
         $this->queryFilterHelper->addContactIdRestriction($innerQueryBuilder, $queryAlias, (int) $contact->getId());
         $this->handleEmptyOperators($operator, $queryAlias, $innerQueryBuilder);
     }
@@ -262,7 +262,6 @@ class CampaignSubscriber implements EventSubscriberInterface
     private function buildOuterQuery($innerQuery, string $queryAlias): QueryBuilder
     {
         $queryBuilder = $this->connection->createQueryBuilder();
-        $this->copyParams($innerQuery, $queryBuilder);
 
         $queryBuilder->select(CustomItem::TABLE_ALIAS.'.id');
         $queryBuilder->from(MAUTIC_TABLE_PREFIX.CustomItem::TABLE_NAME, CustomItem::TABLE_ALIAS);
@@ -272,6 +271,8 @@ class CampaignSubscriber implements EventSubscriberInterface
             $queryAlias,
             CustomItem::TABLE_ALIAS.".id = {$queryAlias}.id"
         );
+
+        $queryBuilder->setParameters($innerQuery->getParameters(), $innerQuery->getParameterTypes());
 
         return $queryBuilder;
     }
