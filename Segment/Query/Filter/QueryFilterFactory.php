@@ -61,11 +61,6 @@ class QueryFilterFactory
                 $queryAlias,
                 $segmentFilter
             );
-            $this->queryFilterHelper->addCustomFieldValueExpressionFromSegmentFilter(
-                $queryBuilder,
-                $queryAlias,
-                $segmentFilter
-            );
         } elseif (CustomItemNameFilterQueryBuilder::getServiceId() === $type) {
             $queryBuilder = $this->queryFilterHelper->createItemNameQueryBuilder($queryAlias);
 
