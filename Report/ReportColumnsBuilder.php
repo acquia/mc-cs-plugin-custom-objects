@@ -132,10 +132,10 @@ class ReportColumnsBuilder
                     ->andWhere('custom_field_id = '.$customField->getId())
                     ->groupBy('custom_item_id');
                 $valueTableName = sprintf('(%s)', $joinQueryBuilder->getSQL());
-                $joinCondition  = sprintf('%s.id = %s.custom_item_id', $customItemTableAlias, $hash);
+                $joinCondition  = sprintf('`%s`.`id` = `%s`.`custom_item_id`', $customItemTableAlias, $hash);
             } else {
                 $valueTableName = $customField->getTypeObject()->getTableName();
-                $joinCondition  = sprintf('%s.id = %s.custom_item_id AND %s.custom_field_id = %s', $customItemTableAlias, $hash, $hash, $customField->getId());
+                $joinCondition  = sprintf('`%s`.`id` = `%s`.`custom_item_id` AND `%s`.`custom_field_id` = %s', $customItemTableAlias, $hash, $hash, $customField->getId());
             }
 
             $queryBuilder->leftJoin($customItemTableAlias, $valueTableName, $hash, $joinCondition);
