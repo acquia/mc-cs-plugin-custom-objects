@@ -138,7 +138,7 @@ class ReportColumnsBuilder
                 $joinCondition  = sprintf('`%s`.`id` = `%s`.`custom_item_id` AND `%s`.`custom_field_id` = %s', $customItemTableAlias, $hash, $hash, $customField->getId());
             }
 
-            $queryBuilder->leftJoin($customItemTableAlias, $valueTableName, $hash, $joinCondition);
+            $queryBuilder->leftJoin($customItemTableAlias, $valueTableName, "`{$hash}`", $joinCondition);
         }
     }
 }
