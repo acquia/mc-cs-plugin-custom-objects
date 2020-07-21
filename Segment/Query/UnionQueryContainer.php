@@ -55,9 +55,11 @@ class UnionQueryContainer implements \Iterator
     }
 
     /**
+     * Return merged SQL as string representation
+     *
      * @throws DBALException
      */
-    public function getMergedQueryString(): string
+    public function getSQL(): string
     {
         $queries = [];
         foreach ($this->queries as $query) {
@@ -123,7 +125,7 @@ class UnionQueryContainer implements \Iterator
     private function checkRebuildStatus(): void
     {
         if ($this->needsRebuild) {
-            throw new \RuntimeException('Use getMergedQueryString() method at first to rebuild parameters and types');
+            throw new \RuntimeException('Use getSQL() method at first to rebuild parameters and types');
         }
     }
 }
