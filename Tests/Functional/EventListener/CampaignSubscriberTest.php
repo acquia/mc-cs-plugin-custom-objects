@@ -145,7 +145,7 @@ class CampaignSubscriberTest extends KernelTestCase
         );
 
         $this->campaignSubscriber->onCampaignTriggerCondition($event);
-//        $this->assertFalse($event->getResult());
+        $this->assertFalse($event->getResult());
 
         // Test equals the same text as the field value.
         $event = $this->createCampaignExecutionEvent(
@@ -188,7 +188,7 @@ class CampaignSubscriberTest extends KernelTestCase
         );
 
         $this->campaignSubscriber->onCampaignTriggerCondition($event);
-//        $this->assertFalse($event->getResult());
+        $this->assertFalse($event->getResult());
 
         // Test the text value is not empty.
         $event = $this->createCampaignExecutionEvent(
