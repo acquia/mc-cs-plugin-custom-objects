@@ -87,8 +87,7 @@ class QueryFilterHelper
             ->andWhere(
                 $qb->expr()->eq("{$alias}_value.custom_field_id", ":{$alias}_custom_field_id")
             )
-            ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId)
-            ->setParameter(":{$alias}_value_value", $segmentFilter->getParameterValue());
+            ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId);
 
         $unionQueryContainer->add($qb);
 
@@ -112,8 +111,7 @@ class QueryFilterHelper
                 ->andWhere(
                     $qb->expr()->eq("{$alias}_value.custom_field_id", ":{$alias}_custom_field_id")
                 )
-                ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId)
-                ->setParameter(":{$alias}_value_value", $segmentFilter->getParameterValue());
+                ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId);
 
             $unionQueryContainer->add($qb);
 
@@ -136,8 +134,7 @@ class QueryFilterHelper
                 ->andWhere(
                     $qb->expr()->eq("{$alias}_value.custom_field_id", ":{$alias}_custom_field_id")
                 )
-                ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId)
-                ->setParameter(":{$alias}_value_value", $segmentFilter->getParameterValue());
+                ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId);
 
             $unionQueryContainer->add($qb);
         }
