@@ -23,8 +23,9 @@ use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemNameFilterQu
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\UnionQueryContainer;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class QueryFilterFactoryTest extends \PHPUnit\Framework\TestCase
+class QueryFilterFactoryTest extends TestCase
 {
     /**
      * @var ContactSegmentFilterFactory|MockObject
@@ -130,14 +131,6 @@ class QueryFilterFactoryTest extends \PHPUnit\Framework\TestCase
                 $this->contactSegmentFilter
             )
             ->willReturn($this->unionQueryContainer);
-
-        $this->queryFilterHelper->expects($this->once())
-            ->method('addCustomFieldValueExpressionFromSegmentFilter')
-            ->with(
-                $this->unionQueryContainer,
-                $queryAlias,
-                $this->contactSegmentFilter
-            );
 
         $this->assertSame(
             $this->unionQueryContainer,
