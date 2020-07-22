@@ -148,7 +148,6 @@ class QueryFilterHelper
     {
         $queryBuilder = new SegmentQueryBuilder($this->entityManager->getConnection());
 
-        // @todo keep this functionality
         return $this->getBasicItemQueryBuilder($queryBuilder, $queryBuilderAlias);
     }
 
@@ -388,7 +387,6 @@ class QueryFilterHelper
 
     /**
      * Get basic query builder with contact reference and item join.
-     * @todo unused, remove me
      */
     private function getBasicItemQueryBuilder(SegmentQueryBuilder $queryBuilder, string $alias): SegmentQueryBuilder
     {
