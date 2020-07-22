@@ -186,9 +186,11 @@ class TokenSubscriber implements EventSubscriberInterface
             } else {
                 if (!empty($token->getFormat())) {
                     try {
-                        $formatEvent = $this->eventDispatcher->dispatch(
+                        $formatEvent = new CustomObjectListFormatEvent($fieldValues, $token->getFormat());
+                        
+                        $this->eventDispatcher->dispatch(
                             CustomObjectEvents::ON_CUSTOM_OBJECT_LIST_FORMAT,
-                            new CustomObjectListFormatEvent($fieldValues, $token->getFormat())
+                            $formatEvent
                         );
 
                         $result = $formatEvent->hasBeenFormatted() ?
