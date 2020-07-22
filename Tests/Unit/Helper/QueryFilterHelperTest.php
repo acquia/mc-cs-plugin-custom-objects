@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Helper;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
@@ -32,7 +35,12 @@ class QueryFilterHelperTest extends TestCase
     {
         parent::setUp();
 
-        $this->queryFilterHelper = new QueryFilterHelper(new CustomFieldTypeProvider());
+        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager
+            ->method('getConnection')
+            ->willReturn($this->createMock(Connection::class));
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->queryFilterHelper = new QueryFilterHelper($entityManager, new CustomFieldTypeProvider(), $coreParametersHelper);
         $this->queryBuilder = $this->createMock(QueryBuilder::class);
         $this->expressionBuilder = $this->createMock(ExpressionBuilder::class);
     }
