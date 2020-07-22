@@ -45,10 +45,11 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
+class TokenSubscriberTest extends TestCase
 {
     private $configProvider;
 
@@ -115,7 +116,7 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->customItemListDbalQueryEvent = $this->createMock(CustomItemListDbalQueryEvent::class);
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $this->assertEquals(
             [
@@ -904,10 +905,8 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
     /**
      * This keeps badly constructed subscriber to keep non unit test (behavioral) functionality for cases where it is used.
-     *
-     * @todo Rewrite these cases to be unit test cases
      */
-    private function constructWithDependencies()
+    private function constructWithDependencies(): void
     {
         $this->configProvider     = $this->createMock(ConfigProvider::class);
         $this->queryFilterHelper  = $this->createMock(QueryFilterHelper::class);
