@@ -253,7 +253,6 @@ class CampaignSubscriber implements EventSubscriberInterface
     {
         $innerQueryBuilder->select($queryAlias.'_value.custom_item_id');
         $this->queryFilterHelper->addContactIdRestriction($innerQueryBuilder, $queryAlias, (int) $contact->getId());
-        $this->handleEmptyOperators($operator, $queryAlias, $innerQueryBuilder);
     }
 
     /**
