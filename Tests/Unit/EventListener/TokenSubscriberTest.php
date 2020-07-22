@@ -253,35 +253,50 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testDecodeTokensWithWhenCustomObjectNotFound(): void
     {
-        $coAlias = 'coAlias';
+        $coAlias = 'product';
+
+        $this->constructWithDependencies();
+
+        $html = '<!DOCTYPE html>
+        <html>
+        <head>
+        <title>{subject}</title>
+        </head>
+        <body>
+        Hello, here is the thing:
+        {custom-object=product:sku | where=segment-filter |order=latest|limit=1 | default=No thing} 
+        Regards
+        </body>
+        </html>
+        ';
+        $email          = new Email();
+        $emailSendEvent = new EmailSendEvent(
+            null,
+            [
+                'subject'          => 'CO segment test',
+                'content'          => $html,
+                'conplainTexttent' => '',
+                'email'            => $email,
+                'lead'             => ['id' => 2345, 'email' => 'john@doe.email'],
+                'source'           => null,
+            ]
+        );
 
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
             ->willReturn(true);
-
-        $event = $this->createMock(EmailSendEvent::class);
-        $event->expects($this->once())
-            ->method('getContent')
-            ->willReturn('eventContent');
-
-        $token = $this->createMock(Token::class);
-        $token->expects($this->once())
-            ->method('getCustomObjectAlias')
-            ->willReturn($coAlias);
-
-        $tokens = new ArrayCollection([$token]);
-
-        $this->tokenParser->expects($this->once())
-            ->method('findTokens')
-            ->with('eventContent')
-            ->willReturn($tokens);
 
         $this->customObjectModel->expects($this->once())
             ->method('fetchEntityByAlias')
             ->with($coAlias)
             ->willThrowException(new NotFoundException());
 
-        $this->subscriber->decodeTokens($event);
+        $this->subscriber->decodeTokens($emailSendEvent);
+
+        $this->assertSame(
+            ['{custom-object=product:sku | where=segment-filter |order=latest|limit=1 | default=No thing}' => 'No thing'],
+            $emailSendEvent->getTokens()
+        );
     }
 
     public function testDecodeTokensWithDefaultValueWhenNoCustomItemFound(): void
@@ -442,7 +457,7 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
         $customItemWithoutField = $this->createMock(CustomItem::class);
         $valueEntity            = $this->createMock(CustomFieldValueInterface::class);
 
-        $valueEntity->expects($this->once())
+        $valueEntity->expects($this->exactly(2))
             ->method('getValue')
             ->willReturn('The field value');
 
@@ -458,6 +473,165 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
                     $this->createMock(FilterOperatorProviderInterface::class)
                 )
             );
+
+        $customObject->method('getId')->willReturn(1234);
+
+        $customItemWithField->expects($this->once())
+            ->method('findCustomFieldValueForFieldAlias')
+            ->with('sku')
+            ->willReturn($valueEntity);
+
+        $customItemWithoutField->expects($this->once())
+            ->method('findCustomFieldValueForFieldAlias')
+            ->with('sku')
+            ->will($this->throwException(new NotFoundException('Field SKU not found')));
+
+        $this->configProvider->expects($this->once())
+            ->method('pluginIsEnabled')
+            ->willReturn(true);
+
+        $this->customObjectModel->expects($this->once())
+            ->method('fetchEntityByAlias')
+            ->willReturn($customObject);
+
+        $this->customItemModel->expects($this->once())
+            ->method('getArrayTableData')
+            ->with($this->callback(function (TableConfig $tableConfig) use ($email) {
+                $this->assertSame(1, $tableConfig->getLimit());
+                $this->assertSame('CustomItem.date_added', $tableConfig->getOrderBy());
+                $this->assertSame('DESC', $tableConfig->getOrderDirection());
+                $this->assertSame(0, $tableConfig->getOffset());
+                $this->assertSame(1234, $tableConfig->getParameter('customObjectId'));
+                $this->assertSame('contact', $tableConfig->getParameter('filterEntityType'));
+                $this->assertSame(2345, $tableConfig->getParameter('filterEntityId'));
+                $this->assertSame($email, $tableConfig->getParameter('email'));
+                $this->assertInstanceOf(Token::class, $tableConfig->getParameter('token'));
+
+                return true;
+            }))
+            ->willReturn(
+                [
+                    ['id' => 3456, 'name' => 'Custom Item with sku field'],
+                    ['id' => 4567, 'name' => 'Custom Item without sku field'],
+                ]
+            );
+
+        $this->customItemModel->expects($this->exactly(2))
+            ->method('populateCustomFields')
+            ->withConsecutive(
+                [
+                    $this->callback(function (CustomItem $customItem) {
+                        $this->assertSame(3456, $customItem->getId());
+                        $this->assertSame('Custom Item with sku field', $customItem->getName());
+
+                        return true;
+                    }),
+                ],
+                [
+                    $this->callback(function (CustomItem $customItem) {
+                        $this->assertSame(4567, $customItem->getId());
+                        $this->assertSame('Custom Item without sku field', $customItem->getName());
+
+                        return true;
+                    }),
+                ]
+            )
+            ->will($this->onConsecutiveCalls($customItemWithField, $customItemWithoutField));
+
+        $this->subscriber->decodeTokens($emailSendEvent);
+
+        $this->assertSame(
+            ['{custom-object=product:sku | where=segment-filter |order=latest|limit=1 | default=No thing}' => 'The field value'],
+            $emailSendEvent->getTokens()
+        );
+    }
+
+    public function testDecodeTokensWithEmptyFieldValue(): void
+    {
+        $this->constructWithDependencies();
+
+        $html = '<!DOCTYPE html>
+        <html>
+        <head>
+        <title>{subject}</title>
+        </head>
+        <body>
+        Hello, here is the thing:
+        {custom-object=product:sku | where=segment-filter |order=latest|limit=1 | default=No thing} 
+        Regards
+        </body>
+        </html>
+        ';
+        $segment = new LeadList();
+        $segment->setName('CO test');
+        $segment->setFilters([
+            [
+                'glue'     => 'and',
+                'field'    => 'cmf_1',
+                'object'   => 'custom_object',
+                'type'     => 'text',
+                'filter'   => '23',
+                'display'  => null,
+                'operator' => '=',
+            ],
+            [
+                'glue'     => 'and',
+                'field'    => 'cmf_10',
+                'object'   => 'custom_object',
+                'type'     => 'int',
+                'filter'   => '4',
+                'display'  => null,
+                'operator' => '=',
+            ],
+        ]);
+        $email = new Email();
+        $email->setName('CO segment test');
+        $email->setSubject('CO segment test');
+        $email->setCustomHtml($html);
+        $email->setEmailType('list');
+        $email->setLists([2 => $segment]);
+        $emailSendEvent = new EmailSendEvent(
+            null,
+            [
+                'subject'          => 'CO segment test',
+                'content'          => $html,
+                'conplainTexttent' => '',
+                'email'            => $email,
+                'lead'             => ['id' => 2345, 'email' => 'john@doe.email'],
+                'source'           => null,
+            ]
+        );
+
+        $customField            = $this->createMock(CustomField::class);
+        $customObject           = $this->createMock(CustomObject::class);
+        $customItemWithField    = $this->createMock(CustomItem::class);
+        $customItemWithoutField = $this->createMock(CustomItem::class);
+        $valueEntity            = $this->createMock(CustomFieldValueInterface::class);
+
+        $customField->expects($this->any())
+            ->method('getDefaultValue')
+            ->willReturn('The field value');
+
+        $customField->expects($this->any())
+            ->method('getTypeObject')
+            ->willReturn(
+                new TextType(
+                    $this->createMock(TranslatorInterface::class),
+                    $this->createMock(FilterOperatorProviderInterface::class)
+                )
+            );
+
+        $valueEntity->expects($this->at(1))
+            ->method('getValue')
+            ->willReturn('');
+
+        $valueEntity->expects($this->at(4))
+            ->method('getValue')
+            ->willReturn('The field value');
+
+        $valueEntity->expects($this->any())
+            ->method('getCustomField')
+            ->willReturn($customField);
 
         $customObject->method('getId')->willReturn(1234);
 
