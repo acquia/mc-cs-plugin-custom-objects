@@ -137,7 +137,7 @@ class CustomFieldFilterQueryBuilderTest extends MauticWebTestCase
         $connection   = $this->entityManager->getConnection();
         $queryBuilder = new QueryBuilder($connection);
 
-        $queryBuilder->select('L.*')->from(MAUTIC_TABLE_PREFIX.'leads', 'L');
+        $queryBuilder->select('l.*')->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
         return $queryBuilder;
     }
