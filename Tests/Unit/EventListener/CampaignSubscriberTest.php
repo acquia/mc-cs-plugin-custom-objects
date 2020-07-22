@@ -371,6 +371,10 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getParameters')
             ->willReturn([]);
 
+        $this->segmentQueryBuilder->expects($this->once())
+            ->method('getParameterTypes')
+            ->willReturn([]);
+
         $this->campaignExecutionEvent->expects($this->once())
             ->method('getEvent')
             ->willReturn(['type' => 'custom_item.63.fieldvalue']);
@@ -421,6 +425,11 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->segmentQueryBuilder->expects($this->once())
             ->method('getParameters')
+            ->willReturn([]);
+
+
+        $this->segmentQueryBuilder->expects($this->once())
+            ->method('getParameterTypes')
             ->willReturn([]);
 
         $this->campaignExecutionEvent->expects($this->once())
