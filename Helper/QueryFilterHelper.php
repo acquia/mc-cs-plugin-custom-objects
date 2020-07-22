@@ -266,6 +266,12 @@ class QueryFilterHelper
     {
         switch ($operator) {
             case 'empty':
+                $expression = $customQuery->expr()->orX(
+                    $customQuery->expr()->isNull($tableAlias.'_value.value'),
+                    $customQuery->expr()->eq($tableAlias.'_value.value', $customQuery->expr()->literal(''))
+                );
+
+                break;
             case 'notEmpty':
                 $expression = $customQuery->expr()->andX(
                     $customQuery->expr()->isNotNull($tableAlias.'_value.value'),
@@ -327,6 +333,12 @@ class QueryFilterHelper
     {
         switch ($operator) {
             case 'empty':
+                $expression = $customQuery->expr()->orX(
+                    $customQuery->expr()->isNull($tableAlias.'_item.name'),
+                    $customQuery->expr()->eq($tableAlias.'_item.name', $customQuery->expr()->literal(''))
+                );
+
+                break;
             case 'notEmpty':
                 $expression = $customQuery->expr()->andX(
                     $customQuery->expr()->isNotNull($tableAlias.'_item.name'),
