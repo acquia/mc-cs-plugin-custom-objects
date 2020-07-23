@@ -832,7 +832,7 @@ class TokenSubscriberTest extends TestCase
                 CustomItem::TABLE_ALIAS,
                 '(SQL QUERY 1)',
                 'filter_0',
-                CustomItem::TABLE_ALIAS.'.id = filter_0.id'
+                CustomItem::TABLE_ALIAS.'.id = filter_0.custom_item_id'
             );
 
         $this->subscriber->onListQuery($this->customItemListDbalQueryEvent);
@@ -1063,13 +1063,13 @@ class TokenSubscriberTest extends TestCase
                     CustomItem::TABLE_ALIAS,
                     '(SQL QUERY 1)',
                     'filter_0',
-                    CustomItem::TABLE_ALIAS.'.id = filter_0.id',
+                    CustomItem::TABLE_ALIAS.'.id = filter_0.custom_item_id',
                 ],
                 [
                     CustomItem::TABLE_ALIAS,
                     '(SQL QUERY 2)',
                     'filter_1',
-                    CustomItem::TABLE_ALIAS.'.id = filter_1.id',
+                    CustomItem::TABLE_ALIAS.'.id = filter_1.custom_item_id',
                 ]
             );
 
