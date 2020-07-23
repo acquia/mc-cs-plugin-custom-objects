@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Helper;
 
 use Doctrine\DBAL\Query\QueryBuilder;
-use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\UnionQueryContainer;
 
 /**
@@ -32,37 +31,5 @@ trait QueryBuilderManipulatorTrait
             $paramType = is_array($value) ? $toQueryBuilder->getConnection()::PARAM_STR_ARRAY : null;
             $toQueryBuilder->setParameter($key, $value, $paramType);
         }
-    }
-
-    /**
-     * Empty and NotEmpty operators require different/opposite behaviour than what segment helper does.
-     * We have to handle it ourselves here.
-     *
-     * @todo Remove me
-     */
-    private function handleEmptyOperators(string $operator, string $queryAlias, SegmentQueryBuilder $innerQueryBuilder): void
-    {
-        // In collision with WHERE (custom_field_id = :custom_field_id
-        // Resets where and this condition is not available anymore
-        // @todo
-//        if ('empty' === $operator) {
-//            $innerQueryBuilder->resetQueryPart('where');
-//            $innerQueryBuilder->where(
-//                $innerQueryBuilder->expr()->orX(
-//                    $innerQueryBuilder->expr()->isNull($queryAlias.'_value.value'),
-//                    $innerQueryBuilder->expr()->eq($queryAlias.'_value.value', $innerQueryBuilder->expr()->literal(''))
-//                )
-//            );
-//        }
-//
-//        if ('!empty' === $operator) {
-//            $innerQueryBuilder->resetQueryPart('where');
-//            $innerQueryBuilder->where(
-//                $innerQueryBuilder->expr()->andX(
-//                    $innerQueryBuilder->expr()->isNotNull($queryAlias.'_value.value'),
-//                    $innerQueryBuilder->expr()->neq($queryAlias.'_value.value', $innerQueryBuilder->expr()->literal(''))
-//                )
-//            );
-//        }
     }
 }
