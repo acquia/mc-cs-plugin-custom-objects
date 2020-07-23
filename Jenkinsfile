@@ -14,6 +14,7 @@ spec:
   containers:
   - name: hosted-tester
     image: us.gcr.io/mautic-ma/mautic_tester_72:master
+    imagePullPolicy: Always
     command:
     - cat
     tty: true
