@@ -69,7 +69,7 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
             $filter
         );
 
-        foreach($unionQueryContainer as $segmentQueryBuilder) {
+        foreach ($unionQueryContainer as $segmentQueryBuilder) {
             $segmentQueryBuilder->andWhere(
                 $segmentQueryBuilder->expr()->eq("{$tableAlias}_contact.contact_id", 'l.id')
             );
