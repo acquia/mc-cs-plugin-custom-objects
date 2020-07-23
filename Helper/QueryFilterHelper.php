@@ -159,7 +159,7 @@ class QueryFilterHelper
      */
     public function addContactIdRestriction(SegmentQueryBuilder $queryBuilder, string $queryAlias, int $contactId): void
     {
-        if (!$this->hasQueryJoinAlias($queryBuilder, $queryAlias.'_contact')){
+        if (!$this->hasQueryJoinAlias($queryBuilder, $queryAlias.'_contact')) {
             if (!$this->hasQueryJoinAlias($queryBuilder, $queryAlias.'_value')) {
                 throw new InvalidArgumentException('SegmentQueryBuilder contains no usable tables for contact restriction.');
             }
@@ -178,7 +178,7 @@ class QueryFilterHelper
         string $tableAlias,
         ContactSegmentFilter $filter
     ): void {
-        foreach ($unionQueryContainer as $segmentQueryBuilder){
+        foreach ($unionQueryContainer as $segmentQueryBuilder) {
             $expression = $this->getCustomValueValueExpression($segmentQueryBuilder, $tableAlias, $filter->getOperator());
 
             $this->addOperatorExpression(
