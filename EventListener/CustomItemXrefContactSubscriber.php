@@ -99,7 +99,7 @@ class CustomItemXrefContactSubscriber implements EventSubscriberInterface
     {
         $tableConfig = $event->getTableConfig();
         if ('contact' === $tableConfig->getParameter('filterEntityType') && $tableConfig->getParameter('filterEntityId')) {
-            $this->customItemRepository->includeItemsLinkedToContact($event->getQueryBuilder(), $tableConfig->getParameter('filterEntityId'));
+            $this->customItemRepository->includeItemsLinkedToContact($event->getQueryBuilder(), (int) $tableConfig->getParameter('filterEntityId'));
         }
     }
 
@@ -107,7 +107,7 @@ class CustomItemXrefContactSubscriber implements EventSubscriberInterface
     {
         $tableConfig = $event->getTableConfig();
         if ('contact' === $tableConfig->getParameter('filterEntityType') && $tableConfig->getParameter('filterEntityId')) {
-            $this->customItemRepository->excludeItemsLinkedToContact($event->getQueryBuilder(), $tableConfig->getParameter('filterEntityId'));
+            $this->customItemRepository->excludeItemsLinkedToContact($event->getQueryBuilder(), (int) $tableConfig->getParameter('filterEntityId'));
         }
     }
 

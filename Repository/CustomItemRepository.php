@@ -42,7 +42,7 @@ class CustomItemRepository extends CommonRepository
         $queryBuilder->select($queryBuilder->expr()->countDistinct(CustomItem::TABLE_ALIAS.'.id'));
         $queryBuilder->where(CustomItem::TABLE_ALIAS.'.customObject = :customObjectId');
         $queryBuilder->setParameter('customObjectId', $customObject->getId());
-        $this->includeItemsLinkedToAnotherItem($queryBuilder, $customItem->getId());
+        $this->includeItemsLinkedToAnotherItem($queryBuilder, (int) $customItem->getId());
 
         return (int) $queryBuilder->getQuery()->getSingleScalarResult();
     }

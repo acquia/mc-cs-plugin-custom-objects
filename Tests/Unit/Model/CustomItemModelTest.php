@@ -38,12 +38,13 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomFieldValueModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use UnexpectedValueException;
 
-class CustomItemModelTest extends \PHPUnit\Framework\TestCase
+class CustomItemModelTest extends TestCase
 {
     private $customItem;
 
@@ -313,7 +314,7 @@ class CustomItemModelTest extends \PHPUnit\Framework\TestCase
     {
         $tableConfig = new TableConfig(10, 1, 'column');
 
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage("customObjectId cannot be empty. It's required for permission management");
         $this->customItemModel->getTableData($tableConfig);
     }
@@ -350,7 +351,7 @@ class CustomItemModelTest extends \PHPUnit\Framework\TestCase
     {
         $tableConfig = new TableConfig(10, 1, 'column');
 
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage("customObjectId cannot be empty. It's required for permission management");
         $this->customItemModel->getArrayTableData($tableConfig);
     }
@@ -480,8 +481,8 @@ class CustomItemModelTest extends \PHPUnit\Framework\TestCase
             ->method('select')
             ->withConsecutive(
                 [CustomItem::TABLE_ALIAS],
-                ['1'],
-                ['1'],
+                ['IDENTITY(ValueText.customItem)'],
+                ['IDENTITY(ValueOption.customItem)'],
                 ['CustomItem.name as value, CustomItem.id']
             );
 
