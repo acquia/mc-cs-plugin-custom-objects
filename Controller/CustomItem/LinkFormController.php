@@ -178,6 +178,7 @@ class LinkFormController extends AbstractFormController
                 'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.php',
                 'passthroughVars' => [
                     'closeModal'    => false,
+                    'callback'      => 'customItemLinkFormLoad',
                     'mauticContent' => 'customItem',
                     'route'         => $this->routeProvider->buildLinkFormRoute($itemId, $entityType, $entityId),
                 ],
@@ -188,7 +189,7 @@ class LinkFormController extends AbstractFormController
     protected function getRelationshipItem(CustomObject $relationshipObject, CustomItem $customItem, string $entityType, int $entityId): CustomItem
     {
         /** @var CustomItemXrefCustomItem|null $relationshipItemXref */
-        $relationshipItemXref = $customItem->getCustomItemReferences()
+        $relationshipItemXref = $customItem->getCustomItemLowerReferences()
             ->filter(function (CustomItemXrefCustomItem $item) use ($entityType, $entityId) {
                 $higher = $item->getCustomItemHigher();
 

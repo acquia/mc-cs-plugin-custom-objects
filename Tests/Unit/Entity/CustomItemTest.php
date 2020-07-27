@@ -58,7 +58,7 @@ class CustomItemTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('Item A', $item->getName());
         $this->assertSame('Klingon', $item->getLanguage());
         $this->assertSame($companyXref, $item->getCompanyReferences()->get(0));
-        $this->assertSame($itemXref, $item->getCustomItemReferences()->get(0));
+        $this->assertSame($itemXref, $item->getCustomItemLowerReferences()->get(0));
     }
 
     public function testCustomFieldValueChanges(): void

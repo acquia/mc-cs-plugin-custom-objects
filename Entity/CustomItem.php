@@ -84,15 +84,15 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @var ArrayCollection
      */
-    private $customItemReferences;
+    private $customItemLowerReferences;
 
     public function __construct(CustomObject $customObject)
     {
-        $this->customObject         = $customObject;
-        $this->customFieldValues    = new ArrayCollection();
-        $this->contactReferences    = new ArrayCollection();
-        $this->companyReferences    = new ArrayCollection();
-        $this->customItemReferences = new ArrayCollection();
+        $this->customObject              = $customObject;
+        $this->customFieldValues         = new ArrayCollection();
+        $this->contactReferences         = new ArrayCollection();
+        $this->companyReferences         = new ArrayCollection();
+        $this->customItemLowerReferences = new ArrayCollection();
     }
 
     public function __clone()
@@ -125,9 +125,8 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createOneToMany('customItemReferences', CustomItemXrefCustomItem::class)
+        $builder->createOneToMany('customItemLowerReferences', CustomItemXrefCustomItem::class)
             ->addJoinColumn('id', 'custom_item_id_lower', false, false, 'CASCADE')
-            ->addJoinColumn('id', 'custom_item_id_higher', false, false, 'CASCADE')
             ->mappedBy('customItemLower')
             ->fetchExtraLazy()
             ->build();
@@ -339,7 +338,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     public function findChildCustomItem(): CustomItem
     {
         /** @var CustomItemXrefCustomItem|null $childXref */
-        $childXref = $this->getCustomItemReferences()
+        $childXref = $this->getCustomItemLowerReferences()
             ->filter(function (CustomItemXrefCustomItem $xref) {
                 // The child custom item's object must have the same ID as the current custom item child object.
                 return $xref->getCustomItemLinkedTo($this)->getCustomObject()->getMasterObject()->getId() === $this->getCustomObject()->getId();
@@ -444,15 +443,15 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     public function addCustomItemReference($reference)
     {
-        $this->customItemReferences->add($reference);
+        $this->customItemLowerReferences->add($reference);
     }
 
     /**
      * @return Collection
      */
-    public function getCustomItemReferences()
+    public function getCustomItemLowerReferences()
     {
-        return $this->customItemReferences;
+        return $this->customItemLowerReferences;
     }
 
     public function getRelationsByType(string $entityType): Collection
@@ -463,7 +462,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
             case 'company':
                 return $this->getCompanyReferences();
             case 'customItem':
-                return $this->getCustomItemReferences();
+                return $this->getCustomItemLowerReferences();
             default:
                 return new ArrayCollection([]);
         }

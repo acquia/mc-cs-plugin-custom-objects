@@ -127,7 +127,6 @@ class ContactTabSubscriber implements EventSubscriberInterface
                 $contactId = (int) $contact->getId();
                 $data      = [
                     'customObjectId'       => $objectId,
-                    'relationshipObjectId' => $object->getRelationshipObject() ? $object->getRelationshipObject()->getId() : null,
                     'currentEntityId'      => $contactId,
                     'currentEntityType'    => $entityType,
                     'tabId'                => "custom-object-{$objectId}",
@@ -137,6 +136,7 @@ class ContactTabSubscriber implements EventSubscriberInterface
                     'searchRoute'          => $this->customItemRouteProvider->buildListRoute($objectId, 1, $entityType, $contactId),
                     'lookupRoute'          => $this->customItemRouteProvider->buildLookupRoute($objectId, $entityType, $contactId),
                     'newRoute'             => $this->customItemRouteProvider->buildNewRouteWithRedirectToContact($objectId, $contactId),
+                    'relationshipObjectId' => $object->getRelationshipObject() ? $object->getRelationshipObject()->getId() : null,
                 ];
 
                 $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:content.html.php', $data);
