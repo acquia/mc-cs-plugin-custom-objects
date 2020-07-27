@@ -48,7 +48,6 @@ if ('index' === $tmpl) {
                         'sessionVar' => 'custom.object',
                         'orderBy'    => CustomObject::TABLE_ALIAS.'.id',
                         'text'       => 'mautic.core.id',
-                        'class'      => 'visible-md visible-lg col-asset-id',
                         'default'    => true,
                     ]
                 );

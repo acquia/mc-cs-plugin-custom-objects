@@ -23,8 +23,9 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderInterface;
+use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 
 class ListController extends CommonController
 {
@@ -34,9 +35,9 @@ class ListController extends CommonController
     private $requestStack;
 
     /**
-     * @var SessionProviderInterface
+     * @var SessionProviderFactory
      */
-    private $sessionProvider;
+    private $sessionProviderFactory;
 
     /**
      * @var CustomItemModel
@@ -60,26 +61,21 @@ class ListController extends CommonController
 
     public function __construct(
         RequestStack $requestStack,
-        SessionProviderInterface $sessionProvider,
+        SessionProviderFactory $sessionProviderFactory,
         CustomItemModel $customItemModel,
         CustomObjectModel $customObjectModel,
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider
     ) {
-        $this->requestStack       = $requestStack;
-        $this->sessionProvider    = $sessionProvider;
-        $this->customItemModel    = $customItemModel;
-        $this->customObjectModel  = $customObjectModel;
-        $this->permissionProvider = $permissionProvider;
-        $this->routeProvider      = $routeProvider;
+        $this->requestStack           = $requestStack;
+        $this->sessionProviderFactory = $sessionProviderFactory;
+        $this->customItemModel        = $customItemModel;
+        $this->customObjectModel      = $customObjectModel;
+        $this->permissionProvider     = $permissionProvider;
+        $this->routeProvider          = $routeProvider;
     }
 
-    /**
-     * @todo make the search filter work.
-     *
-     * @return \Symfony\Component\HttpFoundation\Response|\Symfony\Component\HttpFoundation\JsonResponse
-     */
-    public function listAction(int $objectId, int $page = 1)
+    public function listAction(int $objectId, int $page = 1): Response
     {
         try {
             $this->permissionProvider->canViewAtAll($objectId);
@@ -91,18 +87,19 @@ class ListController extends CommonController
         }
 
         $request          = $this->requestStack->getCurrentRequest();
-        $search           = InputHelper::clean($request->get('search', $this->sessionProvider->getFilter()));
-        $limit            = (int) $request->get('limit', $this->sessionProvider->getPageLimit());
         $filterEntityId   = (int) $request->get('filterEntityId');
         $filterEntityType = InputHelper::clean($request->get('filterEntityType'));
-        $orderBy          = $this->sessionProvider->getOrderBy(CustomItem::TABLE_ALIAS.'.id');
-        $orderByDir       = $this->sessionProvider->getOrderByDir('ASC');
+        $sessionProvider  = $this->sessionProviderFactory->createItemProvider($objectId, $filterEntityType, $filterEntityId);
+        $search           = InputHelper::clean($request->get('search', $sessionProvider->getFilter()));
+        $limit            = (int) $request->get('limit', $sessionProvider->getPageLimit());
+        $orderBy          = $sessionProvider->getOrderBy(CustomItem::TABLE_ALIAS.'.id');
+        $orderByDir       = $sessionProvider->getOrderByDir('ASC');
 
         if ($request->query->has('orderby')) {
             $orderBy    = InputHelper::clean($request->query->get('orderby'), true);
             $orderByDir = 'ASC' === $orderByDir ? 'DESC' : 'ASC';
-            $this->sessionProvider->setOrderBy($orderBy);
-            $this->sessionProvider->setOrderByDir($orderByDir);
+            $sessionProvider->setOrderBy($orderBy);
+            $sessionProvider->setOrderByDir($orderByDir);
         }
 
         $tableConfig = new TableConfig($limit, $page, $orderBy, $orderByDir);
@@ -111,33 +108,37 @@ class ListController extends CommonController
         $tableConfig->addParameter('filterEntityId', $filterEntityId);
         $tableConfig->addParameter('search', $search);
 
-        $this->sessionProvider->setPage($page);
-        $this->sessionProvider->setPageLimit($limit);
-        $this->sessionProvider->setFilter($search);
+        $sessionProvider->setPage($page);
+        $sessionProvider->setPageLimit($limit);
+        $sessionProvider->setFilter($search);
 
         $route    = $this->routeProvider->buildListRoute($objectId, $page);
+        $items    = $this->customItemModel->getTableData($tableConfig);
         $response = [
             'viewParameters' => [
                 'searchValue'      => $search,
                 'customObject'     => $customObject,
                 'filterEntityId'   => $filterEntityId,
                 'filterEntityType' => $filterEntityType,
-                'items'            => $this->customItemModel->getTableData($tableConfig),
+                'items'            => $items,
                 'itemCount'        => $this->customItemModel->getCountForTable($tableConfig),
                 'page'             => $page,
                 'limit'            => $limit,
                 'tmpl'             => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                'currentRoute'     => $route,
             ],
             'contentTemplate' => 'CustomObjectsBundle:CustomItem:list.html.php',
             'passthroughVars' => [
                 'mauticContent' => 'customItem',
-                'route'         => $route,
+                'route'         => $filterEntityType ? null : $route,
             ],
         ];
 
-        if ($request->isXmlHttpRequest()) {
-            $response['viewParameters']['tmpl'] = $request->get('tmpl', 'index');
-        } else {
+        if ($filterEntityId) {
+            $response['viewParameters']['fieldData'] = $this->customItemModel->getFieldListData($customObject, $items, $filterEntityType);
+        }
+
+        if (!$request->isXmlHttpRequest()) {
             $response['returnUrl'] = $route;
         }
 

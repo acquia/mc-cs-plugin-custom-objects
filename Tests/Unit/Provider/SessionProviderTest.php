@@ -13,36 +13,35 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Provider;
 
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectSessionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\SessionProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-/**
- * Tests methods in the AbstractSessionProvider by CustomObjectSessionProvider.
- */
-class CustomObjectSessionProviderTest extends \PHPUnit\Framework\TestCase
+class SessionProviderTest extends TestCase
 {
     private $session;
-    private $params;
+    private $namespace;
+    private $defaultPageLimit;
 
     /**
-     * @var CustomObjectSessionProvider
+     * @var SessionProvider
      */
     private $provider;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->session  = $this->createMock(Session::class);
-        $this->params   = $this->createMock(CoreParametersHelper::class);
-        $this->provider = new CustomObjectSessionProvider($this->session, $this->params);
+        $this->session          = $this->createMock(Session::class);
+        $this->namespace        = 'some.namespace';
+        $this->defaultPageLimit = 15;
+        $this->provider         = new SessionProvider($this->session, $this->namespace, $this->defaultPageLimit);
     }
 
     public function testGetPage(): void
     {
         $this->session->expects($this->once())
             ->method('get')
-            ->with(CustomObjectSessionProvider::KEY_PAGE, 1)
+            ->with($this->buildName('page'), 1)
             ->willReturn(4);
 
         $this->assertSame(4, $this->provider->getPage());
@@ -50,14 +49,9 @@ class CustomObjectSessionProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetPageLimit(): void
     {
-        $this->params->expects($this->once())
-            ->method('get')
-            ->with('default_pagelimit')
-            ->willReturn(5);
-
         $this->session->expects($this->once())
             ->method('get')
-            ->with(CustomObjectSessionProvider::KEY_LIMIT, 5)
+            ->with($this->buildName('limit'), $this->defaultPageLimit)
             ->willReturn(30);
 
         $this->assertSame(30, $this->provider->getPageLimit());
@@ -67,7 +61,7 @@ class CustomObjectSessionProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->session->expects($this->once())
             ->method('get')
-            ->with(CustomObjectSessionProvider::KEY_ORDER_BY, 'id')
+            ->with($this->buildName('orderby'), 'id')
             ->willReturn('name');
 
         $this->assertSame('name', $this->provider->getOrderBy('id'));
@@ -77,7 +71,7 @@ class CustomObjectSessionProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->session->expects($this->once())
             ->method('get')
-            ->with(CustomObjectSessionProvider::KEY_ORDER_BY_DIR, 'DESC')
+            ->with($this->buildName('orderbydir'), 'DESC')
             ->willReturn('ASC');
 
         $this->assertSame('ASC', $this->provider->getOrderByDir());
@@ -87,7 +81,7 @@ class CustomObjectSessionProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->session->expects($this->once())
             ->method('get')
-            ->with(CustomObjectSessionProvider::KEY_FILTER, '')
+            ->with($this->buildName('filter'), '')
             ->willReturn('ids:123');
 
         $this->assertSame('ids:123', $this->provider->getFilter());
@@ -97,7 +91,7 @@ class CustomObjectSessionProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->session->expects($this->once())
             ->method('set')
-            ->with(CustomObjectSessionProvider::KEY_PAGE, 2);
+            ->with($this->buildName('page'), 2);
 
         $this->provider->setPage(2);
     }
@@ -106,7 +100,7 @@ class CustomObjectSessionProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->session->expects($this->once())
             ->method('set')
-            ->with(CustomObjectSessionProvider::KEY_LIMIT, 50);
+            ->with($this->buildName('limit'), 50);
 
         $this->provider->setPageLimit(50);
     }
@@ -115,7 +109,7 @@ class CustomObjectSessionProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->session->expects($this->once())
             ->method('set')
-            ->with(CustomObjectSessionProvider::KEY_ORDER_BY, 'id');
+            ->with($this->buildName('orderby'), 'id');
 
         $this->provider->setOrderBy('id');
     }
@@ -124,7 +118,7 @@ class CustomObjectSessionProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->session->expects($this->once())
             ->method('set')
-            ->with(CustomObjectSessionProvider::KEY_ORDER_BY_DIR, 'DESC');
+            ->with($this->buildName('orderbydir'), 'DESC');
 
         $this->provider->setOrderByDir('DESC');
     }
@@ -133,8 +127,13 @@ class CustomObjectSessionProviderTest extends \PHPUnit\Framework\TestCase
     {
         $this->session->expects($this->once())
             ->method('set')
-            ->with(CustomObjectSessionProvider::KEY_FILTER, 'ids:123');
+            ->with($this->buildName('filter'), 'ids:123');
 
         $this->provider->setFilter('ids:123');
+    }
+
+    private function buildName(string $key): string
+    {
+        return $this->namespace.'.'.$key;
     }
 }

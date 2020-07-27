@@ -26,11 +26,12 @@ use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 use MauticPlugin\CustomObjectsBundle\Report\ReportColumnsBuilder;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\TranslatorInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class ReportColumnsBuilderTest extends TestCase
 {
     /**
-     * @var CustomObject
+     * @var MockObject|CustomObject
      */
     private $customObject;
 
@@ -40,27 +41,27 @@ class ReportColumnsBuilderTest extends TestCase
     private $reportColumnsBuilder;
 
     /**
-     * @var QueryBuilder
+     * @var MockObject|QueryBuilder
      */
     private $queryBuilder;
 
     /**
-     * @var TranslatorInterface
+     * @var MockObject|TranslatorInterface
      */
     private $translatorInterface;
 
     /**
-     * @var FilterOperatorProviderInterface
+     * @var MockObject|FilterOperatorProviderInterface
      */
     private $filterOperatorProviderInterface;
 
     /**
-     * @var CsvHelper
+     * @var MockObject|CsvHelper
      */
     private $csvHelper;
 
     /**
-     * @var Connection
+     * @var MockObject|Connection
      */
     private $connection;
 
@@ -121,15 +122,15 @@ class ReportColumnsBuilderTest extends TestCase
         $columns = $this->reportColumnsBuilder->getColumns();
 
         $this->assertSame($columns, [
-            'c4ca4238.value' => [
+            '_c4ca4238.value' => [
                 'label' => $collection->get(0)->getLabel(),
                 'type'  => 'string',
             ],
-            'c81e728d.value' => [
+            '_c81e728d.value' => [
                 'label' => $collection->get(1)->getLabel(),
                 'type'  => 'string',
             ],
-            'eccbc87e.value' => [
+            '_eccbc87e.value' => [
                 'label' => $collection->get(2)->getLabel(),
                 'type'  => 'datetime',
             ],
@@ -138,7 +139,7 @@ class ReportColumnsBuilderTest extends TestCase
 
     public function callbackFunction(string $columnName): bool
     {
-        return 'eccbc87e.value' != $columnName;
+        return '_eccbc87e.value' != $columnName;
     }
 
     public function testThatOnReportGenerateMethodBuildsCorrectQuery(): void

@@ -14,6 +14,7 @@ spec:
   containers:
   - name: hosted-tester
     image: us.gcr.io/mautic-ma/mautic_tester_72:master
+    imagePullPolicy: Always
     command:
     - cat
     tty: true
@@ -84,7 +85,7 @@ spec:
         container('hosted-tester') {
           ansiColor('xterm') {
             sh """
-              mysql -h 127.0.0.1 -e 'CREATE DATABASE mautictest; CREATE USER travis@"%"; GRANT ALL on mautictest.* to travis@"%"; GRANT SUPER ON *.* TO travis@"%";'
+              mysql -h 127.0.0.1 -e 'CREATE DATABASE mautictest; CREATE USER travis@"%"; GRANT ALL on mautictest.* to travis@"%"; GRANT SUPER,PROCESS ON *.* TO travis@"%";'
               export SYMFONY_ENV="test"
               bin/phpunit -d memory_limit=2048M --bootstrap vendor/autoload.php --fail-on-warning  --testsuite=all --configuration plugins/CustomObjectsBundle/phpunit.xml
             """
@@ -211,8 +212,11 @@ spec:
             'fedys':'miroslav.fedeles',
             'Gregy':'petr.gregor',
             'hluchas':'lukas.drahy',
+            'lijupm':'liju.pm',
             'lukassykora':'lukas.sykora',
-            'pavel-hladik':'pavel.hladik'
+            'pavel-hladik':'pavel.hladik',
+            'rohitp19':'rohit.pavaskar',
+            'shreyal009':'shreyal.mandot'
           ]
           if (githubToSlackMap.("${env.CHANGE_AUTHOR}")) {
             slackSend (channel: "@"+"${githubToSlackMap.("${env.CHANGE_AUTHOR}")}", color: '#FF0000', message: "${REPO_NAME} failed build on ${env.BRANCH_NAME} (${env.CHANGE_TITLE})\nchange: ${env.CHANGE_URL}\nbuild: ${env.BUILD_URL}console")

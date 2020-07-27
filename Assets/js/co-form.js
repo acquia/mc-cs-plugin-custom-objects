@@ -416,8 +416,8 @@ CustomObjectsForm = {
 
                         order = order + 1;
                     }
-                } else if (propertyName === 'required') {
-                    CustomObjectsForm.setChoiceRequiredVal(value);
+                } else if (-1 !== ['required', 'showInCustomObjectDetailList', 'showInContactDetailList'].indexOf(propertyName)) {
+                    CustomObjectsForm.setChoiceRequiredVal(value, propertyName);
                 } else {
                     mQuery('#objectFieldModal').find(target).val(value);
                 }
@@ -517,11 +517,11 @@ CustomObjectsForm = {
     },
 
     /**
-     * S
      * @param value
+     * @param name
      */
-    setChoiceRequiredVal: function(value) {
-        let element = mQuery('#validation .chosen-required .choice-wrapper');
+    setChoiceRequiredVal: function(value, name) {
+        let element = mQuery('#objectFieldModal .chosen-' + name + ' .choice-wrapper');
         let no = element.find('label').eq(0);
         let yes = element.find('label').eq(1);
 

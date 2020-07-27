@@ -84,9 +84,8 @@ class CustomObjectModel extends FormModel
             $customObject->setDateAdded($now->getUtcDateTime());
         }
 
-        // Objects of type master shouldn't have a relationship or master object
+        // Objects of type master shouldn't have a master object
         if (CustomObject::TYPE_MASTER === $customObject->getType()) {
-            $customObject->setRelationship(null);
             $customObject->setMasterObject(null);
         }
 

@@ -21,7 +21,6 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\ArrayHelper;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Form\Validator\Constraints\CustomObjectTypeValues;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
@@ -36,10 +35,6 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     // Object type constants for $type field
     const TYPE_MASTER = 0;
     const TYPE_RELATIONSHIP = 1;
-
-    // Relationship type constants for $relationship field
-    const RELATIONSHIP_MANY_TO_MANY = 0;
-    const RELATIONSHIP_ONE_TO_ONE = 1;
 
     /**
      * @var int|null
@@ -85,11 +80,6 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
      * @var integer|null
      */
     private $type = self::TYPE_MASTER;
-
-    /**
-     * @var integer|null
-     */
-    private $relationship;
 
     /**
      * @var CustomObject|null
@@ -142,7 +132,6 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         $builder->addNullableField('description', Type::STRING, 'description');
         $builder->addNullableField('language', Type::STRING, 'lang');
         $builder->addNullableField('type', Type::INTEGER);
-        $builder->addNullableField('relationship', Type::INTEGER, 'relationship');
 
         $builder->createOneToOne('relationshipObject', CustomObject::class)
             ->addJoinColumn('relationship_object', 'id')
@@ -171,6 +160,12 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     public function getId()
     {
         return $this->id;
+    }
+
+    public function setId(int $id)
+    {
+        $this->id = $id;
+        return $this;
     }
 
     /**
@@ -208,16 +203,6 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     public function setType(int $type): void
     {
         $this->type = $type;
-    }
-
-    public function getRelationship(): ?int
-    {
-        return $this->relationship;
-    }
-
-    public function setRelationship(?int $relationship): void
-    {
-        $this->relationship = $relationship;
     }
 
     public function getMasterObject(): ?CustomObject
@@ -368,17 +353,31 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         throw new NotFoundException("Custom field with order index '${order}' not found.");
     }
 
-    /**
-     * @return Collection
-     */
-    public function getPublishedFields()
+    public function getPublishedFields(): Collection
     {
-        return $this->getCustomFields()
-            ->filter(
-                function (\MauticPlugin\CustomObjectsBundle\Entity\CustomField $customField) {
-                    return $customField->isPublished();
-                }
-            );
+        return $this->customFields->filter(
+            function (CustomField $customField) {
+                return $customField->isPublished();
+            }
+        );
+    }
+
+    public function getFieldsShowInCustomObjectDetailList(): Collection
+    {
+        return $this->customFields->filter(
+            function (CustomField $customField) {
+                return $customField->isShowInCustomObjectDetailList();
+            }
+        );
+    }
+
+    public function getFieldsShowInContactDetailList(): Collection
+    {
+        return $this->customFields->filter(
+            function (CustomField $customField) {
+                return $customField->isShowInContactDetailList();
+            }
+        );
     }
 
     /**
