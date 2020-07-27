@@ -178,6 +178,7 @@ class LinkFormController extends AbstractFormController
                 'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.php',
                 'passthroughVars' => [
                     'closeModal'    => false,
+                    'callback'      => 'customItemLinkFormLoad',
                     'mauticContent' => 'customItem',
                     'route'         => $this->routeProvider->buildLinkFormRoute($itemId, $entityType, $entityId),
                 ],
