@@ -20,21 +20,8 @@ class EmailTokenTest extends MauticMysqlTestCase
 {
     use CustomObjectsTrait;
 
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
     private $filterFactory;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        /** @var EntityManager $entityManager */
-        $entityManager       = $this->getContainer()->get('doctrine.orm.entity_manager');
-        $this->entityManager = $entityManager;
-    }
 
     public function testSomething(): void
     {
@@ -115,13 +102,13 @@ class EmailTokenTest extends MauticMysqlTestCase
             Url: {custom-object=products:url-test-field | limit=10 | format=default | default=No Value found}
         ');
 
-        $this->entityManager->persist($contact);
-        $this->entityManager->persist($segment);
-        $this->entityManager->persist($segmentXrefContact);
-        $this->entityManager->persist($email);
-        $this->entityManager->persist(new CustomItemXrefContact($this->entityManager->find(CustomItem::class, $productA->getId()), $contact));
-        $this->entityManager->persist(new CustomItemXrefContact($this->entityManager->find(CustomItem::class, $productB->getId()), $contact));
-        $this->entityManager->flush();
+        $this->em->persist($contact);
+        $this->em->persist($segment);
+        $this->em->persist($segmentXrefContact);
+        $this->em->persist($email);
+        $this->em->persist(new CustomItemXrefContact($this->em->find(CustomItem::class, $productA->getId()), $contact));
+        $this->em->persist(new CustomItemXrefContact($this->em->find(CustomItem::class, $productB->getId()), $contact));
+        $this->em->flush();
 
         // $this->container->set(
         //     'mailer',
