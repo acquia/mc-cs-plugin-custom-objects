@@ -61,9 +61,7 @@ class CustomItemLookupControllerTest extends MauticMysqlTestCase
 
     private function assertResponse(CustomObject $customObject, CustomItem $customItem, string $entityType, string $filter): void
     {
-        $uri = sprintf('/s/custom/object/%s/item/lookup.json?filterEntityId=%s&filterEntityType=%s&filter=%s',
-            $customObject->getId(), $customItem->getId(), $entityType, $filter
-        );
+        $uri = sprintf('/s/custom/object/%s/item/lookup.json?filterEntityId=%s&filterEntityType=%s&filter=%s', $customObject->getId(), $customItem->getId(), $entityType, $filter);
         $this->client->request(Request::METHOD_GET, $uri);
 
         $response = $this->client->getResponse();

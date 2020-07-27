@@ -61,9 +61,7 @@ class CustomItemListControllerXrefTest extends MauticMysqlTestCase
 
     private function assertResponse(CustomObject $customObject, CustomItem $customItem, string $entityType, int $filterEntityId): void
     {
-        $uri = sprintf('/s/custom/object/%s/item?filterEntityId=%s&filterEntityType=%s',
-            $customObject->getId(), $filterEntityId, $entityType
-        );
+        $uri     = sprintf('/s/custom/object/%s/item?filterEntityId=%s&filterEntityType=%s', $customObject->getId(), $filterEntityId, $entityType);
         $crawler = $this->client->request(Request::METHOD_GET, $uri);
 
         $tableCrawler = $crawler->filterXPath('//h3[contains(text(), "Devices")]/following::table[1]');
