@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Repository;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
@@ -25,10 +24,12 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 
 class CustomItemRepositoryTest extends TestCase
 {
+    private $entityManager;
     private $customObject;
     private $queryBuilder;
     private $contact;
@@ -46,25 +47,17 @@ class CustomItemRepositoryTest extends TestCase
 
         defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
-        $entityManager              = $this->createMock(EntityManager::class);
+        $this->entityManager        = $this->createMock(EntityManager::class);
         $classMetadata              = $this->createMock(ClassMetadata::class);
-        $connection                 = $this->createMock(Connection::class);
         $this->customObject         = $this->createMock(CustomObject::class);
         $this->contact              = $this->createMock(Lead::class);
         $this->queryBuilder         = $this->createMock(QueryBuilder::class);
         $this->expr                 = $this->createMock(Expr::class);
         $this->query                = $this->createMock(AbstractQuery::class);
         $this->customItemRepository = new CustomItemRepository(
-            $entityManager,
+            $this->entityManager,
             $classMetadata
         );
-
-        $entityManager->method('createQueryBuilder')->willReturn($this->queryBuilder);
-        $entityManager->method('getConnection')->willReturn($connection);
-        $this->queryBuilder->method('select')->willReturnSelf();
-        $this->queryBuilder->method('from')->willReturnSelf();
-        $this->queryBuilder->method('expr')->willReturn($this->expr);
-        $this->queryBuilder->method('getQuery')->willReturn($this->query);
     }
 
     public function testCountItemsLinkedToContact(): void
@@ -73,6 +66,7 @@ class CustomItemRepositoryTest extends TestCase
         $customObjectId = 43;
         $contactId      = 53;
 
+        $this->mockQueryBuilder();
         $this->customObject->expects($this->once())
             ->method('getId')
             ->willReturn($customObjectId);
@@ -109,7 +103,7 @@ class CustomItemRepositoryTest extends TestCase
             ->method('getSingleScalarResult')
             ->willReturn($count);
 
-        $this->assertSame(
+        Assert::assertSame(
             $count,
             $this->customItemRepository->countItemsLinkedToContact(
                 $this->customObject,
@@ -125,6 +119,7 @@ class CustomItemRepositoryTest extends TestCase
         $customItemId   = 53;
         $customItem     = $this->createMock(CustomItem::class);
 
+        $this->mockQueryBuilder();
         $this->customObject->expects($this->once())
             ->method('getId')
             ->willReturn($customObjectId);
@@ -170,7 +165,7 @@ class CustomItemRepositoryTest extends TestCase
             ->method('getSingleScalarResult')
             ->willReturn($count);
 
-        $this->assertSame(
+        Assert::assertSame(
             $count,
             $this->customItemRepository->countItemsLinkedToAnotherItem(
                 $this->customObject,
@@ -181,6 +176,79 @@ class CustomItemRepositoryTest extends TestCase
 
     public function testGetTableAlias(): void
     {
-        $this->assertSame(CustomItem::TABLE_ALIAS, $this->customItemRepository->getTableAlias());
+        Assert::assertSame(CustomItem::TABLE_ALIAS, $this->customItemRepository->getTableAlias());
+    }
+
+    public function testIncludeItemsLinkedToContact(): void
+    {
+        $this->entityManager->method('getExpressionBuilder')
+            ->willReturn(new Expr());
+        $this->entityManager->method('createQueryBuilder')
+            ->willReturn(new QueryBuilder($this->entityManager));
+
+        $queryBuilder = new QueryBuilder($this->entityManager);
+        $contactId    = 53;
+
+        $this->customItemRepository->includeItemsLinkedToContact($queryBuilder, $contactId);
+
+        Assert::assertSame('SELECT WHERE CustomItem.id IN(SELECT IDENTITY(contactReference.customItem) FROM MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact contactReference WHERE contactReference.contact = :contactId)', $queryBuilder->getDQL());
+        Assert::assertSame($contactId, $queryBuilder->getParameter('contactId')->getValue());
+    }
+
+    public function testExcludeItemsLinkedToContact(): void
+    {
+        $this->entityManager->method('getExpressionBuilder')
+            ->willReturn(new Expr());
+        $this->entityManager->method('createQueryBuilder')
+            ->willReturn(new QueryBuilder($this->entityManager));
+
+        $queryBuilder = new QueryBuilder($this->entityManager);
+        $contactId    = 53;
+
+        $this->customItemRepository->excludeItemsLinkedToContact($queryBuilder, $contactId);
+
+        Assert::assertSame('SELECT WHERE CustomItem.id NOT IN(SELECT IDENTITY(contactReference.customItem) FROM MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact contactReference WHERE contactReference.contact = :contactId)', $queryBuilder->getDQL());
+        Assert::assertSame($contactId, $queryBuilder->getParameter('contactId')->getValue());
+    }
+
+    public function testIncludeItemsLinkedToAnotherItem(): void
+    {
+        $this->entityManager->method('getExpressionBuilder')
+            ->willReturn(new Expr());
+        $this->entityManager->method('createQueryBuilder')
+            ->willReturn(new QueryBuilder($this->entityManager));
+
+        $queryBuilder = new QueryBuilder($this->entityManager);
+        $customItemId = 53;
+
+        $this->customItemRepository->includeItemsLinkedToAnotherItem($queryBuilder, $customItemId);
+
+        Assert::assertSame('SELECT WHERE CustomItem.id IN(SELECT IDENTITY(lower.customItemLower) FROM MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem lower WHERE lower.customItemHigher = :customItemId) OR CustomItem.id IN(SELECT IDENTITY(higher.customItemHigher) FROM MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem lower, MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem higher WHERE higher.customItemLower = :customItemId)', $queryBuilder->getDQL());
+        Assert::assertSame($customItemId, $queryBuilder->getParameter('customItemId')->getValue());
+    }
+
+    public function testExcludeItemsLinkedToAnotherItem(): void
+    {
+        $this->entityManager->method('getExpressionBuilder')
+            ->willReturn(new Expr());
+        $this->entityManager->method('createQueryBuilder')
+            ->willReturn(new QueryBuilder($this->entityManager));
+
+        $queryBuilder = new QueryBuilder($this->entityManager);
+        $customItemId = 53;
+
+        $this->customItemRepository->excludeItemsLinkedToAnotherItem($queryBuilder, $customItemId);
+
+        Assert::assertSame('SELECT WHERE CustomItem.id NOT IN(SELECT IDENTITY(lower.customItemLower) FROM MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem lower WHERE lower.customItemHigher = :customItemId) AND CustomItem.id NOT IN(SELECT IDENTITY(higher.customItemHigher) FROM MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem lower, MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem higher WHERE higher.customItemLower = :customItemId)', $queryBuilder->getDQL());
+        Assert::assertSame($customItemId, $queryBuilder->getParameter('customItemId')->getValue());
+    }
+
+    private function mockQueryBuilder(): void
+    {
+        $this->entityManager->method('createQueryBuilder')->willReturn($this->queryBuilder);
+        $this->queryBuilder->method('select')->willReturnSelf();
+        $this->queryBuilder->method('from')->willReturnSelf();
+        $this->queryBuilder->method('expr')->willReturn($this->expr);
+        $this->queryBuilder->method('getQuery')->willReturn($this->query);
     }
 }
