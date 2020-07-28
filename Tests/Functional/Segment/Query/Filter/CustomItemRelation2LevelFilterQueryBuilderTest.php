@@ -14,10 +14,12 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Segment\Query\Filter;
 
 use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\MauticWebTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Entity\LeadRepository;
+use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
@@ -27,6 +29,11 @@ class CustomItemRelation2LevelFilterQueryBuilderTest extends MauticWebTestCase
     use FixtureObjectsTrait;
     use DbalQueryTrait;
     use DatabaseSchemaTrait;
+
+    /**
+     * @var CoreParametersHelper
+     */
+    private $coreParametersHelper;
 
     /**
      * Duplicate with parent::$em
@@ -50,6 +57,8 @@ class CustomItemRelation2LevelFilterQueryBuilderTest extends MauticWebTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->coreParametersHelper = $this->getContainer()->get('mautic.helper.core_parameters');
 
         $this->entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
         $this->segmentRepository = $this->container->get('mautic.lead.repository.lead_list');
@@ -84,6 +93,10 @@ class CustomItemRelation2LevelFilterQueryBuilderTest extends MauticWebTestCase
 
     public function testApplyQuery2ndLevel(): void
     {
+        if ($this->coreParametersHelper->get(ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT) < 2) {
+            $this->markTestSkipped('Relationship level 2 not enabled.');
+        }
+
         $this->runCommand(
             'mautic:segments:update',
             ['--env' => 'test']
