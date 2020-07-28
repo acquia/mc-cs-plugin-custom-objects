@@ -55,7 +55,7 @@ class QueryFilterHelperTest extends MauticWebTestCase
             $fixturesDirectory.'/custom_items.yml',
             $fixturesDirectory.'/custom_xref.yml',
             $fixturesDirectory.'/custom_values.yml',
-            $fixturesDirectory.'/custom-item-relation-filter-query-builder-fixture.yml',
+            $fixturesDirectory.'/custom-item-relation-filter-query-builder-fixture-2.yml',
         ], false, null, 'doctrine');
 
         $this->setFixtureObjects($objects);
