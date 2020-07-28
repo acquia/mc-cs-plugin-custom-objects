@@ -154,10 +154,11 @@ class CustomField extends FormEntity implements UniqueEntityInterface
             ->columnName('field_order')
             ->nullable()
             ->build();
+
         $builder->createField('required', Type::BOOLEAN)
             ->columnName('required')
-            ->nullable()
             ->build();
+
         $builder->createField('defaultValue', Type::STRING)
             ->columnName('default_value')
             ->nullable()
