@@ -23,7 +23,7 @@ use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
 
-abstract class AbstractCustomItemRelationTest extends MauticWebTestCase
+abstract class CustomItemRelationTestCase extends MauticWebTestCase
 {
     use FixtureObjectsTrait;
     use DbalQueryTrait;
