@@ -13,53 +13,22 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Segment\Query\Filter;
 
-use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Test\MauticWebTestCase;
-use Mautic\LeadBundle\Entity\LeadList;
-use Mautic\LeadBundle\Entity\LeadListRepository;
-use Mautic\LeadBundle\Entity\LeadRepository;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
 
-class CustomItemRelation1LevelFilterQueryBuilderTest extends MauticWebTestCase
+class CustomItemRelation1LevelFilterQueryBuilderTest extends AbstractCustomItemRelationTest
 {
     use FixtureObjectsTrait;
     use DbalQueryTrait;
     use DatabaseSchemaTrait;
 
-    /**
-     * Duplicate with parent::$em
-     * Must be here otherwise it throws
-     * Doctrine\ORM\ORMInvalidArgumentException : Detached entity Mautic\LeadBundle\Entity\Lead with ID #1 cannot be removed
-     *
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @var LeadListRepository
-     */
-    private $segmentRepository;
-
-    /**
-     * @var LeadRepository
-     */
-    private $contactRepository;
-
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
-        $this->segmentRepository = $this->container->get('mautic.lead.repository.lead_list');
-        $this->contactRepository = $this->container->get('mautic.lead.repository.lead');
-
-        $this->createFreshDatabaseSchema($this->entityManager);
-        $this->postFixtureSetup();
-
         $fixturesDirectory = $this->getFixturesDirectory();
-        $objects           = $this->loadFixtureFiles(
+        $objects = $this->loadFixtureFiles(
             [
                 $fixturesDirectory . '/custom-item-relation-filter-query-builder-fixture-1.yml'
             ],
@@ -71,21 +40,9 @@ class CustomItemRelation1LevelFilterQueryBuilderTest extends MauticWebTestCase
         $this->setFixtureObjects($objects);
     }
 
-    protected function tearDown(): void
-    {
-        foreach ($this->getFixturesInUnloadableOrder() as $entity) {
-            $this->entityManager->remove($entity);
-        }
-
-        $this->entityManager->flush();
-
-        parent::tearDown();
-    }
-
     /**
      * Limit of relations must be set here to 1
      * @see plugins/CustomObjectsBundle/Config/config.php::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT
-     * This is not possible right now, to change this value and rerun configured app with container
      */
     public function testApplyQuery1stLevel(): void
     {
@@ -100,45 +57,5 @@ class CustomItemRelation1LevelFilterQueryBuilderTest extends MauticWebTestCase
         // custom item name
         $this->assertLeadCountBySegmentAlias(1, 'order-plug-name-eq');
         $this->assertContactIsInSegment('direct@relation.net', 'order-plug-name-eq');
-    }
-
-    private function assertLeadCountBySegmentAlias(int $expectedLeadCount, string $segmentAlias): void
-    {
-        $segment = $this->segmentRepository->findOneBy(['alias' => $segmentAlias]);
-
-        if (!$segment) {
-            throw new \InvalidArgumentException("No segment with alias '{$segmentAlias}' found");
-        }
-
-        $count   = $this->segmentRepository->getLeadCount([$segment->getId()]);
-        $count   = (int) $count[$segment->getId()];
-
-        $this->assertSame(
-            $expectedLeadCount,
-            $count,
-            "Segment with alias '{$segmentAlias}' should have '{$expectedLeadCount}' contact count. Has '{$count}'"
-        );
-    }
-
-    private function assertContactIsInSegment(string $contactEmail, string $segmentAlias): void
-    {
-        $contact  = $this->contactRepository->findOneByEmail($contactEmail);
-
-        /** @var LeadList[] $segments */
-        $segments = $this->segmentRepository->getLeadLists($contact->getId());
-
-        $found = false;
-
-        foreach ($segments as $segment) {
-            if ($segment->getAlias() === $segmentAlias) {
-                $found = true;
-                break;
-            }
-        }
-
-        $this->assertTrue(
-            $found,
-            "Contact with email '{$contactEmail}' must be in segment with alias '{$segmentAlias}'"
-        );
     }
 }
