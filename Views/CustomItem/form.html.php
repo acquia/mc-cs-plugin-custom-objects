@@ -48,7 +48,6 @@ $hideCategories = CustomObject::TYPE_RELATIONSHIP === $customObject->getType() ?
                 <div class="col-md-6">
                     <?php echo $view['form']->rowIfExists($form, 'name'); ?>
                     <?php echo $view['form']->row($form['custom_field_values']); ?>
-                    <?php echo $view['form']->rowIfExists($form, 'child_custom_field_values'); ?>
                     <?php echo $view['form']->row($form['contact_id']); ?>
                 </div>
                 <?php if ($customObject->getRelationshipObject() && !empty($form['contact_id']->vars['value'])) : ?>
