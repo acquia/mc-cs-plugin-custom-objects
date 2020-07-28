@@ -22,7 +22,7 @@ use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
 
-class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
+class CustomItemRelation2LevelFilterQueryBuilderTest extends MauticWebTestCase
 {
     use FixtureObjectsTrait;
     use DbalQueryTrait;
@@ -61,7 +61,7 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
         $fixturesDirectory = $this->getFixturesDirectory();
         $objects           = $this->loadFixtureFiles(
             [
-                $fixturesDirectory . '/custom-item-relation-filter-query-builder-fixture.yml'
+                $fixturesDirectory . '/custom-item-relation-filter-query-builder-fixture-2.yml'
             ],
             false,
             null,
@@ -80,28 +80,6 @@ class CustomItemRelationFilterQueryBuilderTest extends MauticWebTestCase
         $this->entityManager->flush();
 
         parent::tearDown();
-    }
-
-    /**
-     * Limit of relations must be set here to 1
-     * @see plugins/CustomObjectsBundle/Config/config.php::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT
-     * This is not possible right now, to change this value and rerun configured app with container
-     */
-    public function testApplyQuery1stLevel(): void
-    {
-        $this->markTestSkipped('Multilevel testing not implemented yet.');
-
-        $this->runCommand(
-            'mautic:segments:update',
-            ['--env' => 'test']
-        );
-
-        // custom item name
-        $this->assertLeadCountBySegmentAlias(1, 'order-plug-name-eq');
-        $this->assertContactIsInSegment('poor@plug.net', 'order-plug-name-eq');
-
-        $this->assertLeadCountBySegmentAlias(1, 'price-eq-1000');
-        $this->assertContactIsInSegment('direct@relation.net', 'price-eq-1000');
     }
 
     public function testApplyQuery2ndLevel(): void
