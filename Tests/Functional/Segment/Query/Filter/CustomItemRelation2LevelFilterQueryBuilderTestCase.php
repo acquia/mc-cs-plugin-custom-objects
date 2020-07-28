@@ -16,7 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Segment\Query\Filter
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
 
-class CustomItemRelation2LevelFilterQueryBuilderTest extends AbstractCustomItemRelationTest
+class CustomItemRelation2LevelFilterQueryBuilderTestCase extends CustomItemRelationTestCase
 {
     use FixtureObjectsTrait;
 

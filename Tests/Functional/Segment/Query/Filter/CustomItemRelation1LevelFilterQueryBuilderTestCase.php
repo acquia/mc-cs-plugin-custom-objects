@@ -17,7 +17,7 @@ use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
 
-class CustomItemRelation1LevelFilterQueryBuilderTest extends AbstractCustomItemRelationTest
+class CustomItemRelation1LevelFilterQueryBuilderTestCase extends CustomItemRelationTestCase
 {
     use FixtureObjectsTrait;
     use DbalQueryTrait;
