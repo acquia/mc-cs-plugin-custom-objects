@@ -216,8 +216,6 @@ class CustomItemModel extends FormModel
 
     /**
      * Returns a list of arrays representing custom items (DBAL).
-     *
-     * @return CustomItem[]
      */
     public function getArrayTableData(TableConfig $tableConfig): array
     {
