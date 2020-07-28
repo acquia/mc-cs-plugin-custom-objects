@@ -1,0 +1,103 @@
+# Describes acceptance criteria for
+# https://backlog.acquia.com/browse/MAUT-1738
+# Two products/orders with different prices added
+
+Mautic\LeadBundle\Entity\Lead:
+
+  # direct relation / one level / contact -> product
+  contact_direct_to_ci:
+    firstname: 'Direct'
+    lastname: 'Relation'
+    is_published: true
+    date_added: '<dateTimeBetween("-1 days","-10 hours")>'
+    email: 'direct@relation.net'
+
+  contact_no_relation:
+    firstname: 'Direct'
+    lastname: 'Relation not matched'
+    is_published: true
+    date_added: '<dateTimeBetween("-1 days","-10 hours")>'
+    email: 'direct-not-match@relation.net'
+
+MauticPlugin\CustomObjectsBundle\Entity\CustomObject:
+
+  custom_object_product:
+    is_published: true
+    date_added: '<dateTimeBetween("-20 days","-2 days")>'
+    name_singular: 'Product'
+    name_plural: 'Products'
+    alias: 'product'
+
+MauticPlugin\CustomObjectsBundle\Entity\CustomField:
+
+  # ID 4
+  custom_field_price:
+    custom_object: '@custom_object_product'
+    is_published: true
+    date_added: '<date_create()>'
+    label: 'Price'
+    alias: 'price'
+    type: 'int'
+
+MauticPlugin\CustomObjectsBundle\Entity\CustomItem:
+
+  custom_item_toaster:
+    is_published: true
+    name: 'Toaster'
+    __construct: ['@custom_object_product']
+
+  custom_item_plug:
+    is_published: true
+    name: 'Plug'
+    __construct: ['@custom_object_product']
+
+MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInt:
+
+  custom_field_toaster_price:
+    __construct: ['@custom_field_price', '@custom_item_toaster']
+    value: 1000
+
+  custom_field_plug_price:
+    __construct: ['@custom_field_price', '@custom_item_plug']
+    value: 500
+
+MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact:
+
+  # direct relation / one level / contact -> product
+  custom_item_xref_contact_toaster_rich:
+    __construct: ['@custom_item_toaster', '@contact_direct_to_ci']
+
+Mautic\LeadBundle\Entity\LeadList:
+
+  # 1st level - 1 contact / 2nd level - 2 contacts
+  price-eq-1000:
+    is_published: true
+    name: 'Price = 1000'
+    alias: 'price-eq-1000'
+    filters:
+      0:
+        glue : 'and'
+        field: 'cmf_1' # @custom_field_price
+        object: 'custom_object'
+        type: 'int'
+        operator: 'eq'
+        properties:
+          filter: '1000'
+    is_global: true
+    is_preference_center: false
+
+  order-plug-name-eq:
+    is_published: true
+    name: 'Order name = Ordered plug'
+    alias: 'order-plug-name-eq'
+    filters: # a:1:{i:0;a:6:{s:4:"glue";s:3:"and";s:5:"field";s:5:"cmo_2";s:6:"object";s:13:"custom_object";s:4:"type";s:4:"text";s:8:"operator";s:1:"=";s:10:"properties";a:1:{s:6:"filter";s:12:"Ordered plug";}}}
+      0:
+        glue : 'and'
+        field: 'cmo_1' # custom_field.id
+        object: 'custom_object'
+        type: 'test'
+        operator: '='
+        properties:
+          filter: 'Toaster'
+    is_global: true
+    is_preference_center: false
