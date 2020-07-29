@@ -187,10 +187,10 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
 
     private function cleanupDB()
     {
-        $query = 'delete from leads where 1';
+        $query = 'delete from '.MAUTIC_TABLE_PREFIX.'leads where 1';
         $this->connection->query($query);
 
-        $query = 'delete from custom_object where 1';
+        $query = 'delete from '.MAUTIC_TABLE_PREFIX.'custom_object where 1';
         $this->connection->query($query);
     }
 
