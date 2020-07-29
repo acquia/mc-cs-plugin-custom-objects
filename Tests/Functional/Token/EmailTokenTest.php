@@ -170,10 +170,10 @@ class EmailTokenTest extends MauticMysqlTestCase
             Date: 2020-07-22, 2020-07-23
             Datetime: 2020-07-22 14:55:00, 2020-07-23 14:55:00
             Email: product@a.email, product@b.email
-            Hidden: top secret, hidden secret
-            Number: 123, 456, 0
+            Hidden: hidden secret, top secret
+            Number: 0, 123, 456
             Phone: +420555666777, +420555666888
-            Select: Option B, Option A
+            Select: Option A, Option B
             Multiselect: \"Option A\",\"Option B\", \"Option B\"
             Text: Text A, Text B
             Textarea: Text ABC, Text BCD
@@ -192,14 +192,14 @@ class EmailTokenTest extends MauticMysqlTestCase
 </ol>
             Email: product@a.email
             Hidden: <ul>
-<li>top secret</li>
 <li>hidden secret</li>
+<li>top secret</li>
 </ul>
-            Number: 123, 456 and 0
+            Number: 0, 123 and 456
             Phone: +420555666777, +420555666888
             Select: <ol>
-<li>Option B</li>
 <li>Option A</li>
+<li>Option B</li>
 </ol>
             Multiselect: <ol>
 <li>\"Option A\",\"Option B\"</li>

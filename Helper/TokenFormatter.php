@@ -50,6 +50,8 @@ class TokenFormatter
 
         $method = self::FORMATS[$format];
 
+        asort($values);
+
         return $this->$method(
             $this->removeEmptyValues(
                 array_unique($values)
