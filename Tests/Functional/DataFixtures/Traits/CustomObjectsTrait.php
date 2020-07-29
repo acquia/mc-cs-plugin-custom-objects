@@ -20,6 +20,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 
 trait CustomObjectsTrait
 {

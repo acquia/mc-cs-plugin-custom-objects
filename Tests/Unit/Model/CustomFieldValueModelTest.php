@@ -181,7 +181,7 @@ class CustomFieldValueModelTest extends \PHPUnit\Framework\TestCase
 
         $this->connection->expects($this->once())
             ->method('prepare')
-            ->with('THE TEXT FIELD SQL QUERY UNION ALL THE NUMBER FIELD SQL QUERY ORDER BY custom_item_id, custom_field_id ASC')
+            ->with('THE TEXT FIELD SQL QUERY UNION ALL THE NUMBER FIELD SQL QUERY')
             ->willReturn($this->statement);
 
         $this->statement->expects($this->once())
