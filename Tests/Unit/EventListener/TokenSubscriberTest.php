@@ -461,8 +461,7 @@ class TokenSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getValue')
             ->willReturn('The field value');
 
-        $valueEntity->expects($this->once())
-            ->method('getCustomField')
+        $valueEntity->method('getCustomField')
             ->willReturn($customField);
 
         $customField->expects($this->once())

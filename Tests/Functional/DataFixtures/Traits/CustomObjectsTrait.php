@@ -15,6 +15,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
@@ -56,6 +57,22 @@ trait CustomObjectsTrait
         $customObjectModel->save($customObject);
 
         return $customObject;
+    }
+
+    public function createCustomItem(ContainerInterface $container, CustomObject $customObject, string $name, array $fieldValues): CustomItem
+    {
+        $customItem = new CustomItem($customObject);
+        $customItem->setName($name);
+
+        foreach ($fieldValues as $fieldAlias => $fielValue) {
+            $customItem->addCustomFieldValue($customItem->createNewCustomFieldValueByFieldAlias($fieldAlias, $fielValue));
+        }
+
+        /** @var CustomItemModel $customItemModel */
+        $customItemModel = $this->container->get('mautic.custom.model.item');
+        $customItemModel->save($customItem);
+
+        return $customItem;
     }
 
     private function addFieldOption(CustomField $customField, string $label, string $value): void

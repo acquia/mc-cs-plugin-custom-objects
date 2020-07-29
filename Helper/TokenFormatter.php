@@ -50,7 +50,11 @@ class TokenFormatter
 
         $method = self::FORMATS[$format];
 
-        return $this->$method($values);
+        return $this->$method(
+            $this->removeEmptyValues(
+                array_unique($values)
+            )
+        );
     }
 
     public function isValidFormat(string $format): bool
@@ -123,5 +127,15 @@ class TokenFormatter
         $list .= "</$tag>";
 
         return $list;
+    }
+
+    private function removeEmptyValues(array $values): array
+    {
+        return array_filter(
+            $values,
+            function ($value) {
+                return '' !== trim($value);
+            }
+        );
     }
 }
