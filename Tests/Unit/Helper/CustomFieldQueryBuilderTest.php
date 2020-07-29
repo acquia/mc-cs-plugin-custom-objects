@@ -58,7 +58,10 @@ class CustomFieldQueryBuilderTest extends TestCase
         $unionQueryContainer = $this->customFieldQueryBuilder->buildQuery('alias', $this->segmentFilter);
 
         $this->assertCount(1, $unionQueryContainer);
-        $this->assertSame('SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_contact alias_contact ON alias_value.custom_item_id = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id', $unionQueryContainer->getSQL());
+        $this->assertSame(
+            'SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_contact alias_contact ON alias_value.custom_item_id = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id',
+            $unionQueryContainer->getSQL()
+        );
     }
 
     public function testBuildQuery2Level()
@@ -68,7 +71,23 @@ class CustomFieldQueryBuilderTest extends TestCase
         $unionQueryContainer = $this->customFieldQueryBuilder->buildQuery('alias', $this->segmentFilter);
 
         $this->assertCount(3, $unionQueryContainer);
-        $this->assertSame('SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_contact alias_contact ON alias_value.custom_item_id = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id UNION ALL SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_custom_item alias_item_xref ON alias_item_xref.custom_item_id_lower = alias_value.custom_item_id INNER JOIN custom_item_xref_contact alias_contact ON alias_item_xref.custom_item_id_higher = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id UNION ALL SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_custom_item alias_item_xref ON alias_item_xref.custom_item_id_higher = alias_value.custom_item_id INNER JOIN custom_item_xref_contact alias_contact ON alias_item_xref.custom_item_id_lower = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id', $unionQueryContainer->getSQL());
+        $this->assertSame(
+            'SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_contact alias_contact ON alias_value.custom_item_id = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id UNION ALL SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_custom_item alias_item_xref ON alias_item_xref.custom_item_id_lower = alias_value.custom_item_id INNER JOIN custom_item_xref_contact alias_contact ON alias_item_xref.custom_item_id_higher = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id UNION ALL SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_custom_item alias_item_xref ON alias_item_xref.custom_item_id_higher = alias_value.custom_item_id INNER JOIN custom_item_xref_contact alias_contact ON alias_item_xref.custom_item_id_lower = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id',
+            $unionQueryContainer->getSQL()
+        );
+    }
+
+    public function testBuildQuery3Level()
+    {
+        $this->constructWithExpectedLimit(2);
+
+        $unionQueryContainer = $this->customFieldQueryBuilder->buildQuery('alias', $this->segmentFilter);
+
+        $this->assertCount(3, $unionQueryContainer);
+        $this->assertSame(
+            'SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_contact alias_contact ON alias_value.custom_item_id = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id UNION ALL SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_custom_item alias_item_xref ON alias_item_xref.custom_item_id_lower = alias_value.custom_item_id INNER JOIN custom_item_xref_contact alias_contact ON alias_item_xref.custom_item_id_higher = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id UNION ALL SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_custom_item alias_item_xref ON alias_item_xref.custom_item_id_higher = alias_value.custom_item_id INNER JOIN custom_item_xref_contact alias_contact ON alias_item_xref.custom_item_id_lower = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id UNION ALL SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_custom_item alias_item_xref_1 ON alias_item_xref_1.custom_item_id_lower = alias_value.custom_item_id INNER JOIN custom_item_xref_custom_item alias_item_xref_2 ON alias_item_xref_2.custom_item_id_lower = alias_value.custom_item_id INNER JOIN custom_item_xref_contact alias_contact ON alias_item_xref_2.custom_item_id_higher = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id UNION ALL SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_custom_item alias_item_xref_1 ON alias_item_xref_1.custom_item_id_higher = alias_value.custom_item_id INNER JOIN custom_item_xref_custom_item alias_item_xref_2 ON alias_item_xref_2.custom_item_id_lower = alias_value.custom_item_id INNER JOIN custom_item_xref_contact alias_contact ON alias_item_xref_2.custom_item_id_higher = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id UNION ALL SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_custom_item alias_item_xref_1 ON alias_item_xref_1.custom_item_id_lower = alias_value.custom_item_id INNER JOIN custom_item_xref_custom_item alias_item_xref_2 ON alias_item_xref_2.custom_item_id_higher = alias_value.custom_item_id INNER JOIN custom_item_xref_contact alias_contact ON alias_item_xref_2.custom_item_id_lower = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id UNION ALL SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_custom_item alias_item_xref_1 ON alias_item_xref_1.custom_item_id_higher = alias_value.custom_item_id INNER JOIN custom_item_xref_custom_item alias_item_xref_2 ON alias_item_xref_2.custom_item_id_higher = alias_value.custom_item_id INNER JOIN custom_item_xref_contact alias_contact ON alias_item_xref_2.custom_item_id_lower = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id',
+            $unionQueryContainer->getSQL()
+        );
     }
 
     private function constructWithExpectedLimit(int $limit): void
