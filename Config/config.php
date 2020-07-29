@@ -1044,12 +1044,19 @@ return [
                     'custom_object.query.filter.helper',
                 ],
             ],
-            'custom_object.query.filter.helper'            => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper::class,
+            'custom_field_query_builder' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Helper\CustomFieldQueryBuilder::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'custom_field.type.provider',
                     'mautic.helper.core_parameters',
+                ],
+            ],
+            'custom_object.query.filter.helper'            => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'custom_field_query_builder',
                 ],
             ],
             'custom_object.helper.token_formatter' => [

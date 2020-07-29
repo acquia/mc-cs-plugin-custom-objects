@@ -12,6 +12,7 @@ use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
+use MauticPlugin\CustomObjectsBundle\Helper\CustomFieldQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemNameFilterQueryBuilder;
@@ -59,7 +60,10 @@ class CustomItemNameFilterQueryBuilderTest extends TestCase
             ->method('getConnection')
             ->willReturn($this->createMock(Connection::class));
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $queryFilterHelper = new QueryFilterHelper($entityManager, new CustomFieldTypeProvider(), $coreParametersHelper);
+        $queryFilterHelper = new QueryFilterHelper(
+            $entityManager,
+            new CustomFieldQueryBuilder($entityManager, new CustomFieldTypeProvider(), $coreParametersHelper)
+        );
 
         $this->queryBuilder = $this->createMock(QueryBuilder::class);
         $this->contactSegmentFilter = $this->createMock(ContactSegmentFilter::class);
