@@ -152,23 +152,15 @@ class EmailTokenTest extends MauticMysqlTestCase
 
         $body = $crawler->filter('body');
 
-        // Remove the tracking link that is causing troubles with different Mautic configurations.
-        $body->filter('a')->each(function (Crawler $crawler) {
-            foreach ($crawler as $node) {
-                $node->parentNode->removeChild($node);
-            }
-        });
-
-        // Remove the tracking image that is causing troubles with different Mautic configurations.
-        $body->filter('img')->each(function (Crawler $crawler) {
+        // Remove the tracking tags that are causing troubles with different Mautic configurations.
+        $body->filter('a,img,div')->each(function (Crawler $crawler) {
             foreach ($crawler as $node) {
                 $node->parentNode->removeChild($node);
             }
         });
 
         Assert::assertSame(
-            "
-            Dear George,
+            "Dear George,
 
             check these values, please:
 
@@ -218,9 +210,8 @@ class EmailTokenTest extends MauticMysqlTestCase
 <li>Text B</li>
 </ul>
             Textarea: Text ABC or Text BCD
-            Url: <ol><li>https://mautic.org</li></ol>
-        <div style=\"width: 100%; text-align: center; font-size: 10px; margin-top: 15px;\"> to no longer receive emails from us.</div>",
-            $body->html()
+            Url: <ol><li>https://mautic.org</li></ol>",
+            trim($body->html())
         );
     }
 }
