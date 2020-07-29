@@ -78,7 +78,7 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
                                 $event->getRoute()
                             );
 
-                            if (null !== $customItem->getCustomObject()->getRelationshipObject()) {
+                            if (null !== $customItem->getCustomObject()->getRelationshipObject() && 'customItem' !== $filterEntityType) {
                                 $event->addButton(
                                     $this->defineEditLinkFormButton($customItem, $customObjectId, $filterEntityType, (int) $filterEntityId),
                                     ButtonHelper::LOCATION_LIST_ACTIONS,
