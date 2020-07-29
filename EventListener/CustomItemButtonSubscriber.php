@@ -72,8 +72,13 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
                     if ($loadedInTab && in_array($filterEntityType, ['contact', 'customItem'], true)) {
                         $customItem = $event->getItem();
                         if ($customItem && $customItem instanceof CustomItem) {
+                            if ($event->getRequest()->query->get('lookup')) {
+                                $button = $this->defineLinkButton($customObjectId, $customItem->getId(), $filterEntityType, (int) $filterEntityId);
+                            } else {
+                                $button = $this->defineUnlinkButton($customObjectId, $customItem->getId(), $filterEntityType, (int) $filterEntityId);
+                            }
                             $event->addButton(
-                                $this->defineUnlinkButton($customObjectId, $customItem->getId(), $filterEntityType, (int) $filterEntityId),
+                                $button,
                                 ButtonHelper::LOCATION_LIST_ACTIONS,
                                 $event->getRoute()
                             );
@@ -264,6 +269,28 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
             ],
             'btnText'   => 'mautic.core.form.new',
             'iconClass' => 'fa fa-plus',
+            'priority'  => 500,
+        ];
+    }
+
+    /**
+     * @return mixed[]
+     *
+     * @throws ForbiddenException
+     */
+    private function defineLinkButton(int $customObjectId, int $customItemId, string $entityType, int $entityId): array
+    {
+        $this->permissionProvider->canCreate($customObjectId);
+
+        return [
+            'attr' => [
+                'href'        => '#',
+                'onclick'     => "CustomObjects.linkCustomItemWithEntity(this, event, ${customObjectId}, '${entityType}', ${entityId}, 'custom-object-${customObjectId}');",
+                'data-action' => $this->routeProvider->buildLinkRoute($customItemId, $entityType, $entityId),
+                'data-toggle' => '',
+            ],
+            'btnText'   => $this->translator->trans('custom.item.link'),
+            'iconClass' => 'fa fa-link',
             'priority'  => 500,
         ];
     }

@@ -10,7 +10,6 @@ declare(strict_types=1);
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
-$listId = 'custom-item-list-'.$customObjectId;
 ?>
 <div class="tab-pane fade bdr-w-0 custom-object-tab" id="<?php echo $tabId; ?>-container">
     <div class="row">
@@ -21,42 +20,36 @@ $listId = 'custom-item-list-'.$customObjectId;
         'searchValue' => $searchValue,
         'action'      => $searchRoute,
         'searchId'    => $searchId,
-        'target'      => '#'.$listId,
+        'target'      => '#'.$namespace,
         'searchHelp'  => '',
     ]
 ); ?>
         </div>
-        <div class="col-md-6">
-            <div class="panel">
-                <div class="form-control-icon pa-xs">
-                    <span class="the-icon fa fa-link text-muted mt-xs"></span>
-                    <input 
-                        type="text"
-                        data-toggle='typeahead' 
-                        class="form-control bdr-w-0"
-                        placeholder="<?php echo $placeholder; ?>" 
-                        data-action="<?php echo $lookupRoute; ?>">
-                </div>
-                <div class="clearfix"></div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <a href="<?php echo $newRoute; ?>" class="btn btn-default pull-right" data-toggle="ajax">
+        <div class="col-md-9 text-right">
+            <a href="<?php echo $linkRoute; ?>" class="btn btn-default" data-toggle="ajaxmodal" data-target="#customItemLookupModal" data-header="<?php echo $linkHeader; ?>">
+                <span>
+                    <i class="fa fa-link"></i>
+                    <span class="hidden-xs hidden-sm">
+                        <?php echo $view['translator']->trans('custom.item.link.existing'); ?>
+                    </span>
+                </span>
+            </a>
+            <a href="<?php echo $newRoute; ?>" class="btn btn-default" data-toggle="ajax">
                 <span>
                     <i class="fa fa-plus"></i>
                     <span class="hidden-xs hidden-sm">
-                        <?php echo $view['translator']->trans('mautic.core.form.new'); ?>
+                        <?php echo $view['translator']->trans('custom.item.link.new'); ?>
                     </span>
                 </span>
             </a>
         </div>
     </div>
-    <div class='custom-item-list page-list' id="<?php echo $listId; ?>">
+    <div class='custom-item-list page-list mt-20' id="<?php echo $namespace; ?>">
         Loading...
     </div>
 </div>
 <script type="text/javascript">
-    CustomObjects.initTabShowingLinkedItems(
+    CustomObjects.reloadItemsTable(
         <?php echo $customObjectId; ?>,
         <?php echo $currentEntityId; ?>,
         '<?php echo $currentEntityType; ?>',
