@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use MauticPlugin\CustomObjectsBundle\Helper\CustomFieldQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -40,7 +41,10 @@ class QueryFilterHelperTest extends TestCase
             ->method('getConnection')
             ->willReturn($this->createMock(Connection::class));
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $this->queryFilterHelper = new QueryFilterHelper($entityManager, new CustomFieldTypeProvider(), $coreParametersHelper);
+        $this->queryFilterHelper = new QueryFilterHelper(
+            $entityManager,
+            new CustomFieldQueryBuilder($entityManager, new CustomFieldTypeProvider(), $coreParametersHelper)
+        );
         $this->queryBuilder = $this->createMock(QueryBuilder::class);
         $this->expressionBuilder = $this->createMock(ExpressionBuilder::class);
     }
