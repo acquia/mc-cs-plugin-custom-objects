@@ -133,7 +133,7 @@ class TokenFormatter
     {
         return array_filter(
             $values,
-            function($value) {
+            function ($value) {
                 return '' !== trim($value);
             }
         );

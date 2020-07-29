@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Helper;
+namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Token;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
