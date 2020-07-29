@@ -152,8 +152,15 @@ class EmailTokenTest extends MauticMysqlTestCase
 
         $body = $crawler->filter('body');
 
-        // Remove the tracking script that is causing troubles with different Mautic configurations.
+        // Remove the tracking link that is causing troubles with different Mautic configurations.
         $body->filter('a')->each(function (Crawler $crawler) {
+            foreach ($crawler as $node) {
+                $node->parentNode->removeChild($node);
+            }
+        });
+
+        // Remove the tracking image that is causing troubles with different Mautic configurations.
+        $body->filter('img')->each(function (Crawler $crawler) {
             foreach ($crawler as $node) {
                 $node->parentNode->removeChild($node);
             }
@@ -212,7 +219,7 @@ class EmailTokenTest extends MauticMysqlTestCase
 </ul>
             Textarea: Text ABC or Text BCD
             Url: <ol><li>https://mautic.org</li></ol>
-        <img height=\"1\" width=\"1\" src=\"data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=\" alt=\"\"><div style=\"width: 100%; text-align: center; font-size: 10px; margin-top: 15px;\"> to no longer receive emails from us.</div>",
+        <div style=\"width: 100%; text-align: center; font-size: 10px; margin-top: 15px;\"> to no longer receive emails from us.</div>",
             $body->html()
         );
     }
