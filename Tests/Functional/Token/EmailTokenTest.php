@@ -164,7 +164,7 @@ class EmailTokenTest extends MauticMysqlTestCase
             Number: 123, 456, 0
             Phone: +420555666777, +420555666888
             Select: Option B, Option A
-            Multiselect: (\"Option A\",\"Option B\"), (\"Option B\")
+            Multiselect: \"Option A\",\"Option B\", \"Option B\"
             Text: Text A, Text B
             Textarea: Text ABC, Text BCD
             Url: https://mautic.org
@@ -192,8 +192,8 @@ class EmailTokenTest extends MauticMysqlTestCase
 <li>Option A</li>
 </ol>
             Multiselect: <ol>
-<li>(\"Option A\",\"Option B\")</li>
-<li>(\"Option B\")</li>
+<li>\"Option A\",\"Option B\"</li>
+<li>\"Option B\"</li>
 </ol>
             Text: <ul>
 <li>Text A</li>

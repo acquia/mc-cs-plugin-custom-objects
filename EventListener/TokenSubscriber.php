@@ -316,8 +316,7 @@ class TokenSubscriber implements EventSubscriberInterface
 
             try {
                 $fieldValue    = $customItem->findCustomFieldValueForFieldAlias($token->getCustomFieldAlias());
-                $stringValue   = $fieldValue->getCustomField()->getTypeObject()->valueToString($fieldValue);
-                $fieldValues[] = $fieldValue->getCustomField()->canHaveMultipleValues() && '' !== $stringValue ? "({$stringValue})" : $stringValue;
+                $fieldValues[] = $fieldValue->getCustomField()->getTypeObject()->valueToString($fieldValue);
             } catch (NotFoundException $e) {
                 // Custom field not found.
             }
