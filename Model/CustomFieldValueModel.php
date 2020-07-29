@@ -196,7 +196,7 @@ class CustomFieldValueModel
         if (0 === $queries->count()) {
             return new ArrayCollection();
         }
-        $query     = implode(' UNION ', $queries->toArray()).' ORDER BY custom_item_id, custom_field_id ASC';
+        $query     = implode(' UNION ALL ', $queries->toArray()).' ORDER BY custom_item_id, custom_field_id ASC';
         $statement = $this->entityManager->getConnection()->prepare($query);
 
         $statement->execute();
