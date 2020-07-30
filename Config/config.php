@@ -1104,6 +1104,7 @@ return [
                     'doctrine.orm.entity_manager',
                     'custom_field.type.provider',
                     'mautic.helper.core_parameters',
+                    'custom_field.repository',
                 ],
             ],
             'custom_object.query.filter.helper'            => [
