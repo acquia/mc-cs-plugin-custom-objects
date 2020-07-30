@@ -15,6 +15,7 @@ use Mautic\LeadBundle\Segment\RandomParameterName;
 use MauticPlugin\CustomObjectsBundle\Helper\CustomFieldQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemNameFilterQueryBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -62,7 +63,12 @@ class CustomItemNameFilterQueryBuilderTest extends TestCase
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $queryFilterHelper = new QueryFilterHelper(
             $entityManager,
-            new CustomFieldQueryBuilder($entityManager, new CustomFieldTypeProvider(), $coreParametersHelper)
+            new CustomFieldQueryBuilder(
+                $entityManager,
+                new CustomFieldTypeProvider(),
+                $coreParametersHelper,
+                $this->createMock(CustomFieldRepository::class)
+            )
         );
 
         $this->queryBuilder = $this->createMock(QueryBuilder::class);
