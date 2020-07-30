@@ -57,22 +57,7 @@ class CustomFieldQueryBuilder
 
         $unionQueryContainer = new UnionQueryContainer();
 
-        $qb = new SegmentQueryBuilder($this->entityManager->getConnection());
-        $qb
-            ->select('contact_id')
-            ->from($dataTable, "{$alias}_value")
-            ->innerJoin(
-                "{$alias}_value",
-                MAUTIC_TABLE_PREFIX.'custom_item_xref_contact',
-                "{$alias}_contact",
-                "{$alias}_value.custom_item_id = {$alias}_contact.custom_item_id"
-            )
-            ->andWhere(
-                $qb->expr()->eq("{$alias}_value.custom_field_id", ":{$alias}_custom_field_id")
-            )
-            ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId);
-
-        $unionQueryContainer->add($qb);
+        $unionQueryContainer->add($this->create1LevelQuery($alias, $segmentFilterFieldId, $dataTable));
 
         if ($this->itemRelationLevelLimit > 1) {
             $qb = new SegmentQueryBuilder($this->entityManager->getConnection());
@@ -123,6 +108,26 @@ class CustomFieldQueryBuilder
         }
 
         return $unionQueryContainer;
+    }
+
+    private function create1LevelQuery(string $alias, int $segmentFilterFieldId, string $dataTable): SegmentQueryBuilder
+    {
+        $qb = new SegmentQueryBuilder($this->entityManager->getConnection());
+        $qb
+            ->select('contact_id')
+            ->from($dataTable, "{$alias}_value")
+            ->innerJoin(
+                "{$alias}_value",
+                MAUTIC_TABLE_PREFIX.'custom_item_xref_contact',
+                "{$alias}_contact",
+                "{$alias}_value.custom_item_id = {$alias}_contact.custom_item_id"
+            )
+            ->andWhere(
+                $qb->expr()->eq("{$alias}_value.custom_field_id", ":{$alias}_custom_field_id")
+            )
+            ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId);
+
+        return $qb;
     }
 
     private function getCustomFieldType(int $customFieldId): string
