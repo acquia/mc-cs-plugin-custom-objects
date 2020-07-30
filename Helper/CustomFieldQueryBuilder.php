@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\UnionQueryContainer;
 
 class CustomFieldQueryBuilder
@@ -43,11 +44,21 @@ class CustomFieldQueryBuilder
      */
     private $unionQueryContainer;
 
-    public function __construct(EntityManager $entityManager, CustomFieldTypeProvider $fieldTypeProvider, CoreParametersHelper $coreParametersHelper)
-    {
+    /**
+     * @var CustomFieldRepository
+     */
+    private $customFieldRepository;
+
+    public function __construct(
+        EntityManager $entityManager,
+        CustomFieldTypeProvider $fieldTypeProvider,
+        CoreParametersHelper $coreParametersHelper,
+        CustomFieldRepository $customFieldRepository
+    ){
         $this->entityManager = $entityManager;
         $this->fieldTypeProvider = $fieldTypeProvider;
         $this->itemRelationLevelLimit = (int) $coreParametersHelper->get(ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT);
+        $this->customFieldRepository = $customFieldRepository;
     }
 
     public function buildQuery(
@@ -56,7 +67,7 @@ class CustomFieldQueryBuilder
     ): UnionQueryContainer {
         $segmentFilterFieldId   = (int) $segmentFilter->getField();
         $segmentFilterFieldType = $segmentFilter->getType();
-        $segmentFilterFieldType = $segmentFilterFieldType ?: $this->getCustomFieldType($segmentFilterFieldId);
+        $segmentFilterFieldType = $segmentFilterFieldType ?: $this->customFieldRepository->getCustomFieldTypeById($segmentFilterFieldId);
         // This value is prefixed
         $dataTable              = $this->fieldTypeProvider->getType($segmentFilterFieldType)->getTableName();
 
@@ -141,21 +152,5 @@ class CustomFieldQueryBuilder
 
             $this->unionQueryContainer->add($qb);
         }
-    }
-
-    /**
-     * @todo move this to \MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository
-     */
-    private function getCustomFieldType(int $customFieldId): string
-    {
-        $qb = $this->entityManager->createQueryBuilder();
-        $qb = $qb
-            ->select('f.type')
-            ->from(MAUTIC_TABLE_PREFIX.'custom_field', 'f')
-            ->where($qb->expr()->eq('f.id', $customFieldId));
-
-        $customFieldType = $this->executeSelect($qb)->fetchColumn();
-
-        return is_string($customFieldType) ? $customFieldType : '';
     }
 }
