@@ -144,7 +144,7 @@ class CustomFieldQueryBuilder
                 MAUTIC_TABLE_PREFIX.'custom_item_xref_contact',
                 "{$alias}_contact",
                 // Use last computed alias to get the last relationship
-                "{$alias}_item_xref_{$joinCount}.custom_item_id_{$finalColumnSuffix} = {$alias}_contact.custom_item_id"
+                "{$alias}_contact.custom_item_id = {$alias}_item_xref_{$joinCount}.custom_item_id_{$finalColumnSuffix}"
             )
                 ->andWhere(
                     $qb->expr()->eq("{$alias}_value.custom_field_id", ":{$alias}_custom_field_id")

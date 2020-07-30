@@ -82,7 +82,7 @@ FROM custom_field_value_int alias_value
          INNER JOIN custom_item_xref_custom_item alias_item_xref_1
                     ON alias_item_xref_1.custom_item_id_lower = alias_value.custom_item_id
          INNER JOIN custom_item_xref_contact alias_contact
-                    ON alias_item_xref_1.custom_item_id_higher = alias_contact.custom_item_id
+                    ON alias_contact.custom_item_id = alias_item_xref_1.custom_item_id_higher
 WHERE alias_value.custom_field_id = :alias_custom_field_id
 UNION ALL
 SELECT contact_id
@@ -90,7 +90,7 @@ FROM custom_field_value_int alias_value
          INNER JOIN custom_item_xref_custom_item alias_item_xref_1
                     ON alias_item_xref_1.custom_item_id_higher = alias_value.custom_item_id
          INNER JOIN custom_item_xref_contact alias_contact
-                    ON alias_item_xref_1.custom_item_id_lower = alias_contact.custom_item_id
+                    ON alias_contact.custom_item_id = alias_item_xref_1.custom_item_id_lower
 WHERE alias_value.custom_field_id = :alias_custom_field_id
 SQL;
 
@@ -115,7 +115,7 @@ FROM custom_field_value_int alias_value
          INNER JOIN custom_item_xref_custom_item alias_item_xref_1
                     ON alias_item_xref_1.custom_item_id_lower = alias_value.custom_item_id
          INNER JOIN custom_item_xref_contact alias_contact
-                    ON alias_item_xref_1.custom_item_id_higher = alias_contact.custom_item_id
+                    ON alias_contact.custom_item_id = alias_item_xref_1.custom_item_id_higher
 WHERE alias_value.custom_field_id = :alias_custom_field_id
 UNION ALL
 SELECT contact_id
@@ -123,27 +123,7 @@ FROM custom_field_value_int alias_value
          INNER JOIN custom_item_xref_custom_item alias_item_xref_1
                     ON alias_item_xref_1.custom_item_id_higher = alias_value.custom_item_id
          INNER JOIN custom_item_xref_contact alias_contact
-                    ON alias_item_xref_1.custom_item_id_lower = alias_contact.custom_item_id
-WHERE alias_value.custom_field_id = :alias_custom_field_id
-UNION ALL
-SELECT contact_id
-FROM custom_field_value_int alias_value
-         INNER JOIN custom_item_xref_custom_item alias_item_xref_1
-                    ON alias_item_xref_1.custom_item_id_lower = alias_value.custom_item_id
-         INNER JOIN custom_item_xref_custom_item alias_item_xref_2
-                    ON alias_item_xref_1.custom_item_id_lower = alias_value.custom_item_id
-         INNER JOIN custom_item_xref_contact alias_contact
-                    ON alias_item_xref_2.custom_item_id_higher = alias_contact.custom_item_id
-WHERE alias_value.custom_field_id = :alias_custom_field_id
-UNION ALL
-SELECT contact_id
-FROM custom_field_value_int alias_value
-         INNER JOIN custom_item_xref_custom_item alias_item_xref_1
-                    ON alias_item_xref_1.custom_item_id_higher = alias_value.custom_item_id
-         INNER JOIN custom_item_xref_custom_item alias_item_xref_2
-                    ON alias_item_xref_1.custom_item_id_lower = alias_value.custom_item_id
-         INNER JOIN custom_item_xref_contact alias_contact
-                    ON alias_item_xref_2.custom_item_id_higher = alias_contact.custom_item_id
+                    ON alias_contact.custom_item_id = alias_item_xref_1.custom_item_id_lower
 WHERE alias_value.custom_field_id = :alias_custom_field_id
 UNION ALL
 SELECT contact_id
@@ -151,9 +131,29 @@ FROM custom_field_value_int alias_value
          INNER JOIN custom_item_xref_custom_item alias_item_xref_1
                     ON alias_item_xref_1.custom_item_id_lower = alias_value.custom_item_id
          INNER JOIN custom_item_xref_custom_item alias_item_xref_2
+                    ON alias_item_xref_1.custom_item_id_lower = alias_value.custom_item_id
+         INNER JOIN custom_item_xref_contact alias_contact
+                    ON alias_contact.custom_item_id = alias_item_xref_2.custom_item_id_higher
+WHERE alias_value.custom_field_id = :alias_custom_field_id
+UNION ALL
+SELECT contact_id
+FROM custom_field_value_int alias_value
+         INNER JOIN custom_item_xref_custom_item alias_item_xref_1
+                    ON alias_item_xref_1.custom_item_id_higher = alias_value.custom_item_id
+         INNER JOIN custom_item_xref_custom_item alias_item_xref_2
+                    ON alias_item_xref_1.custom_item_id_lower = alias_value.custom_item_id
+         INNER JOIN custom_item_xref_contact alias_contact
+                    ON alias_contact.custom_item_id = alias_item_xref_2.custom_item_id_higher
+WHERE alias_value.custom_field_id = :alias_custom_field_id
+UNION ALL
+SELECT contact_id
+FROM custom_field_value_int alias_value
+         INNER JOIN custom_item_xref_custom_item alias_item_xref_1
+                    ON alias_item_xref_1.custom_item_id_lower = alias_value.custom_item_id
+         INNER JOIN custom_item_xref_custom_item alias_item_xref_2
                     ON alias_item_xref_1.custom_item_id_higher = alias_value.custom_item_id
          INNER JOIN custom_item_xref_contact alias_contact
-                    ON alias_item_xref_2.custom_item_id_lower = alias_contact.custom_item_id
+                    ON alias_contact.custom_item_id = alias_item_xref_2.custom_item_id_lower
 WHERE alias_value.custom_field_id = :alias_custom_field_id
 UNION ALL
 SELECT contact_id
@@ -163,7 +163,7 @@ FROM custom_field_value_int alias_value
          INNER JOIN custom_item_xref_custom_item alias_item_xref_2
                     ON alias_item_xref_1.custom_item_id_higher = alias_value.custom_item_id
          INNER JOIN custom_item_xref_contact alias_contact
-                    ON alias_item_xref_2.custom_item_id_lower = alias_contact.custom_item_id
+                    ON alias_contact.custom_item_id = alias_item_xref_2.custom_item_id_lower
 WHERE alias_value.custom_field_id = :alias_custom_field_id
 SQL;
 
