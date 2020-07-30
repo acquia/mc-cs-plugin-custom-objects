@@ -54,7 +54,7 @@ class CustomFieldQueryBuilder
         CustomFieldTypeProvider $fieldTypeProvider,
         CoreParametersHelper $coreParametersHelper,
         CustomFieldRepository $customFieldRepository
-    ){
+    ) {
         $this->entityManager = $entityManager;
         $this->fieldTypeProvider = $fieldTypeProvider;
         $this->itemRelationLevelLimit = (int) $coreParametersHelper->get(ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT);
