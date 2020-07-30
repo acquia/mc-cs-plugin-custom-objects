@@ -21,6 +21,7 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
 use MauticPlugin\CustomObjectsBundle\Helper\CustomFieldQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -72,7 +73,7 @@ class CustomFieldQueryBuilderTest extends TestCase
 
         $this->assertCount(3, $unionQueryContainer);
         $this->assertSame(
-            'SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_contact alias_contact ON alias_value.custom_item_id = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id UNION ALL SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_custom_item alias_item_xref ON alias_item_xref.custom_item_id_lower = alias_value.custom_item_id INNER JOIN custom_item_xref_contact alias_contact ON alias_item_xref.custom_item_id_higher = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id UNION ALL SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_custom_item alias_item_xref ON alias_item_xref.custom_item_id_higher = alias_value.custom_item_id INNER JOIN custom_item_xref_contact alias_contact ON alias_item_xref.custom_item_id_lower = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id',
+            'SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_contact alias_contact ON alias_value.custom_item_id = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id UNION ALL SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_custom_item alias_item_xref_1 ON alias_item_xref_1.custom_item_id_lower = alias_value.custom_item_id INNER JOIN custom_item_xref_contact alias_contact ON alias_item_xref_1.custom_item_id_higher = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id UNION ALL SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_custom_item alias_item_xref_1 ON alias_item_xref_1.custom_item_id_higher = alias_value.custom_item_id INNER JOIN custom_item_xref_contact alias_contact ON alias_item_xref_1.custom_item_id_lower = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id',
             $unionQueryContainer->getSQL()
         );
     }
@@ -118,7 +119,8 @@ class CustomFieldQueryBuilderTest extends TestCase
         $this->customFieldQueryBuilder = new CustomFieldQueryBuilder(
             $entityManager,
             $fieldTypeProvider,
-            $coreParametersHelper
+            $coreParametersHelper,
+            $this->createMock(CustomFieldRepository::class)
         );
     }
 }
