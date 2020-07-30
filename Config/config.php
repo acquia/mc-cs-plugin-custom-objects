@@ -1122,6 +1122,6 @@ return [
     ],
     'parameters' => [
         ConfigProvider::CONFIG_PARAM_ENABLED => true,
-        ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT => 2,
+        ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT => 3,
     ],
 ];
