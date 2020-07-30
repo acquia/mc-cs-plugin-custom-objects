@@ -24,6 +24,9 @@ use MauticPlugin\CustomObjectsBundle\Segment\Query\UnionQueryContainer;
 
 class CustomFieldQueryBuilder
 {
+    private const COLUMN_SUFFIX_LOWER  = 'lower';
+    private const COLUMN_SUFFIX_HIGHER = 'higher';
+
     /**
      * @var EntityManager
      */
@@ -72,12 +75,13 @@ class CustomFieldQueryBuilder
         $dataTable              = $this->fieldTypeProvider->getType($segmentFilterFieldType)->getTableName();
 
         $this->unionQueryContainer = new UnionQueryContainer();
+
         $this->create1LevelQuery($alias, $segmentFilterFieldId, $dataTable);
 
-        $level = 2;
-        while ($level <= $this->itemRelationLevelLimit) {
-            $this->createMultilevelQueries($alias, $segmentFilterFieldId, $dataTable, 2);
-            $level ++;
+        $currentLevel = 2;
+        while ($currentLevel <= $this->itemRelationLevelLimit) {
+            $this->createMultilevelQueries($alias, $segmentFilterFieldId, $dataTable, $currentLevel);
+            $currentLevel ++;
         }
 
         return $this->unionQueryContainer;
@@ -105,46 +109,43 @@ class CustomFieldQueryBuilder
 
     private function createMultilevelQueries(string $alias, int $segmentFilterFieldId, string $dataTable, int $currentLevel): void
     {
-        if ($this->itemRelationLevelLimit > 1 && $currentLevel === 2) { // @todo only second level implemented now
+        // Lets translate this to binary representation to know which (lower/higher) combination to use
+        // starting from 0 to level -1;
+        $targetQueryCount = $currentLevel;
+
+        $targetJoinCount = $targetQueryCount - 1;
+
+        for ($queryCount = 1; $queryCount <= $targetQueryCount; $queryCount++) {
+            // Create query to be added in UNION
             $qb = new SegmentQueryBuilder($this->entityManager->getConnection());
             $qb
                 ->select('contact_id')
-                ->from($dataTable, "{$alias}_value")
-                ->innerJoin(
+                ->from($dataTable, "{$alias}_value");
+
+            for ($joinCount = 1; $joinCount <= $targetJoinCount; $joinCount++) {
+
+                // Compute joins with correct suffixes
+                $columnSuffix = $this->computeSuffix($queryCount);
+
+                $qb->innerJoin(
                     "{$alias}_value",
                     MAUTIC_TABLE_PREFIX.'custom_item_xref_custom_item',
-                    "{$alias}_item_xref_1",
-                    "{$alias}_item_xref_1.custom_item_id_lower = {$alias}_value.custom_item_id"
-                )
-                ->innerJoin(
-                    "{$alias}_value",
-                    MAUTIC_TABLE_PREFIX.'custom_item_xref_contact',
-                    "{$alias}_contact",
-                    "{$alias}_item_xref_1.custom_item_id_higher = {$alias}_contact.custom_item_id"
-                )
-                ->andWhere(
-                    $qb->expr()->eq("{$alias}_value.custom_field_id", ":{$alias}_custom_field_id")
-                )
-                ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId);
+                    "{$alias}_item_xref_{$joinCount}",
+                    "{$alias}_item_xref_{$joinCount}.custom_item_id_{$columnSuffix} = {$alias}_value.custom_item_id"
+                );
+            }
 
-            $this->unionQueryContainer->add($qb);
+            $finalColumnSuffix = $this->getOppositeSuffix($columnSuffix);
 
-            $qb = new SegmentQueryBuilder($this->entityManager->getConnection());
-            $qb
-                ->select('contact_id')
-                ->from($dataTable, "{$alias}_value")
-                ->innerJoin(
-                    "{$alias}_value",
-                    MAUTIC_TABLE_PREFIX.'custom_item_xref_custom_item',
-                    "{$alias}_item_xref_1",
-                    "{$alias}_item_xref_1.custom_item_id_higher = {$alias}_value.custom_item_id"
-                )
-                ->innerJoin(
-                    "{$alias}_value",
-                    MAUTIC_TABLE_PREFIX.'custom_item_xref_contact',
-                    "{$alias}_contact",
-                    "{$alias}_item_xref_1.custom_item_id_lower = {$alias}_contact.custom_item_id"
-                )
+            $joinCount--; // Decrease value to one last used in iteration
+
+            $qb->innerJoin(
+                "{$alias}_value",
+                MAUTIC_TABLE_PREFIX.'custom_item_xref_contact',
+                "{$alias}_contact",
+                // Use last computed alias to get the last relationship
+                "{$alias}_item_xref_{$joinCount}.custom_item_id_{$finalColumnSuffix} = {$alias}_contact.custom_item_id"
+            )
                 ->andWhere(
                     $qb->expr()->eq("{$alias}_value.custom_field_id", ":{$alias}_custom_field_id")
                 )
@@ -152,5 +153,15 @@ class CustomFieldQueryBuilder
 
             $this->unionQueryContainer->add($qb);
         }
+    }
+
+    private function getOppositeSuffix(string $suffix): string
+    {
+        return ($suffix === self::COLUMN_SUFFIX_LOWER) ? self::COLUMN_SUFFIX_HIGHER : self::COLUMN_SUFFIX_LOWER;
+    }
+
+    private function computeSuffix(int $iteration): string
+    {
+        return ($iteration === 1) ? self::COLUMN_SUFFIX_LOWER : self::COLUMN_SUFFIX_HIGHER;
     }
 }
