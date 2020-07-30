@@ -14,13 +14,25 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Provider;
 
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProvider;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 class SessionProviderTest extends TestCase
 {
+    /**
+     * @var Session|MockObject
+     */
     private $session;
+
+    /**
+     * @var string
+     */
     private $namespace;
+
+    /**
+     * @var int
+     */
     private $defaultPageLimit;
 
     /**
@@ -134,6 +146,6 @@ class SessionProviderTest extends TestCase
 
     private function buildName(string $key): string
     {
-        return $this->namespace.'.'.$key;
+        return 'mautic.'.$this->namespace.'.'.$key;
     }
 }

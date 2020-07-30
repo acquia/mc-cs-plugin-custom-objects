@@ -20,21 +20,46 @@ use MauticPlugin\CustomObjectsBundle\EventListener\CustomItemButtonSubscriber;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class CustomItemButtonSubscriberTest extends \PHPUnit\Framework\TestCase
+class CustomItemButtonSubscriberTest extends TestCase
 {
     private const OBJECT_ID  = 555;
     private const ITEM_ID    = 222;
     private const CONTACT_ID = 84;
 
+    /**
+     * @var MockObject|CustomItemPermissionProvider
+     */
     private $permissionProvider;
+
+    /**
+     * @var MockObject|CustomItemRouteProvider
+     */
     private $routeProvider;
+
+    /**
+     * @var MockObject|TranslatorInterface
+     */
     private $translator;
+
+    /**
+     * @var MockObject|CustomItem
+     */
     private $customItem;
+
+    /**
+     * @var MockObject|Request
+     */
     private $request;
+
+    /**
+     * @var MockObject|CustomButtonEvent
+     */
     private $event;
 
     /**
@@ -65,7 +90,7 @@ class CustomItemButtonSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getRoute')
             ->willReturn(CustomItemRouteProvider::ROUTE_LIST, ['route', ['objectId' => self::OBJECT_ID]]);
 
-        $this->event->expects($this->exactly(2))
+        $this->event->expects($this->exactly(3))
             ->method('getRequest')
             ->willReturn($this->request);
 
