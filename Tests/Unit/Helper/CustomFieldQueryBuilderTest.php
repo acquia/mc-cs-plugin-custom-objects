@@ -167,7 +167,6 @@ FROM custom_field_value_int alias_value
 WHERE alias_value.custom_field_id = :alias_custom_field_id
 SQL;
 
-        $this->markTestSkipped('Not implemented yet');
         $this->constructWithExpectedLimit(2);
 
         $unionQueryContainer = $this->customFieldQueryBuilder->buildQuery('alias', $this->segmentFilter);
