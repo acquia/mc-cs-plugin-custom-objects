@@ -38,6 +38,11 @@ class CustomFieldQueryBuilder
      */
     private $itemRelationLevelLimit;
 
+    /**
+     * @var UnionQueryContainer|null
+     */
+    private $unionQueryContainer;
+
     public function __construct(EntityManager $entityManager, CustomFieldTypeProvider $fieldTypeProvider, CoreParametersHelper $coreParametersHelper)
     {
         $this->entityManager = $entityManager;
@@ -55,11 +60,41 @@ class CustomFieldQueryBuilder
         // This value is prefixed
         $dataTable              = $this->fieldTypeProvider->getType($segmentFilterFieldType)->getTableName();
 
-        $unionQueryContainer = new UnionQueryContainer();
+        $this->unionQueryContainer = new UnionQueryContainer();
+        $this->create1LevelQuery($alias, $segmentFilterFieldId, $dataTable);
 
-        $unionQueryContainer->add($this->create1LevelQuery($alias, $segmentFilterFieldId, $dataTable));
+        $level = 2;
+        while ($level <= $this->itemRelationLevelLimit) {
+            $this->createMultilevelQueries($alias, $segmentFilterFieldId, $dataTable, 2);
+            $level ++;
+        }
 
-        if ($this->itemRelationLevelLimit > 1) {
+        return $this->unionQueryContainer;
+    }
+
+    private function create1LevelQuery(string $alias, int $segmentFilterFieldId, string $dataTable): void
+    {
+        $qb = new SegmentQueryBuilder($this->entityManager->getConnection());
+        $qb
+            ->select('contact_id')
+            ->from($dataTable, "{$alias}_value")
+            ->innerJoin(
+                "{$alias}_value",
+                MAUTIC_TABLE_PREFIX.'custom_item_xref_contact',
+                "{$alias}_contact",
+                "{$alias}_value.custom_item_id = {$alias}_contact.custom_item_id"
+            )
+            ->andWhere(
+                $qb->expr()->eq("{$alias}_value.custom_field_id", ":{$alias}_custom_field_id")
+            )
+            ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId);
+
+        $this->unionQueryContainer->add($qb);
+    }
+
+    private function createMultilevelQueries(string $alias, int $segmentFilterFieldId, string $dataTable, int $currentLevel): void
+    {
+        if ($this->itemRelationLevelLimit > 1 && $currentLevel === 2) { // @todo only second level implemented now
             $qb = new SegmentQueryBuilder($this->entityManager->getConnection());
             $qb
                 ->select('contact_id')
@@ -81,7 +116,7 @@ class CustomFieldQueryBuilder
                 )
                 ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId);
 
-            $unionQueryContainer->add($qb);
+            $this->unionQueryContainer->add($qb);
 
             $qb = new SegmentQueryBuilder($this->entityManager->getConnection());
             $qb
@@ -104,32 +139,13 @@ class CustomFieldQueryBuilder
                 )
                 ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId);
 
-            $unionQueryContainer->add($qb);
+            $this->unionQueryContainer->add($qb);
         }
-
-        return $unionQueryContainer;
     }
 
-    private function create1LevelQuery(string $alias, int $segmentFilterFieldId, string $dataTable): SegmentQueryBuilder
-    {
-        $qb = new SegmentQueryBuilder($this->entityManager->getConnection());
-        $qb
-            ->select('contact_id')
-            ->from($dataTable, "{$alias}_value")
-            ->innerJoin(
-                "{$alias}_value",
-                MAUTIC_TABLE_PREFIX.'custom_item_xref_contact',
-                "{$alias}_contact",
-                "{$alias}_value.custom_item_id = {$alias}_contact.custom_item_id"
-            )
-            ->andWhere(
-                $qb->expr()->eq("{$alias}_value.custom_field_id", ":{$alias}_custom_field_id")
-            )
-            ->setParameter(":{$alias}_custom_field_id", $segmentFilterFieldId);
-
-        return $qb;
-    }
-
+    /**
+     * @todo move this to \MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository
+     */
     private function getCustomFieldType(int $customFieldId): string
     {
         $qb = $this->entityManager->createQueryBuilder();
