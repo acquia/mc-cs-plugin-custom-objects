@@ -54,42 +54,126 @@ class CustomFieldQueryBuilderTest extends TestCase
 
     public function testBuildQuery1Level(): void
     {
+        $expectedQuery = <<<SQL
+SELECT contact_id
+FROM custom_field_value_int alias_value
+         INNER JOIN custom_item_xref_contact alias_contact ON alias_value.custom_item_id = alias_contact.custom_item_id
+WHERE alias_value.custom_field_id = :alias_custom_field_id
+SQL;
+
         $this->constructWithExpectedLimit(1);
 
         $unionQueryContainer = $this->customFieldQueryBuilder->buildQuery('alias', $this->segmentFilter);
 
         $this->assertCount(1, $unionQueryContainer);
-        $this->assertSame(
-            'SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_contact alias_contact ON alias_value.custom_item_id = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id',
-            $unionQueryContainer->getSQL()
-        );
+        $this->assertSame($this->trimSpacesAndLinebreaks($expectedQuery), $unionQueryContainer->getSQL());
     }
 
     public function testBuildQuery2Level(): void
     {
+        $expectedQuery = <<<SQL
+SELECT contact_id
+FROM custom_field_value_int alias_value
+         INNER JOIN custom_item_xref_contact alias_contact ON alias_value.custom_item_id = alias_contact.custom_item_id
+WHERE alias_value.custom_field_id = :alias_custom_field_id
+UNION ALL
+SELECT contact_id
+FROM custom_field_value_int alias_value
+         INNER JOIN custom_item_xref_custom_item alias_item_xref_1
+                    ON alias_item_xref_1.custom_item_id_lower = alias_value.custom_item_id
+         INNER JOIN custom_item_xref_contact alias_contact
+                    ON alias_item_xref_1.custom_item_id_higher = alias_contact.custom_item_id
+WHERE alias_value.custom_field_id = :alias_custom_field_id
+UNION ALL
+SELECT contact_id
+FROM custom_field_value_int alias_value
+         INNER JOIN custom_item_xref_custom_item alias_item_xref_1
+                    ON alias_item_xref_1.custom_item_id_higher = alias_value.custom_item_id
+         INNER JOIN custom_item_xref_contact alias_contact
+                    ON alias_item_xref_1.custom_item_id_lower = alias_contact.custom_item_id
+WHERE alias_value.custom_field_id = :alias_custom_field_id
+SQL;
+
         $this->constructWithExpectedLimit(2);
 
         $unionQueryContainer = $this->customFieldQueryBuilder->buildQuery('alias', $this->segmentFilter);
 
         $this->assertCount(3, $unionQueryContainer);
-        $this->assertSame(
-            'SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_contact alias_contact ON alias_value.custom_item_id = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id UNION ALL SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_custom_item alias_item_xref_1 ON alias_item_xref_1.custom_item_id_lower = alias_value.custom_item_id INNER JOIN custom_item_xref_contact alias_contact ON alias_item_xref_1.custom_item_id_higher = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id UNION ALL SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_custom_item alias_item_xref_1 ON alias_item_xref_1.custom_item_id_higher = alias_value.custom_item_id INNER JOIN custom_item_xref_contact alias_contact ON alias_item_xref_1.custom_item_id_lower = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id',
-            $unionQueryContainer->getSQL()
-        );
+        $this->assertSame($this->trimSpacesAndLinebreaks($expectedQuery), $unionQueryContainer->getSQL());
     }
 
     public function testBuildQuery3Level(): void
     {
+        $expectedQuery = <<<SQL
+SELECT contact_id
+FROM custom_field_value_int alias_value
+         INNER JOIN custom_item_xref_contact alias_contact ON alias_value.custom_item_id = alias_contact.custom_item_id
+WHERE alias_value.custom_field_id = :alias_custom_field_id
+UNION ALL
+SELECT contact_id
+FROM custom_field_value_int alias_value
+         INNER JOIN custom_item_xref_custom_item alias_item_xref_1
+                    ON alias_item_xref_1.custom_item_id_lower = alias_value.custom_item_id
+         INNER JOIN custom_item_xref_contact alias_contact
+                    ON alias_item_xref_1.custom_item_id_higher = alias_contact.custom_item_id
+WHERE alias_value.custom_field_id = :alias_custom_field_id
+UNION ALL
+SELECT contact_id
+FROM custom_field_value_int alias_value
+         INNER JOIN custom_item_xref_custom_item alias_item_xref_1
+                    ON alias_item_xref_1.custom_item_id_higher = alias_value.custom_item_id
+         INNER JOIN custom_item_xref_contact alias_contact
+                    ON alias_item_xref_1.custom_item_id_lower = alias_contact.custom_item_id
+WHERE alias_value.custom_field_id = :alias_custom_field_id
+UNION ALL
+SELECT contact_id
+FROM custom_field_value_int alias_value
+         INNER JOIN custom_item_xref_custom_item alias_item_xref_1
+                    ON alias_item_xref_1.custom_item_id_lower = alias_value.custom_item_id
+         INNER JOIN custom_item_xref_custom_item alias_item_xref_2
+                    ON alias_item_xref_1.custom_item_id_lower = alias_value.custom_item_id
+         INNER JOIN custom_item_xref_contact alias_contact
+                    ON alias_item_xref_2.custom_item_id_higher = alias_contact.custom_item_id
+WHERE alias_value.custom_field_id = :alias_custom_field_id
+UNION ALL
+SELECT contact_id
+FROM custom_field_value_int alias_value
+         INNER JOIN custom_item_xref_custom_item alias_item_xref_1
+                    ON alias_item_xref_1.custom_item_id_higher = alias_value.custom_item_id
+         INNER JOIN custom_item_xref_custom_item alias_item_xref_2
+                    ON alias_item_xref_1.custom_item_id_lower = alias_value.custom_item_id
+         INNER JOIN custom_item_xref_contact alias_contact
+                    ON alias_item_xref_2.custom_item_id_higher = alias_contact.custom_item_id
+WHERE alias_value.custom_field_id = :alias_custom_field_id
+UNION ALL
+SELECT contact_id
+FROM custom_field_value_int alias_value
+         INNER JOIN custom_item_xref_custom_item alias_item_xref_1
+                    ON alias_item_xref_1.custom_item_id_lower = alias_value.custom_item_id
+         INNER JOIN custom_item_xref_custom_item alias_item_xref_2
+                    ON alias_item_xref_1.custom_item_id_higher = alias_value.custom_item_id
+         INNER JOIN custom_item_xref_contact alias_contact
+                    ON alias_item_xref_2.custom_item_id_lower = alias_contact.custom_item_id
+WHERE alias_value.custom_field_id = :alias_custom_field_id
+UNION ALL
+SELECT contact_id
+FROM custom_field_value_int alias_value
+         INNER JOIN custom_item_xref_custom_item alias_item_xref_1
+                    ON alias_item_xref_1.custom_item_id_higher = alias_value.custom_item_id
+         INNER JOIN custom_item_xref_custom_item alias_item_xref_2
+                    ON alias_item_xref_1.custom_item_id_higher = alias_value.custom_item_id
+         INNER JOIN custom_item_xref_contact alias_contact
+                    ON alias_item_xref_2.custom_item_id_lower = alias_contact.custom_item_id
+WHERE alias_value.custom_field_id = :alias_custom_field_id
+SQL;
+
         $this->markTestSkipped('Not implemented yet');
         $this->constructWithExpectedLimit(2);
 
         $unionQueryContainer = $this->customFieldQueryBuilder->buildQuery('alias', $this->segmentFilter);
 
-        $this->assertCount(3, $unionQueryContainer);
-        $this->assertSame(
-            'SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_custom_item alias_item_xref_1 ON alias_item_xref_1.custom_item_id_lower = alias_value.custom_item_id INNER JOIN custom_item_xref_custom_item alias_item_xref_2 ON alias_item_xref_1.custom_item_id_lower = alias_value.custom_item_id INNER JOIN custom_item_xref_contact alias_contact ON alias_item_xref_2.custom_item_id_higher = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id UNION ALL SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_custom_item alias_item_xref_1 ON alias_item_xref_1.custom_item_id_higher = alias_value.custom_item_id INNER JOIN custom_item_xref_custom_item alias_item_xref_2 ON alias_item_xref_1.custom_item_id_lower = alias_value.custom_item_id INNER JOIN custom_item_xref_contact alias_contact ON alias_item_xref_2.custom_item_id_higher = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id UNION ALL SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_custom_item alias_item_xref_1 ON alias_item_xref_1.custom_item_id_lower = alias_value.custom_item_id INNER JOIN custom_item_xref_custom_item alias_item_xref_2 ON alias_item_xref_1.custom_item_id_higher = alias_value.custom_item_id INNER JOIN custom_item_xref_contact alias_contact ON alias_item_xref_2.custom_item_id_lower = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id UNION ALL SELECT contact_id FROM custom_field_value_int alias_value INNER JOIN custom_item_xref_custom_item alias_item_xref_1 ON alias_item_xref_1.custom_item_id_higher = alias_value.custom_item_id INNER JOIN custom_item_xref_custom_item alias_item_xref_2 ON alias_item_xref_1.custom_item_id_higher = alias_value.custom_item_id INNER JOIN custom_item_xref_contact alias_contact ON alias_item_xref_2.custom_item_id_lower = alias_contact.custom_item_id WHERE alias_value.custom_field_id = :alias_custom_field_id',
-            $unionQueryContainer->getSQL()
-        );
+        $this->assertCount(7, $unionQueryContainer);
+        $this->assertSame($this->trimSpacesAndLinebreaks($expectedQuery), $unionQueryContainer->getSQL());
     }
 
     private function constructWithExpectedLimit(int $limit): void
@@ -122,5 +206,12 @@ class CustomFieldQueryBuilderTest extends TestCase
             $coreParametersHelper,
             $this->createMock(CustomFieldRepository::class)
         );
+    }
+
+    private function trimSpacesAndLinebreaks(string $string): string
+    {
+        $string = preg_replace('/[\r\n]+/', " ", $string);
+
+        return preg_replace('!\s+!', ' ', $string);
     }
 }
