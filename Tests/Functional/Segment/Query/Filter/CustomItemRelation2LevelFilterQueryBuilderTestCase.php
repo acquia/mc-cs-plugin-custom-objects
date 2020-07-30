@@ -39,9 +39,12 @@ class CustomItemRelation2LevelFilterQueryBuilderTestCase extends CustomItemRelat
 
     public function testApplyQuery2ndLevel(): void
     {
-        if ($this->coreParametersHelper->get(ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT) < 2) {
-            $this->markTestSkipped('Relationship level 2 not enabled.');
-        }
+        $limit = $this->coreParametersHelper->get(ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT);
+
+        $this->assertTrue(
+            1 < $limit,
+            ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT." must be set to higher value than 1 to run this test. Current value is '{$limit}' "
+        );
 
         $this->runCommand(
             'mautic:segments:update',
