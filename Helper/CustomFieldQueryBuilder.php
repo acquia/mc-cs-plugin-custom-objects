@@ -107,44 +107,47 @@ class CustomFieldQueryBuilder
         $this->unionQueryContainer->add($qb);
     }
 
-    private function createMultilevelQueries(string $alias, int $segmentFilterFieldId, string $dataTable, int $currentLevel): void
+    private function createMultilevelQueries(string $alias, int $segmentFilterFieldId, string $dataTable, int $level): void
     {
         // Lets translate this to binary representation to know which (lower/higher) combination to use
         // starting from 0 to level -1;
-        $targetQueryCount = $currentLevel;
+        $targetQueryCount = $this->getTotalQueryCountPerLevel($level);
+        $targetJoinCount = $level  - 1;
+        $totalIterator = 0;
 
-        $targetJoinCount = $targetQueryCount - 1;
-
-        for ($queryCount = 1; $queryCount <= $targetQueryCount; $queryCount++) {
+        for ($queryIterator = 1; $queryIterator <= $targetQueryCount; $queryIterator++) {
             // Create query to be added in UNION
             $qb = new SegmentQueryBuilder($this->entityManager->getConnection());
             $qb
                 ->select('contact_id')
                 ->from($dataTable, "{$alias}_value");
 
-            for ($joinCount = 1; $joinCount <= $targetJoinCount; $joinCount++) {
+            for ($joinIterator = 1; $joinIterator <= $targetJoinCount; $joinIterator++) {
 
                 // Compute joins with correct suffixes
-                $columnSuffix = $this->getComputedSuffix($queryCount);
+                $columnSuffix = $this->getComputedSuffix($level, $totalIterator, $joinIterator);
 
                 $qb->innerJoin(
                     "{$alias}_value",
                     MAUTIC_TABLE_PREFIX.'custom_item_xref_custom_item',
-                    "{$alias}_item_xref_{$joinCount}",
-                    "{$alias}_item_xref_{$joinCount}.custom_item_id_{$columnSuffix} = {$alias}_value.custom_item_id"
+                    "{$alias}_item_xref_{$joinIterator}",
+                    "{$alias}_item_xref_{$joinIterator}.custom_item_id_{$columnSuffix} = {$alias}_value.custom_item_id"
                 );
+
+                $totalIterator++;
             }
 
+            // custom_item_xref_contact join has always opposite suffix than last join
             $finalColumnSuffix = $this->getOppositeSuffix($columnSuffix);
 
-            $joinCount--; // Decrease value to one last used in iteration
+            $joinIterator--; // Decrease value to one last used in iteration
 
             $qb->innerJoin(
                 "{$alias}_value",
                 MAUTIC_TABLE_PREFIX.'custom_item_xref_contact',
                 "{$alias}_contact",
                 // Use last computed alias to get the last relationship
-                "{$alias}_contact.custom_item_id = {$alias}_item_xref_{$joinCount}.custom_item_id_{$finalColumnSuffix}"
+                "{$alias}_contact.custom_item_id = {$alias}_item_xref_{$joinIterator}.custom_item_id_{$finalColumnSuffix}"
             )
                 ->andWhere(
                     $qb->expr()->eq("{$alias}_value.custom_field_id", ":{$alias}_custom_field_id")
@@ -155,13 +158,31 @@ class CustomFieldQueryBuilder
         }
     }
 
+    private function getTotalQueryCountPerLevel(int $level): int
+    {
+        $cipherCount = $level-1; // Matrix ciphers - joins per query
+        $highestCombinationNumberBin = str_repeat('1', $cipherCount);
+
+        return bindec($highestCombinationNumberBin) + 1;
+    }
+
+    private function getComputedSuffix(int $level, int $totalIterator, int $joinIterator): string
+    {
+        $cipherCount = $level-1;
+
+        $totalIteratorBin = decbin($totalIterator);
+        $missingCipherCount = $cipherCount - strlen($totalIteratorBin);
+        if ($missingCipherCount) {
+            $totalIteratorBin = str_repeat("0", $missingCipherCount) . $totalIteratorBin;
+        }
+
+        $decisionValue = (bool) $totalIteratorBin[($cipherCount - $joinIterator-1)]; // 0/1 = true/false
+        // Translate to suffix
+        return $decisionValue ? self::COLUMN_SUFFIX_HIGHER : self::COLUMN_SUFFIX_LOWER;
+    }
+
     private function getOppositeSuffix(string $suffix): string
     {
         return ($suffix === self::COLUMN_SUFFIX_LOWER) ? self::COLUMN_SUFFIX_HIGHER : self::COLUMN_SUFFIX_LOWER;
-    }
-
-    private function getComputedSuffix(int $iteration): string
-    {
-        return ($iteration === 1) ? self::COLUMN_SUFFIX_LOWER : self::COLUMN_SUFFIX_HIGHER;
     }
 }
