@@ -83,7 +83,8 @@ class CustomItemNameFilterQueryBuilderTest extends MauticWebTestCase
             new CustomFieldQueryBuilder(
                 $this->em,
                 $fieldTypeProvider,
-                $this->getContainer()->get('mautic.helper.core_parameters')
+                $this->getContainer()->get('mautic.helper.core_parameters'),
+                $this->getContainer()->get('custom_field.repository')
             )
         );
         $queryBuilderService = new CustomItemNameFilterQueryBuilder(
