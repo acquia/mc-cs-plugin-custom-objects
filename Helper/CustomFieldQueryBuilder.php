@@ -125,7 +125,7 @@ class CustomFieldQueryBuilder
             for ($joinCount = 1; $joinCount <= $targetJoinCount; $joinCount++) {
 
                 // Compute joins with correct suffixes
-                $columnSuffix = $this->computeSuffix($queryCount);
+                $columnSuffix = $this->getComputedSuffix($queryCount);
 
                 $qb->innerJoin(
                     "{$alias}_value",
@@ -160,7 +160,7 @@ class CustomFieldQueryBuilder
         return ($suffix === self::COLUMN_SUFFIX_LOWER) ? self::COLUMN_SUFFIX_HIGHER : self::COLUMN_SUFFIX_LOWER;
     }
 
-    private function computeSuffix(int $iteration): string
+    private function getComputedSuffix(int $iteration): string
     {
         return ($iteration === 1) ? self::COLUMN_SUFFIX_LOWER : self::COLUMN_SUFFIX_HIGHER;
     }
