@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Form\Type;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\QueryBuilder;
 use Mautic\CategoryBundle\Form\Type\CategoryListType;
 use Mautic\CoreBundle\Form\Type\FormButtonsType;
 use Mautic\CoreBundle\Form\Type\YesNoButtonGroupType;
@@ -24,28 +23,28 @@ use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class CustomObjectTypeTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject|EntityManager
      */
     private $entityManager;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject|CustomFieldTypeProvider
      */
     private $customFieldTypeProvider;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject
+     * @var MockObject|CustomObjectRepository
      */
     private $customObjectRepository;
 
@@ -85,6 +84,7 @@ class CustomObjectTypeTest extends TestCase
             'csrf_protection'    => false,
         ];
 
+        /** @var MockObject|OptionsResolver $resolver */
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
             ->method('setDefaults')
@@ -108,13 +108,12 @@ class CustomObjectTypeTest extends TestCase
             'action' => $action,
         ];
 
-        $queryBuilder = $this->createMock(QueryBuilder::class);
-
         $this->customObjectRepository->expects($this->once())
-            ->method('getMasterObjectQueryBuilder')
+            ->method('getMasterObjectChoices')
             ->with($customObject)
-            ->willReturn($queryBuilder);
+            ->willReturn(['Custom Object A' => 123]);
 
+        /** @var MockObject|FormBuilderInterface $builder */
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder
             ->method('add')
@@ -190,23 +189,17 @@ class CustomObjectTypeTest extends TestCase
                 ],
                 [
                     'masterObject',
-                    EntityType::class,
+                    ChoiceType::class,
                     [
                         'label'         => 'custom.object.relationship.master_object.label',
-                        'class'         => CustomObject::class,
+                        'choices'       => ['Custom Object A' => 123],
                         'required'      => true,
                         'placeholder'   => '',
-                        'empty_data'    => null,
                         'label_attr'    => ['class' => 'control-label'],
                         'attr'          => [
                             'class'        => 'form-control',
                             'data-show-on' => '{"custom_object_type":["'.CustomObject::TYPE_RELATIONSHIP.'"]}',
                         ],
-                        'choice_label'  => function ($customObject) {
-                            return $customObject->getNameSingular()." (".$customObject->getAlias().")";
-                        },
-                        'choice_value'  => 'id',
-                        'query_builder' => $queryBuilder,
                         'disabled'      => !$isNewObject,
                     ]
                 ],
