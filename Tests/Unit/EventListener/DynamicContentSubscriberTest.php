@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
 use Doctrine\DBAL\Statement;
-use Mautic\CoreBundle\Test\MauticWebTestCase;
 use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -18,8 +17,9 @@ use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemNameFilterQu
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
 use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DynamicContentSubscriberTest extends MauticWebTestCase
+class DynamicContentSubscriberTest extends TestCase
 {
     /** @var ConfigProvider|MockObject */
     private $configProviderMock;
