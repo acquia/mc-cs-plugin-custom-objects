@@ -92,7 +92,7 @@ class LinkFormController extends AbstractFormController
                     'action'    => $this->routeProvider->buildLinkFormSaveRoute($customItem->getId(), $entityType, $entityId),
                     'objectId'  => $relationshipObject->getId(),
                     'contactId' => $entityId,
-                    'cancelUrl' => ''
+                    'cancelUrl' => '',
                 ]
             );
 
@@ -151,11 +151,12 @@ class LinkFormController extends AbstractFormController
             $form->handleRequest($this->request);
 
             if ($form->isValid()) {
+                $callback = $relationshipItem->getId() ? null : 'customItemLinkFormPostSubmit';
                 $this->customItemModel->save($relationshipItem);
 
                 $responseData = [
                     'closeModal' => true,
-                    'callback'   => 'customItemLinkFormPostSubmit',
+                    'callback'   => $callback,
                     'flashes'    => $this->renderView('MauticCoreBundle:Notification:flash_messages.html.php'),
                 ];
 
@@ -164,7 +165,6 @@ class LinkFormController extends AbstractFormController
         } catch (ForbiddenException | NoRelationshipException | NotFoundException $e) {
             $this->flashBag->add($e->getMessage(), [], FlashBag::LEVEL_ERROR);
         }
-
 
         return $this->delegateView(
             [

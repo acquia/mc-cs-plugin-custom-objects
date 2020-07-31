@@ -73,7 +73,7 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
                         $customItem = $event->getItem();
                         if ($customItem && $customItem instanceof CustomItem) {
                             if ($event->getRequest()->query->get('lookup')) {
-                                $button = $this->defineLinkButton($customObjectId, $customItem->getId(), $filterEntityType, (int) $filterEntityId);
+                                $button = $this->defineLinkButton($customObjectId, $customItem, $filterEntityType, (int) $filterEntityId);
                             } else {
                                 $button = $this->defineUnlinkButton($customObjectId, $customItem->getId(), $filterEntityType, (int) $filterEntityId);
                             }
@@ -178,7 +178,7 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
 
         return [
             'attr' => [
-                'href' => $this->routeProvider->buildLinkFormRoute($customItem->getId(), $entityType, $entityId),
+                'href'                      => $this->routeProvider->buildLinkFormRoute($customItem->getId(), $entityType, $entityId),
                 'data-target'               => '#MauticSharedModal',
                 'data-toggle'               => 'ajaxmodal',
                 'data-header'               => $this->translator->trans('mautic.core.form.edit'),
@@ -187,7 +187,7 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
                 'data-current-entity-id'    => $entityId,
                 'data-current-entity-type'  => $entityType,
                 'data-tab-id'               => sprintf('custom-object-%d', $customObjectId),
-                'data-custom-object-id'     => $customObjectId
+                'data-custom-object-id'     => $customObjectId,
             ],
             'btnText'   => 'mautic.core.form.edit',
             'iconClass' => 'fa fa-pencil-square-o',
@@ -240,7 +240,7 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
 
         return [
             'attr' => [
-                'href' => $this->routeProvider->buildDeleteRoute($customObjectId, $customItem->getId()),
+                'href'                  => $this->routeProvider->buildDeleteRoute($customObjectId, $customItem->getId()),
                 'data-toggle'           => 'confirmation',
                 'data-message'          => $this->translator->trans('custom.item.delete.confirm'),
                 'data-confirm-text'     => $this->translator->trans('mautic.core.form.delete'),
@@ -278,15 +278,27 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
      *
      * @throws ForbiddenException
      */
-    private function defineLinkButton(int $customObjectId, int $customItemId, string $entityType, int $entityId): array
+    private function defineLinkButton(int $customObjectId, CustomItem $customItem, string $entityType, int $entityId): array
     {
         $this->permissionProvider->canCreate($customObjectId);
+        $relationshipObjectId = null;
+
+        if ('contact' === $entityType) {
+            $relationshipObject   = $customItem->getCustomObject()->getRelationshipObject();
+            $relationshipObjectId = $relationshipObject ? $relationshipObject->getId() : null;
+        }
+
+        if ($relationshipObjectId) {
+            $action = $this->routeProvider->buildLinkFormRoute($customItem->getId(), $entityType, $entityId);
+        } else {
+            $action = $this->routeProvider->buildLinkRoute($customItem->getId(), $entityType, $entityId);
+        }
 
         return [
             'attr' => [
                 'href'        => '#',
-                'onclick'     => "CustomObjects.linkCustomItemWithEntity(this, event, ${customObjectId}, '${entityType}', ${entityId}, 'custom-object-${customObjectId}');",
-                'data-action' => $this->routeProvider->buildLinkRoute($customItemId, $entityType, $entityId),
+                'onclick'     => "CustomObjects.linkCustomItemWithEntity(this, event, ${customObjectId}, '${entityType}', ${entityId}, 'custom-object-${customObjectId}', ".($relationshipObjectId ?: 'null').');',
+                'data-action' => $action,
                 'data-toggle' => '',
             ],
             'btnText'   => $this->translator->trans('custom.item.link'),
