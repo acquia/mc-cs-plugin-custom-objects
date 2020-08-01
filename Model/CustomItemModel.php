@@ -255,7 +255,6 @@ class CustomItemModel extends FormModel
         $queryBuilder = $this->createListOrmQueryBuilder($tableConfig);
         $rootAlias    = CustomItem::TABLE_ALIAS;
         $queryBuilder->select("{$rootAlias}.name as value, {$rootAlias}.id");
-        $queryBuilder->groupBy("{$rootAlias}.id");
 
         $this->dispatcher->dispatch(
             CustomItemEvents::ON_CUSTOM_ITEM_LOOKUP_QUERY,
@@ -409,22 +408,20 @@ class CustomItemModel extends FormModel
     private function applySearchFilter(QueryBuilder $queryBuilder, string $search): void
     {
         $valueTextBuilder = $this->entityManager->createQueryBuilder();
-        $valueTextBuilder->select('1');
+        $valueTextBuilder->select('IDENTITY(ValueText.customItem)');
         $valueTextBuilder->from(CustomFieldValueText::class, 'ValueText');
-        $valueTextBuilder->where(sprintf('ValueText.customItem = %s.id', CustomItem::TABLE_ALIAS));
         $valueTextBuilder->andWhere('MATCH (ValueText.value) AGAINST (:search BOOLEAN) > 0');
 
         $valueOptionBuilder = $this->entityManager->createQueryBuilder();
-        $valueOptionBuilder->select('1');
+        $valueOptionBuilder->select('IDENTITY(ValueOption.customItem)');
         $valueOptionBuilder->from(CustomFieldValueOption::class, 'ValueOption');
-        $valueOptionBuilder->where(sprintf('ValueOption.customItem = %s.id', CustomItem::TABLE_ALIAS));
         $valueOptionBuilder->andWhere('MATCH (ValueOption.value) AGAINST (:search BOOLEAN) > 0');
 
         $exprBuilder = $queryBuilder->expr();
         $orCondition = $exprBuilder->orX();
         $orCondition->add('MATCH ('.CustomItem::TABLE_ALIAS.'.name) AGAINST (:search BOOLEAN) > 0');
-        $orCondition->add($exprBuilder->exists($valueTextBuilder->getDQL()));
-        $orCondition->add($exprBuilder->exists($valueOptionBuilder->getDQL()));
+        $orCondition->add($exprBuilder->in(CustomItem::TABLE_ALIAS.'.id', $valueTextBuilder->getDQL()));
+        $orCondition->add($exprBuilder->in(CustomItem::TABLE_ALIAS.'.id', $valueOptionBuilder->getDQL()));
 
         $queryBuilder->andWhere($orCondition);
         $queryBuilder->setParameter('search', (string) new FulltextKeyword($search));

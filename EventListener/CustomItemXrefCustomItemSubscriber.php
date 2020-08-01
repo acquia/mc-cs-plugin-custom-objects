@@ -18,13 +18,13 @@ use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
-use Doctrine\ORM\Query\Expr\Join;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use UnexpectedValueException;
 
@@ -35,10 +35,15 @@ class CustomItemXrefCustomItemSubscriber implements EventSubscriberInterface
      */
     private $entityManager;
 
-    public function __construct(
-        EntityManager $entityManager
-    ) {
-        $this->entityManager = $entityManager;
+    /**
+     * @var CustomItemRepository
+     */
+    private $customItemRepository;
+
+    public function __construct(EntityManager $entityManager, CustomItemRepository $customItemRepository)
+    {
+        $this->entityManager        = $entityManager;
+        $this->customItemRepository = $customItemRepository;
     }
 
     /**
@@ -65,19 +70,7 @@ class CustomItemXrefCustomItemSubscriber implements EventSubscriberInterface
     {
         $tableConfig = $event->getTableConfig();
         if ('customItem' === $tableConfig->getParameter('filterEntityType') && $tableConfig->getParameter('filterEntityId')) {
-            $queryBuilder = $event->getQueryBuilder();
-            $queryBuilder->leftJoin(
-                CustomItemXrefCustomItem::class,
-                'CustomItemXrefCustomItem',
-                Join::WITH,
-                'CustomItem.id = CustomItemXrefCustomItem.customItemLower OR CustomItem.id = CustomItemXrefCustomItem.customItemHigher'
-            );
-            $queryBuilder->andWhere('CustomItem.id != :customItemId');
-            $queryBuilder->andWhere($queryBuilder->expr()->orX(
-                $queryBuilder->expr()->eq('CustomItemXrefCustomItem.customItemLower', ':customItemId'),
-                $queryBuilder->expr()->eq('CustomItemXrefCustomItem.customItemHigher', ':customItemId')
-            ));
-            $queryBuilder->setParameter('customItemId', $tableConfig->getParameter('filterEntityId'));
+            $this->customItemRepository->includeItemsLinkedToAnotherItem($event->getQueryBuilder(), (int) $tableConfig->getParameter('filterEntityId'));
         }
     }
 
@@ -85,23 +78,7 @@ class CustomItemXrefCustomItemSubscriber implements EventSubscriberInterface
     {
         $tableConfig = $event->getTableConfig();
         if ('customItem' === $tableConfig->getParameter('filterEntityType') && $tableConfig->getParameter('filterEntityId')) {
-            $queryBuilder = $event->getQueryBuilder();
-            $queryBuilder->leftJoin(
-                CustomItemXrefCustomItem::class,
-                'CustomItemXrefCustomItem',
-                Join::WITH,
-                'CustomItem.id = CustomItemXrefCustomItem.customItemLower OR CustomItem.id = CustomItemXrefCustomItem.customItemHigher'
-            );
-            $queryBuilder->andWhere('CustomItem.id != :customItemId');
-            $queryBuilder->andWhere($queryBuilder->expr()->orX(
-                $queryBuilder->expr()->andX(
-                    $queryBuilder->expr()->neq('CustomItemXrefCustomItem.customItemLower', ':customItemId'),
-                    $queryBuilder->expr()->neq('CustomItemXrefCustomItem.customItemHigher', ':customItemId')
-                ),
-                $queryBuilder->expr()->isNull('CustomItemXrefCustomItem.customItemLower'),
-                $queryBuilder->expr()->isNull('CustomItemXrefCustomItem.customItemHigher')
-            ));
-            $queryBuilder->setParameter('customItemId', $tableConfig->getParameter('filterEntityId'));
+            $this->customItemRepository->excludeItemsLinkedToAnotherItem($event->getQueryBuilder(), (int) $tableConfig->getParameter('filterEntityId'));
         }
     }
 

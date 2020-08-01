@@ -17,7 +17,6 @@ use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query\Expr;
-use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
@@ -26,8 +25,11 @@ use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
 use MauticPlugin\CustomObjectsBundle\EventListener\CustomItemXrefCustomItemSubscriber;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CustomItemXrefCustomItemSubscriberTest extends \PHPUnit\Framework\TestCase
+class CustomItemXrefCustomItemSubscriberTest extends TestCase
 {
     private const ITEM_A_ID = 90;
 
@@ -54,26 +56,33 @@ class CustomItemXrefCustomItemSubscriberTest extends \PHPUnit\Framework\TestCase
     private $xref;
 
     /**
-     * @var CustomItemXrefCustomItemSubscriber
+     * @var CustomItemXrefCustomItemSubscriber|MockObject
      */
     private $xrefSubscriber;
+
+    /**
+     * @var CustomItemRepository|MockObject
+     */
+    private $customItemRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->entityManager  = $this->createMock(EntityManager::class);
-        $this->queryBuilder   = $this->createMock(QueryBuilder::class);
-        $this->query          = $this->createMock(AbstractQuery::class);
-        $this->expr           = $this->createMock(Expr::class);
-        $this->event          = $this->createMock(CustomItemXrefEntityEvent::class);
-        $this->listEvent      = $this->createMock(CustomItemListQueryEvent::class);
-        $this->discoveryEvent = $this->createMock(CustomItemXrefEntityDiscoveryEvent::class);
-        $this->customItemA    = $this->createMock(CustomItem::class);
-        $this->customItemB    = $this->createMock(CustomItem::class);
-        $this->xref           = $this->createMock(CustomItemXrefCustomItem::class);
-        $this->xrefSubscriber = new CustomItemXrefCustomItemSubscriber(
-            $this->entityManager
+        $this->entityManager        = $this->createMock(EntityManager::class);
+        $this->queryBuilder         = $this->createMock(QueryBuilder::class);
+        $this->query                = $this->createMock(AbstractQuery::class);
+        $this->expr                 = $this->createMock(Expr::class);
+        $this->event                = $this->createMock(CustomItemXrefEntityEvent::class);
+        $this->listEvent            = $this->createMock(CustomItemListQueryEvent::class);
+        $this->discoveryEvent       = $this->createMock(CustomItemXrefEntityDiscoveryEvent::class);
+        $this->customItemA          = $this->createMock(CustomItem::class);
+        $this->customItemB          = $this->createMock(CustomItem::class);
+        $this->xref                 = $this->createMock(CustomItemXrefCustomItem::class);
+        $this->customItemRepository = $this->createMock(CustomItemRepository::class);
+        $this->xrefSubscriber       = new CustomItemXrefCustomItemSubscriber(
+            $this->entityManager,
+            $this->customItemRepository
         );
 
         $this->event->method('getXref')->willReturn($this->xref);
@@ -114,34 +123,9 @@ class CustomItemXrefCustomItemSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getQueryBuilder')
             ->willReturn($this->queryBuilder);
 
-        $this->queryBuilder->expects($this->once())
-            ->method('leftJoin')
-            ->with(
-                CustomItemXrefCustomItem::class,
-                'CustomItemXrefCustomItem',
-                Join::WITH,
-                'CustomItem.id = CustomItemXrefCustomItem.customItemLower OR CustomItem.id = CustomItemXrefCustomItem.customItemHigher'
-            );
-
-        $this->queryBuilder->expects($this->exactly(2))
-            ->method('andWhere')
-            ->withConsecutive(
-                ['CustomItem.id != :customItemId'],
-                [null] // Whatever Expr returns, don't care really.
-            );
-
-        $this->expr->expects($this->once())->method('orX');
-
-        $this->expr->expects($this->exactly(2))
-            ->method('eq')
-            ->withConsecutive(
-                ['CustomItemXrefCustomItem.customItemLower', ':customItemId'],
-                ['CustomItemXrefCustomItem.customItemHigher', ':customItemId']
-            );
-
-        $this->queryBuilder->expects($this->once())
-            ->method('setParameter')
-            ->with('customItemId', self::ITEM_B_ID);
+        $this->customItemRepository->expects($this->once())
+            ->method('includeItemsLinkedToAnotherItem')
+            ->with($this->queryBuilder, self::ITEM_B_ID);
 
         $this->xrefSubscriber->onListQuery($this->listEvent);
     }
@@ -175,41 +159,9 @@ class CustomItemXrefCustomItemSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getQueryBuilder')
             ->willReturn($this->queryBuilder);
 
-        $this->queryBuilder->expects($this->once())
-            ->method('leftJoin')
-            ->with(
-                CustomItemXrefCustomItem::class,
-                'CustomItemXrefCustomItem',
-                Join::WITH,
-                'CustomItem.id = CustomItemXrefCustomItem.customItemLower OR CustomItem.id = CustomItemXrefCustomItem.customItemHigher'
-            );
-
-        $this->queryBuilder->expects($this->exactly(2))
-            ->method('andWhere')
-            ->withConsecutive(
-                ['CustomItem.id != :customItemId'],
-                [null] // Whatever Expr returns, don't care really.
-            );
-
-        $this->expr->expects($this->once())->method('orX');
-
-        $this->expr->expects($this->exactly(2))
-            ->method('neq')
-            ->withConsecutive(
-                ['CustomItemXrefCustomItem.customItemLower', ':customItemId'],
-                ['CustomItemXrefCustomItem.customItemHigher', ':customItemId']
-            );
-
-        $this->expr->expects($this->exactly(2))
-            ->method('isNull')
-            ->withConsecutive(
-                ['CustomItemXrefCustomItem.customItemLower'],
-                ['CustomItemXrefCustomItem.customItemHigher']
-            );
-
-        $this->queryBuilder->expects($this->once())
-            ->method('setParameter')
-            ->with('customItemId', self::ITEM_B_ID);
+        $this->customItemRepository->expects($this->once())
+            ->method('excludeItemsLinkedToAnotherItem')
+            ->with($this->queryBuilder, self::ITEM_B_ID);
 
         $this->xrefSubscriber->onLookupQuery($this->listEvent);
     }

@@ -17,7 +17,6 @@ use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\NoResultException;
-use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\LeadBundle\Entity\Lead;
@@ -32,8 +31,11 @@ use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
 use MauticPlugin\CustomObjectsBundle\EventListener\CustomItemXrefContactSubscriber;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CustomItemXrefContactSubscriberTest extends \PHPUnit\Framework\TestCase
+class CustomItemXrefContactSubscriberTest extends TestCase
 {
     private const ITEM_ID = 90;
 
@@ -42,10 +44,6 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit\Framework\TestCase
     private const USER_ID = 4;
 
     private const USER_NAME = 'Joe';
-
-    private $userHelper;
-
-    private $user;
 
     private $entityManager;
 
@@ -70,9 +68,14 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit\Framework\TestCase
     private $xref;
 
     /**
-     * @var CustomItemXrefContactSubscriber
+     * @var CustomItemXrefContactSubscriber|MockObject
      */
     private $xrefSubscriber;
+
+    /**
+     * @var CustomItemRepository|MockObject
+     */
+    private $customItemRepository;
 
     protected function setUp(): void
     {
@@ -80,31 +83,33 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit\Framework\TestCase
 
         defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
-        $this->entityManager    = $this->createMock(EntityManager::class);
-        $this->queryBuilder     = $this->createMock(QueryBuilder::class);
-        $this->queryBuilderDbal = $this->createMock(DbalQueryBuilder::class);
-        $this->query            = $this->createMock(AbstractQuery::class);
-        $this->userHelper       = $this->createMock(UserHelper::class);
-        $this->user             = $this->createMock(User::class);
-        $this->event            = $this->createMock(CustomItemXrefEntityEvent::class);
-        $this->listEvent        = $this->createMock(CustomItemListQueryEvent::class);
-        $this->listDbalEvent    = $this->createMock(CustomItemListDbalQueryEvent::class);
-        $this->discoveryEvent   = $this->createMock(CustomItemXrefEntityDiscoveryEvent::class);
-        $this->contact          = $this->createMock(Lead::class);
-        $this->customItem       = $this->createMock(CustomItem::class);
-        $this->xref             = $this->createMock(CustomItemXrefContact::class);
-        $this->xrefSubscriber   = new CustomItemXrefContactSubscriber(
+        $this->entityManager        = $this->createMock(EntityManager::class);
+        $this->queryBuilder         = $this->createMock(QueryBuilder::class);
+        $this->queryBuilderDbal     = $this->createMock(DbalQueryBuilder::class);
+        $this->query                = $this->createMock(AbstractQuery::class);
+        $userHelper                 = $this->createMock(UserHelper::class);
+        $this->customItemRepository = $this->createMock(CustomItemRepository::class);
+        $user                       = $this->createMock(User::class);
+        $this->event                = $this->createMock(CustomItemXrefEntityEvent::class);
+        $this->listEvent            = $this->createMock(CustomItemListQueryEvent::class);
+        $this->listDbalEvent        = $this->createMock(CustomItemListDbalQueryEvent::class);
+        $this->discoveryEvent       = $this->createMock(CustomItemXrefEntityDiscoveryEvent::class);
+        $this->contact              = $this->createMock(Lead::class);
+        $this->customItem           = $this->createMock(CustomItem::class);
+        $this->xref                 = $this->createMock(CustomItemXrefContact::class);
+        $this->xrefSubscriber       = new CustomItemXrefContactSubscriber(
             $this->entityManager,
-            $this->userHelper
+            $userHelper,
+            $this->customItemRepository
         );
 
         $this->event->method('getXref')->willReturn($this->xref);
         $this->xref->method('getContact')->willReturn($this->contact);
         $this->xref->method('getCustomItem')->willReturn($this->customItem);
         $this->customItem->method('getId')->willReturn(self::ITEM_ID);
-        $this->userHelper->method('getUser')->willReturn($this->user);
-        $this->user->method('getId')->willReturn(self::USER_ID);
-        $this->user->method('getName')->willReturn(self::USER_NAME);
+        $userHelper->method('getUser')->willReturn($user);
+        $user->method('getId')->willReturn(self::USER_ID);
+        $user->method('getName')->willReturn(self::USER_NAME);
         $this->entityManager->method('createQueryBuilder')->willReturn($this->queryBuilder);
     }
 
@@ -184,17 +189,9 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getQueryBuilder')
             ->willReturn($this->queryBuilder);
 
-        $this->queryBuilder->expects($this->once())
-            ->method('leftJoin')
-            ->with('CustomItem.contactReferences', 'CustomItemXrefContact');
-
-        $this->queryBuilder->expects($this->once())
-            ->method('andWhere')
-            ->with('CustomItemXrefContact.contact = :contactId');
-
-        $this->queryBuilder->expects($this->once())
-            ->method('setParameter')
-            ->with('contactId', self::ENTITY_ID);
+        $this->customItemRepository->expects($this->once())
+            ->method('includeItemsLinkedToContact')
+            ->with($this->queryBuilder, self::ENTITY_ID);
 
         $this->xrefSubscriber->onListOrmQuery($this->listEvent);
     }
@@ -215,7 +212,6 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnLookupQuery(): void
     {
-        $expr        = $this->createMock(Expr::class);
         $tableConfig = new TableConfig(10, 1, 'id');
         $tableConfig->addParameter('filterEntityType', 'contact');
         $tableConfig->addParameter('filterEntityId', self::ENTITY_ID);
@@ -228,23 +224,9 @@ class CustomItemXrefContactSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getQueryBuilder')
             ->willReturn($this->queryBuilder);
 
-        $this->queryBuilder->expects($this->once())
-            ->method('leftJoin')
-            ->with('CustomItem.contactReferences', 'CustomItemXrefContact');
-
-        $this->queryBuilder->expects($this->once())->method('andWhere');
-
-        $this->queryBuilder->method('expr')->willReturn($expr);
-
-        $expr->expects($this->once())->method('orX');
-
-        $expr->expects($this->once())
-            ->method('neq')
-            ->with('CustomItemXrefContact.contact', self::ENTITY_ID);
-
-        $expr->expects($this->once())
-            ->method('isNull')
-            ->with('CustomItemXrefContact.contact');
+        $this->customItemRepository->expects($this->once())
+            ->method('excludeItemsLinkedToContact')
+            ->with($this->queryBuilder, self::ENTITY_ID);
 
         $this->xrefSubscriber->onLookupQuery($this->listEvent);
     }
