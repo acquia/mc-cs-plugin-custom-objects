@@ -206,16 +206,17 @@ class ContactTabSubscriberTest extends TestCase
             ->with(
                 'CustomObjectsBundle:SubscribedEvents/Tab:content.html.php',
                 [
-                    'customObjectId'    => 555,
-                    'currentEntityId'   => 45,
-                    'currentEntityType' => 'contact',
-                    'tabId'             => 'custom-object-555',
-                    'placeholder'       => 'translated placeholder',
-                    'lookupRoute'       => 'lookup/route',
-                    'newRoute'          => 'new/route',
-                    'searchId'          => 'list-search-555',
-                    'searchValue'       => 'Search something',
-                    'searchRoute'       => 'search/route',
+                    'customObjectId'       => 555,
+                    'currentEntityId'      => 45,
+                    'currentEntityType'    => 'contact',
+                    'tabId'                => 'custom-object-555',
+                    'placeholder'          => 'translated placeholder',
+                    'lookupRoute'          => 'lookup/route',
+                    'newRoute'             => 'new/route',
+                    'searchId'             => 'list-search-555',
+                    'searchValue'          => 'Search something',
+                    'searchRoute'          => 'search/route',
+                    'relationshipObjectId' => null,
                 ]
             );
 

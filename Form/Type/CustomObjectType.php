@@ -23,7 +23,6 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -146,23 +145,17 @@ class CustomObjectType extends AbstractType
 
         $builder->add(
             'masterObject',
-            EntityType::class,
+            ChoiceType::class,
             [
                 'label'         => 'custom.object.relationship.master_object.label',
-                'class'         => CustomObject::class,
+                'choices'       => $this->customObjectRepository->getMasterObjectChoices($customObject),
                 'required'      => true,
                 'placeholder'   => '',
-                'empty_data'    => null,
                 'label_attr'    => ['class' => 'control-label'],
                 'attr'          => [
                     'class'        => 'form-control',
                     'data-show-on' => '{"custom_object_type":["'.CustomObject::TYPE_RELATIONSHIP.'"]}',
                 ],
-                'choice_label'  => function ($customObject) {
-                    return $customObject->getNameSingular()." (".$customObject->getAlias().")";
-                },
-                'choice_value'  => 'id',
-                'query_builder' => $this->customObjectRepository->getMasterObjectQueryBuilder($customObject),
                 'disabled'      => !$isNewObject,
             ]
         );

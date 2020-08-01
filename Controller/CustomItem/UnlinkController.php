@@ -56,6 +56,17 @@ class UnlinkController extends JsonController
 
             $this->permissionProvider->canEdit($customItem);
 
+            if ($customItem->getCustomObject()->getRelationshipObject()) {
+                try {
+                    $childCustomItem = $customItem->findChildCustomItem();
+                } catch (NotFoundException $e) {
+                }
+
+                if (isset($childCustomItem)) {
+                    $this->customItemModel->delete($childCustomItem);
+                }
+            }
+
             $this->customItemModel->unlinkEntity($customItem, $entityType, $entityId);
 
             $this->flashBag->add(

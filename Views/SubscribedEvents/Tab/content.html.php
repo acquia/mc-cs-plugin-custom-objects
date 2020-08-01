@@ -60,6 +60,8 @@ $listId = 'custom-item-list-'.$customObjectId;
         <?php echo $customObjectId; ?>,
         <?php echo $currentEntityId; ?>,
         '<?php echo $currentEntityType; ?>',
-        '<?php echo $tabId; ?>'
+        '<?php echo $tabId; ?>',
+        <?php echo isset($relationshipObjectId) ? $relationshipObjectId : 'null'; ?>
+
     );
 </script>

@@ -22,17 +22,31 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 use UnexpectedValueException;
+use PHPUnit\Framework\MockObject\MockObject;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use PHPUnit\Framework\Assert;
 
 class UnlinkControllerTest extends ControllerTestCase
 {
-    private const ITEM_ID = 22;
+    public const ITEM_ID = 22;
 
-    private const ENTITY_ID = 33;
+    public const ENTITY_ID = 33;
 
-    private const ENTITY_TYPE = 'contact';
+    public const ENTITY_TYPE = 'contact';
 
+    /**
+     * @var MockObject|CustomItemModel
+     */
     private $customItemModel;
+
+    /**
+     * @var MockObject|FlashBag
+     */
     private $flashBag;
+
+    /**
+     * @var MockObject|CustomItemPermissionProvider
+     */
     private $permissionProvider;
 
     /**
@@ -102,7 +116,7 @@ class UnlinkControllerTest extends ControllerTestCase
     {
         $this->customItemModel->expects($this->once())
             ->method('fetchEntity')
-            ->willReturn($this->createMock(CustomItem::class));
+            ->willReturn(new CustomItem(new CustomObject()));
 
         $this->customItemModel->expects($this->once())
             ->method('unlinkEntity')
@@ -117,7 +131,13 @@ class UnlinkControllerTest extends ControllerTestCase
 
     public function testSaveAction(): void
     {
-        $customItem = $this->createMock(CustomItem::class);
+        $customItem = new class(new CustomObject()) extends CustomItem {
+            public function getId()
+            {
+                return UnlinkControllerTest::ITEM_ID;
+            }
+        };
+
         $this->customItemModel->expects($this->once())
             ->method('fetchEntity')
             ->willReturn($customItem);
@@ -128,6 +148,56 @@ class UnlinkControllerTest extends ControllerTestCase
         $this->customItemModel->expects($this->once())
             ->method('unlinkEntity')
             ->with($customItem, self::ENTITY_TYPE, self::ENTITY_ID);
+
+        $this->customItemModel->expects($this->never())
+            ->method('delete');
+
+        $this->unlinkController->saveAction(self::ITEM_ID, self::ENTITY_TYPE, self::ENTITY_ID);
+    }
+
+    public function testSaveActionWithChildItem(): void
+    {
+        $customObject = new class() extends CustomObject {
+        };
+
+        $childCustomObject = new class() extends CustomObject {
+        };
+
+        $customObject->setRelationshipObject($childCustomObject);
+
+        $customItem = new class($customObject) extends CustomItem {
+            public function getId()
+            {
+                return UnlinkControllerTest::ITEM_ID;
+            }
+
+            public function findChildCustomItem(): CustomItem
+            {
+                return new class($this->getCustomObject()->getRelationshipObject()) extends CustomItem {
+                };
+            }
+        };
+
+        $this->customItemModel->expects($this->once())
+            ->method('fetchEntity')
+            ->willReturn($customItem);
+
+        $this->permissionProvider->expects($this->once())
+            ->method('canEdit');
+
+        $this->customItemModel->expects($this->once())
+            ->method('unlinkEntity')
+            ->with($customItem, self::ENTITY_TYPE, self::ENTITY_ID);
+
+        $this->customItemModel->expects($this->once())
+            ->method('delete')
+            ->with($this->callback(
+                function (CustomItem $childCustomItem) use ($childCustomObject) {
+                    Assert::assertSame($childCustomObject, $childCustomItem->getCustomObject());
+
+                    return true;
+                }
+            ));
 
         $this->unlinkController->saveAction(self::ITEM_ID, self::ENTITY_TYPE, self::ENTITY_ID);
     }

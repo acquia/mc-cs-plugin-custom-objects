@@ -25,6 +25,7 @@ use Mautic\UserBundle\Entity\User;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
@@ -351,6 +352,12 @@ class CustomItemXrefContactSubscriberTest extends TestCase
         $this->entityManager->expects($this->once())
             ->method('flush');
 
+        $customObject = new CustomObject();
+        $customObject->setType(CustomObject::TYPE_MASTER);
+
+        $this->customItem->method('getCustomObject')
+            ->willReturn($customObject);
+
         $this->xrefSubscriber->createNewEventLogForLinkedContact($this->event);
     }
 
@@ -383,6 +390,12 @@ class CustomItemXrefContactSubscriberTest extends TestCase
 
         $this->entityManager->expects($this->once())
             ->method('flush');
+
+        $customObject = new CustomObject();
+        $customObject->setType(CustomObject::TYPE_MASTER);
+
+        $this->customItem->method('getCustomObject')
+            ->willReturn($customObject);
 
         $this->xrefSubscriber->createNewEventLogForUnlinkedContact($this->event);
     }
