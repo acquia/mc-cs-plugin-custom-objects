@@ -15,10 +15,13 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
 use Mautic\CoreBundle\Helper\ArrayHelper;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
@@ -35,6 +38,7 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
+use MauticPlugin\CustomObjectsBundle\Segment\Query\UnionQueryContainer;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -215,25 +219,18 @@ class CampaignSubscriber implements EventSubscriberInterface
         $queryAlias        = 'q1';
         $value             = $event->getConfig()['value'];
         $operator          = $event->getConfig()['operator'];
-        $queryBuilder      = $this->connection->createQueryBuilder();
         $innerQueryBuilder = $this->queryFilterFactory->configureQueryBuilderFromSegmentFilter(
             $this->modelSegmentFilterArray($customField, $operator, $value),
             $queryAlias
         );
 
-        $innerQueryBuilder->select($queryAlias.'_item.id');
-        $this->queryFilterHelper->addContactIdRestriction($innerQueryBuilder, $queryAlias, (int) $contact->getId());
-        $this->handleEmptyOperators($operator, $queryAlias, $innerQueryBuilder);
-        $this->copyParams($innerQueryBuilder, $queryBuilder);
+        if ($innerQueryBuilder instanceof UnionQueryContainer) {
+            $this->applyParamsToMultipleQueries($innerQueryBuilder, $queryAlias, $contact, $operator);
+        } else {
+            $this->applyParamsToQuery($innerQueryBuilder, $queryAlias, $contact, $operator);
+        }
 
-        $queryBuilder->select(CustomItem::TABLE_ALIAS.'.id');
-        $queryBuilder->from(MAUTIC_TABLE_PREFIX.CustomItem::TABLE_NAME, CustomItem::TABLE_ALIAS);
-        $queryBuilder->innerJoin(
-            CustomItem::TABLE_ALIAS,
-            "({$innerQueryBuilder->getSQL()})",
-            $queryAlias,
-            CustomItem::TABLE_ALIAS.".id = {$queryAlias}.id"
-        );
+        $queryBuilder = $this->buildOuterQuery($innerQueryBuilder, $queryAlias);
 
         $customItemId = $this->executeSelect($queryBuilder)->fetchColumn();
 
@@ -243,6 +240,40 @@ class CampaignSubscriber implements EventSubscriberInterface
         } else {
             $event->setResult(false);
         }
+    }
+
+    private function applyParamsToMultipleQueries(UnionQueryContainer $unionQueryContainer, string $queryAlias, Lead $contact, string $operator): void
+    {
+        foreach ($unionQueryContainer as $segmentQueryBuilder) {
+            $this->applyParamsToQuery($segmentQueryBuilder, $queryAlias, $contact, $operator);
+        }
+    }
+
+    private function applyParamsToQuery(SegmentQueryBuilder $innerQueryBuilder, string $queryAlias, Lead $contact, string $operator): void
+    {
+        $innerQueryBuilder->select($queryAlias.'_value.custom_item_id');
+        $this->queryFilterHelper->addContactIdRestriction($innerQueryBuilder, $queryAlias, (int) $contact->getId());
+    }
+
+    /**
+     * @param UnionQueryContainer|SegmentQueryBuilder $innerQuery
+     */
+    private function buildOuterQuery($innerQuery, string $queryAlias): QueryBuilder
+    {
+        $queryBuilder = $this->connection->createQueryBuilder();
+
+        $queryBuilder->select(CustomItem::TABLE_ALIAS.'.id');
+        $queryBuilder->from(MAUTIC_TABLE_PREFIX.CustomItem::TABLE_NAME, CustomItem::TABLE_ALIAS);
+        $queryBuilder->innerJoin(
+            CustomItem::TABLE_ALIAS,
+            "({$innerQuery->getSQL()})",
+            $queryAlias,
+            CustomItem::TABLE_ALIAS.".id = {$queryAlias}.custom_item_id"
+        );
+
+        $queryBuilder->setParameters($innerQuery->getParameters(), $innerQuery->getParameterTypes());
+
+        return $queryBuilder;
     }
 
     /**

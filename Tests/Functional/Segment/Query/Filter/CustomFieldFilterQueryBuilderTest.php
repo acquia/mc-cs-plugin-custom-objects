@@ -14,11 +14,12 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Segment\Query\Filter;
 
 use Doctrine\ORM\EntityManager;
-use Liip\FunctionalTestBundle\Test\WebTestCase;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\MauticWebTestCase;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
+use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
@@ -83,11 +84,21 @@ class CustomFieldFilterQueryBuilderTest extends MauticWebTestCase
         /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = $this->getContainer()->get('event_dispatcher');
 
-        $queryHelper         = new QueryFilterHelper($fieldTypeProvider);
+        $queryHelper = new QueryFilterHelper(
+            $this->em,
+            new QueryFilterFactory(
+                $this->em,
+                $fieldTypeProvider,
+                $this->getContainer()->get('mautic.helper.core_parameters'),
+                $this->getContainer()->get('custom_field.repository'),
+                new QueryFilterFactory\Calculator()
+            )
+        );
         $queryBuilderService = new CustomFieldFilterQueryBuilder(
             new RandomParameterName(),
             $dispatcher,
-            $queryHelper
+            $queryHelper,
+            new CoreParametersHelper($this->container)
         );
         $filterMock   = $this->createSegmentFilterMock('hate');
         $queryBuilder = $this->getLeadsQueryBuilder();

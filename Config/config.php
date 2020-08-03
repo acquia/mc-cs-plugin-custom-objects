@@ -19,7 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 return [
     'name'        => 'Custom Objects',
     'description' => 'Adds custom objects and fields features to Mautic',
-    'version'     => '0.0.15',
+    'version'     => '0.0.16',
     'author'      => 'Mautic, Inc.',
 
     'routes' => [
@@ -1080,6 +1080,7 @@ return [
                     'mautic.lead.model.random_parameter_name',
                     'event_dispatcher',
                     'custom_object.query.filter.helper',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.lead.query.builder.custom_item.value'  => [
@@ -1093,14 +1094,29 @@ return [
             'custom_object.query.filter.factory' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory::class,
                 'arguments' => [
-                    'database_connection',
                     'mautic.lead.model.lead_segment_filter_factory',
                     'custom_object.query.filter.helper',
                 ],
             ],
+            'query_filter_factory_calculator' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Helper\QueryFilterFactory\Calculator::class,
+            ],
+            'query_filter_factory' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Helper\QueryFilterFactory::class,
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'custom_field.type.provider',
+                    'mautic.helper.core_parameters',
+                    'custom_field.repository',
+                    'query_filter_factory_calculator',
+                ],
+            ],
             'custom_object.query.filter.helper'            => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper::class,
-                'arguments' => ['custom_field.type.provider'],
+                'arguments' => [
+                    'doctrine.orm.entity_manager',
+                    'query_filter_factory',
+                ],
             ],
             'custom_object.helper.token_formatter' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Helper\TokenFormatter::class,
@@ -1110,5 +1126,6 @@ return [
     ],
     'parameters' => [
         ConfigProvider::CONFIG_PARAM_ENABLED => true,
+        ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT => 3,
     ],
 ];
