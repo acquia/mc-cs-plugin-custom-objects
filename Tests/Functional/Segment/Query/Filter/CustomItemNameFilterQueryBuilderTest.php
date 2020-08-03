@@ -18,7 +18,7 @@ use Mautic\CoreBundle\Test\MauticWebTestCase;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
-use MauticPlugin\CustomObjectsBundle\Helper\CustomFieldQueryBuilder;
+use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
@@ -80,12 +80,12 @@ class CustomItemNameFilterQueryBuilderTest extends MauticWebTestCase
 
         $filterHelper = new QueryFilterHelper(
             $this->em,
-            new CustomFieldQueryBuilder(
+            new QueryFilterFactory(
                 $this->em,
                 $fieldTypeProvider,
                 $this->getContainer()->get('mautic.helper.core_parameters'),
                 $this->getContainer()->get('custom_field.repository'),
-                new CustomFieldQueryBuilder\Calculator()
+                new QueryFilterFactory\Calculator()
             )
         );
         $queryBuilderService = new CustomItemNameFilterQueryBuilder(

@@ -18,7 +18,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
-use MauticPlugin\CustomObjectsBundle\Helper\CustomFieldQueryBuilder;
+use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
@@ -28,7 +28,7 @@ use PHPUnit\Framework\TestCase;
 class CustomFieldQueryBuilderTest extends TestCase
 {
     /**
-     * @var CustomFieldQueryBuilder
+     * @var QueryFilterFactory
      */
     private $customFieldQueryBuilder;
 
@@ -199,12 +199,12 @@ SQL;
             ->with(ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT)
             ->willReturn($limit);
 
-        $this->customFieldQueryBuilder = new CustomFieldQueryBuilder(
+        $this->customFieldQueryBuilder = new QueryFilterFactory(
             $entityManager,
             $fieldTypeProvider,
             $coreParametersHelper,
             $this->createMock(CustomFieldRepository::class),
-            new CustomFieldQueryBuilder\Calculator()
+            new QueryFilterFactory\Calculator()
         );
     }
 
