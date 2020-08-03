@@ -1044,7 +1044,7 @@ return [
                     'custom_object.query.filter.helper',
                 ],
             ],
-            'custom_field_query_builder_counter' => [
+            'custom_field_query_builder_calculator' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Helper\CustomFieldQueryBuilder\Calculator::class,
             ],
             'custom_field_query_builder' => [
@@ -1054,7 +1054,7 @@ return [
                     'custom_field.type.provider',
                     'mautic.helper.core_parameters',
                     'custom_field.repository',
-                    'custom_field_query_builder_counter',
+                    'custom_field_query_builder_calculator',
                 ],
             ],
             'custom_object.query.filter.helper'            => [
