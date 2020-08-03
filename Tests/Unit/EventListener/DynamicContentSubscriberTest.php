@@ -17,8 +17,9 @@ use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemNameFilterQu
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
 use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DynamicContentSubscriberTest extends \PHPUnit\Framework\TestCase
+class DynamicContentSubscriberTest extends TestCase
 {
     /** @var ConfigProvider|MockObject */
     private $configProviderMock;
