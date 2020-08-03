@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Helper\CustomFieldQueryBuilder;
 
-use MauticPlugin\CustomObjectsBundle\Helper\CustomFieldQueryBuilder\Calculator;
+use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterFactory\Calculator;
 use PHPUnit\Framework\TestCase;
 
 class CalculatorTest extends TestCase

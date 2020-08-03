@@ -1098,24 +1098,24 @@ return [
                     'custom_object.query.filter.helper',
                 ],
             ],
-            'custom_field_query_builder_calculator' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Helper\CustomFieldQueryBuilder\Calculator::class,
+            'query_filter_factory_calculator' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Helper\QueryFilterFactory\Calculator::class,
             ],
-            'custom_field_query_builder' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Helper\CustomFieldQueryBuilder::class,
+            'query_filter_factory' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Helper\QueryFilterFactory::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'custom_field.type.provider',
                     'mautic.helper.core_parameters',
                     'custom_field.repository',
-                    'custom_field_query_builder_calculator',
+                    'query_filter_factory_calculator',
                 ],
             ],
             'custom_object.query.filter.helper'            => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper::class,
                 'arguments' => [
                     'doctrine.orm.entity_manager',
-                    'custom_field_query_builder',
+                    'query_filter_factory',
                 ],
             ],
             'custom_object.helper.token_formatter' => [

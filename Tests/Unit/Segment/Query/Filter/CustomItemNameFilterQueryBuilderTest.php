@@ -12,7 +12,7 @@ use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
-use MauticPlugin\CustomObjectsBundle\Helper\CustomFieldQueryBuilder;
+use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
@@ -63,12 +63,12 @@ class CustomItemNameFilterQueryBuilderTest extends TestCase
         $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
         $queryFilterHelper = new QueryFilterHelper(
             $entityManager,
-            new CustomFieldQueryBuilder(
+            new QueryFilterFactory(
                 $entityManager,
                 new CustomFieldTypeProvider(),
                 $coreParametersHelper,
                 $this->createMock(CustomFieldRepository::class),
-                new CustomFieldQueryBuilder\Calculator()
+                new QueryFilterFactory\Calculator()
             )
         );
 
