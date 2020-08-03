@@ -63,7 +63,7 @@ SQL;
 
         $this->constructWithExpectedLimit(1);
 
-        $unionQueryContainer = $this->customFieldQueryBuilder->buildQuery('alias', $this->segmentFilter);
+        $unionQueryContainer = $this->customFieldQueryBuilder->createQuery('alias', $this->segmentFilter);
 
         $this->assertCount(1, $unionQueryContainer);
         $this->assertSame($this->trimSpacesAndLinebreaks($expectedQuery), $unionQueryContainer->getSQL());
@@ -96,7 +96,7 @@ SQL;
 
         $this->constructWithExpectedLimit(2);
 
-        $unionQueryContainer = $this->customFieldQueryBuilder->buildQuery('alias', $this->segmentFilter);
+        $unionQueryContainer = $this->customFieldQueryBuilder->createQuery('alias', $this->segmentFilter);
 
         $this->assertCount(3, $unionQueryContainer);
         $this->assertSame($this->trimSpacesAndLinebreaks($expectedQuery), $unionQueryContainer->getSQL());
@@ -169,7 +169,7 @@ SQL;
 
         $this->constructWithExpectedLimit(3);
 
-        $unionQueryContainer = $this->customFieldQueryBuilder->buildQuery('alias', $this->segmentFilter);
+        $unionQueryContainer = $this->customFieldQueryBuilder->createQuery('alias', $this->segmentFilter);
 
         $this->assertCount(7, $unionQueryContainer);
         $this->assertSame($this->trimSpacesAndLinebreaks($expectedQuery), $unionQueryContainer->getSQL());
