@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Helper\CustomFieldQueryBuilder;
 
-
+/**
+ * Parameter combination query counter
+ */
 class Calculator
 {
     private const COLUMN_SUFFIX_LOWER  = 'lower';
@@ -32,6 +34,18 @@ class Calculator
     private $cipherCount;
 
     /**
+     * Number of union queries to be generated
+     *
+     * @var int
+     */
+    private $totalQueryCountPerLevel;
+
+    /**
+     * @var string
+     */
+    private $matrix;
+
+    /**
      * Reset counter with new level
      *
      * @param int $level
@@ -40,13 +54,35 @@ class Calculator
     {
         $this->level = $level;
         $this->cipherCount = $this->level - 1;
+        $this->totalQueryCountPerLevel = $this->getTotalQueryCount();
     }
 
-    public function getTotalQueryCountPerLevel(): int
+    /**
+     * Number of union queries to be generated
+     */
+    public function getTotalQueryCount(): int
     {
+        if ($this->totalQueryCountPerLevel) {
+            return $this->totalQueryCountPerLevel;
+        }
+
         $highestCombinationNumberBin = str_repeat('1', $this->cipherCount);
 
         return bindec($highestCombinationNumberBin) + 1;
+    }
+
+    public function getJoinCountPerQuery(): int
+    {
+        return $this->level - 1;
+    }
+
+    public function getSuffixByIterator(int $i): string
+    {
+        if (isset($this->matrix[$i])) {
+            return $this->matrix[$i];
+        }
+
+        throw new \InvalidArgumentException("Value '$i' is out of generated matrix");
     }
 
     public function getComputedSuffix(int $totalIterator, int $joinIterator): string
@@ -67,4 +103,22 @@ class Calculator
     {
         return ($suffix === self::COLUMN_SUFFIX_LOWER) ? self::COLUMN_SUFFIX_HIGHER : self::COLUMN_SUFFIX_LOWER;
     }
+
+    private function computeMatrix(): array
+    {
+        $this->matrix = '';
+
+        for($i = 1; $i <= $this->totalQueryCountPerLevel; $i++) {
+            $this->matrix .= $this->dec2bin($i++);
+        }
+    }
+
+    private function dec2bin(int $number): string
+    {
+        $value = decbin($value);
+
+
+    }
+
+
 }
