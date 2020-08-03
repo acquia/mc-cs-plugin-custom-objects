@@ -67,7 +67,8 @@ class CustomItemNameFilterQueryBuilderTest extends TestCase
                 $entityManager,
                 new CustomFieldTypeProvider(),
                 $coreParametersHelper,
-                $this->createMock(CustomFieldRepository::class)
+                $this->createMock(CustomFieldRepository::class),
+                new CustomFieldQueryBuilder\Calculator()
             )
         );
 

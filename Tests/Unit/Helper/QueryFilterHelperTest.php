@@ -48,7 +48,8 @@ class QueryFilterHelperTest extends TestCase
                 $entityManager,
                 new CustomFieldTypeProvider(),
                 $coreParametersHelper,
-                $this->createMock(CustomFieldRepository::class)
+                $this->createMock(CustomFieldRepository::class),
+                new CustomFieldQueryBuilder\Calculator()
             )
         );
         $this->queryBuilder = $this->createMock(QueryBuilder::class);

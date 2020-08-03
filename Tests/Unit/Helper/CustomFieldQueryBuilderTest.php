@@ -203,7 +203,8 @@ SQL;
             $entityManager,
             $fieldTypeProvider,
             $coreParametersHelper,
-            $this->createMock(CustomFieldRepository::class)
+            $this->createMock(CustomFieldRepository::class),
+            new CustomFieldQueryBuilder\Calculator()
         );
     }
 
