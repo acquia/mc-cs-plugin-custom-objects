@@ -59,7 +59,7 @@ class QueryFilterHelper
         string $alias,
         ContactSegmentFilter $segmentFilter
     ): UnionQueryContainer {
-        $unionQueryContainer = $this->queryFilterFactory->buildQuery($alias, $segmentFilter);
+        $unionQueryContainer = $this->queryFilterFactory->createQuery($alias, $segmentFilter);
         $this->addCustomFieldValueExpressionFromSegmentFilter($unionQueryContainer, $alias, $segmentFilter);
 
         return $unionQueryContainer;
