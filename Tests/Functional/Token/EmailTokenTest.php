@@ -160,7 +160,7 @@ class EmailTokenTest extends MauticMysqlTestCase
         });
 
         Assert::assertSame(
-            'Dear George,
+            $this->stripWhiteSpaces('Dear George,
 
             check these values, please:
 
@@ -192,8 +192,13 @@ class EmailTokenTest extends MauticMysqlTestCase
             Multiselect: <ol><li>"Option A","Option B"</li><li>"Option B"</li></ol>
             Text: <ul><li>Text A</li><li>Text B</li></ul>
             Textarea: Text ABC or Text BCD
-            Url: <ol><li>https://mautic.org</li></ol>',
-            trim($body->html())
+            Url: <ol><li>https://mautic.org</li></ol>'),
+            $this->stripWhiteSpaces($body->html())
         );
+    }
+
+    private function stripWhiteSpaces(string $string): string
+    {
+        return preg_replace('/\s+/', '', $string);
     }
 }
