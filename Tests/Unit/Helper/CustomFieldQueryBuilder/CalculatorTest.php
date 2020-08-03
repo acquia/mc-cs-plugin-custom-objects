@@ -33,83 +33,95 @@ class CalculatorTest extends TestCase
 
     public function test2LevelMatrix(): void
     {
-        $matrix = implode(
-            '',
-            [
-                '0',
-                '1',
-            ]
-        );
+        $level = 2;
+        $expectedMatrix = [
+            '0',
+            '1',
+        ];
 
-        $this->calculator->init(2);
+        $this->calculator->init($level);
         $this->assertEquals(2, $this->calculator->getTotalQueryCount());
         $this->assertEquals(1, $this->calculator->getJoinCountPerQuery());
+        $this->assertMatrixEquals($level, $expectedMatrix, $this->calculator);
     }
 
     public function test3LevelMatrix(): void
     {
-        $matrix = implode(
-            '',
-            [
-                '00',
-                '01',
-                '10',
-                '11',
-            ]
-        );
+        $level = 3;
+        $expectedMatrix = [
+            '00',
+            '01',
+            '10',
+            '11',
+        ];
 
-        $this->calculator->init(3);
+        $this->calculator->init($level);
         $this->assertEquals(4, $this->calculator->getTotalQueryCount());
         $this->assertEquals(2, $this->calculator->getJoinCountPerQuery());
+        $this->assertMatrixEquals($level, $expectedMatrix, $this->calculator);
     }
 
     public function test4LevelMatrix(): void
     {
-        $matrix = implode(
-            '',
-            [
-                '000',
-                '001',
-                '010',
-                '011',
-                '100',
-                '101',
-                '110',
-                '111',
-            ]
-        );
+        $level = 4;
+        $expectedMatrix = [
+            '000',
+            '001',
+            '010',
+            '011',
+            '100',
+            '101',
+            '110',
+            '111',
+        ];
 
-        $this->calculator->init(4);
+        $this->calculator->init($level);
         $this->assertEquals(8, $this->calculator->getTotalQueryCount());
         $this->assertEquals(3, $this->calculator->getJoinCountPerQuery());
+        $this->assertMatrixEquals($level, $expectedMatrix, $this->calculator);
     }
 
     public function test5LevelMatrix(): void
     {
-        $matrix = implode(
-            '',
-            [
-                '0000',
-                '0001',
-                '0010',
-                '0011',
-                '0100',
-                '0101',
-                '0110',
-                '0111',
-                '1000',
-                '1001',
-                '1010',
-                '1011',
-                '1100',
-                '1101',
-                '1110',
-                '1111',
-            ]
-        );
+        $level = 5;
+        $expectedMatrix = [
+            '0000',
+            '0001',
+            '0010',
+            '0011',
+            '0100',
+            '0101',
+            '0110',
+            '0111',
+            '1000',
+            '1001',
+            '1010',
+            '1011',
+            '1100',
+            '1101',
+            '1110',
+            '1111',
+        ];
 
-        $this->calculator->init(5);
+        $this->calculator->init($level);
         $this->assertEquals(16, $this->calculator->getTotalQueryCount());
         $this->assertEquals(4, $this->calculator->getJoinCountPerQuery());
+        $this->assertMatrixEquals($level, $expectedMatrix, $this->calculator);
+    }
+
+    private function assertMatrixEquals(int $level, array $expectedMatrix, Calculator $calculator)
+    {
+        $expectedMatrix = implode('', $expectedMatrix);
+
+        for($i = 0; $i < strlen($expectedMatrix); $i++) {
+            $decisionValue = (bool) $expectedMatrix[$i];
+            $expectedSuffix = $decisionValue ? self::COLUMN_SUFFIX_HIGHER : self::COLUMN_SUFFIX_LOWER;
+            $this->assertEquals($expectedSuffix, $calculator->getSuffixByIterator($i));
+        }
+    }
+
+    private function getSuffix($decisionValue): string
+    {
+        return $decisionValue ? self::COLUMN_SUFFIX_HIGHER : self::COLUMN_SUFFIX_LOWER;
     }
 }
