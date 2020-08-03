@@ -53,20 +53,20 @@ class CustomFieldQueryBuilder
     /**
      * @var Calculator
      */
-    private $counter;
+    private $calculator;
 
     public function __construct(
         EntityManager $entityManager,
         CustomFieldTypeProvider $fieldTypeProvider,
         CoreParametersHelper $coreParametersHelper,
         CustomFieldRepository $customFieldRepository,
-        Calculator $counter
+        Calculator $calculator
     ) {
         $this->entityManager = $entityManager;
         $this->fieldTypeProvider = $fieldTypeProvider;
         $this->itemRelationLevelLimit = (int) $coreParametersHelper->get(ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT);
         $this->customFieldRepository = $customFieldRepository;
-        $this->counter = $counter;
+        $this->calculator = $calculator;
     }
 
     public function buildQuery(
@@ -116,22 +116,20 @@ class CustomFieldQueryBuilder
     {
         // Lets translate this to binary representation to know which (lower/higher) combination to use
         // starting from 0 to level -1;
-        $this->counter->init($level);
-        $targetQueryCount = $this->counter->getTotalQueryCount();
-        $targetJoinCount = $level  - 1;
+        $this->calculator->init($level);
+        $totalQueryCount = $this->calculator->getTotalQueryCount();
+        $joinCount = $this->calculator->getJoinCountPerQuery();
         $totalIterator = 0;
 
-        for ($queryIterator = 1; $queryIterator <= $targetQueryCount; $queryIterator++) {
+        for ($queryIterator = 1; $queryIterator <= $totalQueryCount; $queryIterator++) {
             // Create query to be added in UNION
             $qb = new SegmentQueryBuilder($this->entityManager->getConnection());
             $qb
                 ->select('contact_id')
                 ->from($dataTable, "{$alias}_value");
 
-            for ($joinIterator = 1; $joinIterator <= $targetJoinCount; $joinIterator++) {
-
-                // Compute joins with correct suffixes
-                $columnSuffix = $this->counter->getComputedSuffix($totalIterator, $joinIterator);
+            for ($joinIterator = 1; $joinIterator <= $joinCount; $joinIterator++) {
+                $columnSuffix = $this->calculator->getSuffixByIterator($totalIterator);
 
                 $qb->innerJoin(
                     "{$alias}_value",
@@ -144,7 +142,7 @@ class CustomFieldQueryBuilder
             }
 
             // custom_item_xref_contact join has always opposite suffix than last join
-            $finalColumnSuffix = $this->counter->getOppositeSuffix($columnSuffix);
+            $finalColumnSuffix = $this->calculator->getOppositeSuffix($columnSuffix);
 
             $joinIterator--; // Decrease value to one last used in iteration
 
