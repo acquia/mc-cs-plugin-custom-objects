@@ -128,15 +128,29 @@ class CustomFieldQueryBuilder
                 ->select('contact_id')
                 ->from($dataTable, "{$alias}_value");
 
+            $lastAlias = false;
+            $lastSuffix = false;
+
             for ($joinIterator = 1; $joinIterator <= $joinCount; $joinIterator++) {
                 $columnSuffix = $this->calculator->getSuffixByIterator($totalIterator);
+
+                $joinTo = "{$alias}_value.custom_item_id";
+
+                if ($lastAlias) {
+                    $joinTo = "{$lastAlias}.custom_item_id_".$this->calculator->getOppositeSuffix($lastSuffix);
+                }
+
+                $currentAlias = "{$alias}_item_xref_{$joinIterator}";
 
                 $qb->innerJoin(
                     "{$alias}_value",
                     MAUTIC_TABLE_PREFIX.'custom_item_xref_custom_item',
                     "{$alias}_item_xref_{$joinIterator}",
-                    "{$alias}_item_xref_{$joinIterator}.custom_item_id_{$columnSuffix} = {$alias}_value.custom_item_id"
+                    "{$currentAlias}.custom_item_id_{$columnSuffix} = {$joinTo}"
                 );
+
+                $lastAlias = $currentAlias;
+                $lastSuffix = $columnSuffix;
 
                 $totalIterator++;
             }

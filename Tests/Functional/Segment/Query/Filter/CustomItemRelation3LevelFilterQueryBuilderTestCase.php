@@ -56,7 +56,7 @@ class CustomItemRelation3LevelFilterQueryBuilderTestCase extends CustomItemRelat
             ['--env' => 'test']
         );
 
-        $this->assertLeadCountBySegmentAlias(2, 'price-eq-1000');
+        $this->assertLeadCountBySegmentAlias(3, 'price-eq-1000');
         // 1st level
         $this->assertContactIsInSegment('direct@relation.net', 'price-eq-1000');
         // 2nd level
