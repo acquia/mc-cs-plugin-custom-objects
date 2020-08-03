@@ -196,8 +196,9 @@ class CustomFieldValueModel
         if (0 === $queries->count()) {
             return new ArrayCollection();
         }
-
-        $statement = $this->entityManager->getConnection()->prepare(implode(' UNION ', $queries->toArray()));
+        
+        $query     = implode(' UNION ALL ', $queries->toArray());
+        $statement = $this->entityManager->getConnection()->prepare($query);
 
         $statement->execute();
 
@@ -215,7 +216,7 @@ class CustomFieldValueModel
             $type         = $customField->getTypeObject();
             $alias        = $type->getTableAlias();
             $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
-            $queryBuilder->select("{$alias}.custom_field_id, {$alias}.value, '{$type->getKey()}' AS type");
+            $queryBuilder->select("{$alias}.custom_field_id, {$alias}.custom_item_id, {$alias}.value, '{$type->getKey()}' AS type");
             $queryBuilder->from($type->getTableName(), $alias);
             $queryBuilder->where("{$alias}.custom_item_id = {$customItem->getId()}");
             $queryBuilder->andWhere("{$alias}.custom_field_id = {$customField->getId()}");
