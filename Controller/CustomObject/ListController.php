@@ -105,6 +105,7 @@ class ListController extends CommonController
                     'page'           => $page,
                     'limit'          => $limit,
                     'tmpl'           => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
+                    'sessionVar'     => $sessionProvider->getNamespace(),
                 ],
                 'contentTemplate' => 'CustomObjectsBundle:CustomObject:list.html.php',
                 'passthroughVars' => [
