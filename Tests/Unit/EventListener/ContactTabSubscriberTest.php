@@ -243,7 +243,6 @@ class ContactTabSubscriberTest extends TestCase
                     'linkHeader'           => 'translated modal header',
                     'linkRoute'            => 'link/route',
                     'namespace'            => 'Some namespace',
-                    'relationshipObjectId' => null,
                 ]
             );
 
