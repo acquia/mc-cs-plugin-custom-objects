@@ -113,7 +113,7 @@ class CalculatorTest extends TestCase
     {
         $expectedMatrix = implode('', $expectedMatrix);
 
-        for($i = 0; $i < strlen($expectedMatrix); $i++) {
+        for ($i = 0; $i < strlen($expectedMatrix); $i++) {
             $decisionValue = (bool) $expectedMatrix[$i];
             $expectedSuffix = $decisionValue ? self::COLUMN_SUFFIX_HIGHER : self::COLUMN_SUFFIX_LOWER;
             $this->assertEquals($expectedSuffix, $calculator->getSuffixByIterator($i));

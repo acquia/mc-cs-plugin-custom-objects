@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Helper\CustomFieldQueryBuilder;
 
 /**
- * Parameter combination query counter
+ * Parameter and join combination query counter
  */
 class Calculator
 {
@@ -80,19 +80,23 @@ class Calculator
     public function getSuffixByIterator(int $i): string
     {
         if (isset($this->matrix[$i])) {
-            $decisionValue = $this->matrix[$i];
+            $decisionValue = (bool) $this->matrix[$i];
             return $decisionValue ? self::COLUMN_SUFFIX_HIGHER : self::COLUMN_SUFFIX_LOWER;
         }
 
         throw new \InvalidArgumentException("Value '$i' is out of generated matrix");
     }
 
+    public function getOppositeSuffix(string $suffix): string
+    {
+        return ($suffix === self::COLUMN_SUFFIX_LOWER) ? self::COLUMN_SUFFIX_HIGHER : self::COLUMN_SUFFIX_LOWER;
+    }
 
     private function calculateMatrix(): void
     {
         $this->matrix = '';
 
-        for($i = 0; $i < $this->totalQueryCountPerLevel; $i++) {
+        for ($i = 0; $i < $this->totalQueryCountPerLevel; $i++) {
             $this->matrix .= $this->dec2bin($i);
         }
     }
@@ -103,14 +107,9 @@ class Calculator
         $missingCipherCount = $this->cipherCount - strlen($value);
 
         if ($missingCipherCount) {
-            $value = str_repeat("0", $missingCipherCount) . $value;;
+            $value = str_repeat('0', $missingCipherCount) . $value;
         }
 
         return $value;
-    }
-
-    public function getOppositeSuffix(string $suffix): string
-    {
-        return ($suffix === self::COLUMN_SUFFIX_LOWER) ? self::COLUMN_SUFFIX_HIGHER : self::COLUMN_SUFFIX_LOWER;
     }
 }
