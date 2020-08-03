@@ -17,13 +17,13 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
-use MauticPlugin\CustomObjectsBundle\Helper\CustomFieldQueryBuilder\Calculator;
+use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterFactory\Calculator;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\UnionQueryContainer;
 
-class CustomFieldQueryBuilder
+class QueryFilterFactory
 {
     /**
      * @var EntityManager

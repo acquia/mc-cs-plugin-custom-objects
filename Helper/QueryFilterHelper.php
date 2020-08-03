@@ -33,9 +33,9 @@ class QueryFilterHelper
     private $entityManager;
 
     /**
-     * @var CustomFieldQueryBuilder
+     * @var QueryFilterFactory
      */
-    private $customFieldQueryBuilder;
+    private $queryFilterFactory;
 
     /**
      * @var CustomFieldTypeProvider
@@ -49,17 +49,17 @@ class QueryFilterHelper
 
     public function __construct(
         EntityManager $entityManager,
-        CustomFieldQueryBuilder $customFieldQueryBuilder
+        QueryFilterFactory $queryFilterFactory
     ) {
         $this->entityManager = $entityManager;
-        $this->customFieldQueryBuilder = $customFieldQueryBuilder;
+        $this->queryFilterFactory = $queryFilterFactory;
     }
 
     public function createValueQuery(
         string $alias,
         ContactSegmentFilter $segmentFilter
     ): UnionQueryContainer {
-        $unionQueryContainer = $this->customFieldQueryBuilder->buildQuery($alias, $segmentFilter);
+        $unionQueryContainer = $this->queryFilterFactory->buildQuery($alias, $segmentFilter);
         $this->addCustomFieldValueExpressionFromSegmentFilter($unionQueryContainer, $alias, $segmentFilter);
 
         return $unionQueryContainer;

@@ -37,11 +37,6 @@ class CustomItemRelation3LevelFilterQueryBuilderTestCase extends CustomItemRelat
         $this->setFixtureObjects($objects);
     }
 
-    protected function tearDown(): void
-    {
-    }
-
-
     public function testApplyQuery2ndLevel(): void
     {
         $limit = $this->coreParametersHelper->get(ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT);
