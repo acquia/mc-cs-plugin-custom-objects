@@ -72,7 +72,9 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
                     if ($loadedInTab && in_array($filterEntityType, ['contact', 'customItem'], true)) {
                         $customItem = $event->getItem();
                         if ($customItem && $customItem instanceof CustomItem) {
-                            if ($event->getRequest()->query->get('lookup')) {
+                            $lookup = $event->getRequest()->query->get('lookup');
+
+                            if ($lookup) {
                                 $button = $this->defineLinkButton($customObjectId, $customItem, $filterEntityType, (int) $filterEntityId);
                             } else {
                                 $button = $this->defineUnlinkButton($customObjectId, $customItem->getId(), $filterEntityType, (int) $filterEntityId);
@@ -83,7 +85,7 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
                                 $event->getRoute()
                             );
 
-                            if (null !== $customItem->getCustomObject()->getRelationshipObject() && 'customItem' !== $filterEntityType) {
+                            if (null !== $customItem->getCustomObject()->getRelationshipObject() && 'customItem' !== $filterEntityType && !$lookup) {
                                 $event->addButton(
                                     $this->defineEditLinkFormButton($customItem, $customObjectId, $filterEntityType, (int) $filterEntityId),
                                     ButtonHelper::LOCATION_LIST_ACTIONS,
