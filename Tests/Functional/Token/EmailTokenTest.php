@@ -6,15 +6,15 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Token;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
-use Mautic\LeadBundle\Entity\Lead;
-use PHPUnit\Framework\Assert;
-use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\CustomObjectsTrait;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
-use Mautic\EmailBundle\Model\EmailModel;
-use Symfony\Component\HttpFoundation\Request;
 use Mautic\EmailBundle\Entity\Stat;
 use Mautic\EmailBundle\Entity\StatRepository;
+use Mautic\EmailBundle\Model\EmailModel;
+use Mautic\LeadBundle\Entity\Lead;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
+use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\CustomObjectsTrait;
+use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\HttpFoundation\Request;
 
 class EmailTokenTest extends MauticMysqlTestCase
 {
@@ -29,17 +29,17 @@ class EmailTokenTest extends MauticMysqlTestCase
             'Product A',
             [
                 'country-list-test-field' => 'Czech Republic',
-                'date-test-field' => '2020-07-22',
-                'datetime-test-field' => '2020-07-22 14:55',
-                'email-test-field' => 'product@a.email',
-                'hidden-test-field' => 'top secret',
-                'number-test-field' => 123,
+                'date-test-field'         => '2020-07-22',
+                'datetime-test-field'     => '2020-07-22 14:55',
+                'email-test-field'        => 'product@a.email',
+                'hidden-test-field'       => 'top secret',
+                'number-test-field'       => 123,
                 'phone-number-test-field' => '+420555666777',
-                'select-test-field' => 'option_b',
-                'multiselect-test-field' => ['option_a', 'option_b'],
-                'text-test-field' => 'Text A',
-                'textarea-test-field' => 'Text ABC',
-                'url-test-field' => 'https://mautic.org',
+                'select-test-field'       => 'option_b',
+                'multiselect-test-field'  => ['option_a', 'option_b'],
+                'text-test-field'         => 'Text A',
+                'textarea-test-field'     => 'Text ABC',
+                'url-test-field'          => 'https://mautic.org',
             ]
         );
         $productB = $this->createCustomItem(
@@ -48,17 +48,17 @@ class EmailTokenTest extends MauticMysqlTestCase
             'Product B',
             [
                 'country-list-test-field' => 'Slovak Republic',
-                'date-test-field' => '2020-07-23',
-                'datetime-test-field' => '2020-07-23 14:55',
-                'email-test-field' => 'product@b.email',
-                'hidden-test-field' => 'hidden secret',
-                'number-test-field' => 456,
+                'date-test-field'         => '2020-07-23',
+                'datetime-test-field'     => '2020-07-23 14:55',
+                'email-test-field'        => 'product@b.email',
+                'hidden-test-field'       => 'hidden secret',
+                'number-test-field'       => 456,
                 'phone-number-test-field' => '+420555666888',
-                'select-test-field' => 'option_a',
-                'multiselect-test-field' => ['option_b'],
-                'text-test-field' => 'Text B',
-                'textarea-test-field' => 'Text BCD',
-                'url-test-field' => 'https://mautic.org',
+                'select-test-field'       => 'option_a',
+                'multiselect-test-field'  => ['option_b'],
+                'text-test-field'         => 'Text B',
+                'textarea-test-field'     => 'Text BCD',
+                'url-test-field'          => 'https://mautic.org',
             ]
         );
 
@@ -127,11 +127,11 @@ class EmailTokenTest extends MauticMysqlTestCase
             $email,
             [
                 [
-                    'id' => $contact->getId(),
-                    'email' => $contact->getEmail(),
+                    'id'        => $contact->getId(),
+                    'email'     => $contact->getEmail(),
                     'firstname' => $contact->getFirstname(),
-                    'lastname' => $contact->getLastname(),
-                ]
+                    'lastname'  => $contact->getLastname(),
+                ],
             ]
         );
 
@@ -142,7 +142,7 @@ class EmailTokenTest extends MauticMysqlTestCase
         $emailStat = $emailStatRepository->findOneBy(
             [
                 'email' => $email->getId(),
-                'lead' => $contact->getId(),
+                'lead'  => $contact->getId(),
             ]
         );
 
@@ -160,7 +160,7 @@ class EmailTokenTest extends MauticMysqlTestCase
         });
 
         Assert::assertSame(
-            "Dear George,
+            'Dear George,
 
             check these values, please:
 
@@ -174,7 +174,7 @@ class EmailTokenTest extends MauticMysqlTestCase
             Number: 0, 123, 456
             Phone: +420555666777, +420555666888
             Select: Option A, Option B
-            Multiselect: \"Option A\",\"Option B\", \"Option B\"
+            Multiselect: "Option A","Option B", "Option B"
             Text: Text A, Text B
             Textarea: Text ABC, Text BCD
             Url: https://mautic.org
@@ -182,35 +182,17 @@ class EmailTokenTest extends MauticMysqlTestCase
             ## Various formatting and limit
             Name: Product A, Product B or Product C
             List: Czech Republic and Slovak Republic
-            Date: <ul>
-<li>2020-07-22</li>
-<li>2020-07-23</li>
-</ul>
-            Datetime: <ol>
-<li>2020-07-22 14:55:00</li>
-<li>2020-07-23 14:55:00</li>
-</ol>
+            Date: <ul><li>2020-07-22</li><li>2020-07-23</li></ul>
+            Datetime: <ol><li>2020-07-22 14:55:00</li><li>2020-07-23 14:55:00</li></ol>
             Email: product@a.email
-            Hidden: <ul>
-<li>hidden secret</li>
-<li>top secret</li>
-</ul>
+            Hidden: <ul><li>hidden secret</li><li>top secret</li></ul>
             Number: 0, 123 and 456
             Phone: +420555666777, +420555666888
-            Select: <ol>
-<li>Option A</li>
-<li>Option B</li>
-</ol>
-            Multiselect: <ol>
-<li>\"Option A\",\"Option B\"</li>
-<li>\"Option B\"</li>
-</ol>
-            Text: <ul>
-<li>Text A</li>
-<li>Text B</li>
-</ul>
+            Select: <ol><li>Option A</li><li>Option B</li></ol>
+            Multiselect: <ol><li>"Option A","Option B"</li><li>"Option B"</li></ol>
+            Text: <ul><li>Text A</li><li>Text B</li></ul>
             Textarea: Text ABC or Text BCD
-            Url: <ol><li>https://mautic.org</li></ol>",
+            Url: <ol><li>https://mautic.org</li></ol>',
             trim($body->html())
         );
     }
