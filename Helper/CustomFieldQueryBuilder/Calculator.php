@@ -54,7 +54,10 @@ class Calculator
     {
         $this->level = $level;
         $this->cipherCount = $this->level - 1;
-        $this->totalQueryCountPerLevel = $this->getTotalQueryCount();
+
+        $highestCombinationNumberBin = str_repeat('1', $this->cipherCount);
+        $this->totalQueryCountPerLevel = bindec($highestCombinationNumberBin) + 1;
+
         $this->calculateMatrix();
     }
 
@@ -63,18 +66,12 @@ class Calculator
      */
     public function getTotalQueryCount(): int
     {
-        if ($this->totalQueryCountPerLevel) {
-            return $this->totalQueryCountPerLevel;
-        }
-
-        $highestCombinationNumberBin = str_repeat('1', $this->cipherCount);
-
-        return bindec($highestCombinationNumberBin) + 1;
+        return $this->totalQueryCountPerLevel;
     }
 
     public function getJoinCountPerQuery(): int
     {
-        return $this->level - 1;
+        return $this->cipherCount;
     }
 
     public function getSuffixByIterator(int $i): string
