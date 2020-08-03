@@ -117,7 +117,7 @@ class CustomFieldQueryBuilder
         // Lets translate this to binary representation to know which (lower/higher) combination to use
         // starting from 0 to level -1;
         $this->counter->init($level);
-        $targetQueryCount = $this->counter->getTotalQueryCountPerLevel($level);
+        $targetQueryCount = $this->counter->getTotalQueryCount();
         $targetJoinCount = $level  - 1;
         $totalIterator = 0;
 
