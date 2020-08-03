@@ -55,6 +55,7 @@ class Calculator
         $this->level = $level;
         $this->cipherCount = $this->level - 1;
         $this->totalQueryCountPerLevel = $this->getTotalQueryCount();
+        $this->calculateMatrix();
     }
 
     /**
@@ -79,46 +80,37 @@ class Calculator
     public function getSuffixByIterator(int $i): string
     {
         if (isset($this->matrix[$i])) {
-            return $this->matrix[$i];
+            $decisionValue = $this->matrix[$i];
+            return $decisionValue ? self::COLUMN_SUFFIX_HIGHER : self::COLUMN_SUFFIX_LOWER;
         }
 
         throw new \InvalidArgumentException("Value '$i' is out of generated matrix");
     }
 
-    public function getComputedSuffix(int $totalIterator, int $joinIterator): string
+
+    private function calculateMatrix(): void
     {
-        $totalIteratorBin = decbin($totalIterator);
-        $missingCipherCount = $this->cipherCount - strlen($totalIteratorBin);
+        $this->matrix = '';
+
+        for($i = 0; $i < $this->totalQueryCountPerLevel; $i++) {
+            $this->matrix .= $this->dec2bin($i);
+        }
+    }
+
+    private function dec2bin(int $value): string
+    {
+        $value = decbin($value);
+        $missingCipherCount = $this->cipherCount - strlen($value);
 
         if ($missingCipherCount) {
-            $totalIteratorBin = str_repeat("0", $missingCipherCount) . $totalIteratorBin;
+            $value = str_repeat("0", $missingCipherCount) . $value;;
         }
 
-        $decisionValue = (bool) $totalIteratorBin[($this->cipherCount - $joinIterator-1)]; // 0/1 = true/false
-        // Translate to suffix
-        return $decisionValue ? self::COLUMN_SUFFIX_HIGHER : self::COLUMN_SUFFIX_LOWER;
+        return $value;
     }
 
     public function getOppositeSuffix(string $suffix): string
     {
         return ($suffix === self::COLUMN_SUFFIX_LOWER) ? self::COLUMN_SUFFIX_HIGHER : self::COLUMN_SUFFIX_LOWER;
     }
-
-    private function computeMatrix(): array
-    {
-        $this->matrix = '';
-
-        for($i = 1; $i <= $this->totalQueryCountPerLevel; $i++) {
-            $this->matrix .= $this->dec2bin($i++);
-        }
-    }
-
-    private function dec2bin(int $number): string
-    {
-        $value = decbin($value);
-
-
-    }
-
-
 }
