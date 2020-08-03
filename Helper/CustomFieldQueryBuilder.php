@@ -17,6 +17,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
+use MauticPlugin\CustomObjectsBundle\Helper\CustomFieldQueryBuilder\Calculator;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
@@ -24,9 +25,6 @@ use MauticPlugin\CustomObjectsBundle\Segment\Query\UnionQueryContainer;
 
 class CustomFieldQueryBuilder
 {
-    private const COLUMN_SUFFIX_LOWER  = 'lower';
-    private const COLUMN_SUFFIX_HIGHER = 'higher';
-
     /**
      * @var EntityManager
      */
@@ -52,16 +50,23 @@ class CustomFieldQueryBuilder
      */
     private $customFieldRepository;
 
+    /**
+     * @var Calculator
+     */
+    private $counter;
+
     public function __construct(
         EntityManager $entityManager,
         CustomFieldTypeProvider $fieldTypeProvider,
         CoreParametersHelper $coreParametersHelper,
-        CustomFieldRepository $customFieldRepository
+        CustomFieldRepository $customFieldRepository,
+        Calculator $counter
     ) {
         $this->entityManager = $entityManager;
         $this->fieldTypeProvider = $fieldTypeProvider;
         $this->itemRelationLevelLimit = (int) $coreParametersHelper->get(ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT);
         $this->customFieldRepository = $customFieldRepository;
+        $this->counter = $counter;
     }
 
     public function buildQuery(
@@ -111,7 +116,8 @@ class CustomFieldQueryBuilder
     {
         // Lets translate this to binary representation to know which (lower/higher) combination to use
         // starting from 0 to level -1;
-        $targetQueryCount = $this->getTotalQueryCountPerLevel($level);
+        $this->counter->init($level);
+        $targetQueryCount = $this->counter->getTotalQueryCountPerLevel($level);
         $targetJoinCount = $level  - 1;
         $totalIterator = 0;
 
@@ -125,7 +131,7 @@ class CustomFieldQueryBuilder
             for ($joinIterator = 1; $joinIterator <= $targetJoinCount; $joinIterator++) {
 
                 // Compute joins with correct suffixes
-                $columnSuffix = $this->getComputedSuffix($level, $totalIterator, $joinIterator);
+                $columnSuffix = $this->counter->getComputedSuffix($totalIterator, $joinIterator);
 
                 $qb->innerJoin(
                     "{$alias}_value",
@@ -138,7 +144,7 @@ class CustomFieldQueryBuilder
             }
 
             // custom_item_xref_contact join has always opposite suffix than last join
-            $finalColumnSuffix = $this->getOppositeSuffix($columnSuffix);
+            $finalColumnSuffix = $this->counter->getOppositeSuffix($columnSuffix);
 
             $joinIterator--; // Decrease value to one last used in iteration
 
@@ -156,33 +162,5 @@ class CustomFieldQueryBuilder
 
             $this->unionQueryContainer->add($qb);
         }
-    }
-
-    private function getTotalQueryCountPerLevel(int $level): int
-    {
-        $cipherCount = $level-1; // Matrix ciphers - joins per query
-        $highestCombinationNumberBin = str_repeat('1', $cipherCount);
-
-        return bindec($highestCombinationNumberBin) + 1;
-    }
-
-    private function getComputedSuffix(int $level, int $totalIterator, int $joinIterator): string
-    {
-        $cipherCount = $level-1;
-
-        $totalIteratorBin = decbin($totalIterator);
-        $missingCipherCount = $cipherCount - strlen($totalIteratorBin);
-        if ($missingCipherCount) {
-            $totalIteratorBin = str_repeat("0", $missingCipherCount) . $totalIteratorBin;
-        }
-
-        $decisionValue = (bool) $totalIteratorBin[($cipherCount - $joinIterator-1)]; // 0/1 = true/false
-        // Translate to suffix
-        return $decisionValue ? self::COLUMN_SUFFIX_HIGHER : self::COLUMN_SUFFIX_LOWER;
-    }
-
-    private function getOppositeSuffix(string $suffix): string
-    {
-        return ($suffix === self::COLUMN_SUFFIX_LOWER) ? self::COLUMN_SUFFIX_HIGHER : self::COLUMN_SUFFIX_LOWER;
     }
 }
