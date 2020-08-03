@@ -69,7 +69,7 @@ class QueryFilterFactory
         $this->calculator = $calculator;
     }
 
-    public function buildQuery(
+    public function createQuery(
         string $alias,
         ContactSegmentFilter $segmentFilter
     ): UnionQueryContainer {
