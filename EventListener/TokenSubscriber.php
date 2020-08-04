@@ -175,20 +175,22 @@ class TokenSubscriber implements EventSubscriberInterface
         $tokens->map(function (Token $token) use ($event): void {
             try {
                 $customObject = $this->customObjectModel->fetchEntityByAlias($token->getCustomObjectAlias());
+                $fieldValues = $this->getCustomFieldValues($customObject, $token, $event);
             } catch (NotFoundException $e) {
-                return;
+                $fieldValues = null;
             }
 
-            $fieldValues = $this->getCustomFieldValues($customObject, $token, $event);
 
             if (empty($fieldValues)) {
                 $result = $token->getDefaultValue();
             } else {
                 if (!empty($token->getFormat())) {
                     try {
-                        $formatEvent = $this->eventDispatcher->dispatch(
+                        $formatEvent = new CustomObjectListFormatEvent($fieldValues, $token->getFormat());
+                        
+                        $this->eventDispatcher->dispatch(
                             CustomObjectEvents::ON_CUSTOM_OBJECT_LIST_FORMAT,
-                            new CustomObjectListFormatEvent($fieldValues, $token->getFormat())
+                            $formatEvent
                         );
 
                         $result = $formatEvent->hasBeenFormatted() ?
@@ -314,6 +316,10 @@ class TokenSubscriber implements EventSubscriberInterface
 
             try {
                 $fieldValue    = $customItem->findCustomFieldValueForFieldAlias($token->getCustomFieldAlias());
+                // If the CO item doesn't have a value, get the default value
+                if ("" == $fieldValue->getValue()) {
+                    $fieldValue->setValue($fieldValue->getCustomField()->getDefaultValue());
+                }
                 $fieldValues[] = $fieldValue->getCustomField()->getTypeObject()->valueToString($fieldValue);
             } catch (NotFoundException $e) {
                 // Custom field not found.

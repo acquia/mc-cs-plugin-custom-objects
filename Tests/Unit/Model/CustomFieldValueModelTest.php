@@ -147,8 +147,8 @@ class CustomFieldValueModelTest extends \PHPUnit\Framework\TestCase
         $this->queryBuilder->expects($this->exactly(2))
             ->method('select')
             ->withConsecutive(
-                ["cfv_text.custom_field_id, cfv_text.value, 'text' AS type"],
-                ["cfv_int.custom_field_id, cfv_int.value, 'int' AS type"]
+                ["cfv_text.custom_field_id, cfv_text.custom_item_id, cfv_text.value, 'text' AS type"],
+                ["cfv_int.custom_field_id, cfv_int.custom_item_id, cfv_int.value, 'int' AS type"]
             );
 
         $this->queryBuilder->expects($this->exactly(2))
@@ -181,7 +181,7 @@ class CustomFieldValueModelTest extends \PHPUnit\Framework\TestCase
 
         $this->connection->expects($this->once())
             ->method('prepare')
-            ->with('THE TEXT FIELD SQL QUERY UNION THE NUMBER FIELD SQL QUERY')
+            ->with('THE TEXT FIELD SQL QUERY UNION ALL THE NUMBER FIELD SQL QUERY')
             ->willReturn($this->statement);
 
         $this->statement->expects($this->once())
