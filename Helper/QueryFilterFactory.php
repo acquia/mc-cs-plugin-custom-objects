@@ -132,7 +132,6 @@ class QueryFilterFactory
             $lastAlias = false;
             $lastSuffix = false;
 
-
             for ($joinIterator = 1; $joinIterator <= $joinCount; $joinIterator++) {
                 $columnSuffix = $this->calculator->getSuffixByIterator($totalIterator);
 
