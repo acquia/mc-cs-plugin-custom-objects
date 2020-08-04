@@ -31,7 +31,7 @@
         "unit": "../../bin/phpunit -d memory_limit=2048M --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=unit",
         "functional": "../../bin/phpunit -d memory_limit=2048M --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=functional",
         "coverage": "../../bin/phpunit -d memory_limit=2048M --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --fail-on-warning --testsuite=all --coverage-text --coverage-html=Tests/Coverage",
-        "phpstan": "../../bin/phpstan analyse --autoload-file=../../vendor/autoload.php --level=6 Command Config Controller CustomFieldType DTO Entity Event EventListener Exception Form Helper Migrations Model Provider Repository Security Segment Tests",
+        "phpstan": "../../bin/phpstan analyse --autoload-file=../../vendor/autoload.php --level=1 Command Config Controller CustomFieldType DTO Entity Event EventListener Exception Form Helper Migrations Model Provider Repository Security Segment Tests",
         "csfixer": "../../bin/php-cs-fixer fix . -v --dry-run --diff --using-cache=no",
         "fixcs": "../../bin/php-cs-fixer fix . -v --using-cache=no"
     }
