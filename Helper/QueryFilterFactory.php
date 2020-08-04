@@ -128,8 +128,10 @@ class QueryFilterFactory
                 ->select('contact_id')
                 ->from($dataTable, "{$alias}_value");
 
+            $columnSuffix = '';
             $lastAlias = false;
             $lastSuffix = false;
+
 
             for ($joinIterator = 1; $joinIterator <= $joinCount; $joinIterator++) {
                 $columnSuffix = $this->calculator->getSuffixByIterator($totalIterator);
