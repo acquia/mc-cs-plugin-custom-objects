@@ -3,7 +3,6 @@
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
-
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
@@ -270,10 +269,34 @@ class SegmentFiltersChoicesGenerateSubscriberTest extends TestCase
                 ['mautic.core.operator.ends.with'],
                 ['mautic.core.operator.contains']
             )
-            ->willReturn('Mobile', 'equals', 'not equal', 'empty', 'not empty', 'like', 'not like',
-                'regexp', 'not regexp', 'starts with', 'ends with', 'contains', 'equals', 'not equal', 'greater than',
-                'greater than or equal', 'less than', 'less than or equal', 'empty', 'not empty', 'like', 'not like',
-                'regexp', 'not regexp', 'starts with', 'ends with', 'contains'
+            ->willReturn(
+                'Mobile',
+                'equals',
+                'not equal',
+                'empty',
+                'not empty',
+                'like',
+                'not like',
+                'regexp',
+                'not regexp',
+                'starts with',
+                'ends with',
+                'contains',
+                'equals',
+                'not equal',
+                'greater than',
+                'greater than or equal',
+                'less than',
+                'less than or equal',
+                'empty',
+                'not empty',
+                'like',
+                'not like',
+                'regexp',
+                'not regexp',
+                'starts with',
+                'ends with',
+                'contains'
             );
 
         $this->filterOperatorProvider->expects($this->at(0))
