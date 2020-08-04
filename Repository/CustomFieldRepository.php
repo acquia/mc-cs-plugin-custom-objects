@@ -52,7 +52,7 @@ class CustomFieldRepository extends CommonRepository
 
     public function getCustomFieldTypeById(int $customFieldId): string
     {
-        $customField = $this->findOneById($customFieldId);
+        $customField = $this->findOneBy(['id' => $customFieldId]);
 
         return $customField ? $customField->getType() : '';
     }

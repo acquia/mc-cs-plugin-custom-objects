@@ -126,6 +126,10 @@ class LinkFormController extends AbstractFormController
 
     public function saveAction(int $itemId, string $entityType, int $entityId): Response
     {
+        $relationshipItem = null;
+        $relationshipObject = null;
+        $form = null;
+
         try {
             $customItem = $this->customItemModel->fetchEntity($itemId);
 
