@@ -913,9 +913,6 @@ return [
             'custom_object.command.generate_sample_data' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Command\GenerateSampleDataCommand::class,
                 'arguments' => [
-                    'mautic.custom.model.object',
-                    'mautic.custom.model.item',
-                    'mautic.lead.model.lead',
                     'doctrine.orm.entity_manager',
                     'custom_object.random.helper',
                 ],
