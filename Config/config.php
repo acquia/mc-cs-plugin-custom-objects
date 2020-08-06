@@ -1077,7 +1077,6 @@ return [
                     'mautic.lead.model.random_parameter_name',
                     'event_dispatcher',
                     'custom_object.query.filter.helper',
-                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.lead.query.builder.custom_item.value'  => [
