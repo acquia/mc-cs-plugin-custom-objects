@@ -6,7 +6,6 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Segment\Query\Filter;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
@@ -60,15 +59,15 @@ class CustomItemNameFilterQueryBuilderTest extends TestCase
         $entityManager
             ->method('getConnection')
             ->willReturn($this->createMock(Connection::class));
-        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+
         $queryFilterHelper = new QueryFilterHelper(
             $entityManager,
             new QueryFilterFactory(
                 $entityManager,
                 new CustomFieldTypeProvider(),
-                $coreParametersHelper,
                 $this->createMock(CustomFieldRepository::class),
-                new QueryFilterFactory\Calculator()
+                new QueryFilterFactory\Calculator(),
+                1
             )
         );
 

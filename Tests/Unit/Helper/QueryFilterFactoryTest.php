@@ -15,17 +15,15 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Helper;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterFactory;
-use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class CustomFieldQueryBuilderTest extends TestCase
+class QueryFilterFactoryTest extends TestCase
 {
     /**
      * @var QueryFilterFactory
@@ -193,18 +191,12 @@ SQL;
             ->with('int')
             ->willReturn($customField);
 
-        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
-        $coreParametersHelper->expects($this->once())
-            ->method('get')
-            ->with(ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT)
-            ->willReturn($limit);
-
         $this->customFieldQueryBuilder = new QueryFilterFactory(
             $entityManager,
             $fieldTypeProvider,
-            $coreParametersHelper,
             $this->createMock(CustomFieldRepository::class),
-            new QueryFilterFactory\Calculator()
+            new QueryFilterFactory\Calculator(),
+            $limit
         );
     }
 
