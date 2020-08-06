@@ -45,10 +45,6 @@ class RandomHelper
     public function getWord(): string
     {
         return(md5(uniqid()));
-        $randomWords = $this->getRandomWords();
-        $randomKey   = array_rand($randomWords);
-
-        return $randomWords[$randomKey];
     }
 
     public function getEmail(): string

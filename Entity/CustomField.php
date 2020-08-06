@@ -157,6 +157,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
         $builder->createField('required', Type::BOOLEAN)
             ->columnName('required')
+            ->option('default', false)
             ->build();
 
         $builder->createField('defaultValue', Type::STRING)

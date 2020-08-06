@@ -13,12 +13,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Command;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManager;
-use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\CustomObjectsBundle\Helper\RandomHelper;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
@@ -30,21 +28,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class GenerateSampleDataCommand extends ContainerAwareCommand
 {
     /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    /**
-     * @var LeadModel
-     */
-    private $contactModel;
-
-    /**
      * @var EntityManager
      */
     private $entityManager;
@@ -55,25 +38,19 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
     private $randomHelper;
 
     /**
-     * @var \Doctrine\DBAL\Connection
+     * @var Connection
      */
     private $connection;
 
     public function __construct(
-        CustomObjectModel $customObjectModel,
-        CustomItemModel $customItemModel,
-        LeadModel $contactModel,
         EntityManager $entityManager,
         RandomHelper $randomHelper
     ) {
         parent::__construct();
 
-        $this->customObjectModel = $customObjectModel;
-        $this->customItemModel   = $customItemModel;
-        $this->contactModel      = $contactModel;
         $this->entityManager     = $entityManager;
         $this->randomHelper      = $randomHelper;
-        $this->connection        = $this->entityManager->getConnection();
+        $this->connection        = $entityManager->getConnection();
     }
 
     /**
@@ -100,9 +77,6 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         parent::configure();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io       = new SymfonyStyle($input, $output);
@@ -115,7 +89,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         }
 
         if (!$force) {
-            $confirmation = new ConfirmationQuestion("Do you really want to ddelete current data and generate {$limit} sample of contacts? [Y/n] ", false);
+            $confirmation = new ConfirmationQuestion("Do you really want to  current data and generate {$limit} sample of contacts? [Y/n] ", false);
 
             if (!$enquirer->ask($input, $output, $confirmation)) {
                 return 0;
@@ -185,7 +159,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         return [$coProductId, $cfPriceId, $coOrderId];
     }
 
-    private function cleanupDB()
+    private function cleanupDB(): void
     {
         $query = 'delete from '.MAUTIC_TABLE_PREFIX.'leads where 1';
         $this->connection->query($query);
@@ -209,7 +183,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         $this->generateProductRelations($contactId, $coProductId, $cfPriceId, $coOrderId, $priceLimit);
     }
 
-    private function generateProductRelations(int $contactId, int $coProductId, int $cfPriceId, int $coOrderId, int $priceLimit)
+    private function generateProductRelations(int $contactId, int $coProductId, int $cfPriceId, int $coOrderId, int $priceLimit): void
     {
         $ciProduct = [
             'custom_object_id' => $coProductId,
