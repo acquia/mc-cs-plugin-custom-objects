@@ -73,7 +73,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         $this->contactModel      = $contactModel;
         $this->entityManager     = $entityManager;
         $this->randomHelper      = $randomHelper;
-        $this->connection        = $this->entityManager->getConnection();
+        $this->connection        = $entityManager->getConnection();
     }
 
     /**
@@ -115,7 +115,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         }
 
         if (!$force) {
-            $confirmation = new ConfirmationQuestion("Do you really want to ddelete current data and generate {$limit} sample of contacts? [Y/n] ", false);
+            $confirmation = new ConfirmationQuestion("Do you really want to  current data and generate {$limit} sample of contacts? [Y/n] ", false);
 
             if (!$enquirer->ask($input, $output, $confirmation)) {
                 return 0;
@@ -185,7 +185,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         return [$coProductId, $cfPriceId, $coOrderId];
     }
 
-    private function cleanupDB()
+    private function cleanupDB(): void
     {
         $query = 'delete from '.MAUTIC_TABLE_PREFIX.'leads where 1';
         $this->connection->query($query);
@@ -209,7 +209,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         $this->generateProductRelations($contactId, $coProductId, $cfPriceId, $coOrderId, $priceLimit);
     }
 
-    private function generateProductRelations(int $contactId, int $coProductId, int $cfPriceId, int $coOrderId, int $priceLimit)
+    private function generateProductRelations(int $contactId, int $coProductId, int $cfPriceId, int $coOrderId, int $priceLimit): void
     {
         $ciProduct = [
             'custom_object_id' => $coProductId,
