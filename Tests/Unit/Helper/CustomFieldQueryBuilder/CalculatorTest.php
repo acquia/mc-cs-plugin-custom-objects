@@ -43,6 +43,9 @@ class CalculatorTest extends TestCase
         $this->assertEquals(2, $this->calculator->getTotalQueryCount());
         $this->assertEquals(1, $this->calculator->getJoinCountPerQuery());
         $this->assertMatrixEquals($level, $expectedMatrix, $this->calculator);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->calculator->getSuffixByIterator(2);
     }
 
     public function test3LevelMatrix(): void
