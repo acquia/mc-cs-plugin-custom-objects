@@ -14,11 +14,9 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Helper;
 
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterFactory\Calculator;
-use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\UnionQueryContainer;
@@ -36,11 +34,6 @@ class QueryFilterFactory
     private $fieldTypeProvider;
 
     /**
-     * @var int
-     */
-    private $itemRelationLevelLimit;
-
-    /**
      * @var UnionQueryContainer|null
      */
     private $unionQueryContainer;
@@ -55,18 +48,23 @@ class QueryFilterFactory
      */
     private $calculator;
 
+    /**
+     * @var int
+     */
+    private $itemRelationLevelLimit;
+
     public function __construct(
         EntityManager $entityManager,
         CustomFieldTypeProvider $fieldTypeProvider,
-        CoreParametersHelper $coreParametersHelper,
         CustomFieldRepository $customFieldRepository,
-        Calculator $calculator
+        Calculator $calculator,
+        int $itemRelationLevelLimit
     ) {
         $this->entityManager = $entityManager;
         $this->fieldTypeProvider = $fieldTypeProvider;
-        $this->itemRelationLevelLimit = (int) $coreParametersHelper->get(ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT);
         $this->customFieldRepository = $customFieldRepository;
         $this->calculator = $calculator;
+        $this->itemRelationLevelLimit = $itemRelationLevelLimit;
     }
 
     public function createQuery(

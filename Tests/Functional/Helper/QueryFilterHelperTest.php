@@ -42,9 +42,9 @@ class QueryFilterHelperTest extends MauticWebTestCase
             new QueryFilterFactory(
                 $this->em,
                 $fieldTypeProvider,
-                $this->getContainer()->get('mautic.helper.core_parameters'),
                 $this->getContainer()->get('custom_field.repository'),
-                new QueryFilterFactory\Calculator()
+                new QueryFilterFactory\Calculator(),
+                1
             )
         );
 

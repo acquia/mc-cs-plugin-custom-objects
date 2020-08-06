@@ -1102,9 +1102,9 @@ return [
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'custom_field.type.provider',
-                    'mautic.helper.core_parameters',
                     'custom_field.repository',
                     'query_filter_factory_calculator',
+                    '%'.ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT.'%',
                 ],
             ],
             'custom_object.query.filter.helper'            => [
