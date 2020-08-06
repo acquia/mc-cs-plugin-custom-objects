@@ -1104,7 +1104,7 @@ return [
                     'custom_field.type.provider',
                     'custom_field.repository',
                     'query_filter_factory_calculator',
-                    '%'.ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT.'%',
+                    '%mautic.'.ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT.'%',
                 ],
             ],
             'custom_object.query.filter.helper'            => [
