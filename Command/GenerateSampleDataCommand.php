@@ -89,7 +89,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         }
 
         if (!$force) {
-            $confirmation = new ConfirmationQuestion("Do you really want to  current data and generate {$limit} sample of contacts? [Y/n] ", false);
+            $confirmation = new ConfirmationQuestion("Do you really want to delete current data and generate {$limit} sample of contacts? [Y/n] ", false);
 
             if (!$enquirer->ask($input, $output, $confirmation)) {
                 return 0;
