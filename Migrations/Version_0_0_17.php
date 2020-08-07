@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaException;
 use Mautic\IntegrationsBundle\Migration\AbstractMigration;
 
-class Version_0_0_16 extends AbstractMigration
+class Version_0_0_17 extends AbstractMigration
 {
     protected function isApplicable(Schema $schema): bool
     {
