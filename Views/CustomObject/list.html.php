@@ -35,8 +35,8 @@ if ('index' === $tmpl) {
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'sessionVar' => 'custom.object',
-                        'orderBy'    => CustomObject::TABLE_ALIAS.'.name',
+                        'sessionVar' => $sessionVar,
+                        'orderBy'    => CustomObject::TABLE_ALIAS.'.namePlural',
                         'text'       => 'mautic.core.name',
                         'class'      => 'col-custom_object_-name',
                     ]
@@ -45,7 +45,7 @@ if ('index' === $tmpl) {
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'sessionVar' => 'custom.object',
+                        'sessionVar' => $sessionVar,
                         'orderBy'    => CustomObject::TABLE_ALIAS.'.id',
                         'text'       => 'mautic.core.id',
                         'default'    => true,
@@ -93,7 +93,7 @@ if ('index' === $tmpl) {
                 'page'       => $page,
                 'limit'      => $limit,
                 'baseUrl'    => $view['router']->path(CustomObjectRouteProvider::ROUTE_LIST),
-                'sessionVar' => 'custom.object',
+                'sessionVar' => $sessionVar,
                 'routeBase'  => CustomObjectRouteProvider::ROUTE_LIST,
             ]
                 ); ?>

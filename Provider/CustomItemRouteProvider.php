@@ -65,14 +65,22 @@ class CustomItemRouteProvider
         $this->router = $router;
     }
 
-    public function buildListRoute(int $objectId, int $page = 1, string $filterEntityType = null, int $filterEntityId = null): string
+    public function buildListRoute(int $objectId, int $page = 1, string $filterEntityType = null, int $filterEntityId = null, array $parameters = []): string
     {
-        return $this->router->generate(static::ROUTE_LIST, [
+        return $this->router->generate(static::ROUTE_LIST, array_merge([
             'objectId'         => $objectId,
             'page'             => $page,
             'filterEntityType' => $filterEntityType,
             'filterEntityId'   => $filterEntityId,
-        ]);
+        ], $parameters));
+    }
+
+    public function buildLinkRoute(int $customItemId, string $entityType, int $entityId): string
+    {
+        return $this->router->generate(
+            static::ROUTE_LINK,
+            ['itemId' => $customItemId, 'entityType' => $entityType, 'entityId' => $entityId]
+        );
     }
 
     public function buildUnlinkRoute(int $customItemId, string $entityType, int $entityId): string

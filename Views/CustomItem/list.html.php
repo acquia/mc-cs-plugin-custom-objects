@@ -20,12 +20,14 @@ if ('index' === $tmpl) {
     $view->extend('CustomObjectsBundle:CustomItem:index.html.php');
 }
 
+$target    = '#'.$namespace;
 $routeSelf = $view['router']->path(
     CustomItemRouteProvider::ROUTE_LIST,
     [
         'objectId'         => $customObject->getId(),
         'filterEntityId'   => $filterEntityId,
         'filterEntityType' => $filterEntityType,
+        'lookup'           => $lookup,
         'tmpl'             => 'list',
     ]
 );
@@ -40,7 +42,7 @@ $routeSelf = $view['router']->path(
     'MauticCoreBundle:Helper:tableheader.html.php',
     [
                         'checkall'  => 'true',
-                        'target'    => "#custom-items-{$customObject->getId()}-table",
+                        'target'    => $target,
                         'langVar'   => 'custom.item',
                         'routeBase' => 'custom_item',
                         'baseUrl'   => $routeSelf,
@@ -50,22 +52,24 @@ $routeSelf = $view['router']->path(
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'sessionVar' => 'custom.item',
+                        'sessionVar' => $sessionVar,
                         'orderBy'    => CustomItem::TABLE_ALIAS.'.name',
                         'text'       => 'mautic.core.name',
                         'class'      => 'col-custom_item_name',
                         'baseUrl'    => $routeSelf,
+                        'target'     => $target,
                     ]
                 );
 
                 echo $view->render(
                     'MauticCoreBundle:Helper:tableheader.html.php',
                     [
-                        'sessionVar' => 'custom.item',
+                        'sessionVar' => $sessionVar,
                         'orderBy'    => CustomItem::TABLE_ALIAS.'.id',
                         'text'       => 'mautic.core.id',
                         'default'    => true,
                         'baseUrl'    => $routeSelf,
+                        'target'     => $target,
                     ]
                 );
                 ?>
@@ -117,12 +121,13 @@ $routeSelf = $view['router']->path(
                 'page'        => $page,
                 'limit'       => $limit,
                 'baseUrl'     => $routeSelf = $view['router']->path(CustomItemRouteProvider::ROUTE_LIST, ['objectId'  => $customObject->getId()]),
-                'queryString' => "&filterEntityId={$filterEntityId}&filterEntityType={$filterEntityType}",
-                'sessionVar'  => 'custom.item',
+                'queryString' => "&filterEntityId={$filterEntityId}&filterEntityType={$filterEntityType}&lookup={$lookup}",
+                'sessionVar'  => $sessionVar,
                 'routeBase'   => CustomItemRouteProvider::ROUTE_LIST,
+                'target'      => $target,
             ]
                 ); ?>
     </div>
 <?php else: ?>
-    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php', ['tip' => 'custom.object.noresults.tip']); ?>
+    <?php echo $view->render('MauticCoreBundle:Helper:noresults.html.php', ['tip' => $lookup ? 'custom.item.link.noresults.tip' : 'custom.object.noresults.tip']); ?>
 <?php endif; ?>

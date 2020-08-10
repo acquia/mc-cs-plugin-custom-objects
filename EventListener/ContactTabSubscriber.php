@@ -111,6 +111,8 @@ class ContactTabSubscriber implements EventSubscriberInterface
 
                 $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:link.html.php', $data);
             }
+
+            $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:modal.html.php');
         }
 
         if ($event->checkContext('MauticLeadBundle:Lead:lead.html.php', 'tabs.content')) {
@@ -123,20 +125,21 @@ class ContactTabSubscriber implements EventSubscriberInterface
 
             /** @var CustomObject $object */
             foreach ($objects as $object) {
-                $objectId  = (int) $object->getId();
-                $contactId = (int) $contact->getId();
-                $data      = [
-                    'customObjectId'       => $objectId,
-                    'currentEntityId'      => $contactId,
-                    'currentEntityType'    => $entityType,
-                    'tabId'                => "custom-object-{$objectId}",
-                    'searchId'             => "list-search-{$objectId}",
-                    'searchValue'          => $this->sessionProviderFactory->createItemProvider($objectId, $entityType, $contactId)->getFilter(),
-                    'placeholder'          => $this->translator->trans('custom.item.link.search.placeholder.contact', ['%object%' => $object->getNameSingular()]),
-                    'searchRoute'          => $this->customItemRouteProvider->buildListRoute($objectId, 1, $entityType, $contactId),
-                    'lookupRoute'          => $this->customItemRouteProvider->buildLookupRoute($objectId, $entityType, $contactId),
-                    'newRoute'             => $this->customItemRouteProvider->buildNewRouteWithRedirectToContact($objectId, $contactId),
-                    'relationshipObjectId' => $object->getRelationshipObject() ? $object->getRelationshipObject()->getId() : null,
+                $objectId        = (int) $object->getId();
+                $contactId       = (int) $contact->getId();
+                $sessionProvider = $this->sessionProviderFactory->createItemProvider($objectId, $entityType, $contactId);
+                $data            = [
+                    'customObjectId'    => $objectId,
+                    'currentEntityId'   => $contactId,
+                    'currentEntityType' => $entityType,
+                    'tabId'             => "custom-object-{$objectId}",
+                    'searchId'          => "list-search-{$objectId}",
+                    'searchValue'       => $sessionProvider->getFilter(),
+                    'linkHeader'        => $this->translator->trans('custom.item.link.existing.modal.header.contact', ['%object%' => $object->getNameSingular()]),
+                    'searchRoute'       => $this->customItemRouteProvider->buildListRoute($objectId, 1, $entityType, $contactId),
+                    'newRoute'          => $this->customItemRouteProvider->buildNewRouteWithRedirectToContact($objectId, $contactId),
+                    'linkRoute'         => $this->customItemRouteProvider->buildListRoute($objectId, 1, $entityType, $contactId, ['lookup' => 1, 'search' => '']),
+                    'namespace'         => $sessionProvider->getNamespace(),
                 ];
 
                 $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:content.html.php', $data);

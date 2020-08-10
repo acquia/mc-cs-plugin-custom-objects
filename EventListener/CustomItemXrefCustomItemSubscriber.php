@@ -70,7 +70,14 @@ class CustomItemXrefCustomItemSubscriber implements EventSubscriberInterface
     {
         $tableConfig = $event->getTableConfig();
         if ('customItem' === $tableConfig->getParameter('filterEntityType') && $tableConfig->getParameter('filterEntityId')) {
-            $this->customItemRepository->includeItemsLinkedToAnotherItem($event->getQueryBuilder(), (int) $tableConfig->getParameter('filterEntityId'));
+            $queryBuilder   = $event->getQueryBuilder();
+            $filterEntityId = (int) $tableConfig->getParameter('filterEntityId');
+
+            if ($tableConfig->getParameter('lookup')) {
+                $this->customItemRepository->excludeItemsLinkedToAnotherItem($queryBuilder, $filterEntityId);
+            } else {
+                $this->customItemRepository->includeItemsLinkedToAnotherItem($queryBuilder, $filterEntityId);
+            }
         }
     }
 
