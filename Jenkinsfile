@@ -119,8 +119,9 @@ spec:
         }
       }
     }
-    stage('Automerge to beta') {
+    stage('Automerge to development') {
       when {
+        changeRequest target: 'beta'
         changeRequest target: 'staging'
       }
       steps {
@@ -134,7 +135,7 @@ spec:
             error("PR still WIP. Failing the build to prevent accidental merge")
           }
           else {
-            echo "Merging PR to beta"
+            echo "Merging PR to development"
             withEnv(["PRNUMBER=${CHANGE_ID}"]) {
             sshagent (credentials: ['1a066462-6d24-4247-bef6-1da084c8f484']) {
             dir('plugins/CustomObjectsBundle') {
@@ -146,11 +147,11 @@ spec:
                     echo "Skipping Jenkinse's merge commit which we do not need"
                     gitsha="$(git rev-parse HEAD~1)"
                 fi
-                git remote set-branches --add origin beta
+                git remote set-branches --add origin development
                 git fetch -q
-                git checkout origin/beta
-                git merge -m "Merge commit '$gitsha' from PR $PRNUMBER into beta" "$gitsha"
-                git push origin HEAD:beta
+                git checkout origin/development
+                git merge -m "Merge commit '$gitsha' from PR $PRNUMBER into development" "$gitsha"
+                git push origin HEAD:development
                 git checkout "$gitsha"
               '''
             }}}
