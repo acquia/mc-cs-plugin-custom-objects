@@ -98,5 +98,6 @@ class CustomItemRelation2LevelFilterQueryBuilderTestCase extends CustomItemRelat
         // combined
         $this->assertLeadCountBySegmentAlias(2, 'combined');
         $this->assertContactIsInSegment('rich@toaster.net', 'combined');
+        $this->assertContactIsInSegment('direct@relation.net', 'date-lt-1990');
     }
 }
