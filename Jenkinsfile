@@ -167,6 +167,7 @@ spec:
           changeRequest()
         }
         anyOf {
+          branch 'development'
           branch 'beta';
           /* Disabling automatic releasing to production until custom objects goes GA */
           /*branch 'staging';*/
