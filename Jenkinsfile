@@ -203,7 +203,7 @@ spec:
   post {
     failure {
       script {
-        if (BRANCH_NAME ==~ /^(beta|staging)$/) {
+        if (BRANCH_NAME ==~ /^(development|beta|staging)$/) {
           slackSend (color: '#FF0000', message: "${REPO_NAME} failed build on branch ${env.BRANCH_NAME}. (${env.BUILD_URL}console)")
         }
         if (env.CHANGE_AUTHOR != null && !env.CHANGE_TITLE.contains("WIP")) {
@@ -218,7 +218,7 @@ spec:
     }
     fixed {
       script {
-        if (BRANCH_NAME ==~ /^(beta|staging)$/) {
+        if (BRANCH_NAME ==~ /^(development|beta|staging)$/) {
           slackSend (color: '#00FF00', message: "${REPO_NAME} build on branch ${env.BRANCH_NAME} is fixed. (${env.BUILD_URL}console)")
         }
       }
