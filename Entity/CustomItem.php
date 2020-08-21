@@ -19,6 +19,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\ManyToOne;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
@@ -79,25 +81,54 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var CustomObject
-     *
+     * @ManyToOne(targetEntity="CustomObject")
+     * @JoinColumn(name="custom_object_id", referencedColumnName="id")
+     * @Groups({"custom_item:read", "custom_item:write"})
      */
     private $customObject;
 
     /**
      * @var string|null
+     * @Groups({"custom_item:read", "custom_item:write"})
+     * @ApiProperty(
+     *     attributes={
+     *         "openapi_context"={
+     *             "type"="string",
+     *             "maxLength"=255,
+     *             "example"="en"
+     *         }
+     *     }
+     * )
      *
      */
     private $language;
 
     /**
      * @var Category|null
-     *
+     * @ManyToOne(targetEntity="Category")
+     * @JoinColumn(name="category_id", referencedColumnName="id")
+     * @Groups({"custom_item:read", "custom_item:write"})
      **/
     private $category;
 
     /**
      * @var ArrayCollection
+     * @ApiProperty(
+     *     attributes={
+     *         "openapi_context"={
+     *             "type"="object",
+     *             "additionalProperties"={
+     *                 "oneOf"={
+     *                      {"type"="string"},
+     *                      {"type"="number"},
+     *                      {"type"="boolean"}
+     *                 }
+     *             }
+     *         }
+     *     }
+     * )
      *
+     * @Groups({"custom_item:read", "custom_item:write"})
      */
     private $customFieldValues;
 
@@ -227,6 +258,14 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     }
 
     /**
+     * @param CustomObject $customObject
+     */
+    public function setCustomObject(CustomObject $customObject): void
+    {
+        $this->customObject = $customObject;
+    }
+
+    /**
      * @return Category|null
      */
     public function getCategory()
@@ -258,6 +297,24 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     {
         $this->isChanged('language', $language);
         $this->language = $language;
+    }
+
+    /**
+     * @param array $values
+     * @throws NotFoundException
+     */
+    public function setCustomFieldValues($values)
+    {
+        foreach ($values as $fieldName => $fieldValue)
+        {
+            try {
+                $customFieldValue = $this->findCustomFieldValueForFieldAlias((string) $fieldName);
+                $customFieldValue->setValue($fieldValue);
+            } catch (NotFoundException $e) {
+                $this->createNewCustomFieldValueByFieldAlias((string) $fieldName, $fieldValue);
+            }
+        }
+        $this->setDefaultValuesForMissingFields();
     }
 
     /**
