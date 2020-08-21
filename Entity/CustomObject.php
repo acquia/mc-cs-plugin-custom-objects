@@ -134,7 +134,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         $builder->addNullableField('type', Type::INTEGER);
 
         $builder->createOneToOne('relationshipObject', CustomObject::class)
-            ->addJoinColumn('relationship_object', 'id')
+            ->addJoinColumn('relationship_object', 'id', true, false, "SET NULL")
             ->fetchExtraLazy()
             ->build();
 
