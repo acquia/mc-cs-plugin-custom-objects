@@ -49,4 +49,11 @@ class CustomFieldRepository extends CommonRepository
 
         return new ArrayCollection($query->getResult());
     }
+
+    public function getCustomFieldTypeById(int $customFieldId): string
+    {
+        $customField = $this->findOneBy(['id' => $customFieldId]);
+
+        return $customField ? $customField->getType() : '';
+    }
 }

@@ -13,18 +13,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Command;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManager;
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Model\LeadModel;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInt;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Helper\RandomHelper;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
@@ -36,21 +28,6 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class GenerateSampleDataCommand extends ContainerAwareCommand
 {
     /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    /**
-     * @var LeadModel
-     */
-    private $contactModel;
-
-    /**
      * @var EntityManager
      */
     private $entityManager;
@@ -60,20 +37,20 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
      */
     private $randomHelper;
 
+    /**
+     * @var Connection
+     */
+    private $connection;
+
     public function __construct(
-        CustomObjectModel $customObjectModel,
-        CustomItemModel $customItemModel,
-        LeadModel $contactModel,
         EntityManager $entityManager,
         RandomHelper $randomHelper
     ) {
         parent::__construct();
 
-        $this->customObjectModel = $customObjectModel;
-        $this->customItemModel   = $customItemModel;
-        $this->contactModel      = $contactModel;
         $this->entityManager     = $entityManager;
         $this->randomHelper      = $randomHelper;
+        $this->connection        = $entityManager->getConnection();
     }
 
     /**
@@ -84,53 +61,39 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         $this->setName('mautic:customobjects:generatesampledata')
             ->setDescription('Creates specified amount of custom items with random links to contacts, random names and random custom field values.')
             ->addOption(
-                '--object-id',
-                '-i',
-                InputOption::VALUE_REQUIRED,
-                'Set Custom Object ID to know what custom items to generated.'
-            )
-            ->addOption(
                 '--limit',
                 '-l',
                 InputOption::VALUE_OPTIONAL,
                 'How many custom items to create. Defaults to 10'
+            )
+            ->addOption(
+                '--force',
+                '-f',
+                InputOption::VALUE_OPTIONAL,
+                'Without confirmation. Use --force=1'
             );
+        ;
 
         parent::configure();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io       = new SymfonyStyle($input, $output);
         $enquirer = $this->getHelper('question');
-        $objectId = (int) $input->getOption('object-id');
         $limit    = (int) $input->getOption('limit');
+        $force    = (bool) (int) $input->getOption('force');
 
         if (!$limit) {
             $limit = 1000;
         }
 
-        if (!$objectId) {
-            $io->error('Provide a Custom Object ID for which you want to generate the custom items. Use --object-id=X');
+        if (!$force) {
+            $confirmation = new ConfirmationQuestion("Do you really want to delete current data and generate {$limit} sample of contacts? [Y/n] ", false);
 
-            return 1;
-        }
-
-        try {
-            $customObject = $this->customObjectModel->fetchEntity($objectId);
-        } catch (NotFoundException $e) {
-            $io->error($e->getMessage());
-
-            return 1;
-        }
-
-        $confirmation = new ConfirmationQuestion("Do you really want to generate {$limit} sample {$customObject->getNamePlural()}? [Y/n] ", false);
-
-        if (!$enquirer->ask($input, $output, $confirmation)) {
-            return 0;
+            if (!$enquirer->ask($input, $output, $confirmation)) {
+                return 0;
+            }
         }
 
         $startTime = microtime(true);
@@ -138,12 +101,13 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         $progress->setFormat(' %current%/%max% [%bar%] | %percent:3s%% | Elapsed: %elapsed:6s% | Estimated: %estimated:-6s% | Memory Usage: %memory:6s%');
         $progress->start();
 
+        $this->cleanupDB();
+        [$coProductId, $cfPriceId, $coOrderId] = $this->createCustomObjectsWithItems();
+
         for ($i = 1; $i <= $limit; ++$i) {
-            $customItem = $this->generateCustomItem($customObject);
-            $customItem = $this->generateCustomFieldValues($customItem, $customObject);
-            $customItem = $this->generateContactReferences($customItem);
-            $this->customItemModel->save($customItem);
-            $this->clearMemory($customItem);
+            $this->generateContact($coProductId, $cfPriceId, $coOrderId, $limit);
+            $this->entityManager->clear();
+
             $progress->advance();
         }
 
@@ -155,59 +119,156 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         return 0;
     }
 
-    private function generateCustomItem(CustomObject $customObject): CustomItem
+    /**
+     * @return int[]
+     * @throws DBALException
+     */
+    private function createCustomObjectsWithItems(): array
     {
-        $customItem = new CustomItem($customObject);
-        $customItem->setName($this->randomHelper->getSentence(random_int(2, 6)));
+        $coProduct = [
+            'is_published' => true,
+            'alias' => 'product',
+            'name_singular' => 'Product',
+            'name_plural' => 'Products',
+            'type' => 0,
+        ];
 
-        return $customItem;
+        $coProductId = $this->insertInto('custom_object', $coProduct);
+
+        $cfPrice = [
+            'is_published' => true,
+            'custom_object_id' => $coProductId,
+            'alias' => 'price',
+            'Label' => 'Price',
+            'type' => 'int',
+            'required' => 0,
+        ];
+
+        $cfPriceId = $this->insertInto('custom_field', $cfPrice);
+
+        $coOrder = [
+            'is_published' => true,
+            'alias' => 'order',
+            'name_singular' => 'Order',
+            'name_plural' => 'Orders',
+            'type' => 0,
+        ];
+
+        $coOrderId = $this->insertInto('custom_object', $coOrder);
+
+        return [$coProductId, $cfPriceId, $coOrderId];
     }
 
-    private function generateCustomFieldValues(CustomItem $customItem, CustomObject $customObject): CustomItem
+    private function cleanupDB(): void
     {
-        foreach ($customObject->getCustomFields() as $field) {
-            if ('text' === $field->getType()) {
-                $customItem->addCustomFieldValue(new CustomFieldValueText($field, $customItem, $this->randomHelper->getSentence(random_int(0, 100))));
-            }
+        $query = 'delete from '.MAUTIC_TABLE_PREFIX.'leads where 1';
+        $this->connection->query($query);
 
-            if ('int' === $field->getType()) {
-                $customItem->addCustomFieldValue(new CustomFieldValueInt($field, $customItem, random_int(0, 1000)));
-            }
-        }
+        $query = 'delete from '.MAUTIC_TABLE_PREFIX.'custom_object where 1';
+        $this->connection->query($query);
+    }
 
-        return $customItem;
+    private function generateContact(int $coProductId, int $cfPriceId, int $coOrderId, int $priceLimit): void
+    {
+        $contact = [
+            'firstname'    => $this->randomHelper->getWord(),
+            'lastname'     => $this->randomHelper->getWord(),
+            'email'        => $this->randomHelper->getEmail(),
+            'is_published' => true,
+            'points'       => 0,
+        ];
+
+        $contactId = $this->insertInto('leads', $contact);
+
+        $this->generateProductRelations($contactId, $coProductId, $cfPriceId, $coOrderId, $priceLimit);
+    }
+
+    private function generateProductRelations(int $contactId, int $coProductId, int $cfPriceId, int $coOrderId, int $priceLimit): void
+    {
+        $ciProduct = [
+            'custom_object_id' => $coProductId,
+            'name' => $this->randomHelper->getWord(),
+            'is_published' => true,
+        ];
+
+        $ciProductId = $this->insertInto('custom_item', $ciProduct);
+
+        $ciValueInt = [
+            'custom_field_id' => $cfPriceId,
+            'custom_item_id'  => $ciProductId,
+            'value'           => rand(1, $priceLimit),
+        ];
+
+        $this->insertInto('custom_field_value_int', $ciValueInt);
+
+        $ciOrder = [
+            'custom_object_id' => $coOrderId,
+            'name' => $this->randomHelper->getWord(),
+            'is_published' => true,
+        ];
+
+        $ciOrderId = $this->insertInto('custom_item', $ciOrder);
+
+        $dateAdded = date("Y-m-d H:i:s");
+
+        $cixContact = [
+            'custom_item_id' => $ciProductId,
+            'contact_id' => $contactId,
+            'date_added' => $dateAdded,
+        ];
+
+        $this->insertInto('custom_item_xref_contact', $cixContact);
+
+        $cixci = [
+            'custom_item_id_lower' => $ciProductId,
+            'custom_item_id_higher' => $ciOrderId,
+            'date_added' => $dateAdded,
+        ];
+
+        $this->insertInto('custom_item_xref_custom_item', $cixci);
     }
 
     /**
-     * Generates up to 10 custom item - contact references and adds them to the CustomItem entity.
+     * @param  string $table
+     * @param  array  $row
+     * @return int Last inserted row ID
+     *
+     * @throws DBALException
      */
-    private function generateContactReferences(CustomItem $customItem): CustomItem
+    private function insertInto(string $table, array $row): int
     {
-        for ($i = 1; $i <= random_int(0, 10); ++$i) {
-            $contact   = new Lead();
-            $reference = new CustomItemXrefContact($customItem, $contact);
-            $contact->setFirstname(ucfirst($this->randomHelper->getWord()));
-            $contact->setLastname(ucfirst($this->randomHelper->getWord()));
+        $table       = MAUTIC_TABLE_PREFIX.$table;
+        $columnNames = implode(',', array_keys($row));
+        $values      = implode(
+            ',',
+            array_map(
+                function ($value) {
+                    switch (gettype($value)) {
+                        case 'string':
+                            return "'$value'";
+                            break;
+                        case 'integer':
+                            return (string) $value;
+                            break;
+                        case 'boolean':
+                            return (bool) $value;
+                            break;
+                        default:
+                            $type = gettype($value);
+                            throw new \InvalidArgumentException("Unsupported type '$type' for insert query");
+                    }
+                },
+                array_values($row)
+            )
+        );
 
-            $this->contactModel->saveEntity($contact);
+        $query = "
+            INSERT INTO `$table` ($columnNames)
+            VALUES ($values)
+        ";
 
-            $customItem->addContactReference($reference);
-        }
+        $this->connection->query($query);
 
-        return $customItem;
-    }
-
-    private function clearMemory(CustomItem $customItem): void
-    {
-        foreach ($customItem->getCustomFieldValues() as $value) {
-            $this->entityManager->detach($value);
-        }
-
-        foreach ($customItem->getContactReferences() as $reference) {
-            $this->entityManager->detach($reference->getContact());
-            $this->entityManager->detach($reference);
-        }
-
-        $this->entityManager->detach($customItem);
+        return (int) $this->connection->lastInsertId();
     }
 }

@@ -13,23 +13,19 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Segment\Query\Filter;
 
-use Doctrine\DBAL\Connection;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
-use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
+use MauticPlugin\CustomObjectsBundle\Segment\Query\UnionQueryContainer;
 
 class QueryFilterFactory
 {
     /**
-     * @var Connection
-     */
-    private $connection;
-
-    /**
      * @var ContactSegmentFilterFactory
      */
-    private $filterFactory;
+    private $contactSegmentFilterFactory;
 
     /**
      * @var QueryFilterHelper
@@ -37,25 +33,22 @@ class QueryFilterFactory
     private $queryFilterHelper;
 
     public function __construct(
-        Connection $connection,
         ContactSegmentFilterFactory $filterFactory,
         QueryFilterHelper $queryFilterHelper
     ) {
-        $this->connection        = $connection;
-        $this->filterFactory     = $filterFactory;
-        $this->queryFilterHelper = $queryFilterHelper;
+        $this->contactSegmentFilterFactory = $filterFactory;
+        $this->queryFilterHelper           = $queryFilterHelper;
     }
 
     /**
-     * @param mixed[] $segmentFilter
-     *
+     * @return UnionQueryContainer|SegmentQueryBuilder
      * @throws InvalidSegmentFilterException
-     * @throws \MauticPlugin\CustomObjectsBundle\Exception\NotFoundException
-     * @throws \Exception
+     * @throws NotFoundException
+     * @throws Exception
      */
-    public function configureQueryBuilderFromSegmentFilter(array $segmentFilter, string $queryAlias): QueryBuilder
+    public function configureQueryBuilderFromSegmentFilter(array $segmentFilter, string $queryAlias)
     {
-        $segmentFilter = $this->filterFactory->factorSegmentFilter($segmentFilter);
+        $segmentFilter = $this->contactSegmentFilterFactory->factorSegmentFilter($segmentFilter);
 
         if ($segmentFilter->getTable() !== MAUTIC_TABLE_PREFIX.'custom_objects') {
             throw new InvalidSegmentFilterException("{$segmentFilter->getTable()} filter table cannot be processed.");
@@ -64,18 +57,15 @@ class QueryFilterFactory
         $type = $segmentFilter->getQueryType();
 
         if (CustomFieldFilterQueryBuilder::getServiceId() === $type) {
-            $filterQueryBuilder = $this->queryFilterHelper->createValueQueryBuilder(
-                $this->connection,
+            $queryBuilder = $this->queryFilterHelper->createValueQuery(
                 $queryAlias,
-                (int) $segmentFilter->getField(),
-                $segmentFilter->getType()
+                $segmentFilter
             );
-            $this->queryFilterHelper->addCustomFieldValueExpressionFromSegmentFilter($filterQueryBuilder, $queryAlias, $segmentFilter);
         } elseif (CustomItemNameFilterQueryBuilder::getServiceId() === $type) {
-            $filterQueryBuilder = $this->queryFilterHelper->createItemNameQueryBuilder($this->connection, $queryAlias);
+            $queryBuilder = $this->queryFilterHelper->createItemNameQueryBuilder($queryAlias);
 
             $this->queryFilterHelper->addCustomObjectNameExpression(
-                $filterQueryBuilder,
+                $queryBuilder,
                 $queryAlias,
                 $segmentFilter->getOperator(),
                 $segmentFilter->getParameterValue()
@@ -84,6 +74,6 @@ class QueryFilterFactory
             throw new InvalidSegmentFilterException("{$type} filter query type cannot be processed.");
         }
 
-        return $filterQueryBuilder;
+        return $queryBuilder;
     }
 }

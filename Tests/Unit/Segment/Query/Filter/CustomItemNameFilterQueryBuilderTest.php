@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Segment\Query\Filter;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 use Mautic\LeadBundle\Segment\Query\Filter\FilterQueryBuilderInterface;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
+use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemNameFilterQueryBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -51,7 +54,23 @@ class CustomItemNameFilterQueryBuilderTest extends TestCase
 
         $randomParameter = new RandomParameterName();
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $queryFilterHelper = new QueryFilterHelper(new CustomFieldTypeProvider());
+
+        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager
+            ->method('getConnection')
+            ->willReturn($this->createMock(Connection::class));
+
+        $queryFilterHelper = new QueryFilterHelper(
+            $entityManager,
+            new QueryFilterFactory(
+                $entityManager,
+                new CustomFieldTypeProvider(),
+                $this->createMock(CustomFieldRepository::class),
+                new QueryFilterFactory\Calculator(),
+                1
+            )
+        );
+
         $this->queryBuilder = $this->createMock(QueryBuilder::class);
         $this->contactSegmentFilter = $this->createMock(ContactSegmentFilter::class);
         $this->connection = $this->createMock(Connection::class);
@@ -62,6 +81,11 @@ class CustomItemNameFilterQueryBuilderTest extends TestCase
             $queryFilterHelper,
             $eventDispatcher
         );
+    }
+
+    public function testGetServiceId(): void
+    {
+        $this->assertSame('mautic.lead.query.builder.custom_item.value', CustomItemNameFilterQueryBuilder::getServiceId());
     }
 
     /**
@@ -112,8 +136,8 @@ class CustomItemNameFilterQueryBuilderTest extends TestCase
     public function parameterValueProvider()
     {
         return [
-          ['mautic'],
-          [10],
+            ['mautic'],
+            [10],
         ];
     }
 }

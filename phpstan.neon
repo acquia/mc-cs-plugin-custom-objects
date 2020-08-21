@@ -1,8 +1,3 @@
 parameters:
 	ignoreErrors:
 		- '#Constant MAUTIC_TABLE_PREFIX not found.#'
-		- '#Call to an undefined method Mautic\\CoreBundle\\Controller\\MauticController&Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller::setTranslator().#'
-		- '#Call to an undefined method Mautic\\CoreBundle\\Controller\\MauticController&Symfony\\Bundle\\FrameworkBundle\\Controller\\Controller::setRequest().#'
-		- '#Call to an undefined method Symfony\\Component\\Form\\FormInterface::isClicked().#'
-		- '#Method MauticPlugin\\CustomObjectsBundle\\Model\\CustomObjectModel::fetchEntities() should return Doctrine\\ORM\\Tools\\Pagination\\Paginator&iterable<MauticPlugin\\CustomObjectsBundle\\Entity\\CustomObject> but returns array|Doctrine\\ORM\\Tools\\Pagination\\Paginator.#'
-		- '#.*|PHPUnit_Framework_MockObject_MockObject given$#'

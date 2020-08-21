@@ -44,10 +44,12 @@ class RandomHelper
 
     public function getWord(): string
     {
-        $randomWords = $this->getRandomWords();
-        $randomKey   = array_rand($randomWords);
+        return(md5(uniqid()));
+    }
 
-        return $randomWords[$randomKey];
+    public function getEmail(): string
+    {
+        return uniqid('', true) . '@' . uniqid('', true) . '.net';
     }
 
     /**
