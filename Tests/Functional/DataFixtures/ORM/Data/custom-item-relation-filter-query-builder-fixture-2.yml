@@ -92,6 +92,15 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomField:
     alias: 'text'
     type: 'text'
 
+  # ID 6
+  custom_field_order_date:
+    custom_object: '@custom_object_order'
+    is_published: true
+    date_added: '<date_create()>'
+    label: 'Date'
+    alias: 'date'
+    type: 'date'
+
 MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption:
 
   custom_field_option_1:
@@ -135,6 +144,10 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueDate:
   custom_field_plug_date:
     __construct: ['@custom_field_date', '@custom_item_plug']
     value: '2020-07-01'
+
+  custom_field_order_date_value:
+    __construct: ['@custom_field_order_date', '@custom_item_order_toaster']
+    value: '2020-08-13'
 
 MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueDateTime:
 
@@ -380,3 +393,29 @@ Mautic\LeadBundle\Entity\LeadList:
           filter: 'text'
     is_global: true
     is_preference_center: false
+
+  # Combined filter
+  combined:
+    is_published: true
+    name: 'Combined Price = 1000 and Date = 2020-08-13'
+    alias: 'combined'
+    filters:
+      0:
+        glue : 'and'
+        field: 'cmf_4' # @custom_field_price
+        object: 'custom_object'
+        type: 'int'
+        operator: 'eq'
+        properties:
+          filter: '1000'
+      1:
+        glue : 'and'
+        field: 'cmf_6'
+        object: 'custom_object'
+        type: 'date'
+        operator: 'eq'
+        properties:
+          filter: '2020-08-13'
+    is_global: true
+    is_preference_center: false
+

@@ -55,6 +55,11 @@ class CustomItemRelation2LevelFilterQueryBuilderTestCase extends CustomItemRelat
         $this->assertLeadCountBySegmentAlias(1, 'order-plug-name-eq');
         $this->assertContactIsInSegment('poor@plug.net', 'order-plug-name-eq');
 
+        // price eq 1000
+        $this->assertLeadCountBySegmentAlias(2, 'price-eq-1000');
+        $this->assertContactIsInSegment('rich@toaster.net', 'price-eq-1000');
+        $this->assertContactIsInSegment('direct@relation.net', 'price-eq-1000');
+
         // date
         $this->assertLeadCountBySegmentAlias(2, 'date-lt-1990');
         $this->assertContactIsInSegment('rich@toaster.net', 'date-lt-1990');
@@ -89,5 +94,10 @@ class CustomItemRelation2LevelFilterQueryBuilderTestCase extends CustomItemRelat
         $this->assertLeadCountBySegmentAlias(2, 'text-eq-text');
         $this->assertContactIsInSegment('rich@toaster.net', 'text-eq-text');
         $this->assertContactIsInSegment('direct@relation.net', 'text-eq-text');
+
+        // combined
+        $this->assertLeadCountBySegmentAlias(2, 'combined');
+        $this->assertContactIsInSegment('rich@toaster.net', 'combined');
+        $this->assertContactIsInSegment('direct@relation.net', 'date-lt-1990');
     }
 }
