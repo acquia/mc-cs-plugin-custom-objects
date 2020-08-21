@@ -36,12 +36,12 @@ class SessionProviderFactory
 
     public function createObjectProvider(): SessionProvider
     {
-        return $this->createProvider('mautic.custom.object');
+        return $this->createProvider('custom-object');
     }
 
-    public function createItemProvider(int $objectId, string $filterEntityType = null, int $filterEntityId = null): SessionProvider
+    public function createItemProvider(int $objectId, string $filterEntityType = null, int $filterEntityId = null, bool $lookup = false): SessionProvider
     {
-        $namespace = implode('.', array_filter(['mautic.custom.item', $objectId, $filterEntityType, $filterEntityId]));
+        $namespace = implode('-', ['custom-item', $objectId, $filterEntityType, $filterEntityId, (int) $lookup]);
 
         return $this->createProvider($namespace);
     }

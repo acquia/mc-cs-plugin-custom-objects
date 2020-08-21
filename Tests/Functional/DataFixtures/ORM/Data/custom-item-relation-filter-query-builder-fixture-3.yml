@@ -1,0 +1,137 @@
+# Describes acceptance criteria for
+# https://backlog.acquia.com/browse/MAUT-1738
+# Two products/orders with different prices added
+
+Mautic\LeadBundle\Entity\Lead:
+
+  # direct relation / one level / contact -> product
+  contact_direct_to_ci:
+    firstname: 'Direct'
+    lastname: 'Relation'
+    is_published: true
+    date_added: '<dateTimeBetween("-1 days","-10 hours")>'
+    email: 'direct@relation.net'
+
+  # 2nd level relations / contact -> order -> product
+  contact_rich:
+    firstname: 'Rich'
+    lastname: 'Toaster'
+    is_published: true
+    date_added: '<dateTimeBetween("-1 days","-10 hours")>'
+    email: 'rich@toaster.net'
+
+  # 2nd level relations / contact -> order -> something -> product
+  contact_poor_toaster:
+    firstname: 'Poor'
+    lastname: 'Plug'
+    is_published: true
+    date_added: '<dateTimeBetween("-1 days","-10 hours")>'
+    email: 'poor@toaster.net'
+
+  contact_poor_plug:
+    firstname: 'Poor'
+    lastname: 'Plug'
+    is_published: true
+    date_added: '<dateTimeBetween("-1 days","-10 hours")>'
+    email: 'poor@plug.net'
+
+MauticPlugin\CustomObjectsBundle\Entity\CustomObject:
+
+  custom_object_product:
+    is_published: true
+    date_added: '<dateTimeBetween("-20 days","-2 days")>'
+    name_singular: 'Product'
+    name_plural: 'Products'
+    alias: 'product'
+
+  custom_object_2:
+    is_published: true
+    date_added: '<dateTimeBetween("-20 days","-2 days")>'
+    name_singular: '2'
+    name_plural: '2'
+    alias: '2'
+
+  custom_object_3:
+    is_published: true
+    date_added: '<dateTimeBetween("-20 days","-2 days")>'
+    name_singular: '3'
+    name_plural: '3'
+    alias: '3'
+
+MauticPlugin\CustomObjectsBundle\Entity\CustomField:
+  # ID 1
+  custom_field_price:
+    custom_object: '@custom_object_product'
+    is_published: true
+    date_added: '<date_create()>'
+    label: 'Price'
+    alias: 'price'
+    type: 'int'
+
+MauticPlugin\CustomObjectsBundle\Entity\CustomItem:
+
+  custom_item_toaster:
+    is_published: true
+    name: 'Toaster'
+    __construct: ['@custom_object_product']
+
+  custom_item_2_toaster:
+    is_published: true
+    name: '2 toaster'
+    __construct: ['@custom_object_2']
+
+  custom_item_3_toaster:
+    is_published: true
+    name: '3 toaster'
+    __construct: ['@custom_object_3']
+
+  custom_item_plug:
+    is_published: true
+    name: 'Plug'
+    __construct: ['@custom_object_product']
+
+MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInt:
+
+  custom_field_toaster_price:
+    __construct: ['@custom_field_price', '@custom_item_toaster']
+    value: 1000
+
+MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact:
+
+  # direct relation / one level / contact -> product
+  custom_item_xref_contact_toaster_rich:
+    __construct: ['@custom_item_toaster', '@contact_direct_to_ci']
+
+  # 2nd level relations / contact -> order -> product
+  custom_item_xref_order_contact_toaster_rich:
+    __construct: ['@custom_item_2_toaster', '@contact_rich']
+
+  # 3rd level
+  custom_item_xref_order_contact_plug_toaster:
+    __construct: ['@custom_item_3_toaster', '@contact_poor_toaster']
+
+MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem:
+
+  custom_item_toaster_xref_toaster_1:
+    __construct: ['@custom_item_toaster', '@custom_item_2_toaster',]
+
+  custom_item_toaster_xref_toaster_2:
+    __construct: ['@custom_item_2_toaster', '@custom_item_3_toaster',]
+
+Mautic\LeadBundle\Entity\LeadList:
+
+  price-eq-1000:
+    is_published: true
+    name: 'Price = 1000'
+    alias: 'price-eq-1000'
+    filters:
+      0:
+        glue : 'and'
+        field: 'cmf_1' # @custom_field_price
+        object: 'custom_object'
+        type: 'int'
+        operator: 'eq'
+        properties:
+          filter: '1000'
+    is_global: true
+    is_preference_center: false

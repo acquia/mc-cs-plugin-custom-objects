@@ -100,7 +100,14 @@ class CustomItemXrefContactSubscriber implements EventSubscriberInterface
     {
         $tableConfig = $event->getTableConfig();
         if ('contact' === $tableConfig->getParameter('filterEntityType') && $tableConfig->getParameter('filterEntityId')) {
-            $this->customItemRepository->includeItemsLinkedToContact($event->getQueryBuilder(), (int) $tableConfig->getParameter('filterEntityId'));
+            $queryBuilder   = $event->getQueryBuilder();
+            $filterEntityId = (int) $tableConfig->getParameter('filterEntityId');
+
+            if ($tableConfig->getParameter('lookup')) {
+                $this->customItemRepository->excludeItemsLinkedToContact($queryBuilder, $filterEntityId);
+            } else {
+                $this->customItemRepository->includeItemsLinkedToContact($queryBuilder, $filterEntityId);
+            }
         }
     }
 

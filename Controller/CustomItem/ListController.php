@@ -89,7 +89,8 @@ class ListController extends CommonController
         $request          = $this->requestStack->getCurrentRequest();
         $filterEntityId   = (int) $request->get('filterEntityId');
         $filterEntityType = InputHelper::clean($request->get('filterEntityType'));
-        $sessionProvider  = $this->sessionProviderFactory->createItemProvider($objectId, $filterEntityType, $filterEntityId);
+        $lookup           = (bool) $request->get('lookup');
+        $sessionProvider  = $this->sessionProviderFactory->createItemProvider($objectId, $filterEntityType, $filterEntityId, $lookup);
         $search           = InputHelper::clean($request->get('search', $sessionProvider->getFilter()));
         $limit            = (int) $request->get('limit', $sessionProvider->getPageLimit());
         $orderBy          = $sessionProvider->getOrderBy(CustomItem::TABLE_ALIAS.'.id');
@@ -107,25 +108,30 @@ class ListController extends CommonController
         $tableConfig->addParameter('filterEntityType', $filterEntityType);
         $tableConfig->addParameter('filterEntityId', $filterEntityId);
         $tableConfig->addParameter('search', $search);
+        $tableConfig->addParameter('lookup', $lookup);
 
         $sessionProvider->setPage($page);
         $sessionProvider->setPageLimit($limit);
         $sessionProvider->setFilter($search);
 
-        $route    = $this->routeProvider->buildListRoute($objectId, $page);
-        $items    = $this->customItemModel->getTableData($tableConfig);
-        $response = [
+        $route     = $this->routeProvider->buildListRoute($objectId, $page, $filterEntityType ?: null, $filterEntityId ?: null, ['lookup' => $lookup ?: null]);
+        $items     = $this->customItemModel->getTableData($tableConfig);
+        $namespace = $sessionProvider->getNamespace();
+        $response  = [
             'viewParameters' => [
                 'searchValue'      => $search,
                 'customObject'     => $customObject,
                 'filterEntityId'   => $filterEntityId,
                 'filterEntityType' => $filterEntityType,
+                'lookup'           => $lookup,
                 'items'            => $items,
                 'itemCount'        => $this->customItemModel->getCountForTable($tableConfig),
                 'page'             => $page,
                 'limit'            => $limit,
                 'tmpl'             => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                 'currentRoute'     => $route,
+                'sessionVar'       => $namespace,
+                'namespace'        => $namespace,
             ],
             'contentTemplate' => 'CustomObjectsBundle:CustomItem:list.html.php',
             'passthroughVars' => [

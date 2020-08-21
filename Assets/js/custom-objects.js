@@ -90,29 +90,6 @@ CustomObjects = {
         operatorSelect.trigger("chosen:updated");
     },
 
-    // Called from tab content HTML:
-    initTabShowingLinkedItems(customObjectId, currentEntityId, currentEntityType, tabId, relationshipObjectId) {
-        let input = mQuery('#'+tabId+'-container [data-toggle="typeahead"]');
-        CustomObjects.initCustomItemTypeahead(input, customObjectId, function(selectedItem) {
-            if (relationshipObjectId) {
-                CustomObjects.activeModal = {
-                    customObjectId: customObjectId,
-                    currentEntityId: currentEntityId,
-                    currentEntityType: currentEntityType,
-                    tabId: tabId
-                };
-                let itemLinkUrl = mauticBaseUrl+'s/custom/item/'+selectedItem.id+'/link-form/'+currentEntityType+'/'+currentEntityId;
-                Mautic.loadAjaxModal('#MauticSharedModal', itemLinkUrl, 'GET');
-            } else {
-                CustomObjects.linkCustomItemWithEntity(selectedItem.id, currentEntityId, currentEntityType, function() {
-                    CustomObjects.reloadItemsTable(customObjectId, currentEntityId, currentEntityType, tabId);
-                    input.val('');
-                });
-            }
-        });
-        CustomObjects.reloadItemsTable(customObjectId, currentEntityId, currentEntityType, tabId);
-    },
-
     initCustomItemTypeaheadsOnCampaignEventForm() {
         let typeaheadInputs = mQuery('input[data-toggle="typeahead"]');
         typeaheadInputs.each(function(i, nameInputHtml) {
@@ -159,11 +136,7 @@ CustomObjects = {
     },
 
     reloadItemsTable(customObjectId, currentEntityId, currentEntityType, tabId) {
-        CustomObjects.getItemsForObjectLinkedToEntity(customObjectId, currentEntityId, currentEntityType, function(response) {
-            let selector = '#'+tabId+'-container .custom-item-list';
-            mQuery(selector).html(response.newContent);
-            Mautic.onPageLoad(selector);
-        });
+        CustomObjects.reloadItems(customObjectId, currentEntityId, currentEntityType, 0, '#'+tabId+'-container .custom-item-list');
     },
 
     initCustomItemTypeahead(input, customObjectId, onSelectCallback) {
@@ -210,36 +183,63 @@ CustomObjects = {
         });
     },
 
-    linkCustomItemWithEntity(customItemId, entityId, entityType, callback) {
-        mQuery.ajax({
-            type: 'POST',
-            url: mauticBaseUrl+'s/custom/item/'+customItemId+'/link/'+entityType+'/'+entityId+'.json',
-            success: callback,
-            showLoadingBar: true,
-        });
-    },
-
-    unlinkCustomItemFromEntity(elHtml, event, customObjectId, currentEntityType, currentEntityId, tabId) { // update this to use it for all entity types
+    linkCustomItemWithEntity(elHtml, event, customObjectId, currentEntityType, currentEntityId, tabId, relationshipObjectId) {
         event.preventDefault();
-        mQuery.ajax({
-            type: 'POST',
-            url: mQuery(elHtml).attr('data-action'),
-            showLoadingBar: true,
-            success: function() {
+        const $element = mQuery(elHtml);
+        const action = $element.attr('data-action');
+        const modalListSelector = '#' + $element.closest('.page-list').attr('id');
+
+        if (relationshipObjectId) {
+            CustomObjects.activeModal = {
+                customObjectId: customObjectId,
+                currentEntityId: currentEntityId,
+                currentEntityType: currentEntityType,
+                tabId: tabId,
+                modalListSelector: modalListSelector
+            };
+            Mautic.loadAjaxModal('#MauticSharedModal', action, 'GET');
+        } else {
+            CustomObjects.customItemLinkAction(action, customObjectId, currentEntityType, currentEntityId, function () {
+                CustomObjects.reloadItems(customObjectId, currentEntityId, currentEntityType, 1, modalListSelector)
                 CustomObjects.reloadItemsTable(customObjectId, currentEntityId, currentEntityType, tabId);
-            }
+            });
+        }
+    },
+
+    unlinkCustomItemFromEntity(elHtml, event, customObjectId, currentEntityType, currentEntityId, tabId) {
+        event.preventDefault();
+
+        CustomObjects.customItemLinkAction(mQuery(elHtml).attr('data-action'), customObjectId, currentEntityType, currentEntityId, function () {
+            CustomObjects.reloadItemsTable(customObjectId, currentEntityId, currentEntityType, tabId);
         });
     },
 
-    getItemsForObjectLinkedToEntity(customObjectId, currentEntityId, currentEntityType, callback) {
+    customItemLinkAction(url, customObjectId, currentEntityType, currentEntityId, callback) {
+        mQuery.ajax({
+            type: 'POST',
+            url: url,
+            showLoadingBar: true,
+            success: callback
+        });
+    },
+
+    reloadItems(customObjectId, currentEntityId, currentEntityType, lookup, selector) {
         mQuery.ajax({
             type: 'GET',
-            url: mauticBaseUrl+'s/custom/object/'+customObjectId+'/item?tmpl=list',
-            data: {filterEntityId: currentEntityId, 'filterEntityType': currentEntityType},
-            success: callback,
-            showLoadingBar: true,
+            url: mauticBaseUrl+'s/custom/object/'+customObjectId+'/item',
+            data: {
+                filterEntityId: currentEntityId,
+                filterEntityType: currentEntityType,
+                tmpl: 'list',
+                lookup: lookup
+            },
+            success: function (response) {
+                mQuery(selector).html(response.newContent);
+                Mautic.onPageLoad(selector);
+            },
+            showLoadingBar: true
         });
-    },
+    }
 };
 
 Mautic.customItemLinkFormLoad = function(response) {
@@ -283,12 +283,24 @@ Mautic.customObjectsSetUpLinkFormModalFromEditLink = function(el) {
 };
 
 Mautic.customObjectsCleanUpFormModal = function() {
+    const activeModal = CustomObjects.activeModal;
+
+    if (activeModal.modalListSelector) {
+        CustomObjects.reloadItems(
+            activeModal.customObjectId,
+            activeModal.currentEntityId,
+            activeModal.currentEntityType,
+            1,
+            activeModal.modalListSelector
+        );
+    }
+
     CustomObjects.reloadItemsTable(
-        CustomObjects.activeModal.customObjectId,
-        CustomObjects.activeModal.currentEntityId,
-        CustomObjects.activeModal.currentEntityType,
-        CustomObjects.activeModal.tabId
+        activeModal.customObjectId,
+        activeModal.currentEntityId,
+        activeModal.currentEntityType,
+        activeModal.tabId
     );
-    mQuery('#'+CustomObjects.activeModal.tabId+'-container').find('[data-toggle="typeahead"]').val('');
+
     CustomObjects.activeModal = {};
 };

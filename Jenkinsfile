@@ -1,3 +1,5 @@
+@Library('jenkins-scripts')
+
 def REPO_NAME = env.JOB_NAME.split("/")[0]
 def SUBMODULE_NAME = "CustomObjectsBundle"
 
@@ -119,8 +121,9 @@ spec:
         }
       }
     }
-    stage('Automerge to beta') {
+    stage('Automerge to development') {
       when {
+        changeRequest target: 'beta'
         changeRequest target: 'staging'
       }
       steps {
@@ -134,7 +137,7 @@ spec:
             error("PR still WIP. Failing the build to prevent accidental merge")
           }
           else {
-            echo "Merging PR to beta"
+            echo "Merging PR to development"
             withEnv(["PRNUMBER=${CHANGE_ID}"]) {
             sshagent (credentials: ['1a066462-6d24-4247-bef6-1da084c8f484']) {
             dir('plugins/CustomObjectsBundle') {
@@ -146,11 +149,11 @@ spec:
                     echo "Skipping Jenkinse's merge commit which we do not need"
                     gitsha="$(git rev-parse HEAD~1)"
                 fi
-                git remote set-branches --add origin beta
+                git remote set-branches --add origin development
                 git fetch -q
-                git checkout origin/beta
-                git merge -m "Merge commit '$gitsha' from PR $PRNUMBER into beta" "$gitsha"
-                git push origin HEAD:beta
+                git checkout origin/development
+                git merge -m "Merge commit '$gitsha' from PR $PRNUMBER into development" "$gitsha"
+                git push origin HEAD:development
                 git checkout "$gitsha"
               '''
             }}}
@@ -164,6 +167,7 @@ spec:
           changeRequest()
         }
         anyOf {
+          branch 'development'
           branch 'beta';
           /* Disabling automatic releasing to production until custom objects goes GA */
           /*branch 'staging';*/
@@ -200,26 +204,12 @@ spec:
   post {
     failure {
       script {
-        if (BRANCH_NAME ==~ /^(beta|staging)$/) {
+        if (BRANCH_NAME ==~ /^(development|beta|staging)$/) {
           slackSend (color: '#FF0000', message: "${REPO_NAME} failed build on branch ${env.BRANCH_NAME}. (${env.BUILD_URL}console)")
         }
         if (env.CHANGE_AUTHOR != null && !env.CHANGE_TITLE.contains("WIP")) {
-          def githubToSlackMap = [
-            'alanhartless':'alan.hartless',
-            'anton-vlasenko':'anton.vlasenko',
-            'dongilbert':'don.gilbert',
-            'escopecz':'jan.linhart',
-            'fedys':'miroslav.fedeles',
-            'Gregy':'petr.gregor',
-            'hluchas':'lukas.drahy',
-            'lijupm':'liju.pm',
-            'lukassykora':'lukas.sykora',
-            'pavel-hladik':'pavel.hladik',
-            'rohitp19':'rohit.pavaskar',
-            'shreyal009':'shreyal.mandot'
-          ]
-          if (githubToSlackMap.("${env.CHANGE_AUTHOR}")) {
-            slackSend (channel: "@"+"${githubToSlackMap.("${env.CHANGE_AUTHOR}")}", color: '#FF0000', message: "${REPO_NAME} failed build on ${env.BRANCH_NAME} (${env.CHANGE_TITLE})\nchange: ${env.CHANGE_URL}\nbuild: ${env.BUILD_URL}console")
+          if (githubToSlack("${env.CHANGE_AUTHOR}")) {
+            slackSend (channel: "@"+"${githubToSlack("${env.CHANGE_AUTHOR}")}", color: '#FF0000', message: "${REPO_NAME} failed build on ${env.BRANCH_NAME} (${env.CHANGE_TITLE})\nchange: ${env.CHANGE_URL}\nbuild: ${env.BUILD_URL}console")
           }
           else {
             slackSend (color: '#FF0000', message: "${REPO_NAME} failed build on ${env.BRANCH_NAME} (${env.CHANGE_TITLE})\nchange: ${env.CHANGE_URL}\nbuild: ${env.BUILD_URL}console\nsending alert to channel, there is no Github to Slack mapping for '${CHANGE_AUTHOR}'")
@@ -229,7 +219,7 @@ spec:
     }
     fixed {
       script {
-        if (BRANCH_NAME ==~ /^(beta|staging)$/) {
+        if (BRANCH_NAME ==~ /^(development|beta|staging)$/) {
           slackSend (color: '#00FF00', message: "${REPO_NAME} build on branch ${env.BRANCH_NAME} is fixed. (${env.BUILD_URL}console)")
         }
       }

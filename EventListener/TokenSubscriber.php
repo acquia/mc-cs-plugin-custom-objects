@@ -30,6 +30,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
 use MauticPlugin\CustomObjectsBundle\Event\CustomObjectListFormatEvent;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidCustomObjectFormatListException;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
@@ -210,6 +211,8 @@ class TokenSubscriber implements EventSubscriberInterface
 
     /**
      * Add some where conditions to the query requesting the right custom items for the token replacement.
+     *
+     * @throws InvalidArgumentException
      */
     public function onListQuery(CustomItemListDbalQueryEvent $event): void
     {
@@ -259,15 +262,17 @@ class TokenSubscriber implements EventSubscriberInterface
                     continue;
                 }
 
-                $this->queryFilterHelper->addContactIdRestriction($innerQueryBuilder, $queryAlias, $contactId);
-                $innerQueryBuilder->select($queryAlias.'_item.id');
-                $this->handleEmptyOperators($filter['operator'], $queryAlias, $innerQueryBuilder);
+                foreach ($innerQueryBuilder as $segmentQueryBuilder) {
+                    $segmentQueryBuilder->select($queryAlias.'_value.custom_item_id');
+                    $this->queryFilterHelper->addContactIdRestriction($segmentQueryBuilder, $queryAlias, $contactId);
+                    $segmentQueryBuilder->andWhere("{$queryAlias}_contact.custom_item_id = {$queryAlias}_value.custom_item_id");
+                }
 
                 $queryBuilder->innerJoin(
                     CustomItem::TABLE_ALIAS,
                     "({$innerQueryBuilder->getSQL()})",
                     $queryAlias,
-                    CustomItem::TABLE_ALIAS.".id = {$queryAlias}.id"
+                    CustomItem::TABLE_ALIAS.".id = {$queryAlias}.custom_item_id"
                 );
 
                 $this->copyParams($innerQueryBuilder, $queryBuilder);

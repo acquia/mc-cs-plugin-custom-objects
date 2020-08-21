@@ -103,6 +103,8 @@ class CustomItemTabSubscriber implements EventSubscriberInterface
 
                 $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:link.html.php', $data);
             }
+
+            $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:modal.html.php');
         }
 
         if ($event->checkContext('CustomObjectsBundle:CustomItem:detail.html.php', 'tabs.content')) {
@@ -119,19 +121,21 @@ class CustomItemTabSubscriber implements EventSubscriberInterface
                     continue;
                 }
 
-                $objectId = (int) $object->getId();
-                $itemId   = (int) $item->getId();
-                $data     = [
+                $objectId        = (int) $object->getId();
+                $itemId          = (int) $item->getId();
+                $sessionProvider = $this->sessionProviderFactory->createItemProvider($objectId, $entityType, $itemId);
+                $data            = [
                     'customObjectId'    => $objectId,
                     'currentEntityId'   => $itemId,
                     'currentEntityType' => $entityType,
                     'tabId'             => "custom-object-{$objectId}",
                     'searchId'          => "list-search-{$objectId}",
-                    'searchValue'       => $this->sessionProviderFactory->createItemProvider($objectId, $entityType, $itemId)->getFilter(),
-                    'placeholder'       => $this->translator->trans('custom.item.link.search.placeholder.custom_object', ['%object%' => $object->getNameSingular()]),
+                    'searchValue'       => $sessionProvider->getFilter(),
+                    'linkHeader'        => $this->translator->trans('custom.item.link.existing.modal.header.custom_object', ['%object%' => $object->getNameSingular()]),
                     'searchRoute'       => $this->customItemRouteProvider->buildListRoute($objectId, 1, $entityType, $itemId),
-                    'lookupRoute'       => $this->customItemRouteProvider->buildLookupRoute($objectId, $entityType, $itemId),
                     'newRoute'          => $this->customItemRouteProvider->buildNewRoute($objectId),
+                    'linkRoute'         => $this->customItemRouteProvider->buildListRoute($objectId, 1, $entityType, $itemId, ['lookup' => 1, 'search' => '']),
+                    'namespace'         => $sessionProvider->getNamespace(),
                 ];
 
                 $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:content.html.php', $data);

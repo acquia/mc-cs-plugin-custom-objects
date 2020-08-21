@@ -33,7 +33,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     const TABLE_ALIAS = 'CustomObject';
 
     // Object type constants for $type field
-    const TYPE_MASTER = 0;
+    const TYPE_MASTER       = 0;
     const TYPE_RELATIONSHIP = 1;
 
     /**
@@ -77,7 +77,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     private $customFields;
 
     /**
-     * @var integer|null
+     * @var int|null
      */
     private $type = self::TYPE_MASTER;
 
@@ -165,6 +165,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     public function setId(int $id)
     {
         $this->id = $id;
+
         return $this;
     }
 

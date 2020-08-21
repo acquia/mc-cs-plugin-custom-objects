@@ -13,23 +13,44 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Segment\Query\Filter;
 
-use Doctrine\DBAL\Connection;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
-use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemNameFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
+use MauticPlugin\CustomObjectsBundle\Segment\Query\UnionQueryContainer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class QueryFilterFactoryTest extends \PHPUnit\Framework\TestCase
+class QueryFilterFactoryTest extends TestCase
 {
-    private $connection;
+    /**
+     * @var ContactSegmentFilterFactory|MockObject
+     */
     private $contactSegmentFilterFactory;
+
+    /**
+     * @var QueryFilterHelper|MockObject
+     */
     private $queryFilterHelper;
+
+    /**
+     * @var ContactSegmentFilter|MockObject
+     */
     private $contactSegmentFilter;
-    private $queryBuilder;
+
+    /**
+     * @var SegmentQueryBuilder|MockObject
+     */
+    private $segmentQueryBuilder;
+
+    /**
+     * @var UnionQueryContainer|MockObject
+     */
+    private $unionQueryContainer;
 
     /**
      * @var QueryFilterFactory
@@ -42,13 +63,12 @@ class QueryFilterFactoryTest extends \PHPUnit\Framework\TestCase
 
         defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
-        $this->connection                  = $this->createMock(Connection::class);
         $this->contactSegmentFilterFactory = $this->createMock(ContactSegmentFilterFactory::class);
         $this->queryFilterHelper           = $this->createMock(QueryFilterHelper::class);
         $this->contactSegmentFilter        = $this->createMock(ContactSegmentFilter::class);
-        $this->queryBuilder                = $this->createMock(QueryBuilder::class);
+        $this->segmentQueryBuilder         = $this->createMock(SegmentQueryBuilder::class);
+        $this->unionQueryContainer         = $this->createMock(UnionQueryContainer::class);
         $this->factory                     = new QueryFilterFactory(
-            $this->connection,
             $this->contactSegmentFilterFactory,
             $this->queryFilterHelper
         );
@@ -104,34 +124,16 @@ class QueryFilterFactoryTest extends \PHPUnit\Framework\TestCase
             ->method('getQueryType')
             ->willReturn(CustomFieldFilterQueryBuilder::getServiceId());
 
-        $this->contactSegmentFilter->expects($this->once())
-            ->method('getField')
-            ->willReturn($fieldId);
-
-        $this->contactSegmentFilter->expects($this->once())
-            ->method('getType')
-            ->willReturn($fieldType);
-
         $this->queryFilterHelper->expects($this->once())
-            ->method('createValueQueryBuilder')
+            ->method('createValueQuery')
             ->with(
-                $this->connection,
-                $queryAlias,
-                1,
-                $fieldType
-            )
-            ->willReturn($this->queryBuilder);
-
-        $this->queryFilterHelper->expects($this->once())
-            ->method('addCustomFieldValueExpressionFromSegmentFilter')
-            ->with(
-                $this->queryBuilder,
                 $queryAlias,
                 $this->contactSegmentFilter
-            );
+            )
+            ->willReturn($this->unionQueryContainer);
 
         $this->assertSame(
-            $this->queryBuilder,
+            $this->unionQueryContainer,
             $this->factory->configureQueryBuilderFromSegmentFilter($segmentFilter, $queryAlias)
         );
     }
@@ -176,23 +178,20 @@ class QueryFilterFactoryTest extends \PHPUnit\Framework\TestCase
 
         $this->queryFilterHelper->expects($this->once())
             ->method('createItemNameQueryBuilder')
-            ->with(
-                $this->connection,
-                $queryAlias
-            )
-            ->willReturn($this->queryBuilder);
+            ->with($queryAlias)
+            ->willReturn($this->segmentQueryBuilder);
 
         $this->queryFilterHelper->expects($this->once())
             ->method('addCustomObjectNameExpression')
             ->with(
-                $this->queryBuilder,
+                $this->segmentQueryBuilder,
                 $queryAlias,
                 $operator,
                 $value
             );
 
         $this->assertSame(
-            $this->queryBuilder,
+            $this->segmentQueryBuilder,
             $this->factory->configureQueryBuilderFromSegmentFilter($segmentFilter, $queryAlias)
         );
     }

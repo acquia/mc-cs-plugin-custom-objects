@@ -23,7 +23,8 @@ class CustomItemListControllerXrefTest extends MauticMysqlTestCase
         $this->em->persist(new CustomItemXrefCustomItem($customItemUnlinked, $customItemLinked));
         $this->em->flush();
 
-        $this->assertResponse($customObject, $customItemLinked, 'customItem', $customItemUnlinked->getId());
+        $this->assertResponse($customObject, $customItemLinked, 'customItem', $customItemUnlinked->getId(), 0);
+        $this->assertResponse($customObject, $customItemUnlinked, 'customItem', $customItemUnlinked->getId(), 1);
     }
 
     public function testListContact(): void
@@ -36,7 +37,8 @@ class CustomItemListControllerXrefTest extends MauticMysqlTestCase
         $this->em->persist($contact);
         $this->em->flush();
 
-        $this->assertResponse($customObject, $customItemLinked, 'contact', $customItemUnlinked->getId());
+        $this->assertResponse($customObject, $customItemLinked, 'contact', $customItemUnlinked->getId(), 0);
+        $this->assertResponse($customObject, $customItemUnlinked, 'contact', $customItemUnlinked->getId(), 1);
     }
 
     private function createCustomObject(): CustomObject
@@ -59,12 +61,12 @@ class CustomItemListControllerXrefTest extends MauticMysqlTestCase
         return $customItem;
     }
 
-    private function assertResponse(CustomObject $customObject, CustomItem $customItem, string $entityType, int $filterEntityId): void
+    private function assertResponse(CustomObject $customObject, CustomItem $customItem, string $entityType, int $filterEntityId, int $lookup): void
     {
-        $uri     = sprintf('/s/custom/object/%s/item?filterEntityId=%s&filterEntityType=%s', $customObject->getId(), $filterEntityId, $entityType);
+        $uri     = sprintf('/s/custom/object/%s/item?filterEntityId=%s&filterEntityType=%s&lookup=%d', $customObject->getId(), $filterEntityId, $entityType, $lookup);
         $crawler = $this->client->request(Request::METHOD_GET, $uri);
 
-        $tableCrawler = $crawler->filterXPath('//h3[contains(text(), "Devices")]/following::table[1]');
+        $tableCrawler = $crawler->filter('table');
         Assert::assertSame(1, $tableCrawler->count());
 
         $rowCrawler = $tableCrawler->filterXPath('.//tbody/tr');

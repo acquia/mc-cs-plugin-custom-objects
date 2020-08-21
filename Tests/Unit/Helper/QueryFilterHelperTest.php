@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Helper;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -32,7 +36,21 @@ class QueryFilterHelperTest extends TestCase
     {
         parent::setUp();
 
-        $this->queryFilterHelper = new QueryFilterHelper(new CustomFieldTypeProvider());
+        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager
+            ->method('getConnection')
+            ->willReturn($this->createMock(Connection::class));
+
+        $this->queryFilterHelper = new QueryFilterHelper(
+            $entityManager,
+            new QueryFilterFactory(
+                $entityManager,
+                new CustomFieldTypeProvider(),
+                $this->createMock(CustomFieldRepository::class),
+                new QueryFilterFactory\Calculator(),
+                1
+            )
+        );
         $this->queryBuilder = $this->createMock(QueryBuilder::class);
         $this->expressionBuilder = $this->createMock(ExpressionBuilder::class);
     }

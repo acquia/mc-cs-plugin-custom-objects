@@ -30,16 +30,34 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class ContactTabSubscriberTest extends TestCase
 {
+    /**
+     * @var MockObject|CustomObjectModel
+     */
     private $customObjectModel;
 
+    /**
+     * @var MockObject|CustomItemRepository
+     */
     private $customItemRepository;
 
+    /**
+     * @var MockObject|ConfigProvider
+     */
     private $configProvider;
 
+    /**
+     * @var MockObject|TranslatorInterface
+     */
     private $translator;
 
+    /**
+     * @var MockObject|CustomItemRouteProvider
+     */
     private $customItemRouteProvider;
 
+    /**
+     * @var MockObject|CustomContentEvent
+     */
     private $customContentEvent;
 
     /**
@@ -131,6 +149,12 @@ class ContactTabSubscriberTest extends TestCase
             );
 
         $this->customContentEvent->expects($this->at(3))
+            ->method('addTemplate')
+            ->with(
+                'CustomObjectsBundle:SubscribedEvents/Tab:modal.html.php'
+            );
+
+        $this->customContentEvent->expects($this->at(4))
             ->method('checkContext')
             ->with('MauticLeadBundle:Lead:lead.html.php', 'tabs.content')
             ->willReturn(false);
@@ -175,26 +199,28 @@ class ContactTabSubscriberTest extends TestCase
 
         $this->translator->expects($this->once())
             ->method('trans')
-            ->with('custom.item.link.search.placeholder.contact')
-            ->willReturn('translated placeholder');
-
-        $this->customItemRouteProvider->expects($this->once())
-            ->method('buildLookupRoute')
-            ->with(555, 'contact', 45)
-            ->willReturn('lookup/route');
+            ->with('custom.item.link.existing.modal.header.contact')
+            ->willReturn('translated modal header');
 
         $this->customItemRouteProvider->expects($this->once())
             ->method('buildNewRouteWithRedirectToContact')
             ->with(555)
             ->willReturn('new/route');
 
-        $this->customItemRouteProvider->expects($this->once())
+        $this->customItemRouteProvider->expects($this->exactly(2))
             ->method('buildListRoute')
-            ->with(555, 1, 'contact', 45)
-            ->willReturn('search/route');
+            ->withConsecutive(
+                [555, 1, 'contact', 45],
+                [555, 1, 'contact', 45, ['lookup' => 1, 'search' => '']]
+            )
+            ->willReturnOnConsecutiveCalls(
+                'search/route',
+                'link/route'
+            );
 
         $sessionProvider = $this->createMock(SessionProvider::class);
         $sessionProvider->method('getFilter')->willReturn('Search something');
+        $sessionProvider->method('getNamespace')->willReturn('Some namespace');
 
         $this->sessionProviderFactory->expects($this->once())
             ->method('createItemProvider')
@@ -210,13 +236,13 @@ class ContactTabSubscriberTest extends TestCase
                     'currentEntityId'      => 45,
                     'currentEntityType'    => 'contact',
                     'tabId'                => 'custom-object-555',
-                    'placeholder'          => 'translated placeholder',
-                    'lookupRoute'          => 'lookup/route',
                     'newRoute'             => 'new/route',
                     'searchId'             => 'list-search-555',
                     'searchValue'          => 'Search something',
                     'searchRoute'          => 'search/route',
-                    'relationshipObjectId' => null,
+                    'linkHeader'           => 'translated modal header',
+                    'linkRoute'            => 'link/route',
+                    'namespace'            => 'Some namespace',
                 ]
             );
 

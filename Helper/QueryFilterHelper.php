@@ -14,49 +14,60 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Helper;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
+use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
-use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
+use MauticPlugin\CustomObjectsBundle\Segment\Query\UnionQueryContainer;
 
 class QueryFilterHelper
 {
     use DbalQueryTrait;
 
     /**
+     * @var EntityManager
+     */
+    private $entityManager;
+
+    /**
+     * @var QueryFilterFactory
+     */
+    private $queryFilterFactory;
+
+    /**
      * @var CustomFieldTypeProvider
      */
     private $fieldTypeProvider;
 
-    public function __construct(CustomFieldTypeProvider $fieldTypeProvider)
-    {
-        $this->fieldTypeProvider = $fieldTypeProvider;
-    }
-
     /**
-     * @throws NotFoundException
+     * @var int
      */
-    public function createValueQueryBuilder(
-        Connection $connection,
-        string $builderAlias,
-        int $fieldId,
-        ?string $fieldType = null
-    ): QueryBuilder {
-        $queryBuilder      = new QueryBuilder($connection);
-        $fieldType         = $fieldType ?: $this->getCustomFieldType($queryBuilder, $fieldId);
-        $valueQueryBuilder = $this->getBasicItemQueryBuilder($queryBuilder, $builderAlias);
-        $this->addCustomFieldValueJoin($valueQueryBuilder, $builderAlias, $fieldType, $fieldId);
+    private $itemRelationLevelLimit;
 
-        return $valueQueryBuilder;
+    public function __construct(
+        EntityManager $entityManager,
+        QueryFilterFactory $queryFilterFactory
+    ) {
+        $this->entityManager = $entityManager;
+        $this->queryFilterFactory = $queryFilterFactory;
     }
 
-    public function createItemNameQueryBuilder(Connection $connection, string $queryBuilderAlias): QueryBuilder
+    public function createValueQuery(
+        string $alias,
+        ContactSegmentFilter $segmentFilter
+    ): UnionQueryContainer {
+        $unionQueryContainer = $this->queryFilterFactory->createQuery($alias, $segmentFilter);
+        $this->addCustomFieldValueExpressionFromSegmentFilter($unionQueryContainer, $alias, $segmentFilter);
+
+        return $unionQueryContainer;
+    }
+
+    public function createItemNameQueryBuilder(string $queryBuilderAlias): SegmentQueryBuilder
     {
-        $queryBuilder = new QueryBuilder($connection);
+        $queryBuilder = new SegmentQueryBuilder($this->entityManager->getConnection());
 
         return $this->getBasicItemQueryBuilder($queryBuilder, $queryBuilderAlias);
     }
@@ -67,13 +78,13 @@ class QueryFilterHelper
      *
      * @throws InvalidArgumentException
      */
-    public function addContactIdRestriction(QueryBuilder $queryBuilder, string $queryAlias, int $contactId): void
+    public function addContactIdRestriction(SegmentQueryBuilder $queryBuilder, string $queryAlias, int $contactId): void
     {
-        if (!in_array($queryAlias.'_contact', $this->getQueryJoinAliases($queryBuilder), true)) {
-            if (!in_array($queryAlias.'_item', $this->getQueryJoinAliases($queryBuilder), true)) {
-                throw new InvalidArgumentException('QueryBuilder contains no usable tables for contact restriction.');
+        if (!$this->hasQueryJoinAlias($queryBuilder, $queryAlias.'_contact')) {
+            if (!$this->hasQueryJoinAlias($queryBuilder, $queryAlias.'_value')) {
+                throw new InvalidArgumentException('SegmentQueryBuilder contains no usable tables for contact restriction.');
             }
-            $tableAlias = $queryAlias.'_item.contact_id';
+            $tableAlias = $queryAlias.'_contact.contact_id';
         } else {
             $tableAlias = $queryAlias.'_contact.contact_id';
         }
@@ -84,40 +95,25 @@ class QueryFilterHelper
     }
 
     public function addCustomFieldValueExpressionFromSegmentFilter(
-        QueryBuilder $queryBuilder,
+        UnionQueryContainer $unionQueryContainer,
         string $tableAlias,
         ContactSegmentFilter $filter
     ): void {
-        $expression = $this->getCustomValueValueExpression($queryBuilder, $tableAlias, $filter->getOperator());
+        foreach ($unionQueryContainer as $segmentQueryBuilder) {
+            $expression = $this->getCustomValueValueExpression($segmentQueryBuilder, $tableAlias, $filter->getOperator());
 
-        $this->addOperatorExpression(
-            $queryBuilder,
-            $tableAlias,
-            $expression,
-            $filter->getOperator(),
-            $filter->getParameterValue()
-        );
-    }
-
-    public function addCustomObjectNameExpressionFromSegmentFilter(QueryBuilder $queryBuilder, string $tableAlias, ContactSegmentFilter $filter): void
-    {
-        $expression = $this->getCustomObjectNameExpression($queryBuilder, $tableAlias, $filter->getOperator());
-        $this->addOperatorExpression($queryBuilder, $tableAlias, $expression, $filter->getOperator(), $filter->getParameterValue());
-    }
-
-    /**
-     * Limit the result of query builder to given value of in CustomFieldValue.
-     *
-     * @param array|string|CompositeExpression $value
-     */
-    public function addCustomFieldValueExpression(QueryBuilder $queryBuilder, string $tableAlias, string $operator, $value): void
-    {
-        $expression = $this->getCustomValueValueExpression($queryBuilder, $tableAlias, $operator);
-        $this->addOperatorExpression($queryBuilder, $tableAlias, $expression, $operator, $value);
+            $this->addOperatorExpression(
+                $segmentQueryBuilder,
+                $tableAlias,
+                $expression,
+                $filter->getOperator(),
+                $filter->getParameterValue()
+            );
+        }
     }
 
     public function addCustomObjectNameExpression(
-        QueryBuilder $queryBuilder,
+        SegmentQueryBuilder $queryBuilder,
         string $tableAlias,
         string $operator,
         ?string $value
@@ -130,8 +126,8 @@ class QueryFilterHelper
      * @param CompositeExpression|string            $expression
      * @param array|string|CompositeExpression|null $value
      */
-    public function addOperatorExpression(
-        QueryBuilder $queryBuilder,
+    private function addOperatorExpression(
+        SegmentQueryBuilder $segmentQueryBuilder,
         string $tableAlias,
         $expression,
         string $operator,
@@ -147,7 +143,7 @@ class QueryFilterHelper
             case 'notIn':
             case 'multiselect':
             case 'in':
-                $valueType      = $queryBuilder->getConnection()::PARAM_STR_ARRAY;
+                $valueType      = Connection::PARAM_STR_ARRAY;
                 $valueParameter = $tableAlias.'_value_value';
 
                 break;
@@ -159,53 +155,14 @@ class QueryFilterHelper
             case 'notIn':
                 break;
             default:
-                $queryBuilder->andWhere($expression);
+                $segmentQueryBuilder->andWhere($expression);
 
                 break;
         }
 
         if (isset($valueParameter)) {
-            $queryBuilder->setParameter($valueParameter, $value, $valueType);
+            $segmentQueryBuilder->setParameter($valueParameter, $value, $valueType);
         }
-    }
-
-    /**
-     * Limit the result of queryBuilder to result of customQuery.
-     *
-     * @throws DBALException
-     */
-    public function addValueExpressionFromQueryBuilder(
-        QueryBuilder $queryBuilder,
-        QueryBuilder $customQuery,
-        string $glue,
-        string $operator
-    ): void {
-        switch ($operator) {
-            case 'empty':
-            case 'notIn':
-            case 'neq':
-            case 'notLike':
-                $queryBuilder->addLogic($queryBuilder->expr()->notExists($customQuery->getSQL()), $glue);
-
-                break;
-            default:
-                $queryBuilder->addLogic($queryBuilder->expr()->exists($customQuery->getSQL()), $glue);
-
-                break;
-        }
-        $queryBuilder->setParametersPairs(array_keys($customQuery->getParameters()), array_values($customQuery->getParameters()));
-    }
-
-    private function getCustomFieldType(QueryBuilder $queryBuilder, int $customFieldId): string
-    {
-        $qb = $queryBuilder->getConnection()->createQueryBuilder();
-        $qb = $qb->select('f.type')
-            ->from(MAUTIC_TABLE_PREFIX.'custom_field', 'f')
-            ->where($qb->expr()->eq('f.id', $customFieldId));
-
-        $customFieldType = $this->executeSelect($queryBuilder)->fetchColumn();
-
-        return is_string($customFieldType) ? $customFieldType : '';
     }
 
     /**
@@ -213,10 +170,16 @@ class QueryFilterHelper
      *
      * @return CompositeExpression|string
      */
-    private function getCustomValueValueExpression(QueryBuilder $customQuery, string $tableAlias, string $operator)
+    private function getCustomValueValueExpression(SegmentQueryBuilder $customQuery, string $tableAlias, string $operator)
     {
         switch ($operator) {
             case 'empty':
+                $expression = $customQuery->expr()->orX(
+                    $customQuery->expr()->isNull($tableAlias.'_value.value'),
+                    $customQuery->expr()->eq($tableAlias.'_value.value', $customQuery->expr()->literal(''))
+                );
+
+                break;
             case 'notEmpty':
                 $expression = $customQuery->expr()->andX(
                     $customQuery->expr()->isNotNull($tableAlias.'_value.value'),
@@ -274,10 +237,16 @@ class QueryFilterHelper
      *
      * @return CompositeExpression|string
      */
-    private function getCustomObjectNameExpression(QueryBuilder $customQuery, string $tableAlias, string $operator)
+    private function getCustomObjectNameExpression(SegmentQueryBuilder $customQuery, string $tableAlias, string $operator)
     {
         switch ($operator) {
             case 'empty':
+                $expression = $customQuery->expr()->orX(
+                    $customQuery->expr()->isNull($tableAlias.'_item.name'),
+                    $customQuery->expr()->eq($tableAlias.'_item.name', $customQuery->expr()->literal(''))
+                );
+
+                break;
             case 'notEmpty':
                 $expression = $customQuery->expr()->andX(
                     $customQuery->expr()->isNotNull($tableAlias.'_item.name'),
@@ -323,49 +292,23 @@ class QueryFilterHelper
     }
 
     /**
-     * @throws NotFoundException
-     */
-    private function addCustomFieldValueJoin(
-        QueryBuilder $customFieldQueryBuilder,
-        string $alias,
-        string $fieldType,
-        int $fieldId
-    ): QueryBuilder {
-        $dataTable = $this->fieldTypeProvider->getType($fieldType)->getTableName();
-
-        $customFieldQueryBuilder->leftJoin(
-            $alias.'_item',
-            $dataTable,
-            $alias.'_value',
-            $customFieldQueryBuilder->expr()->andX(
-                $alias.'_value.custom_item_id = '.$alias.'_item.id',
-                $customFieldQueryBuilder->expr()->eq($alias.'_value.custom_field_id', ":{$alias}_custom_field_id")
-            )
-        );
-
-        $customFieldQueryBuilder->setParameter("{$alias}_custom_field_id", $fieldId);
-
-        return $customFieldQueryBuilder;
-    }
-
-    /**
-     * Get all tables currently registered in the queryBuilder.
+     * Get all tables currently registered in the queryBuilder and check is alias is present
      *
-     * @return mixed[]
+     * @return bool
      */
-    private function getQueryJoinAliases(QueryBuilder $queryBuilder): array
+    private function hasQueryJoinAlias(SegmentQueryBuilder $queryBuilder, $alias): bool
     {
         $joins    = array_column($queryBuilder->getQueryParts()['join'], 0);
         $tables   = array_column($joins, 'joinAlias');
         $tables[] = $queryBuilder->getQueryParts()['from'][0]['alias'];
 
-        return $tables;
+        return in_array($alias, $tables, true);
     }
 
     /**
      * Get basic query builder with contact reference and item join.
      */
-    private function getBasicItemQueryBuilder(QueryBuilder $queryBuilder, string $alias): QueryBuilder
+    private function getBasicItemQueryBuilder(SegmentQueryBuilder $queryBuilder, string $alias): SegmentQueryBuilder
     {
         $customFieldQueryBuilder = $queryBuilder->createQueryBuilder();
 

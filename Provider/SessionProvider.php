@@ -64,6 +64,11 @@ class SessionProvider
         $this->defaultPageLimit = $defaultPageLimit;
     }
 
+    public function getNamespace(): string
+    {
+        return $this->namespace;
+    }
+
     public function getPage(int $default = 1): int
     {
         return (int) $this->getValue(static::KEY_PAGE, $default);
@@ -131,6 +136,6 @@ class SessionProvider
 
     private function buildName(string $key): string
     {
-        return $this->namespace.'.'.$key;
+        return 'mautic.'.$this->namespace.'.'.$key;
     }
 }

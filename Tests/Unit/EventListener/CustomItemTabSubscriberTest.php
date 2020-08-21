@@ -28,18 +28,39 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomItemTabSubscriberTest extends TestCase
 {
+    /**
+     * @var MockObject|CustomObjectModel
+     */
     private $customObjectModel;
 
+    /**
+     * @var MockObject|CustomItemRepository
+     */
     private $customItemRepository;
 
+    /**
+     * @var MockObject|TranslatorInterface
+     */
     private $translator;
 
+    /**
+     * @var MockObject|CustomItemRouteProvider
+     */
     private $customItemRouteProvider;
 
+    /**
+     * @var MockObject|CustomContentEvent
+     */
     private $customContentEvent;
 
+    /**
+     * @var MockObject|CustomItem
+     */
     private $customItem;
 
+    /**
+     * @var MockObject|CustomObject
+     */
     private $customObject;
 
     /**
@@ -111,6 +132,12 @@ class CustomItemTabSubscriberTest extends TestCase
             );
 
         $this->customContentEvent->expects($this->at(3))
+            ->method('addTemplate')
+            ->with(
+                'CustomObjectsBundle:SubscribedEvents/Tab:modal.html.php'
+            );
+
+        $this->customContentEvent->expects($this->at(4))
             ->method('checkContext')
             ->with('CustomObjectsBundle:CustomItem:detail.html.php', 'tabs.content')
             ->willReturn(false);
@@ -149,10 +176,11 @@ class CustomItemTabSubscriberTest extends TestCase
             ->method('getVars')
             ->willReturn(['item' => $this->customItem]);
 
-        $this->customContentEvent->expects($this->never())
-            ->method('addTemplate');
-
         $this->customContentEvent->expects($this->at(2))
+            ->method('addTemplate')
+            ->with('CustomObjectsBundle:SubscribedEvents/Tab:modal.html.php');
+
+        $this->customContentEvent->expects($this->at(3))
             ->method('checkContext')
             ->with('CustomObjectsBundle:CustomItem:detail.html.php', 'tabs.content')
             ->willReturn(false);
@@ -193,26 +221,28 @@ class CustomItemTabSubscriberTest extends TestCase
 
         $this->translator->expects($this->once())
             ->method('trans')
-            ->with('custom.item.link.search.placeholder.custom_object')
-            ->willReturn('translated placeholder');
-
-        $this->customItemRouteProvider->expects($this->once())
-            ->method('buildLookupRoute')
-            ->with(555, 'customItem', 45)
-            ->willReturn('lookup/route');
+            ->with('custom.item.link.existing.modal.header.custom_object')
+            ->willReturn('translated modal header');
 
         $this->customItemRouteProvider->expects($this->once())
             ->method('buildNewRoute')
             ->with(555)
             ->willReturn('new/route');
 
-        $this->customItemRouteProvider->expects($this->once())
+        $this->customItemRouteProvider->expects($this->exactly(2))
             ->method('buildListRoute')
-            ->with(555, 1, 'customItem', 45)
-            ->willReturn('search/route');
+            ->withConsecutive(
+                [555, 1, 'customItem', 45],
+                [555, 1, 'customItem', 45, ['lookup' => 1, 'search' => '']]
+            )
+            ->willReturnOnConsecutiveCalls(
+                'search/route',
+                'link/route'
+            );
 
         $sessionProvider = $this->createMock(SessionProvider::class);
         $sessionProvider->method('getFilter')->willReturn('Search something');
+        $sessionProvider->method('getNamespace')->willReturn('Some namespace');
 
         $this->sessionProviderFactory->expects($this->once())
             ->method('createItemProvider')
@@ -228,12 +258,13 @@ class CustomItemTabSubscriberTest extends TestCase
                     'currentEntityId'   => 45,
                     'currentEntityType' => 'customItem',
                     'tabId'             => 'custom-object-555',
-                    'placeholder'       => 'translated placeholder',
-                    'lookupRoute'       => 'lookup/route',
                     'newRoute'          => 'new/route',
                     'searchId'          => 'list-search-555',
                     'searchValue'       => 'Search something',
                     'searchRoute'       => 'search/route',
+                    'linkHeader'        => 'translated modal header',
+                    'linkRoute'         => 'link/route',
+                    'namespace'         => 'Some namespace',
                 ]
             );
 
