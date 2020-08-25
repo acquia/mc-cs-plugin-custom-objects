@@ -82,40 +82,61 @@ spec:
         }
       }
     }
-    stage('Test') {
-      steps {
-        container('hosted-tester') {
-          ansiColor('xterm') {
-            sh """
-              mysql -h 127.0.0.1 -e 'CREATE DATABASE mautictest; CREATE USER travis@"%"; GRANT ALL on mautictest.* to travis@"%"; GRANT SUPER,PROCESS ON *.* TO travis@"%";'
-              export SYMFONY_ENV="test"
-              bin/phpunit -d memory_limit=2048M --bootstrap vendor/autoload.php --fail-on-warning  --testsuite=all --configuration plugins/CustomObjectsBundle/phpunit.xml
-            """
-          }
-        }
-      }
-    }
-    stage('Static Analysis') {
-      steps {
-        container('hosted-tester') {
-          ansiColor('xterm') {
-            dir('plugins/CustomObjectsBundle') {
-              sh """
-                composer phpstan -- --no-progress
-              """
+    stage('Tests') {
+      parallel {
+        stage('PHPUNIT') {
+          environment {
+            COVERALLS_REPO_TOKEN = credentials('COVERALLS_REPO_TOKEN')
+            CI_PULL_REQUEST = "${env.CHANGE_ID}"
+            CI_BRANCH = "${env.BRANCH_NAME}"
+            CI_BUILD_URL = "${env.BUILD_URL}"
+          }    
+          steps {
+            container('hosted-tester') {
+              ansiColor('xterm') {
+                sh """
+                  echo "PHP Version Info"
+                  php --version
+
+                  mysql -h 127.0.0.1 -e 'CREATE DATABASE mautictest; CREATE USER travis@"%"; GRANT ALL on mautictest.* to travis@"%"; GRANT SUPER,PROCESS ON *.* TO travis@"%";'
+                  export SYMFONY_ENV="test"
+                  bin/phpunit -d memory_limit=2048M --bootstrap vendor/autoload.php --fail-on-warning  --testsuite=all --configuration plugins/CustomObjectsBundle/phpunit.xml
+
+                  mkdir -p var/cache/coverage-reportx
+                  
+                  # pcov-clobber needs to be used until we upgrade to phpunit 8
+                  bin/pcov clobber
+                  bin/phpunit -d pcov.enabled=1 -d memory_limit=3000M --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --fail-on-warning --disallow-test-output --coverage-clover var/cache/coverage-report/clover.xml
+
+                  php-coveralls -x var/cache/coverage-report/clover.xml --json_path var/cache/coverage-report/coveralls-upload.json
+                """
+              }
             }
           }
         }
-      }
-    }
-    stage('Styling') {
-      steps {
-        container('hosted-tester') {
-          ansiColor('xterm') {
-            dir('plugins/CustomObjectsBundle') {
-              sh """
-                composer csfixer
-              """
+        stage('Static Analysis') {
+          steps {
+            container('hosted-tester') {
+              ansiColor('xterm') {
+                dir('plugins/CustomObjectsBundle') {
+                  sh """
+                    composer phpstan -- --no-progress
+                  """
+                }
+              }
+            }
+          }
+        }
+        stage('CS Fixer') {
+          steps {
+            container('hosted-tester') {
+              ansiColor('xterm') {
+                dir('plugins/CustomObjectsBundle') {
+                  sh """
+                    composer csfixer
+                  """
+                }
+              }
             }
           }
         }
@@ -123,8 +144,10 @@ spec:
     }
     stage('Automerge to development') {
       when {
-        changeRequest target: 'beta'
-        changeRequest target: 'staging'
+        anyOf {
+          changeRequest target: 'beta'
+          changeRequest target: 'staging'
+        }
       }
       steps {
         script {
