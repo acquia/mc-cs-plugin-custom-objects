@@ -102,7 +102,7 @@ spec:
                   export SYMFONY_ENV="test"
                   bin/phpunit -d memory_limit=2048M --bootstrap vendor/autoload.php --fail-on-warning  --testsuite=all --configuration plugins/CustomObjectsBundle/phpunit.xml
 
-                  mkdir -p var/cache/coverage-reportx
+                  mkdir -p var/cache/coverage-report
                   
                   # pcov-clobber needs to be used until we upgrade to phpunit 8
                   bin/pcov clobber
