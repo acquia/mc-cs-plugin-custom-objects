@@ -21,6 +21,7 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
+use Doctrine\ORM\Mapping\OneToMany;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Mautic\ApiBundle\Serializer\Driver\ApiMetadataDriver;
 use Mautic\CategoryBundle\Entity\Category;
@@ -141,12 +142,14 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     /**
      * @var ArrayCollection
      *
+     * @Groups({"custom_item:read", "custom_item:write"})
      */
     private $contactReferences;
 
     /**
      * @var ArrayCollection
      *
+     * @Groups({"custom_item:read", "custom_item:write"})
      */
     private $companyReferences;
 
