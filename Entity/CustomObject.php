@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Type;
@@ -24,9 +25,31 @@ use Mautic\CoreBundle\Helper\ArrayHelper;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Form\Validator\Constraints\CustomObjectTypeValues;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+/**
+ * @ApiResource(
+ *     collectionOperations={
+ *          "get"={"security"="'custom_objects:custom_objects:viewother'"},
+ *          "post"={"security"="'custom_objects:custom_objects:create'"}
+ *     },
+ *     itemOperations={
+ *          "get"={"security"="'custom_objects:custom_objects:view'"},
+ *          "put"={"security"="'custom_objects:custom_objects:edit'"},
+ *          "patch"={"security"="'custom_objects:custom_objects:edit'"},
+ *          "delete"={"security"="'custom_objects:custom_objects:delete'"}
+ *     },
+ *     shortName="custom_objects",
+ *     normalizationContext={"groups"={"custom_object:read"}, "swagger_definition_name"="Read"},
+ *     denormalizationContext={"groups"={"custom_object:write"}, "swagger_definition_name"="Write"},
+ *     attributes={
+ *          "pagination_items_per_page"=10,
+ *          "formats"={"jsonld", "json", "html", "csv"={"text/csv"}}
+ *     }
+ * )
+ */
 class CustomObject extends FormEntity implements UniqueEntityInterface
 {
     const TABLE_NAME  = 'custom_object';
@@ -43,36 +66,44 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var string|null
+     * @Groups({"custom_object:read", "custom_object:write"})
      */
     private $alias;
 
     /**
      * @var string|null
+     * @Groups({"custom_object:read", "custom_object:write"})
      */
     private $nameSingular;
 
     /**
      * @var string|null
+     * @Groups({"custom_object:read", "custom_object:write"})
      */
     private $namePlural;
 
     /**
      * @var string|null
+     * @Groups({"custom_object:read", "custom_object:write"})
      */
     private $description;
 
     /**
      * @var string|null
+     * @Groups({"custom_object:read", "custom_object:write"})
      */
     private $language;
 
     /**
      * @var Category|null
+     * @Assert\Valid
+     * @Groups({"custom_object:read", "custom_object:write"})
      **/
     private $category;
 
     /**
      * @var ArrayCollection
+     * @Groups({"custom_object:read", "custom_object:write"})
      */
     private $customFields;
 

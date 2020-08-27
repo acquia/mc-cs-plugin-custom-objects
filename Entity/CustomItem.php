@@ -13,19 +13,45 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\ManyToOne;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+/**
+ * @ApiResource(
+ *     collectionOperations={
+ *          "get"={"security"="'custom_objects:custom_items:viewother'"},
+ *          "post"={"security"="'custom_objects:custom_items:create'"}
+ *     },
+ *     itemOperations={
+ *          "get"={"security"="'custom_objects:custom_items:view'"},
+ *          "put"={"security"="'custom_objects:custom_items:edit'"},
+ *          "patch"={"security"="'custom_objects:custom_items:edit'"},
+ *          "delete"={"security"="'custom_objects:custom_items:delete'"}
+ *     },
+ *     shortName="custom_items",
+ *     normalizationContext={"groups"={"custom_item:read"}, "swagger_definition_name"="Read"},
+ *     denormalizationContext={"groups"={"custom_item:write"}, "swagger_definition_name"="Write"},
+ *     attributes={
+ *          "pagination_items_per_page"=10,
+ *          "formats"={"jsonld", "json", "html", "csv"={"text/csv"}}
+ *     }
+ * )
+ */
 class CustomItem extends FormEntity implements UniqueEntityInterface
 {
     public const TABLE_NAME  = 'custom_item';
@@ -38,11 +64,25 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var string|null
+     * @Groups({"custom_item:read", "custom_item:write"})
+     * @ApiProperty(
+     *     attributes={
+     *         "openapi_context"={
+     *             "type"="string",
+     *             "maxLength"=255,
+     *             "nullable"=false,
+     *             "example"="city"
+     *         }
+     *     }
+     * )
      */
     private $name;
 
     /**
      * @var CustomObject
+     * @ManyToOne(targetEntity="CustomObject")
+     * @JoinColumn(name="custom_object_id", referencedColumnName="id")
+     * @Groups({"custom_item:read", "custom_item:write"})
      */
     private $customObject;
 
@@ -53,16 +93,44 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var string|null
+     * @Groups({"custom_item:read", "custom_item:write"})
+     * @ApiProperty(
+     *     attributes={
+     *         "openapi_context"={
+     *             "type"="string",
+     *             "maxLength"=255,
+     *             "example"="en"
+     *         }
+     *     }
+     * )
      */
     private $language;
 
     /**
      * @var Category|null
+     * @ManyToOne(targetEntity="Category")
+     * @JoinColumn(name="category_id", referencedColumnName="id")
+     * @Groups({"custom_item:read", "custom_item:write"})
      **/
     private $category;
 
     /**
      * @var ArrayCollection
+     * @ApiProperty(
+     *     attributes={
+     *         "openapi_context"={
+     *             "type"="object",
+     *             "additionalProperties"={
+     *                 "oneOf"={
+     *                      {"type"="string"},
+     *                      {"type"="number"},
+     *                      {"type"="boolean"}
+     *                 }
+     *             }
+     *         }
+     *     }
+     * )
+     * @Groups({"custom_item:read", "custom_item:write"})
      */
     private $customFieldValues;
 
@@ -73,11 +141,13 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var ArrayCollection
+     * @Groups({"custom_item:read", "custom_item:write"})
      */
     private $contactReferences;
 
     /**
      * @var ArrayCollection
+     * @Groups({"custom_item:read", "custom_item:write"})
      */
     private $companyReferences;
 
@@ -185,6 +255,14 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     }
 
     /**
+     * @param CustomObject $customObject
+     */
+    public function setCustomObject(CustomObject $customObject): void
+    {
+        $this->customObject = $customObject;
+    }
+
+    /**
      * @return Category|null
      */
     public function getCategory()
@@ -254,6 +332,24 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         }
 
         $this->customFieldValues->set($customFieldValue->getCustomField()->getId(), $customFieldValue);
+    }
+
+    /**
+     * @param array $values
+     * @throws NotFoundException
+     */
+    public function setCustomFieldValues($values)
+    {
+        foreach ($values as $fieldName => $fieldValue)
+        {
+            try {
+                $customFieldValue = $this->findCustomFieldValueForFieldAlias((string) $fieldName);
+                $customFieldValue->setValue($fieldValue);
+            } catch (NotFoundException $e) {
+                $this->createNewCustomFieldValueByFieldAlias((string) $fieldName, $fieldValue);
+            }
+        }
+        $this->setDefaultValuesForMissingFields();
     }
 
     /**
