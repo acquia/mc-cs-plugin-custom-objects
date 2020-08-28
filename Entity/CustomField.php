@@ -15,12 +15,14 @@ namespace MauticPlugin\CustomObjectsBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
+use Doctrine\ORM\Mapping\OneToMany;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\AbstractMultivalueType;
@@ -157,6 +159,9 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var Collection|CustomFieldOption[]
+     * @OneToMany(targetEntity="CustomFieldOption", mappedBy="customField")
+     * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
+     * @ApiSubresource()
      */
     private $options;
 

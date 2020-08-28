@@ -16,6 +16,10 @@ namespace MauticPlugin\CustomObjectsBundle\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Column;
+use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\ManyToOne;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -23,15 +27,26 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
  * @ApiResource(
- *     collectionOperations={},
- *     itemOperations={},
- *     shortName="custom_field_options",
+ *     collectionOperations={
+ *          "get"={"security"="'custom_objects:custom_fields:viewother'"},
+ *          "post"={"security"="'custom_objects:custom_fields:create'"}
+ *     },
+ *     itemOperations={
+ *          "get"={"security"="'custom_objects:custom_fields:view'"},
+ *          "put"={"security"="'custom_objects:custom_fields:edit'"},
+ *          "patch"={"security"="'custom_objects:custom_fields:edit'"},
+ *          "delete"={"security"="'custom_objects:custom_fields:delete'"}
+ *     },
+ *     shortName="custom_field_options"
  * )
  */
 class CustomFieldOption implements \ArrayAccess
 {
     /**
      * @var CustomField|null
+     * @Id @Column(type="integer")
+     * @ManyToOne(targetEntity="CustomField", inversedBy="options")
+     * @JoinColumn("custom_field_id")
      */
     private $customField;
 
@@ -43,6 +58,7 @@ class CustomFieldOption implements \ArrayAccess
 
     /**
      * @var string|null
+     * @Id @Column(type="integer")
      * @Groups({"custom_object:read", "custom_object:write", "custom_field:read", "custom_field:write"})
      */
     private $value;
