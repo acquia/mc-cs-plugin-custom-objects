@@ -122,30 +122,30 @@ final class CustomFieldFunctionalTest extends MauticMysqlTestCase
     private function createField($customObject): Response
     {
         $payload = $this->getCreatePayload('/api/v2/custom_objects/'.$customObject->getId());
-        $server = ['CONTENT_TYPE' => 'application/ld+json', 'ACCEPT' => 'application/ld+json'];
-        $this->client->request('POST', '/api/v2/custom_fields.jsonld', [], [], $server, json_encode($payload));
+        $server = ['CONTENT_TYPE' => 'application/ld+json', 'HTTP_ACCEPT' => 'application/ld+json'];
+        $this->client->request('POST', '/api/v2/custom_fields', [], [], $server, json_encode($payload));
         return $this->client->getResponse();
     }
 
     private function retrieveField(string $createdId): Response
     {
-        $server = ['CONTENT_TYPE' => 'application/ld+json', 'ACCEPT' => 'application/ld+json'];
-        $this->client->request('GET', $createdId.'.jsonld', [], [], $server);
+        $server = ['CONTENT_TYPE' => 'application/ld+json', 'HTTP_ACCEPT' => 'application/ld+json'];
+        $this->client->request('GET', $createdId, [], [], $server);
         return $this->client->getResponse();
     }
 
     private function updateField(string $createdId): Response
     {
-        $server = ['CONTENT_TYPE' => 'application/ld+json', 'ACCEPT' => 'application/ld+json'];
+        $server = ['CONTENT_TYPE' => 'application/ld+json', 'HTTP_ACCEPT' => 'application/ld+json'];
         $payload = $this->getEditPayload();
-        $this->client->request('PUT', $createdId.'.jsonld', [], [], $server, json_encode($payload));
+        $this->client->request('PUT', $createdId, [], [], $server, json_encode($payload));
         return $this->client->getResponse();
     }
 
     private function deleteField(string $createdId): Response
     {
-        $server = ['CONTENT_TYPE' => 'application/ld+json', 'ACCEPT' => 'application/ld+json'];
-        $this->client->request('DELETE', $createdId.'.jsonld', [], [], $server);
+        $server = ['CONTENT_TYPE' => 'application/ld+json', 'HTTP_ACCEPT' => 'application/ld+json'];
+        $this->client->request('DELETE', $createdId, [], [], $server);
         return $this->client->getResponse();
     }
 

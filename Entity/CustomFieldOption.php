@@ -32,10 +32,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  *          "post"={"security"="'custom_objects:custom_fields:create'"}
  *     },
  *     itemOperations={
- *          "get"={"security"="'custom_objects:custom_fields:view'"},
- *          "put"={"security"="'custom_objects:custom_fields:edit'"},
- *          "patch"={"security"="'custom_objects:custom_fields:edit'"},
- *          "delete"={"security"="'custom_objects:custom_fields:delete'"}
+ *          "get"={"security"="'custom_objects:custom_fields:view(getCustomField)'"},
+ *          "put"={"security"="'custom_objects:custom_fields:edit(getCustomField)'"},
+ *          "patch"={"security"="'custom_objects:custom_fields:edit(getCustomField)'"},
+ *          "delete"={"security"="'custom_objects:custom_fields:delete(getCustomField)'"}
  *     },
  *     shortName="custom_field_options"
  * )

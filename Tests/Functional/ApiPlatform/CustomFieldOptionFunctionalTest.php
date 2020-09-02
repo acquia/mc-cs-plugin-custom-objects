@@ -18,9 +18,7 @@ use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use Symfony\Component\BrowserKit\Cookie;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 /**
  * @IgnoreAnnotation("dataProvider")
@@ -77,11 +75,10 @@ final class CustomFieldOptionFunctionalTest extends MauticMysqlTestCase
 
         // CREATE OBJECT AND FIELD
         $customObject = $this->createCustomObject();
-        $customField = $this->createField($customObject);
+        $customField = $this->createField($customObject, $user);
 
         // CREATE
         $clientCreateResponse = $this->createFieldOption($customField);
-        dump($clientCreateResponse->getContent());
         $this->assertEquals($httpCreated, $clientCreateResponse->getStatusCode());
 
         // RETRIEVE
@@ -128,7 +125,7 @@ final class CustomFieldOptionFunctionalTest extends MauticMysqlTestCase
         return $customObject;
     }
 
-    private function createField(CustomObject $customObject): CustomField
+    private function createField(CustomObject $customObject, User $user): CustomField
     {
         $customField = new CustomField();
         $customField->setLabel('Test custom field');
@@ -136,6 +133,7 @@ final class CustomFieldOptionFunctionalTest extends MauticMysqlTestCase
         $customField->setCustomObject($customObject);
         $customField->setType('multiselect');
         $customField->setDefaultValue('custom field text');
+        $customField->setCreatedBy($user);
         $this->em->persist($customField);
         $this->em->flush();
         return $customField;
@@ -144,21 +142,21 @@ final class CustomFieldOptionFunctionalTest extends MauticMysqlTestCase
     private function createFieldOption(CustomField $customField): Response
     {
         $payload = $this->getCreatePayload('/api/v2/custom_fields/'.$customField->getId());
-        $server = ['CONTENT_TYPE' => 'application/ld+json', 'ACCEPT' => 'application/ld+json'];
+        $server = ['CONTENT_TYPE' => 'application/ld+json', 'HTTP_ACCEPT' => 'application/ld+json'];
         $this->client->request('POST', '/api/v2/custom_field_options', [], [], $server, json_encode($payload));
         return $this->client->getResponse();
     }
 
     private function retrieveFieldOption(string $createdId): Response
     {
-        $server = ['CONTENT_TYPE' => 'application/ld+json', 'ACCEPT' => 'application/ld+json'];
+        $server = ['CONTENT_TYPE' => 'application/ld+json', 'HTTP_ACCEPT' => 'application/ld+json'];
         $this->client->request('GET', $createdId, [], [], $server);
         return $this->client->getResponse();
     }
 
     private function updateFieldOption(string $createdId): Response
     {
-        $server = ['CONTENT_TYPE' => 'application/ld+json', 'ACCEPT' => 'application/ld+json'];
+        $server = ['CONTENT_TYPE' => 'application/ld+json', 'HTTP_ACCEPT' => 'application/ld+json'];
         $payload = $this->getEditPayload();
         $this->client->request('PUT', $createdId, [], [], $server, json_encode($payload));
         return $this->client->getResponse();
@@ -166,7 +164,7 @@ final class CustomFieldOptionFunctionalTest extends MauticMysqlTestCase
 
     private function deleteFieldOption(string $createdId): Response
     {
-        $server = ['CONTENT_TYPE' => 'application/ld+json', 'ACCEPT' => 'application/ld+json'];
+        $server = ['CONTENT_TYPE' => 'application/ld+json', 'HTTP_ACCEPT' => 'application/ld+json'];
         $this->client->request('DELETE', $createdId, [], [], $server);
         return $this->client->getResponse();
     }
@@ -176,7 +174,8 @@ final class CustomFieldOptionFunctionalTest extends MauticMysqlTestCase
         return [
             "label"        => "New Custom Field Option",
             "value"        => "custom_field_option",
-            "order"        => 0
+            "order"        => 0,
+            "customField"  => $customField,
         ];
     }
 
@@ -211,9 +210,9 @@ final class CustomFieldOptionFunctionalTest extends MauticMysqlTestCase
                     ['viewown', 'viewother', 'editown', 'editother', 'create', 'publishown', 'publishother'],
                     Response::HTTP_CREATED,
                     Response::HTTP_OK,
-                    "New Custom Field",
+                    "New Custom Field Option",
                     Response::HTTP_OK,
-                    "Edited Custom Field",
+                    "Edited Custom Field Option",
                     Response::HTTP_FORBIDDEN
                 ],
             "no_update" =>
@@ -221,7 +220,7 @@ final class CustomFieldOptionFunctionalTest extends MauticMysqlTestCase
                     ['viewown', 'viewother', 'create', 'deleteown', 'deleteother', 'publishown', 'publishother'],
                     Response::HTTP_CREATED,
                     Response::HTTP_OK,
-                    "New Custom Field",
+                    "New Custom Field Option",
                     Response::HTTP_FORBIDDEN,
                     null,
                     Response::HTTP_NO_CONTENT
