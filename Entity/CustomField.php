@@ -450,10 +450,6 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      */
     public function setDefaultValue($defaultValue): void
     {
-        if (!$this->getTypeObject()) {
-            $this->defaultValue = $defaultValue;
-            return;
-        }
         try {
             $this->defaultValue = $this->getTypeObject()->createDefaultValueTransformer()->reverseTransform($defaultValue);
 
