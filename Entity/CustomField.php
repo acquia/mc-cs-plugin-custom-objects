@@ -131,7 +131,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     private $customObject;
 
     /**
-     * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
+     * @Groups({"custom_field:read", "custom_field:write"})
      * @ApiProperty(
      *     attributes={
      *         "openapi_context"={

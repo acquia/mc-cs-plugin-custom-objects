@@ -58,17 +58,21 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
     {
         $optionEntitiesCollection = null;
         $defaultValue = null;
-        if ($class === CustomField::class and array_key_exists('options', $data) and count($data['options']) > 0) {
+        if ($class === CustomField::class) {
             // Store and unset values that need TypeObject
-            $options = $data['options'];
-            unset($data['options']);
-            $defaultValue = $data['defaultValue'];
-            unset($data['defaultValue']);
-            $optionEntities = [];
-            foreach($options as $option){
-                $optionEntities[] = $this->decorated->denormalize($option, CustomFieldOption::class, $format, $context);
+            if (array_key_exists('options', $data) and count($data['options']) > 0) {
+                $options = $data['options'];
+                unset($data['options']);
+                $optionEntities = [];
+                foreach($options as $option){
+                    $optionEntities[] = $this->decorated->denormalize($option, CustomFieldOption::class, $format, $context);
+                }
+                $optionEntitiesCollection = new ArrayCollection($optionEntities);
             }
-            $optionEntitiesCollection = new ArrayCollection($optionEntities);
+            if (array_key_exists('defaultValue', $data)) {
+                $defaultValue = $data['defaultValue'];
+                unset($data['defaultValue']);
+            }
         }
         $entity = $this->decorated->denormalize($data, $class, $format, $context);
         if ($entity instanceof CustomField) {
