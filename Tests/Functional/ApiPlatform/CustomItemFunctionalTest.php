@@ -4,25 +4,16 @@
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\ApiPlatform;
 
 
-use Doctrine\Common\Annotations\Annotation\IgnoreAnnotation;
-use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
-use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
-use Mautic\UserBundle\Entity\User;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * @IgnoreAnnotation("dataProvider")
- */
-final class CustomObjectFunctionalTest extends AbstractApiPlatformFunctionalTest
+final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
 {
     /**
      * @dataProvider getCRUDProvider
      *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function testCustomObjectCRUD(
+    public function testCustomItemCRUD(
         array $permissions,
         string $httpCreated,
         string $httpRetrieved,
@@ -32,11 +23,11 @@ final class CustomObjectFunctionalTest extends AbstractApiPlatformFunctionalTest
         string $httpDeleted): void
     {
         $user = $this->getUser();
-        $this->setPermission($user, 'custom_objects:custom_objects' ,$permissions);
+        $this->setPermission($user, 'custom_objects:custom_items' ,$permissions);
 
         // CREATE
         $payloadCreate = $this->getCreatePayload();
-        $clientCreateResponse = $this->createEntity('custom_objects', $payloadCreate);
+        $clientCreateResponse = $this->createEntity('custom_items', $payloadCreate);
         $this->assertEquals($httpCreated, $clientCreateResponse->getStatusCode());
         if (Response::HTTP_FORBIDDEN === $clientCreateResponse->getStatusCode()) {
             return;

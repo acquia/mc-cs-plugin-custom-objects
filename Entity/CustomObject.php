@@ -13,11 +13,15 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\OneToOne;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
@@ -26,6 +30,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Form\Validator\Constraints\CustomObjectTypeValues;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -97,7 +102,6 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @var Category|null
      * @Assert\Valid
-     * @Groups({"custom_object:read", "custom_object:write"})
      **/
     private $category;
 
@@ -109,16 +113,41 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var int|null
+     * @Groups({"custom_object:read", "custom_object:write"})
      */
     private $type = self::TYPE_MASTER;
 
     /**
      * @var CustomObject|null
+     * @OneToOne(targetEntity="CustomObject")
+     * @JoinColumn(name="master_object", referencedColumnName="id")
+     * @Groups({"custom_object:read", "custom_object:write"})
+     * @ApiProperty(
+     *     attributes={
+     *         "openapi_context"={
+     *             "type"="string",
+     *             "maxLength"=255,
+     *             "nullable"=false
+     *         }
+     *     }
+     * )
      */
     private $masterObject;
 
     /**
      * @var CustomObject|null
+     * @OneToOne(targetEntity="CustomObject")
+     * @JoinColumn(name="relationship_object", referencedColumnName="id", onDelete="SET NULL")
+     * @Groups({"custom_object:read", "custom_object:write"})
+     * @ApiProperty(
+     *     attributes={
+     *         "openapi_context"={
+     *             "type"="string",
+     *             "maxLength"=255,
+     *             "nullable"=false
+     *         }
+     *     }
+     * )
      */
     private $relationshipObject;
 

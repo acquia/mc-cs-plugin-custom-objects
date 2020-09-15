@@ -125,13 +125,13 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     /**
      * @ManyToOne(targetEntity="CustomObject", inversedBy="customFields")
      * @JoinColumn(name="custom_object_id", referencedColumnName="id")
-     * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
+     * @Groups({"custom_field:read", "custom_field:write"})
      * @var CustomObject|null
      */
     private $customObject;
 
     /**
-     * @Groups({"custom_field:read", "custom_field:write"})
+     * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
      * @ApiProperty(
      *     attributes={
      *         "openapi_context"={
