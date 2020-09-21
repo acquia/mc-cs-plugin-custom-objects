@@ -122,15 +122,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
      * @OneToOne(targetEntity="CustomObject")
      * @JoinColumn(name="master_object", referencedColumnName="id")
      * @Groups({"custom_object:read", "custom_object:write"})
-     * @ApiProperty(
-     *     attributes={
-     *         "openapi_context"={
-     *             "type"="string",
-     *             "maxLength"=255,
-     *             "nullable"=false
-     *         }
-     *     }
-     * )
+     * @ApiProperty(readableLink=false, writableLink=false)
      */
     private $masterObject;
 
@@ -139,15 +131,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
      * @OneToOne(targetEntity="CustomObject")
      * @JoinColumn(name="relationship_object", referencedColumnName="id", onDelete="SET NULL")
      * @Groups({"custom_object:read", "custom_object:write"})
-     * @ApiProperty(
-     *     attributes={
-     *         "openapi_context"={
-     *             "type"="string",
-     *             "maxLength"=255,
-     *             "nullable"=false
-     *         }
-     *     }
-     * )
+     * @ApiProperty(readableLink=false, writableLink=false)
      */
     private $relationshipObject;
 

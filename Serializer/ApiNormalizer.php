@@ -6,8 +6,10 @@ namespace MauticPlugin\CustomObjectsBundle\Serializer;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -23,9 +25,14 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
      */
     private $customFieldTypeProvider;
 
+    /**
+     * @var CustomItemModel
+     */
+    private $customItemModel;
+
     private $decorated;
 
-    public function __construct(NormalizerInterface $decorated, CustomFieldTypeProvider $customFieldTypeProvider)
+    public function __construct(NormalizerInterface $decorated, CustomFieldTypeProvider $customFieldTypeProvider, CustomItemModel $customItemModel)
     {
         if (!$decorated instanceof DenormalizerInterface) {
             throw new \InvalidArgumentException(sprintf('The decorated normalizer must implement the %s.', DenormalizerInterface::class));
@@ -33,6 +40,7 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
 
         $this->decorated = $decorated;
         $this->customFieldTypeProvider = $customFieldTypeProvider;
+        $this->customItemModel = $customItemModel;
     }
 
     public function supportsNormalization($data, $format = null)
@@ -42,6 +50,9 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
 
     public function normalize($object, $format = null, array $context = [])
     {
+        if ($object instanceof CustomItem) {
+            $object = $this->customItemModel->fetchEntity($object->getId());
+        }
         return $this->decorated->normalize($object, $format, $context);
     }
 
@@ -92,6 +103,9 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
             catch(NotFoundException $e) {
                 throw new InvalidArgumentException($e->getMessage());
             }
+        }
+        if ($entity instanceof CustomItem) {
+
         }
         return $entity;
     }

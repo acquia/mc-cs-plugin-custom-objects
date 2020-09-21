@@ -1131,7 +1131,8 @@ return [
                 'decoratedService' => ['api_platform.jsonld.normalizer.item', 'api_platform.jsonld.normalizer.item.inner'],
                 'arguments'        => [
                     'api_platform.jsonld.normalizer.item.inner',
-                    'custom_field.type.provider'
+                    'custom_field.type.provider',
+                    'mautic.custom.model.item'
                 ],
             ],
         ],
