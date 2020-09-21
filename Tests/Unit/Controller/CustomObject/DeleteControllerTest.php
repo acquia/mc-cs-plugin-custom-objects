@@ -25,6 +25,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use MauticPlugin\CustomObjectsBundle\Exception\InUseException;
 
 class DeleteControllerTest extends ControllerTestCase
 {
@@ -76,6 +77,29 @@ class DeleteControllerTest extends ControllerTestCase
         $this->flashBag->expects($this->never())
             ->method('add');
 
+        $this->deleteController->deleteAction(self::OBJECT_ID);
+    }
+    
+    public function testDeleteActionIfCustomObjectIsInUse(): void
+    {
+        $customObject = $this->createMock(CustomObject::class);
+        
+        $customObject->method('getId')->willReturn(self::OBJECT_ID);
+        
+        $this->customObjectModel->expects($this->once())
+        ->method('fetchEntity')
+        ->with(self::OBJECT_ID)
+        ->willReturn($customObject);
+        
+        $this->customObjectModel->expects($this->once())
+        ->method('checkCustomObjectIsAssociated')
+        ->with(self::OBJECT_ID)
+        ->will($this->throwException(new InUseException()));
+        
+        $this->flashBag->expects($this->once())
+        ->method('add')
+        ->with('custom.item.error.link.segment');
+        
         $this->deleteController->deleteAction(self::OBJECT_ID);
     }
 
