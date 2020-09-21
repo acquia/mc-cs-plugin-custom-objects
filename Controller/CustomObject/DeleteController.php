@@ -17,6 +17,7 @@ use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Service\FlashBag;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Exception\InUseException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectSessionProvider;
@@ -65,21 +66,33 @@ class DeleteController extends CommonController
         try {
             $customObject = $this->customObjectModel->fetchEntity($objectId);
             $this->permissionProvider->canDelete($customObject);
+            $this->customObjectModel->checkCustomObjectIsAssociated($objectId);
+            $this->customObjectModel->delete($customObject);
+            
+            $this->flashBag->add(
+                'mautic.core.notice.deleted',
+                [
+                    '%name%' => $customObject->getName(),
+                    '%id%'   => $customObject->getId(),
+                ]
+            );
+            
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
             return $this->accessDenied(false, $e->getMessage());
+        } catch (InUseException $e) {
+            $this->flashBag->add(
+                'custom.item.error.link.segment',
+                [
+                    '%itemName%' => $customObject->getName(),
+                    '%segmentList%'   => implode(', ', $e->getSegmentList()),
+                ],
+                FlashBag::LEVEL_ERROR
+            );
         }
 
-        $this->customObjectModel->delete($customObject);
-
-        $this->flashBag->add(
-            'mautic.core.notice.deleted',
-            [
-                '%name%' => $customObject->getName(),
-                '%id%'   => $customObject->getId(),
-            ]
-        );
+        
 
         return $this->forward(
             'CustomObjectsBundle:CustomObject\List:list',

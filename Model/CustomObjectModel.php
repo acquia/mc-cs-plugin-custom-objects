@@ -27,6 +27,7 @@ use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Exception\InUseException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
@@ -134,6 +135,33 @@ class CustomObjectModel extends FormModel
         return $customObject;
     }
 
+    /**
+     * @throws InUseException
+     */
+    public function checkCustomObjectIsAssociated(int $customObjectId): Void
+    {   
+        
+        $fieldValueLength = 4 + strlen((string)$customObjectId); // 4 char for cmo_
+        
+        $queryBuilder = $this->em->getConnection()->createQueryBuilder();
+        $queryBuilder->select('l.name')
+        ->from(MAUTIC_TABLE_PREFIX.'lead_lists','l')
+        ->where($queryBuilder->expr()->eq('l.is_published', 1))
+        ->andWhere($queryBuilder->expr()->like('l.filters', ':object'))
+        ->andWhere($queryBuilder->expr()->like('l.filters', ':field'))
+        ->setParameter('object', '%s:6:"object";s:13:"custom_object";%')
+        ->setParameter('field', '%s:5:"field";s:'.$fieldValueLength.':"cmo_'.$customObjectId.'";%');
+        
+        $segmentList = $queryBuilder->execute()->fetchAll();
+        if (!empty($segmentList))
+        {
+            $list = array_column($segmentList, 'name');
+            $exception = new InUseException();
+            $exception->setSegmentList($list);
+            throw $exception;
+        }
+    }
+    
     /**
      * @throws NotFoundException
      */
