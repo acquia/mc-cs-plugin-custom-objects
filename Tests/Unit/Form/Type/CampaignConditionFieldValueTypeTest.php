@@ -93,9 +93,9 @@ class CampaignConditionFieldValueTypeTest extends TestCase
             ->expects(self::at(0))
             ->method('add')
             ->with(
-                    'field',
-                    ChoiceType::class,
-                    [
+                'field',
+                ChoiceType::class,
+                [
                         'required' => true,
                         'label'    => 'custom.item.field',
                         'choices'  => $fields,
