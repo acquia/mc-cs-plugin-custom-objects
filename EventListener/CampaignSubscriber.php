@@ -127,6 +127,12 @@ class CampaignSubscriber implements EventSubscriberInterface
         $customObjects = $this->customObjectModel->fetchAllPublishedEntities();
 
         foreach ($customObjects as $customObject) {
+
+            if ($customObject->getCustomFields()->count() === 0) {
+                // Filter COs without defined custom fields
+                continue;
+            }
+
             $event->addAction("custom_item.{$customObject->getId()}.linkcontact", [
                 'label'           => $this->translator->trans('custom.item.events.link.contact', ['%customObject%' => $customObject->getNameSingular()]),
                 'description'     => $this->translator->trans('custom.item.events.link.contact_descr', ['%customObject%' => $customObject->getNameSingular()]),
