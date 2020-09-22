@@ -68,16 +68,14 @@ class CampaignConditionFieldValueType extends AbstractType
                 'attr'     => [
                     'class' => 'form-control',
                 ],
-                'choice_attr' => function ($fieldId) use ($fields) {
-                    /** @var CustomField $field */
-                    $field = $fields[$fieldId];
-
+                'choice_attr' => array_map(function ($field){
                     return [
                         'data-operators'  => json_encode($field->getTypeObject()->getOperatorOptions()),
                         'data-options'    => json_encode($field->getChoices()),
                         'data-field-type' => $field->getType(),
                     ];
                 },
+                $fields)
             ]
         );
 
