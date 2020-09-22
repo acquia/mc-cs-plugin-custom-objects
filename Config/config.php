@@ -918,6 +918,14 @@ return [
                 ],
                 'tag' => 'console.command',
             ],
+            'custom_object.command.delete_custom_object' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Command\DeleteCustomObjectCommand::class,
+                'arguments' => [
+                    'custom_object.repository',
+                    'doctrine.orm.entity_manager',
+                ],
+                'tag' => 'console.command',
+            ]
         ],
         'fieldTypes' => [
             'custom.field.type.country' => [
