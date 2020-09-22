@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Form\Type;
 
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use Symfony\Component\Form\AbstractType;
@@ -68,14 +67,16 @@ class CampaignConditionFieldValueType extends AbstractType
                 'attr'     => [
                     'class' => 'form-control',
                 ],
-                'choice_attr' => array_map(function ($field){
-                    return [
+                'choice_attr' => array_map(
+                    function ($field) {
+                        return [
                         'data-operators'  => json_encode($field->getTypeObject()->getOperatorOptions()),
                         'data-options'    => json_encode($field->getChoices()),
                         'data-field-type' => $field->getType(),
                     ];
-                },
-                $fields)
+                    },
+                    $fields
+                )
             ]
         );
 
