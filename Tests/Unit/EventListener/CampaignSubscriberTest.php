@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Statement;
@@ -33,9 +34,10 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
+class CampaignSubscriberTest extends TestCase
 {
     private const OBJECT_ID = 63;
 
@@ -68,6 +70,7 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
 
         $this->customFieldModel       = $this->createMock(CustomFieldModel::class);
         $this->customObjectModel      = $this->createMock(CustomObjectModel::class);
@@ -121,6 +124,13 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
 
     public function testOnCampaignBuild(): void
     {
+        $customFields = new ArrayCollection();
+        $customFields->add(new CustomField());
+
+        $this->customObject->expects(self::once())
+            ->method('getCustomFields')
+            ->willReturn($customFields);
+
         $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
             ->willReturn(true);
@@ -136,6 +146,28 @@ class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->campaignBuilderEvent->expects($this->at(1))
             ->method('addCondition')
             ->with('custom_item.63.fieldvalue');
+
+        $this->campaignSubscriber->onCampaignBuild($this->campaignBuilderEvent);
+    }
+
+    public function testOnCampaignBuildNoCustomFieldsDefined(): void
+    {
+        $customFields = new ArrayCollection();
+        $this->customObject->expects(self::once())
+            ->method('getCustomFields')
+            ->willReturn($customFields);
+
+        $this->configProvider->expects($this->once())
+            ->method('pluginIsEnabled')
+            ->willReturn(true);
+
+        $this->customObjectModel->expects($this->once())
+            ->method('fetchAllPublishedEntities')
+            ->willReturn([$this->customObject]);
+
+        $this->campaignBuilderEvent->expects(self::never())
+            ->method('addAction')
+            ->with('custom_item.63.linkcontact');
 
         $this->campaignSubscriber->onCampaignBuild($this->campaignBuilderEvent);
     }
