@@ -84,7 +84,7 @@ class DeleteController extends CommonController
             $this->flashBag->add(
                 'custom.item.error.link.segment',
                 [
-                    '%itemName%' => $customObject->getName(),
+                    '%itemName%' => isset($customObject) ? $customObject->getName() : null,
                     '%segmentList%'   => implode(', ', $e->getSegmentList()),
                 ],
                 FlashBag::LEVEL_ERROR
