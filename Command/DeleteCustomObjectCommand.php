@@ -84,7 +84,7 @@ class DeleteCustomObjectCommand extends ContainerAwareCommand
         }
         catch (\Exception $e) {
             $this->entityManager->rollback();
-            $errorMessage = sprintf('An error occurred when trying to delete custom object #ID %s, and the changes were rolled back: %s', $customObjectId, $e->getMessage());
+            $errorMessage = sprintf('The following error occurred when trying to delete custom object #ID %s (and the changes were rolled back): %s', $customObjectId, $e->getMessage());
             $io->error($errorMessage);
             return 1;
         }
