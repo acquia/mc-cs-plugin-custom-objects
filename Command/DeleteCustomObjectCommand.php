@@ -54,7 +54,7 @@ class DeleteCustomObjectCommand extends ContainerAwareCommand
     {
         $this
             ->setName(static::COMMAND_NAME)
-            ->setDescription('Deletes a master custom object and all of its related children.')
+            ->setDescription('Deletes a custom object and all of its related children (if any).')
             ->addArgument(
                 'custom-object-id',
                 InputOption::VALUE_REQUIRED,
@@ -73,7 +73,8 @@ class DeleteCustomObjectCommand extends ContainerAwareCommand
         $customObject = $this->customObjectRepository->find($customObjectId);
 
         if (!$customObject instanceof CustomObject) {
-            $io->error(sprintf('Custom object ID #%s doesn\'t exist. It\'s impossible to delete it', $customObjectId));
+            $errorMessage = sprintf('Custom object ID #%s doesn\'t exist. It\'s impossible to delete it', $customObjectId);
+            $io->error($errorMessage);
             return 1;
         }
 
@@ -84,7 +85,7 @@ class DeleteCustomObjectCommand extends ContainerAwareCommand
         }
         catch (\Exception $e) {
             $this->entityManager->rollback();
-            $errorMessage = sprintf('The following error occurred when trying to delete custom object #ID %s (and the changes were rolled back): %s', $customObjectId, $e->getMessage());
+            $errorMessage = sprintf('The following error occurred when trying to delete custom object ID #%s (and the changes were rolled back): %s', $customObjectId, $e->getMessage());
             $io->error($errorMessage);
             return 1;
         }
