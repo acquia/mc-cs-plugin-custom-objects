@@ -228,7 +228,7 @@ class CustomObjectTypeTest extends TestCase
                     'buttons',
                     FormButtonsType::class,
                     [
-                        'cancel_onclick' => "mQuery('form[name=custom_object]').attr('method', 'get').attr('action', mQuery('form[name=custom_object]').attr('action').replace('/save', '/cancel'));",
+                        'cancel_onclick' => "mQuery('form[name=custom_object]').attr('action', mQuery('form[name=custom_object]').attr('action').replace('/save', '/cancel'));",
                     ]
                 ]
             );
