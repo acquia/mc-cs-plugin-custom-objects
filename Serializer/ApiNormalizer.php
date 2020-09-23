@@ -104,9 +104,6 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
                 throw new InvalidArgumentException($e->getMessage());
             }
         }
-        if ($entity instanceof CustomItem) {
-
-        }
         return $entity;
     }
 

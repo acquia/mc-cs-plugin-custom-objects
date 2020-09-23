@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
@@ -37,6 +38,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
  * @ApiResource(
@@ -58,6 +60,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  *          "formats"={"jsonld", "json", "html", "csv"={"text/csv"}}
  *     }
  * )
+ * @ApiFilter(SearchFilter::class, properties={"alias": "partial"})
  */
 class CustomField extends FormEntity implements UniqueEntityInterface
 {
@@ -110,7 +113,20 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      *             "type"="string",
      *             "maxLength"=255,
      *             "nullable"=false,
-     *             "example"="text"
+     *             "example"="text",
+     *             "enum"={
+     *                 "checkbox_group",
+     *                 "country",
+     *                 "datetime",
+     *                 "date",
+     *                 "email",
+     *                 "hidden",
+     *                 "int",
+     *                 "multiselect",
+     *                 "phone",
+     *                 "radio_group",
+     *                 "select"
+     *             }
      *         }
      *     }
      * )

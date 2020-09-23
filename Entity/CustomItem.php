@@ -110,21 +110,42 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      * @var Category|null
      * @ManyToOne(targetEntity="Category")
      * @JoinColumn(name="category_id", referencedColumnName="id")
+     * @ApiProperty(readableLink=false, writableLink=false)
      * @Groups({"custom_item:read", "custom_item:write"})
      **/
     private $category;
 
     /**
      * @var ArrayCollection
+     */
+    private $customFieldValues;
+
+    /**
+     * @var array
      * @ApiProperty(
      *     attributes={
      *         "openapi_context"={
-     *             "type"="object",
-     *             "additionalProperties"={
-     *                 "oneOf"={
-     *                      {"type"="string"},
-     *                      {"type"="number"},
-     *                      {"type"="boolean"}
+     *             "type"="array",
+     *             "items"={
+     *                 "type"="object",
+     *                 "properties"={
+     *                     "type"={
+     *                         "type"="string"
+     *                     },
+     *                     "alias"={
+     *                         "type"="string"
+     *                     },
+     *                     "value"={
+     *                         "type"="object",
+     *                         "additionalProperties"={
+     *                             "oneOf"={
+     *                                 {"type"="string"},
+     *                                 {"type"="number"},
+     *                                 {"type"="boolean"},
+     *                                 {"type"="array"}
+     *                             }
+     *                         }
+     *                     }
      *                 }
      *             }
      *         }
@@ -132,7 +153,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      * )
      * @Groups({"custom_item:read", "custom_item:write"})
      */
-    private $customFieldValues;
+    private $fieldValues;
 
     /**
      * @var mixed[]
@@ -141,13 +162,11 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var ArrayCollection
-     * @Groups({"custom_item:read", "custom_item:write"})
      */
     private $contactReferences;
 
     /**
      * @var ArrayCollection
-     * @Groups({"custom_item:read", "custom_item:write"})
      */
     private $companyReferences;
 
@@ -388,6 +407,43 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         }
 
         return $this->customFieldValues;
+    }
+
+    /**
+     * Just for API
+     */
+    public function getFieldValues(): array
+    {
+        $fieldValues = [];
+        if (null === $this->customFieldValues) {
+            $this->customFieldValues = new ArrayCollection();
+        }
+        foreach($this->customFieldValues as $customFieldValue) {
+            $fieldValues[] =
+                [
+                    'type' => $customFieldValue->getCustomField()->getType(),
+                    'value' => $customFieldValue->getValue(),
+                    'alias' => $customFieldValue->getCustomField()->getAlias(),
+                ];
+        }
+        return $fieldValues;
+    }
+
+    /**
+     * Just for API
+     */
+    public function setFieldValues(array $values): void
+    {
+        foreach ($values as $value)
+        {
+            try {
+                $customFieldValue = $this->findCustomFieldValueForFieldAlias((string) $value['alias']);
+                $customFieldValue->setValue($value['value']);
+            } catch (NotFoundException $e) {
+                $this->createNewCustomFieldValueByFieldAlias((string) $value['alias'], $value['value']);
+            }
+        }
+        $this->setDefaultValuesForMissingFields();
     }
 
     /**
