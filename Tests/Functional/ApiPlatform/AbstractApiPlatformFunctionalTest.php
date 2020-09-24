@@ -4,14 +4,26 @@
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\ApiPlatform;
 
 
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
 use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
 use Mautic\UserBundle\Entity\User;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Response;
 
 abstract class AbstractApiPlatformFunctionalTest extends MauticMysqlTestCase
 {
+    /**
+     * @var EntityManager
+     */
+    protected $em;
+
+    /**
+     * @var Container
+     */
+    protected $container;
+
     /**
      * @var array
      */
@@ -38,7 +50,7 @@ abstract class AbstractApiPlatformFunctionalTest extends MauticMysqlTestCase
         $this->client = static::createClient([], $this->clientUser);
         $this->client->disableReboot();
         $this->client->followRedirects(false);
-        $this->container = $this->client->getContainer();
+        $this->container       = $this->client->getContainer();
         $this->em        = $this->container->get('doctrine')->getManager();
         $repository      = $this->em->getRepository(User::class);
         $user = $repository->findOneBy(['firstName' => 'Sales']);

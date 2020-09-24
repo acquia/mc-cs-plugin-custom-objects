@@ -34,14 +34,14 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 /**
  * @ApiResource(
  *     collectionOperations={
- *          "get"={"security"="'custom_objects:custom_items:viewother'"},
- *          "post"={"security"="'custom_objects:custom_items:create'"}
+ *          "get"={"security"="'custom_objects:[customObject]:viewother'"},
+ *          "post"={"security"="'custom_objects:[customObject]:create'"}
  *     },
  *     itemOperations={
- *          "get"={"security"="'custom_objects:custom_items:view'"},
- *          "put"={"security"="'custom_objects:custom_items:edit'"},
- *          "patch"={"security"="'custom_objects:custom_items:edit'"},
- *          "delete"={"security"="'custom_objects:custom_items:delete'"}
+ *          "get"={"security"="'custom_objects:[customObject]:view'"},
+ *          "put"={"security"="'custom_objects:[customObject]:edit'"},
+ *          "patch"={"security"="'custom_objects:[customObject]:edit'"},
+ *          "delete"={"security"="'custom_objects:[customObject]:delete'"}
  *     },
  *     shortName="custom_items",
  *     normalizationContext={"groups"={"custom_item:read"}, "swagger_definition_name"="Read"},
