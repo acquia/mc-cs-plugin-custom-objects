@@ -10,10 +10,17 @@
  */
 
 use Mautic\CoreBundle\Templating\Engine\PhpEngine;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\MultiselectType;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\SelectType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
+
 
 /* @var PhpEngine $view */
 /* @var CustomFieldValueInterface $fieldValue */
+
+$customFieldTypeObject = $fieldValue->getCustomField()->getTypeObject();
+$isOfSelectOrMultiselectType =
+    $customFieldTypeObject instanceof SelectType || $customFieldTypeObject instanceof MultiselectType;
 ?>
 <?php if ($fieldValue->getValue() instanceof DateTimeInterface) : ?>
     <?php if ('date' === $fieldValue->getCustomField()->getType()) : ?>
@@ -21,6 +28,8 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
     <?php else : // This must be 'datetime' field?>
         <?php echo $view['date']->toFull($fieldValue->getValue()); ?>
     <?php endif; ?>
+<?php elseif ($isOfSelectOrMultiselectType) : ?>
+
 <?php elseif (is_array($fieldValue->getValue())) : ?>
     <?php echo $view->escape($view['formatter']->arrayToString($fieldValue->getValue())); ?>
 <?php else : ?>
