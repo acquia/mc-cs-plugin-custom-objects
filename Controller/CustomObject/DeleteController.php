@@ -15,11 +15,14 @@ namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Service\FlashBag;
+use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
+use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -45,11 +48,17 @@ class DeleteController extends CommonController
      */
     private $permissionProvider;
 
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
     public function __construct(
         CustomObjectModel $customObjectModel,
         SessionProviderFactory $sessionProviderFactory,
         FlashBag $flashBag,
-        CustomObjectPermissionProvider $permissionProvider
+        CustomObjectPermissionProvider $permissionProvider,
+        EventDispatcherInterface $dispatcher
     ) {
         $this->customObjectModel      = $customObjectModel;
         $this->sessionProviderFactory = $sessionProviderFactory;
@@ -71,7 +80,8 @@ class DeleteController extends CommonController
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        $this->customObjectModel->delete($customObject);
+        $customObjectEvent = new CustomObjectEvent($customObject);
+        $this->eventDispatcher->dispatch(CustomObjectEvents::ON_CUSTOM_OBJECT_UI_PRE_DELETE, $customObjectEvent);
 
         $this->flashBag->add(
             'mautic.core.notice.deleted',

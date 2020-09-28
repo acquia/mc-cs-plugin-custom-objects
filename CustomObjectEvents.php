@@ -49,6 +49,16 @@ final class CustomObjectEvents
     public const ON_CUSTOM_OBJECT_PRE_DELETE = 'custom.object.on_pre_delete';
 
     /**
+     * The custom.object.ui.pre_delete event is fired when a user initiates custom object deletion in the UI
+     *
+     * The event listener receives a
+     * @see \MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent
+     *
+     * @var string
+     */
+    public const ON_CUSTOM_OBJECT_UI_PRE_DELETE = 'custom.object.ui.pre_delete';
+
+    /**
      * The custom.object.on_post_delete event is fired when a custom object is deleted.
      *
      * The event listener receives a

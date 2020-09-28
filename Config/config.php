@@ -301,6 +301,7 @@ return [
                     'mautic.core.service.flashbag',
                     'custom_item.permission.provider',
                     'custom_item.route.provider',
+                    'event_dispatcher',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -848,6 +849,12 @@ return [
             ],
             'custom_object.post_save.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectPostSaveSubscriber::class,
+                'arguments' => [
+                    'mautic.custom.model.object',
+                ]
+            ],
+            'custom_object.pre_delete.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectPreDeleteSubscriber::class,
                 'arguments' => [
                     'mautic.custom.model.object',
                 ]
