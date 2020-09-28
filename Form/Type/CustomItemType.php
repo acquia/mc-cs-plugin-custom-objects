@@ -91,9 +91,9 @@ class CustomItemType extends AbstractType
         $builder->add('category', CategoryListType::class, ['bundle' => 'global']);
         $builder->add('isPublished', YesNoButtonGroupType::class);
 
-        $cancelOnclickUrl = "mQuery('form[name=custom_item]').attr('method', 'get').attr('action', mQuery('form[name=custom_item]').attr('action').replace('/save', '/cancel'));";
+        $cancelOnclickUrl = "mQuery('form[name=custom_item]').attr('action', mQuery('form[name=custom_item]').attr('action').replace('/save', '/cancel'));";
         if (!empty($options['cancelUrl'])) {
-            $cancelOnclickUrl = sprintf("mQuery('form[name=custom_item]').attr('method', 'get').attr('action', %s);", json_encode($options['cancelUrl']));
+            $cancelOnclickUrl = sprintf("mQuery('form[name=custom_item]').attr('action', %s);", json_encode($options['cancelUrl']));
         }
 
         $builder->add(
