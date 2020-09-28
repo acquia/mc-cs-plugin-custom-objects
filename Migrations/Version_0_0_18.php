@@ -36,7 +36,7 @@ class Version_0_0_18 extends AbstractMigration
             $this->addSql("ALTER TABLE {$this->concatPrefix('custom_object')} DROP INDEX UNIQ_9C007FE8594D0CC2;");
         }
 
-        $this->addSql("ALTER TABLE {$this->concatPrefix('custom_object')} ADD CONSTRAINT FK_CO_MASTER_OBJECT FOREIGN KEY (master_object) REFERENCES {$this->concatPrefix('custom_object')} (id) ON UPDATE CASCADE ON DELETE CASCADE;");
+        $this->addSql("ALTER TABLE {$this->concatPrefix('custom_object')} ADD CONSTRAINT FK_CO_MASTER_OBJECT FOREIGN KEY (master_object) REFERENCES {$this->concatPrefix('custom_object')} (id) ON DELETE CASCADE;");
         $this->addSql("ALTER TABLE {$this->concatPrefix('custom_object')} ADD UNIQUE INDEX UNIQ_CO_MASTER_OBJECT (master_object);");
     }
 }
