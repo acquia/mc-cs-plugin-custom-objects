@@ -923,6 +923,7 @@ return [
                 'arguments' => [
                     'custom_object.repository',
                     'doctrine.orm.entity_manager',
+                    'mautic.custom.model.object',
                 ],
                 'tag' => 'console.command',
             ]

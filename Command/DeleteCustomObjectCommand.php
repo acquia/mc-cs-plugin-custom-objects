@@ -15,9 +15,9 @@ namespace MauticPlugin\CustomObjectsBundle\Command;
 
 use Doctrine\ORM\EntityManager;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -39,12 +39,18 @@ class DeleteCustomObjectCommand extends ContainerAwareCommand
      */
     private $entityManager;
 
-    public function __construct(CustomObjectRepository $customObjectRepository, EntityManager $entityManager)
+    /**
+     * @var CustomObjectModel
+     */
+    private $customObjectModel;
+
+    public function __construct(CustomObjectRepository $customObjectRepository, EntityManager $entityManager, CustomObjectModel $customObjectModel)
     {
         parent::__construct();
 
         $this->customObjectRepository = $customObjectRepository;
         $this->entityManager = $entityManager;
+        $this->customObjectModel = $customObjectModel;
     }
 
     /**
@@ -54,7 +60,7 @@ class DeleteCustomObjectCommand extends ContainerAwareCommand
     {
         $this
             ->setName(static::COMMAND_NAME)
-            ->setDescription('Deletes a custom object and all of its related children (if any).')
+            ->setDescription('Deletes a custom object and all of its related children.')
             ->addArgument(
                 'custom-object-id',
                 InputOption::VALUE_REQUIRED,
@@ -95,6 +101,6 @@ class DeleteCustomObjectCommand extends ContainerAwareCommand
 
     private function deleteCustomObject(CustomObject $customObject): void
     {
-        throw new \Exception('1');
+        $this->customObjectModel->delete($customObject);
     }
 }
