@@ -81,7 +81,7 @@ return [
             CustomItemRouteProvider::ROUTE_CANCEL => [
                 'path'       => '/custom/object/{objectId}/item/cancel/{itemId}',
                 'controller' => 'CustomObjectsBundle:CustomItem\Cancel:cancel',
-                'method'     => 'GET',
+                'method'     => 'POST',
                 'defaults'   => [
                     'itemId' => null,
                 ],
@@ -166,7 +166,7 @@ return [
             CustomObjectRouteProvider::ROUTE_CANCEL => [
                 'path'       => '/custom/object/cancel/{objectId}',
                 'controller' => 'CustomObjectsBundle:CustomObject\Cancel:cancel',
-                'method'     => 'GET',
+                'method'     => 'POST',
                 'defaults'   => [
                     'objectId' => null,
                 ],
