@@ -301,7 +301,6 @@ return [
                     'mautic.core.service.flashbag',
                     'custom_item.permission.provider',
                     'custom_item.route.provider',
-                    'event_dispatcher',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -479,6 +478,7 @@ return [
                     'custom_object.session.provider_factory',
                     'mautic.core.service.flashbag',
                     'custom_object.permission.provider',
+                    'event_dispatcher',
                 ],
                 'methodCalls' => [
                     'setContainer' => [

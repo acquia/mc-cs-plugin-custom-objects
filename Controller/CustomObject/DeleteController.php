@@ -58,12 +58,13 @@ class DeleteController extends CommonController
         SessionProviderFactory $sessionProviderFactory,
         FlashBag $flashBag,
         CustomObjectPermissionProvider $permissionProvider,
-        EventDispatcherInterface $dispatcher
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->customObjectModel      = $customObjectModel;
         $this->sessionProviderFactory = $sessionProviderFactory;
         $this->flashBag               = $flashBag;
         $this->permissionProvider     = $permissionProvider;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
