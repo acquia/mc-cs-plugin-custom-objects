@@ -28,6 +28,11 @@ class CustomObjectEvent extends Event
      */
     private $isNew;
 
+    /**
+     * @var string
+     */
+    private $message;
+
     public function __construct(CustomObject $customObject, bool $isNew = false)
     {
         $this->customObject = $customObject;
@@ -42,5 +47,21 @@ class CustomObjectEvent extends Event
     public function entityIsNew(): bool
     {
         return $this->isNew;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMessage(): string
+    {
+        return (string)$this->message;
+    }
+
+    /**
+     * @param string $message
+     */
+    public function setMessage(string $message): void
+    {
+        $this->message = $message;
     }
 }

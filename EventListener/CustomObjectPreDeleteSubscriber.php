@@ -33,7 +33,7 @@ class CustomObjectPreDeleteSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            CustomObjectEvents::ON_CUSTOM_OBJECT_UI_PRE_DELETE => 'preDelete',
+            CustomObjectEvents::ON_CUSTOM_OBJECT_USER_PRE_DELETE => 'preDelete',
         ];
     }
 
