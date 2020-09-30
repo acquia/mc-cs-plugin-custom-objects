@@ -558,6 +558,7 @@ return [
                     'mautic.helper.user',
                     'mautic.custom.model.field',
                     'event_dispatcher',
+                    'mautic.lead.model.list',
                 ],
             ],
         ],

@@ -22,6 +22,7 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Model\ListModel;
 use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
@@ -54,13 +55,19 @@ class CustomObjectModel extends FormModel
      */
     private $customFieldModel;
 
+    /**
+     * @var ListModel
+     */
+    private $listModel;
+
     public function __construct(
         EntityManager $entityManager,
         CustomObjectRepository $customObjectRepository,
         CustomObjectPermissionProvider $permissionProvider,
         UserHelper $userHelper,
         CustomFieldModel $customFieldModel,
-        EventDispatcherInterface $dispatcher
+        EventDispatcherInterface $dispatcher,
+        ListModel $listModel
     ) {
         $this->entityManager          = $entityManager;
         $this->customObjectRepository = $customObjectRepository;
@@ -68,6 +75,7 @@ class CustomObjectModel extends FormModel
         $this->userHelper             = $userHelper;
         $this->customFieldModel       = $customFieldModel;
         $this->dispatcher             = $dispatcher;
+        $this->listModel = $listModel;
     }
 
     public function save(CustomObject $customObject): CustomObject
@@ -368,5 +376,27 @@ class CustomObjectModel extends FormModel
                 return CustomObject::TYPE_MASTER === $type || null === $type;
             }
         );
+    }
+
+    public function getFilterSegments(CustomObject $customObject)
+    {
+        $alias       = 'cmo_' . $customObject->getId();
+        $aliasLength = mb_strlen($alias);
+        $like = "%;s:5:\"field\";s:${aliasLength}:\"{$alias}\";%";
+
+        $filter = [
+            'force'  => [
+                ['column' => 'l.filters', 'expr' => 'LIKE', 'value'=> $like],
+            ],
+        ];
+
+        foreach ($customObject->getCustomFields() as $customField) {
+            $alias       = 'cmf_' . $customField->getId();
+            $aliasLength = mb_strlen($alias);
+            $like = "%;s:5:\"field\";s:${aliasLength}:\"{$alias}\";%";
+            $filter['force'][] = ['column' => 'l.filters', 'expr' => 'LIKE', 'value'=> $like];
+        }
+
+        return $this->listModel->getEntities(['filter' => $filter]);
     }
 }
