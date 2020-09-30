@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 class CustomItemLookupControllerTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     public function testListCustomItem(): void
     {
         $customObject       = $this->createCustomObject();
