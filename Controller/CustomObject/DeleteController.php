@@ -88,11 +88,10 @@ class DeleteController extends CommonController
             '%name%' => $customObject->getName(),
             '%id%'   => $customObject->getId(),
         ];
-        $message = $this->translator->trans('mautic.core.notice.deleted', $translationParameters);
 
-        $message = $customObjectEvent->getMessage() ?: $message;
+        $message = $customObjectEvent->getMessage() ?: $this->translator->trans('mautic.core.notice.deleted', $translationParameters, 'flashes');
 
-        $this->flashBag->add($message, [], FlashBag::LEVEL_NOTICE, false);
+        $this->flashBag->add($message);
 
         return $this->forward(
             'CustomObjectsBundle:CustomObject\List:list',
