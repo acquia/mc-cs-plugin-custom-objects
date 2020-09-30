@@ -34,7 +34,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 /**
  * @ApiResource(
  *     collectionOperations={
- *          "get"={"security"="'custom_objects:[customObject]:viewother'"},
+ *          "get"={""},
  *          "post"={"security"="'custom_objects:[customObject]:create'"}
  *     },
  *     itemOperations={

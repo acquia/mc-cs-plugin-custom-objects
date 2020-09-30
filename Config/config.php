@@ -1135,6 +1135,14 @@ return [
                     'mautic.custom.model.item'
                 ],
             ],
+            'api_platform.custom_object.custom_item.extension' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Extension\CustomItemListeningExtension::class,
+                'arguments' => [
+                    'mautic.helper.user',
+                    'mautic.security'
+                ],
+                'tag' => 'api_platform.doctrine.orm.query_extension.collection',
+            ]
         ],
     ],
     'parameters' => [
