@@ -12,10 +12,14 @@
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\ApiPlatform;
 
 use Doctrine\Common\Annotations\Annotation\IgnoreAnnotation;
+use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use Mautic\UserBundle\Entity\User;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\MultiselectType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * @IgnoreAnnotation("dataProvider")
@@ -44,8 +48,8 @@ final class CustomFieldOptionFunctionalTest extends AbstractApiPlatformFunctiona
         // PERMISSION
         $this->setPermission($user, 'custom_objects:custom_fields', $permissions);
         // CREATE
-        $payloadCreate = $this->getCreatePayload('/api/v2/custom_field_options/' . $customField->getId());
-        $clientCreateResponse = $this->createEntity('custom_fields', $payloadCreate);
+        $payloadCreate = $this->getCreatePayload('/api/v2/custom_fields/' . $customField->getId());
+        $clientCreateResponse = $this->createEntity('custom_field_options', $payloadCreate);
         $this->assertEquals($httpCreated, $clientCreateResponse->getStatusCode());
         if (!property_exists(json_decode($clientCreateResponse->getContent()), '@id')) {
             return;
@@ -83,11 +87,16 @@ final class CustomFieldOptionFunctionalTest extends AbstractApiPlatformFunctiona
 
     private function createField(CustomObject $customObject, User $user): CustomField
     {
+        $translatorMock = $this->createMock(TranslatorInterface::class);
+        $filterOperatorProviderMock = $this->createMock(FilterOperatorProviderInterface::class);
+        $csvHelperMock = $this->createMock(CsvHelper::class);
+        $customFieldType = new MultiselectType($translatorMock, $filterOperatorProviderMock, $csvHelperMock);
         $customField = new CustomField();
         $customField->setLabel('Test custom field');
         $customField->setAlias('test_custom_field');
         $customField->setCustomObject($customObject);
         $customField->setType('multiselect');
+        $customField->setTypeObject($customFieldType);
         $customField->setDefaultValue('custom field text');
         $customField->setCreatedBy($user);
         $this->em->persist($customField);

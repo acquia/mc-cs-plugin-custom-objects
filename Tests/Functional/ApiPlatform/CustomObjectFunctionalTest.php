@@ -4,11 +4,6 @@
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\ApiPlatform;
 
 use Doctrine\Common\Annotations\Annotation\IgnoreAnnotation;
-use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
-use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
-use Mautic\UserBundle\Entity\User;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
