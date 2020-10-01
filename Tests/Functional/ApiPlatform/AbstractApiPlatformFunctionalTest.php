@@ -35,12 +35,12 @@ abstract class AbstractApiPlatformFunctionalTest extends MauticMysqlTestCase
     public function setUp(): void
     {
         putenv('MAUTIC_CONFIG_PARAMETERS='.json_encode(
-                [
-                    'api_enabled'                       => true,
-                    'api_enable_basic_auth'             => true,
-                    'create_custom_field_in_background' => true,
-                ]
-            ));
+            [
+                'api_enabled'                       => true,
+                'api_enable_basic_auth'             => true,
+                'create_custom_field_in_background' => true,
+            ]
+        ));
         \Mautic\CoreBundle\ErrorHandler\ErrorHandler::register('prod');
     }
 

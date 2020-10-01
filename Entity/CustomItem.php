@@ -356,8 +356,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     public function setCustomFieldValues($values)
     {
-        foreach ($values as $fieldName => $fieldValue)
-        {
+        foreach ($values as $fieldName => $fieldValue) {
             try {
                 $customFieldValue = $this->findCustomFieldValueForFieldAlias((string) $fieldName);
                 $customFieldValue->setValue($fieldValue);
@@ -415,7 +414,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         if (null === $this->customFieldValues) {
             $this->customFieldValues = new ArrayCollection();
         }
-        foreach($this->customFieldValues as $customFieldValue) {
+        foreach ($this->customFieldValues as $customFieldValue) {
             $fieldValues[] =
                 [
                     'id'    => strval($customFieldValue->getCustomField()->getId()),
@@ -432,8 +431,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     public function setFieldValues(array $values): void
     {
-        foreach ($values as $value)
-        {
+        foreach ($values as $value) {
             try {
                 $customFieldValue = $this->findCustomFieldValueForFieldId((int) $value['id']);
                 $customFieldValue->setValue($value['value']);

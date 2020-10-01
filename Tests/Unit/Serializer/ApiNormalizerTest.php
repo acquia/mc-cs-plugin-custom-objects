@@ -99,7 +99,7 @@ class ApiNormalizerTest extends TestCase
         $this->normalizerInterface
             ->expects($this->at(2))
             ->method('denormalize')
-            ->with($dataReduced , $class, null, [])
+            ->with($dataReduced, $class, null, [])
             ->willReturn($customField);
         $customFieldType = $this->createMock(CustomFieldTypeInterface::class);
         $this->customFieldTypeProvider

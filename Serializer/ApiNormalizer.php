@@ -90,7 +90,7 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
 
     public function setSerializer(SerializerInterface $serializer)
     {
-        if($this->decorated instanceof SerializerAwareInterface) {
+        if ($this->decorated instanceof SerializerAwareInterface) {
             $this->decorated->setSerializer($serializer);
         }
     }
@@ -102,7 +102,7 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
         $normalizedObject = $this->decorated->normalize($objectCustomItem, $format, $context);
         // Change id to IRI
         if (array_key_exists('fieldValues', $normalizedObject)) {
-            foreach ($normalizedObject['fieldValues'] as &$values){
+            foreach ($normalizedObject['fieldValues'] as &$values) {
                 $values['id'] = $this->iriConverter->getItemIriFromResourceClass(CustomField::class, [intval($values['id'])]);
             }
         }
@@ -112,9 +112,10 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
     /**
      * @throws ExceptionInterface
      */
-    private function denormalizeCustomItem($data, $class, $format = null, array $context = []) {
+    private function denormalizeCustomItem($data, $class, $format = null, array $context = [])
+    {
         if (array_key_exists('fieldValues', $data)) {
-            foreach ($data['fieldValues'] as &$values){
+            foreach ($data['fieldValues'] as &$values) {
                 $values['id'] = $this->iriConverter->getItemFromIri($values['id'])->getId();
             }
         }
@@ -125,7 +126,8 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
      * @throws ExceptionInterface
      * @throws InvalidArgumentException
      */
-    private function denormalizeCustomField($data, $class, $format = null, array $context = []) {
+    private function denormalizeCustomField($data, $class, $format = null, array $context = [])
+    {
         $optionEntitiesCollection = null;
         $defaultValue = null;
         // Store and unset values that need TypeObject
@@ -133,7 +135,7 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
             $options = $data['options'];
             unset($data['options']);
             $optionEntities = [];
-            foreach($options as $option){
+            foreach ($options as $option) {
                 $optionEntities[] = $this->decorated->denormalize($option, CustomFieldOption::class, $format, $context);
             }
             $optionEntitiesCollection = new ArrayCollection($optionEntities);
@@ -147,7 +149,7 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
 
         // Set back the stored values when TypeObject is present
         try {
-            if(array_key_exists('type', $data)) {
+            if (array_key_exists('type', $data)) {
                 $type = $data['type'];
                 $typeObject = $this->customFieldTypeProvider->getType($type);
                 $entity->setTypeObject($typeObject);
@@ -158,8 +160,7 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
             if ($defaultValue) {
                 $entity->setDefaultValue($defaultValue);
             }
-        }
-        catch(NotFoundException $e) {
+        } catch(NotFoundException $e) {
             throw new InvalidArgumentException($e->getMessage());
         }
         return $entity;

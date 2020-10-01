@@ -61,8 +61,7 @@ class CustomItemListeningExtension implements QueryCollectionExtensionInterface
             /* @var $customObjectPermissionsObject CustomObjectPermissions|null */
             $customObjectPermissionsObject = $permissions['custom_objects'];
             $customObjectPermissions       = $customObjectPermissionsObject->getPermissions();
-        }
-        else {
+        } else {
             throw new PermissionNotFoundException();
         }
 
@@ -77,7 +76,7 @@ class CustomItemListeningExtension implements QueryCollectionExtensionInterface
             $userPermission = $customObjectActivePermissions[$customObjectKey];
             $viewPermission = $customObjectPermission['viewother'];
             $fullPermission = $customObjectPermission['full'];
-            if(($userPermission & $viewPermission) or ($userPermission & $fullPermission)) {
+            if (($userPermission & $viewPermission) or ($userPermission & $fullPermission)) {
                 $allowedCustomObjectIds[] = $customObjectKey;
             }
         }

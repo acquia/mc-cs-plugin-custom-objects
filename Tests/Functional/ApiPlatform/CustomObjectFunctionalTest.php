@@ -29,7 +29,8 @@ final class CustomObjectFunctionalTest extends AbstractApiPlatformFunctionalTest
         ?string $retrievedAlias,
         string $httpUpdated,
         ?string $updatedAlias,
-        string $httpDeleted): void
+        string $httpDeleted
+    ): void
     {
         $user = $this->getUser();
         $this->setPermission($user, 'custom_objects:custom_objects' ,$permissions);
@@ -130,7 +131,8 @@ final class CustomObjectFunctionalTest extends AbstractApiPlatformFunctionalTest
      *
      * @return array|array[]
      */
-    public function getCRUDProvider(): array {
+    public function getCRUDProvider(): array
+    {
         return [
             "all_ok" =>
                 [

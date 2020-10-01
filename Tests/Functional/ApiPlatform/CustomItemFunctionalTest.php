@@ -31,7 +31,8 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         ?string $retrievedAlias,
         string $httpUpdated,
         ?string $updatedAlias,
-        string $httpDeleted): void
+        string $httpDeleted
+    ): void
     {
         // USER
         $user = $this->getUser();
@@ -99,7 +100,8 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
      *
      * @return array|array[]
      */
-    public function getCRUDProvider(): array {
+    public function getCRUDProvider(): array
+    {
         return [
             "all_ok" =>
                 [

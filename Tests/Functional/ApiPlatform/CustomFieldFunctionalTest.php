@@ -12,49 +12,14 @@
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\ApiPlatform;
 
 use Doctrine\Common\Annotations\Annotation\IgnoreAnnotation;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;
-use Mautic\UserBundle\DataFixtures\ORM\LoadUserData;
-use Mautic\UserBundle\Entity\User;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @IgnoreAnnotation("dataProvider")
  */
-final class CustomFieldFunctionalTest extends MauticMysqlTestCase
+final class CustomFieldFunctionalTest extends AbstractApiPlatformFunctionalTest
 {
-    /**
-     * @var array
-     */
-    private $clientUser = [
-        'PHP_AUTH_USER' => 'sales',
-        'PHP_AUTH_PW'   => 'mautic',
-    ];
-
-    public function setUp(): void
-    {
-        putenv('MAUTIC_CONFIG_PARAMETERS='.json_encode(
-                [
-                    'api_enabled'                       => true,
-                    'api_enable_basic_auth'             => true,
-                    'create_custom_field_in_background' => true,
-                ]
-            ));
-        \Mautic\CoreBundle\ErrorHandler\ErrorHandler::register('prod');
-    }
-    private function getUser(): User
-    {
-        $this->loadFixtures([LoadRoleData::class, LoadUserData::class]);
-        $this->client = static::createClient([], $this->clientUser);
-        $this->client->disableReboot();
-        $this->client->followRedirects(true);
-        $this->container = $this->client->getContainer();
-        $this->em        = $this->container->get('doctrine')->getManager();
-        $repository      = $this->em->getRepository(User::class);
-        return $repository->findOneBy(['firstName' => 'Sales']);
-    }
-
     /**
      * @dataProvider getCRUDProvider
      *
@@ -67,47 +32,40 @@ final class CustomFieldFunctionalTest extends MauticMysqlTestCase
         ?string $retrievedLabel,
         string $httpUpdated,
         ?string $updatedLabel,
-        string $httpDeleted): void
+        string $httpDeleted
+    ): void
     {
+        // USER
         $user = $this->getUser();
-        $this->setPermission($user, $permissions);
-        // CREATE
+        // OBJECT
         $customObject = $this->createCustomObject();
-        $payload = $this->getCreatePayload('/api/v2/custom_objects/'.$customObject->getId());
-        $clientCreateResponse = $this->createField($customObject, $payload);
+        // PERMISSION
+        $this->setPermission($user, 'custom_objects:custom_fields' ,$permissions);
+        // CREATE
+        $payloadCreate = $this->getCreatePayload('/api/v2/custom_objects/'.$customObject->getId());
+        $clientCreateResponse = $this->createEntity('custom_fields', $payloadCreate);
         $this->assertEquals($httpCreated, $clientCreateResponse->getStatusCode());
-        // RETRIEVE
         if (!property_exists(json_decode($clientCreateResponse->getContent()), '@id')) {
             return;
         }
+        // GET ID OF ENTITY
         $createdId = json_decode($clientCreateResponse->getContent())->{'@id'};
-        $clientRetrieveResponse = $this->retrieveField($createdId);
+        // RETRIEVE
+        $clientRetrieveResponse = $this->retrieveEntity($createdId);
         $this->assertEquals($httpRetrieved, $clientRetrieveResponse->getStatusCode());
         if ($retrievedLabel) {
             $this->assertEquals($retrievedLabel, json_decode($clientRetrieveResponse->getContent())->label);
         }
         // UPDATE
-        $payload = $this->getEditPayload();
-        $clientUpdateResponse = $this->updateField($createdId, $payload);
+        $payloadUpdate = $this->getEditPayload();
+        $clientUpdateResponse = $this->updateEntity($createdId, $payloadUpdate);
         $this->assertEquals($httpUpdated, $clientUpdateResponse->getStatusCode());
         if ($updatedLabel) {
             $this->assertEquals($updatedLabel, json_decode($clientUpdateResponse->getContent())->label);
         }
         // DELETE
-        $clientDeleteResponse = $this->deleteField($createdId);
+        $clientDeleteResponse = $this->deleteEntity($createdId);
         $this->assertEquals($httpDeleted, $clientDeleteResponse->getStatusCode());
-    }
-
-    private function setPermission(User $user, array $permissionArray): void
-    {
-        $role = $user->getRole();
-        $permissions = [
-            'custom_objects:custom_fields'  => $permissionArray
-        ];
-        $roleModel = $this->container->get('mautic.user.model.role');
-        $roleModel->setRolePermissions($role, $permissions);
-        $this->em->persist($role);
-        $this->em->flush();
     }
 
     private function createCustomObject(): CustomObject
@@ -119,34 +77,6 @@ final class CustomFieldFunctionalTest extends MauticMysqlTestCase
         $this->em->persist($customObject);
         $this->em->flush();
         return $customObject;
-    }
-
-    private function createField(string $customObject, array $payload): Response
-    {
-        $server = ['CONTENT_TYPE' => 'application/ld+json', 'HTTP_ACCEPT' => 'application/ld+json'];
-        $this->client->request('POST', '/api/v2/custom_fields', [], [], $server, json_encode($payload));
-        return $this->client->getResponse();
-    }
-
-    private function retrieveField(string $createdId): Response
-    {
-        $server = ['CONTENT_TYPE' => 'application/ld+json', 'HTTP_ACCEPT' => 'application/ld+json'];
-        $this->client->request('GET', $createdId, [], [], $server);
-        return $this->client->getResponse();
-    }
-
-    private function updateField(string $createdId, array $payload): Response
-    {
-        $server = ['CONTENT_TYPE' => 'application/ld+json', 'HTTP_ACCEPT' => 'application/ld+json'];
-        $this->client->request('PUT', $createdId, [], [], $server, json_encode($payload));
-        return $this->client->getResponse();
-    }
-
-    private function deleteField(string $createdId): Response
-    {
-        $server = ['CONTENT_TYPE' => 'application/ld+json', 'HTTP_ACCEPT' => 'application/ld+json'];
-        $this->client->request('DELETE', $createdId, [], [], $server);
-        return $this->client->getResponse();
     }
 
     private function getCreatePayload(string $customObject): array
@@ -188,7 +118,8 @@ final class CustomFieldFunctionalTest extends MauticMysqlTestCase
      *
      * @return array|array[]
      */
-    public function getCRUDProvider(): array {
+    public function getCRUDProvider(): array
+    {
         return [
             "all_ok" =>
                 [
@@ -251,22 +182,26 @@ final class CustomFieldFunctionalTest extends MauticMysqlTestCase
         ?int $updatedOptionsCount,
         ?array $updatedOptions,
         ?string $updatedDeafaultValue,
-        string $httpDeleted): void
+        string $httpDeleted
+    ): void
     {
+        // USER
         $user = $this->getUser();
-        $this->setPermission($user, $permissions);
-        // CREATE
+        // OBJECT
         $customObject = $this->createCustomObject();
-        $payload = $this->getCreateWithOptionsPayload('/api/v2/custom_objects/'.$customObject->getId());
-        $clientCreateResponse = $this->createField($customObject, $payload);
+        // PERMISSION
+        $this->setPermission($user, 'custom_objects:custom_fields' ,$permissions);
+        // CREATE
+        $payloadCreate = $this->getCreateWithOptionsPayload('/api/v2/custom_objects/'.$customObject->getId());
+        $clientCreateResponse = $this->createEntity('custom_items', $payloadCreate);
         $this->assertEquals($httpCreated, $clientCreateResponse->getStatusCode());
-
-        // RETRIEVE
         if (!property_exists(json_decode($clientCreateResponse->getContent()), '@id')) {
             return;
         }
+        // GET ID OF ENTITY
         $createdId = json_decode($clientCreateResponse->getContent())->{'@id'};
-        $clientRetrieveResponse = $this->retrieveField($createdId);
+        // RETRIEVE
+        $clientRetrieveResponse = $this->retrieveEntity($createdId);
         $this->assertEquals($httpRetrieved, $clientRetrieveResponse->getStatusCode());
         if ($retrievedLabel) {
             $contentArray = json_decode($clientRetrieveResponse->getContent(), true);
@@ -277,8 +212,8 @@ final class CustomFieldFunctionalTest extends MauticMysqlTestCase
             $this->assertEquals($retrievedDeafaultValue, $contentArray['defaultValue']);
         }
         // UPDATE
-        $payload = $this->getEditWithOptionsPayload();
-        $clientUpdateResponse = $this->updateField($createdId, $payload);
+        $payloadUpdate = $this->getEditWithOptionsPayload();
+        $clientUpdateResponse = $this->updateEntity($createdId, $payloadUpdate);
         $this->assertEquals($httpUpdated, $clientUpdateResponse->getStatusCode());
         if ($updatedLabel) {
             $contentUpdateArray = json_decode($clientUpdateResponse->getContent(), true);
@@ -289,7 +224,7 @@ final class CustomFieldFunctionalTest extends MauticMysqlTestCase
             $this->assertEquals($updatedDeafaultValue, $contentUpdateArray['defaultValue']);
         }
         // DELETE
-        $clientDeleteResponse = $this->deleteField($createdId);
+        $clientDeleteResponse = $this->deleteEntity($createdId);
         $this->assertEquals($httpDeleted, $clientDeleteResponse->getStatusCode());
     }
 
@@ -348,7 +283,8 @@ final class CustomFieldFunctionalTest extends MauticMysqlTestCase
      *
      * @return array|array[]
      */
-    public function getCRUDWithOptionsProvider(): array {
+    public function getCRUDWithOptionsProvider(): array
+    {
         return [
             "all_ok" =>
                 [
