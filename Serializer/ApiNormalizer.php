@@ -3,7 +3,6 @@
 
 namespace MauticPlugin\CustomObjectsBundle\Serializer;
 
-
 use ApiPlatform\Core\Api\IriConverterInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
@@ -160,7 +159,7 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
             if ($defaultValue) {
                 $entity->setDefaultValue($defaultValue);
             }
-        } catch(NotFoundException $e) {
+        } catch (NotFoundException $e) {
             throw new InvalidArgumentException($e->getMessage());
         }
         return $entity;

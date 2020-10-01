@@ -30,10 +30,9 @@ final class CustomObjectFunctionalTest extends AbstractApiPlatformFunctionalTest
         string $httpUpdated,
         ?string $updatedAlias,
         string $httpDeleted
-    ): void
-    {
+    ): void {
         $user = $this->getUser();
-        $this->setPermission($user, 'custom_objects:custom_objects' ,$permissions);
+        $this->setPermission($user, 'custom_objects:custom_objects', $permissions);
 
         // CREATE
         $payloadCreate = $this->getCreatePayload();

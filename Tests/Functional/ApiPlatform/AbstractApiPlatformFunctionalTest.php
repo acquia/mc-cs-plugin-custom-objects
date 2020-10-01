@@ -3,7 +3,6 @@
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\ApiPlatform;
 
-
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\DataFixtures\ORM\LoadRoleData;

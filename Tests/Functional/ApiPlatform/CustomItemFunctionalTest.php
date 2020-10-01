@@ -3,7 +3,6 @@
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\ApiPlatform;
 
-
 use Doctrine\Common\Annotations\Annotation\IgnoreAnnotation;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CategoryBundle\Entity\Category;
@@ -32,8 +31,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         string $httpUpdated,
         ?string $updatedAlias,
         string $httpDeleted
-    ): void
-    {
+    ): void {
         // USER
         $user = $this->getUser();
         // OBJECTS
@@ -41,7 +39,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         $category = $this->createCategory();
         $customField = $this->createCustomField($customObject);
         // PERMISSION
-        $this->setPermission($user, 'custom_objects:' . $customObject->getId() ,$permissions);
+        $this->setPermission($user, 'custom_objects:' . $customObject->getId(), $permissions);
         // CREATE
         $payloadCreate = $this->getCreatePayload($customObject, $category, $customField);
         $clientCreateResponse = $this->createEntity('custom_items', $payloadCreate);

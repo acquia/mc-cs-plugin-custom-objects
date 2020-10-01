@@ -3,7 +3,6 @@
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Serializer;
 
-
 use ApiPlatform\Core\Api\IriConverterInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;

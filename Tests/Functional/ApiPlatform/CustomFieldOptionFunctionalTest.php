@@ -35,15 +35,14 @@ final class CustomFieldOptionFunctionalTest extends AbstractApiPlatformFunctiona
         string $httpUpdated,
         ?string $updatedLabel,
         string $httpDeleted
-    ): void
-    {
+    ): void {
         // USER
         $user = $this->getUser();
         // OBJECTS
         $customObject = $this->createCustomObject();
         $customField = $this->createField($customObject, $user);
         // PERMISSION
-        $this->setPermission($user, 'custom_objects:custom_fields' ,$permissions);
+        $this->setPermission($user, 'custom_objects:custom_fields', $permissions);
         // CREATE
         $payloadCreate = $this->getCreatePayload('/api/v2/custom_field_options/' . $customField->getId());
         $clientCreateResponse = $this->createEntity('custom_fields', $payloadCreate);

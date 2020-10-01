@@ -33,14 +33,13 @@ final class CustomFieldFunctionalTest extends AbstractApiPlatformFunctionalTest
         string $httpUpdated,
         ?string $updatedLabel,
         string $httpDeleted
-    ): void
-    {
+    ): void {
         // USER
         $user = $this->getUser();
         // OBJECT
         $customObject = $this->createCustomObject();
         // PERMISSION
-        $this->setPermission($user, 'custom_objects:custom_fields' ,$permissions);
+        $this->setPermission($user, 'custom_objects:custom_fields', $permissions);
         // CREATE
         $payloadCreate = $this->getCreatePayload('/api/v2/custom_objects/'.$customObject->getId());
         $clientCreateResponse = $this->createEntity('custom_fields', $payloadCreate);
@@ -183,8 +182,7 @@ final class CustomFieldFunctionalTest extends AbstractApiPlatformFunctionalTest
         ?array $updatedOptions,
         ?string $updatedDeafaultValue,
         string $httpDeleted
-    ): void
-    {
+    ): void {
         // USER
         $user = $this->getUser();
         // OBJECT
