@@ -291,7 +291,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     public function setCategory($category)
     {
-        $this->isChanged('category', $category ? $category->getId() : null);
+        $this->isChanged('category', $category ? $category: null);
         $this->category = $category;
     }
 
