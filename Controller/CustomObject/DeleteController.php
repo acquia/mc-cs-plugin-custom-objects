@@ -81,16 +81,31 @@ class DeleteController extends CommonController
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        $customObjectEvent = new CustomObjectEvent($customObject);
-        $this->eventDispatcher->dispatch(CustomObjectEvents::ON_CUSTOM_OBJECT_USER_PRE_DELETE, $customObjectEvent);
-
         $translationParameters = [
             '%name%' => $customObject->getName(),
             '%id%'   => $customObject->getId(),
         ];
 
-        $message = $customObjectEvent->getMessage() ?: $this->translator->trans('mautic.core.notice.deleted', $translationParameters, 'flashes');
+        $relatedSegments = $this->customObjectModel->getFilterSegments($customObject);
+        if (0 < count($relatedSegments)) {
+            $segments = [];
+            foreach ($relatedSegments as $relatedSegment) {
+                $segments[$relatedSegment->getId()] = sprintf('"%s" (%d)', $relatedSegment->getName(), $relatedSegment->getId());
+            }
 
+            $translationParameters['%segments%'] = implode(', ', $segments);
+            $this->flashBag->add('custom.object.error.used.in.segments', $translationParameters, FlashBag::LEVEL_ERROR);
+
+            return $this->forward(
+                'CustomObjectsBundle:CustomObject\List:list',
+                ['page' => $this->sessionProviderFactory->createObjectProvider()->getPage()]
+            );
+        }
+
+        $customObjectEvent = new CustomObjectEvent($customObject);
+        $this->eventDispatcher->dispatch(CustomObjectEvents::ON_CUSTOM_OBJECT_USER_PRE_DELETE, $customObjectEvent);
+
+        $message = $customObjectEvent->getMessage() ?: $this->translator->trans('mautic.core.notice.deleted', $translationParameters, 'flashes');
         $this->flashBag->add($message);
 
         return $this->forward(
