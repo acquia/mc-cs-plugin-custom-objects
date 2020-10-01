@@ -13,14 +13,15 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Segment\Query\Filter;
 
-use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Test\MauticWebTestCase;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemNameFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
@@ -28,62 +29,43 @@ use MauticPlugin\CustomObjectsBundle\Tests\Functional\Exception\FixtureNotFoundE
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class CustomItemNameFilterQueryBuilderTest extends MauticWebTestCase
+class CustomItemNameFilterQueryBuilderTest extends MauticMysqlTestCase
 {
     use FixtureObjectsTrait;
     use DbalQueryTrait;
 
-    /** @var EntityManager */
-    private $entityManager;
-
-    protected function setUp(): void
+    /**
+     * @throws FixtureNotFoundException
+     * @throws NotFoundException
+     */
+    public function testApplyQuery(): void
     {
-        parent::setUp();
-
-        /** @var EntityManager */
-        $entityManager       = $this->getContainer()->get('doctrine.orm.entity_manager');
-        $this->entityManager = $entityManager;
         $fixturesDirectory   = $this->getFixturesDirectory();
         $objects             = $this->loadFixtureFiles([
-            $fixturesDirectory.'/roles.yml',
-            $fixturesDirectory.'/users.yml',
             $fixturesDirectory.'/leads.yml',
             $fixturesDirectory.'/custom_objects.yml',
             $fixturesDirectory.'/custom_fields.yml',
             $fixturesDirectory.'/custom_items.yml',
             $fixturesDirectory.'/custom_xref.yml',
             $fixturesDirectory.'/custom_values.yml',
-        ], false, null, 'doctrine'); //,ORMPurger::PURGE_MODE_DELETE);
+        ], true);
 
         $this->setFixtureObjects($objects);
-    }
-
-    protected function tearDown(): void
-    {
-        foreach ($this->getFixturesInUnloadableOrder() as $entity) {
-            $this->entityManager->remove($entity);
-        }
-        $this->entityManager->flush();
-        parent::tearDown();
-    }
-
-    /**
-     * @throws FixtureNotFoundException
-     */
-    public function testApplyQuery(): void
-    {
         /** @var CustomFieldTypeProvider $fieldTypeProvider */
         $fieldTypeProvider = $this->getContainer()->get('custom_field.type.provider');
 
         /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = $this->getContainer()->get('event_dispatcher');
 
+        /** @var CustomFieldRepository $customFieldRepository */
+        $customFieldRepository = $this->getContainer()->get('custom_field.repository');
+
         $filterHelper = new QueryFilterHelper(
             $this->em,
             new QueryFilterFactory(
                 $this->em,
                 $fieldTypeProvider,
-                $this->getContainer()->get('custom_field.repository'),
+                $customFieldRepository,
                 new QueryFilterFactory\Calculator(),
                 1
             )
@@ -127,9 +109,7 @@ class CustomItemNameFilterQueryBuilderTest extends MauticWebTestCase
 
     private function getLeadsQueryBuilder(): QueryBuilder
     {
-        $connection   = $this->entityManager->getConnection();
-        $queryBuilder = new QueryBuilder($connection);
-
+        $queryBuilder = new QueryBuilder($this->connection);
         $queryBuilder->select('l.*')->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
         return $queryBuilder;
