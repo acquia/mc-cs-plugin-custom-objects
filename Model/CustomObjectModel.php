@@ -378,25 +378,13 @@ class CustomObjectModel extends FormModel
         );
     }
 
-    public function getFilterSegments(CustomObject $customObject)
+    /**
+     * This method returns all segments that use this custom object or its custom fields
+     *
+     * @return LeadList[]
+     */
+    public function getFilterSegments(CustomObject $customObject): array
     {
-        $alias       = 'cmo_' . $customObject->getId();
-        $aliasLength = mb_strlen($alias);
-        $like = "%;s:5:\"field\";s:${aliasLength}:\"{$alias}\";%";
-
-        $filter = [
-            'force'  => [
-                ['column' => 'l.filters', 'expr' => 'LIKE', 'value'=> $like],
-            ],
-        ];
-
-        foreach ($customObject->getCustomFields() as $customField) {
-            $alias       = 'cmf_' . $customField->getId();
-            $aliasLength = mb_strlen($alias);
-            $like = "%;s:5:\"field\";s:${aliasLength}:\"{$alias}\";%";
-            $filter['force'][] = ['column' => 'l.filters', 'expr' => 'LIKE', 'value'=> $like];
-        }
-
-        return $this->listModel->getEntities(['filter' => $filter]);
+        return $this->customObjectRepository->getFilterSegments($customObject);
     }
 }
