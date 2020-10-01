@@ -19,8 +19,6 @@ class SegmentFiltersDictionarySubscriberTest extends MauticMysqlTestCase
     {
         $fixturesDirectory = $this->getFixturesDirectory();
         $objects           = $this->loadFixtureFiles([
-            $fixturesDirectory.'/roles.yml',
-            $fixturesDirectory.'/users.yml',
             $fixturesDirectory.'/leads.yml',
             $fixturesDirectory.'/custom_objects.yml',
             $fixturesDirectory.'/custom_fields.yml',

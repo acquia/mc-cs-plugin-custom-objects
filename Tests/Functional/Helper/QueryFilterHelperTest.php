@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Helper;
 
-use Mautic\CoreBundle\Test\MauticWebTestCase;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\UnionQueryContainer;
-use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
 
-class QueryFilterHelperTest extends MauticWebTestCase
+class QueryFilterHelperTest extends MauticMysqlTestCase
 {
     use FixtureObjectsTrait;
-    use DatabaseSchemaTrait;
 
     /**
      * @var ContactSegmentFilterFactory
@@ -33,28 +32,25 @@ class QueryFilterHelperTest extends MauticWebTestCase
     {
         parent::setUp();
 
-        $this->filterFactory = $this->getContainer()->get('mautic.lead.model.lead_segment_filter_factory');
+        $this->filterFactory = $this->container->get('mautic.lead.model.lead_segment_filter_factory');
 
         /** @var CustomFieldTypeProvider $fieldTypeProvider */
-        $fieldTypeProvider  = $this->getContainer()->get('custom_field.type.provider');
-        $this->filterHelper = new QueryFilterHelper(
+        $fieldTypeProvider = $this->container->get('custom_field.type.provider');
+        /** @var CustomFieldRepository $customFieldRepository */
+        $customFieldRepository = $this->container->get('custom_field.repository');
+        $this->filterHelper    = new QueryFilterHelper(
             $this->em,
             new QueryFilterFactory(
                 $this->em,
                 $fieldTypeProvider,
-                $this->getContainer()->get('custom_field.repository'),
+                $customFieldRepository,
                 new QueryFilterFactory\Calculator(),
                 1
             )
         );
 
-        $this->createFreshDatabaseSchema($this->em);
-        $this->postFixtureSetup();
         $fixturesDirectory = $this->getFixturesDirectory();
-
-        $objects = $this->loadFixtureFiles([
-            $fixturesDirectory.'/roles.yml',
-            $fixturesDirectory.'/users.yml',
+        $objects           = $this->loadFixtureFiles([
             $fixturesDirectory.'/leads.yml',
             $fixturesDirectory.'/custom_objects.yml',
             $fixturesDirectory.'/custom_fields.yml',
@@ -62,8 +58,7 @@ class QueryFilterHelperTest extends MauticWebTestCase
             $fixturesDirectory.'/custom_xref.yml',
             $fixturesDirectory.'/custom_values.yml',
             $fixturesDirectory.'/custom-item-relation-filter-query-builder-fixture-2.yml',
-        ], false, null, 'doctrine');
-
+        ], true);
         $this->setFixtureObjects($objects);
     }
 
@@ -72,44 +67,44 @@ class QueryFilterHelperTest extends MauticWebTestCase
         $this->assertMatchWhere(
             'test_value.value = :test_value_value',
             [
-                'glue' => 'and',
-                'field' => 'cmf_'.$this->getFixtureById('custom_field1')->getId(),
-                'type' => 'custom_object',
+                'glue'     => 'and',
+                'field'    => 'cmf_'.$this->getFixtureById('custom_field1')->getId(),
+                'type'     => 'custom_object',
                 'operator' => 'eq',
-                'value' => 'love',
+                'value'    => 'love',
             ]
         );
 
         $this->assertMatchWhere(
             'test_value.value LIKE :test_value_value',
             [
-                'glue' => 'and',
-                'field' => 'cmf_'.$this->getFixtureById('custom_field1')->getId(),
-                'type' => 'custom_object',
+                'glue'     => 'and',
+                'field'    => 'cmf_'.$this->getFixtureById('custom_field1')->getId(),
+                'type'     => 'custom_object',
                 'operator' => 'like',
-                'value' => 'love',
+                'value'    => 'love',
             ]
         );
 
         $this->assertMatchWhere(
             '(test_value.value <> :test_value_value) OR (test_value.value IS NULL)',
             [
-                'glue' => 'and',
-                'field' => 'cmf_'.$this->getFixtureById('custom_field1')->getId(),
-                'type' => 'custom_object',
+                'glue'     => 'and',
+                'field'    => 'cmf_'.$this->getFixtureById('custom_field1')->getId(),
+                'type'     => 'custom_object',
                 'operator' => 'neq',
-                'value' => 'love',
+                'value'    => 'love',
             ]
         );
 
         $this->assertMatchWhere(
             'test_value.value > :test_value_value',
             [
-                'glue' => 'and',
-                'field' => 'cmf_'.$this->getFixtureById('custom_object_product')->getId(),
-                'object' => 'custom_object',
-                'type' => 'int',
-                'operator' => 'gt',
+                'glue'       => 'and',
+                'field'      => 'cmf_'.$this->getFixtureById('custom_object_product')->getId(),
+                'object'     => 'custom_object',
+                'type'       => 'int',
+                'operator'   => 'gt',
                 'properties' => [
                     'filter' => '500',
                 ],
@@ -120,7 +115,7 @@ class QueryFilterHelperTest extends MauticWebTestCase
     protected function assertMatchWhere(string $expectedWhere, array $filter): void
     {
         $unionQueryContainer = new UnionQueryContainer();
-        $qb = new QueryBuilder($this->em->getConnection());
+        $qb                  = new QueryBuilder($this->em->getConnection());
         $unionQueryContainer->add($qb);
 
         $this->filterHelper->addCustomFieldValueExpressionFromSegmentFilter(
