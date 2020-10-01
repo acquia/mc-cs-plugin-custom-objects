@@ -13,7 +13,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use DateTimeImmutable;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadEventLog;
@@ -32,38 +33,11 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\CustomObjectsTrait;
-use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class ImportSubscriberTest extends KernelTestCase
+class ImportSubscriberTest extends MauticMysqlTestCase
 {
-    use DatabaseSchemaTrait;
     use CustomObjectsTrait;
-
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    protected function setUp(): void
-    {
-        self::bootKernel();
-
-        $this->container = static::$kernel->getContainer();
-
-        /** @var EntityManager $entityManager */
-        $entityManager       = $this->container->get('doctrine.orm.entity_manager');
-        $this->entityManager = $entityManager;
-
-        $this->createFreshDatabaseSchema($entityManager);
-    }
 
     /**
      * Tests insert of 1 custom item.
@@ -97,8 +71,8 @@ class ImportSubscriberTest extends KernelTestCase
         ];
 
         $expectedValues                   = $csvRow;
-        $expectedValues['datetime']       = new \DateTimeImmutable('2019-03-04 12:35:09');
-        $expectedValues['date']           = new \DateTimeImmutable('2019-03-04 00:00:00');
+        $expectedValues['datetime']       = new DateTimeImmutable('2019-03-04 12:35:09');
+        $expectedValues['date']           = new DateTimeImmutable('2019-03-04 00:00:00');
         $expectedValues['multiselect']    = ['option_b', 'option_a'];
 
         // Import the custom item
@@ -106,7 +80,7 @@ class ImportSubscriberTest extends KernelTestCase
 
         $this->assertFalse($insertStatus);
 
-        $this->entityManager->clear();
+        $this->em->clear();
 
         // Fetch the imported custom item
         $insertedCustomItem = $this->getCustomItemByName($csvRow['name']);
@@ -135,13 +109,13 @@ class ImportSubscriberTest extends KernelTestCase
         $updateStatus = $this->importCsvRow($customObject, $editCsvRow);
 
         $expectedUpdatedValues                   = $editCsvRow;
-        $expectedUpdatedValues['datetime']       = new \DateTimeImmutable('2019-03-04 12:35:09');
-        $expectedUpdatedValues['date']           = new \DateTimeImmutable('2019-05-24 00:00:00');
+        $expectedUpdatedValues['datetime']       = new DateTimeImmutable('2019-03-04 12:35:09');
+        $expectedUpdatedValues['date']           = new DateTimeImmutable('2019-05-24 00:00:00');
         $expectedUpdatedValues['multiselect']    = ['option_b', 'option_a'];
 
         $this->assertTrue($updateStatus);
 
-        $this->entityManager->clear();
+        $this->em->clear();
 
         // Fetch the imported custom item again
         $updatedCustomItem = $this->getCustomItemByName($editCsvRow['name']);
@@ -187,10 +161,10 @@ class ImportSubscriberTest extends KernelTestCase
         $csvRow       = [
             'name'           => 'Import CI all fields test Custom Item',
             'contacts'       => "{$jane->getId()},{$john->getId()}",
-            // 'text'           => '', // Missing on puprose so the default value could kick in.
-            // 'multiselect'    => '', // Missing on puprose so the default value could kick in.
+            // 'text'           => '', // Missing on purpose so the default value could kick in.
+            // 'multiselect'    => '', // Missing on purpose so the default value could kick in.
             'country'        => 'Czech Republic',
-            // 'date'           => '', // Missing on puprose so the default value could kick in.
+            // 'date'           => '', // Missing on purpose so the default value could kick in.
             'datetime'       => '2019-03-04 12:35:09',
             'email'          => 'info@doe.corp',
             'hidden'         => 'secret hidden text', // Ensure the default value can be overwritten when provided.
@@ -202,8 +176,8 @@ class ImportSubscriberTest extends KernelTestCase
         ];
 
         $expectedValues                   = $csvRow;
-        $expectedValues['datetime']       = new \DateTimeImmutable('2019-03-04 12:35:09');
-        $expectedValues['date']           = new \DateTimeImmutable('2019-06-21 00:00:00');
+        $expectedValues['datetime']       = new DateTimeImmutable('2019-03-04 12:35:09');
+        $expectedValues['date']           = new DateTimeImmutable('2019-06-21 00:00:00');
         $expectedValues['multiselect']    = ['option_b'];
         $expectedValues['text']           = 'A default value';
 
@@ -212,7 +186,7 @@ class ImportSubscriberTest extends KernelTestCase
 
         $this->assertFalse($insertStatus);
 
-        $this->entityManager->clear();
+        $this->em->clear();
 
         // Fetch the imported custom item
         $insertedCustomItem = $this->getCustomItemByName($csvRow['name']);
@@ -400,10 +374,7 @@ class ImportSubscriberTest extends KernelTestCase
         return $importProcessEvent->wasMerged();
     }
 
-    /**
-     * @return CustomItem|mixed
-     */
-    private function getCustomItemByName(string $name)
+    private function getCustomItemByName(string $name): ?CustomItem
     {
         /** @var CustomItemRepository $customItemRepository */
         $customItemRepository = $this->container->get('custom_item.repository');
@@ -415,7 +386,7 @@ class ImportSubscriberTest extends KernelTestCase
         $customItem = $customItemRepository->findOneBy(['name' => $name]);
 
         if (!$customItem) {
-            return;
+            return null;
         }
 
         return $customItemModel->populateCustomFields($customItem);
