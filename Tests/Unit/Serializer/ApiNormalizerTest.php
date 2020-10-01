@@ -4,11 +4,13 @@
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Serializer;
 
 
+use ApiPlatform\Core\Api\IriConverterInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Serializer\ApiNormalizer;
 use PHPUnit\Framework\TestCase;
@@ -28,6 +30,16 @@ class ApiNormalizerTest extends TestCase
     private $customFieldTypeProvider;
 
     /**
+     * @var \PHPUnit\Framework\MockObject\MockObject|IriConverterInterface
+     */
+    private $iriConverter;
+
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject|CustomItemModel
+     */
+    private $customItemModel;
+
+    /**
      * @var ApiNormalizer
      */
     private $apiNormalizer;
@@ -36,7 +48,9 @@ class ApiNormalizerTest extends TestCase
     {
         $this->normalizerInterface     = $this->createMock([NormalizerInterface::class, DenormalizerInterface::class]);
         $this->customFieldTypeProvider = $this->createMock(CustomFieldTypeProvider::class);
-        $this->apiNormalizer           = new ApiNormalizer($this->normalizerInterface, $this->customFieldTypeProvider);
+        $this->iriConverter            = $this->createMock(IriConverterInterface::class);
+        $this->customItemModel         = $this->createMock(CustomItemModel::class);
+        $this->apiNormalizer           = new ApiNormalizer($this->normalizerInterface, $this->customFieldTypeProvider, $this->customItemModel, $this->iriConverter);
         parent::setUp();
     }
 

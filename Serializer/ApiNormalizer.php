@@ -4,7 +4,7 @@
 namespace MauticPlugin\CustomObjectsBundle\Serializer;
 
 
-use ApiPlatform\Core\Bridge\Symfony\Routing\IriConverter;
+use ApiPlatform\Core\Api\IriConverterInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
@@ -37,11 +37,11 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
     private $decorated;
 
     /**
-     * @var IriConverter
+     * @var IriConverterInterface
      */
     private $iriConverter;
 
-    public function __construct(NormalizerInterface $decorated, CustomFieldTypeProvider $customFieldTypeProvider, CustomItemModel $customItemModel, IriConverter $iriConverter)
+    public function __construct(NormalizerInterface $decorated, CustomFieldTypeProvider $customFieldTypeProvider, CustomItemModel $customItemModel, IriConverterInterface $iriConverter)
     {
         if (!$decorated instanceof DenormalizerInterface) {
             throw new \InvalidArgumentException(sprintf('The decorated normalizer must implement the %s.', DenormalizerInterface::class));
