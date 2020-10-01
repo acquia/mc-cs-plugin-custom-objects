@@ -77,6 +77,11 @@ class DeleteController extends CommonController
             return $this->accessDenied(false, $e->getMessage());
         }
 
+        $controller = 'CustomObjectsBundle:CustomObject\List:list';
+        $page = [
+            'page' => $this->sessionProviderFactory->createObjectProvider()->getPage()
+        ];
+
         $translationParameters = [
             '%name%' => $customObject->getName(),
             '%id%'   => $customObject->getId(),
@@ -93,8 +98,8 @@ class DeleteController extends CommonController
             $this->flashBag->add('custom.object.error.used.in.segments', $translationParameters, FlashBag::LEVEL_ERROR);
 
             return $this->forward(
-                'CustomObjectsBundle:CustomObject\List:list',
-                ['page' => $this->sessionProviderFactory->createObjectProvider()->getPage()]
+                $controller,
+                $page
             );
         }
 
@@ -105,8 +110,8 @@ class DeleteController extends CommonController
         $this->flashBag->add($message);
 
         return $this->forward(
-            'CustomObjectsBundle:CustomObject\List:list',
-            ['page' => $this->sessionProviderFactory->createObjectProvider()->getPage()]
+            $controller,
+            $page
         );
     }
 }
