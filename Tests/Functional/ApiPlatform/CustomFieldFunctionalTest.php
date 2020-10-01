@@ -188,7 +188,7 @@ final class CustomFieldFunctionalTest extends AbstractApiPlatformFunctionalTest
         // OBJECT
         $customObject = $this->createCustomObject();
         // PERMISSION
-        $this->setPermission($user, 'custom_objects:custom_fields' ,$permissions);
+        $this->setPermission($user, 'custom_objects:custom_fields', $permissions);
         // CREATE
         $payloadCreate = $this->getCreateWithOptionsPayload('/api/v2/custom_objects/'.$customObject->getId());
         $clientCreateResponse = $this->createEntity('custom_items', $payloadCreate);
