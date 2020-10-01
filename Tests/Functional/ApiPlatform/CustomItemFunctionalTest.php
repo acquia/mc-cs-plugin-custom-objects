@@ -79,8 +79,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
                 "fieldValues" =>
                     [
                         [
-                            "type" => "text",
-                            "alias" => $customField->getAlias(),
+                            "id" => "/api/v2/custom_fields/" . $customField->getId(),
                             "value" => "test"
                         ]
                     ]

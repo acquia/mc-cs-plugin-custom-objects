@@ -4,6 +4,7 @@
 namespace MauticPlugin\CustomObjectsBundle\Serializer;
 
 
+use ApiPlatform\Core\Bridge\Symfony\Routing\IriConverter;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
@@ -30,17 +31,26 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
      */
     private $customItemModel;
 
+    /**
+     * @var NormalizerInterface
+     */
     private $decorated;
 
-    public function __construct(NormalizerInterface $decorated, CustomFieldTypeProvider $customFieldTypeProvider, CustomItemModel $customItemModel)
+    /**
+     * @var IriConverter
+     */
+    private $iriConverter;
+
+    public function __construct(NormalizerInterface $decorated, CustomFieldTypeProvider $customFieldTypeProvider, CustomItemModel $customItemModel, IriConverter $iriConverter)
     {
         if (!$decorated instanceof DenormalizerInterface) {
             throw new \InvalidArgumentException(sprintf('The decorated normalizer must implement the %s.', DenormalizerInterface::class));
         }
 
-        $this->decorated = $decorated;
+        $this->decorated               = $decorated;
         $this->customFieldTypeProvider = $customFieldTypeProvider;
-        $this->customItemModel = $customItemModel;
+        $this->customItemModel         = $customItemModel;
+        $this->iriConverter            = $iriConverter;
     }
 
     public function supportsNormalization($data, $format = null)
@@ -51,7 +61,7 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
     public function normalize($object, $format = null, array $context = [])
     {
         if ($object instanceof CustomItem) {
-            $object = $this->customItemModel->fetchEntity($object->getId());
+            return $this->normalizeCustomItem($object, $format, $context);
         }
         return $this->decorated->normalize($object, $format, $context);
     }
@@ -67,44 +77,15 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
-        $optionEntitiesCollection = null;
-        $defaultValue = null;
+        if ($class === CustomItem::class) {
+            return $this->denormalizeCustomItem($data, $class, $format, $context);
+        }
+
         if ($class === CustomField::class) {
-            // Store and unset values that need TypeObject
-            if (array_key_exists('options', $data) and count($data['options']) > 0) {
-                $options = $data['options'];
-                unset($data['options']);
-                $optionEntities = [];
-                foreach($options as $option){
-                    $optionEntities[] = $this->decorated->denormalize($option, CustomFieldOption::class, $format, $context);
-                }
-                $optionEntitiesCollection = new ArrayCollection($optionEntities);
-            }
-            if (array_key_exists('defaultValue', $data)) {
-                $defaultValue = $data['defaultValue'];
-                unset($data['defaultValue']);
-            }
+            return $this->denormalizeCustomField($data, $class, $format, $context);
         }
-        $entity = $this->decorated->denormalize($data, $class, $format, $context);
-        if ($entity instanceof CustomField) {
-            try {
-                if(array_key_exists('type', $data)) {
-                    $type = $data['type'];
-                    $typeObject = $this->customFieldTypeProvider->getType($type);
-                    $entity->setTypeObject($typeObject);
-                }
-                if ($optionEntitiesCollection) {
-                    $entity->setOptions($optionEntitiesCollection);
-                }
-                if ($defaultValue) {
-                    $entity->setDefaultValue($defaultValue);
-                }
-            }
-            catch(NotFoundException $e) {
-                throw new InvalidArgumentException($e->getMessage());
-            }
-        }
-        return $entity;
+
+        return $this->decorated->denormalize($data, $class, $format, $context);
     }
 
     public function setSerializer(SerializerInterface $serializer)
@@ -112,5 +93,75 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
         if($this->decorated instanceof SerializerAwareInterface) {
             $this->decorated->setSerializer($serializer);
         }
+    }
+
+    private function normalizeCustomItem($object, $format = null, array $context = [])
+    {
+        $objectCustomItem = $this->customItemModel->fetchEntity($object->getId());
+        // Get obejct from model
+        $normalizedObject = $this->decorated->normalize($objectCustomItem, $format, $context);
+        // Change id to IRI
+        if (array_key_exists('fieldValues', $normalizedObject)) {
+            foreach ($normalizedObject['fieldValues'] as &$values){
+                $values['id'] = $this->iriConverter->getItemIriFromResourceClass(CustomField::class, [intval($values['id'])]);
+            }
+        }
+        return $normalizedObject;
+    }
+
+    /**
+     * @throws ExceptionInterface
+     */
+    private function denormalizeCustomItem($data, $class, $format = null, array $context = []) {
+        if (array_key_exists('fieldValues', $data)) {
+            foreach ($data['fieldValues'] as &$values){
+                $values['id'] = $this->iriConverter->getItemFromIri($values['id'])->getId();
+            }
+        }
+        return $this->decorated->denormalize($data, $class, $format, $context);
+    }
+
+    /**
+     * @throws ExceptionInterface
+     * @throws InvalidArgumentException
+     */
+    private function denormalizeCustomField($data, $class, $format = null, array $context = []) {
+        $optionEntitiesCollection = null;
+        $defaultValue = null;
+        // Store and unset values that need TypeObject
+        if (array_key_exists('options', $data) and count($data['options']) > 0) {
+            $options = $data['options'];
+            unset($data['options']);
+            $optionEntities = [];
+            foreach($options as $option){
+                $optionEntities[] = $this->decorated->denormalize($option, CustomFieldOption::class, $format, $context);
+            }
+            $optionEntitiesCollection = new ArrayCollection($optionEntities);
+        }
+        if (array_key_exists('defaultValue', $data)) {
+            $defaultValue = $data['defaultValue'];
+            unset($data['defaultValue']);
+        }
+
+        $entity = $this->decorated->denormalize($data, $class, $format, $context);
+
+        // Set back the stored values when TypeObject is present
+        try {
+            if(array_key_exists('type', $data)) {
+                $type = $data['type'];
+                $typeObject = $this->customFieldTypeProvider->getType($type);
+                $entity->setTypeObject($typeObject);
+            }
+            if ($optionEntitiesCollection) {
+                $entity->setOptions($optionEntitiesCollection);
+            }
+            if ($defaultValue) {
+                $entity->setDefaultValue($defaultValue);
+            }
+        }
+        catch(NotFoundException $e) {
+            throw new InvalidArgumentException($e->getMessage());
+        }
+        return $entity;
     }
 }

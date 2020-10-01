@@ -129,10 +129,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      *             "items"={
      *                 "type"="object",
      *                 "properties"={
-     *                     "type"={
-     *                         "type"="string"
-     *                     },
-     *                     "alias"={
+     *                     "id"={
      *                         "type"="string"
      *                     },
      *                     "value"={
@@ -421,9 +418,8 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         foreach($this->customFieldValues as $customFieldValue) {
             $fieldValues[] =
                 [
-                    'type' => $customFieldValue->getCustomField()->getType(),
+                    'id'    => strval($customFieldValue->getCustomField()->getId()),
                     'value' => $customFieldValue->getValue(),
-                    'alias' => $customFieldValue->getCustomField()->getAlias(),
                 ];
         }
         return $fieldValues;
@@ -431,16 +427,18 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
 
     /**
      * Just for API
+     *
+     * @throws NotFoundException
      */
     public function setFieldValues(array $values): void
     {
         foreach ($values as $value)
         {
             try {
-                $customFieldValue = $this->findCustomFieldValueForFieldAlias((string) $value['alias']);
+                $customFieldValue = $this->findCustomFieldValueForFieldId((int) $value['id']);
                 $customFieldValue->setValue($value['value']);
             } catch (NotFoundException $e) {
-                $this->createNewCustomFieldValueByFieldAlias((string) $value['alias'], $value['value']);
+                $this->createNewCustomFieldValueByFieldId((int) $value['id'], $value['value']);
             }
         }
         $this->setDefaultValuesForMissingFields();
