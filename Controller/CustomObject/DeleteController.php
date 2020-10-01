@@ -24,7 +24,6 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Response;
 
 class DeleteController extends CommonController
 {
@@ -67,10 +66,7 @@ class DeleteController extends CommonController
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    /**
-     * @return Response|JsonResponse
-     */
-    public function deleteAction(int $objectId)
+    public function deleteAction(int $objectId): JsonResponse
     {
         try {
             $customObject = $this->customObjectModel->fetchEntity($objectId);
