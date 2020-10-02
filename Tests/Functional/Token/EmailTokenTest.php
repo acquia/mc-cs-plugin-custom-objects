@@ -20,6 +20,15 @@ class EmailTokenTest extends MauticMysqlTestCase
 {
     use CustomObjectsTrait;
 
+    protected function beforeBeginTransaction(): void
+    {
+        $this->resetAutoincrement([
+            'custom_field',
+            'custom_item',
+            'custom_field_value_option',
+        ]);
+    }
+
     public function testEmailTokens(): void
     {
         $product  = $this->createCustomObjectWithAllFields($this->container, 'Product');
