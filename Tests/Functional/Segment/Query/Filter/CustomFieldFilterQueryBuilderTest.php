@@ -43,7 +43,7 @@ class CustomFieldFilterQueryBuilderTest extends MauticMysqlTestCase
             $fixturesDirectory.'/custom_items.yml',
             $fixturesDirectory.'/custom_xref.yml',
             $fixturesDirectory.'/custom_values.yml',
-        ], true);
+        ]);
         $this->setFixtureObjects($objects);
 
         /** @var CustomFieldTypeProvider $fieldTypeProvider */

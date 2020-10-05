@@ -58,7 +58,7 @@ class QueryFilterHelperTest extends MauticMysqlTestCase
             $fixturesDirectory.'/custom_xref.yml',
             $fixturesDirectory.'/custom_values.yml',
             $fixturesDirectory.'/custom-item-relation-filter-query-builder-fixture-2.yml',
-        ], true);
+        ]);
         $this->setFixtureObjects($objects);
     }
 

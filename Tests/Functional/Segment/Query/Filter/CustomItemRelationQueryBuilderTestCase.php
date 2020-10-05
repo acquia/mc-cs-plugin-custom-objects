@@ -67,7 +67,7 @@ class CustomItemRelationQueryBuilderTestCase extends MauticMysqlTestCase
     {
         $this->loadFixtureFiles([
             $this->getFixturesDirectory().'/custom-item-relation-filter-query-builder-fixture-1.yml',
-        ], true);
+        ]);
 
         $this->runCommand(
             'mautic:segments:update',
@@ -86,7 +86,7 @@ class CustomItemRelationQueryBuilderTestCase extends MauticMysqlTestCase
     {
         $this->loadFixtureFiles([
             $this->getFixturesDirectory().'/custom-item-relation-filter-query-builder-fixture-2.yml',
-        ], true);
+        ]);
 
         $limit = $this->coreParametersHelper->get(ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT);
 
@@ -154,7 +154,7 @@ class CustomItemRelationQueryBuilderTestCase extends MauticMysqlTestCase
     {
         $this->loadFixtureFiles([
             $this->getFixturesDirectory().'/custom-item-relation-filter-query-builder-fixture-3.yml',
-        ], true);
+        ]);
 
         $limit = $this->coreParametersHelper->get(ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT);
 
