@@ -23,6 +23,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -34,6 +35,11 @@ class DeleteControllerTest extends ControllerTestCase
     private $sessionProvider;
     private $flashBag;
     private $permissionProvider;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
 
     /**
      * @var DeleteController
@@ -50,11 +56,13 @@ class DeleteControllerTest extends ControllerTestCase
         $this->flashBag           = $this->createMock(FlashBag::class);
         $this->permissionProvider = $this->createMock(CustomObjectPermissionProvider::class);
         $this->request            = $this->createMock(Request::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->deleteController   = new DeleteController(
             $this->customObjectModel,
             $sessionProviderFactory,
             $this->flashBag,
-            $this->permissionProvider
+            $this->permissionProvider,
+            $this->eventDispatcher
         );
 
         $this->addSymfonyDependencies($this->deleteController);
