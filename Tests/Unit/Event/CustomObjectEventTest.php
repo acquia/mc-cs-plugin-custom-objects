@@ -32,7 +32,7 @@ class CustomObjectEventTest extends TestCase
     protected function setUp(): void
     {
         $this->customObject = new CustomObject();
-        $this->event = new CustomObjectEvent($this->customObject);
+        $this->event        = new CustomObjectEvent($this->customObject);
     }
 
     public function testGettersSetters(): void
