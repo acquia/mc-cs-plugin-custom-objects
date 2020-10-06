@@ -288,7 +288,7 @@ class TokenSubscriber implements EventSubscriberInterface
      */
     private function getCustomFieldValues(CustomObject $customObject, Token $token, EmailSendEvent $event): array
     {
-        $orderBy  = CustomItem::TABLE_ALIAS.'.date_added';
+        $orderBy  = CustomItem::TABLE_ALIAS.'.id';
         $orderDir = 'DESC';
 
         if ('latest' === $token->getOrder()) {
