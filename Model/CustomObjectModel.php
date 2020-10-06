@@ -379,7 +379,7 @@ class CustomObjectModel extends FormModel
     }
 
     /**
-     * This method returns all segments that use this custom object or its custom fields
+     * This method returns all segments that use this custom object or its custom fields.
      *
      * @return LeadList[]
      */

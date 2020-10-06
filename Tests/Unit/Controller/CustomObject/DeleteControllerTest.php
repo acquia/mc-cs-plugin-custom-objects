@@ -69,7 +69,7 @@ class DeleteControllerTest extends ControllerTestCase
         $this->flashBag           = $this->createMock(FlashBag::class);
         $this->permissionProvider = $this->createMock(CustomObjectPermissionProvider::class);
         $this->request            = $this->createMock(Request::class);
-        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->eventDispatcher    = $this->createMock(EventDispatcherInterface::class);
         $this->deleteController   = new DeleteController(
             $this->customObjectModel,
             $sessionProviderFactory,
@@ -188,9 +188,9 @@ class DeleteControllerTest extends ControllerTestCase
     private function createSegments(int $quantity): ArrayCollection
     {
         $segments = new ArrayCollection();
-        for ($i = 1; $i <= $quantity; $i++) {
+        for ($i = 1; $i <= $quantity; ++$i) {
             $segment = new LeadList();
-            $segment->setName('Segment ' . $i);
+            $segment->setName('Segment '.$i);
             $segments->add($segment);
         }
 
