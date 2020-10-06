@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomObject;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\LeadBundle\Entity\LeadList;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomObject\DeleteController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
@@ -24,6 +26,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\SessionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -52,6 +55,11 @@ class DeleteControllerTest extends ControllerTestCase
      */
     private $translator;
 
+    /**
+     * @var int
+     */
+    private $leadListIndex;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -79,6 +87,8 @@ class DeleteControllerTest extends ControllerTestCase
 
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->deleteController->setTranslator($this->translator);
+
+        $this->leadListIndex = 1;
     }
 
     public function testDeleteActionIfCustomObjectNotFound(): void
@@ -145,5 +155,46 @@ class DeleteControllerTest extends ControllerTestCase
             ->willReturn($message);
 
         $this->deleteController->deleteAction(self::OBJECT_ID);
+    }
+
+    public function testThatItDisplaysErrorMessageIfThereAreRelatedSegments(): void
+    {
+        $customObject = $this->createMock(CustomObject::class);
+
+        $customObject->method('getId')->willReturn(self::OBJECT_ID);
+
+        $this->customObjectModel->expects($this->once())
+            ->method('fetchEntity')
+            ->with(self::OBJECT_ID)
+            ->willReturn($customObject);
+
+        $this->eventDispatcher->expects($this->never())
+            ->method('dispatch');
+
+        $this->flashBag->expects($this->once())
+            ->method('add');
+
+        $this->sessionProvider->expects($this->once())
+            ->method('getPage')
+            ->willReturn(3);
+
+        $segments = $this->createSegments(2);
+        $this->customObjectModel->expects($this->once())
+            ->method('getFilterSegments')
+            ->willReturn($segments->toArray());
+
+        $this->deleteController->deleteAction(self::OBJECT_ID);
+    }
+
+    private function createSegments(int $quantity): ArrayCollection
+    {
+        $segments = new ArrayCollection();
+        for ($i = 1; $i <= $quantity; $i++) {
+            $segment = new LeadList();
+            $segment->setName('Segment ' . $i);
+            $segments->add($segment);
+        }
+
+        return $segments;
     }
 }

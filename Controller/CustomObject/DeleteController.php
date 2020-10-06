@@ -91,7 +91,7 @@ class DeleteController extends CommonController
         if (0 < count($relatedSegments)) {
             $segments = [];
             foreach ($relatedSegments as $relatedSegment) {
-                $segments[$relatedSegment->getId()] = sprintf('"%s" (%d)', $relatedSegment->getName(), $relatedSegment->getId());
+                $segments[] = sprintf('"%s" (%d)', $relatedSegment->getName(), $relatedSegment->getId());
             }
 
             $translationParameters['%segments%'] = implode(', ', $segments);
