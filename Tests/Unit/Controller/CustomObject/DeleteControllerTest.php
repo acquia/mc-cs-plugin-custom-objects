@@ -26,6 +26,7 @@ use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class DeleteControllerTest extends ControllerTestCase
 {
@@ -45,6 +46,11 @@ class DeleteControllerTest extends ControllerTestCase
      * @var DeleteController
      */
     private $deleteController;
+
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
 
     protected function setUp(): void
     {
@@ -70,6 +76,9 @@ class DeleteControllerTest extends ControllerTestCase
         $this->request->method('isXmlHttpRequest')->willReturn(true);
         $this->request->method('getRequestUri')->willReturn('https://a.b');
         $sessionProviderFactory->method('createObjectProvider')->willReturn($this->sessionProvider);
+
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->deleteController->setTranslator($this->translator);
     }
 
     public function testDeleteActionIfCustomObjectNotFound(): void
@@ -119,17 +128,21 @@ class DeleteControllerTest extends ControllerTestCase
             ->with(self::OBJECT_ID)
             ->willReturn($customObject);
 
-        $this->customObjectModel->expects($this->once())
-            ->method('delete')
-            ->with($customObject);
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch');
 
+        $message = 'mautic.core.notice.deleted';
         $this->flashBag->expects($this->once())
             ->method('add')
-            ->with('mautic.core.notice.deleted');
+            ->with($message);
 
         $this->sessionProvider->expects($this->once())
             ->method('getPage')
             ->willReturn(3);
+
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->willReturn($message);
 
         $this->deleteController->deleteAction(self::OBJECT_ID);
     }
