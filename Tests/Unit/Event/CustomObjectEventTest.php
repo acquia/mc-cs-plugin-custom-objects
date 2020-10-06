@@ -15,15 +15,36 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Event;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
+use PHPUnit\Framework\TestCase;
 
-class CustomObjectEventTest extends \PHPUnit\Framework\TestCase
+class CustomObjectEventTest extends TestCase
 {
+    /**
+     * @var CustomObjectEvent
+     */
+    private $event;
+
+    /**
+     * @var CustomObject
+     */
+    private $customObject;
+
+    protected function setUp(): void
+    {
+        $this->customObject = new CustomObject();
+        $this->event = new CustomObjectEvent($this->customObject);
+    }
+
     public function testGettersSetters(): void
     {
-        $customObject = $this->createMock(CustomObject::class);
-        $event        = new CustomObjectEvent($customObject);
+        static::assertSame($this->customObject, $this->event->getCustomObject());
+        static::assertFalse($this->event->entityIsNew());
+    }
 
-        $this->assertSame($customObject, $event->getCustomObject());
-        $this->assertFalse($event->entityIsNew());
+    public function testMessageGettersAndSetters(): void
+    {
+        $message = 'Some message';
+        $this->event->setMessage($message);
+        static::assertSame($message, $this->event->getMessage());
     }
 }
