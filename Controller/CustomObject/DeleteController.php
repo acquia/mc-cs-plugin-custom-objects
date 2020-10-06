@@ -63,7 +63,7 @@ class DeleteController extends CommonController
         $this->sessionProviderFactory = $sessionProviderFactory;
         $this->flashBag               = $flashBag;
         $this->permissionProvider     = $permissionProvider;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->eventDispatcher        = $eventDispatcher;
     }
 
     public function deleteAction(int $objectId): Response
@@ -78,8 +78,8 @@ class DeleteController extends CommonController
         }
 
         $controller = 'CustomObjectsBundle:CustomObject\List:list';
-        $page = [
-            'page' => $this->sessionProviderFactory->createObjectProvider()->getPage()
+        $page       = [
+            'page' => $this->sessionProviderFactory->createObjectProvider()->getPage(),
         ];
 
         $translationParameters = [
