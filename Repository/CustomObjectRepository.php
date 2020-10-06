@@ -81,7 +81,7 @@ class CustomObjectRepository extends CommonRepository
     }
 
     /**
-     * This method returns all segments that use this custom object or its custom fields for filtering
+     * This method returns all segments that use this custom object or its custom fields for filtering.
      *
      * @return LeadList[]
      */
@@ -91,9 +91,9 @@ class CustomObjectRepository extends CommonRepository
             ->select('l')
             ->from(LeadList::class, 'l', 'l.id');
 
-        $alias       = 'cmo_' . $customObject->getId();
+        $alias       = 'cmo_'.$customObject->getId();
         $aliasLength = mb_strlen($alias);
-        $like = "%;s:5:\"field\";s:${aliasLength}:\"{$alias}\";%";
+        $like        = "%;s:5:\"field\";s:${aliasLength}:\"{$alias}\";%";
 
         $filterExpression = $queryBuilder->expr()->orX(
             $queryBuilder->expr()->like('l.filters', $queryBuilder->expr()->literal($like))
@@ -101,9 +101,9 @@ class CustomObjectRepository extends CommonRepository
 
         /** @var CustomField $customField */
         foreach ($customObject->getCustomFields() as $customField) {
-            $alias       = 'cmf_' . $customField->getId();
+            $alias       = 'cmf_'.$customField->getId();
             $aliasLength = mb_strlen($alias);
-            $like = "%;s:5:\"field\";s:${aliasLength}:\"{$alias}\";%";
+            $like        = "%;s:5:\"field\";s:${aliasLength}:\"{$alias}\";%";
             $filterExpression->add(
                 $queryBuilder->expr()->like('l.filters', $queryBuilder->expr()->literal($like))
             );

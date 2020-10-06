@@ -173,7 +173,7 @@ class CustomObjectRepositoryTest extends TestCase
     private function createCustomFields(int $quantity): array
     {
         $customFields = [];
-        for ($id = 1; $id <= $quantity; $id++) {
+        for ($id = 1; $id <= $quantity; ++$id) {
             $customField = new CustomField();
             $customField->setId($id);
             $customFields[] = $customField;
