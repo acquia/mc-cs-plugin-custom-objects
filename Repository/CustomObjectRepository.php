@@ -81,7 +81,7 @@ class CustomObjectRepository extends CommonRepository
     }
 
     /**
-     * This method returns all segments that use this custom object or its custom fields
+     * This method returns all segments that use this custom object or its custom fields for filtering
      *
      * @return LeadList[]
      */
@@ -99,6 +99,7 @@ class CustomObjectRepository extends CommonRepository
             $queryBuilder->expr()->like('l.filters', $queryBuilder->expr()->literal($like))
         );
 
+        /** @var CustomField $customField */
         foreach ($customObject->getCustomFields() as $customField) {
             $alias       = 'cmf_' . $customField->getId();
             $aliasLength = mb_strlen($alias);
