@@ -173,7 +173,7 @@ pipeline {
         anyOf {
           branch 'development'
           branch 'beta';
-          // branch 'staging'; # Disabling automatic releasing to production until custom objects goes GA
+          branch 'staging';
         }
       }
       steps {
