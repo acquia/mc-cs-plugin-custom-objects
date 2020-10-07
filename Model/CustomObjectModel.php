@@ -385,7 +385,7 @@ class CustomObjectModel extends FormModel
     public function checkIfTheCustomObjectIsUsedInSegmentFilters(CustomObject $customObject): void
     {
         $segments = $this->customObjectRepository->getFilterSegments($customObject);
-        if (0 < count($segments)) {
+        if (1 > count($segments)) {
             return;
         }
 
