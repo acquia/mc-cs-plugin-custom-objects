@@ -19,6 +19,7 @@ use Mautic\LeadBundle\Entity\LeadList;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomObject\DeleteController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Exception\InUseException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
@@ -140,18 +141,9 @@ class DeleteControllerTest extends ControllerTestCase
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch');
 
-        $message = 'mautic.core.notice.deleted';
-        $this->flashBag->expects($this->once())
-            ->method('add')
-            ->with($message);
-
         $this->sessionProvider->expects($this->once())
             ->method('getPage')
             ->willReturn(3);
-
-        $this->translator->expects($this->once())
-            ->method('trans')
-            ->willReturn($message);
 
         $this->deleteController->deleteAction(self::OBJECT_ID);
     }
@@ -178,9 +170,12 @@ class DeleteControllerTest extends ControllerTestCase
             ->willReturn(3);
 
         $segments = $this->createSegments(2);
+        $inUseException = new InUseException();
+        $inUseException->setSegmentList($segments->toArray());
+
         $this->customObjectModel->expects($this->once())
-            ->method('getFilterSegments')
-            ->willReturn($segments->toArray());
+            ->method('checkIfTheCustomObjectIsUsedInSegmentFilters')
+            ->willThrowException($inUseException);
 
         $this->deleteController->deleteAction(self::OBJECT_ID);
     }
