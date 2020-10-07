@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Entity\Lead;
@@ -25,19 +25,10 @@ use MauticPlugin\CustomObjectsBundle\EventListener\TokenSubscriber;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldValueModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\CustomObjectsTrait;
-use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class TokenSubscriberTest extends KernelTestCase
+class TokenSubscriberTest extends MauticMysqlTestCase
 {
-    use DatabaseSchemaTrait;
     use CustomObjectsTrait;
-
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
 
     /**
      * @var CustomItemModel
@@ -56,26 +47,11 @@ class TokenSubscriberTest extends KernelTestCase
 
     protected function setUp(): void
     {
-        self::bootKernel();
+        parent::setUp();
 
-        $this->container = static::$kernel->getContainer();
-
-        /** @var EntityManager $entityManager */
-        $entityManager = $this->container->get('doctrine.orm.entity_manager');
-
-        /** @var CustomItemModel $customItemModel */
-        $customItemModel       = $this->container->get('mautic.custom.model.item');
-        $this->customItemModel = $customItemModel;
-
-        /** @var CustomFieldValueModel $customFieldValueModel */
-        $customFieldValueModel       = $this->container->get('mautic.custom.model.field.value');
-        $this->customFieldValueModel = $customFieldValueModel;
-
-        /** @var TokenSubscriber $subscriber */
-        $subscriber       = $this->container->get('custom_object.emailtoken.subscriber');
-        $this->subscriber = $subscriber;
-
-        $this->createFreshDatabaseSchema($entityManager);
+        $this->customItemModel       = $this->container->get('mautic.custom.model.item');
+        $this->customFieldValueModel = $this->container->get('mautic.custom.model.field.value');
+        $this->subscriber            = $this->container->get('custom_object.emailtoken.subscriber');
     }
 
     public function testTextFieldSegmentFilterToken(): void
@@ -394,9 +370,6 @@ class TokenSubscriberTest extends KernelTestCase
         return $segment;
     }
 
-    /**
-     * @return LeadList
-     */
     private function addContactToSegment(Lead $contact, LeadList $segment): void
     {
         /** @var ListModel $segmentModel */

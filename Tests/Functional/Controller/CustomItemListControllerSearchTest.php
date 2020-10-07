@@ -17,6 +17,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 class CustomItemListControllerSearchTest extends MauticMysqlTestCase
 {
+    protected $useCleanupRollback = false;
+
     public function testSearchItemName(): void
     {
         $customObject    = $this->createCustomObject();

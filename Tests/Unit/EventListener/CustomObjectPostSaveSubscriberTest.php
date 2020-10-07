@@ -11,16 +11,17 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\EventListener;
+namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
+use Exception;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
 use MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectPostSaveSubscriber;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use PHPUnit\Framework\Assert;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use PHPUnit\Framework\TestCase;
 
-class CustomObjectPostSaveSubscriberTest extends KernelTestCase
+class CustomObjectPostSaveSubscriberTest extends TestCase
 {
     public function testPostSaveRelationshipObject(): void
     {
@@ -60,7 +61,7 @@ class CustomObjectPostSaveSubscriberTest extends KernelTestCase
 
             public function saveEntity($entity, $unlock = true)
             {
-                throw new \Exception('Should not have been called.');
+                throw new Exception('Should not have been called.');
             }
         };
 
