@@ -11,7 +11,6 @@
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\ApiPlatform;
 
-use Doctrine\Common\Annotations\Annotation\IgnoreAnnotation;
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\MultiselectType;
@@ -21,17 +20,19 @@ use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Translation\TranslatorInterface;
 
-/**
- * @IgnoreAnnotation("dataProvider")
- */
 final class CustomFieldOptionFunctionalTest extends AbstractApiPlatformFunctionalTest
 {
+    public function testCustomFieldOptionCRUD(): void
+    {
+        foreach ($this->getCRUDProvider() as $parameters) {
+            $this->runTestCustomFieldOptionCRUD(...$parameters);
+        }
+    }
+
     /**
-     * @dataProvider getCRUDProvider
-     *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function testCustomFieldOptionCRUD(
+    private function runTestCustomFieldOptionCRUD(
         array $permissions,
         string $httpCreated,
         string $httpRetrieved,
@@ -44,11 +45,11 @@ final class CustomFieldOptionFunctionalTest extends AbstractApiPlatformFunctiona
         $user = $this->getUser();
         // OBJECTS
         $customObject = $this->createCustomObject();
-        $customField = $this->createField($customObject, $user);
+        $customField  = $this->createField($customObject, $user);
         // PERMISSION
         $this->setPermission($user, 'custom_objects:custom_fields', $permissions);
         // CREATE
-        $payloadCreate = $this->getCreatePayload('/api/v2/custom_fields/' . $customField->getId());
+        $payloadCreate        = $this->getCreatePayload('/api/v2/custom_fields/'.$customField->getId());
         $clientCreateResponse = $this->createEntity('custom_field_options', $payloadCreate);
         $this->assertEquals($httpCreated, $clientCreateResponse->getStatusCode());
         if (!property_exists(json_decode($clientCreateResponse->getContent()), '@id')) {
@@ -63,7 +64,7 @@ final class CustomFieldOptionFunctionalTest extends AbstractApiPlatformFunctiona
             $this->assertEquals($retrievedLabel, json_decode($clientRetrieveResponse->getContent())->label);
         }
         // UPDATE
-        $payloadUpdate = $this->getEditPayload();
+        $payloadUpdate        = $this->getEditPayload();
         $clientUpdateResponse = $this->updateEntity($createdId, $payloadUpdate);
         $this->assertEquals($httpUpdated, $clientUpdateResponse->getStatusCode());
         if ($updatedLabel) {
@@ -82,16 +83,17 @@ final class CustomFieldOptionFunctionalTest extends AbstractApiPlatformFunctiona
         $customObject->setAlias('test_custom_object');
         $this->em->persist($customObject);
         $this->em->flush();
+
         return $customObject;
     }
 
     private function createField(CustomObject $customObject, User $user): CustomField
     {
-        $translatorMock = $this->createMock(TranslatorInterface::class);
+        $translatorMock             = $this->createMock(TranslatorInterface::class);
         $filterOperatorProviderMock = $this->createMock(FilterOperatorProviderInterface::class);
-        $csvHelperMock = $this->createMock(CsvHelper::class);
-        $customFieldType = new MultiselectType($translatorMock, $filterOperatorProviderMock, $csvHelperMock);
-        $customField = new CustomField();
+        $csvHelperMock              = $this->createMock(CsvHelper::class);
+        $customFieldType            = new MultiselectType($translatorMock, $filterOperatorProviderMock, $csvHelperMock);
+        $customField                = new CustomField();
         $customField->setLabel('Test custom field');
         $customField->setAlias('test_custom_field');
         $customField->setCustomObject($customObject);
@@ -101,25 +103,26 @@ final class CustomFieldOptionFunctionalTest extends AbstractApiPlatformFunctiona
         $customField->setCreatedBy($user);
         $this->em->persist($customField);
         $this->em->flush();
+
         return $customField;
     }
 
     private function getCreatePayload(string $customField): array
     {
         return [
-            "label"        => "New Custom Field Option",
-            "value"        => "custom_field_option",
-            "order"        => 0,
-            "customField"  => $customField,
+            'label'        => 'New Custom Field Option',
+            'value'        => 'custom_field_option',
+            'order'        => 0,
+            'customField'  => $customField,
         ];
     }
 
     private function getEditPayload(): array
     {
         return [
-            "label"        => "Edited Custom Field Option",
-            "value"        => "custom_field_option",
-            "order"        => 0
+            'label'        => 'Edited Custom Field Option',
+            'value'        => 'custom_field_option',
+            'order'        => 0,
         ];
     }
 
@@ -128,48 +131,44 @@ final class CustomFieldOptionFunctionalTest extends AbstractApiPlatformFunctiona
      *
      * @return array|array[]
      */
-    public function getCRUDProvider(): array
+    private function getCRUDProvider(): array
     {
         return [
-            "all_ok" =>
-                [
+            'all_ok' => [
                     ['viewown', 'viewother', 'editown', 'editother', 'create', 'deleteown', 'deleteother', 'publishown', 'publishother'],
                     Response::HTTP_CREATED,
                     Response::HTTP_OK,
-                    "New Custom Field Option",
+                    'New Custom Field Option',
                     Response::HTTP_OK,
-                    "Edited Custom Field Option",
-                    Response::HTTP_NO_CONTENT
+                    'Edited Custom Field Option',
+                    Response::HTTP_NO_CONTENT,
                 ],
-            "no_delete" =>
-                [
+            'no_delete' => [
                     ['viewown', 'viewother', 'editown', 'editother', 'create', 'publishown', 'publishother'],
                     Response::HTTP_CREATED,
                     Response::HTTP_OK,
-                    "New Custom Field Option",
+                    'New Custom Field Option',
                     Response::HTTP_OK,
-                    "Edited Custom Field Option",
-                    Response::HTTP_FORBIDDEN
+                    'Edited Custom Field Option',
+                    Response::HTTP_FORBIDDEN,
                 ],
-            "no_update" =>
-                [
+            'no_update' => [
                     ['viewown', 'viewother', 'create', 'deleteown', 'deleteother', 'publishown', 'publishother'],
                     Response::HTTP_CREATED,
                     Response::HTTP_OK,
-                    "New Custom Field Option",
+                    'New Custom Field Option',
                     Response::HTTP_FORBIDDEN,
                     null,
-                    Response::HTTP_NO_CONTENT
+                    Response::HTTP_NO_CONTENT,
                 ],
-            "no_create" =>
-                [
+            'no_create' => [
                     ['viewown', 'viewother', 'editown', 'editother', 'deleteown', 'deleteother', 'publishown', 'publishother'],
                     Response::HTTP_FORBIDDEN,
                     '',
                     null,
                     '',
                     null,
-                    ''
+                    '',
                 ],
         ];
     }

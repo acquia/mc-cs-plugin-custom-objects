@@ -1,22 +1,22 @@
 <?php
 
-
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\ApiPlatform;
 
-use Doctrine\Common\Annotations\Annotation\IgnoreAnnotation;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * @IgnoreAnnotation("dataProvider")
- */
 final class CustomObjectFunctionalTest extends AbstractApiPlatformFunctionalTest
 {
+    public function testCustomObjectCRUD(): void
+    {
+        foreach ($this->getCRUDProvider() as $parameters) {
+            $this->runTestCustomObjectCRUD(...$parameters);
+        }
+    }
+
     /**
-     * @dataProvider getCRUDProvider
-     *
      * @throws \Doctrine\ORM\ORMException
      */
-    public function testCustomObjectCRUD(
+    public function runTestCustomObjectCRUD(
         array $permissions,
         string $httpCreated,
         string $httpRetrieved,
@@ -29,7 +29,7 @@ final class CustomObjectFunctionalTest extends AbstractApiPlatformFunctionalTest
         $this->setPermission($user, 'custom_objects:custom_objects', $permissions);
 
         // CREATE
-        $payloadCreate = $this->getCreatePayload();
+        $payloadCreate        = $this->getCreatePayload();
         $clientCreateResponse = $this->createEntity('custom_objects', $payloadCreate);
         $this->assertEquals($httpCreated, $clientCreateResponse->getStatusCode());
         if (Response::HTTP_FORBIDDEN === $clientCreateResponse->getStatusCode()) {
@@ -44,7 +44,7 @@ final class CustomObjectFunctionalTest extends AbstractApiPlatformFunctionalTest
             $this->assertEquals($retrievedAlias, json_decode($clientRetrieveResponse->getContent())->alias);
         }
         // UPDATE
-        $payloadUpdate = $this->getEditPayload();
+        $payloadUpdate        = $this->getEditPayload();
         $clientUpdateResponse = $this->updateEntity($createdId, $payloadUpdate);
         $this->assertEquals($httpUpdated, $clientUpdateResponse->getStatusCode());
         if ($updatedAlias) {
@@ -59,51 +59,49 @@ final class CustomObjectFunctionalTest extends AbstractApiPlatformFunctionalTest
     {
         return
             [
-                "alias" => "customObjectTest",
-                "nameSingular" => "Test",
-                "namePlural" => "Tests",
-                "description" => "string string",
-                "language" => "en",
-                "customFields" =>
-                    [
+                'alias'        => 'customObjectTest',
+                'nameSingular' => 'Test',
+                'namePlural'   => 'Tests',
+                'description'  => 'string string',
+                'language'     => 'en',
+                'customFields' => [
                         [
-                            "label" => "Test Field 1",
-                            "alias" => "customObjectTestField1",
-                            "type" => "multiselect",
-                            "order" => 42,
-                            "required" => true,
-                            "defaultValue" => "one",
-                            "options" =>
-                                [
+                            'label'        => 'Test Field 1',
+                            'alias'        => 'customObjectTestField1',
+                            'type'         => 'multiselect',
+                            'order'        => 42,
+                            'required'     => true,
+                            'defaultValue' => 'one',
+                            'options'      => [
                                     [
-                                        "label" => "one",
-                                        "value" => "one",
-                                        "order" => 0
+                                        'label' => 'one',
+                                        'value' => 'one',
+                                        'order' => 0,
                                     ],
                                     [
-                                        "label" => "two",
-                                        "value" => "two",
-                                        "order" => 1
-                                    ]
+                                        'label' => 'two',
+                                        'value' => 'two',
+                                        'order' => 1,
+                                    ],
                                 ],
-                            "params" => [
-                                "string"
+                            'params' => [
+                                'string',
                             ],
-                            "isPublished" => true
+                            'isPublished' => true,
                         ],
                         [
-                            "label" => "Test Field 2",
-                            "alias" => "customObjectTestField2",
-                            "type" => "text",
-                            "order" => 43,
-                            "required" => true,
-                            "defaultValue" => "text",
-                            "params" => [
-                                "string"
+                            'label'        => 'Test Field 2',
+                            'alias'        => 'customObjectTestField2',
+                            'type'         => 'text',
+                            'order'        => 43,
+                            'required'     => true,
+                            'defaultValue' => 'text',
+                            'params'       => [
+                                'string',
                             ],
-                            "isPublished" => true
+                            'isPublished' => true,
                         ],
-                    ]
+                    ],
             ];
     }
 
@@ -111,11 +109,11 @@ final class CustomObjectFunctionalTest extends AbstractApiPlatformFunctionalTest
     {
         return
             [
-                "alias" => "customObjectTestEdited",
-                "nameSingular" => "Test Edited",
-                "namePlural" => "Tests Edited",
-                "description" => "string string Edited",
-                "language" => "en",
+                'alias'        => 'customObjectTestEdited',
+                'nameSingular' => 'Test Edited',
+                'namePlural'   => 'Tests Edited',
+                'description'  => 'string string Edited',
+                'language'     => 'en',
             ];
     }
 
@@ -124,48 +122,44 @@ final class CustomObjectFunctionalTest extends AbstractApiPlatformFunctionalTest
      *
      * @return array|array[]
      */
-    public function getCRUDProvider(): array
+    private function getCRUDProvider(): array
     {
         return [
-            "all_ok" =>
-                [
+            'all_ok' => [
                     ['viewown', 'viewother', 'editown', 'editother', 'create', 'deleteown', 'deleteother', 'publishown', 'publishother'],
                     Response::HTTP_CREATED,
                     Response::HTTP_OK,
-                    "customObjectTest",
+                    'customObjectTest',
                     Response::HTTP_OK,
-                    "customObjectTestEdited",
-                    Response::HTTP_NO_CONTENT
+                    'customObjectTestEdited',
+                    Response::HTTP_NO_CONTENT,
                 ],
-            "no_delete" =>
-                [
+            'no_delete' => [
                     ['viewown', 'viewother', 'editown', 'editother', 'create', 'publishown', 'publishother'],
                     Response::HTTP_CREATED,
                     Response::HTTP_OK,
-                    "customObjectTest",
+                    'customObjectTest',
                     Response::HTTP_OK,
-                    "customObjectTestEdited",
-                    Response::HTTP_FORBIDDEN
+                    'customObjectTestEdited',
+                    Response::HTTP_FORBIDDEN,
                 ],
-            "no_update" =>
-                [
+            'no_update' => [
                     ['viewown', 'viewother', 'create', 'deleteown', 'deleteother', 'publishown', 'publishother'],
                     Response::HTTP_CREATED,
                     Response::HTTP_OK,
-                    "customObjectTest",
+                    'customObjectTest',
                     Response::HTTP_FORBIDDEN,
                     null,
-                    Response::HTTP_NO_CONTENT
+                    Response::HTTP_NO_CONTENT,
                 ],
-            "no_create" =>
-                [
+            'no_create' => [
                     ['viewown', 'viewother', 'editown', 'editother', 'deleteown', 'deleteother', 'publishown', 'publishother'],
                     Response::HTTP_FORBIDDEN,
                     '',
                     null,
                     '',
                     null,
-                    ''
+                    '',
                 ],
         ];
     }

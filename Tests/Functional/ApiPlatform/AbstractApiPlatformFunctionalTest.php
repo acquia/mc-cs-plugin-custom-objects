@@ -2,8 +2,11 @@
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\ApiPlatform;
 
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\User;
+use ReflectionClass;
 use Symfony\Component\HttpFoundation\Response;
 
 abstract class AbstractApiPlatformFunctionalTest extends MauticMysqlTestCase
@@ -33,10 +36,24 @@ abstract class AbstractApiPlatformFunctionalTest extends MauticMysqlTestCase
         $permissions = [
             $permission => $permissionArray,
         ];
+
+        // delete previous permissions
+        $this->em->createQueryBuilder()
+            ->delete(Permission::class, 'p')
+            ->where('p.bundle = :bundle')
+            ->setParameter('bundle', reset(explode(':', $permission)))
+            ->getQuery()
+            ->execute();
+
         $roleModel = $this->container->get('mautic.user.model.role');
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
         $this->em->flush();
+
+        // reset in-memory permission cache
+        $property = (new ReflectionClass(CorePermissions::class))->getProperty('grantedPermissions');
+        $property->setAccessible(true);
+        $property->setValue($this->container->get('mautic.security'), []);
     }
 
     protected function createEntity(string $shortName, array $payload): Response
