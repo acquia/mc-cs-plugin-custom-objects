@@ -23,6 +23,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\LeadBundle\Model\ListModel;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
@@ -58,6 +59,11 @@ class CustomObjectModelTest extends \PHPUnit\Framework\TestCase
     private $translator;
 
     /**
+     * @var ListModel
+     */
+    private $listModel;
+
+    /**
      * @var CustomObjectModel
      */
     private $customObjectModel;
@@ -84,13 +90,15 @@ class CustomObjectModelTest extends \PHPUnit\Framework\TestCase
         $this->customFieldModel               = $this->createMock(CustomFieldModel::class);
         $this->dispatcher                     = $this->createMock(EventDispatcherInterface::class);
         $this->translator                     = $this->createMock(TranslatorInterface::class);
+        $this->listModel                      = $this->createMock(ListModel::class);
         $this->customObjectModel              = new CustomObjectModel(
             $this->entityManager,
             $this->customObjectRepository,
             $this->customObjectPermissionProvider,
             $this->userHelper,
             $this->customFieldModel,
-            $this->dispatcher
+            $this->dispatcher,
+            $this->listModel
         );
 
         $this->customObjectModel->setEntityManager($this->entityManager);

@@ -75,7 +75,7 @@ class CustomObjectModel extends FormModel
         $this->userHelper             = $userHelper;
         $this->customFieldModel       = $customFieldModel;
         $this->dispatcher             = $dispatcher;
-        $this->listModel = $listModel;
+        $this->listModel              = $listModel;
     }
 
     public function save(CustomObject $customObject): CustomObject
