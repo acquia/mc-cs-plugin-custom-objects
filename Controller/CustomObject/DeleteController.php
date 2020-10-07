@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Service\FlashBag;
 use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Exception\InUseException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
@@ -68,29 +69,27 @@ class DeleteController extends CommonController
 
     public function deleteAction(int $objectId): Response
     {
-        try {
-            $customObject = $this->customObjectModel->fetchEntity($objectId);
-            $this->permissionProvider->canDelete($customObject);
-        } catch (NotFoundException $e) {
-            return $this->notFound($e->getMessage());
-        } catch (ForbiddenException $e) {
-            return $this->accessDenied(false, $e->getMessage());
-        }
-
         $controller = 'CustomObjectsBundle:CustomObject\List:list';
         $page       = [
             'page' => $this->sessionProviderFactory->createObjectProvider()->getPage(),
         ];
 
-        $translationParameters = [
-            '%name%' => $customObject->getName(),
-            '%id%'   => $customObject->getId(),
-        ];
+        try {
+            $customObject = $this->customObjectModel->fetchEntity($objectId);
+            $translationParameters = [
+                '%name%' => $customObject->getName(),
+                '%id%'   => $customObject->getId(),
+            ];
 
-        $relatedSegments = $this->customObjectModel->getFilterSegments($customObject);
-        if (0 < count($relatedSegments)) {
+            $this->permissionProvider->canDelete($customObject);
+            $this->customObjectModel->checkIfTheCustomObjectIsUsedInSegmentFilters($customObject);
+        } catch (NotFoundException $e) {
+            return $this->notFound($e->getMessage());
+        } catch (ForbiddenException $e) {
+            return $this->accessDenied(false, $e->getMessage());
+        } catch (InUseException $exception) {
             $segments = [];
-            foreach ($relatedSegments as $relatedSegment) {
+            foreach ($exception->getSegmentList() as $relatedSegment) {
                 $segments[] = sprintf('"%s" (%d)', $relatedSegment->getName(), $relatedSegment->getId());
             }
 
@@ -104,10 +103,8 @@ class DeleteController extends CommonController
         }
 
         $customObjectEvent = new CustomObjectEvent($customObject);
+        $customObjectEvent->setFlashBag($this->flashBag);
         $this->eventDispatcher->dispatch(CustomObjectEvents::ON_CUSTOM_OBJECT_USER_PRE_DELETE, $customObjectEvent);
-
-        $message = $customObjectEvent->getMessage() ?: $this->translator->trans('mautic.core.notice.deleted', $translationParameters, 'flashes');
-        $this->flashBag->add($message);
 
         return $this->forward(
             $controller,

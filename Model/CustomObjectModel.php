@@ -28,6 +28,7 @@ use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Exception\InUseException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
@@ -379,12 +380,17 @@ class CustomObjectModel extends FormModel
     }
 
     /**
-     * This method returns all segments that use this custom object or its custom fields.
-     *
-     * @return LeadList[]
+     * @throws InUseException
      */
-    public function getFilterSegments(CustomObject $customObject): array
+    public function checkIfTheCustomObjectIsUsedInSegmentFilters(CustomObject $customObject): void
     {
-        return $this->customObjectRepository->getFilterSegments($customObject);
+        $segments = $this->customObjectRepository->getFilterSegments($customObject);
+        if (0 < count($segments)) {
+            return;
+        }
+
+        $exception = new InUseException();
+        $exception->setSegmentList($segments);
+        throw $exception;
     }
 }

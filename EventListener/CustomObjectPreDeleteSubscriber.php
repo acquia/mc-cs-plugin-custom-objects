@@ -17,6 +17,7 @@ use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomObjectPreDeleteSubscriber implements EventSubscriberInterface
 {
@@ -25,9 +26,15 @@ class CustomObjectPreDeleteSubscriber implements EventSubscriberInterface
      */
     private $customObjectModel;
 
-    public function __construct(CustomObjectModel $customObjectModel)
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
+
+    public function __construct(CustomObjectModel $customObjectModel, TranslatorInterface $translator)
     {
         $this->customObjectModel = $customObjectModel;
+        $this->translator = $translator;
     }
 
     public static function getSubscribedEvents()
@@ -39,7 +46,15 @@ class CustomObjectPreDeleteSubscriber implements EventSubscriberInterface
 
     public function preDelete(CustomObjectEvent $event): void
     {
-        $object = $event->getCustomObject();
-        $this->customObjectModel->delete($object);
+        $customObject = $event->getCustomObject();
+        $this->customObjectModel->delete($customObject);
+
+        $flashBag = $event->getFlashBag();
+        if (!$flashBag) {
+            return;
+        }
+
+        $message = $this->translator->trans('mautic.core.notice.deleted', ['%name%' => $customObject->getName(),], 'flashes');
+        $flashBag->add($message);
     }
 }

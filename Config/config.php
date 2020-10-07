@@ -858,6 +858,7 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectPreDeleteSubscriber::class,
                 'arguments' => [
                     'mautic.custom.model.object',
+                    'translator',
                 ]
             ],
         ],

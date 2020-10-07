@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Event;
 
+use Mautic\CoreBundle\Service\FlashBag;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Symfony\Component\EventDispatcher\Event;
 
@@ -32,6 +33,11 @@ class CustomObjectEvent extends Event
      * @var string
      */
     private $message;
+
+    /**
+     * @var FlashBag
+     */
+    private $flashBag;
 
     public function __construct(CustomObject $customObject, bool $isNew = false)
     {
@@ -57,5 +63,15 @@ class CustomObjectEvent extends Event
     public function setMessage(string $message): void
     {
         $this->message = $message;
+    }
+
+    public function getFlashBag(): ?FlashBag
+    {
+        return $this->flashBag;
+    }
+
+    public function setFlashBag(FlashBag $flashBag): void
+    {
+        $this->flashBag = $flashBag;
     }
 }
