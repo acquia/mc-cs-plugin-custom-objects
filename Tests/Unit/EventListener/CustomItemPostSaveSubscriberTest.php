@@ -11,8 +11,9 @@ declare(strict_types=1);
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 
-namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\EventListener;
+namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
+use Exception;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
@@ -20,11 +21,11 @@ use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
 use MauticPlugin\CustomObjectsBundle\EventListener\CustomItemPostSaveSubscriber;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class CustomItemPostSaveSubscriberTest extends KernelTestCase
+class CustomItemPostSaveSubscriberTest extends TestCase
 {
     public function testGetSubscribedEvents(): void
     {
@@ -41,7 +42,7 @@ class CustomItemPostSaveSubscriberTest extends KernelTestCase
 
             public function fetchEntity(int $id): CustomItem
             {
-                throw new \Exception('This should not have been called.');
+                throw new Exception('This should not have been called.');
             }
         };
 
@@ -82,7 +83,7 @@ class CustomItemPostSaveSubscriberTest extends KernelTestCase
 
             public function fetchEntity(int $id): CustomItem
             {
-                throw new \Exception('This should not have been called.');
+                throw new Exception('This should not have been called.');
             }
         };
 

@@ -49,23 +49,44 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class TokenSubscriberTest extends TestCase
 {
+    /**
+     * @var ConfigProvider|MockObject
+     */
     private $configProvider;
 
+    /**
+     * @var QueryFilterHelper|MockObject
+     */
     private $queryFilterHelper;
 
+    /**
+     * @var QueryFilterFactory|MockObject
+     */
     private $queryFilterFactory;
 
+    /**
+     * @var CustomObjectModel|MockObject
+     */
     private $customObjectModel;
 
+    /**
+     * @var CustomItemModel|MockObject
+     */
     private $customItemModel;
 
     /**
-     * @var TokenParser
+     * @var TokenParser|MockObject
      */
     private $tokenParser;
 
+    /**
+     * @var EventModel|MockObject
+     */
     private $eventModel;
 
+    /**
+     * @var EventDispatcher|MockObject
+     */
     private $eventDispatcher;
 
     /**
@@ -78,10 +99,19 @@ class TokenSubscriberTest extends TestCase
      */
     private $subscriber;
 
+    /**
+     * @var BuilderEvent|MockObject
+     */
     private $builderEvent;
 
+    /**
+     * @var EmailSendEvent|MockObject
+     */
     private $emailSendEvent;
 
+    /**
+     * @var CustomItemListDbalQueryEvent|MockObject
+     */
     private $customItemListDbalQueryEvent;
 
     protected function setUp(): void
@@ -228,6 +258,7 @@ class TokenSubscriberTest extends TestCase
             ->method('pluginIsEnabled')
             ->willReturn(true);
 
+        /** @var EmailSendEvent|MockObject $event */
         $event = $this->createMock(EmailSendEvent::class);
         $event->expects($this->once())
             ->method('getContent')
@@ -496,7 +527,7 @@ class TokenSubscriberTest extends TestCase
             ->method('getArrayTableData')
             ->with($this->callback(function (TableConfig $tableConfig) use ($email) {
                 $this->assertSame(1, $tableConfig->getLimit());
-                $this->assertSame('CustomItem.date_added', $tableConfig->getOrderBy());
+                $this->assertSame('CustomItem.id', $tableConfig->getOrderBy());
                 $this->assertSame('DESC', $tableConfig->getOrderDirection());
                 $this->assertSame(0, $tableConfig->getOffset());
                 $this->assertSame(1234, $tableConfig->getParameter('customObjectId'));
@@ -655,7 +686,7 @@ class TokenSubscriberTest extends TestCase
             ->method('getArrayTableData')
             ->with($this->callback(function (TableConfig $tableConfig) use ($email) {
                 $this->assertSame(1, $tableConfig->getLimit());
-                $this->assertSame('CustomItem.date_added', $tableConfig->getOrderBy());
+                $this->assertSame('CustomItem.id', $tableConfig->getOrderBy());
                 $this->assertSame('DESC', $tableConfig->getOrderDirection());
                 $this->assertSame(0, $tableConfig->getOffset());
                 $this->assertSame(1234, $tableConfig->getParameter('customObjectId'));

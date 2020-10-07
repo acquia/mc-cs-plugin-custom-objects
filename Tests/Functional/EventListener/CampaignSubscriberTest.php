@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\EventListener;
 
-use Doctrine\ORM\EntityManager;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
@@ -22,68 +22,29 @@ use MauticPlugin\CustomObjectsBundle\EventListener\CampaignSubscriber;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldValueModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\CustomObjectsTrait;
-use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\DatabaseSchemaTrait;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class CampaignSubscriberTest extends KernelTestCase
+class CampaignSubscriberTest extends MauticMysqlTestCase
 {
-    use DatabaseSchemaTrait;
     use CustomObjectsTrait;
-
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
-
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
-     * @var CustomFieldValueModel
-     */
-    private $customFieldValueModel;
-
-    /**
-     * @var CampaignSubscriber
-     */
-    private $campaignSubscriber;
-
-    protected function setUp(): void
-    {
-        self::bootKernel();
-
-        $this->container = static::$kernel->getContainer();
-
-        /** @var EntityManager $entityManager */
-        $entityManager = $this->container->get('doctrine.orm.entity_manager');
-
-        /** @var CustomItemModel $customItemModel */
-        $customItemModel       = $this->container->get('mautic.custom.model.item');
-        $this->customItemModel = $customItemModel;
-
-        /** @var CustomFieldValueModel $customFieldValueModel */
-        $customFieldValueModel       = $this->container->get('mautic.custom.model.field.value');
-        $this->customFieldValueModel = $customFieldValueModel;
-
-        /** @var CampaignSubscriber $campaignSubscriber */
-        $campaignSubscriber       = $this->container->get('custom_item.campaign.subscriber');
-        $this->campaignSubscriber = $campaignSubscriber;
-
-        $this->createFreshDatabaseSchema($entityManager);
-    }
 
     public function testVariousConditions(): void
     {
+        /** @var CustomItemModel $customItemModel */
+        $customItemModel       = $this->container->get('mautic.custom.model.item');
+
+        /** @var CustomFieldValueModel $customFieldValueModel */
+        $customFieldValueModel       = $this->container->get('mautic.custom.model.field.value');
+
+        /** @var CampaignSubscriber $campaignSubscriber */
+        $campaignSubscriber       = $this->container->get('custom_item.campaign.subscriber');
+
         $contact      = $this->createContact('john@doe.email');
         $customObject = $this->createCustomObjectWithAllFields($this->container, 'Campaign test object');
         $customItem   = new CustomItem($customObject);
 
         $customItem->setName('Campaign test item');
 
-        $this->customFieldValueModel->createValuesForItem($customItem);
+        $customFieldValueModel->createValuesForItem($customItem);
 
         // Set some values
         $textValue = $customItem->findCustomFieldValueForFieldAlias('text-test-field');
@@ -101,8 +62,8 @@ class CampaignSubscriberTest extends KernelTestCase
         $urlValue = $customItem->findCustomFieldValueForFieldAlias('url-test-field');
 
         // Save the values
-        $this->customItemModel->save($customItem);
-        $this->customItemModel->linkEntity($customItem, 'contact', (int) $contact->getId());
+        $customItemModel->save($customItem);
+        $customItemModel->linkEntity($customItem, 'contact', (int) $contact->getId());
 
         // Test the multiselect value less than 2019-08-05.
         // This is throwing 'Array to string conversion' exception. Have to investigate further.
@@ -113,7 +74,7 @@ class CampaignSubscriberTest extends KernelTestCase
             'option_b'
         );
 
-        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $campaignSubscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
 
         // Test the multiselect value less than 2019-06-05.
@@ -124,7 +85,7 @@ class CampaignSubscriberTest extends KernelTestCase
             ['option_a']
         );
 
-        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $campaignSubscriber->onCampaignTriggerCondition($event);
         $this->assertFalse($event->getResult());
 
         // Test the URL value is empty.
@@ -134,7 +95,7 @@ class CampaignSubscriberTest extends KernelTestCase
             'empty'
         );
 
-        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $campaignSubscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
 
         // Test the URL value is not empty.
@@ -144,7 +105,7 @@ class CampaignSubscriberTest extends KernelTestCase
             '!empty'
         );
 
-        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $campaignSubscriber->onCampaignTriggerCondition($event);
         $this->assertFalse($event->getResult());
 
         // Test equals the same text as the field value.
@@ -155,7 +116,7 @@ class CampaignSubscriberTest extends KernelTestCase
             'abracadabra'
         );
 
-        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $campaignSubscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
 
         // Test equals the different text as the field value.
@@ -166,7 +127,7 @@ class CampaignSubscriberTest extends KernelTestCase
             'unicorn'
         );
 
-        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $campaignSubscriber->onCampaignTriggerCondition($event);
         $this->assertFalse($event->getResult());
 
         // Test not equals the different text as the field value.
@@ -177,7 +138,7 @@ class CampaignSubscriberTest extends KernelTestCase
             'unicorn'
         );
 
-        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $campaignSubscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
 
         // Test the text value is empty.
@@ -187,7 +148,7 @@ class CampaignSubscriberTest extends KernelTestCase
             'empty'
         );
 
-        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $campaignSubscriber->onCampaignTriggerCondition($event);
         $this->assertFalse($event->getResult());
 
         // Test the text value is not empty.
@@ -197,7 +158,7 @@ class CampaignSubscriberTest extends KernelTestCase
             '!empty'
         );
 
-        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $campaignSubscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
 
         // Test the text value starts with abra.
@@ -208,7 +169,7 @@ class CampaignSubscriberTest extends KernelTestCase
             'abra'
         );
 
-        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $campaignSubscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
 
         // Test the text value starts with unicorn.
@@ -219,7 +180,7 @@ class CampaignSubscriberTest extends KernelTestCase
             'unicorn'
         );
 
-        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $campaignSubscriber->onCampaignTriggerCondition($event);
         $this->assertFalse($event->getResult());
 
         // Test the text value ends with abra.
@@ -230,7 +191,7 @@ class CampaignSubscriberTest extends KernelTestCase
             'cadabra'
         );
 
-        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $campaignSubscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
 
         // Test the text value emnds with unicorn.
@@ -241,7 +202,7 @@ class CampaignSubscriberTest extends KernelTestCase
             'unicorn'
         );
 
-        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $campaignSubscriber->onCampaignTriggerCondition($event);
         $this->assertFalse($event->getResult());
 
         // Test the text value contains cada.
@@ -252,11 +213,11 @@ class CampaignSubscriberTest extends KernelTestCase
             'cada'
         );
 
-        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $campaignSubscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
 
         // Test the text value contains unicorn.
-        $event = $this->createCampaignExecutionEvent(
+        $this->createCampaignExecutionEvent(
             $contact,
             $textValue->getCustomField()->getId(),
             'contains',
@@ -271,7 +232,7 @@ class CampaignSubscriberTest extends KernelTestCase
             'abra%'
         );
 
-        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $campaignSubscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
 
         // Test the text value not like unicorn.
@@ -282,7 +243,7 @@ class CampaignSubscriberTest extends KernelTestCase
             'unicorn'
         );
 
-        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $campaignSubscriber->onCampaignTriggerCondition($event);
         $this->assertFalse($event->getResult());
 
         // Test the date value less than 2019-08-05.
@@ -293,7 +254,7 @@ class CampaignSubscriberTest extends KernelTestCase
             '2019-08-05'
         );
 
-        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $campaignSubscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
 
         // Test the date value less than 2019-06-05.
@@ -304,7 +265,7 @@ class CampaignSubscriberTest extends KernelTestCase
             '2019-06-05'
         );
 
-        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $campaignSubscriber->onCampaignTriggerCondition($event);
         $this->assertFalse($event->getResult());
 
         // Test the date value greater than 2019-08-05.
@@ -315,7 +276,7 @@ class CampaignSubscriberTest extends KernelTestCase
             '2019-08-05'
         );
 
-        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $campaignSubscriber->onCampaignTriggerCondition($event);
         $this->assertFalse($event->getResult());
 
         // Test the date value greater than 2019-06-05.
@@ -326,7 +287,7 @@ class CampaignSubscriberTest extends KernelTestCase
             '2019-06-05'
         );
 
-        $this->campaignSubscriber->onCampaignTriggerCondition($event);
+        $campaignSubscriber->onCampaignTriggerCondition($event);
         $this->assertTrue($event->getResult());
     }
 

@@ -184,7 +184,7 @@ class EmailTokenTest extends MauticMysqlTestCase
             List: Czech Republic and Slovak Republic
             Date: <ul><li>2020-07-22</li><li>2020-07-23</li></ul>
             Datetime: <ol><li>2020-07-22 14:55:00</li><li>2020-07-23 14:55:00</li></ol>
-            Email: product@a.email
+            Email:
             Hidden: <ul><li>hidden secret</li><li>top secret</li></ul>
             Number: 123 and 456
             Phone: +420555666777, +420555666888

@@ -37,8 +37,9 @@ class CustomItemListControllerXrefTest extends MauticMysqlTestCase
         $this->em->persist($contact);
         $this->em->flush();
 
-        $this->assertResponse($customObject, $customItemLinked, 'contact', $customItemUnlinked->getId(), 0);
-        $this->assertResponse($customObject, $customItemUnlinked, 'contact', $customItemUnlinked->getId(), 1);
+        $filterEntityId = (int) $contact->getId();
+        $this->assertResponse($customObject, $customItemLinked, 'contact', $filterEntityId, 0);
+        $this->assertResponse($customObject, $customItemUnlinked, 'contact', $filterEntityId, 1);
     }
 
     private function createCustomObject(): CustomObject

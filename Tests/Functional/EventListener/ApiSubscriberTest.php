@@ -16,12 +16,21 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\EventListener;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\CustomObjectsTrait;
 use Symfony\Component\HttpFoundation\Response;
 
 class ApiSubscriberTest extends MauticMysqlTestCase
 {
     use CustomObjectsTrait;
+
+    protected function beforeBeginTransaction(): void
+    {
+        $this->resetAutoincrement([
+            'leads',
+            'custom_item',
+        ]);
+    }
 
     /**
      * A custom object with alias "unicorn" does not exist.
