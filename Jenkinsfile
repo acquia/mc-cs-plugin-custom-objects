@@ -86,6 +86,7 @@ pipeline {
                   mkdir -p var/cache/coverage-report
                   # pcov-clobber needs to be used until we upgrade to phpunit 8
                   bin/pcov clobber
+                  # APP_DEBUG=0 disables debug mode for functional test clients decreasing memory usage to almost half
                   APP_DEBUG=0 bin/phpunit -d pcov.enabled=1 -d memory_limit=3G --bootstrap vendor/autoload.php --configuration plugins/${SUBMODULE_NAME}/phpunit.xml --fail-on-warning  --disallow-test-output --coverage-clover var/cache/coverage-report/clover.xml --testsuite=all
                   php-coveralls -x var/cache/coverage-report/clover.xml --json_path var/cache/coverage-report/coveralls-upload.json
                 '''
