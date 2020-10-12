@@ -25,6 +25,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -43,6 +44,7 @@ class FormControllerTest extends ControllerTestCase
     private $lockFlashMessageHelper;
     private $customObject;
     private $form;
+    private $coreParameters;
 
     /**
      * @var FormController
@@ -63,6 +65,7 @@ class FormControllerTest extends ControllerTestCase
         $this->request                 = $this->createMock(Request::class);
         $this->customObject            = $this->createMock(CustomObject::class);
         $this->form                    = $this->createMock(FormInterface::class);
+        $this->coreParameters          = $this->createMock(CoreParametersHelper::class);
         $this->formController          = new FormController(
             $this->formFactory,
             $this->customObjectModel,
@@ -124,6 +127,7 @@ class FormControllerTest extends ControllerTestCase
 
     public function testEditActionIfCustomObjectNotFound(): void
     {
+        $this->formController->setCoreParametersHelper($this->coreParameters);
         $this->customObjectModel->expects($this->once())
             ->method('fetchEntity')
             ->with(self::OBJECT_ID)
@@ -202,6 +206,7 @@ class FormControllerTest extends ControllerTestCase
 
     public function testCloneActionIfCustomObjectNotFound(): void
     {
+        $this->formController->setCoreParametersHelper($this->coreParameters);
         $this->customObjectModel->expects($this->once())
             ->method('fetchEntity')
             ->with(self::OBJECT_ID)

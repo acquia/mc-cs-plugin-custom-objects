@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomItem;
 
 use Mautic\CoreBundle\Form\Type\DateRangeType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ViewController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
@@ -43,6 +44,7 @@ class ViewControllerTest extends ControllerTestCase
     private $formFactory;
     private $form;
     private $customItem;
+    private $coreParameters;
 
     /**
      * @var ViewController
@@ -61,6 +63,7 @@ class ViewControllerTest extends ControllerTestCase
         $this->requestStack               = $this->createMock(RequestStack::class);
         $this->formFactory                = $this->createMock(FormFactoryInterface::class);
         $this->form                       = $this->createMock(FormInterface::class);
+        $this->coreParameters             = $this->createMock(CoreParametersHelper::class);
         $this->customItem                 = $this->createMock(CustomItem::class);
         $this->viewController             = new ViewController(
             $this->requestStack,
@@ -77,6 +80,7 @@ class ViewControllerTest extends ControllerTestCase
 
     public function testViewActionIfCustomItemNotFound(): void
     {
+        $this->viewController->setCoreParametersHelper($this->coreParameters);
         $this->customItemModel->expects($this->once())
             ->method('fetchEntity')
             ->will($this->throwException(new NotFoundException('Item not found message')));

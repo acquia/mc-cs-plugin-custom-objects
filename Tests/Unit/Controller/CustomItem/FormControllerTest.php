@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomItem;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\FormController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
@@ -27,11 +28,11 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class FormControllerTest extends ControllerTestCase
 {
@@ -90,6 +91,8 @@ class FormControllerTest extends ControllerTestCase
      * @var FormController
      */
     private $formController;
+    
+    private $coreParameters;
 
     protected function setUp(): void
     {
@@ -105,6 +108,7 @@ class FormControllerTest extends ControllerTestCase
         $this->customObject            = $this->createMock(CustomObject::class);
         $this->customItem              = $this->createMock(CustomItem::class);
         $this->form                    = $this->createMock(FormInterface::class);
+        $this->coreParameters          = $this->createMock(CoreParametersHelper::class);
         $this->formController          = new FormController(
             $this->formFactory,
             $this->customObjectModel,
@@ -122,7 +126,7 @@ class FormControllerTest extends ControllerTestCase
         $this->request->method('isXmlHttpRequest')->willReturn(true);
         $this->request->method('getRequestUri')->willReturn('https://a.b');
         $formControllerReflectionObject = new \ReflectionObject($this->formController);
-        $reflectionProperty = $formControllerReflectionObject->getProperty('permissionBase');
+        $reflectionProperty             = $formControllerReflectionObject->getProperty('permissionBase');
         $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($this->formController, 'somePermissionBase');
     }
@@ -192,7 +196,7 @@ class FormControllerTest extends ControllerTestCase
 
     public function testNewWithRedirectToContactAction(): void
     {
-        $customObject = new class extends CustomObject {
+        $customObject = new class() extends CustomObject {
             public function getId()
             {
                 return FormControllerTest::OBJECT_ID;
@@ -229,7 +233,7 @@ class FormControllerTest extends ControllerTestCase
 
     public function testNewWithRedirectToContactActionWithChildObject(): void
     {
-        $customObject = new class extends CustomObject {
+        $customObject = new class() extends CustomObject {
             public function getId()
             {
                 return FormControllerTest::OBJECT_ID;
@@ -237,7 +241,7 @@ class FormControllerTest extends ControllerTestCase
 
             public function getRelationshipObject(): CustomObject
             {
-                return new class extends CustomObject {
+                return new class() extends CustomObject {
                     public function getId()
                     {
                         return 555;
@@ -283,8 +287,8 @@ class FormControllerTest extends ControllerTestCase
                 CustomItemType::class,
                 $this->isInstanceOf(CustomItem::class),
                 [
-                    'action' => 'https://list.items',
-                    'objectId' => self::OBJECT_ID,
+                    'action'    => 'https://list.items',
+                    'objectId'  => self::OBJECT_ID,
                     'contactId' => static::CONTACT_ID,
                     'cancelUrl' => null,
                 ]
@@ -296,6 +300,7 @@ class FormControllerTest extends ControllerTestCase
 
     public function testEditActionIfCustomItemNotFound(): void
     {
+        $this->formController->setCoreParametersHelper($this->coreParameters);
         $this->customItemModel->expects($this->once())
             ->method('fetchEntity')
             ->willThrowException(new NotFoundException());
@@ -352,7 +357,7 @@ class FormControllerTest extends ControllerTestCase
 
     public function testEditWithRedirectToContactAction(): void
     {
-        $customObject = new class extends CustomObject {
+        $customObject = new class() extends CustomObject {
             public function getId()
             {
                 return FormControllerTest::OBJECT_ID;
@@ -392,7 +397,7 @@ class FormControllerTest extends ControllerTestCase
 
     public function testEditWithRedirectToContactActionWithChildObject(): void
     {
-        $customObject = new class extends CustomObject {
+        $customObject = new class() extends CustomObject {
             public function getId()
             {
                 return FormControllerTest::OBJECT_ID;
@@ -400,7 +405,7 @@ class FormControllerTest extends ControllerTestCase
 
             public function getRelationshipObject(): CustomObject
             {
-                return new class extends CustomObject {
+                return new class() extends CustomObject {
                     public function getId()
                     {
                         return 555;
@@ -466,6 +471,7 @@ class FormControllerTest extends ControllerTestCase
 
     public function testEditWithRedirectToContactActionIfCustomItemNotFound(): void
     {
+        $this->formController->setCoreParametersHelper($this->coreParameters);
         $this->customItemModel->expects($this->once())
             ->method('fetchEntity')
             ->will($this->throwException(new NotFoundException()));
@@ -581,6 +587,7 @@ class FormControllerTest extends ControllerTestCase
 
     public function testCloneActionIfCustomItemNotFound(): void
     {
+        $this->formController->setCoreParametersHelper($this->coreParameters);
         $this->customItemModel->expects($this->once())
             ->method('fetchEntity')
             ->will($this->throwException(new NotFoundException()));
@@ -626,8 +633,8 @@ class FormControllerTest extends ControllerTestCase
                 CustomItemType::class,
                 $customItem,
                 [
-                    'action' => 'https://list.items',
-                    'objectId' => self::OBJECT_ID,
+                    'action'    => 'https://list.items',
+                    'objectId'  => self::OBJECT_ID,
                     'contactId' => $contactId,
                     'cancelUrl' => null,
                 ]
