@@ -25,7 +25,6 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -41,7 +40,6 @@ class FormControllerTest extends AbstractFieldControllerTest
     private $objectRouteProvider;
     private $form;
     private $formController;
-    private $coreParameters;
 
     protected function setUp(): void
     {
@@ -55,7 +53,6 @@ class FormControllerTest extends AbstractFieldControllerTest
         $this->customObjectModel   = $this->createMock(CustomObjectModel::class);
         $this->objectRouteProvider = $this->createMock(CustomObjectRouteProvider::class);
         $this->form                = $this->createMock(FormInterface::class);
-        $this->coreParameters      = $this->createMock(CoreParametersHelper::class);
 
         $this->formController = new FormController(
             $this->formFactory,
@@ -79,9 +76,7 @@ class FormControllerTest extends AbstractFieldControllerTest
         $panelCount = null;
 
         $request = $this->createRequestMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
-        
-        $this->formController->setCoreParametersHelper($this->coreParameters);
-        
+
         $this->customFieldModel->expects($this->once())
             ->method('fetchEntity')
             ->will($this->throwException(new NotFoundException('not found message')));

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomObject;
 
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Service\FlashBag;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomObject\SaveController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
@@ -53,7 +52,6 @@ class SaveControllerTest extends ControllerTestCase
     private $lockFlashMessageHelper;
     private $customObject;
     private $form;
-    private $coreParameters;
 
     /**
      * @var SaveController
@@ -78,7 +76,6 @@ class SaveControllerTest extends ControllerTestCase
         $this->request                    = $this->createMock(Request::class);
         $this->customObject               = $this->createMock(CustomObject::class);
         $this->form                       = $this->createMock(FormInterface::class);
-        $this->coreParameters             = $this->createMock(CoreParametersHelper::class);
         $this->saveController             = new SaveController(
             $this->requestStack,
             $this->flashBag,
@@ -98,7 +95,6 @@ class SaveControllerTest extends ControllerTestCase
 
     public function testSaveActionIfExistingCustomObjectNotFound(): void
     {
-        $this->saveController->setCoreParametersHelper($this->coreParameters);
         $this->customObjectModel->expects($this->once())
             ->method('fetchEntity')
             ->will($this->throwException(new NotFoundException()));

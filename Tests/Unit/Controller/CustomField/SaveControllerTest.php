@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomField;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomField\SaveController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
@@ -43,7 +42,6 @@ class SaveControllerTest extends AbstractFieldControllerTest
     private $customObjectModel;
     private $form;
     private $saveController;
-    private $coreParameters;
 
     protected function setUp(): void
     {
@@ -56,7 +54,6 @@ class SaveControllerTest extends AbstractFieldControllerTest
         $this->permissionProvider = $this->createMock(CustomFieldPermissionProvider::class);
         $this->fieldRouteProvider = $this->createMock(CustomFieldRouteProvider::class);
         $this->customObjectModel  = $this->createMock(CustomObjectModel::class);
-        $this->coreParameters     = $this->createMock(CoreParametersHelper::class);
         $this->form               = $this->createMock(FormInterface::class);
 
         $this->saveController = new SaveController(
@@ -81,8 +78,7 @@ class SaveControllerTest extends AbstractFieldControllerTest
         $panelCount = null;
 
         $request = $this->createRequestMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
-        $this->saveController->setCoreParametersHelper($this->coreParameters);
-        
+
         $this->customFieldModel->expects($this->once())
             ->method('fetchEntity')
             ->will($this->throwException(new NotFoundException('not found message')));

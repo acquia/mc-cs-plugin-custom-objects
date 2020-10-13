@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomItem;
 
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\SaveController;
@@ -28,14 +27,14 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
-use PHPUnit\Framework\Assert;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Assert;
 
 class SaveControllerTest extends ControllerTestCase
 {
@@ -94,8 +93,6 @@ class SaveControllerTest extends ControllerTestCase
      * @var SaveController
      */
     private $saveController;
-    
-    private $coreParameters;
 
     protected function setUp(): void
     {
@@ -112,7 +109,6 @@ class SaveControllerTest extends ControllerTestCase
         $this->request                 = new Request();
         $this->customItem              = $this->createMock(CustomItem::class);
         $this->form                    = $this->createMock(FormInterface::class);
-        $this->coreParameters          = $this->createMock(CoreParametersHelper::class);
         $this->saveController          = new SaveController(
             $this->requestStack,
             $this->formFactory,
@@ -127,14 +123,13 @@ class SaveControllerTest extends ControllerTestCase
         $this->addSymfonyDependencies($this->saveController);
 
         $saveControllerReflectionObject = new \ReflectionObject($this->saveController);
-        $reflectionProperty             = $saveControllerReflectionObject->getProperty('permissionBase');
+        $reflectionProperty = $saveControllerReflectionObject->getProperty('permissionBase');
         $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($this->saveController, 'somePermissionBase');
     }
 
     public function testSaveActionIfExistingCustomItemNotFound(): void
     {
-        $this->saveController->setCoreParametersHelper($this->coreParameters);
         $this->customItemModel->expects($this->once())
             ->method('fetchEntity')
             ->will($this->throwException(new NotFoundException()));
@@ -490,7 +485,7 @@ class SaveControllerTest extends ControllerTestCase
                     function (CustomItem $customItem) {
                         Assert::assertSame(self::OBJECT_ID, $customItem->getCustomObject()->getId());
                         Assert::assertSame(6668, $customItem->getChildCustomItem()->getCustomObject()->getId());
-
+    
                         return true;
                     }
                 ),

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomItem;
 
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Service\FlashBag;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\DeleteController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
@@ -39,7 +38,6 @@ class DeleteControllerTest extends ControllerTestCase
     private $flashBag;
     private $permissionProvider;
     private $routeProvider;
-    private $coreParameters;
 
     /**
      * @var DeleteController
@@ -57,7 +55,6 @@ class DeleteControllerTest extends ControllerTestCase
         $this->permissionProvider = $this->createMock(CustomItemPermissionProvider::class);
         $this->routeProvider      = $this->createMock(CustomItemRouteProvider::class);
         $this->request            = $this->createMock(Request::class);
-        $this->coreParameters     = $this->createMock(CoreParametersHelper::class);
         $this->deleteController   = new DeleteController(
             $this->customItemModel,
             $sessionProviderFactory,
@@ -75,7 +72,6 @@ class DeleteControllerTest extends ControllerTestCase
 
     public function testDeleteActionIfCustomItemNotFound(): void
     {
-        $this->deleteController->setCoreParametersHelper($this->coreParameters);
         $this->customItemModel->expects($this->once())
             ->method('fetchEntity')
             ->will($this->throwException(new NotFoundException('Item not found message')));
