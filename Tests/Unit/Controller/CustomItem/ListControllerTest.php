@@ -25,7 +25,6 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -42,7 +41,6 @@ class ListControllerTest extends ControllerTestCase
     private $sessionProvider;
     private $permissionProvider;
     private $routeProvider;
-    private $coreParameters;
 
     /**
      * @var ListController
@@ -60,7 +58,6 @@ class ListControllerTest extends ControllerTestCase
         $this->sessionProvider    = $this->createMock(SessionProvider::class);
         $this->permissionProvider = $this->createMock(CustomItemPermissionProvider::class);
         $this->routeProvider      = $this->createMock(CustomItemRouteProvider::class);
-        $this->coreParameters     = $this->createMock(CoreParametersHelper::class);
         $this->request            = $this->createMock(Request::class);
         $this->listController     = new ListController(
             $this->requestStack,
@@ -79,7 +76,6 @@ class ListControllerTest extends ControllerTestCase
 
     public function testListActionIfCustomObjectNotFound(): void
     {
-        $this->listController->setCoreParametersHelper($this->coreParameters);
         $this->customObjectModel->expects($this->once())
             ->method('fetchEntity')
             ->will($this->throwException(new NotFoundException()));
