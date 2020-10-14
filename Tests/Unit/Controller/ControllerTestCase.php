@@ -13,8 +13,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller;
 
+use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Controller\MauticController;
 use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -113,6 +115,10 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase
         if ($controller instanceof MauticController) {
             $controller->setRequest($request);
             $controller->setTranslator($translator);
+        }
+        
+        if ($controller instanceof CommonController) {
+            $controller->setCoreParametersHelper($this->createMock(CoreParametersHelper::class));
         }
     }
 }
