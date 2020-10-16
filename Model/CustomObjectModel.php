@@ -22,11 +22,13 @@ use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\LeadBundle\Model\ListModel;
 use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Exception\InUseException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
@@ -54,13 +56,19 @@ class CustomObjectModel extends FormModel
      */
     private $customFieldModel;
 
+    /**
+     * @var ListModel
+     */
+    private $listModel;
+
     public function __construct(
         EntityManager $entityManager,
         CustomObjectRepository $customObjectRepository,
         CustomObjectPermissionProvider $permissionProvider,
         UserHelper $userHelper,
         CustomFieldModel $customFieldModel,
-        EventDispatcherInterface $dispatcher
+        EventDispatcherInterface $dispatcher,
+        ListModel $listModel
     ) {
         $this->entityManager          = $entityManager;
         $this->customObjectRepository = $customObjectRepository;
@@ -68,6 +76,7 @@ class CustomObjectModel extends FormModel
         $this->userHelper             = $userHelper;
         $this->customFieldModel       = $customFieldModel;
         $this->dispatcher             = $dispatcher;
+        $this->listModel              = $listModel;
     }
 
     public function save(CustomObject $customObject): CustomObject
@@ -368,5 +377,20 @@ class CustomObjectModel extends FormModel
                 return CustomObject::TYPE_MASTER === $type || null === $type;
             }
         );
+    }
+
+    /**
+     * @throws InUseException
+     */
+    public function checkIfTheCustomObjectIsUsedInSegmentFilters(CustomObject $customObject): void
+    {
+        $segments = $this->customObjectRepository->getFilterSegments($customObject);
+        if (1 > count($segments)) {
+            return;
+        }
+
+        $exception = new InUseException();
+        $exception->setSegmentList($segments);
+        throw $exception;
     }
 }

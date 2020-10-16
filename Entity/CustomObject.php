@@ -139,7 +139,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
             ->build();
 
         $builder->createOneToOne('masterObject', CustomObject::class)
-            ->addJoinColumn('master_object', 'id')
+            ->addJoinColumn('master_object', 'id', true, false, 'CASCADE')
             ->build();
     }
 

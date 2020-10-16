@@ -19,7 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 return [
     'name'        => 'Custom Objects',
     'description' => 'Adds custom objects and fields features to Mautic',
-    'version'     => '0.0.17',
+    'version'     => '0.0.19',
     'author'      => 'Mautic, Inc.',
 
     'routes' => [
@@ -478,6 +478,7 @@ return [
                     'custom_object.session.provider_factory',
                     'mautic.core.service.flashbag',
                     'custom_object.permission.provider',
+                    'event_dispatcher',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -557,6 +558,7 @@ return [
                     'mautic.helper.user',
                     'mautic.custom.model.field',
                     'event_dispatcher',
+                    'mautic.lead.model.list',
                 ],
             ],
         ],
@@ -850,6 +852,13 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectPostSaveSubscriber::class,
                 'arguments' => [
                     'mautic.custom.model.object',
+                ]
+            ],
+            'custom_object.pre_delete.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectPreDeleteSubscriber::class,
+                'arguments' => [
+                    'mautic.custom.model.object',
+                    'translator',
                 ]
             ],
         ],
