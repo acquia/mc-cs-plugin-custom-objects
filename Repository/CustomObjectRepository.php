@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Repository;
 
+use Doctrine\ORM\Query\Expr\Orx;
+use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\LeadList;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
@@ -91,11 +93,27 @@ class CustomObjectRepository extends CommonRepository
             ->select('l')
             ->from(LeadList::class, 'l', 'l.id');
 
+        $filterExpression = $queryBuilder->expr()->orX();
+
+        $this->buildSegmentFilterForCustomObjectFields($customObject, $queryBuilder, $filterExpression);
+
+        $childCustomObject = $customObject->getRelationshipObject();
+        if ($childCustomObject instanceof CustomObject) {
+            $this->buildSegmentFilterForCustomObjectFields($childCustomObject, $queryBuilder, $filterExpression);
+        }
+
+        $queryBuilder->andWhere($filterExpression);
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
+    private function buildSegmentFilterForCustomObjectFields(CustomObject $customObject, QueryBuilder $queryBuilder, Orx $filterExpression): void
+    {
         $alias       = 'cmo_'.$customObject->getId();
         $aliasLength = mb_strlen($alias);
         $like        = "%;s:5:\"field\";s:${aliasLength}:\"{$alias}\";%";
 
-        $filterExpression = $queryBuilder->expr()->orX(
+        $filterExpression->add(
             $queryBuilder->expr()->like('l.filters', $queryBuilder->expr()->literal($like))
         );
 
@@ -108,9 +126,5 @@ class CustomObjectRepository extends CommonRepository
                 $queryBuilder->expr()->like('l.filters', $queryBuilder->expr()->literal($like))
             );
         }
-
-        $queryBuilder->andWhere($filterExpression);
-
-        return $queryBuilder->getQuery()->getResult();
     }
 }

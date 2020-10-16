@@ -160,7 +160,7 @@ class CustomObjectRepositoryTest extends TestCase
             ->method('orX')
             ->willReturn($orX);
 
-        $orX->expects($this->exactly(2))
+        $orX->expects($this->exactly(3))
             ->method('add');
 
         $this->query->expects($this->once())
