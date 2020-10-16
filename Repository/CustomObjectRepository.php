@@ -13,8 +13,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Repository;
 
+use Doctrine\ORM\Query\Expr\Orx;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\LeadBundle\Entity\LeadList;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 class CustomObjectRepository extends CommonRepository
@@ -78,5 +80,51 @@ class CustomObjectRepository extends CommonRepository
     public function getTableAlias(): string
     {
         return CustomObject::TABLE_ALIAS;
+    }
+
+    /**
+     * This method returns all segments that use this custom object or its custom fields for filtering.
+     *
+     * @return LeadList[]
+     */
+    public function getFilterSegments(CustomObject $customObject): array
+    {
+        $queryBuilder = $this->_em->createQueryBuilder()
+            ->select('l')
+            ->from(LeadList::class, 'l', 'l.id');
+
+        $filterExpression = $queryBuilder->expr()->orX();
+
+        $this->buildSegmentFilterForCustomObjectFields($customObject, $queryBuilder, $filterExpression);
+
+        $childCustomObject = $customObject->getRelationshipObject();
+        if ($childCustomObject instanceof CustomObject) {
+            $this->buildSegmentFilterForCustomObjectFields($childCustomObject, $queryBuilder, $filterExpression);
+        }
+
+        $queryBuilder->andWhere($filterExpression);
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
+    private function buildSegmentFilterForCustomObjectFields(CustomObject $customObject, QueryBuilder $queryBuilder, Orx $filterExpression): void
+    {
+        $alias       = 'cmo_'.$customObject->getId();
+        $aliasLength = mb_strlen($alias);
+        $like        = "%;s:5:\"field\";s:${aliasLength}:\"{$alias}\";%";
+
+        $filterExpression->add(
+            $queryBuilder->expr()->like('l.filters', $queryBuilder->expr()->literal($like))
+        );
+
+        /** @var CustomField $customField */
+        foreach ($customObject->getCustomFields() as $customField) {
+            $alias       = 'cmf_'.$customField->getId();
+            $aliasLength = mb_strlen($alias);
+            $like        = "%;s:5:\"field\";s:${aliasLength}:\"{$alias}\";%";
+            $filterExpression->add(
+                $queryBuilder->expr()->like('l.filters', $queryBuilder->expr()->literal($like))
+            );
+        }
     }
 }

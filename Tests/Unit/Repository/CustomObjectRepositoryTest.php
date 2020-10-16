@@ -18,16 +18,23 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
+use PHPUnit\Framework\TestCase;
 
-class CustomObjectRepositoryTest extends \PHPUnit\Framework\TestCase
+class CustomObjectRepositoryTest extends TestCase
 {
     private $entityManager;
     private $classMetadata;
     private $queryBuilder;
     private $query;
     private $expression;
+
+    /**
+     * @var CustomObject
+     */
+    private $customObject;
 
     /**
      * @var CustomObjectRepository
@@ -51,6 +58,7 @@ class CustomObjectRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->entityManager->method('createQueryBuilder')->willReturn($this->queryBuilder);
         $this->queryBuilder->method('getQuery')->willReturn($this->query);
         $this->queryBuilder->method('expr')->willReturn($this->expression);
+        $this->customObject = $this->createMock(CustomObject::class);
     }
 
     public function testCheckAliasExists(): void
@@ -124,5 +132,53 @@ class CustomObjectRepositoryTest extends \PHPUnit\Framework\TestCase
     public function testGetTableAlias(): void
     {
         $this->assertSame(CustomObject::TABLE_ALIAS, $this->repository->getTableAlias());
+    }
+
+    public function testGetFilterSegmentsMethod(): void
+    {
+        $customObjectId = random_int(1, 100);
+        $this->customObject->expects($this->once())
+            ->method('getId')
+            ->willReturn($customObjectId);
+
+        $customFields = $this->createCustomFields(2);
+        $this->customObject->expects($this->once())
+            ->method('getCustomFields')
+            ->willReturn($customFields);
+
+        $this->queryBuilder->expects($this->once())
+            ->method('select')
+            ->with('l')
+            ->willReturnSelf();
+
+        $this->queryBuilder->expects($this->once())
+            ->method('from')
+            ->willReturnSelf();
+
+        $orX = $this->createMock(Expr\Orx::class);
+        $this->expression->expects($this->once())
+            ->method('orX')
+            ->willReturn($orX);
+
+        $orX->expects($this->exactly(3))
+            ->method('add');
+
+        $this->query->expects($this->once())
+            ->method('getResult')
+            ->willReturn([]);
+
+        $this->repository->getFilterSegments($this->customObject);
+    }
+
+    private function createCustomFields(int $quantity): array
+    {
+        $customFields = [];
+        for ($id = 1; $id <= $quantity; ++$id) {
+            $customField = new CustomField();
+            $customField->setId($id);
+            $customFields[] = $customField;
+        }
+
+        return $customFields;
     }
 }

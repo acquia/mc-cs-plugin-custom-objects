@@ -16,6 +16,7 @@ class DeleteControllerTest extends MauticMysqlTestCase
         $parentCustomObject->setNameSingular('Product');
         $parentCustomObject->setNamePlural('Products');
         $parentCustomObject->setAlias('products');
+        $parentCustomObject->setType(CustomObject::TYPE_MASTER);
         $this->em->persist($parentCustomObject);
 
         // Create a Child Custom Object
@@ -23,6 +24,7 @@ class DeleteControllerTest extends MauticMysqlTestCase
         $childObject->setNameSingular('Electronics');
         $childObject->setNamePlural('Electronics');
         $childObject->setAlias('electronics');
+        $childObject->setType(CustomObject::TYPE_RELATIONSHIP);
 
         // Set Parent-Child relationship and save
         $childObject->setMasterObject($parentCustomObject);
