@@ -37,7 +37,7 @@ class Version_0_0_18 extends AbstractMigration
             $this->addSql("ALTER TABLE {$this->concatPrefix('custom_object')} DROP INDEX master_object;");
         }
 
-        // Fix column type. Sometimes it doesn't match what we have in the Version_0_0_11.php. Version_0_0_11 is not correct.
+        // Fix column type. Sometimes it doesn't match what we have in loadMetadata method. Version_0_0_11 migration is not correct.
         $this->addSql("ALTER TABLE {$this->concatPrefix('custom_object')} CHANGE COLUMN `master_object` `master_object` INT(10) UNSIGNED NULL DEFAULT NULL;");
 
         if ($this->schema->getTable($this->concatPrefix('custom_object'))->hasIndex('UNIQ_9C007FE8594D0CC2')) {
