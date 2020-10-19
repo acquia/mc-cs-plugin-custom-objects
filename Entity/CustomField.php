@@ -79,7 +79,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      *     attributes={
      *         "openapi_context"={
      *             "type"="string",
-     *             "maxLength"=255,
+     *             "maxLength"=191,
      *             "nullable"=false,
      *             "example"="City"
      *         }
@@ -95,7 +95,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      *     attributes={
      *         "openapi_context"={
      *             "type"="string",
-     *             "maxLength"=255,
+     *             "maxLength"=191,
      *             "nullable"=false,
      *             "example"="city"
      *         }
@@ -111,7 +111,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface
      *     attributes={
      *         "openapi_context"={
      *             "type"="string",
-     *             "maxLength"=255,
+     *             "maxLength"=191,
      *             "nullable"=false,
      *             "example"="text",
      *             "enum"={
@@ -636,24 +636,30 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
     /**
      * @Groups({"custom_field:read", "custom_object:read"})
+     *
+     * @return bool
      */
-    public function getIsPublished():?bool
+    public function getIsPublished()
     {
         return parent::getIsPublished();
     }
 
     /**
      * @Groups({"custom_field:read", "custom_object:read"})
+     *
+     * @return \DateTime
      */
-    public function getDateAdded():?\DateTime
+    public function getDateAdded()
     {
         return parent::getDateAdded();
     }
 
     /**
      * @Groups({"custom_field:read", "custom_object:read"})
+     *
+     * @return \DateTime
      */
-    public function getDateModified():?\DateTime
+    public function getDateModified()
     {
         return parent::getDateModified();
     }

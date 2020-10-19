@@ -69,7 +69,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      *     attributes={
      *         "openapi_context"={
      *             "type"="string",
-     *             "maxLength"=255,
+     *             "maxLength"=191,
      *             "nullable"=false,
      *             "example"="city"
      *         }
@@ -98,7 +98,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      *     attributes={
      *         "openapi_context"={
      *             "type"="string",
-     *             "maxLength"=255,
+     *             "maxLength"=191,
      *             "example"="en"
      *         }
      *     }

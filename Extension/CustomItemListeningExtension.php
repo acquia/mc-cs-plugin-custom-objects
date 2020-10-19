@@ -76,7 +76,7 @@ class CustomItemListeningExtension implements QueryCollectionExtensionInterface
             $userPermission = $customObjectActivePermissions[$customObjectKey];
             $viewPermission = $customObjectPermission['viewother'];
             $fullPermission = $customObjectPermission['full'];
-            if (($userPermission & $viewPermission) or ($userPermission & $fullPermission)) {
+            if (($userPermission & $viewPermission) || ($userPermission & $fullPermission)) {
                 $allowedCustomObjectIds[] = $customObjectKey;
             }
         }

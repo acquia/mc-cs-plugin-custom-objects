@@ -113,7 +113,7 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
      */
     private function denormalizeCustomItem($data, $class, $format = null, array $context = [])
     {
-        if (array_key_exists('fieldValues', $data)) {
+        if (array_key_exists('fieldValues', $data) && is_iterable($data['fieldValues'])) {
             foreach ($data['fieldValues'] as &$values) {
                 $values['id'] = $this->iriConverter->getItemFromIri($values['id'])->getId();
             }
@@ -130,7 +130,7 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
         $optionEntitiesCollection = null;
         $defaultValue = null;
         // Store and unset values that need TypeObject
-        if (array_key_exists('options', $data) and count($data['options']) > 0) {
+        if (array_key_exists('options', $data) && is_array($data['options']) && count($data['options']) > 0) {
             $options = $data['options'];
             unset($data['options']);
             $optionEntities = [];
