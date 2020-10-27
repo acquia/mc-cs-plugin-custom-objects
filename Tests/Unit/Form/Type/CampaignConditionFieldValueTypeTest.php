@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Form\Type;
 
-
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
@@ -66,7 +65,8 @@ final class CampaignConditionFieldValueTypeTest extends TestCase
         );
     }
 
-    public function testBuildForm() {
+    public function testBuildForm()
+    {
         $customObject = new CustomObject();
         $customObject->setId(42);
         $customField = new CustomField();
