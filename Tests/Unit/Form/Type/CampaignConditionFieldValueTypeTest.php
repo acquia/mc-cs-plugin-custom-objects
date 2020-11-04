@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 /*
  * @copyright   2020 Mautic Contributors. All rights reserved
  * @author      Mautic
@@ -14,7 +13,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Form\Type;
 
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
-use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateType;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CampaignConditionFieldValueType;
@@ -30,92 +29,118 @@ use Symfony\Component\Form\FormConfigBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class CampaignConditionFieldValueTypeTest extends TestCase
+final class CampaignConditionFieldValueTypeTest extends TestCase
 {
     /**
-     * @var CustomFieldModel|MockObject
+     * @var MockObject|CustomFieldModel
      */
-    private $customFieldModel;
+    private $customFieldModelMock;
 
     /**
-     * @var CustomItemRouteProvider|MockObject
+     * @var MockObject|CustomItemRouteProvider
      */
-    private $routeProvider;
+    private $customItemRouterMock;
 
     /**
      * @var MockObject|TranslatorInterface
      */
-    private $translator;
+    private $translatorMock;
 
     /**
      * @var CampaignConditionFieldValueType
      */
-    private $form;
+    private $campaignConditionFieldValueType;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->customFieldModel = $this->createMock(CustomFieldModel::class);
-        $this->routeProvider = $this->createMock(CustomItemRouteProvider::class);
-        $this->translator = $this->createMock(TranslatorInterface::class);
-
-        $this->form = new CampaignConditionFieldValueType(
-            $this->customFieldModel,
-            $this->routeProvider,
-            $this->translator
+        $this->customFieldModelMock            = $this->createMock(CustomFieldModel::class);
+        $this->customItemRouterMock            = $this->createMock(CustomItemRouteProvider::class);
+        $this->translatorMock                  = $this->createMock(TranslatorInterface::class);
+        $this->campaignConditionFieldValueType = new CampaignConditionFieldValueType(
+            $this->customFieldModelMock,
+            $this->customItemRouterMock,
+            $this->translatorMock
         );
     }
 
     public function testBuildForm()
     {
-        $filterOperatorProvider = $this->createMock(FilterOperatorProviderInterface::class);
-        $fieldType = new DateType($this->translator, $filterOperatorProvider);
-        $field = new CustomField();
-        $field->setTypeObject($fieldType);
-        $fields = [$field];
-
         $customObject = new CustomObject();
-        $customObject->addCustomField($field);
+        $customObject->setId(42);
+        $customField = new CustomField();
+        $customField->setId(42);
+        $customField->setLabel('Cheese');
+        $customField->setType('int');
+        $filterOperatorProviderInterfaceMock = $this->createMock(FilterOperatorProviderInterface::class);
+        $filterOperatorProviderInterfaceMock
+            ->expects(self::any())
+            ->method('getAllOperators')
+            ->willReturn([
+                '=' => ['label' => 'a'],
+                '!=' => ['label' => 'b'],
+            ]);
+        $this->translatorMock
+            ->expects(self::at(0))
+            ->method('trans')
+            ->with('a')
+            ->willReturn('a');
+        $this->translatorMock
+            ->expects(self::at(1))
+            ->method('trans')
+            ->with('b')
+            ->willReturn('b');
+        $this->translatorMock
+            ->expects(self::at(2))
+            ->method('trans')
+            ->with('a')
+            ->willReturn('a');
+        $this->translatorMock
+            ->expects(self::at(3))
+            ->method('trans')
+            ->with('b')
+            ->willReturn('b');
 
-        $options['customObject'] = $customObject;
-        $options['data']['field'] = 0;
-
-        $operators = [];
-
-        $this->customFieldModel->expects(self::once())
+        $customField->setTypeObject(new IntType($this->translatorMock, $filterOperatorProviderInterfaceMock));
+        $customFields = [42 => $customField];
+        $this->customFieldModelMock
+            ->expects(self::once())
             ->method('fetchCustomFieldsForObject')
-            ->with($options['customObject'])
-            ->willReturn($fields);
-
-        $builder = $this->createMock(FormBuilderInterface::class);
-        $builder
+            ->with($customObject)
+            ->willReturn($customFields);
+        $formBuilderMock = $this->createMock(FormBuilderInterface::class);
+        $formBuilderMock
             ->expects(self::at(0))
             ->method('add')
             ->with(
                 'field',
                 ChoiceType::class,
                 [
-                        'required' => true,
-                        'label'    => 'custom.item.field',
-                        'choices'  => $fields,
-                        'attr'     => [
-                            'class' => 'form-control',
-                        ],
-                        'choice_attr' => array_map(
-                            function ($field) {
-                                return [
-                                    'data-operators'  => json_encode($field->getTypeObject()->getOperatorOptions()),
-                                    'data-options'    => json_encode($field->getChoices()),
-                                    'data-field-type' => $field->getType(),
-                                ];
-                            },
-                            $fields
-                        )
+                    'required' => true,
+                    'label'    => 'custom.item.field',
+                    'choices'  => [
+                        'Cheese' => 42
+                    ],
+                    'attr'     => [
+                        'class' => 'form-control',
+                    ],
+                    'choice_attr' =>  [
+                        42 => [
+                            'data-operators'  => '{"=":"a","!=":"b"}',
+                            'data-options'    => '[]',
+                            'data-field-type' => 'int',
+                        ]
                     ]
+                ]
             );
-
-        $builder
+        $options = [
+            'customObject' => $customObject,
+            'data' => [
+                'field' => 42
+            ]
+        ];
+        $formBuilderMock
             ->expects(self::at(1))
             ->method('add')
             ->with(
@@ -124,23 +149,21 @@ class CampaignConditionFieldValueTypeTest extends TestCase
                 [
                     'required' => true,
                     'label'    => 'custom.item.operator',
-                    'choices'  => $operators,
+                    'choices'  => [
+                        'a' => '=',
+                        'b' => '!=',
+                    ],
                     'attr'     => ['class' => 'link-custom-item-id'],
                 ]
             );
-
-        $formConfigBuilder = $this->createMock(FormConfigBuilderInterface::class);
-        $formConfigBuilder
-            ->expects(self::once())
-            ->method('resetViewTransformers');
-
-        $builder
+        $formConfigBuilderMock = $this->createMock(FormConfigBuilderInterface::class);
+        $formBuilderMock
             ->expects(self::at(2))
             ->method('get')
             ->with('operator')
-            ->willReturn($formConfigBuilder);
+            ->willReturn($formConfigBuilderMock);
 
-        $builder
+        $formBuilderMock
             ->expects(self::at(3))
             ->method('add')
             ->with(
@@ -153,25 +176,26 @@ class CampaignConditionFieldValueTypeTest extends TestCase
                 ]
             );
 
-        $builder
+        $formBuilderMock
             ->expects(self::at(4))
             ->method('add')
             ->with(
                 'customObjectId',
                 HiddenType::class,
-                ['data' => $options['customObject']->getId()]
+                ['data' => 42]
             );
 
-        $this->form->buildForm($builder, $options);
+        $this->campaignConditionFieldValueType->buildForm($formBuilderMock, $options);
     }
 
     public function testConfigureOptions()
     {
         $resolver = $this->createMock(OptionsResolver::class);
-        $resolver->expects(self::once())
+        $resolver
+            ->expects(self::once())
             ->method('setRequired')
             ->with(['customObject']);
 
-        $this->form->configureOptions($resolver);
+        $this->campaignConditionFieldValueType->configureOptions($resolver);
     }
 }
