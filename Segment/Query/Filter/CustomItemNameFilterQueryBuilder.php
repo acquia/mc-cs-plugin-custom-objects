@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Segment\Query\Filter;
 
+use Doctrine\DBAL\DBALException;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -44,8 +45,15 @@ class CustomItemNameFilterQueryBuilder extends BaseFilterQueryBuilder
         return 'mautic.lead.query.builder.custom_item.value';
     }
 
+    /**
+     * @param  QueryBuilder  $queryBuilder
+     * @param  ContactSegmentFilter  $filter
+     * @return QueryBuilder
+     * @throws DBALException
+     */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
+        $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $customObjectId = $filter->getField();
 
         $tableAlias = 'cin_'.(int) $filter->getField();
@@ -66,7 +74,7 @@ class CustomItemNameFilterQueryBuilder extends BaseFilterQueryBuilder
         );
 
         $filterQueryBuilder->select($tableAlias.'_contact.contact_id as lead_id');
-        $filterQueryBuilder->andWhere('l.id = '.$tableAlias.'_contact.contact_id');
+        $filterQueryBuilder->andWhere($leadsTableAlias.'.id = '.$tableAlias.'_contact.contact_id');
 
         switch ($filter->getOperator()) {
             case 'empty':
