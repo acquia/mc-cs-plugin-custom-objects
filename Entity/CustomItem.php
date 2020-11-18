@@ -45,11 +45,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  *     },
  *     shortName="custom_items",
  *     normalizationContext={"groups"={"custom_item:read"}, "swagger_definition_name"="Read"},
- *     denormalizationContext={"groups"={"custom_item:write"}, "swagger_definition_name"="Write"},
- *     attributes={
- *          "pagination_items_per_page"=10,
- *          "formats"={"jsonld", "json", "html", "csv"={"text/csv"}}
- *     }
+ *     denormalizationContext={"groups"={"custom_item:write"}, "swagger_definition_name"="Write"}
  * )
  */
 class CustomItem extends FormEntity implements UniqueEntityInterface
@@ -59,6 +55,16 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var int|null
+     * @Groups({"custom_item:read", "custom_item:write"})
+     * @ApiProperty(
+     *     attributes={
+     *         "openapi_context"={
+     *             "type"="int",
+     *             "nullable"=false,
+     *             "example"="42"
+     *         }
+     *     }
+     * )
      */
     private $id;
 

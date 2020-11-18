@@ -15,7 +15,6 @@ namespace MauticPlugin\CustomObjectsBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Type;
@@ -30,7 +29,6 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Form\Validator\Constraints\CustomObjectTypeValues;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\Serializer\Annotation\Groups;
-use Symfony\Component\Serializer\Annotation\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -48,11 +46,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  *     },
  *     shortName="custom_objects",
  *     normalizationContext={"groups"={"custom_object:read"}, "swagger_definition_name"="Read"},
- *     denormalizationContext={"groups"={"custom_object:write"}, "swagger_definition_name"="Write"},
- *     attributes={
- *          "pagination_items_per_page"=10,
- *          "formats"={"jsonld", "json", "html", "csv"={"text/csv"}}
- *     }
+ *     denormalizationContext={"groups"={"custom_object:write"}, "swagger_definition_name"="Write"}
  * )
  */
 class CustomObject extends FormEntity implements UniqueEntityInterface
@@ -66,6 +60,16 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var int|null
+     * @Groups({"custom_object:read", "custom_object:write"})
+     * @ApiProperty(
+     *     attributes={
+     *         "openapi_context"={
+     *             "type"="int",
+     *             "nullable"=false,
+     *             "example"="42"
+     *         }
+     *     }
+     * )
      */
     private $id;
 

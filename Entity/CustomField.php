@@ -54,11 +54,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  *     },
  *     shortName="custom_fields",
  *     normalizationContext={"groups"={"custom_field:read"}, "swagger_definition_name"="Read"},
- *     denormalizationContext={"groups"={"custom_field:write"}, "swagger_definition_name"="Write"},
- *     attributes={
- *          "pagination_items_per_page"=10,
- *          "formats"={"jsonld", "json", "html", "csv"={"text/csv"}}
- *     }
+ *     denormalizationContext={"groups"={"custom_field:write"}, "swagger_definition_name"="Write"}
  * )
  * @ApiFilter(SearchFilter::class, properties={"alias": "partial"})
  */
@@ -69,6 +65,16 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var int|null
+     * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
+     * @ApiProperty(
+     *     attributes={
+     *         "openapi_context"={
+     *             "type"="int",
+     *             "nullable"=false,
+     *             "example"="42"
+     *         }
+     *     }
+     * )
      */
     private $id;
 
