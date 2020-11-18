@@ -6,6 +6,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Serializer;
 use ApiPlatform\Core\Api\IriConverterInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
@@ -118,6 +119,11 @@ class ApiNormalizerTest extends TestCase
             ->expects($this->at(2))
             ->method('setDefaultValue')
             ->with('1');
+        $typeObjectMock = $this->createMock(IntType::class);
+        $customField
+            ->expects($this->at(3))
+            ->method('getTypeObject')
+            ->willReturn($typeObjectMock);
         $returnedEntity = $this->apiNormalizer->denormalize($data, $class);
         $this->assertSame($customField, $returnedEntity);
     }
