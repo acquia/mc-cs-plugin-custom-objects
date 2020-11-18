@@ -1126,11 +1126,21 @@ return [
             'custom_object.helper.token_formatter' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Helper\TokenFormatter::class,
             ],
-            'api_platform.custom_object.serializer.api_normalizer' => [
+            'api_platform.custom_object.serializer.api_normalizer_jsonld' => [
                 'class'            => \MauticPlugin\CustomObjectsBundle\Serializer\ApiNormalizer::class,
                 'decoratedService' => ['api_platform.jsonld.normalizer.item', 'api_platform.jsonld.normalizer.item.inner'],
                 'arguments'        => [
                     'api_platform.jsonld.normalizer.item.inner',
+                    'custom_field.type.provider',
+                    'mautic.custom.model.item',
+                    'api_platform.iri_converter'
+                ],
+            ],
+            'api_platform.custom_object.serializer.api_normalizer_json' => [
+                'class'            => \MauticPlugin\CustomObjectsBundle\Serializer\ApiNormalizer::class,
+                'decoratedService' => ['api_platform.serializer.normalizer.item', 'api_platform.serializer.normalizer.item.inner'],
+                'arguments'        => [
+                    'api_platform.serializer.normalizer.item.inner',
                     'custom_field.type.provider',
                     'mautic.custom.model.item',
                     'api_platform.iri_converter'

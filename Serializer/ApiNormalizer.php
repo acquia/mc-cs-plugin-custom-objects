@@ -4,10 +4,10 @@
 namespace MauticPlugin\CustomObjectsBundle\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
+use ApiPlatform\Core\Exception\InvalidArgumentException;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
@@ -43,7 +43,7 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
     public function __construct(NormalizerInterface $decorated, CustomFieldTypeProvider $customFieldTypeProvider, CustomItemModel $customItemModel, IriConverterInterface $iriConverter)
     {
         if (!$decorated instanceof DenormalizerInterface) {
-            throw new \InvalidArgumentException(sprintf('The decorated normalizer must implement the %s.', DenormalizerInterface::class));
+            throw new InvalidArgumentException(sprintf('The decorated normalizer must implement the %s.', DenormalizerInterface::class));
         }
 
         $this->decorated               = $decorated;
@@ -161,6 +161,10 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
             }
         } catch (NotFoundException $e) {
             throw new InvalidArgumentException($e->getMessage());
+        }
+        // Check if type exists (needed for validation)
+        if (!$entity->getTypeObject()) {
+            throw new InvalidArgumentException('Custom field type is missing.');
         }
         return $entity;
     }
