@@ -5,6 +5,7 @@ namespace MauticPlugin\CustomObjectsBundle\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
 use ApiPlatform\Core\Exception\InvalidArgumentException;
+use Doctrine\ORM\EntityManager;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
@@ -40,7 +41,12 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
      */
     private $iriConverter;
 
-    public function __construct(NormalizerInterface $decorated, CustomFieldTypeProvider $customFieldTypeProvider, CustomItemModel $customItemModel, IriConverterInterface $iriConverter)
+    /**
+     * @var EntityManager
+     */
+    private $em;
+
+    public function __construct(NormalizerInterface $decorated, CustomFieldTypeProvider $customFieldTypeProvider, CustomItemModel $customItemModel, IriConverterInterface $iriConverter, EntityManager $em)
     {
         if (!$decorated instanceof DenormalizerInterface) {
             throw new InvalidArgumentException(sprintf('The decorated normalizer must implement the %s.', DenormalizerInterface::class));
@@ -50,6 +56,7 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
         $this->customFieldTypeProvider = $customFieldTypeProvider;
         $this->customItemModel         = $customItemModel;
         $this->iriConverter            = $iriConverter;
+        $this->em                      = $em;
     }
 
     public function supportsNormalization($data, $format = null)
@@ -82,6 +89,10 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
 
         if ($class === CustomField::class) {
             return $this->denormalizeCustomField($data, $class, $format, $context);
+        }
+
+        if ($class === CustomFieldOption::class) {
+            return $this->denormalizeCustomFieldOption($data, $class, $format, $context);
         }
 
         return $this->decorated->denormalize($data, $class, $format, $context);
@@ -167,5 +178,31 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
             throw new InvalidArgumentException('Custom field type is missing.');
         }
         return $entity;
+    }
+
+    /**
+     * @throws ExceptionInterface
+     * @throws InvalidArgumentException
+     */
+    private function denormalizeCustomFieldOption($data, $class, $format = null, array $context = [])
+    {
+        $value = null;
+        if (array_key_exists('value', $data)) {
+            $value = $data['value'];
+        }
+        $customFieldId = null;
+        if (array_key_exists('customField', $data)) {
+            $customField = $data['customField'];
+            $customFieldEntity = $this->iriConverter->getItemFromIri($customField);
+            if ($customFieldEntity instanceof CustomField) {
+                $customFieldId = $customFieldEntity->getId();
+            }
+        }
+        $existingId = (bool) count($this->em->getRepository(CustomFieldOption::class)->findBy(['customField' => $customFieldId, 'value' => $value]));
+        if ($existingId) {
+            throw new InvalidArgumentException('Custom field and value is not unique.');
+        }
+
+        return $this->decorated->denormalize($data, $class, $format, $context);
     }
 }

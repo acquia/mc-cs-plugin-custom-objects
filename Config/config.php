@@ -1133,7 +1133,8 @@ return [
                     'api_platform.jsonld.normalizer.item.inner',
                     'custom_field.type.provider',
                     'mautic.custom.model.item',
-                    'api_platform.iri_converter'
+                    'api_platform.iri_converter',
+                    'doctrine.orm.entity_manager'
                 ],
             ],
             'api_platform.custom_object.serializer.api_normalizer_json' => [
@@ -1143,7 +1144,8 @@ return [
                     'api_platform.serializer.normalizer.item.inner',
                     'custom_field.type.provider',
                     'mautic.custom.model.item',
-                    'api_platform.iri_converter'
+                    'api_platform.iri_converter',
+                    'doctrine.orm.entity_manager'
                 ],
             ],
             'api_platform.custom_object.custom_item.extension' => [
