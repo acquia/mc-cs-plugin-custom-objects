@@ -60,7 +60,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var int|null
-     * @Groups({"custom_object:read", "custom_object:write"})
+     * @Groups({"custom_object:read"})
      * @ApiProperty(
      *     attributes={
      *         "openapi_context"={

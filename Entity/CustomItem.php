@@ -55,7 +55,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var int|null
-     * @Groups({"custom_item:read", "custom_item:write"})
+     * @Groups({"custom_item:read"})
      * @ApiProperty(
      *     attributes={
      *         "openapi_context"={
