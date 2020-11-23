@@ -38,10 +38,11 @@ abstract class AbstractApiPlatformFunctionalTest extends MauticMysqlTestCase
         ];
 
         // delete previous permissions
+        $explodePermission = explode(':', $permission);
         $this->em->createQueryBuilder()
             ->delete(Permission::class, 'p')
             ->where('p.bundle = :bundle')
-            ->setParameter('bundle', reset(explode(':', $permission)))
+            ->setParameter('bundle', reset($explodePermission))
             ->getQuery()
             ->execute();
 

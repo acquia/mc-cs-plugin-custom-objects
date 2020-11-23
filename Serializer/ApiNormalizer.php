@@ -149,6 +149,8 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
                 $optionEntities[] = $this->decorated->denormalize($option, CustomFieldOption::class, $format, $context);
             }
             $optionEntitiesCollection = new ArrayCollection($optionEntities);
+        } elseif (array_key_exists('options', $data) && is_array($data['options'])) {
+            unset($data['options']);
         }
         if (array_key_exists('defaultValue', $data)) {
             $defaultValue = $data['defaultValue'];
