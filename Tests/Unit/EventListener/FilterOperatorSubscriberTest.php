@@ -181,6 +181,7 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
             ->willReturn('withinCustomObjects');
         /** @var \PHPUnit\Framework\MockObject\MockObject|QueryBuilder $queryBuilderMock */
         $queryBuilderMock = $this->createMock(QueryBuilder::class);
+        $queryBuilderMock->method('getTableAlias')->willReturn('l');
         $queryBuilderMock->expects($this->once())
             ->method('innerJoin')
             ->with(
