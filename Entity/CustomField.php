@@ -13,10 +13,17 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiSubresource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\ManyToOne;
+use Doctrine\ORM\Mapping\OneToMany;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\AbstractMultivalueType;
@@ -27,10 +34,30 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
+/**
+ * @ApiResource(
+ *     collectionOperations={
+ *          "get"={"security"="'custom_objects:custom_fields:viewother'"},
+ *          "post"={"security"="'custom_objects:custom_fields:create'"}
+ *     },
+ *     itemOperations={
+ *          "get"={"security"="'custom_objects:custom_fields:view'"},
+ *          "put"={"security"="'custom_objects:custom_fields:edit'"},
+ *          "patch"={"security"="'custom_objects:custom_fields:edit'"},
+ *          "delete"={"security"="'custom_objects:custom_fields:delete'"}
+ *     },
+ *     shortName="custom_fields",
+ *     normalizationContext={"groups"={"custom_field:read"}, "swagger_definition_name"="Read"},
+ *     denormalizationContext={"groups"={"custom_field:write"}, "swagger_definition_name"="Write"}
+ * )
+ * @ApiFilter(SearchFilter::class, properties={"alias": "partial"})
+ */
 class CustomField extends FormEntity implements UniqueEntityInterface
 {
     public const TABLE_NAME  = 'custom_field';
@@ -38,21 +65,77 @@ class CustomField extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var int|null
+     * @Groups({"custom_field:read", "custom_object:read"})
+     * @ApiProperty(
+     *     attributes={
+     *         "openapi_context"={
+     *             "type"="int",
+     *             "nullable"=false,
+     *             "example"="42"
+     *         }
+     *     }
+     * )
      */
     private $id;
 
     /**
      * @var string|null
+     * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
+     * @ApiProperty(
+     *     attributes={
+     *         "openapi_context"={
+     *             "type"="string",
+     *             "maxLength"=191,
+     *             "nullable"=false,
+     *             "example"="City"
+     *         }
+     *     }
+     * )
      */
     private $label;
 
     /**
      * @var string|null
+     * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
+     * @ApiProperty(
+     *     attributes={
+     *         "openapi_context"={
+     *             "type"="string",
+     *             "maxLength"=191,
+     *             "nullable"=false,
+     *             "example"="city"
+     *         }
+     *     }
+     * )
      */
     private $alias;
 
     /**
      * @var string|null
+     * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
+     * @ApiProperty(
+     *     attributes={
+     *         "openapi_context"={
+     *             "type"="string",
+     *             "maxLength"=191,
+     *             "nullable"=false,
+     *             "example"="text",
+     *             "enum"={
+     *                 "checkbox_group",
+     *                 "country",
+     *                 "datetime",
+     *                 "date",
+     *                 "email",
+     *                 "hidden",
+     *                 "int",
+     *                 "multiselect",
+     *                 "phone",
+     *                 "radio_group",
+     *                 "select"
+     *             }
+     *         }
+     *     }
+     * )
      */
     private $type;
 
@@ -62,32 +145,51 @@ class CustomField extends FormEntity implements UniqueEntityInterface
     private $typeObject;
 
     /**
+     * @ManyToOne(targetEntity="CustomObject", inversedBy="customFields")
+     * @JoinColumn(name="custom_object_id", referencedColumnName="id")
+     * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
      * @var CustomObject|null
      */
     private $customObject;
 
     /**
+     * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
+     * @ApiProperty(
+     *     attributes={
+     *         "openapi_context"={
+     *             "type"="integer",
+     *             "nullable"=true,
+     *             "example"=42
+     *         }
+     *     }
+     * )
      * @var int|null
      */
     private $order;
 
     /**
      * @var bool
+     * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
      */
     private $required = false;
 
     /**
      * @var mixed
+     * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
      */
     private $defaultValue;
 
     /**
      * @var Collection|CustomFieldOption[]
+     * @OneToMany(targetEntity="CustomFieldOption", mappedBy="customField")
+     * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
+     * @ApiSubresource()
      */
     private $options;
 
     /**
      * @var Params|string[]
+     * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
      */
     private $params;
 
@@ -536,5 +638,48 @@ class CustomField extends FormEntity implements UniqueEntityInterface
         }
 
         return $placeholder;
+    }
+
+    /**
+     * @Groups({"custom_field:read", "custom_object:read"})
+     *
+     * @return bool
+     */
+    public function getIsPublished()
+    {
+        return parent::getIsPublished();
+    }
+
+    /**
+     * @Groups({"custom_field:read", "custom_object:read"})
+     *
+     * @return \DateTime
+     */
+    public function getDateAdded()
+    {
+        return parent::getDateAdded();
+    }
+
+    /**
+     * @Groups({"custom_field:read", "custom_object:read"})
+     *
+     * @return \DateTime
+     */
+    public function getDateModified()
+    {
+        return parent::getDateModified();
+    }
+
+    /**
+     * @Groups({"custom_field:write", "custom_object:write"})
+     * @param bool $isPublished
+     *
+     * @return $this
+     */
+    public function setIsPublished($isPublished)
+    {
+        parent::setIsPublished($isPublished);
+
+        return $this;
     }
 }
