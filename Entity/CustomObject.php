@@ -13,10 +13,14 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\OneToOne;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
@@ -24,9 +28,27 @@ use Mautic\CoreBundle\Helper\ArrayHelper;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Form\Validator\Constraints\CustomObjectTypeValues;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+/**
+ * @ApiResource(
+ *     collectionOperations={
+ *          "get"={"security"="'custom_objects:custom_objects:viewother'"},
+ *          "post"={"security"="'custom_objects:custom_objects:create'"}
+ *     },
+ *     itemOperations={
+ *          "get"={"security"="'custom_objects:custom_objects:view'"},
+ *          "put"={"security"="'custom_objects:custom_objects:edit'"},
+ *          "patch"={"security"="'custom_objects:custom_objects:edit'"},
+ *          "delete"={"security"="'custom_objects:custom_objects:delete'"}
+ *     },
+ *     shortName="custom_objects",
+ *     normalizationContext={"groups"={"custom_object:read"}, "swagger_definition_name"="Read"},
+ *     denormalizationContext={"groups"={"custom_object:write"}, "swagger_definition_name"="Write"}
+ * )
+ */
 class CustomObject extends FormEntity implements UniqueEntityInterface
 {
     const TABLE_NAME  = 'custom_object';
@@ -38,56 +60,82 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var int|null
+     * @Groups({"custom_object:read"})
+     * @ApiProperty(
+     *     attributes={
+     *         "openapi_context"={
+     *             "type"="int",
+     *             "nullable"=false,
+     *             "example"="42"
+     *         }
+     *     }
+     * )
      */
     private $id;
 
     /**
      * @var string|null
+     * @Groups({"custom_object:read", "custom_object:write"})
      */
     private $alias;
 
     /**
      * @var string|null
+     * @Groups({"custom_object:read", "custom_object:write"})
      */
     private $nameSingular;
 
     /**
      * @var string|null
+     * @Groups({"custom_object:read", "custom_object:write"})
      */
     private $namePlural;
 
     /**
      * @var string|null
+     * @Groups({"custom_object:read", "custom_object:write"})
      */
     private $description;
 
     /**
      * @var string|null
+     * @Groups({"custom_object:read", "custom_object:write"})
      */
     private $language;
 
     /**
      * @var Category|null
+     * @Assert\Valid
      **/
     private $category;
 
     /**
      * @var ArrayCollection
+     * @Groups({"custom_object:read", "custom_object:write"})
      */
     private $customFields;
 
     /**
      * @var int|null
+     * @Groups({"custom_object:read", "custom_object:write"})
      */
     private $type = self::TYPE_MASTER;
 
     /**
      * @var CustomObject|null
+     * @OneToOne(targetEntity="CustomObject")
+     * @JoinColumn(name="master_object", referencedColumnName="id")
+     * @Groups({"custom_object:read", "custom_object:write"})
+     * @ApiProperty(readableLink=false, writableLink=false)
      */
     private $masterObject;
 
     /**
      * @var CustomObject|null
+     * @OneToOne(targetEntity="CustomObject")
+     * @JoinColumn(name="relationship_object", referencedColumnName="id", onDelete="SET NULL")
+     * @Groups({"custom_object:read", "custom_object:write"})
+     * @ApiProperty(readableLink=false, writableLink=false)
      */
     private $relationshipObject;
 

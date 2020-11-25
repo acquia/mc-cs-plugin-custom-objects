@@ -13,19 +13,41 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
+use ApiPlatform\Core\Annotation\ApiProperty;
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\JoinColumn;
+use Doctrine\ORM\Mapping\ManyToOne;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
+/**
+ * @ApiResource(
+ *     collectionOperations={
+ *          "get"={""},
+ *          "post"={"security"="'custom_objects:[customObject]:create'"}
+ *     },
+ *     itemOperations={
+ *          "get"={"security"="'custom_objects:[customObject]:view'"},
+ *          "put"={"security"="'custom_objects:[customObject]:edit'"},
+ *          "patch"={"security"="'custom_objects:[customObject]:edit'"},
+ *          "delete"={"security"="'custom_objects:[customObject]:delete'"}
+ *     },
+ *     shortName="custom_items",
+ *     normalizationContext={"groups"={"custom_item:read"}, "swagger_definition_name"="Read"},
+ *     denormalizationContext={"groups"={"custom_item:write"}, "swagger_definition_name"="Write"}
+ * )
+ */
 class CustomItem extends FormEntity implements UniqueEntityInterface
 {
     public const TABLE_NAME  = 'custom_item';
@@ -33,16 +55,40 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var int|null
+     * @Groups({"custom_item:read"})
+     * @ApiProperty(
+     *     attributes={
+     *         "openapi_context"={
+     *             "type"="int",
+     *             "nullable"=false,
+     *             "example"="42"
+     *         }
+     *     }
+     * )
      */
     private $id;
 
     /**
      * @var string|null
+     * @Groups({"custom_item:read", "custom_item:write"})
+     * @ApiProperty(
+     *     attributes={
+     *         "openapi_context"={
+     *             "type"="string",
+     *             "maxLength"=191,
+     *             "nullable"=false,
+     *             "example"="city"
+     *         }
+     *     }
+     * )
      */
     private $name;
 
     /**
      * @var CustomObject
+     * @ManyToOne(targetEntity="CustomObject")
+     * @JoinColumn(name="custom_object_id", referencedColumnName="id")
+     * @Groups({"custom_item:read", "custom_item:write"})
      */
     private $customObject;
 
@@ -53,11 +99,25 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var string|null
+     * @Groups({"custom_item:read", "custom_item:write"})
+     * @ApiProperty(
+     *     attributes={
+     *         "openapi_context"={
+     *             "type"="string",
+     *             "maxLength"=191,
+     *             "example"="en"
+     *         }
+     *     }
+     * )
      */
     private $language;
 
     /**
      * @var Category|null
+     * @ManyToOne(targetEntity="Category")
+     * @JoinColumn(name="category_id", referencedColumnName="id")
+     * @ApiProperty(readableLink=false, writableLink=false)
+     * @Groups({"custom_item:read", "custom_item:write"})
      **/
     private $category;
 
@@ -65,6 +125,38 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      * @var ArrayCollection
      */
     private $customFieldValues;
+
+    /**
+     * @var array
+     * @ApiProperty(
+     *     attributes={
+     *         "openapi_context"={
+     *             "type"="array",
+     *             "items"={
+     *                 "type"="object",
+     *                 "properties"={
+     *                     "id"={
+     *                         "type"="string"
+     *                     },
+     *                     "value"={
+     *                         "type"="object",
+     *                         "additionalProperties"={
+     *                             "oneOf"={
+     *                                 {"type"="string"},
+     *                                 {"type"="number"},
+     *                                 {"type"="boolean"},
+     *                                 {"type"="array"}
+     *                             }
+     *                         }
+     *                     }
+     *                 }
+     *             }
+     *         }
+     *     }
+     * )
+     * @Groups({"custom_item:read", "custom_item:write"})
+     */
+    private $fieldValues;
 
     /**
      * @var mixed[]
@@ -185,6 +277,14 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     }
 
     /**
+     * @param CustomObject $customObject
+     */
+    public function setCustomObject(CustomObject $customObject): void
+    {
+        $this->customObject = $customObject;
+    }
+
+    /**
      * @return Category|null
      */
     public function getCategory()
@@ -197,7 +297,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     public function setCategory($category)
     {
-        $this->isChanged('category', $category ? $category->getId() : null);
+        $this->isChanged('category', $category ? $category: null);
         $this->category = $category;
     }
 
@@ -257,6 +357,23 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     }
 
     /**
+     * @param array $values
+     * @throws NotFoundException
+     */
+    public function setCustomFieldValues($values)
+    {
+        foreach ($values as $fieldName => $fieldValue) {
+            try {
+                $customFieldValue = $this->findCustomFieldValueForFieldAlias((string) $fieldName);
+                $customFieldValue->setValue($fieldValue);
+            } catch (NotFoundException $e) {
+                $this->createNewCustomFieldValueByFieldAlias((string) $fieldName, $fieldValue);
+            }
+        }
+        $this->setDefaultValuesForMissingFields();
+    }
+
+    /**
      * Called when the custom field values are loaded from the database.
      */
     public function createFieldValuesSnapshot()
@@ -292,6 +409,43 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         }
 
         return $this->customFieldValues;
+    }
+
+    /**
+     * Just for API
+     */
+    public function getFieldValues(): array
+    {
+        $fieldValues = [];
+        if (null === $this->customFieldValues) {
+            $this->customFieldValues = new ArrayCollection();
+        }
+        foreach ($this->customFieldValues as $customFieldValue) {
+            $fieldValues[] =
+                [
+                    'id'    => strval($customFieldValue->getCustomField()->getId()),
+                    'value' => $customFieldValue->getValue(),
+                ];
+        }
+        return $fieldValues;
+    }
+
+    /**
+     * Just for API
+     *
+     * @throws NotFoundException
+     */
+    public function setFieldValues(array $values): void
+    {
+        foreach ($values as $value) {
+            try {
+                $customFieldValue = $this->findCustomFieldValueForFieldId((int) $value['id']);
+                $customFieldValue->setValue($value['value']);
+            } catch (NotFoundException $e) {
+                $this->createNewCustomFieldValueByFieldId((int) $value['id'], $value['value']);
+            }
+        }
+        $this->setDefaultValuesForMissingFields();
     }
 
     /**
