@@ -46,9 +46,6 @@ class CustomItemNameFilterQueryBuilder extends BaseFilterQueryBuilder
     }
 
     /**
-     * @param  QueryBuilder  $queryBuilder
-     * @param  ContactSegmentFilter  $filter
-     * @return QueryBuilder
      * @throws DBALException
      */
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder

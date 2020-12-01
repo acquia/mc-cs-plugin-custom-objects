@@ -46,9 +46,6 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
     }
 
     /**
-     * @param  SegmentQueryBuilder  $queryBuilder
-     * @param  ContactSegmentFilter  $filter
-     * @return SegmentQueryBuilder
      * @throws DBALException
      */
     public function applyQuery(SegmentQueryBuilder $queryBuilder, ContactSegmentFilter $filter): SegmentQueryBuilder
