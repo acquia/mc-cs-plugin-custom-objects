@@ -26,6 +26,8 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 class FilterOperatorSubscriber implements EventSubscriberInterface
 {
     public const WITHIN_CUSTOM_OBJECTS = 'withinCustomObjects';
+    
+    public const NOT_IN_CUSTOM_OBJECTS = 'notInCustomObjects';
 
     /**
      * @var CustomObjectModel
@@ -57,18 +59,25 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
             'expr'        => self::WITHIN_CUSTOM_OBJECTS,
             'negate_expr' => 'notWithinCustomObjects',
         ]);
+        
+        $event->addOperator(self::NOT_IN_CUSTOM_OBJECTS, [
+            'label'       => 'custom.not_in.custom.objects.label',
+            'expr'        => self::NOT_IN_CUSTOM_OBJECTS,
+            'negate_expr' => 'inCustomObjects',
+        ]);
     }
 
     public function addWithinFieldValuesOperator(FieldOperatorsEvent $event)
     {
         if ('generated_email_domain' === $event->getField()) {
             $event->addOperator(self::WITHIN_CUSTOM_OBJECTS);
+            $event->addOperator(self::NOT_IN_CUSTOM_OBJECTS);
         }
     }
 
     public function onSegmentFilterFormHandleWithinFieldFormType(FormAdjustmentEvent $event): void
     {
-        if (!$event->operatorIsOneOf(self::WITHIN_CUSTOM_OBJECTS)) {
+        if (!$event->operatorIsOneOf(self::WITHIN_CUSTOM_OBJECTS,self::NOT_IN_CUSTOM_OBJECTS)) {
             return;
         }
 
@@ -100,19 +109,35 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
 
     public function onWithinFieldValuesBuilder(SegmentOperatorQueryBuilderEvent $event): void
     {
-        if (!$event->operatorIsOneOf(self::WITHIN_CUSTOM_OBJECTS)) {
+        
+        if (!$event->operatorIsOneOf(self::WITHIN_CUSTOM_OBJECTS,self::NOT_IN_CUSTOM_OBJECTS)) {
             return;
         }
 
         $customObjectId = $this->getCustomObjectId($event->getFilter()->getParameterValue());
         $contactField   = $event->getFilter()->getField();
 
-        $event->getQueryBuilder()->innerJoin(
-            'l',
-            MAUTIC_TABLE_PREFIX.'custom_item',
-            'ci',
-            "ci.custom_object_id = {$customObjectId} AND ci.name = l.{$contactField} AND ci.is_published = 1"
-        );
+        if ($event->operatorIsOneOf(self::WITHIN_CUSTOM_OBJECTS)) {
+            
+            $event->getQueryBuilder()->innerJoin(
+                'l',
+                MAUTIC_TABLE_PREFIX.'custom_item',
+                'ci',
+                "ci.custom_object_id = {$customObjectId} AND ci.name = l.{$contactField} AND ci.is_published = 1"
+            );
+
+        } else if($event->operatorIsOneOf(self::NOT_IN_CUSTOM_OBJECTS)) {
+
+            $event->getQueryBuilder()->leftJoin(
+                'l',
+                MAUTIC_TABLE_PREFIX.'custom_item',
+                'ci',
+                "ci.custom_object_id = {$customObjectId} AND ci.name = l.{$contactField} AND ci.is_published = 1"
+            );
+    
+            $event->getQueryBuilder()->andWhere('ci.name IS NULL');
+
+        }
 
         $event->setOperatorHandled(true);
         $event->stopPropagation();
