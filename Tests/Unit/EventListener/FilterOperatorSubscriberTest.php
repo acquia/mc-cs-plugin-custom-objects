@@ -40,7 +40,7 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     public function testGetSubscribedEvents(): void
     {
         $subscribedEvents = FilterOperatorSubscriber::getSubscribedEvents();
-        $this->assertCount(4, $subscribedEvents, 'Expects 4 subscribed events');
+        $this->assertCount(5, $subscribedEvents, 'Expects 5 subscribed events');
     }
 
     /**
@@ -176,7 +176,7 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
         $contactSegmentFilterMock->expects($this->once())
             ->method('getField')
             ->willReturn('city');
-        $contactSegmentFilterMock->expects($this->once())
+        $contactSegmentFilterMock
             ->method('getOperator')
             ->willReturn('withinCustomObjects');
         /** @var \PHPUnit\Framework\MockObject\MockObject|QueryBuilder $queryBuilderMock */
