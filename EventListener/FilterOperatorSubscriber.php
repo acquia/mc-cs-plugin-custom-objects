@@ -15,8 +15,8 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Mautic\LeadBundle\Event\FieldOperatorsEvent;
 use Mautic\LeadBundle\Event\FormAdjustmentEvent;
-use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
+use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
 use Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent;
 use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
@@ -27,7 +27,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 class FilterOperatorSubscriber implements EventSubscriberInterface
 {
     public const WITHIN_CUSTOM_OBJECTS = 'withinCustomObjects';
-    
+
     public const NOT_IN_CUSTOM_OBJECTS = 'notInCustomObjects';
 
     /**
@@ -72,9 +72,10 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
 
     public function addNotInCustomObjectsOperatorForEmailType(LeadListFiltersChoicesEvent $event): void
     {
-        $config = $event->getChoices()['lead']['email'];
-        $config['operators'][$event->getTranslator()->trans('custom.not_in.custom.objects.label')] = self::NOT_IN_CUSTOM_OBJECTS;
-        $event->setChoice('lead','email',$config);
+        $config                      = $event->getChoices()['lead']['email'];
+        $label                       = $event->getTranslator()->trans('custom.not_in.custom.objects.label');
+        $config['operators'][$label] = self::NOT_IN_CUSTOM_OBJECTS;
+        $event->setChoice('lead', 'email', $config);
     }
 
     public function onSegmentFilterFormHandleWithinFieldFormType(FormAdjustmentEvent $event): void
@@ -119,25 +120,21 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
         $contactField   = $event->getFilter()->getField();
 
         if ($event->operatorIsOneOf(self::WITHIN_CUSTOM_OBJECTS)) {
-            
             $event->getQueryBuilder()->innerJoin(
                 'l',
                 MAUTIC_TABLE_PREFIX.'custom_item',
                 'ci',
                 "ci.custom_object_id = {$customObjectId} AND ci.name = l.{$contactField} AND ci.is_published = 1"
             );
-
-        } else if($event->operatorIsOneOf(self::NOT_IN_CUSTOM_OBJECTS)) {
-
+        } elseif ($event->operatorIsOneOf(self::NOT_IN_CUSTOM_OBJECTS)) {
             $event->getQueryBuilder()->leftJoin(
                 'l',
                 MAUTIC_TABLE_PREFIX.'custom_item',
                 'ci',
                 "ci.custom_object_id = {$customObjectId} AND ci.name = l.{$contactField} AND ci.is_published = 1"
             );
-    
-            $event->getQueryBuilder()->andWhere('ci.name IS NULL');
 
+            $event->getQueryBuilder()->andWhere('ci.name IS NULL');
         }
 
         $event->setOperatorHandled(true);
