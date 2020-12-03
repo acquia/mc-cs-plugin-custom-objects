@@ -31,7 +31,7 @@ class FilterOperatorSubscriberTest extends MauticMysqlTestCase
 
     public function testIfProperContactsAreAddedinSegmentWithNotInCustomObjectsFilter()
     {
-        // 1) create 2 contacts with acquia.com and gmail.com in email
+        // 1) create 2 contacts with "testcontact1@acquia.com" and "testcontact2@gmail.com" in email
         $contact1 = new Lead();
         $contact1->setFirstname('Test')->setLastname('Contact 1')->setEmail('testcontact1@acquia.com');
         $this->em->persist($contact1);
@@ -40,7 +40,7 @@ class FilterOperatorSubscriberTest extends MauticMysqlTestCase
         $contact2->setFirstname('Test')->setLastname('Contact 2')->setEmail('testcontact2@gmail.com');
         $this->em->persist($contact2);
 
-        // 2) create custom object "Email Domain List" with "acquia.com" and "mautic.com" as items
+        // 2) create custom object "Email List" with "testcontact1@acquia.com" and "testcontact2@mautic.com" as items
         $customObject = new CustomObject();
         $customObject->setNameSingular('Email List');
         $customObject->setNamePlural('Emai List');
@@ -57,7 +57,7 @@ class FilterOperatorSubscriberTest extends MauticMysqlTestCase
         $this->em->persist($customItem2);
         $this->em->flush();
 
-        // 3) create a segment with filter : generatred email domain > not in custom objects
+        // 3) create a segment with filter : email > not in custom objects > select custom object
         $filters = [[
                 'object'     => 'lead',
                 'glue'       => 'and',
