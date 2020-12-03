@@ -127,14 +127,15 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
                 "ci.custom_object_id = {$customObjectId} AND ci.name = l.{$contactField} AND ci.is_published = 1"
             );
         } elseif ($event->operatorIsOneOf(self::NOT_IN_CUSTOM_OBJECTS)) {
-            $event->getQueryBuilder()->leftJoin(
-                'l',
-                MAUTIC_TABLE_PREFIX.'custom_item',
-                'ci',
-                "ci.custom_object_id = {$customObjectId} AND ci.name = l.{$contactField} AND ci.is_published = 1"
-            );
+            $queryBuilder           = $event->getQueryBuilder();
+            $subQueryBuilder        = $queryBuilder->getConnection()->createQueryBuilder();
+            $expr                   = $subQueryBuilder->expr();
+            $customItemQueryBuilder = $subQueryBuilder->select('ci.name')
+                ->from(MAUTIC_TABLE_PREFIX.'custom_item', 'ci')
+                ->andWhere($expr->eq('ci.custom_object_id', $customObjectId))
+                ->andWhere($expr->eq('ci.is_published', 1));
 
-            $event->getQueryBuilder()->andWhere('ci.name IS NULL');
+            $queryBuilder->andWhere($expr->notIn('l.'.$contactField, $customItemQueryBuilder->getSQL()));
         }
 
         $event->setOperatorHandled(true);
