@@ -16,6 +16,7 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 use Mautic\LeadBundle\Event\FieldOperatorsEvent;
 use Mautic\LeadBundle\Event\FormAdjustmentEvent;
 use Mautic\LeadBundle\Event\LeadListFiltersOperatorsEvent;
+use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent;
 use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
@@ -49,6 +50,7 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
             LeadEvents::COLLECT_OPERATORS_FOR_FIELD                    => ['addWithinFieldValuesOperator', -9999],
             LeadEvents::ADJUST_FILTER_FORM_TYPE_FOR_FIELD              => ['onSegmentFilterFormHandleWithinFieldFormType', 2000],
             LeadEvents::LIST_FILTERS_OPERATOR_QUERYBUILDER_ON_GENERATE => ['onWithinFieldValuesBuilder', 0],
+            LeadEvents::LIST_FILTERS_CHOICES_ON_GENERATE               => ['addNotInCustomObjectsOperatorForEmailType', -9999],
         ];
     }
 
@@ -59,25 +61,25 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
             'expr'        => self::WITHIN_CUSTOM_OBJECTS,
             'negate_expr' => 'notWithinCustomObjects',
         ]);
-        
-        $event->addOperator(self::NOT_IN_CUSTOM_OBJECTS, [
-            'label'       => 'custom.not_in.custom.objects.label',
-            'expr'        => self::NOT_IN_CUSTOM_OBJECTS,
-            'negate_expr' => 'inCustomObjects',
-        ]);
     }
 
-    public function addWithinFieldValuesOperator(FieldOperatorsEvent $event)
+    public function addWithinFieldValuesOperator(FieldOperatorsEvent $event): void
     {
         if ('generated_email_domain' === $event->getField()) {
             $event->addOperator(self::WITHIN_CUSTOM_OBJECTS);
-            $event->addOperator(self::NOT_IN_CUSTOM_OBJECTS);
         }
+    }
+
+    public function addNotInCustomObjectsOperatorForEmailType(LeadListFiltersChoicesEvent $event): void
+    {
+        $config = $event->getChoices()['lead']['email'];
+        $config['operators'][$event->getTranslator()->trans('custom.not_in.custom.objects.label')] = self::NOT_IN_CUSTOM_OBJECTS;
+        $event->setChoice('lead','email',$config);
     }
 
     public function onSegmentFilterFormHandleWithinFieldFormType(FormAdjustmentEvent $event): void
     {
-        if (!$event->operatorIsOneOf(self::WITHIN_CUSTOM_OBJECTS,self::NOT_IN_CUSTOM_OBJECTS)) {
+        if (!$event->operatorIsOneOf(self::WITHIN_CUSTOM_OBJECTS, self::NOT_IN_CUSTOM_OBJECTS)) {
             return;
         }
 
@@ -109,8 +111,7 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
 
     public function onWithinFieldValuesBuilder(SegmentOperatorQueryBuilderEvent $event): void
     {
-        
-        if (!$event->operatorIsOneOf(self::WITHIN_CUSTOM_OBJECTS,self::NOT_IN_CUSTOM_OBJECTS)) {
+        if (!$event->operatorIsOneOf(self::WITHIN_CUSTOM_OBJECTS, self::NOT_IN_CUSTOM_OBJECTS)) {
             return;
         }
 
