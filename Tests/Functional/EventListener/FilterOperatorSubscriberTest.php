@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /*
- * @copyright   2019 Mautic Contributors. All rights reserved
+ * @copyright   2020 Mautic Contributors. All rights reserved
  * @author      Mautic, Inc
  *
  * @link        https://mautic.com
@@ -94,9 +94,9 @@ class FilterOperatorSubscriberTest extends MauticMysqlTestCase
 
         // 6) Assertions
         $this->assertCount(1, $leads);
-        $this->assertSame($leads[0]->getLead()->getId(), $contact2->getId());
-        $this->assertSame($leads[0]->getLead()->getFirstname(), $contact2->getFirstname());
-        $this->assertSame($leads[0]->getLead()->getLastname(), $contact2->getLastname());
-        $this->assertSame($leads[0]->getLead()->getEmail(), $contact2->getEmail());
+        $this->assertSame($contact2->getId(), $leads[0]->getLead()->getId());
+        $this->assertSame($contact2->getFirstname(), $leads[0]->getLead()->getFirstname());
+        $this->assertSame($contact2->getLastname(), $leads[0]->getLead()->getLastname());
+        $this->assertSame($contact2->getEmail(), $leads[0]->getLead()->getEmail());
     }
 }
