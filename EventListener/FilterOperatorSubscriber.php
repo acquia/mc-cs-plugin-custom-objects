@@ -116,15 +116,17 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
             return;
         }
 
+        $leadsTableAlias = $event->getLeadsTableAlias();
+
         $customObjectId = $this->getCustomObjectId($event->getFilter()->getParameterValue());
         $contactField   = $event->getFilter()->getField();
 
         if ($event->operatorIsOneOf(self::WITHIN_CUSTOM_OBJECTS)) {
             $event->getQueryBuilder()->innerJoin(
-                'l',
+                $leadsTableAlias,
                 MAUTIC_TABLE_PREFIX.'custom_item',
                 'ci',
-                "ci.custom_object_id = {$customObjectId} AND ci.name = l.{$contactField} AND ci.is_published = 1"
+                "ci.custom_object_id = {$customObjectId} AND ci.name = $leadsTableAlias.{$contactField} AND ci.is_published = 1"
             );
         } elseif ($event->operatorIsOneOf(self::NOT_IN_CUSTOM_OBJECTS)) {
             $queryBuilder           = $event->getQueryBuilder();
@@ -135,7 +137,7 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
                 ->andWhere($expr->eq('ci.custom_object_id', $customObjectId))
                 ->andWhere($expr->eq('ci.is_published', 1));
 
-            $queryBuilder->andWhere($expr->notIn('l.'.$contactField, $customItemQueryBuilder->getSQL()));
+            $queryBuilder->andWhere($expr->notIn($leadsTableAlias.'.'.$contactField, $customItemQueryBuilder->getSQL()));
         }
 
         $event->setOperatorHandled(true);
