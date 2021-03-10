@@ -65,7 +65,7 @@ class CustomFieldOption implements \ArrayAccess
 
     /**
      * @var int|null
-     * @Groups({"custom_object:read", "custom_object:write", "custom_field:read", "custom_field:write"})
+     * @Groups({"custom_object:read", "custom_field:read"})
      */
     private $order;
 
