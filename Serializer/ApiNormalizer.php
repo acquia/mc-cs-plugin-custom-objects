@@ -167,7 +167,9 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
                 $entity->setTypeObject($typeObject);
             }
             if ($optionEntitiesCollection) {
-                $entity->setOptions($optionEntitiesCollection);
+                foreach ($optionEntitiesCollection as $optionEntity) {
+                    $entity->addOption($optionEntity);
+                }
             }
             if ($defaultValue) {
                 $entity->setDefaultValue($defaultValue);
