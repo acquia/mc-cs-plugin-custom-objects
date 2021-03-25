@@ -67,7 +67,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         $this->assertEquals($httpUpdated, $clientUpdateResponse->getStatusCode());
         if ($updatedAlias) {
             $this->assertEquals($updatedAlias, json_decode($clientUpdateResponse->getContent())->name);
-            $this->assertEquals($updatedVariable, json_decode($clientRetrieveResponse->getContent(), true)['fieldValues'][0]['value']);
+            $this->assertEquals($updatedVariable, json_decode($clientUpdateResponse->getContent(), true)['fieldValues'][0]['value']);
         }
         // DELETE
         $clientDeleteResponse = $this->deleteEntity($createdId);
