@@ -437,7 +437,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     public function setFieldValues(array $values): void
     {
-        if (null === $this->customFieldValues){
+        if (null === $this->customFieldValues) {
             $this->customFieldValues = new ArrayCollection();
         }
         foreach ($values as $value) {
