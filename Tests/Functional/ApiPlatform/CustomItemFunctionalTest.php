@@ -35,8 +35,10 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         string $httpCreated,
         string $httpRetrieved,
         ?string $retrievedAlias,
+        ?string $retrievedVariable,
         string $httpUpdated,
         ?string $updatedAlias,
+        ?string $updatedVariable,
         string $httpDeleted
     ): void {
         // USER
@@ -57,13 +59,15 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         $this->assertEquals($httpRetrieved, $clientRetrieveResponse->getStatusCode());
         if ($retrievedAlias) {
             $this->assertEquals($retrievedAlias, json_decode($clientRetrieveResponse->getContent())->name);
+            $this->assertEquals($retrievedVariable, json_decode($clientRetrieveResponse->getContent(), true)['fieldValues'][0]['value']);
         }
         // UPDATE
-        $payloadUpdate        = $this->getEditPayload();
+        $payloadUpdate        = $this->getEditPayload($customField);
         $clientUpdateResponse = $this->updateEntity($createdId, $payloadUpdate);
         $this->assertEquals($httpUpdated, $clientUpdateResponse->getStatusCode());
         if ($updatedAlias) {
             $this->assertEquals($updatedAlias, json_decode($clientUpdateResponse->getContent())->name);
+            $this->assertEquals($updatedVariable, json_decode($clientUpdateResponse->getContent(), true)['fieldValues'][0]['value']);
         }
         // DELETE
         $clientDeleteResponse = $this->deleteEntity($createdId);
@@ -87,11 +91,17 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
             ];
     }
 
-    private function getEditPayload(): array
+    private function getEditPayload($customField): array
     {
         return
             [
                 'name' => 'Custom Item Edited',
+                'fieldValues'  => [
+                    [
+                        'id'    => '/api/v2/custom_fields/'.$customField->getId(),
+                        'value' => 'test2',
+                    ],
+                ],
             ];
     }
 
@@ -108,8 +118,10 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
                 Response::HTTP_CREATED,
                 Response::HTTP_OK,
                 'Custom Item Created',
+                'test',
                 Response::HTTP_OK,
                 'Custom Item Edited',
+                'test2',
                 Response::HTTP_NO_CONTENT,
             ],
             'no_delete' => [
@@ -117,8 +129,10 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
                 Response::HTTP_CREATED,
                 Response::HTTP_OK,
                 'Custom Item Created',
+                'test',
                 Response::HTTP_OK,
                 'Custom Item Edited',
+                'test2',
                 Response::HTTP_FORBIDDEN,
             ],
             'no_update' => [
@@ -126,7 +140,9 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
                 Response::HTTP_CREATED,
                 Response::HTTP_OK,
                 'Custom Item Created',
+                'test',
                 Response::HTTP_FORBIDDEN,
+                null,
                 null,
                 Response::HTTP_NO_CONTENT,
             ],
@@ -135,7 +151,9 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
                 Response::HTTP_FORBIDDEN,
                 '',
                 null,
+                null,
                 '',
+                null,
                 null,
                 '',
             ],
