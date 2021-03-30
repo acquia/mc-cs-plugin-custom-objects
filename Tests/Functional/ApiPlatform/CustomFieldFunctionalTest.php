@@ -220,7 +220,7 @@ final class CustomFieldFunctionalTest extends AbstractApiPlatformFunctionalTest
             $contentUpdateArray = json_decode($clientUpdateResponse->getContent(), true);
             $this->assertEquals($updatedLabel, $contentUpdateArray['label']);
             $this->assertEquals($updatedOptionsCount, count($contentUpdateArray['options']));
-            $this->assertSame($updatedOptions[0], $contentUpdateArray['options'][1]['label']);
+            $this->assertSame($updatedOptions[0], $contentUpdateArray['options'][2]['label']);
             $this->assertSame($updatedOptions[1], $contentUpdateArray['options'][3]['label']);
             $this->assertEquals($updatedDeafaultValue, $contentUpdateArray['defaultValue']);
         }
@@ -243,12 +243,10 @@ final class CustomFieldFunctionalTest extends AbstractApiPlatformFunctionalTest
                 [
                     'label' => 'new1',
                     'value' => 'new1',
-                    'order' => 0,
                 ],
                 [
                     'label' => 'new2',
                     'value' => 'new2',
-                    'order' => 1,
                 ],
             ],
             'params'       => [
@@ -268,12 +266,10 @@ final class CustomFieldFunctionalTest extends AbstractApiPlatformFunctionalTest
                 [
                     'label' => 'edit1',
                     'value' => 'edit1',
-                    'order' => 2,
                 ],
                 [
                     'label' => 'edit2',
                     'value' => 'edit2',
-                    'order' => 3,
                 ],
             ],
         ];

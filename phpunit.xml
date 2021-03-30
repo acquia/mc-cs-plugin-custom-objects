@@ -45,4 +45,9 @@
         </whitelist>
     </filter>
 
+    <listeners>
+        <listener class="\Symfony\Bridge\PhpUnit\SymfonyTestsListener" />
+        <listener class="\Mautic\CoreBundle\Test\Listeners\CleanupListener" />
+    </listeners>
+
 </phpunit>
