@@ -120,15 +120,19 @@ class ApiNormalizerTest extends TestCase
             ->with($customFieldType);
         $customField
             ->expects($this->at(1))
-            ->method('setOptions')
-            ->with(new ArrayCollection([$customOptionOne, $customOptionTwo]));
+            ->method('addOption')
+            ->with($customOptionOne);
         $customField
             ->expects($this->at(2))
+            ->method('addOption')
+            ->with($customOptionTwo);
+        $customField
+            ->expects($this->at(3))
             ->method('setDefaultValue')
             ->with('1');
         $typeObjectMock = $this->createMock(IntType::class);
         $customField
-            ->expects($this->at(3))
+            ->expects($this->at(4))
             ->method('getTypeObject')
             ->willReturn($typeObjectMock);
         $returnedEntity = $this->apiNormalizer->denormalize($data, $class);
