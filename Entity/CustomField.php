@@ -26,6 +26,8 @@ use Doctrine\ORM\Mapping\ManyToOne;
 use Doctrine\ORM\Mapping\OneToMany;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\UuidInterface;
+use Mautic\CoreBundle\Entity\UuidTrait;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\AbstractMultivalueType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\CustomFieldTypeInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\StaticChoiceTypeInterface;
@@ -58,8 +60,10 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
  * )
  * @ApiFilter(SearchFilter::class, properties={"alias": "partial"})
  */
-class CustomField extends FormEntity implements UniqueEntityInterface
+class CustomField extends FormEntity implements UniqueEntityInterface, UuidInterface
 {
+    use UuidTrait;
+
     public const TABLE_NAME  = 'custom_field';
     public const TABLE_ALIAS = 'CustomField';
 
@@ -288,6 +292,8 @@ class CustomField extends FormEntity implements UniqueEntityInterface
             ->columnName('show_in_contact_detail_list')
             ->option('default', true)
             ->build();
+
+        static::addUuidField($builder);
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
