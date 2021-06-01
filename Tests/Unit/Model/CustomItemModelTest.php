@@ -525,8 +525,7 @@ class CustomItemModelTest extends TestCase
 
         $this->customFieldValueModel->expects($this->once())
             ->method('createValuesForItem')
-            ->with($this->customItem)
-            ->willReturn($customFieldValues);
+            ->with($this->customItem);
 
         $this->customItem->expects($this->once())
             ->method('createFieldValuesSnapshot');

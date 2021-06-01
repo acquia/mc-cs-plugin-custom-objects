@@ -21,7 +21,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 class ApiNormalizerTest extends TestCase
 {
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|DenormalizerInterface|NormalizerInterface
+     * @var \PHPUnit\Framework\MockObject\MockObject|Normalizer
      */
     private $normalizerInterface;
 
@@ -52,7 +52,7 @@ class ApiNormalizerTest extends TestCase
 
     public function setUp(): void
     {
-        $this->normalizerInterface     = $this->createMock([NormalizerInterface::class, DenormalizerInterface::class]);
+        $this->normalizerInterface     = $this->createMock(Normalizer::class);
         $this->customFieldTypeProvider = $this->createMock(CustomFieldTypeProvider::class);
         $this->iriConverter            = $this->createMock(IriConverterInterface::class);
         $this->customItemModel         = $this->createMock(CustomItemModel::class);
@@ -138,4 +138,8 @@ class ApiNormalizerTest extends TestCase
         $returnedEntity = $this->apiNormalizer->denormalize($data, $class);
         $this->assertSame($customField, $returnedEntity);
     }
+}
+
+abstract class Normalizer implements NormalizerInterface, DenormalizerInterface
+{
 }

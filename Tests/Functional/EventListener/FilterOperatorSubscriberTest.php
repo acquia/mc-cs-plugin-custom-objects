@@ -37,7 +37,7 @@ class FilterOperatorSubscriberTest extends MauticMysqlTestCase
 
         $segment_filters = $crawler->filter('#available_segment_filters')->html();
 
-        $this->assertContains('not in custom objects', $segment_filters);
+        $this->assertStringContainsString('not in custom objects', $segment_filters);
     }
 
     public function testIfProperContactsAreAddedinSegmentWithNotInCustomObjectsFilter()
