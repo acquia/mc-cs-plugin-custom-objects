@@ -200,12 +200,10 @@ class ListControllerTest extends ControllerTestCase
             ->willReturn('DESC');
 
         $this->sessionProvider->expects($this->once())
-            ->method('setOrderBy')
-            ->willReturn('e.name');
+            ->method('setOrderBy');
 
         $this->sessionProvider->expects($this->once())
-            ->method('setOrderByDir')
-            ->willReturn('ASC');
+            ->method('setOrderByDir');
 
         $assertTableConfig = function (TableConfig $tableConfig) use ($search) {
             $this->assertSame(10, $tableConfig->getLimit());

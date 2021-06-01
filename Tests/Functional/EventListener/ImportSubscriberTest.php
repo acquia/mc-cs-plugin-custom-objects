@@ -213,7 +213,7 @@ class ImportSubscriberTest extends MauticMysqlTestCase
         try {
             $this->importCsvRow($customObject, $csvRow);
         } catch (InvalidValueException $e) {
-            $this->assertContains("Value 'unicorn' does not exist in the list of options of field 'Multiselect Test Field' (multiselect-test-field). Possible values: option_a,option_b", $e->getMessage());
+            $this->assertStringContainsString("Value 'unicorn' does not exist in the list of options of field 'Multiselect Test Field' (multiselect-test-field). Possible values: option_a,option_b", $e->getMessage());
         }
     }
 
@@ -230,7 +230,7 @@ class ImportSubscriberTest extends MauticMysqlTestCase
         try {
             $this->importCsvRow($customObject, $csvRow);
         } catch (InvalidValueException $e) {
-            $this->assertContains('Failed to parse time string (unicorn)', $e->getMessage());
+            $this->assertStringContainsString('Failed to parse time string (unicorn)', $e->getMessage());
         }
     }
 
@@ -262,7 +262,7 @@ class ImportSubscriberTest extends MauticMysqlTestCase
         try {
             $this->importCsvRow($customObject, $csvRow);
         } catch (InvalidValueException $e) {
-            $this->assertContains('\'+420111222333\' is not a valid phone number. Use the following international phone number format [+][country code][subscriber number] for this field (eg: ‪+14028650000)', $e->getMessage());
+            $this->assertStringContainsString('\'+420111222333\' is not a valid phone number. Use the following international phone number format [+][country code][subscriber number] for this field (eg: ‪+14028650000)', $e->getMessage());
         }
     }
 
@@ -278,7 +278,7 @@ class ImportSubscriberTest extends MauticMysqlTestCase
         try {
             $this->importCsvRow($customObject, $csvRow);
         } catch (InvalidValueException $e) {
-            $this->assertContains('\'unicorn\' is not a valid URL address. Maybe you forgot to add the protocol like https://?', $e->getMessage());
+            $this->assertStringContainsString('\'unicorn\' is not a valid URL address. Maybe you forgot to add the protocol like https://?', $e->getMessage());
         }
     }
 
@@ -294,7 +294,7 @@ class ImportSubscriberTest extends MauticMysqlTestCase
         try {
             $this->importCsvRow($customObject, $csvRow);
         } catch (InvalidValueException $e) {
-            $this->assertContains('This value should not be blank.', $e->getMessage());
+            $this->assertStringContainsString('This value should not be blank.', $e->getMessage());
         }
     }
 
@@ -359,8 +359,7 @@ class ImportSubscriberTest extends MauticMysqlTestCase
 
         $permissionProvider->expects($this->once())
             ->method('canCreate')
-            ->with($customObject->getId())
-            ->willReturn(true);
+            ->with($customObject->getId());
 
         $import             = new Import();
         $leadEventLog       = new LeadEventLog();

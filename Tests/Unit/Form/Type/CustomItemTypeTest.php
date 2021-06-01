@@ -29,7 +29,7 @@ class CustomItemTypeTest extends TestCase
     /** @var OptionsResolver|MockObject */
     private $optionsResolver;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->customItemType = new CustomItemType();
         $this->builder = $this->createMock(FormBuilderInterface::class);
