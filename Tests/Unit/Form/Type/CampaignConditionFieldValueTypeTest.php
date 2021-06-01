@@ -51,7 +51,7 @@ final class CampaignConditionFieldValueTypeTest extends TestCase
      */
     private $campaignConditionFieldValueType;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

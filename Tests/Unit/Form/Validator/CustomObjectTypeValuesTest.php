@@ -23,7 +23,7 @@ class CustomObjectTypeValuesTest extends \PHPUnit\Framework\TestCase
      */
     private $constraint;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->constraint = new CustomObjectTypeValues();
     }

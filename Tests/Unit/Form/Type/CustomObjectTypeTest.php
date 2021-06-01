@@ -53,7 +53,7 @@ class CustomObjectTypeTest extends TestCase
      */
     private $type;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManager::class);
         $this->customFieldTypeProvider = $this->createMock(CustomFieldTypeProvider::class);

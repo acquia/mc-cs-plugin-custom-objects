@@ -43,7 +43,7 @@ class CustomObjectTypeValuesValidatorTest extends \PHPUnit\Framework\TestCase
      */
     private $validator;
 
-    public function setUp()
+    protected function setUp(): void
     {
         $this->customObject = $this->createMock(CustomObject::class);
         $this->constraint = $this->createMock(Constraint::class);
