@@ -104,7 +104,7 @@ class CustomItemXrefCustomItemSubscriberTest extends TestCase
 
         $this->listEvent->expects($this->never())
             ->method('getQueryBuilder')
-            ->willReturn($tableConfig);
+            ->willReturn($this->queryBuilder);
 
         $this->xrefSubscriber->onListQuery($this->listEvent);
     }
@@ -140,7 +140,7 @@ class CustomItemXrefCustomItemSubscriberTest extends TestCase
 
         $this->listEvent->expects($this->never())
             ->method('getQueryBuilder')
-            ->willReturn($tableConfig);
+            ->willReturn($this->queryBuilder);
 
         $this->xrefSubscriber->onLookupQuery($this->listEvent);
     }
