@@ -10,7 +10,7 @@ CustomObjects = {
 
     onCampaignEventModalLoaded(callback) {
         mQuery(document).ajaxComplete(function(event, request, settings) {
-            if (settings.type === 'GET' && settings.url.indexOf('s/campaigns/events') >= 0) {
+            if (settings.type === 'POST' && settings.url.indexOf('s/campaigns/events') >= 0) {
                 callback(event, request, settings);
             }
         })
