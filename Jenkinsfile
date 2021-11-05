@@ -66,9 +66,8 @@ pipeline {
     }
     stage('Tests') {
       parallel {
-        stage('PHPUNIT') {
+        stage('PHPUNIT & Sonar Scan') {
           environment {
-            COVERALLS_REPO_TOKEN = credentials('COVERALLS_REPO_TOKEN')
             CI_PULL_REQUEST = "${env.CHANGE_ID}"
             CI_BRANCH = "${env.BRANCH_NAME}"
             CI_BUILD_URL = "${env.BUILD_URL}"
