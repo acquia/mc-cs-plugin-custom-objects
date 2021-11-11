@@ -84,18 +84,22 @@ pipeline {
 
                   mysql -h 127.0.0.1 -e 'CREATE DATABASE mautictest; CREATE USER travis@"%"; GRANT ALL on mautictest.* to travis@"%"; GRANT SUPER,PROCESS ON *.* TO travis@"%";'
                   export SYMFONY_ENV="test"
+                  export AGENT_HOME=`pwd`
 
-                  mkdir -p var/cache/coverage-report
+                  pwd
+                  mkdir -p "${AGENT_HOME}/var/cache/coverage-report"
                   # APP_DEBUG=0 disables debug mode for functional test clients decreasing memory usage to almost half
-                  APP_DEBUG=0 php -dpcov.enabled=1 -dpcov.directory=. -dpcov.exclude="~tests|themes|vendor~" bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration plugins/${SUBMODULE_NAME}/phpunit.xml --disallow-test-output --coverage-clover var/cache/coverage-report/clover.xml --testsuite=all
+                  cd ./plugins/${SUBMODULE_NAME}/
+                  APP_DEBUG=0 php -dpcov.enabled=1 -dpcov.directory=. -dpcov.exclude="~tests|themes|vendor~" bin/phpunit -d memory_limit=1G --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --disallow-test-output --coverage-clover ${AGENT_HOME}/var/cache/coverage-report/clover.xml --testsuite=all
                 '''
                 withSonarQubeEnv('SonarqubeServer') {
                   sh '''
-                     cat var/cache/coverage-report/clover.xml
+                     ls -ltrh
                      pwd
-                     find . -type f -name "sonar-project.properties"
-                     cp ./plugins/CustomObjectsBundle/sonar-project.properties ./sonar-project.properties
-                     #cd ./plugins/CustomObjectsBundle/
+                     cat ${AGENT_HOME}/var/cache/coverage-report/clover.xml | head -10
+                     pwd
+                     find ${AGENT_HOME} -type f -name "sonar-project.properties"
+                     cd ${AGENT_HOME}/plugins/${SUBMODULE_NAME}/
                      pwd
                      ls -ltrh
                      $SCANNER_HOME/bin/sonar-scanner -Dproject.settings=./sonar-project.properties
