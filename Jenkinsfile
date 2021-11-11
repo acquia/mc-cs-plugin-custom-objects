@@ -127,14 +127,14 @@ pipeline {
       steps {
         container('mautic-tester') {
           ansiColor('xterm') {
+            unstash 'CloverCoverage'
             withSonarQubeEnv('SonarqubeServer') {
-              unstash 'CloverCoverage'
               sh '''
                  ls -ltrh
                  pwd
                  find . -type f -name "clover.xml"
                  pwd
-                 #$SCANNER_HOME/bin/sonar-scanner -Dproject.settings=sonar-project.properties
+                 $SCANNER_HOME/bin/sonar-scanner -Dproject.settings=sonar-project.properties
               '''
             }
           }
