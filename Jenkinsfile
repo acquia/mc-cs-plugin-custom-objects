@@ -96,10 +96,10 @@ pipeline {
                   sh '''
                      ls -ltrh
                      pwd
-                     cat ${AGENT_HOME}/var/cache/coverage-report/clover.xml | head -10
+                     cat var/cache/coverage-report/clover.xml | head -10
                      pwd
                      find ${AGENT_HOME} -type f -name "sonar-project.properties"
-                     cd ${AGENT_HOME}/plugins/${SUBMODULE_NAME}/
+                     cd plugins/${SUBMODULE_NAME}/
                      pwd
                      ls -ltrh
                      $SCANNER_HOME/bin/sonar-scanner -Dproject.settings=./sonar-project.properties
