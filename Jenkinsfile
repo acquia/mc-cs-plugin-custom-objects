@@ -91,7 +91,14 @@ pipeline {
                 '''
                 withSonarQubeEnv('SonarqubeServer') {
                   sh '''
-                     $SCANNER_HOME/bin/sonar-scanner -Dproject.settings=sonar-project.properties
+                     cat var/cache/coverage-report/clover.xml
+                     pwd
+                     find . -type f -name "sonar-project.properties"
+                     cp ./plugins/CustomObjectsBundle/sonar-project.properties ./sonar-project.properties
+                     #cd ./plugins/CustomObjectsBundle/
+                     pwd
+                     ls -ltrh
+                     $SCANNER_HOME/bin/sonar-scanner -Dproject.settings=./sonar-project.properties
                   '''
                 }
               }
