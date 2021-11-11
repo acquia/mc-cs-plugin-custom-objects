@@ -90,7 +90,7 @@ pipeline {
                   mkdir -p "${AGENT_HOME}/var/cache/coverage-report"
                   # APP_DEBUG=0 disables debug mode for functional test clients decreasing memory usage to almost half
                   cd ./plugins/${SUBMODULE_NAME}/
-                  APP_DEBUG=0 php -dpcov.enabled=1 -dpcov.directory=. -dpcov.exclude="~tests|themes|vendor~" bin/phpunit -d memory_limit=1G --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --disallow-test-output --coverage-clover ${AGENT_HOME}/var/cache/coverage-report/clover.xml --testsuite=all
+                  APP_DEBUG=0 php -dpcov.enabled=1 -dpcov.directory=. -dpcov.exclude="~tests|themes|vendor~" ../../bin/phpunit -d memory_limit=1G --bootstrap ../../vendor/autoload.php --configuration phpunit.xml --disallow-test-output --coverage-clover ${AGENT_HOME}/var/cache/coverage-report/clover.xml --testsuite=all
                 '''
                 withSonarQubeEnv('SonarqubeServer') {
                   sh '''
