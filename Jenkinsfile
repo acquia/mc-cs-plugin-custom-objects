@@ -66,11 +66,14 @@ pipeline {
     }
     stage('Tests') {
       parallel {
-        stage('PHPUNIT') {
+        stage('PHPUNIT & Sonar Scan') {
           environment {
             CI_PULL_REQUEST = "${env.CHANGE_ID}"
             CI_BRANCH = "${env.BRANCH_NAME}"
             CI_BUILD_URL = "${env.BUILD_URL}"
+            SCANNER_HOME = tool 'SonarQubeScanner'
+            JAVA_HOME = tool 'AutoJavaInstallation'
+            PATH = "${JAVA_HOME}/bin:${PATH}"
           }    
           steps {
             container('mautic-tester') {
@@ -81,11 +84,25 @@ pipeline {
 
                   mysql -h 127.0.0.1 -e 'CREATE DATABASE mautictest; CREATE USER travis@"%"; GRANT ALL on mautictest.* to travis@"%"; GRANT SUPER,PROCESS ON *.* TO travis@"%";'
                   export SYMFONY_ENV="test"
+                  
                   mkdir -p var/cache/coverage-report
                   # APP_DEBUG=0 disables debug mode for functional test clients decreasing memory usage to almost half
+                  cd .//
                   APP_DEBUG=0 php -dpcov.enabled=1 -dpcov.directory=. -dpcov.exclude="~tests|themes|vendor~" bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration plugins/${SUBMODULE_NAME}/phpunit.xml --disallow-test-output --coverage-clover var/cache/coverage-report/clover.xml --testsuite=all
                 '''
-                stash includes: 'var/cache/coverage-report/clover.xml', name: 'CloverCoverage'
+                withSonarQubeEnv('SonarqubeServer') {
+                  sh '''
+                     ls -ltrh
+                     pwd
+                     cat var/cache/coverage-report/clover.xml | head -10
+                     pwd
+                     find ${AGENT_HOME} -type f -name "sonar-project.properties"
+                     cd plugins/${SUBMODULE_NAME}/
+                     pwd
+                     ls -ltrh
+                     $SCANNER_HOME/bin/sonar-scanner -Dproject.settings=sonar-project.properties
+                  '''
+                }
               }
             }
           }
@@ -113,28 +130,6 @@ pipeline {
                   '''
                 }
               }
-            }
-          }
-        }
-      }
-    }
-    stage('Sonar Scan') {
-      environment {
-        SCANNER_HOME = tool 'SonarQubeScanner'
-        JAVA_HOME = tool 'AutoJavaInstallation'
-        PATH = "${JAVA_HOME}/bin:${PATH}"
-      }
-      steps {
-        container('mautic-tester') {
-          ansiColor('xterm') {
-            withSonarQubeEnv('SonarqubeServer') {
-              unstash 'CloverCoverage'
-              sh '''
-                 ls -ltrh
-                 pwd
-                 find . -type f -name "clover.xml"
-                 # $SCANNER_HOME/bin/sonar-scanner -Dproject.settings=sonar-project.properties
-              '''
             }
           }
         }
