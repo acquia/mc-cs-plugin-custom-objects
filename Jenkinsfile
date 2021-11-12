@@ -88,7 +88,6 @@ pipeline {
                   mkdir -p var/cache/coverage-report
                   # APP_DEBUG=0 disables debug mode for functional test clients decreasing memory usage to almost half
                   APP_DEBUG=0 php -dpcov.enabled=1 -dpcov.directory=. -dpcov.exclude="~tests|themes|vendor~" bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration plugins/${SUBMODULE_NAME}/phpunit.xml --disallow-test-output --coverage-clover var/cache/coverage-report/clover.xml --testsuite=all
-                  php-coveralls -x var/cache/coverage-report/clover.xml --json_path var/cache/coverage-report/coveralls-upload.json
                 '''
                 withSonarQubeEnv('SonarqubeServer') {
                   sh '''
