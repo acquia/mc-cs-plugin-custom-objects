@@ -89,10 +89,13 @@ pipeline {
                   # APP_DEBUG=0 disables debug mode for functional test clients decreasing memory usage to almost half
                   APP_DEBUG=0 php -dpcov.enabled=1 -dpcov.directory=. -dpcov.exclude="~tests|themes|vendor~" bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration plugins/${SUBMODULE_NAME}/phpunit.xml --disallow-test-output --coverage-clover var/cache/coverage-report/clover.xml --testsuite=all
                 '''
-                withSonarQubeEnv('SonarqubeServer') {
+                dir("plugins/${env.SUBMODULE_NAME}") {
+                  withSonarQubeEnv('SonarqubeServer') {
+                    sh "$SCANNER_HOME/bin/sonar-scanner -Dproject.settings=sonar-project.properties"
+                  }
                   sh '''
-                     cd plugins/${SUBMODULE_NAME}/
-                     $SCANNER_HOME/bin/sonar-scanner -Dproject.settings=sonar-project.properties
+                     # we have to clean up or the docker build later will not use cache
+                     rm -r ../../var/cache/coverage-report/clover.xml .scannerwork
                   '''
                 }
               }
@@ -127,13 +130,13 @@ pipeline {
         }
       }
     }
-    stage("Quality Gate") {
-      steps {
-        timeout(time: 1, unit: 'HOURS') {
-          waitForQualityGate abortPipeline: true
-        }
-      }
-    }
+    // stage("Quality Gate") {
+    //   steps {
+    //     timeout(time: 1, unit: 'HOURS') {
+    //       waitForQualityGate abortPipeline: true
+    //     }
+    //   }
+    // }
     stage('Automerge') {
       when {
         anyOf {
