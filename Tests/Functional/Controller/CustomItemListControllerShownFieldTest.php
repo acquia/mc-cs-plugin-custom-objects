@@ -39,6 +39,14 @@ class CustomItemListControllerShownFieldTest extends MauticMysqlTestCase
         $this->fieldFactory = $this->container->get('custom_object.custom_field_factory');
     }
 
+    protected function beforeBeginTransaction(): void
+    {
+        $this->resetAutoincrement([
+            'custom_item',
+            'custom_object',
+        ]);
+    }
+
     public function testCustomItemDetailList(): void
     {
         $this->assertDetailListDisplaysFields('customItem');
