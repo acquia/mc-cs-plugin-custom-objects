@@ -106,11 +106,9 @@ pipeline {
           steps {
             container('mautic-tester') {
               ansiColor('xterm') {
-                dir("plugins/${env.SUBMODULE_NAME}") {
-                  sh '''
-                    composer phpstan -- --no-progress
-                  '''
-                }
+                sh '''
+                  composer phpstan -- --no-progress
+                '''
               }
             }
           }
