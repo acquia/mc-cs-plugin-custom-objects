@@ -17,6 +17,16 @@ class CustomItemLookupControllerTest extends MauticMysqlTestCase
 {
     protected $useCleanupRollback = false;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->resetAutoincrement([
+            'custom_item',
+            'leads',
+        ]);
+    }
+
     public function testListCustomItem(): void
     {
         $customObject       = $this->createCustomObject();
