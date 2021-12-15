@@ -1,3 +1,0 @@
-parameters:
-	ignoreErrors:
-		- '#Constant MAUTIC_TABLE_PREFIX not found.#'
