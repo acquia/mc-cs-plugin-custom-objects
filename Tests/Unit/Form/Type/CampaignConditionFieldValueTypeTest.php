@@ -65,7 +65,7 @@ final class CampaignConditionFieldValueTypeTest extends TestCase
         );
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $customObject = new CustomObject();
         $customObject->setId(42);
@@ -78,29 +78,13 @@ final class CampaignConditionFieldValueTypeTest extends TestCase
             ->expects(self::any())
             ->method('getAllOperators')
             ->willReturn([
-                '=' => ['label' => 'a'],
+                '='  => ['label' => 'a'],
                 '!=' => ['label' => 'b'],
             ]);
         $this->translatorMock
-            ->expects(self::at(0))
             ->method('trans')
-            ->with('a')
-            ->willReturn('a');
-        $this->translatorMock
-            ->expects(self::at(1))
-            ->method('trans')
-            ->with('b')
-            ->willReturn('b');
-        $this->translatorMock
-            ->expects(self::at(2))
-            ->method('trans')
-            ->with('a')
-            ->willReturn('a');
-        $this->translatorMock
-            ->expects(self::at(3))
-            ->method('trans')
-            ->with('b')
-            ->willReturn('b');
+            ->withConsecutive(['a'], ['b'], ['a'], ['b'])
+            ->willReturnOnConsecutiveCalls('a', 'b', 'a', 'b');
 
         $customField->setTypeObject(new IntType($this->translatorMock, $filterOperatorProviderInterfaceMock));
         $customFields = [42 => $customField];
@@ -111,79 +95,69 @@ final class CampaignConditionFieldValueTypeTest extends TestCase
             ->willReturn($customFields);
         $formBuilderMock = $this->createMock(FormBuilderInterface::class);
         $formBuilderMock
-            ->expects(self::at(0))
             ->method('add')
-            ->with(
-                'field',
-                ChoiceType::class,
+            ->withConsecutive(
                 [
-                    'required' => true,
-                    'label'    => 'custom.item.field',
-                    'choices'  => [
-                        'Cheese' => 42
+                    'field',
+                    ChoiceType::class,
+                    [
+                        'required' => true,
+                        'label'    => 'custom.item.field',
+                        'choices'  => [
+                            'Cheese' => 42,
+                        ],
+                        'attr'     => [
+                            'class' => 'form-control',
+                        ],
+                        'choice_attr' => [
+                            42 => [
+                                'data-operators'  => '{"=":"a","!=":"b"}',
+                                'data-options'    => '[]',
+                                'data-field-type' => 'int',
+                            ],
+                        ],
                     ],
-                    'attr'     => [
-                        'class' => 'form-control',
+                ],
+                [
+                    'operator',
+                    ChoiceType::class,
+                    [
+                        'required' => true,
+                        'label'    => 'custom.item.operator',
+                        'choices'  => [
+                            'a' => '=',
+                            'b' => '!=',
+                        ],
+                        'attr'     => ['class' => 'link-custom-item-id'],
                     ],
-                    'choice_attr' =>  [
-                        42 => [
-                            'data-operators'  => '{"=":"a","!=":"b"}',
-                            'data-options'    => '[]',
-                            'data-field-type' => 'int',
-                        ]
-                    ]
+                ],
+                [
+                    'value',
+                    TextType::class,
+                    [
+                        'required' => true,
+                        'label'    => 'custom.item.field.value',
+                        'attr'     => ['class' => 'form-control'],
+                    ],
+                ],
+                [
+                    'customObjectId',
+                    HiddenType::class,
+                    ['data' => 42],
                 ]
             );
         $options = [
             'customObject' => $customObject,
-            'data' => [
-                'field' => 42
-            ]
+            'data'         => [
+                'field' => 42,
+            ],
         ];
-        $formBuilderMock
-            ->expects(self::at(1))
-            ->method('add')
-            ->with(
-                'operator',
-                ChoiceType::class,
-                [
-                    'required' => true,
-                    'label'    => 'custom.item.operator',
-                    'choices'  => [
-                        'a' => '=',
-                        'b' => '!=',
-                    ],
-                    'attr'     => ['class' => 'link-custom-item-id'],
-                ]
-            );
         $formConfigBuilderMock = $this->createMock(FormConfigBuilderInterface::class);
         $formBuilderMock
-            ->expects(self::at(2))
+            ->expects($this->once())
             ->method('get')
             ->with('operator')
             ->willReturn($formConfigBuilderMock);
-
-        $formBuilderMock
-            ->expects(self::at(3))
-            ->method('add')
-            ->with(
-                'value',
-                TextType::class,
-                [
-                    'required' => true,
-                    'label'    => 'custom.item.field.value',
-                    'attr'     => ['class' => 'form-control'],
-                ]
-            );
-
-        $formBuilderMock
-            ->expects(self::at(4))
-            ->method('add')
-            ->with(
-                'customObjectId',
-                HiddenType::class,
-                ['data' => 42]
-            );
 
         $this->campaignConditionFieldValueType->buildForm($formBuilderMock, $options);
     }

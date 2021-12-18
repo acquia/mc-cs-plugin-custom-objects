@@ -141,13 +141,9 @@ class CampaignSubscriberTest extends TestCase
             ->method('fetchAllPublishedEntities')
             ->willReturn([$this->customObject]);
 
-        $this->campaignBuilderEvent->expects($this->at(0))
+        $this->campaignBuilderEvent
             ->method('addAction')
-            ->with('custom_item.63.linkcontact');
-
-        $this->campaignBuilderEvent->expects($this->at(1))
-            ->method('addCondition')
-            ->with('custom_item.63.fieldvalue');
+            ->withConsecutive(['custom_item.63.linkcontact'], ['custom_item.63.fieldvalue']);
 
         $this->campaignSubscriber->onCampaignBuild($this->campaignBuilderEvent);
     }
@@ -458,7 +454,6 @@ class CampaignSubscriberTest extends TestCase
         $this->segmentQueryBuilder->expects($this->once())
             ->method('getParameters')
             ->willReturn([]);
-
 
         $this->segmentQueryBuilder->expects($this->once())
             ->method('getParameterTypes')

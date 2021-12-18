@@ -20,8 +20,9 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
+use PHPUnit\Framework\TestCase;
 
-class MenuSubscriberTest extends \PHPUnit\Framework\TestCase
+class MenuSubscriberTest extends TestCase
 {
     private $customObjectModel;
 
@@ -120,32 +121,31 @@ class MenuSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getMasterCustomObjects')
             ->willReturn([$customObject1, $customObject2]);
 
-        $this->menuEvent->expects($this->at(0))
+        $this->menuEvent
             ->method('addMenuItems')
-            ->willReturn([
-                'priority' => 61,
-                'items'    => [
-                    'custom.object.title' => [
-                        'access'    => 'custom_objects:custom_objects:view',
-                        'iconClass' => 'fa-list-alt',
-                        'id'        => 'mautic_custom_object_list',
+            ->willReturnOnConsecutiveCalls(
+                [
+                    'priority' => 61,
+                    'items'    => [
+                        'custom.object.title' => [
+                            'access'    => 'custom_objects:custom_objects:view',
+                            'iconClass' => 'fa-list-alt',
+                            'id'        => 'mautic_custom_object_list',
+                        ],
                     ],
                 ],
-            ]);
-
-        $this->menuEvent->expects($this->at(2))
-            ->method('addMenuItems')
-            ->willReturn([
-                'items' => [
-                    'Test Object' => [
-                        'route'           => CustomItemRouteProvider::ROUTE_LIST,
-                        'routeParameters' => ['objectId' => 333, 'page' => 1],
-                        'access'          => 'custom_fields:custom_fields:view',
-                        'id'              => 'mautic_custom_object_333',
-                        'parent'          => 'custom.object.title',
+                [
+                    'items' => [
+                        'Test Object' => [
+                            'route'           => CustomItemRouteProvider::ROUTE_LIST,
+                            'routeParameters' => ['objectId' => 333, 'page' => 1],
+                            'access'          => 'custom_fields:custom_fields:view',
+                            'id'              => 'mautic_custom_object_333',
+                            'parent'          => 'custom.object.title',
+                        ],
                     ],
-                ],
-            ]);
+                ]
+            );
 
         $this->menuSubscriber->onBuildMenu($this->menuEvent);
     }

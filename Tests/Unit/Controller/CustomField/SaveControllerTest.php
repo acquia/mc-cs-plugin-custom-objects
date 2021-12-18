@@ -128,15 +128,12 @@ class SaveControllerTest extends AbstractFieldControllerTest
 
         $customField = $this->createMock(CustomField::class);
 
-        $request = $this->createRequestMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
-        $request->expects($this->at(5))
-            ->method('get')
-            ->with('custom_field')
-            ->willReturn([]);
-        $request->expects($this->at(5))
-            ->method('get')
-            ->with('custom_field')
-            ->willReturn([]);
+        $mapExtras = [
+            ['custom_field', null, []],
+            ['custom_field', null, []],
+            ['panelId', null, $panelCount],
+        ];
+        $request = $this->createRequestMock($objectId, $fieldId, $fieldType, $panelId, $panelCount, $mapExtras);
 
         $this->customObjectModel->expects($this->once())
             ->method('fetchEntity')
@@ -158,10 +155,14 @@ class SaveControllerTest extends AbstractFieldControllerTest
             ->with($fieldType, $fieldId, $objectId, $panelCount, $panelId)
             ->willReturn($action);
 
-        $this->formFactory->expects($this->at(0))
+        $this->formFactory
             ->method('create')
-            ->with(CustomFieldType::class, $customField, ['action' => $action])
-            ->willReturn($this->form);
+            ->willReturnMap(
+                [
+                    [CustomFieldType::class, $customField, ['action' => $action], $this->form],
+                    [CustomObjectType::class, $customObject, [], $this->form],
+                ]
+            );
 
         $this->form->expects($this->once())
             ->method('handleRequest')
@@ -174,11 +175,6 @@ class SaveControllerTest extends AbstractFieldControllerTest
         $this->form->expects($this->once())
             ->method('getData')
             ->willReturn($customField);
-
-        $request->expects($this->at(6))
-            ->method('get')
-            ->with('panelId')
-            ->willReturn($panelCount);
 
         $this->customFieldModel->expects($this->once())
             ->method('setAlias')
@@ -193,12 +189,6 @@ class SaveControllerTest extends AbstractFieldControllerTest
 
         $customObject->expects($this->once())
             ->method('setCustomFields');
-
-        $customObject = $this->createMock(CustomObject::class);
-        $this->formFactory->expects($this->at(1))
-            ->method('create')
-            ->with(CustomObjectType::class, $customObject)
-            ->willReturn($this->form);
 
         $this->saveController->saveAction($request);
     }
@@ -218,15 +208,14 @@ class SaveControllerTest extends AbstractFieldControllerTest
 
         $customField = $this->createMock(CustomField::class);
 
-        $request = $this->createRequestMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
-        $request->expects($this->at(5))
-            ->method('get')
-            ->with('custom_field')
-            ->willReturn([]);
-        $request->expects($this->at(5))
-            ->method('get')
-            ->with('custom_field')
-            ->willReturn([]);
+        $mapExtras = [
+            ['custom_field', null, []],
+            ['custom_field', null, []],
+            ['panelId', null, $panelCount],
+            ['panelCount', null, $panelCount],
+            ['custom_field', null, []],
+        ];
+        $request = $this->createRequestMock($objectId, $fieldId, $fieldType, $panelId, $panelCount, $mapExtras);
 
         $this->customObjectModel->expects($this->once())
             ->method('fetchEntity')
@@ -248,10 +237,14 @@ class SaveControllerTest extends AbstractFieldControllerTest
             ->with($fieldType, $fieldId, $objectId, $panelCount, $panelId)
             ->willReturn($action);
 
-        $this->formFactory->expects($this->at(0))
+        $this->formFactory
             ->method('create')
-            ->with(CustomFieldType::class, $customField, ['action' => $action])
-            ->willReturn($this->form);
+            ->willReturnMap(
+                [
+                    [CustomFieldType::class, $customField, ['action' => $action], $this->form],
+                    [CustomObjectType::class, $customObject, [], $this->form],
+                ]
+            );
 
         $this->form->expects($this->once())
             ->method('handleRequest')
@@ -265,24 +258,9 @@ class SaveControllerTest extends AbstractFieldControllerTest
             ->method('getData')
             ->willReturn($customField);
 
-        $request->expects($this->at(6))
-            ->method('get')
-            ->with('panelId')
-            ->willReturn($panelCount);
-
         $customField->expects($this->once())
             ->method('setOrder')
             ->with(0);
-
-        $request->expects($this->at(7))
-            ->method('get')
-            ->with('panelCount')
-            ->willReturn($panelCount);
-
-        $request->expects($this->at(8))
-            ->method('get')
-            ->with('custom_field')
-            ->willReturn([]);
 
         $customField->expects($this->once())
             ->method('getOptions')
@@ -290,12 +268,6 @@ class SaveControllerTest extends AbstractFieldControllerTest
 
         $customObject->expects($this->once())
             ->method('setCustomFields');
-
-        $customObject = $this->createMock(CustomObject::class);
-        $this->formFactory->expects($this->at(1))
-            ->method('create')
-            ->with(CustomObjectType::class, $customObject)
-            ->willReturn($this->form);
 
         $this->saveController->saveAction($request);
     }
@@ -315,15 +287,11 @@ class SaveControllerTest extends AbstractFieldControllerTest
 
         $customField = $this->createMock(CustomField::class);
 
-        $request = $this->createRequestMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
-        $request->expects($this->at(5))
-            ->method('get')
-            ->with('custom_field')
-            ->willReturn([]);
-        $request->expects($this->at(5))
-            ->method('get')
-            ->with('custom_field')
-            ->willReturn([]);
+        $mapExtras = [
+            ['custom_field', null, []],
+            ['custom_field', null, []],
+        ];
+        $request = $this->createRequestMock($objectId, $fieldId, $fieldType, $panelId, $panelCount, $mapExtras);
 
         $this->customObjectModel->expects($this->once())
             ->method('fetchEntity')
@@ -345,7 +313,7 @@ class SaveControllerTest extends AbstractFieldControllerTest
             ->with($fieldType, $fieldId, $objectId, $panelCount, $panelId)
             ->willReturn($action);
 
-        $this->formFactory->expects($this->at(0))
+        $this->formFactory->expects($this->once())
             ->method('create')
             ->with(CustomFieldType::class, $customField, ['action' => $action])
             ->willReturn($this->form);

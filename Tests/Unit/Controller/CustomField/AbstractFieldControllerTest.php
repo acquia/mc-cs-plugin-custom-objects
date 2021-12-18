@@ -23,29 +23,26 @@ abstract class AbstractFieldControllerTest extends ControllerTestCase
         $fieldId = null,
         $fieldType = null,
         $panelId = null,
-        $panelCount = null
+        $panelCount = null,
+        array $mapExtras = []
     ): Request {
         $request = $this->createMock(Request::class);
-        $request->expects($this->at(0))
+
+        $map = [
+            ['objectId', null, $objectId],
+            ['fieldId', null, $fieldId],
+            ['fieldType', null, $fieldType],
+            ['panelId', null, $panelId],
+            ['panelCount', null, $panelCount],
+        ];
+
+        foreach ($mapExtras as $mapExtra) {
+            $map[] = $mapExtra;
+        }
+
+        $request
             ->method('get')
-            ->with('objectId')
-            ->willReturn($objectId);
-        $request->expects($this->at(1))
-            ->method('get')
-            ->with('fieldId')
-            ->willReturn($fieldId);
-        $request->expects($this->at(2))
-            ->method('get')
-            ->with('fieldType')
-            ->willReturn($fieldType);
-        $request->expects($this->at(3))
-            ->method('get')
-            ->with('panelId')
-            ->willReturn($panelId);
-        $request->expects($this->at(4))
-            ->method('get')
-            ->with('panelCount')
-            ->willReturn($panelCount);
+            ->willReturnMap($map);
 
         return $request;
     }

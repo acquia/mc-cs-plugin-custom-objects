@@ -36,10 +36,11 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class CustomObjectModelTest extends \PHPUnit\Framework\TestCase
+class CustomObjectModelTest extends TestCase
 {
     private $customObject;
     private $customField;
@@ -167,10 +168,13 @@ class CustomObjectModelTest extends \PHPUnit\Framework\TestCase
             ->method('setMetadata')
             ->with($this->customField);
 
-        $this->dispatcher->expects($this->at(0))->method('dispatch')->with(CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_SAVE, $this->isInstanceOf(CustomObjectEvent::class));
+        $this->dispatcher->method('dispatch')
+            ->withConsecutive(
+                [CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_SAVE, $this->isInstanceOf(CustomObjectEvent::class)],
+                [CustomObjectEvents::ON_CUSTOM_OBJECT_POST_SAVE, $this->isInstanceOf(CustomObjectEvent::class)]
+            );
         $this->entityManager->expects($this->once())->method('persist')->with($this->customObject);
         $this->entityManager->expects($this->once())->method('flush');
-        $this->dispatcher->expects($this->at(1))->method('dispatch')->with(CustomObjectEvents::ON_CUSTOM_OBJECT_POST_SAVE, $this->isInstanceOf(CustomObjectEvent::class));
 
         $this->assertSame($this->customObject, $this->customObjectModel->save($this->customObject));
     }
@@ -244,10 +248,13 @@ class CustomObjectModelTest extends \PHPUnit\Framework\TestCase
             ->method('setMetadata')
             ->with($this->customField);
 
-        $this->dispatcher->expects($this->at(0))->method('dispatch')->with(CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_SAVE, $this->isInstanceOf(CustomObjectEvent::class));
+        $this->dispatcher->method('dispatch')
+            ->withConsecutive(
+                [CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_SAVE, $this->isInstanceOf(CustomObjectEvent::class)],
+                [CustomObjectEvents::ON_CUSTOM_OBJECT_POST_SAVE, $this->isInstanceOf(CustomObjectEvent::class)]
+            );
         $this->entityManager->expects($this->once())->method('persist')->with($this->customObject);
         $this->entityManager->expects($this->once())->method('flush');
-        $this->dispatcher->expects($this->at(1))->method('dispatch')->with(CustomObjectEvents::ON_CUSTOM_OBJECT_POST_SAVE, $this->isInstanceOf(CustomObjectEvent::class));
 
         $this->assertSame($this->customObject, $this->customObjectModel->save($this->customObject));
     }
@@ -294,10 +301,13 @@ class CustomObjectModelTest extends \PHPUnit\Framework\TestCase
             ->method('setMetadata')
             ->with($this->customField);
 
-        $this->dispatcher->expects($this->at(0))->method('dispatch')->with(CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_SAVE, $this->isInstanceOf(CustomObjectEvent::class));
+        $this->dispatcher->method('dispatch')
+            ->withConsecutive(
+                [CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_SAVE, $this->isInstanceOf(CustomObjectEvent::class)],
+                [CustomObjectEvents::ON_CUSTOM_OBJECT_POST_SAVE, $this->isInstanceOf(CustomObjectEvent::class)]
+            );
         $this->entityManager->expects($this->once())->method('persist')->with($this->customObject);
         $this->entityManager->expects($this->once())->method('flush');
-        $this->dispatcher->expects($this->at(1))->method('dispatch')->with(CustomObjectEvents::ON_CUSTOM_OBJECT_POST_SAVE, $this->isInstanceOf(CustomObjectEvent::class));
 
         $this->assertSame($this->customObject, $this->customObjectModel->save($this->customObject));
     }
@@ -308,20 +318,17 @@ class CustomObjectModelTest extends \PHPUnit\Framework\TestCase
             ->method('getId')
             ->willReturn(34);
 
-        $this->dispatcher->expects($this->at(0))
-            ->method('dispatch')
-            ->with(CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_DELETE, $this->isInstanceOf(CustomObjectEvent::class));
+        $this->dispatcher->method('dispatch')
+            ->withConsecutive(
+                [CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_DELETE, $this->isInstanceOf(CustomObjectEvent::class)]
+            );
 
-        $this->entityManager->expects($this->at(0))
+        $this->entityManager->expects($this->once())
             ->method('remove')
             ->with($this->customObject);
 
-        $this->entityManager->expects($this->at(1))
+        $this->entityManager->expects($this->once())
             ->method('flush');
-
-        $this->dispatcher->expects($this->at(1))
-            ->method('dispatch')
-            ->with(CustomObjectEvents::ON_CUSTOM_OBJECT_POST_DELETE, $this->isInstanceOf(CustomObjectEvent::class));
 
         $this->customObjectModel->delete($this->customObject);
     }
