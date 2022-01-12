@@ -14,7 +14,7 @@ abstract class AbstractApiPlatformFunctionalTest extends MauticMysqlTestCase
     /**
      * @var array
      */
-    protected $clientServer = [
+    protected array $clientServer = [
         'PHP_AUTH_USER' => 'sales',
         'PHP_AUTH_PW'   => 'mautic',
     ];
