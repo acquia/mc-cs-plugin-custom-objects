@@ -49,14 +49,14 @@ class TokenSubscriberTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->customItemModel       = $this->container->get('mautic.custom.model.item');
-        $this->customFieldValueModel = $this->container->get('mautic.custom.model.field.value');
-        $this->subscriber            = $this->container->get('custom_object.emailtoken.subscriber');
+        $this->customItemModel       = self::$container->get('mautic.custom.model.item');
+        $this->customFieldValueModel = self::$container->get('mautic.custom.model.field.value');
+        $this->subscriber            = self::$container->get('custom_object.emailtoken.subscriber');
     }
 
     public function testTextFieldSegmentFilterToken(): void
     {
-        $customObject = $this->createCustomObjectWithAllFields($this->container, 'Product');
+        $customObject = $this->createCustomObjectWithAllFields(self::$container, 'Product');
         $customItem   = new CustomItem($customObject);
         $contact      = $this->createContact('john@doe.email');
 
@@ -139,7 +139,7 @@ class TokenSubscriberTest extends MauticMysqlTestCase
 
     public function testDatetimeFieldSegmentFilterToken(): void
     {
-        $customObject = $this->createCustomObjectWithAllFields($this->container, 'Product');
+        $customObject = $this->createCustomObjectWithAllFields(self::$container, 'Product');
         $customItem   = new CustomItem($customObject);
         $contact      = $this->createContact('john@doe.email');
 
@@ -208,7 +208,7 @@ class TokenSubscriberTest extends MauticMysqlTestCase
 
     public function testMultiselectFieldSegmentFilterToken(): void
     {
-        $customObject = $this->createCustomObjectWithAllFields($this->container, 'Product');
+        $customObject = $this->createCustomObjectWithAllFields(self::$container, 'Product');
         $customItem   = new CustomItem($customObject);
         $contact      = $this->createContact('john@doe.email');
 
@@ -277,7 +277,7 @@ class TokenSubscriberTest extends MauticMysqlTestCase
 
     public function testSelectFieldSegmentFilterToken(): void
     {
-        $customObject = $this->createCustomObjectWithAllFields($this->container, 'Product');
+        $customObject = $this->createCustomObjectWithAllFields(self::$container, 'Product');
         $customItem   = new CustomItem($customObject);
         $contact      = $this->createContact('john@doe.email');
 
@@ -347,7 +347,7 @@ class TokenSubscriberTest extends MauticMysqlTestCase
     private function createContact(string $email): Lead
     {
         /** @var LeadModel $contactModel */
-        $contactModel = $this->container->get('mautic.lead.model.lead');
+        $contactModel = self::$container->get('mautic.lead.model.lead');
         $contact      = new Lead();
         $contact->setEmail($email);
         $contactModel->saveEntity($contact);
@@ -361,7 +361,7 @@ class TokenSubscriberTest extends MauticMysqlTestCase
     private function createSegment(array $filters): LeadList
     {
         /** @var ListModel $segmentModel */
-        $segmentModel = $this->container->get('mautic.lead.model.list');
+        $segmentModel = self::$container->get('mautic.lead.model.list');
         $segment      = new LeadList();
         $segment->setFilters($filters);
         $segment->setName('Segment A');
@@ -373,7 +373,7 @@ class TokenSubscriberTest extends MauticMysqlTestCase
     private function addContactToSegment(Lead $contact, LeadList $segment): void
     {
         /** @var ListModel $segmentModel */
-        $segmentModel = $this->container->get('mautic.lead.model.list');
+        $segmentModel = self::$container->get('mautic.lead.model.list');
         $segmentModel->addLead($contact, $segment, true);
     }
 }

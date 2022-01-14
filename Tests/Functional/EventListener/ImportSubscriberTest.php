@@ -52,7 +52,7 @@ class ImportSubscriberTest extends MauticMysqlTestCase
     {
         $jane         = $this->createContact('jane@doe.email');
         $john         = $this->createContact('john@doe.email');
-        $customObject = $this->createCustomObjectWithAllFields($this->container, 'Import CI all fields test Custom Object');
+        $customObject = $this->createCustomObjectWithAllFields(self::$container, 'Import CI all fields test Custom Object');
         $csvRow       = [
             'name'           => 'Import CI all fields test Custom Item',
             'contacts'       => "{$jane->getId()},{$john->getId()}",
@@ -157,7 +157,7 @@ class ImportSubscriberTest extends MauticMysqlTestCase
 
         $jane         = $this->createContact('jane@doe.email');
         $john         = $this->createContact('john@doe.email');
-        $customObject = $this->createCustomObjectWithAllFields($this->container, 'Import CI all fields test Custom Object', $configureFieldCallback);
+        $customObject = $this->createCustomObjectWithAllFields(self::$container, 'Import CI all fields test Custom Object', $configureFieldCallback);
         $csvRow       = [
             'name'           => 'Import CI all fields test Custom Item',
             'contacts'       => "{$jane->getId()},{$john->getId()}",
@@ -330,16 +330,16 @@ class ImportSubscriberTest extends MauticMysqlTestCase
         });
 
         /** @var CustomObjectModel $customObjectModel */
-        $customObjectModel = $this->container->get('mautic.custom.model.object');
+        $customObjectModel = self::$container->get('mautic.custom.model.object');
 
         /** @var CustomItemImportModel $customItemImportModel */
-        $customItemImportModel = $this->container->get('mautic.custom.model.import.item');
+        $customItemImportModel = self::$container->get('mautic.custom.model.import.item');
 
         /** @var CustomFieldRepository $customFieldRepository */
-        $customFieldRepository = $this->container->get('custom_field.repository');
+        $customFieldRepository = self::$container->get('custom_field.repository');
 
         /** @var TranslatorInterface $translator */
-        $translator = $this->container->get('translator');
+        $translator = self::$container->get('translator');
 
         $configProvider     = $this->createMock(ConfigProvider::class);
         $permissionProvider = $this->createMock(CustomItemPermissionProvider::class);
@@ -376,10 +376,10 @@ class ImportSubscriberTest extends MauticMysqlTestCase
     private function getCustomItemByName(string $name): ?CustomItem
     {
         /** @var CustomItemRepository $customItemRepository */
-        $customItemRepository = $this->container->get('custom_item.repository');
+        $customItemRepository = self::$container->get('custom_item.repository');
 
         /** @var CustomItemModel $customItemModel */
-        $customItemModel = $this->container->get('mautic.custom.model.item');
+        $customItemModel = self::$container->get('mautic.custom.model.item');
 
         /** @var CustomItem $customItem */
         $customItem = $customItemRepository->findOneBy(['name' => $name]);
@@ -394,7 +394,7 @@ class ImportSubscriberTest extends MauticMysqlTestCase
     private function createContact(string $email): Lead
     {
         /** @var LeadModel $contactModel */
-        $contactModel = $this->container->get('mautic.lead.model.lead');
+        $contactModel = self::$container->get('mautic.lead.model.lead');
         $contact      = new Lead();
         $contact->setEmail($email);
         $contactModel->saveEntity($contact);
