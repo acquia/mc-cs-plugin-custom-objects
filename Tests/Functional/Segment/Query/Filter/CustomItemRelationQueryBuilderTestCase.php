@@ -36,9 +36,9 @@ class CustomItemRelationQueryBuilderTestCase extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->coreParametersHelper = $this->container->get('mautic.helper.core_parameters');
-        $this->segmentRepository    = $this->container->get('mautic.lead.repository.lead_list');
-        $this->contactRepository    = $this->container->get('mautic.lead.repository.lead');
+        $this->coreParametersHelper = self::$container->get('mautic.helper.core_parameters');
+        $this->segmentRepository    = self::$container->get('mautic.lead.repository.lead_list');
+        $this->contactRepository    = self::$container->get('mautic.lead.repository.lead');
     }
 
     protected function beforeBeginTransaction(): void

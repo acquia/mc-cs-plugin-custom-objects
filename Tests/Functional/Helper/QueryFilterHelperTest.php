@@ -32,12 +32,12 @@ class QueryFilterHelperTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->filterFactory = $this->container->get('mautic.lead.model.lead_segment_filter_factory');
+        $this->filterFactory = self::$container->get('mautic.lead.model.lead_segment_filter_factory');
 
         /** @var CustomFieldTypeProvider $fieldTypeProvider */
-        $fieldTypeProvider = $this->container->get('custom_field.type.provider');
+        $fieldTypeProvider = self::$container->get('custom_field.type.provider');
         /** @var CustomFieldRepository $customFieldRepository */
-        $customFieldRepository = $this->container->get('custom_field.repository');
+        $customFieldRepository = self::$container->get('custom_field.repository');
         $this->filterHelper    = new QueryFilterHelper(
             $this->em,
             new QueryFilterFactory(

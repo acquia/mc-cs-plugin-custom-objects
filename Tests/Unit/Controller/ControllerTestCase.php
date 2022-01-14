@@ -57,7 +57,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase
         $request      = empty($this->request) ? $this->createMock(Request::class) : $this->request;
         $session      = empty($this->session) ? $this->createMock(Session::class) : $this->session;
 
-        $this->container   = $this->createMock(ContainerInterface::class);
+        self::$container   = $this->createMock(ContainerInterface::class);
         $httpKernel        = $this->createMock(HttpKernel::class);
         $response          = $this->createMock(Response::class);
         $phpEngine         = $this->createMock(PhpEngine::class);
@@ -68,7 +68,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase
         $this->router      = $this->createMock(RouterInterface::class);
         $this->userHelper  = $this->createMock(UserHelper::class);
 
-        $this->container->method('get')->will($this->returnValueMap([
+        self::$container->method('get')->will($this->returnValueMap([
             ['request_stack', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $requestStack],
             ['http_kernel', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $httpKernel],
             ['templating', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $phpEngine],
@@ -81,7 +81,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase
 
         $phpEngine->method('renderResponse')->willReturn($response);
 
-        $this->container->method('has')->will($this->returnValueMap([
+        self::$container->method('has')->will($this->returnValueMap([
             ['templating', true],
         ]));
 
@@ -100,7 +100,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase
         $notificationModel->method('getNotificationContent')->willReturn([[], '', '']);
         $requestStack->method('getCurrentRequest')->willReturn($request);
 
-        $controller->setContainer($this->container);
+        $controller->setContainer(self::$container);
 
         if ($controller instanceof MauticController) {
             $controller->setRequest($request);
