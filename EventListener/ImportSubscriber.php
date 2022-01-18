@@ -101,13 +101,13 @@ class ImportSubscriber implements EventSubscriberInterface
         }
 
         try {
-            $customObjectId = $this->getCustomObjectId($event->getRouteObjectName());
+            $customObjectId = $this->getCustomObjectId($event->routeObjectName);
             $this->permissionProvider->canCreate($customObjectId);
             $customObject = $this->customObjectModel->fetchEntity($customObjectId);
             $event->setObjectIsSupported(true);
-            $event->setObjectSingular($event->getRouteObjectName());
-            $event->setObjectName($customObject->getNamePlural());
-            $event->setActiveLink("#mautic_custom_object_{$customObjectId}");
+            $event->objectSingular = $event->routeObjectName;
+            $event->objectName = $customObject->getNamePlural();
+            $event->activeLink = "#mautic_custom_object_$customObjectId";
             $event->setIndexRoute(CustomItemRouteProvider::ROUTE_LIST, ['objectId' => $customObjectId]);
             $event->stopPropagation();
         } catch (NotFoundException | ForbiddenException $e) {
@@ -121,7 +121,7 @@ class ImportSubscriber implements EventSubscriberInterface
         }
 
         try {
-            $customObjectId = $this->getCustomObjectId($event->getRouteObjectName());
+            $customObjectId = $this->getCustomObjectId($event->routeObjectName);
             $this->permissionProvider->canCreate($customObjectId);
             $customObject  = $this->customObjectModel->fetchEntity($customObjectId);
             $customFields  = $customObject->getCustomFields();
@@ -138,10 +138,10 @@ class ImportSubscriber implements EventSubscriberInterface
                 $fieldList[$customField->getId()] = $customField->getName();
             }
 
-            $event->setFields([
+            $event->fields = [
                 $customObject->getNamePlural() => $fieldList,
                 'mautic.lead.special_fields'   => $specialFields,
-            ]);
+            ];
         } catch (NotFoundException | ForbiddenException $e) {
         }
     }
@@ -193,10 +193,10 @@ class ImportSubscriber implements EventSubscriberInterface
         }
 
         try {
-            $customObjectId = $this->getCustomObjectId($event->getImport()->getObject());
+            $customObjectId = $this->getCustomObjectId($event->import->getObject());
             $this->permissionProvider->canCreate($customObjectId);
             $customObject = $this->customObjectModel->fetchEntity($customObjectId);
-            $merged       = $this->customItemImportModel->import($event->getImport(), $event->getRowData(), $customObject);
+            $merged       = $this->customItemImportModel->import($event->import, $event->rowData, $customObject);
             $event->setWasMerged($merged);
         } catch (NotFoundException $e) {
             // Not a Custom Object import or the custom object doesn't exist anymore. Move on.
