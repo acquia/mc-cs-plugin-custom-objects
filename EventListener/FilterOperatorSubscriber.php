@@ -75,7 +75,7 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
         $config                      = $event->getChoices()['lead']['email'];
         $label                       = $event->getTranslator()->trans('custom.not_in.custom.objects.label');
         $config['operators'][$label] = self::NOT_IN_CUSTOM_OBJECTS;
-        $event->setChoices(['lead' => ['email' => $config]]);
+        $event->setChoice('lead', 'email', $config);
     }
 
     public function onSegmentFilterFormHandleWithinFieldFormType(FormAdjustmentEvent $event): void
