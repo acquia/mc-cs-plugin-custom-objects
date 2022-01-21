@@ -53,7 +53,6 @@ class CountryTypeTest extends \PHPUnit\Framework\TestCase
         $optionsResolver->expects($this->once())
             ->method('setDefaults')
             ->with($this->callback(function (array $options) {
-                $this->assertTrue($options['choices_as_values']);
                 $this->assertFalse($options['choice_translation_domain']);
                 $this->assertSame('Czech Republic', $options['choices']['choices']['Czech Republic']);
 

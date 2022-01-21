@@ -24,6 +24,7 @@ use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+use Twig\Environment;
 
 /**
  * Even though we use nice controllers with defined dependencies, when we call some method like
@@ -68,7 +69,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase
         $this->router      = $this->createMock(RouterInterface::class);
         $this->userHelper  = $this->createMock(UserHelper::class);
 
-        $this->container->method('get')->will($this->returnValueMap([
+        $this->container->method('get')->willReturnMap([
             ['request_stack', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $requestStack],
             ['http_kernel', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $httpKernel],
             ['templating', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $phpEngine],
@@ -77,17 +78,19 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase
             ['mautic.security', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $security],
             ['router', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->router],
             ['mautic.helper.user', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->userHelper],
-        ]));
+            ['twig', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->createMock(Environment::class)],
+        ]);
 
         $phpEngine->method('renderResponse')->willReturn($response);
 
-        $this->container->method('has')->will($this->returnValueMap([
-            ['templating', true],
-        ]));
+        $this->container->method('has')->willReturnMap([
+            ['templating', false], // 'templating' will be removed in Symfony 5
+            ['twig', true],
+        ]);
 
-        $modelFactory->method('getModel')->will($this->returnValueMap([
+        $modelFactory->method('getModel')->willReturnMap([
             ['core.notification', $notificationModel],
-        ]));
+        ]);
 
         $request->query   = new ParameterBag();
         $request->headers = new HeaderBag();

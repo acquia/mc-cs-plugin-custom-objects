@@ -6,6 +6,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Mautic\LeadBundle\Entity\Import;
+use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Event\ImportInitEvent;
 use Mautic\LeadBundle\Event\ImportMappingEvent;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
@@ -18,7 +19,6 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemImportModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -67,10 +67,11 @@ class ImportSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->customFieldRepository = $this->createMock(CustomFieldRepository::class);
         $this->translator            = $this->createMock(TranslatorInterface::class);
         $this->importValidateEvent   = $this->createMock(ImportValidateEvent::class);
-        $this->importInitEvent       = $this->createMock(ImportInitEvent::class);
-        $this->importMappingEvent    = $this->createMock(ImportMappingEvent::class);
-        $this->importProcessEvent    = $this->createMock(ImportProcessEvent::class);
+        $this->importInitEvent       = new ImportInitEvent('unicorn');
+        $this->importMappingEvent    = new ImportMappingEvent('unicorn');
         $this->import                = $this->createMock(Import::class);
+        $leadEventLogMock            = $this->createMock(LeadEventLog::class);
+        $this->importProcessEvent    = new ImportProcessEvent($this->import, $leadEventLogMock, []);
         $this->customObject          = $this->createMock(CustomObject::class);
         $this->form                  = $this->createMock(Form::class);
         $this->importSubscriber      = new ImportSubscriber(
@@ -89,9 +90,6 @@ class ImportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('pluginIsEnabled')
             ->willReturn(false);
 
-        $this->importInitEvent->expects($this->never())
-            ->method('getRouteObjectName');
-
         $this->importSubscriber->onImportInit($this->importInitEvent);
     }
 
@@ -103,37 +101,20 @@ class ImportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('pluginIsEnabled')
             ->willReturn(true);
 
-        $this->importInitEvent->expects($this->exactly(2))
-            ->method('getRouteObjectName')
-            ->willReturn('custom-object:35');
+        $this->importInitEvent->routeObjectName = 'custom-object:35';
 
         $this->customObjectModel->expects($this->once())
             ->method('fetchEntity')
             ->with(35)
             ->willReturn($this->customObject);
 
-        $this->importInitEvent->expects($this->once())
-            ->method('setObjectIsSupported')
-            ->with(true);
+        $this->importInitEvent->objectSupported = true;
 
-        $this->importInitEvent->expects($this->once())
-            ->method('setObjectSingular')
-            ->with('custom-object:35');
+        $this->importInitEvent->objectSingular = 'custom-object:35';
 
-        $this->importInitEvent->expects($this->once())
-            ->method('setObjectName')
-            ->with('Test Object');
+        $this->importInitEvent->objectName = 'Test Object';
 
-        $this->importInitEvent->expects($this->once())
-            ->method('setActiveLink')
-            ->with('#mautic_custom_object_35');
-
-        $this->importInitEvent->expects($this->once())
-            ->method('setIndexRoute')
-            ->with(CustomItemRouteProvider::ROUTE_LIST, ['objectId' => 35]);
-
-        $this->importInitEvent->expects($this->once())
-            ->method('stopPropagation');
+        $this->importInitEvent->activeLink = '#mautic_custom_object_35';
 
         $this->importSubscriber->onImportInit($this->importInitEvent);
     }
@@ -144,20 +125,12 @@ class ImportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('pluginIsEnabled')
             ->willReturn(true);
 
-        $this->importInitEvent->expects($this->once())
-            ->method('getRouteObjectName')
-            ->willReturn('custom-object:35');
+        $this->importInitEvent->routeObjectName = 'custom-object:35';
 
         $this->customObjectModel->expects($this->once())
             ->method('fetchEntity')
             ->with(35)
             ->will($this->throwException(new NotFoundException()));
-
-        $this->importInitEvent->expects($this->never())
-            ->method('setObjectIsSupported');
-
-        $this->importInitEvent->expects($this->never())
-            ->method('stopPropagation');
 
         $this->importSubscriber->onImportInit($this->importInitEvent);
     }
@@ -168,9 +141,6 @@ class ImportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('pluginIsEnabled')
             ->willReturn(false);
 
-        $this->importMappingEvent->expects($this->never())
-            ->method('getRouteObjectName');
-
         $this->importSubscriber->onFieldMapping($this->importMappingEvent);
     }
 
@@ -180,9 +150,7 @@ class ImportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('pluginIsEnabled')
             ->willReturn(true);
 
-        $this->importMappingEvent->expects($this->once())
-            ->method('getRouteObjectName')
-            ->willReturn('page');
+        $this->importMappingEvent->routeObjectName = 'page';
 
         $this->customObjectModel->expects($this->never())
             ->method('fetchEntity');
@@ -196,9 +164,7 @@ class ImportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('pluginIsEnabled')
             ->willReturn(true);
 
-        $this->importMappingEvent->expects($this->once())
-            ->method('getRouteObjectName')
-            ->willReturn('custom-object:35');
+        $this->importMappingEvent->routeObjectName = 'custom-object:35';
 
         $customField = $this->createMock(CustomField::class);
 
@@ -223,18 +189,16 @@ class ImportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->with(35)
             ->willReturn($this->customObject);
 
-        $this->importMappingEvent->expects($this->once())
-            ->method('setFields')
-            ->with([
-                'Object A' => [
-                    'customItemId'   => 'mautic.core.id',
-                    'customItemName' => 'custom.item.name.label',
-                    456              => 'Field A',
-                ],
-                'mautic.lead.special_fields' => [
-                    'linkedContactIds' => 'custom.item.link.contact.ids',
-                ],
-            ]);
+        $this->importMappingEvent->fields = [
+            'Object A' => [
+                'customItemId'   => 'mautic.core.id',
+                'customItemName' => 'custom.item.name.label',
+                456              => 'Field A',
+            ],
+            'mautic.lead.special_fields' => [
+                'linkedContactIds' => 'custom.item.link.contact.ids',
+            ],
+        ];
 
         $this->importSubscriber->onFieldMapping($this->importMappingEvent);
     }
@@ -399,9 +363,6 @@ class ImportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('pluginIsEnabled')
             ->willReturn(false);
 
-        $this->importProcessEvent->expects($this->never())
-            ->method('getImport');
-
         $this->importSubscriber->onImportProcess($this->importProcessEvent);
     }
 
@@ -411,9 +372,7 @@ class ImportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('pluginIsEnabled')
             ->willReturn(true);
 
-        $this->importProcessEvent->expects($this->once())
-            ->method('getImport')
-            ->willReturn($this->import);
+        $this->importProcessEvent->import = $this->import;
 
         $this->import->expects($this->once())
             ->method('getObject')
@@ -431,9 +390,7 @@ class ImportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('pluginIsEnabled')
             ->willReturn(true);
 
-        $this->importProcessEvent->expects($this->once())
-            ->method('getImport')
-            ->willReturn($this->import);
+        $this->importProcessEvent->import = $this->import;
 
         $this->import->expects($this->once())
             ->method('getObject')
@@ -459,13 +416,9 @@ class ImportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('pluginIsEnabled')
             ->willReturn(true);
 
-        $this->importProcessEvent->expects($this->exactly(2))
-            ->method('getImport')
-            ->willReturn($this->import);
+        $this->importProcessEvent->import = $this->import;
 
-        $this->importProcessEvent->expects($this->once())
-            ->method('getRowData')
-            ->willReturn(['some' => 'rows']);
+        $this->importProcessEvent->rowData = ['some' => 'rows'];
 
         $this->import->expects($this->once())
             ->method('getObject')
@@ -484,9 +437,7 @@ class ImportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->with($this->import, ['some' => 'rows'], $this->customObject)
             ->willReturn(false);
 
-        $this->importProcessEvent->expects($this->once())
-            ->method('setWasMerged')
-            ->with(false);
+        $this->importProcessEvent->setWasMerged(false);
 
         $this->importSubscriber->onImportProcess($this->importProcessEvent);
     }
