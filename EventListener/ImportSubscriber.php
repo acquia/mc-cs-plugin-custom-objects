@@ -103,11 +103,11 @@ class ImportSubscriber implements EventSubscriberInterface
         try {
             $customObjectId = $this->getCustomObjectId($event->routeObjectName);
             $this->permissionProvider->canCreate($customObjectId);
-            $customObject = $this->customObjectModel->fetchEntity($customObjectId);
-            $event->setObjectIsSupported(true);
-            $event->objectSingular = $event->routeObjectName;
-            $event->objectName = $customObject->getNamePlural();
-            $event->activeLink = "#mautic_custom_object_$customObjectId";
+            $customObject           = $this->customObjectModel->fetchEntity($customObjectId);
+            $event->objectSupported = true;
+            $event->objectSingular  = $event->routeObjectName;
+            $event->objectName      = $customObject->getNamePlural();
+            $event->activeLink      = "#mautic_custom_object_$customObjectId";
             $event->setIndexRoute(CustomItemRouteProvider::ROUTE_LIST, ['objectId' => $customObjectId]);
             $event->stopPropagation();
         } catch (NotFoundException | ForbiddenException $e) {
