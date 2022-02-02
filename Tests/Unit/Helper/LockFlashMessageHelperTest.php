@@ -17,10 +17,11 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Service\FlashBag;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class LockFlashMessageHelperTest extends \PHPUnit\Framework\TestCase
+class LockFlashMessageHelperTest extends TestCase
 {
     public function testAddFlash(): void
     {
@@ -76,31 +77,15 @@ class LockFlashMessageHelperTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn($contactUrl);
 
-        $coreParametersHelper->expects($this->at(0))
+        $coreParametersHelper
             ->method('get')
-            ->with('date_format_dateonly')
-            ->willReturn($dateFormat1);
-        $coreParametersHelper->expects($this->at(1))
-            ->method('get')
-            ->with('date_format_timeonly')
-            ->willReturn($dateFormat2);
-        $coreParametersHelper->expects($this->at(2))
-            ->method('get')
-            ->with('date_format_full')
-            ->willReturn($dateFormat3);
+            ->withConsecutive(['date_format_dateonly'], ['date_format_timeonly'], ['date_format_full'])
+            ->willReturnOnConsecutiveCalls($dateFormat1, $dateFormat2, $dateFormat3);
 
-        $checkedOut->expects($this->at(0))
+        $checkedOut
             ->method('format')
-            ->with($dateFormat1)
-            ->willReturn(1);
-        $checkedOut->expects($this->at(1))
-            ->method('format')
-            ->with($dateFormat2)
-            ->willReturn(2);
-        $checkedOut->expects($this->at(2))
-            ->method('format')
-            ->with($dateFormat3)
-            ->willReturn(3);
+            ->withConsecutive([$dateFormat1], [$dateFormat2], [$dateFormat3])
+            ->willReturnOnConsecutiveCalls(1, 2, 3);
 
         $flashBag->expects($this->once())
             ->method('add')

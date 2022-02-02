@@ -130,12 +130,15 @@ class CustomItemModelTest extends TestCase
         $this->customItem->expects($this->once())->method('setModifiedBy')->with($this->user);
         $this->customItem->expects($this->once())->method('setModifiedByUser')->with('John Doe');
         $this->customItem->expects($this->once())->method('setDateModified');
-        $this->entityManager->expects($this->at(0))->method('persist')->with($this->customItem);
+        $this->entityManager->expects($this->once())->method('persist')->with($this->customItem);
         $this->customItem->expects($this->once())->method('getCustomFieldValues')->willReturn(new ArrayCollection());
         $this->customItem->expects($this->once())->method('recordCustomFieldValueChanges');
-        $this->dispatcher->expects($this->at(0))->method('dispatch')->with(CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, $this->isInstanceOf(CustomItemEvent::class));
-        $this->entityManager->expects($this->at(1))->method('flush');
-        $this->dispatcher->expects($this->at(1))->method('dispatch')->with(CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $this->isInstanceOf(CustomItemEvent::class));
+        $this->dispatcher->method('dispatch')
+            ->withConsecutive(
+                [CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, $this->isInstanceOf(CustomItemEvent::class)],
+                [CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $this->isInstanceOf(CustomItemEvent::class)]
+            );
+        $this->entityManager->expects($this->once())->method('flush');
         $this->validator->expects($this->once())->method('validate')->with($this->customItem)->willReturn($this->violationList);
 
         $this->assertSame($this->customItem, $this->customItemModel->save($this->customItem));
@@ -150,13 +153,16 @@ class CustomItemModelTest extends TestCase
         $this->customItem->expects($this->once())->method('setModifiedBy')->with($this->user);
         $this->customItem->expects($this->once())->method('setModifiedByUser')->with('John Doe');
         $this->customItem->expects($this->once())->method('setDateModified');
-        $this->entityManager->expects($this->at(0))->method('persist')->with($this->customItem);
+        $this->entityManager->expects($this->once())->method('persist')->with($this->customItem);
         $this->customItem->expects($this->once())->method('getCustomFieldValues')->willReturn(new ArrayCollection([$customFieldValue]));
         $this->customItem->expects($this->once())->method('recordCustomFieldValueChanges');
         $this->customFieldValueModel->expects($this->once())->method('save')->with($customFieldValue);
-        $this->dispatcher->expects($this->at(0))->method('dispatch')->with(CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, $this->isInstanceOf(CustomItemEvent::class));
-        $this->entityManager->expects($this->at(1))->method('flush');
-        $this->dispatcher->expects($this->at(1))->method('dispatch')->with(CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $this->isInstanceOf(CustomItemEvent::class));
+        $this->dispatcher->method('dispatch')
+            ->withConsecutive(
+                [CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, $this->isInstanceOf(CustomItemEvent::class)],
+                [CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $this->isInstanceOf(CustomItemEvent::class)]
+            );
+        $this->entityManager->expects($this->once())->method('flush');
         $this->validator->expects($this->once())->method('validate')->with($this->customItem)->willReturn($this->violationList);
 
         $this->assertSame($this->customItem, $this->customItemModel->save($this->customItem));
@@ -165,10 +171,13 @@ class CustomItemModelTest extends TestCase
     public function testDelete(): void
     {
         $this->customItem->expects($this->once())->method('getId')->willReturn(34);
-        $this->dispatcher->expects($this->at(0))->method('dispatch')->with(CustomItemEvents::ON_CUSTOM_ITEM_PRE_DELETE, $this->isInstanceOf(CustomItemEvent::class));
-        $this->entityManager->expects($this->at(0))->method('remove')->with($this->customItem);
-        $this->entityManager->expects($this->at(1))->method('flush');
-        $this->dispatcher->expects($this->at(1))->method('dispatch')->with(CustomItemEvents::ON_CUSTOM_ITEM_POST_DELETE, $this->isInstanceOf(CustomItemEvent::class));
+        $this->dispatcher->method('dispatch')
+            ->withConsecutive(
+                [CustomItemEvents::ON_CUSTOM_ITEM_PRE_DELETE, $this->isInstanceOf(CustomItemEvent::class)],
+                [CustomItemEvents::ON_CUSTOM_ITEM_POST_DELETE, $this->isInstanceOf(CustomItemEvent::class)]
+            );
+        $this->entityManager->expects($this->once())->method('remove')->with($this->customItem);
+        $this->entityManager->expects($this->once())->method('flush');
 
         $this->customItemModel->delete($this->customItem);
     }
@@ -516,9 +525,6 @@ class CustomItemModelTest extends TestCase
 
     public function testPopulateCustomFields(): void
     {
-        $customFieldValue  = $this->createMock(CustomFieldValueInterface::class);
-        $customFieldValues = new ArrayCollection([$customFieldValue]);
-
         $this->customItem->expects($this->once())
             ->method('getCustomFieldValues')
             ->willReturn(new ArrayCollection());

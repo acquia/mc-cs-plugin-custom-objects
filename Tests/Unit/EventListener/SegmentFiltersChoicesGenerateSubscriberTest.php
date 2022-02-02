@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
 use Mautic\LeadBundle\LeadEvents;
-use Doctrine\Common\Collections\Criteria;
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
@@ -87,7 +87,7 @@ class SegmentFiltersChoicesGenerateSubscriberTest extends TestCase
         $customObject->setNamePlural('Products');
         $customObject->setIsPublished(true);
 
-        $intType = new IntType($this->translator, $this->filterOperatorProvider);
+        $intType     = new IntType($this->translator, $this->filterOperatorProvider);
         $customField = new CustomField();
         $customField->setId(1);
         $customField->setType('int');
@@ -97,168 +97,146 @@ class SegmentFiltersChoicesGenerateSubscriberTest extends TestCase
 
         $customObject->addCustomField($customField);
 
-
         $criteria = new Criteria(Criteria::expr()->eq('isPublished', 1));
 
         $keyTypeMapping = [
-            'custom.field.type.int' => 'int',
+            'custom.field.type.int'  => 'int',
             'custom.field.type.text' => 'text',
         ];
 
         $allOperators = [
-            '=' =>
-                [
-                    'label' => 'equals',
-                    'expr' => 'eq',
+            '=' => [
+                    'label'       => 'equals',
+                    'expr'        => 'eq',
                     'negate_expr' => 'neq',
                 ],
-            '!=' =>
-                [
-                    'label' => 'not equal',
-                    'expr' => 'neq',
+            '!=' => [
+                    'label'       => 'not equal',
+                    'expr'        => 'neq',
                     'negate_expr' => 'eq',
                 ],
-            'gt' =>
-                [
-                    'label' => 'greater than',
-                    'expr' => 'gt',
+            'gt' => [
+                    'label'       => 'greater than',
+                    'expr'        => 'gt',
                     'negate_expr' => 'lt',
                 ],
-            'gte' =>
-                [
-                    'label' => 'greater than or equal',
-                    'expr' => 'gte',
+            'gte' => [
+                    'label'       => 'greater than or equal',
+                    'expr'        => 'gte',
                     'negate_expr' => 'lt',
                 ],
-            'lt' =>
-                [
-                    'label' => 'less than',
-                    'expr' => 'lt',
+            'lt' => [
+                    'label'       => 'less than',
+                    'expr'        => 'lt',
                     'negate_expr' => 'gt',
                 ],
-            'lte' =>
-                [
-                    'label' => 'less than or equal',
-                    'expr' => 'lte',
+            'lte' => [
+                    'label'       => 'less than or equal',
+                    'expr'        => 'lte',
                     'negate_expr' => 'gt',
                 ],
-            'empty' =>
-                [
-                    'label' => 'empty',
-                    'expr' => 'empty',
+            'empty' => [
+                    'label'       => 'empty',
+                    'expr'        => 'empty',
                     'negate_expr' => 'notEmpty',
                 ],
-            '!empty' =>
-                [
-                    'label' => 'not empty',
-                    'expr' => 'notEmpty',
+            '!empty' => [
+                    'label'       => 'not empty',
+                    'expr'        => 'notEmpty',
                     'negate_expr' => 'empty',
                 ],
-            'like' =>
-                [
-                    'label' => 'like',
-                    'expr' => 'like',
+            'like' => [
+                    'label'       => 'like',
+                    'expr'        => 'like',
                     'negate_expr' => 'notLike',
                 ],
-            '!like' =>
-                [
-                    'label' => 'not like',
-                    'expr' => 'notLike',
+            '!like' => [
+                    'label'       => 'not like',
+                    'expr'        => 'notLike',
                     'negate_expr' => 'like',
                 ],
-            'between' =>
-                [
-                    'label' => 'between',
-                    'expr' => 'between',
+            'between' => [
+                    'label'       => 'between',
+                    'expr'        => 'between',
                     'negate_expr' => 'notBetween',
-                    'hide' => true,
+                    'hide'        => true,
                 ],
-            '!between' =>
-                [
-                    'label' => 'not between',
-                    'expr' => 'notBetween',
+            '!between' => [
+                    'label'       => 'not between',
+                    'expr'        => 'notBetween',
                     'negate_expr' => 'between',
-                    'hide' => true,
+                    'hide'        => true,
                 ],
-            'in' =>
-                [
-                    'label' => 'including',
-                    'expr' => 'in',
+            'in' => [
+                    'label'       => 'including',
+                    'expr'        => 'in',
                     'negate_expr' => 'notIn',
                 ],
-            '!in' =>
-                [
-                    'label' => 'excluding',
-                    'expr' => 'notIn',
+            '!in' => [
+                    'label'       => 'excluding',
+                    'expr'        => 'notIn',
                     'negate_expr' => 'in',
                 ],
-            'regexp' =>
-                [
-                    'label' => 'regexp',
-                    'expr' => 'regexp',
+            'regexp' => [
+                    'label'       => 'regexp',
+                    'expr'        => 'regexp',
                     'negate_expr' => 'notRegexp',
                 ],
-            '!regexp' =>
-                [
-                    'label' => 'not regexp',
-                    'expr' => 'notRegexp',
+            '!regexp' => [
+                    'label'       => 'not regexp',
+                    'expr'        => 'notRegexp',
                     'negate_expr' => 'regexp',
                 ],
-            'date' =>
-                [
-                    'label' => 'date',
-                    'expr' => 'date',
+            'date' => [
+                    'label'       => 'date',
+                    'expr'        => 'date',
                     'negate_expr' => 'date',
-                    'hide' => true,
+                    'hide'        => true,
                 ],
-            'startsWith' =>
-                [
-                    'label' => 'starts with',
-                    'expr' => 'startsWith',
+            'startsWith' => [
+                    'label'       => 'starts with',
+                    'expr'        => 'startsWith',
                     'negate_expr' => 'startsWith',
                 ],
-            'endsWith' =>
-                [
-                    'label' => 'ends with',
-                    'expr' => 'endsWith',
+            'endsWith' => [
+                    'label'       => 'ends with',
+                    'expr'        => 'endsWith',
                     'negate_expr' => 'endsWith',
                 ],
-            'contains' =>
-                [
-                    'label' => 'contains',
-                    'expr' => 'contains',
+            'contains' => [
+                    'label'       => 'contains',
+                    'expr'        => 'contains',
                     'negate_expr' => 'contains',
                 ],
-            'withinCustomObjects' =>
-                [
-                    'label' => 'within custom objects',
-                    'expr' => 'withinCustomObjects',
+            'withinCustomObjects' => [
+                    'label'       => 'within custom objects',
+                    'expr'        => 'withinCustomObjects',
                     'negate_expr' => 'notWithinCustomObjects',
                 ],
         ];
 
         $fieldOperators = [
-            'equals' => '=',
-            'not equal' => '!=',
-            'greater than' => 'gt',
+            'equals'                => '=',
+            'not equal'             => '!=',
+            'greater than'          => 'gt',
             'greater than or equal' => 'gte',
-            'less than' => 'lt',
-            'less than or equal' => 'lte',
-            'empty' => 'empty',
-            'not empty' => '!empty',
+            'less than'             => 'lt',
+            'less than or equal'    => 'lte',
+            'empty'                 => 'empty',
+            'not empty'             => '!empty',
         ];
 
         $event = new LeadListFiltersChoicesEvent([], [], $this->translator);
 
-        $this->configProvider->expects($this->at(0))
+        $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
             ->willReturn(true);
 
-        $this->fieldTypeProvider->expects($this->at(0))
+        $this->fieldTypeProvider->expects($this->once())
             ->method('getKeyTypeMapping')
             ->willReturn($keyTypeMapping);
 
-        $this->customObjectRepository->expects($this->at(0))
+        $this->customObjectRepository->expects($this->once())
             ->method('matching')
             ->with($criteria)
             ->willReturn(new ArrayCollection([$customObject]));
@@ -324,7 +302,7 @@ class SegmentFiltersChoicesGenerateSubscriberTest extends TestCase
                 'contains'
             );
 
-        $this->filterOperatorProvider->expects($this->at(0))
+        $this->filterOperatorProvider->expects($this->once())
             ->method('getAllOperators')
             ->willReturn($allOperators);
 

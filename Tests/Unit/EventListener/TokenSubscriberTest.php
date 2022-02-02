@@ -650,13 +650,9 @@ class TokenSubscriberTest extends TestCase
                 )
             );
 
-        $valueEntity->expects($this->at(1))
+        $valueEntity
             ->method('getValue')
-            ->willReturn('');
-
-        $valueEntity->expects($this->at(4))
-            ->method('getValue')
-            ->willReturn('The field value');
+            ->willReturnOnConsecutiveCalls('', 'The field value');
 
         $valueEntity->expects($this->any())
             ->method('getCustomField')
