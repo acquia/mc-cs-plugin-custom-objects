@@ -130,23 +130,18 @@ class ViewControllerTest extends ControllerTestCase
             ->with(DateRangeType::class)
             ->willReturn($this->form);
 
-        $this->form->expects($this->at(0))
+        $this->form
             ->method('get')
-            ->with('date_from')
-            ->willReturnSelf();
+            ->willReturnMap(
+                [
+                    ['date_from', $this->form],
+                    ['date_to', $this->form],
+                ]
+            );
 
-        $this->form->expects($this->at(1))
+        $this->form
             ->method('getData')
-            ->willReturn('2019-02-04');
-
-        $this->form->expects($this->at(2))
-            ->method('get')
-            ->with('date_to')
-            ->willReturnSelf();
-
-        $this->form->expects($this->at(3))
-            ->method('getData')
-            ->willReturn('2019-03-04');
+            ->willReturnOnConsecutiveCalls('2019-02-04', '2019-03-04');
 
         $this->customItemXrefContactModel->expects($this->once())
             ->method('getLinksLineChartData')

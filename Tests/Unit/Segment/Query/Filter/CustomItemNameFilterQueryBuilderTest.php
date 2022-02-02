@@ -50,7 +50,7 @@ class CustomItemNameFilterQueryBuilderTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
+        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', '');
 
         $randomParameter = new RandomParameterName();
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
@@ -71,10 +71,10 @@ class CustomItemNameFilterQueryBuilderTest extends TestCase
             )
         );
 
-        $this->queryBuilder = $this->createMock(QueryBuilder::class);
+        $this->queryBuilder         = $this->createMock(QueryBuilder::class);
         $this->contactSegmentFilter = $this->createMock(ContactSegmentFilter::class);
-        $this->connection = $this->createMock(Connection::class);
-        $this->expressionBuilder = $this->createMock(ExpressionBuilder::class);
+        $this->connection           = $this->createMock(Connection::class);
+        $this->expressionBuilder    = $this->createMock(ExpressionBuilder::class);
 
         $this->customItemNameFilterQueryBuilder = new CustomItemNameFilterQueryBuilder(
             $randomParameter,
@@ -90,42 +90,29 @@ class CustomItemNameFilterQueryBuilderTest extends TestCase
 
     /**
      * @dataProvider parameterValueProvider
+     *
      * @param $parameterValue
      */
     public function testApplyQuery($parameterValue): void
     {
         $this->contactSegmentFilter
-            ->expects($this->at(0))
-            ->method("getField")
-            ->willReturn("field1");
+            ->method('getField')
+            ->willReturnOnConsecutiveCalls('field1', '1');
 
         $this->contactSegmentFilter
-            ->expects($this->at(1))
-            ->method("getField")
-            ->willReturn("1");
+            ->method('getOperator')
+            ->willReturnOnConsecutiveCalls('eq', 'eq');
 
         $this->contactSegmentFilter
-            ->expects($this->at(2))
-            ->method("getOperator")
-            ->willReturn("eq");
-
-        $this->contactSegmentFilter
-            ->expects($this->at(3))
-            ->method("getParameterValue")
+            ->expects($this->once())
+            ->method('getParameterValue')
             ->willReturn($parameterValue);
 
-        $this->contactSegmentFilter
-            ->expects($this->at(4))
-            ->method("getOperator")
-            ->willReturn("eq");
-
         $this->queryBuilder
-            ->expects($this->any())
-            ->method("getConnection")
+            ->method('getConnection')
             ->willReturn($this->connection);
 
         $this->queryBuilder
-            ->expects($this->any())
             ->method('expr')
             ->willReturn($this->expressionBuilder);
 

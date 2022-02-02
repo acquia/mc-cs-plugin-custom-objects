@@ -35,7 +35,7 @@ class AbstractCustomFieldTypeTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
+        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', '');
 
         $this->translator             = $this->createMock(TranslatorInterface::class);
         $this->customField            = $this->createMock(CustomField::class);

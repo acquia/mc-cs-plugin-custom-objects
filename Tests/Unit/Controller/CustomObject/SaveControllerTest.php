@@ -170,19 +170,18 @@ class SaveControllerTest extends ControllerTestCase
             )
             ->willReturn($this->form);
 
-        $this->form->expects($this->at(1))
+        $this->form->expects($this->once())
             ->method('isValid')
             ->willReturn(true);
 
-        $this->form->expects($this->at(2))
+        $this->form
             ->method('get')
-            ->with('buttons')
-            ->willReturnSelf();
-
-        $this->form->expects($this->at(3))
-            ->method('get')
-            ->with('save')
-            ->willReturn($this->createMock(ClickableInterface::class));
+            ->willReturnMap(
+                [
+                    ['buttons', $this->form],
+                    ['save', $this->createMock(ClickableInterface::class)],
+                ]
+            );
 
         $this->customObjectModel->expects($this->once())
             ->method('save')
@@ -258,20 +257,24 @@ class SaveControllerTest extends ControllerTestCase
             )
             ->willReturn($this->form);
 
-        $this->form->expects($this->at(0))
+        $this->form->expects($this->once())
             ->method('submit')
             ->with([]);
 
-        $this->form->expects($this->at(1))
+        $this->form->expects($this->once())
             ->method('isValid')
             ->willReturn(true);
 
-        $this->form->expects($this->at(2))
-            ->method('get')
-            ->with('buttons')
-            ->willReturnSelf();
-
         $click = $this->createMock(ClickableInterface::class);
+
+        $this->form
+            ->method('get')
+            ->willReturnMap(
+                [
+                    ['buttons', $this->form],
+                    ['save', $click],
+                ]
+            );
 
         $click->expects($this->once())
             ->method('isClicked')
@@ -280,11 +283,6 @@ class SaveControllerTest extends ControllerTestCase
         $this->customObjectModel->expects($this->once())
             ->method('unlockEntity')
             ->with($this->customObject);
-
-        $this->form->expects($this->at(3))
-            ->method('get')
-            ->with('save')
-            ->willReturn($click);
 
         $this->customObjectModel->expects($this->once())
             ->method('save')
@@ -311,7 +309,7 @@ class SaveControllerTest extends ControllerTestCase
         /** @var JsonResponse $jsonResponse */
         $jsonResponse = $this->saveController->saveAction(self::OBJECT_ID);
 
-        $this->assertRegExp('/Redirecting to https:\/\/view.object/', $jsonResponse->getContent());
+        $this->assertMatchesRegularExpression('/Redirecting to https:\/\/view.object/', $jsonResponse->getContent());
     }
 
     public function testSaveActionForNewCustomObjectWithInvalidForm(): void
@@ -341,12 +339,15 @@ class SaveControllerTest extends ControllerTestCase
             )
             ->willReturn($this->form);
 
-        $this->request->expects($this->at(0))
+        $this->request
             ->method('get')
-            ->with('custom_object')
-            ->willReturn([]);
+            ->willReturnMap(
+                [
+                    ['custom_object', null, []],
+                ]
+            );
 
-        $this->form->expects($this->at(1))
+        $this->form->expects($this->once())
             ->method('isValid')
             ->willReturn(false);
 

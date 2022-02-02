@@ -128,36 +128,34 @@ class ContactTabSubscriberTest extends TestCase
             ->method('pluginIsEnabled')
             ->willReturn(true);
 
-        $this->customContentEvent->expects($this->at(0))
+        $this->customContentEvent
             ->method('checkContext')
-            ->with('MauticLeadBundle:Lead:lead.html.php', 'tabs')
-            ->willReturn(true);
-
-        $this->customContentEvent->expects($this->at(1))
-            ->method('getVars')
-            ->willReturn(['lead' => $contact]);
-
-        $this->customContentEvent->expects($this->at(2))
-            ->method('addTemplate')
-            ->with(
-                'CustomObjectsBundle:SubscribedEvents/Tab:link.html.php',
+            ->willReturnMap(
                 [
-                    'count' => 13,
-                    'title' => 'Object A',
-                    'tabId' => 'custom-object-555',
+                    ['MauticLeadBundle:Lead:lead.html.php', 'tabs', true],
+                    ['MauticLeadBundle:Lead:lead.html.php', 'tabs.content', false],
                 ]
             );
 
-        $this->customContentEvent->expects($this->at(3))
-            ->method('addTemplate')
-            ->with(
-                'CustomObjectsBundle:SubscribedEvents/Tab:modal.html.php'
-            );
+        $this->customContentEvent->expects($this->once())
+            ->method('getVars')
+            ->willReturn(['lead' => $contact]);
 
-        $this->customContentEvent->expects($this->at(4))
-            ->method('checkContext')
-            ->with('MauticLeadBundle:Lead:lead.html.php', 'tabs.content')
-            ->willReturn(false);
+        $this->customContentEvent
+            ->method('addTemplate')
+            ->withConsecutive(
+                [
+                    'CustomObjectsBundle:SubscribedEvents/Tab:link.html.php',
+                    [
+                        'count' => 13,
+                        'title' => 'Object A',
+                        'tabId' => 'custom-object-555',
+                    ],
+                ],
+                [
+                    'CustomObjectsBundle:SubscribedEvents/Tab:modal.html.php',
+                ]
+            );
 
         $this->customObjectModel->expects($this->once())
             ->method('getMasterCustomObjects')
@@ -183,17 +181,16 @@ class ContactTabSubscriberTest extends TestCase
             ->method('pluginIsEnabled')
             ->willReturn(true);
 
-        $this->customContentEvent->expects($this->at(0))
+        $this->customContentEvent
             ->method('checkContext')
-            ->with('MauticLeadBundle:Lead:lead.html.php', 'tabs')
-            ->willReturn(false);
+            ->willReturnMap(
+                [
+                    ['MauticLeadBundle:Lead:lead.html.php', 'tabs', false],
+                    ['MauticLeadBundle:Lead:lead.html.php', 'tabs.content', true],
+                ]
+            );
 
-        $this->customContentEvent->expects($this->at(1))
-            ->method('checkContext')
-            ->with('MauticLeadBundle:Lead:lead.html.php', 'tabs.content')
-            ->willReturn(true);
-
-        $this->customContentEvent->expects($this->at(2))
+        $this->customContentEvent->expects($this->once())
             ->method('getVars')
             ->willReturn(['lead' => $contact]);
 
@@ -227,7 +224,7 @@ class ContactTabSubscriberTest extends TestCase
             ->with(555, 'contact', 45)
             ->willReturn($sessionProvider);
 
-        $this->customContentEvent->expects($this->at(3))
+        $this->customContentEvent->expects($this->once())
             ->method('addTemplate')
             ->with(
                 'CustomObjectsBundle:SubscribedEvents/Tab:content.html.php',

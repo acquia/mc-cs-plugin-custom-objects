@@ -93,7 +93,7 @@ class DynamicContentSubscriberTest extends TestCase
 
     public function testFiltersInsertedIntoEvent(): void
     {
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
+        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', '');
 
         $filterObject   = [
             'custom_field_1' => [

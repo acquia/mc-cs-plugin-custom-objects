@@ -51,7 +51,7 @@ class CustomItemXrefContactRepositoryTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') or define('MAUTIC_TABLE_PREFIX', '');
+        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', '');
 
         $this->entityManager        = $this->createMock(EntityManager::class);
         $this->classMetadata        = $this->createMock(ClassMetadata::class);

@@ -111,36 +111,33 @@ class CustomItemTabSubscriberTest extends TestCase
             ->method('getNamePlural')
             ->willReturn('Object A');
 
-        $this->customContentEvent->expects($this->at(0))
+        $this->customContentEvent
             ->method('checkContext')
-            ->with('CustomObjectsBundle:CustomItem:detail.html.php', 'tabs')
-            ->willReturn(true);
+            ->withConsecutive(
+                ['CustomObjectsBundle:CustomItem:detail.html.php', 'tabs'],
+                ['CustomObjectsBundle:CustomItem:detail.html.php', 'tabs.content']
+            )
+            ->willReturnOnConsecutiveCalls(true, false);
 
-        $this->customContentEvent->expects($this->at(1))
+        $this->customContentEvent->expects($this->once())
             ->method('getVars')
             ->willReturn(['item' => $this->customItem]);
 
-        $this->customContentEvent->expects($this->at(2))
+        $this->customContentEvent
             ->method('addTemplate')
-            ->with(
-                'CustomObjectsBundle:SubscribedEvents/Tab:link.html.php',
+            ->withConsecutive(
                 [
-                    'count' => 13,
-                    'title' => 'Object A',
-                    'tabId' => 'custom-object-555',
+                    'CustomObjectsBundle:SubscribedEvents/Tab:link.html.php',
+                    [
+                        'count' => 13,
+                        'title' => 'Object A',
+                        'tabId' => 'custom-object-555',
+                    ],
+                ],
+                [
+                    'CustomObjectsBundle:SubscribedEvents/Tab:modal.html.php',
                 ]
             );
-
-        $this->customContentEvent->expects($this->at(3))
-            ->method('addTemplate')
-            ->with(
-                'CustomObjectsBundle:SubscribedEvents/Tab:modal.html.php'
-            );
-
-        $this->customContentEvent->expects($this->at(4))
-            ->method('checkContext')
-            ->with('CustomObjectsBundle:CustomItem:detail.html.php', 'tabs.content')
-            ->willReturn(false);
 
         $this->customObjectModel->expects($this->once())
             ->method('getMasterCustomObjects')
@@ -167,23 +164,21 @@ class CustomItemTabSubscriberTest extends TestCase
             ->method('getCustomObject')
             ->willReturn($this->customObject);
 
-        $this->customContentEvent->expects($this->at(0))
+        $this->customContentEvent
             ->method('checkContext')
-            ->with('CustomObjectsBundle:CustomItem:detail.html.php', 'tabs')
-            ->willReturn(true);
+            ->withConsecutive(
+                ['CustomObjectsBundle:CustomItem:detail.html.php', 'tabs'],
+                ['CustomObjectsBundle:CustomItem:detail.html.php', 'tabs.content']
+            )
+            ->willReturn(true, false);
 
-        $this->customContentEvent->expects($this->at(1))
+        $this->customContentEvent->expects($this->once())
             ->method('getVars')
             ->willReturn(['item' => $this->customItem]);
 
-        $this->customContentEvent->expects($this->at(2))
+        $this->customContentEvent->expects($this->once())
             ->method('addTemplate')
             ->with('CustomObjectsBundle:SubscribedEvents/Tab:modal.html.php');
-
-        $this->customContentEvent->expects($this->at(3))
-            ->method('checkContext')
-            ->with('CustomObjectsBundle:CustomItem:detail.html.php', 'tabs.content')
-            ->willReturn(false);
 
         $this->customObjectModel->expects($this->once())
             ->method('getMasterCustomObjects')
@@ -205,17 +200,15 @@ class CustomItemTabSubscriberTest extends TestCase
             ->willReturn($otherCustomObject);
         $this->customObject->method('getId')->willReturn(555);
 
-        $this->customContentEvent->expects($this->at(0))
+        $this->customContentEvent
             ->method('checkContext')
-            ->with('CustomObjectsBundle:CustomItem:detail.html.php', 'tabs')
-            ->willReturn(false);
+            ->withConsecutive(
+                ['CustomObjectsBundle:CustomItem:detail.html.php', 'tabs'],
+                ['CustomObjectsBundle:CustomItem:detail.html.php', 'tabs.content']
+            )
+            ->willReturn(false, true);
 
-        $this->customContentEvent->expects($this->at(1))
-            ->method('checkContext')
-            ->with('CustomObjectsBundle:CustomItem:detail.html.php', 'tabs.content')
-            ->willReturn(true);
-
-        $this->customContentEvent->expects($this->at(2))
+        $this->customContentEvent->expects($this->once())
             ->method('getVars')
             ->willReturn(['item' => $this->customItem]);
 
@@ -249,7 +242,7 @@ class CustomItemTabSubscriberTest extends TestCase
             ->with(555, 'customItem', 45)
             ->willReturn($sessionProvider);
 
-        $this->customContentEvent->expects($this->at(3))
+        $this->customContentEvent->expects($this->once())
             ->method('addTemplate')
             ->with(
                 'CustomObjectsBundle:SubscribedEvents/Tab:content.html.php',

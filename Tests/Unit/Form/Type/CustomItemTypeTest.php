@@ -31,26 +31,26 @@ class CustomItemTypeTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->customItemType = new CustomItemType();
-        $this->builder = $this->createMock(FormBuilderInterface::class);
+        $this->customItemType  = new CustomItemType();
+        $this->builder         = $this->createMock(FormBuilderInterface::class);
         $this->optionsResolver = $this->createMock(OptionsResolver::class);
     }
 
     public function testBuildForm(): void
     {
-        $customObject = new CustomObject();
-        $customItem = new CustomItem($customObject);
+        $customObject    = new CustomObject();
+        $customItem      = new CustomItem($customObject);
         $childCustomItem = new CustomItem($customObject);
         $customItem->setChildCustomItem($childCustomItem);
 
         $options = [
             'cancelUrl' => 'https://mautic/cancel/url',
-            'action' => '/form/action',
+            'action'    => '/form/action',
         ];
 
         $this
             ->builder
-            ->expects($this->at(0))
+            ->expects($this->once())
             ->method('getData')
             ->willReturn($customItem);
 
@@ -68,7 +68,7 @@ class CustomItemTypeTest extends TestCase
                         'required'   => true,
                         'label_attr' => ['class' => 'control-label'],
                         'attr'       => ['class' => 'form-control'],
-                    ]
+                    ],
                 ],
                 [
                     'custom_field_values',
@@ -81,7 +81,7 @@ class CustomItemTypeTest extends TestCase
                             'label'      => false,
                             'customItem' => $customItem,
                         ],
-                    ]
+                    ],
                 ],
                 [
                     'child_custom_field_values',
@@ -94,7 +94,7 @@ class CustomItemTypeTest extends TestCase
                             'label'      => false,
                             'customItem' => $customItem->getChildCustomItem(),
                         ],
-                    ]
+                    ],
                 ],
                 [
                     'contact_id',
@@ -102,29 +102,29 @@ class CustomItemTypeTest extends TestCase
                     [
                         'mapped' => false,
                         'data'   => null,
-                    ]
+                    ],
                 ],
                 [
                     'category',
                     CategoryListType::class,
-                    ['bundle' => 'global']
+                    ['bundle' => 'global'],
                 ],
                 [
                     'isPublished',
-                    YesNoButtonGroupType::class
+                    YesNoButtonGroupType::class,
                 ],
                 [
                     'buttons',
                     FormButtonsType::class,
                     [
                         'cancel_onclick' => $cancelOnclickUrl,
-                    ]
+                    ],
                 ]
             );
 
         $this
             ->builder
-            ->expects($this->at(8))
+            ->expects($this->once())
             ->method('setAction')
             ->with($options['action']);
 
@@ -135,7 +135,7 @@ class CustomItemTypeTest extends TestCase
     {
         $this
             ->optionsResolver
-            ->expects($this->at(0))
+            ->expects($this->once())
             ->method('setDefaults')
             ->with([
                 'data_class' => CustomItem::class,
@@ -143,13 +143,13 @@ class CustomItemTypeTest extends TestCase
 
         $this
             ->optionsResolver
-            ->expects($this->at(1))
+            ->expects($this->once())
             ->method('setRequired')
             ->with(['objectId']);
 
         $this
             ->optionsResolver
-            ->expects($this->at(2))
+            ->expects($this->once())
             ->method('setDefined')
             ->with(['contactId', 'cancelUrl']);
 

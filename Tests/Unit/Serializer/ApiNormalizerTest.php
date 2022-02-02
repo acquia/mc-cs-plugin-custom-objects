@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
@@ -63,8 +62,8 @@ class ApiNormalizerTest extends TestCase
 
     public function testDenormalizeNotCustomField(): void
     {
-        $data  = ['sth' => 'sth'];
-        $class = CustomObject::class;
+        $data         = ['sth' => 'sth'];
+        $class        = CustomObject::class;
         $customObject = $this->createMock(CustomObject::class);
         $this->normalizerInterface
             ->expects($this->once())
@@ -79,35 +78,28 @@ class ApiNormalizerTest extends TestCase
     {
         $options = [
             ['label' => '1'],
-            ['label' => '2']
+            ['label' => '2'],
         ];
         $dataReduced = [
-            'type'         => 'multiselect'
+            'type'         => 'multiselect',
         ];
         $data = $dataReduced + [
             'options'      => $options,
             'defaultValue' => '1',
         ];
         $class           = CustomField::class;
-        $customField    = $this->createMock(CustomField::class);
+        $customField     = $this->createMock(CustomField::class);
         $classOption     = CustomFieldOption::class;
         $customOptionOne = $this->createMock(CustomFieldOption::class);
         $customOptionTwo = $this->createMock(CustomFieldOption::class);
         $this->normalizerInterface
-            ->expects($this->at(0))
             ->method('denormalize')
-            ->with($options[0], $classOption, null, [])
-            ->willReturn($customOptionOne);
-        $this->normalizerInterface
-            ->expects($this->at(1))
-            ->method('denormalize')
-            ->with($options[1], $classOption, null, [])
-            ->willReturn($customOptionTwo);
-        $this->normalizerInterface
-            ->expects($this->at(2))
-            ->method('denormalize')
-            ->with($dataReduced, $class, null, [])
-            ->willReturn($customField);
+            ->withConsecutive(
+                [$options[0], $classOption, null, []],
+                [$options[1], $classOption, null, []],
+                [$dataReduced, $class, null, []]
+            )
+            ->willReturnOnConsecutiveCalls($customOptionOne, $customOptionTwo, $customField);
         $customFieldType = $this->createMock(CustomFieldTypeInterface::class);
         $this->customFieldTypeProvider
             ->expects($this->once())
@@ -115,24 +107,19 @@ class ApiNormalizerTest extends TestCase
             ->with('multiselect')
             ->willReturn($customFieldType);
         $customField
-            ->expects($this->at(0))
+            ->expects($this->once())
             ->method('setTypeObject')
             ->with($customFieldType);
         $customField
-            ->expects($this->at(1))
             ->method('addOption')
-            ->with($customOptionOne);
+            ->withConsecutive([$customOptionOne], [$customOptionTwo]);
         $customField
-            ->expects($this->at(2))
-            ->method('addOption')
-            ->with($customOptionTwo);
-        $customField
-            ->expects($this->at(3))
+            ->expects($this->once())
             ->method('setDefaultValue')
             ->with('1');
         $typeObjectMock = $this->createMock(IntType::class);
         $customField
-            ->expects($this->at(4))
+            ->expects($this->once())
             ->method('getTypeObject')
             ->willReturn($typeObjectMock);
         $returnedEntity = $this->apiNormalizer->denormalize($data, $class);

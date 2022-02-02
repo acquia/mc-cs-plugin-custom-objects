@@ -69,10 +69,13 @@ class BatchDeleteControllerTest extends ControllerTestCase
 
     public function testDeleteActionIfCustomItemNotFound(): void
     {
-        $this->request->expects($this->at(0))
+        $this->request
             ->method('get')
-            ->with('ids', '[]')
-            ->willReturn('[13, 14]');
+            ->willReturnMap(
+                [
+                    ['ids', '[]', '[13, 14]'],
+                ]
+            );
 
         $this->customItemModel->expects($this->exactly(2))
             ->method('fetchEntity')
@@ -90,10 +93,13 @@ class BatchDeleteControllerTest extends ControllerTestCase
 
     public function testDeleteActionIfCustomItemForbidden(): void
     {
-        $this->request->expects($this->at(0))
+        $this->request
             ->method('get')
-            ->with('ids', '[]')
-            ->willReturn('[13, 14]');
+            ->willReturnMap(
+                [
+                    ['ids', '[]', '[13, 14]'],
+                ]
+            );
 
         $this->customItemModel->expects($this->exactly(2))
             ->method('fetchEntity')
@@ -118,28 +124,22 @@ class BatchDeleteControllerTest extends ControllerTestCase
         $customItem13 = $this->createMock(CustomItem::class);
         $customItem14 = $this->createMock(CustomItem::class);
 
-        $this->request->expects($this->at(0))
+        $this->request
             ->method('get')
-            ->with('ids', '[]')
-            ->willReturn('[13, 14]');
+            ->willReturnMap(
+                [
+                    ['ids', '[]', '[13, 14]'],
+                ]
+            );
 
-        $this->customItemModel->expects($this->at(0))
+        $this->customItemModel
             ->method('fetchEntity')
-            ->with(13)
-            ->willReturn($customItem13);
+            ->withConsecutive([13], [14])
+            ->willReturn($customItem13, $customItem14);
 
-        $this->customItemModel->expects($this->at(1))
+        $this->customItemModel
             ->method('delete')
-            ->with($customItem13);
-
-        $this->customItemModel->expects($this->at(2))
-            ->method('fetchEntity')
-            ->with(14)
-            ->willReturn($customItem14);
-
-        $this->customItemModel->expects($this->at(3))
-            ->method('delete')
-            ->with($customItem14);
+            ->withConsecutive([$customItem13], [$customItem14]);
 
         $this->flashBag->expects($this->once())
             ->method('add')

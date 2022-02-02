@@ -27,14 +27,14 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\Assert;
 
 class SaveControllerTest extends ControllerTestCase
 {
@@ -123,7 +123,7 @@ class SaveControllerTest extends ControllerTestCase
         $this->addSymfonyDependencies($this->saveController);
 
         $saveControllerReflectionObject = new \ReflectionObject($this->saveController);
-        $reflectionProperty = $saveControllerReflectionObject->getProperty('permissionBase');
+        $reflectionProperty             = $saveControllerReflectionObject->getProperty('permissionBase');
         $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($this->saveController, 'somePermissionBase');
     }
@@ -195,10 +195,14 @@ class SaveControllerTest extends ControllerTestCase
             ->willReturn(false);
 
         $clickable = $this->createMock(ClickableInterface::class);
-        $this->form->expects($this->at(3))
+        $this->form
             ->method('get')
-            ->with('save')
-            ->willReturn($clickable);
+            ->willReturnMap(
+                [
+                    ['save', $clickable],
+                    ['buttons', $this->form],
+                ]
+            );
 
         $clickable->expects($this->once())
             ->method('isClicked')
@@ -224,23 +228,13 @@ class SaveControllerTest extends ControllerTestCase
             )
             ->willReturn($this->form);
 
-        $this->form->expects($this->at(0))
+        $this->form->expects($this->once())
             ->method('handleRequest')
             ->with($this->request);
 
-        $this->form->expects($this->at(1))
+        $this->form->expects($this->once())
             ->method('isValid')
             ->willReturn(true);
-
-        $this->form->expects($this->at(2))
-            ->method('get')
-            ->with('buttons')
-            ->willReturnSelf();
-
-        $this->form->expects($this->at(3))
-            ->method('get')
-            ->with('save')
-            ->willReturn($this->createMock(ClickableInterface::class));
 
         $this->customItemModel->expects($this->once())
             ->method('save')
@@ -318,24 +312,23 @@ class SaveControllerTest extends ControllerTestCase
             )
             ->willReturn($this->form);
 
-        $this->form->expects($this->at(0))
+        $this->form->expects($this->once())
             ->method('handleRequest')
             ->with($this->request);
 
-        $this->form->expects($this->at(1))
+        $this->form->expects($this->once())
             ->method('isValid')
             ->willReturn(true);
 
-        $this->form->expects($this->at(2))
-            ->method('get')
-            ->with('buttons')
-            ->willReturnSelf();
-
         $clickable = $this->createMock(ClickableInterface::class);
-        $this->form->expects($this->at(3))
+        $this->form
             ->method('get')
-            ->with('save')
-            ->willReturn($clickable);
+            ->willReturnMap(
+                [
+                    ['save', $clickable],
+                    ['buttons', $this->form],
+                ]
+            );
 
         $clickable->expects($this->once())
             ->method('isClicked')
@@ -408,11 +401,11 @@ class SaveControllerTest extends ControllerTestCase
             )
             ->willReturn($this->form);
 
-        $this->form->expects($this->at(0))
+        $this->form->expects($this->once())
             ->method('handleRequest')
             ->with($this->request);
 
-        $this->form->expects($this->at(1))
+        $this->form->expects($this->once())
             ->method('isValid')
             ->willReturn(false);
 
@@ -485,7 +478,7 @@ class SaveControllerTest extends ControllerTestCase
                     function (CustomItem $customItem) {
                         Assert::assertSame(self::OBJECT_ID, $customItem->getCustomObject()->getId());
                         Assert::assertSame(6668, $customItem->getChildCustomItem()->getCustomObject()->getId());
-    
+
                         return true;
                     }
                 ),
@@ -496,11 +489,11 @@ class SaveControllerTest extends ControllerTestCase
             )
             ->willReturn($this->form);
 
-        $this->form->expects($this->at(0))
+        $this->form->expects($this->once())
             ->method('handleRequest')
             ->with($this->request);
 
-        $this->form->expects($this->at(1))
+        $this->form->expects($this->once())
             ->method('isValid')
             ->willReturn(false);
 
@@ -578,10 +571,6 @@ class SaveControllerTest extends ControllerTestCase
             ->willReturn(false);
 
         $clickable = $this->createMock(ClickableInterface::class);
-        $this->form->expects($this->at(3))
-            ->method('get')
-            ->with('save')
-            ->willReturn($clickable);
 
         $clickable->expects($this->once())
             ->method('isClicked')
@@ -607,23 +596,22 @@ class SaveControllerTest extends ControllerTestCase
             )
             ->willReturn($this->form);
 
-        $this->form->expects($this->at(0))
+        $this->form->expects($this->once())
             ->method('handleRequest')
             ->with($this->request);
 
-        $this->form->expects($this->at(1))
+        $this->form->expects($this->once())
             ->method('isValid')
             ->willReturn(true);
 
-        $this->form->expects($this->at(2))
+        $this->form
             ->method('get')
-            ->with('buttons')
-            ->willReturnSelf();
-
-        $this->form->expects($this->at(3))
-            ->method('get')
-            ->with('save')
-            ->willReturn($this->createMock(ClickableInterface::class));
+            ->willReturnMap(
+                [
+                    ['save', $clickable],
+                    ['buttons', $this->form],
+                ]
+            );
 
         $this->customItemModel->expects($this->once())
             ->method('save')
