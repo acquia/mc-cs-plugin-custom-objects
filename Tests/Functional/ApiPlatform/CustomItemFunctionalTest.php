@@ -15,7 +15,6 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
 {
     public function testCustomItemCRUD(): void
     {
-        $this->markTestSkipped('Skipping for now');
         $customObject = $this->createCustomObject();
         $category     = $this->createCategory();
         $customField  = $this->createCustomField($customObject);
