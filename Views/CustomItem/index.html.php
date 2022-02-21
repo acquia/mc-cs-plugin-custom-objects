@@ -1,6 +1,5 @@
 <?php declare(strict_types=1);
 
-
 if (!$lookup) {
     $view->extend('MauticCoreBundle:Default:content.html.php');
 

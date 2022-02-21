@@ -29,7 +29,6 @@ class TokenFormatterTest extends TestCase
         TokenFormatter::ORDERED_LIST_FORMAT => 'formatOrderedList',
     ];
 
-
     public function setUp(): void
     {
         $this->formatter = new TokenFormatter();
@@ -41,7 +40,6 @@ class TokenFormatterTest extends TestCase
             '',
             $this->formatter->format($this->noValues, 'A BAD FORMAT')
         );
-
 
         $this->expectException(InvalidCustomObjectFormatListException::class);
         $this->formatter->format($this->manyValues, 'A BAD FORMAT');

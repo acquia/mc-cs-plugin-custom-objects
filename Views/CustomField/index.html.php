@@ -1,6 +1,5 @@
 <?php declare(strict_types=1);
 
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 
 $view['slots']->set('mauticContent', 'customField');

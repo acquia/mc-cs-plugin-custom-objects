@@ -47,7 +47,3 @@ See [Wiki](wiki)
 ## Tests
 
 The plugin has currently test coverage of 91%. Each new PR must be covered by tests to be considered to be merged. To run the tests execute `composer test -- --filter CustomObjects` from the Mautic root dir.
-
-
-
-

@@ -1,6 +1,5 @@
 <?php declare(strict_types=1);
 
-
 /** @var \MauticPlugin\CustomObjectsBundle\Entity\CustomField $customField */
 $title = $customField->getId() ? $customField->getLabel() : $customField->getTypeObject()->getName();
 

@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace MauticPlugin\CustomObjectsBundle\Provider;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;

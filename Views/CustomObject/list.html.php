@@ -1,6 +1,5 @@
 <?php declare(strict_types=1);
 
-
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 

@@ -172,7 +172,6 @@ class TokenSubscriber implements EventSubscriberInterface
                 $fieldValues = null;
             }
 
-
             if (empty($fieldValues)) {
                 $result = $token->getDefaultValue();
             } else {

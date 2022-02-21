@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiFilter;

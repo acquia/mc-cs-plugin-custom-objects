@@ -95,7 +95,6 @@ $view['slots']->set('actions', $view->render('MauticCoreBundle:Helper:page_actio
             <?php echo $view['content']->getCustomContent('details.stats.graph.below', $mauticTemplateVars); ?>
         </div>
 
-
         <!-- tabs controls -->
         <ul class="nav nav-tabs pr-md pl-md">
             <li class="active">

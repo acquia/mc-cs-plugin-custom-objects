@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;

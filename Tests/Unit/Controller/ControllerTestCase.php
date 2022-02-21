@@ -51,7 +51,6 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase
      */
     protected $userHelper;
 
-
     protected function addSymfonyDependencies(Controller $controller): void
     {
         $requestStack = empty($this->requestStack) ? $this->createMock(RequestStack::class) : $this->requestStack;

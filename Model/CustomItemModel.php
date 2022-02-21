@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
