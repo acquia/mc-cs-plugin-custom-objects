@@ -48,7 +48,7 @@ class DbalQueryTraitTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @param mixed[] $args
-     * 
+     *
      * @return mixed
      */
     private function invokeMethod(object $object, string $methodName, array $args = [])
