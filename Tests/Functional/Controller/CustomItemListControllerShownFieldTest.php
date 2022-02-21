@@ -32,7 +32,7 @@ class CustomItemListControllerShownFieldTest extends MauticMysqlTestCase
      */
     private $fieldFactory;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

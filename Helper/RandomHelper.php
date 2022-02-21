@@ -15,11 +15,6 @@ namespace MauticPlugin\CustomObjectsBundle\Helper;
 
 class RandomHelper
 {
-    /**
-     * @var string[]
-     */
-    private $randomWords = [];
-
     public function getSentence(int $limit): string
     {
         $words = [];
