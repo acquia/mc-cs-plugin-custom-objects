@@ -23,6 +23,7 @@ class CustomObjectPostSaveSubscriberTest extends TestCase
         $customObject->setMasterObject($masterObject);
 
         $customObjectModel = new class($masterObject) extends CustomObjectModel {
+            /** @var CustomObject $masterObject */
             private $masterObject;
 
             public function __construct(CustomObject $masterObject)
@@ -30,7 +31,7 @@ class CustomObjectPostSaveSubscriberTest extends TestCase
                 $this->masterObject = $masterObject;
             }
 
-            public function saveEntity($entity, $unlock = true)
+            public function saveEntity($entity, $unlock = true): void
             {
                 Assert::assertSame($this->masterObject, $entity);
             }
@@ -50,7 +51,7 @@ class CustomObjectPostSaveSubscriberTest extends TestCase
                 // noop
             }
 
-            public function saveEntity($entity, $unlock = true)
+            public function saveEntity($entity, $unlock = true): void
             {
                 throw new Exception('Should not have been called.');
             }
