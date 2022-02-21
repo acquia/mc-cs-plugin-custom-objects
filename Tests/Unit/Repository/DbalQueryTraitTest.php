@@ -46,7 +46,12 @@ class DbalQueryTraitTest extends \PHPUnit\Framework\TestCase
         $this->invokeMethod($trait, 'executeSelect', [$qb]);
     }
 
-    private function invokeMethod($object, $methodName, array $args = [])
+    /**
+     * @param mixed[] $args
+     * 
+     * @return mixed
+     */
+    private function invokeMethod(object $object, string $methodName, array $args = [])
     {
         $reflection = new \ReflectionClass(get_class($object));
         $method     = $reflection->getMethod($methodName);
