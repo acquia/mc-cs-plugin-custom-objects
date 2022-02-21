@@ -42,7 +42,7 @@ Once some of your contacts buy a Mautic T-shirt or hoodie you can link them with
 
 ## Documentation
 
-See wiki/Custom-Objects-Documentation
+See (Wiki)[wiki/Custom-Objects-Documentation]
 
 ## Tests
 
