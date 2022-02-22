@@ -15,13 +15,10 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Repository;
 
 use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Query\QueryBuilder;
-use Mautic\AllydeBundle\Tests\TestingTrait;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 
 class DbalQueryTraitTest extends \PHPUnit\Framework\TestCase
 {
-    use TestingTrait;
-
     public function testExecuteSelectIfSelect(): void
     {
         $qb        = $this->createMock(QueryBuilder::class);
@@ -47,5 +44,19 @@ class DbalQueryTraitTest extends \PHPUnit\Framework\TestCase
         $this->expectException(\UnexpectedValueException::class);
 
         $this->invokeMethod($trait, 'executeSelect', [$qb]);
+    }
+
+    /**
+     * @param mixed[] $args
+     *
+     * @return mixed
+     */
+    private function invokeMethod(object $object, string $methodName, array $args = [])
+    {
+        $reflection = new \ReflectionClass(get_class($object));
+        $method     = $reflection->getMethod($methodName);
+        $method->setAccessible(true);
+
+        return $method->invokeArgs($object, $args);
     }
 }
