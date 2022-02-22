@@ -7,8 +7,6 @@ namespace MauticPlugin\CustomObjectsBundle\Migrations;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Schema\SchemaException;
-use Mautic\AllydeBundle\Helper\ExitCodeHelper;
 use Mautic\IntegrationsBundle\Migration\AbstractMigration;
 
 class Version_0_0_19 extends AbstractMigration
