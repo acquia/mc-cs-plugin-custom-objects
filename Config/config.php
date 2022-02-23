@@ -1125,7 +1125,7 @@ $coParams = [
     ],
 ];
 
-if (class_exists('Symfony\\Component\\Serializer\\Normalizer\\NormalizerInterface')) {
+if (interface_exists('ApiPlatform\\Core\\Api\\IriConverterInterface', false)) {
     $coParams['services']['other']['api_platform.custom_object.serializer.api_normalizer_jsonld'] = [
         'class'            => \MauticPlugin\CustomObjectsBundle\Serializer\ApiNormalizer::class,
         'decoratedService' => ['api_platform.jsonld.normalizer.item', 'api_platform.jsonld.normalizer.item.inner'],
