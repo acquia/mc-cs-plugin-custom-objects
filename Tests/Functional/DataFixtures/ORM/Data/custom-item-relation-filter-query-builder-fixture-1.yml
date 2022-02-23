@@ -1,5 +1,4 @@
 # Describes acceptance criteria for
-# https://backlog.acquia.com/browse/MAUT-1738
 # Two products/orders with different prices added
 
 Mautic\LeadBundle\Entity\Lead:

@@ -379,7 +379,6 @@ CustomObjectsForm = {
         let defaultValueIdSelector = '#custom_object_customFields_' + panelId + '_defaultValue';
         let type = mQuery('#custom_object_customFields_' + panelId + '_type').val();
 
-
         mQuery(panel).find('input').each(function (i, input) {
 
             let value = mQuery(input).val();

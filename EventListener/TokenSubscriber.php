@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2019 Mautic, Inc. All rights reserved
- * @author      Mautic, Inc.
- *
- * @link        https://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Mautic\CampaignBundle\Entity\Event;
@@ -180,7 +171,6 @@ class TokenSubscriber implements EventSubscriberInterface
             } catch (NotFoundException $e) {
                 $fieldValues = null;
             }
-
 
             if (empty($fieldValues)) {
                 $result = $token->getDefaultValue();
