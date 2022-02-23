@@ -7,7 +7,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 
-return [
+$coParams = [
     'name'        => 'Custom Objects',
     'description' => 'Adds custom objects and fields features to Mautic',
     'version'     => '0.0.19',
@@ -1117,36 +1117,6 @@ return [
             'custom_object.helper.token_formatter' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Helper\TokenFormatter::class,
             ],
-            'api_platform.custom_object.serializer.api_normalizer_jsonld' => [
-                'class'            => \MauticPlugin\CustomObjectsBundle\Serializer\ApiNormalizer::class,
-                'decoratedService' => ['api_platform.jsonld.normalizer.item', 'api_platform.jsonld.normalizer.item.inner'],
-                'arguments'        => [
-                    'api_platform.jsonld.normalizer.item.inner',
-                    'custom_field.type.provider',
-                    'mautic.custom.model.item',
-                    'api_platform.iri_converter',
-                    'doctrine.orm.entity_manager',
-                ],
-            ],
-            'api_platform.custom_object.serializer.api_normalizer_json' => [
-                'class'            => \MauticPlugin\CustomObjectsBundle\Serializer\ApiNormalizer::class,
-                'decoratedService' => ['api_platform.serializer.normalizer.item', 'api_platform.serializer.normalizer.item.inner'],
-                'arguments'        => [
-                    'api_platform.serializer.normalizer.item.inner',
-                    'custom_field.type.provider',
-                    'mautic.custom.model.item',
-                    'api_platform.iri_converter',
-                    'doctrine.orm.entity_manager',
-                ],
-            ],
-            'api_platform.custom_object.custom_item.extension' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Extension\CustomItemListeningExtension::class,
-                'arguments' => [
-                    'mautic.helper.user',
-                    'mautic.security',
-                ],
-                'tag' => 'api_platform.doctrine.orm.query_extension.collection',
-            ],
         ],
     ],
     'parameters' => [
@@ -1154,3 +1124,38 @@ return [
         ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT => 3,
     ],
 ];
+
+if (class_exists('Symfony\\Component\\Serializer\\Normalizer\\NormalizerInterface')) {
+    $coParams['services']['other']['api_platform.custom_object.serializer.api_normalizer_jsonld'] = [
+        'class'            => \MauticPlugin\CustomObjectsBundle\Serializer\ApiNormalizer::class,
+        'decoratedService' => ['api_platform.jsonld.normalizer.item', 'api_platform.jsonld.normalizer.item.inner'],
+        'arguments'        => [
+            'api_platform.jsonld.normalizer.item.inner',
+            'custom_field.type.provider',
+            'mautic.custom.model.item',
+            'api_platform.iri_converter',
+            'doctrine.orm.entity_manager'
+        ],
+    ];
+    $coParams['services']['other']['api_platform.custom_object.serializer.api_normalizer_json'] = [
+        'class'            => \MauticPlugin\CustomObjectsBundle\Serializer\ApiNormalizer::class,
+        'decoratedService' => ['api_platform.serializer.normalizer.item', 'api_platform.serializer.normalizer.item.inner'],
+        'arguments'        => [
+            'api_platform.serializer.normalizer.item.inner',
+            'custom_field.type.provider',
+            'mautic.custom.model.item',
+            'api_platform.iri_converter',
+            'doctrine.orm.entity_manager'
+        ],
+    ];
+    $coParams['services']['other']['api_platform.custom_object.custom_item.extension'] = [
+        'class' => \MauticPlugin\CustomObjectsBundle\Extension\CustomItemListeningExtension::class,
+        'arguments' => [
+            'mautic.helper.user',
+            'mautic.security'
+        ],
+        'tag' => 'api_platform.doctrine.orm.query_extension.collection',
+    ];
+}
+
+return $coParams;
