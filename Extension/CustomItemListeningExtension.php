@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\CustomObjectsBundle\Extension;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;

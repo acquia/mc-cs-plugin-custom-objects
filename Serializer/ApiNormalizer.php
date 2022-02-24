@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\CustomObjectsBundle\Serializer;
 
 use ApiPlatform\Core\Api\IriConverterInterface;
