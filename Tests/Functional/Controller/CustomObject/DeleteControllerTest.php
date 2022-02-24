@@ -1,6 +1,5 @@
 <?php
 
-
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Controller\CustomObject;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;

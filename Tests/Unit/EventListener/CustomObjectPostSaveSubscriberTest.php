@@ -2,15 +2,6 @@
 
 declare(strict_types=1);
 
-/*
- * @copyright   2020 Mautic Contributors. All rights reserved
- * @author      Mautic, Inc
- *
- * @link        https://mautic.com
- *
- * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
- */
-
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
 use Exception;
@@ -32,6 +23,7 @@ class CustomObjectPostSaveSubscriberTest extends TestCase
         $customObject->setMasterObject($masterObject);
 
         $customObjectModel = new class($masterObject) extends CustomObjectModel {
+            /** @var CustomObject $masterObject */
             private $masterObject;
 
             public function __construct(CustomObject $masterObject)
@@ -39,7 +31,7 @@ class CustomObjectPostSaveSubscriberTest extends TestCase
                 $this->masterObject = $masterObject;
             }
 
-            public function saveEntity($entity, $unlock = true)
+            public function saveEntity($entity, $unlock = true): void
             {
                 Assert::assertSame($this->masterObject, $entity);
             }
@@ -59,7 +51,7 @@ class CustomObjectPostSaveSubscriberTest extends TestCase
                 // noop
             }
 
-            public function saveEntity($entity, $unlock = true)
+            public function saveEntity($entity, $unlock = true): void
             {
                 throw new Exception('Should not have been called.');
             }
