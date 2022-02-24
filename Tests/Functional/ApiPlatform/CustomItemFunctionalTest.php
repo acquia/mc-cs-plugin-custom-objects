@@ -95,7 +95,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
     {
         return
             [
-                'name' => 'Custom Item Edited',
+                'name'         => 'Custom Item Edited',
                 'fieldValues'  => [
                     [
                         'id'    => '/api/v2/custom_fields/'.$customField->getId(),

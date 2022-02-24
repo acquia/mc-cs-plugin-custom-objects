@@ -42,7 +42,7 @@ class CustomItemNameFilterQueryBuilder extends BaseFilterQueryBuilder
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
-        $customObjectId = $filter->getField();
+        $customObjectId  = $filter->getField();
 
         $tableAlias = 'cin_'.(int) $filter->getField();
 

@@ -42,7 +42,7 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
     public function applyQuery(SegmentQueryBuilder $queryBuilder, ContactSegmentFilter $filter): SegmentQueryBuilder
     {
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
-        $filterOperator = $filter->getOperator();
+        $filterOperator  = $filter->getOperator();
 
         $tableAlias = 'cfwq_'.(int) $filter->getField();
 

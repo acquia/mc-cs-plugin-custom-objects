@@ -63,7 +63,6 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
                 InputOption::VALUE_OPTIONAL,
                 'Without confirmation. Use --force=1'
             );
-        ;
 
         parent::configure();
     }
@@ -112,37 +111,38 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
 
     /**
      * @return int[]
+     *
      * @throws DBALException
      */
     private function createCustomObjectsWithItems(): array
     {
         $coProduct = [
-            'is_published' => true,
-            'alias' => 'product',
+            'is_published'  => true,
+            'alias'         => 'product',
             'name_singular' => 'Product',
-            'name_plural' => 'Products',
-            'type' => 0,
+            'name_plural'   => 'Products',
+            'type'          => 0,
         ];
 
         $coProductId = $this->insertInto('custom_object', $coProduct);
 
         $cfPrice = [
-            'is_published' => true,
+            'is_published'     => true,
             'custom_object_id' => $coProductId,
-            'alias' => 'price',
-            'Label' => 'Price',
-            'type' => 'int',
-            'required' => 0,
+            'alias'            => 'price',
+            'Label'            => 'Price',
+            'type'             => 'int',
+            'required'         => 0,
         ];
 
         $cfPriceId = $this->insertInto('custom_field', $cfPrice);
 
         $coOrder = [
-            'is_published' => true,
-            'alias' => 'order',
+            'is_published'  => true,
+            'alias'         => 'order',
             'name_singular' => 'Order',
-            'name_plural' => 'Orders',
-            'type' => 0,
+            'name_plural'   => 'Orders',
+            'type'          => 0,
         ];
 
         $coOrderId = $this->insertInto('custom_object', $coOrder);
@@ -178,8 +178,8 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
     {
         $ciProduct = [
             'custom_object_id' => $coProductId,
-            'name' => $this->randomHelper->getWord(),
-            'is_published' => true,
+            'name'             => $this->randomHelper->getWord(),
+            'is_published'     => true,
         ];
 
         $ciProductId = $this->insertInto('custom_item', $ciProduct);
@@ -194,34 +194,32 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
 
         $ciOrder = [
             'custom_object_id' => $coOrderId,
-            'name' => $this->randomHelper->getWord(),
-            'is_published' => true,
+            'name'             => $this->randomHelper->getWord(),
+            'is_published'     => true,
         ];
 
         $ciOrderId = $this->insertInto('custom_item', $ciOrder);
 
-        $dateAdded = date("Y-m-d H:i:s");
+        $dateAdded = date('Y-m-d H:i:s');
 
         $cixContact = [
             'custom_item_id' => $ciProductId,
-            'contact_id' => $contactId,
-            'date_added' => $dateAdded,
+            'contact_id'     => $contactId,
+            'date_added'     => $dateAdded,
         ];
 
         $this->insertInto('custom_item_xref_contact', $cixContact);
 
         $cixci = [
-            'custom_item_id_lower' => $ciProductId,
+            'custom_item_id_lower'  => $ciProductId,
             'custom_item_id_higher' => $ciOrderId,
-            'date_added' => $dateAdded,
+            'date_added'            => $dateAdded,
         ];
 
         $this->insertInto('custom_item_xref_custom_item', $cixci);
     }
 
     /**
-     * @param  string $table
-     * @param  array  $row
      * @return int Last inserted row ID
      *
      * @throws DBALException

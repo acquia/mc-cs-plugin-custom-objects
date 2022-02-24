@@ -23,9 +23,9 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\EventListener\ReportSubscriber;
 use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\TranslatorInterface;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class ReportSubscriberTest extends TestCase
 {
@@ -211,7 +211,7 @@ class ReportSubscriberTest extends TestCase
             ->method('addTable');
 
         $this->translatorInterface->method('trans')
-            ->willReturn('Some string' . mt_rand(1, 100));
+            ->willReturn('Some string'.mt_rand(1, 100));
 
         $this->reportSubscriber->onReportBuilder($this->reportBuilderEvent);
     }
@@ -239,7 +239,7 @@ class ReportSubscriberTest extends TestCase
             ->method('addTable');
 
         $this->translatorInterface->method('trans')
-            ->willReturn('Some string' . mt_rand(1, 100));
+            ->willReturn('Some string'.mt_rand(1, 100));
 
         $this->reportSubscriber->onReportBuilder($this->reportBuilderEvent);
     }

@@ -51,7 +51,7 @@ class QueryFilterHelperTest extends TestCase
                 1
             )
         );
-        $this->queryBuilder = $this->createMock(QueryBuilder::class);
+        $this->queryBuilder      = $this->createMock(QueryBuilder::class);
         $this->expressionBuilder = $this->createMock(ExpressionBuilder::class);
     }
 

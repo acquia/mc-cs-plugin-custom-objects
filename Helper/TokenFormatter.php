@@ -8,21 +8,21 @@ use MauticPlugin\CustomObjectsBundle\Exception\InvalidCustomObjectFormatListExce
 
 class TokenFormatter
 {
-    public const DEFAULT_FORMAT = 'default';
-    public const OR_LIST_FORMAT = 'or-list';
-    public const AND_LIST_FORMAT = 'and-list';
-    public const BULLET_LIST_FORMAT = 'bullet-list';
+    public const DEFAULT_FORMAT      = 'default';
+    public const OR_LIST_FORMAT      = 'or-list';
+    public const AND_LIST_FORMAT     = 'and-list';
+    public const BULLET_LIST_FORMAT  = 'bullet-list';
     public const ORDERED_LIST_FORMAT = 'ordered-list';
 
     /**
      * Key = Name of a format
-     * Value = Function to perform the formatting
+     * Value = Function to perform the formatting.
      */
     public const FORMATS = [
-        self::DEFAULT_FORMAT => 'formatDefault',
-        self::OR_LIST_FORMAT => 'formatOrList',
-        self::AND_LIST_FORMAT => 'formatAndList',
-        self::BULLET_LIST_FORMAT => 'formatBulletList',
+        self::DEFAULT_FORMAT      => 'formatDefault',
+        self::OR_LIST_FORMAT      => 'formatOrList',
+        self::AND_LIST_FORMAT     => 'formatAndList',
+        self::BULLET_LIST_FORMAT  => 'formatBulletList',
         self::ORDERED_LIST_FORMAT => 'formatOrderedList',
     ];
 
@@ -91,7 +91,7 @@ class TokenFormatter
     {
         return $this->htmlList($values, 'ol');
     }
-    
+
     private function conjunctionList(array $values, string $conjunction): string
     {
         if (0 === count($values)) {
@@ -104,7 +104,7 @@ class TokenFormatter
 
         $lastItem = array_pop($values);
 
-        return implode(', ', $values) . " $conjunction $lastItem";
+        return implode(', ', $values)." $conjunction $lastItem";
     }
 
     private function htmlList(array $values, string $tag): string
@@ -115,7 +115,7 @@ class TokenFormatter
 
         $list = "<$tag>";
         foreach ($values as $item) {
-            $list .= '<li>' . $item . '</li>';
+            $list .= '<li>'.$item.'</li>';
         }
         $list .= "</$tag>";
 

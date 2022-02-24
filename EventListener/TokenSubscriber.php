@@ -178,7 +178,7 @@ class TokenSubscriber implements EventSubscriberInterface
                 if (!empty($token->getFormat())) {
                     try {
                         $formatEvent = new CustomObjectListFormatEvent($fieldValues, $token->getFormat());
-                        
+
                         $this->eventDispatcher->dispatch(
                             CustomObjectEvents::ON_CUSTOM_OBJECT_LIST_FORMAT,
                             $formatEvent
@@ -312,7 +312,7 @@ class TokenSubscriber implements EventSubscriberInterface
             try {
                 $fieldValue    = $customItem->findCustomFieldValueForFieldAlias($token->getCustomFieldAlias());
                 // If the CO item doesn't have a value, get the default value
-                if ("" == $fieldValue->getValue()) {
+                if ('' == $fieldValue->getValue()) {
                     $fieldValue->setValue($fieldValue->getCustomField()->getDefaultValue());
                 }
                 $fieldValues[] = $fieldValue->getCustomField()->getTypeObject()->valueToString($fieldValue);

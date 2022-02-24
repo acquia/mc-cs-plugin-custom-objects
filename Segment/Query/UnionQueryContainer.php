@@ -8,7 +8,8 @@ use Doctrine\DBAL\DBALException;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
 
 /**
- * This is covering impossibility to use union in Doctrine QueryBuilder
+ * This is covering impossibility to use union in Doctrine QueryBuilder.
+ *
  * @see https://github.com/doctrine/orm/issues/5657#issuecomment-181228313
  */
 class UnionQueryContainer implements \Iterator
@@ -35,6 +36,7 @@ class UnionQueryContainer implements \Iterator
 
     /**
      * Whether parameters needs to be rebuild.
+     *
      * @var bool
      */
     private $needsRebuild = false;
@@ -46,7 +48,7 @@ class UnionQueryContainer implements \Iterator
     }
 
     /**
-     * Return merged SQL as string representation
+     * Return merged SQL as string representation.
      *
      * @throws DBALException
      */
@@ -70,6 +72,7 @@ class UnionQueryContainer implements \Iterator
     public function getParameters(): array
     {
         $this->checkRebuildStatus();
+
         return $this->parameters;
     }
 
@@ -79,6 +82,7 @@ class UnionQueryContainer implements \Iterator
     public function getParameterTypes(): array
     {
         $this->checkRebuildStatus();
+
         return $this->parameterTypes;
     }
 
@@ -110,7 +114,8 @@ class UnionQueryContainer implements \Iterator
     }
 
     /**
-     * This checks development workflow to prevent bugs
+     * This checks development workflow to prevent bugs.
+     *
      * @throws \RuntimeException
      */
     private function checkRebuildStatus(): void

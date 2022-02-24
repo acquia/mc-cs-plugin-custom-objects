@@ -13,7 +13,7 @@ class Version_0_0_16 extends AbstractMigration
     protected function isApplicable(Schema $schema): bool
     {
         $tableName = $this->concatPrefix('custom_field');
-        $table = $schema->getTable($tableName);
+        $table     = $schema->getTable($tableName);
 
         try {
             return $table->hasColumn('required') &&

@@ -13,6 +13,7 @@ use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -20,7 +21,6 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use PHPUnit\Framework\MockObject\MockObject;
 
 class CustomObjectTypeTest extends TestCase
 {
@@ -46,9 +46,9 @@ class CustomObjectTypeTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->entityManager           = $this->createMock(EntityManager::class);
         $this->customFieldTypeProvider = $this->createMock(CustomFieldTypeProvider::class);
-        $this->customObjectRepository = $this->createMock(CustomObjectRepository::class);
+        $this->customObjectRepository  = $this->createMock(CustomObjectRepository::class);
 
         $this->type = new CustomObjectType(
             $this->entityManager,
@@ -134,7 +134,7 @@ class CustomObjectTypeTest extends TestCase
                             'class'   => 'form-control',
                             'tooltip' => 'custom.object.help.name.singular',
                         ],
-                    ]
+                    ],
                 ],
                 [
                     'namePlural',
@@ -147,7 +147,7 @@ class CustomObjectTypeTest extends TestCase
                             'class'   => 'form-control',
                             'tooltip' => 'custom.object.help.name.plural',
                         ],
-                    ]
+                    ],
                 ],
                 [
                     'description',
@@ -159,7 +159,7 @@ class CustomObjectTypeTest extends TestCase
                         'attr'       => [
                             'class' => 'form-control editor',
                         ],
-                    ]
+                    ],
                 ],
                 [
                     'type',
@@ -176,7 +176,7 @@ class CustomObjectTypeTest extends TestCase
                             'custom.object.type.master'       => CustomObject::TYPE_MASTER,
                             'custom.object.type.relationship' => CustomObject::TYPE_RELATIONSHIP,
                         ],
-                    ]
+                    ],
                 ],
                 [
                     'masterObject',
@@ -192,7 +192,7 @@ class CustomObjectTypeTest extends TestCase
                             'data-show-on' => '{"custom_object_type":["'.CustomObject::TYPE_RELATIONSHIP.'"]}',
                         ],
                         'disabled'      => !$isNewObject,
-                    ]
+                    ],
                 ],
                 [
                     'category',
@@ -213,14 +213,14 @@ class CustomObjectTypeTest extends TestCase
                         'allow_delete'       => true,
                         'by_reference'       => false,
                         'prototype'          => false, // Do not use CF panel prototype in DOM
-                    ]
+                    ],
                 ],
                 [
                     'buttons',
                     FormButtonsType::class,
                     [
                         'cancel_onclick' => "mQuery('form[name=custom_object]').attr('action', mQuery('form[name=custom_object]').attr('action').replace('/save', '/cancel'));",
-                    ]
+                    ],
                 ]
             );
 

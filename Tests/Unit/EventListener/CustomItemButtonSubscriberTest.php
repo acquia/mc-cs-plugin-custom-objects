@@ -218,7 +218,7 @@ class CustomItemButtonSubscriberTest extends TestCase
             ->method('addButton')
             ->withConsecutive([[
                 'attr' => [
-                    'href' => 'generated/delete/route',
+                    'href'                  => 'generated/delete/route',
                     'data-toggle'           => 'confirmation',
                     'data-message'          => 'translated string',
                     'data-confirm-text'     => 'translated string',
@@ -395,13 +395,13 @@ class CustomItemButtonSubscriberTest extends TestCase
             ->method('addButton')
             ->withConsecutive([[
                 'attr' => [
-                    'href' => 'generated/delete/route',
-                    'data-toggle' => 'confirmation',
-                    'data-message' => null,
-                    'data-confirm-text' => null,
+                    'href'                  => 'generated/delete/route',
+                    'data-toggle'           => 'confirmation',
+                    'data-message'          => null,
+                    'data-confirm-text'     => null,
                     'data-confirm-callback' => 'executeAction',
-                    'data-cancel-text' => null,
-                    'data-cancel-callback' => 'dismissConfirmation',
+                    'data-cancel-text'      => null,
+                    'data-cancel-callback'  => 'dismissConfirmation',
                 ],
                 'btnText'   => 'mautic.core.form.delete',
                 'iconClass' => 'fa fa-fw fa-trash-o text-danger',

@@ -31,8 +31,8 @@ class CustomObjectListFormatSubscriberTest extends TestCase
     public function setUp(): void
     {
         $this->tokenFormatterMock = $this->createMock(TokenFormatter::class);
-        $this->subscriber = new CustomObjectListFormatSubscriber($this->tokenFormatterMock);
-        $this->eventMock = $this->createMock(CustomObjectListFormatEvent::class);
+        $this->subscriber         = new CustomObjectListFormatSubscriber($this->tokenFormatterMock);
+        $this->eventMock          = $this->createMock(CustomObjectListFormatEvent::class);
 
         parent::setUp();
     }
@@ -70,8 +70,8 @@ class CustomObjectListFormatSubscriberTest extends TestCase
 
     public function testOnFormat(): void
     {
-        $format = 'format';
-        $values = ['values'];
+        $format          = 'format';
+        $values          = ['values'];
         $formattedString = 'formattedString';
 
         $this->eventMock->expects($this->once())

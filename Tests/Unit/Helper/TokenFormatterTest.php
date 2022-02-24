@@ -22,10 +22,10 @@ class TokenFormatterTest extends TestCase
     private $noValues = [];
 
     private $availableFormats = [
-        TokenFormatter::DEFAULT_FORMAT => 'formatDefault',
-        TokenFormatter::OR_LIST_FORMAT => 'formatOrList',
-        TokenFormatter::AND_LIST_FORMAT => 'formatAndList',
-        TokenFormatter::BULLET_LIST_FORMAT => 'formatBulletList',
+        TokenFormatter::DEFAULT_FORMAT      => 'formatDefault',
+        TokenFormatter::OR_LIST_FORMAT      => 'formatOrList',
+        TokenFormatter::AND_LIST_FORMAT     => 'formatAndList',
+        TokenFormatter::BULLET_LIST_FORMAT  => 'formatBulletList',
         TokenFormatter::ORDERED_LIST_FORMAT => 'formatOrderedList',
     ];
 

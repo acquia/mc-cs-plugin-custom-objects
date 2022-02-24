@@ -56,7 +56,7 @@ class CustomItemPostSaveSubscriberTest extends TestCase
 
         $customItem = new CustomItem($customObject);
         $subscriber = new CustomItemPostSaveSubscriber($customItemModel, $requestStack);
-        $event = new CustomItemEvent($customItem);
+        $event      = new CustomItemEvent($customItem);
 
         $subscriber->postSave($event);
 
@@ -97,7 +97,7 @@ class CustomItemPostSaveSubscriberTest extends TestCase
 
         $customItem = new CustomItem($customObject);
         $subscriber = new CustomItemPostSaveSubscriber($customItemModel, $requestStack);
-        $event = new CustomItemEvent($customItem);
+        $event      = new CustomItemEvent($customItem);
 
         $subscriber->postSave($event);
 
