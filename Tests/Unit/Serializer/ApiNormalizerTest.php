@@ -51,7 +51,7 @@ class ApiNormalizerTest extends TestCase
 
     public function setUp(): void
     {
-        if (interface_exists('ApiPlatform\\Core\\Api\\IriConverterInterface', false)) {
+        if (interface_exists('ApiPlatform\\Core\\Api\\IriConverterInterface')) {
             $this->normalizerInterface     = $this->createMock(Normalizer::class);
             $this->customFieldTypeProvider = $this->createMock(CustomFieldTypeProvider::class);
             $this->iriConverter            = $this->createMock(IriConverterInterface::class);
@@ -132,7 +132,7 @@ class ApiNormalizerTest extends TestCase
     }
 }
 
-if (interface_exists('ApiPlatform\\Core\\Api\\IriConverterInterface', false)) {
+if (interface_exists('ApiPlatform\\Core\\Api\\IriConverterInterface')) {
 
     abstract class Normalizer implements NormalizerInterface, DenormalizerInterface
     {
