@@ -133,7 +133,6 @@ class ApiNormalizerTest extends TestCase
 }
 
 if (interface_exists('ApiPlatform\\Core\\Api\\IriConverterInterface')) {
-
     abstract class Normalizer implements NormalizerInterface, DenormalizerInterface
     {
     }
