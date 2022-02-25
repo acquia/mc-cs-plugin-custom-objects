@@ -3,7 +3,6 @@
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 /** @var CustomObject $customObject */
-
 $view->extend('MauticCoreBundle:Default:content.html.php');
 
 $view['slots']->set('mauticContent', 'customItem');
@@ -61,7 +60,7 @@ $hideCategories = CustomObject::TYPE_RELATIONSHIP === $customObject->getType() ?
             </div>
         </div>
     </div>
-    <div class="col-md-3 bg-white height-auto <?php echo $hideCategories ?>">
+    <div class="col-md-3 bg-white height-auto <?php echo $hideCategories; ?>">
         <div class="pr-lg pl-lg pt-md pb-md">
             <?php echo $view['form']->row($form['category']); ?>
             <?php echo $view['form']->row($form['isPublished']); ?>

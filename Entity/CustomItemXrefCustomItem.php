@@ -10,8 +10,8 @@ use DateTimeZone;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
-use UnexpectedValueException;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefCustomItemRepository;
+use UnexpectedValueException;
 
 /**
  * As the {custom item} - {custom item} table can store the IDs both ways (higher - lower, lower - higher)

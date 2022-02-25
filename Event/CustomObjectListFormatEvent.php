@@ -31,7 +31,7 @@ class CustomObjectListFormatEvent extends Event
     public function __construct(array $customObjectValues, string $format = 'default')
     {
         $this->customObjectValues = $customObjectValues;
-        $this->format = $format;
+        $this->format             = $format;
     }
 
     public function getCustomObjectValues(): array
@@ -53,7 +53,7 @@ class CustomObjectListFormatEvent extends Event
     {
         if ('' !== $formattedString) {
             $this->hasBeenFormatted = true;
-            $this->formattedString = $formattedString;
+            $this->formattedString  = $formattedString;
         }
     }
 

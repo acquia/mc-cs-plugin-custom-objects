@@ -33,6 +33,7 @@ class QueryFilterFactory
 
     /**
      * @return UnionQueryContainer|SegmentQueryBuilder
+     *
      * @throws InvalidSegmentFilterException
      * @throws NotFoundException
      * @throws Exception

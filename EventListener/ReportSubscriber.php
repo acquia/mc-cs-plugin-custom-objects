@@ -188,7 +188,7 @@ class ReportSubscriber implements EventSubscriberInterface
 
         /** @var CustomObject $customObject */
         foreach ($this->getCustomObjects() as $customObject) {
-            $customObjectColumns = $this->getCustomObjectColumns($customObject, static::CUSTOM_ITEM_TABLE_ALIAS.'.');
+            $customObjectColumns       = $this->getCustomObjectColumns($customObject, static::CUSTOM_ITEM_TABLE_ALIAS.'.');
             $parentCustomObjectColumns = [];
 
             if ($customObject->getMasterObject()) {
@@ -242,7 +242,7 @@ class ReportSubscriber implements EventSubscriberInterface
     {
         $customObjectId = explode('.', $context);
         $customObjectId = (int) end($customObjectId);
-        
+
         if (1 > $customObjectId) {
             throw new \Exception('Custom Object ID is not defined.');
         }

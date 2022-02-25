@@ -30,11 +30,11 @@ class RandomHelper
 
     public function getWord(): string
     {
-        return(md5(uniqid()));
+        return md5(uniqid());
     }
 
     public function getEmail(): string
     {
-        return uniqid('', true) . '@' . uniqid('', true) . '.net';
+        return uniqid('', true).'@'.uniqid('', true).'.net';
     }
 }

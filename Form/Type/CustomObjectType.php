@@ -43,7 +43,7 @@ class CustomObjectType extends AbstractType
 
     public function __construct(EntityManager $entityManager, CustomFieldTypeProvider $customFieldTypeProvider, CustomObjectRepository $customObjectRepository)
     {
-        $this->entityManager = $entityManager;
+        $this->entityManager           = $entityManager;
         $this->customFieldTypeProvider = $customFieldTypeProvider;
         $this->customObjectRepository  = $customObjectRepository;
     }
