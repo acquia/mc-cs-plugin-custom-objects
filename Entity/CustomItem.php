@@ -267,9 +267,6 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         return $this->customObject;
     }
 
-    /**
-     * @param CustomObject $customObject
-     */
     public function setCustomObject(CustomObject $customObject): void
     {
         $this->customObject = $customObject;
@@ -288,7 +285,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     public function setCategory($category)
     {
-        $this->isChanged('category', $category ? $category: null);
+        $this->isChanged('category', $category ? $category : null);
         $this->category = $category;
     }
 
@@ -349,6 +346,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
 
     /**
      * @param array $values
+     *
      * @throws NotFoundException
      */
     public function setCustomFieldValues($values)
@@ -403,7 +401,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     }
 
     /**
-     * Just for API
+     * Just for API.
      */
     public function getFieldValues(): array
     {
@@ -418,11 +416,12 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
                     'value' => $customFieldValue->getValue(),
                 ];
         }
+
         return $fieldValues;
     }
 
     /**
-     * Just for API
+     * Just for API.
      *
      * @throws NotFoundException
      */

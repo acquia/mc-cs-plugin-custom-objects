@@ -25,7 +25,7 @@ class UnionQueryContainerTest extends TestCase
     public function setUp(): void
     {
         $this->unionQueryContainer = new UnionQueryContainer();
-        $this->connection = new Connection(
+        $this->connection          = new Connection(
             [],
             $this->createMock(Driver::class)
         );
@@ -34,7 +34,7 @@ class UnionQueryContainerTest extends TestCase
 
     public function testWorkflow(): void
     {
-        # Test no query
+        // Test no query
         $this->assertEquals(
             '',
             $this->unionQueryContainer->getSQL()
@@ -50,7 +50,7 @@ class UnionQueryContainerTest extends TestCase
             $this->unionQueryContainer->getParameterTypes()
         );
 
-        # Test one query
+        // Test one query
         $qb = new SegmentQueryBuilder($this->connection);
 
         $qb->select('table_1')
@@ -76,7 +76,7 @@ class UnionQueryContainerTest extends TestCase
             $this->unionQueryContainer->getParameterTypes()
         );
 
-        # Test two queries
+        // Test two queries
 
         $qb = new SegmentQueryBuilder($this->connection);
         $qb->select('table_2')
@@ -96,14 +96,14 @@ class UnionQueryContainerTest extends TestCase
                 'param2' => [
                     0 => 2,
                     1 => 3,
-                ]
+                ],
             ],
             $this->unionQueryContainer->getParameters()
         );
 
         $this->assertEquals(
             [
-                'param2' => Connection::PARAM_INT_ARRAY
+                'param2' => Connection::PARAM_INT_ARRAY,
             ],
             $this->unionQueryContainer->getParameterTypes()
         );

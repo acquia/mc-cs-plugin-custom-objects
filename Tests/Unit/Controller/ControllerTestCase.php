@@ -106,7 +106,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase
             $controller->setRequest($request);
             $controller->setTranslator($translator);
         }
-        
+
         if ($controller instanceof CommonController) {
             $controller->setCoreParametersHelper($this->createMock(CoreParametersHelper::class));
         }

@@ -37,7 +37,7 @@ class Version_0_0_11 extends AbstractMigration
     protected function up(): void
     {
         $tableCustomObject = $this->concatPrefix($this->table);
-        $default = CustomObject::TYPE_MASTER;
+        $default           = CustomObject::TYPE_MASTER;
 
         $this->addSql("ALTER TABLE {$tableCustomObject} ADD type INT DEFAULT {$default}, ADD INDEX (type)");
         $this->addSql("ALTER TABLE {$tableCustomObject} ADD master_object INT, ADD INDEX (master_object)");

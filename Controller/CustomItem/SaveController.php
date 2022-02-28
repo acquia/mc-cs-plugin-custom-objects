@@ -121,9 +121,9 @@ class SaveController extends AbstractFormController
 
             return $this->redirect($this->routeProvider->buildViewRoute($objectId, $itemId));
         }
-        
+
         $action = $this->routeProvider->buildSaveRoute($objectId, $itemId);
-        
+
         if (!$customItem->getId() && $customItem->getCustomObject()->getRelationshipObject() && $contactId) {
             $customItem->setChildCustomItem(
                 $this->customItemModel->populateCustomFields(
@@ -157,7 +157,7 @@ class SaveController extends AbstractFormController
 
             $pathParameters = [
                 'objectId' => $objectId,
-                'itemId' => $customItem->getId(),
+                'itemId'   => $customItem->getId(),
             ];
 
             if (0 < $contactId) {
@@ -174,7 +174,7 @@ class SaveController extends AbstractFormController
                     return $this->redirectToRoute('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $contactId]);
                 }
 
-                $formView = 'CustomObjectsBundle:CustomItem\Form:editWithRedirectToContact';
+                $formView                    = 'CustomObjectsBundle:CustomItem\Form:editWithRedirectToContact';
                 $pathParameters['contactId'] = $contactId;
             }
 

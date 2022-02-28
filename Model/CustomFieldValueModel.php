@@ -187,7 +187,7 @@ class CustomFieldValueModel
         if (0 === $queries->count()) {
             return new ArrayCollection();
         }
-        
+
         $query     = implode(' UNION ALL ', $queries->toArray());
         $statement = $this->entityManager->getConnection()->prepare($query);
 

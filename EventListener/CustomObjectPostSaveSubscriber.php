@@ -30,7 +30,7 @@ class CustomObjectPostSaveSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Persists the relationship object to the
+     * Persists the relationship object to the.
      */
     public function postSave(CustomObjectEvent $event): void
     {

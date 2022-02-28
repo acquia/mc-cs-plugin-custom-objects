@@ -108,12 +108,12 @@ return [
             CustomItemRouteProvider::ROUTE_LINK_FORM => [
                 'path'       => '/custom/item/{itemId}/link-form/{entityType}/{entityId}',
                 'controller' => 'CustomObjectsBundle:CustomItem\LinkForm:form',
-                'method'     => 'GET'
+                'method'     => 'GET',
             ],
             CustomItemRouteProvider::ROUTE_LINK_FORM_SAVE => [
                 'path'       => '/custom/item/{itemId}/link-form/{entityType}/{entityId}',
                 'controller' => 'CustomObjectsBundle:CustomItem\LinkForm:save',
-                'method'     => 'POST'
+                'method'     => 'POST',
             ],
             CustomItemRouteProvider::ROUTE_UNLINK => [
                 'path'       => '/custom/item/{itemId}/unlink/{entityType}/{entityId}.json',
@@ -356,7 +356,7 @@ return [
                 ],
             ],
             'custom_item.link_form_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\LinkFormController::class,
+                'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\LinkFormController::class,
                 'arguments' => [
                     'form.factory',
                     'mautic.custom.model.item',
@@ -367,8 +367,8 @@ return [
                 'methodCalls' => [
                     'setContainer' => [
                         '@service_container',
-                    ]
-                ]
+                    ],
+                ],
             ],
             'custom_item.unlink_controller' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\UnlinkController::class,
@@ -729,7 +729,7 @@ return [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomItemPostSaveSubscriber::class,
                 'arguments' => [
                     'mautic.custom.model.item',
-                    'request_stack'
+                    'request_stack',
                 ],
             ],
             'custom_item.post_delete.subscriber' => [
@@ -834,23 +834,23 @@ return [
                 ],
             ],
             'custom_object.tokens.list_format.subscriber' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectListFormatSubscriber::class,
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectListFormatSubscriber::class,
                 'arguments' => [
-                    'custom_object.helper.token_formatter'
-                ]
+                    'custom_object.helper.token_formatter',
+                ],
             ],
             'custom_object.post_save.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectPostSaveSubscriber::class,
                 'arguments' => [
                     'mautic.custom.model.object',
-                ]
+                ],
             ],
             'custom_object.pre_delete.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectPreDeleteSubscriber::class,
                 'arguments' => [
                     'mautic.custom.model.object',
                     'translator',
-                ]
+                ],
             ],
         ],
         'forms' => [
@@ -1125,7 +1125,7 @@ return [
                     'custom_field.type.provider',
                     'mautic.custom.model.item',
                     'api_platform.iri_converter',
-                    'doctrine.orm.entity_manager'
+                    'doctrine.orm.entity_manager',
                 ],
             ],
             'api_platform.custom_object.serializer.api_normalizer_json' => [
@@ -1136,21 +1136,21 @@ return [
                     'custom_field.type.provider',
                     'mautic.custom.model.item',
                     'api_platform.iri_converter',
-                    'doctrine.orm.entity_manager'
+                    'doctrine.orm.entity_manager',
                 ],
             ],
             'api_platform.custom_object.custom_item.extension' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Extension\CustomItemListeningExtension::class,
+                'class'     => \MauticPlugin\CustomObjectsBundle\Extension\CustomItemListeningExtension::class,
                 'arguments' => [
                     'mautic.helper.user',
-                    'mautic.security'
+                    'mautic.security',
                 ],
                 'tag' => 'api_platform.doctrine.orm.query_extension.collection',
-            ]
+            ],
         ],
     ],
     'parameters' => [
-        ConfigProvider::CONFIG_PARAM_ENABLED => true,
+        ConfigProvider::CONFIG_PARAM_ENABLED                              => true,
         ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT => 3,
     ],
 ];

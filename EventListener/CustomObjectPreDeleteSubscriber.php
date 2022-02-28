@@ -25,7 +25,7 @@ class CustomObjectPreDeleteSubscriber implements EventSubscriberInterface
     public function __construct(CustomObjectModel $customObjectModel, TranslatorInterface $translator)
     {
         $this->customObjectModel = $customObjectModel;
-        $this->translator = $translator;
+        $this->translator        = $translator;
     }
 
     public static function getSubscribedEvents()
@@ -45,7 +45,7 @@ class CustomObjectPreDeleteSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $message = $this->translator->trans('mautic.core.notice.deleted', ['%name%' => $customObject->getName(),], 'flashes');
+        $message = $this->translator->trans('mautic.core.notice.deleted', ['%name%' => $customObject->getName()], 'flashes');
         $flashBag->add($message);
     }
 }

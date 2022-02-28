@@ -14,7 +14,7 @@ class NoRelationshipException extends Exception
         ?Throwable $throwable = null
     ) {
         parent::__construct(
-            "This custom object does not have relationship fields defined.",
+            'This custom object does not have relationship fields defined.',
             $code,
             $throwable
         );

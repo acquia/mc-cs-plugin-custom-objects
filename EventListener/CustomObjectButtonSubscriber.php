@@ -187,7 +187,7 @@ class CustomObjectButtonSubscriber implements EventSubscriberInterface
 
         return [
             'attr' => [
-                'href' => $this->routeProvider->buildDeleteRoute($entity->getId()),
+                'href'                  => $this->routeProvider->buildDeleteRoute($entity->getId()),
                 'data-toggle'           => 'confirmation',
                 'data-message'          => $this->translator->trans('custom.object.delete.confirm'),
                 'data-confirm-text'     => $this->translator->trans('mautic.core.form.delete'),

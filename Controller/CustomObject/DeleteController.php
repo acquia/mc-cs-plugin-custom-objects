@@ -66,7 +66,7 @@ class DeleteController extends CommonController
         ];
 
         try {
-            $customObject = $this->customObjectModel->fetchEntity($objectId);
+            $customObject          = $this->customObjectModel->fetchEntity($objectId);
             $translationParameters = [
                 '%name%' => $customObject->getName(),
                 '%id%'   => $customObject->getId(),

@@ -23,7 +23,7 @@ class CustomObjectPostSaveSubscriberTest extends TestCase
         $customObject->setMasterObject($masterObject);
 
         $customObjectModel = new class($masterObject) extends CustomObjectModel {
-            /** @var CustomObject $masterObject */
+            /** @var CustomObject */
             private $masterObject;
 
             public function __construct(CustomObject $masterObject)
@@ -37,7 +37,7 @@ class CustomObjectPostSaveSubscriberTest extends TestCase
             }
         };
 
-        $event = new CustomObjectEvent($customObject);
+        $event      = new CustomObjectEvent($customObject);
         $subscriber = new CustomObjectPostSaveSubscriber($customObjectModel);
 
         $subscriber->postSave($event);
@@ -60,7 +60,7 @@ class CustomObjectPostSaveSubscriberTest extends TestCase
         $customObject = new CustomObject();
         $customObject->setType(CustomObject::TYPE_MASTER);
 
-        $event = new CustomObjectEvent($customObject);
+        $event      = new CustomObjectEvent($customObject);
         $subscriber = new CustomObjectPostSaveSubscriber($customObjectModel);
 
         $subscriber->postSave($event);

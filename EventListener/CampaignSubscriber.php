@@ -122,7 +122,7 @@ class CampaignSubscriber implements EventSubscriberInterface
         $customObjects = $this->customObjectModel->fetchAllPublishedEntities();
 
         foreach ($customObjects as $customObject) {
-            if ($customObject->getCustomFields()->count() === 0) {
+            if (0 === $customObject->getCustomFields()->count()) {
                 // Filter COs without defined custom fields
                 continue;
             }
