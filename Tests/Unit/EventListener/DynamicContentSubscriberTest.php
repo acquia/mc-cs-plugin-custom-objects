@@ -30,12 +30,6 @@ class DynamicContentSubscriberTest extends TestCase
     /** @var QueryFilterFactory|MockObject */
     private $queryFilterFactory;
 
-    /** @var ContactFiltersEvaluateEvent|MockObject */
-    private $evaluateEvent;
-
-    /** @var Lead|MockObject */
-    private $leadMock;
-
     /** @var Logger|MockObject */
     private $loggerMock;
 
@@ -55,8 +49,6 @@ class DynamicContentSubscriberTest extends TestCase
         $this->configProviderMock    = $this->createMock(ConfigProvider::class);
         $this->queryFilterFactory    = $this->createMock(QueryFilterFactory::class);
         $this->queryFilterHelperMock = $this->createMock(QueryFilterHelper::class);
-        $this->evaluateEvent         = $this->createMock(ContactFiltersEvaluateEvent::class);
-        $this->leadMock              = $this->createMock(Lead::class);
         $this->loggerMock            = $this->createMock(Logger::class);
         $this->queryBuilderMock      = $this->createMock(QueryBuilder::class);
         $this->statementMock         = $this->createMock(Statement::class);
@@ -75,40 +67,26 @@ class DynamicContentSubscriberTest extends TestCase
             ->method('pluginIsEnabled')
             ->willReturn(false);
 
-        $this->evaluateEvent->expects($this->never())->method('getFilters');
+        $this->queryFilterFactory->expects($this->never())->method('configureQueryBuilderFromSegmentFilter');
 
-        $this->dynamicContentSubscriber->evaluateFilters($this->evaluateEvent);
+        $this->dynamicContentSubscriber->evaluateFilters($this->buildEventWithFilters());
     }
 
     public function testFiltersNotEvaluatedIfEventMarkedEvaluated(): void
     {
         $this->configProviderMock->expects($this->once())->method('pluginIsEnabled')->willReturn(true);
 
-        $this->evaluateEvent->expects($this->once())->method('getFilters')->willReturn([]);
-        $this->evaluateEvent->expects($this->once())->method('isEvaluated')->willReturn(true);
+        $event = $this->buildEventWithFilters();
+        $event->setIsEvaluated(true);
+
         $this->queryFilterFactory->expects($this->never())->method('configureQueryBuilderFromSegmentFilter');
 
-        $this->dynamicContentSubscriber->evaluateFilters($this->evaluateEvent);
+        $this->dynamicContentSubscriber->evaluateFilters($event);
     }
 
     public function testFiltersInsertedIntoEvent(): void
     {
         defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', '');
-
-        $filterObject   = [
-            'custom_field_1' => [
-                'type'          => CustomFieldFilterQueryBuilder::getServiceId(),
-                'table'         => 'custom_field_text',
-                'field'         => 'cfwq_1',
-                'foreign_table' => 'custom_objects',
-            ],
-            'custom_item_1'  => [
-                'type'          => CustomItemNameFilterQueryBuilder::getServiceId(),
-                'table'         => 'custom_field_text',
-                'field'         => 'cowq_2',
-                'foreign_table' => 'custom_objects',
-            ],
-        ];
 
         $this->configProviderMock->expects($this->once())->method('pluginIsEnabled')->willReturn(true);
 
@@ -139,9 +117,8 @@ class DynamicContentSubscriberTest extends TestCase
                 $this->throwException(new InvalidSegmentFilterException('Testing invalid segment handling here.'))
             ));
 
-        $this->evaluateEvent->expects($this->once())->method('getFilters')->willReturn($filterObject);
-        $this->evaluateEvent->expects($this->once())->method('isEvaluated')->willReturn(false);
-        $this->evaluateEvent->expects($this->once())->method('getContact')->willReturn($this->leadMock);
+        $event = $this->buildEventWithFilters();
+        $event->setIsEvaluated(false);
 
         $this->queryBuilderMock->expects($this->once())->method('execute')->willReturn($this->statementMock);
 
@@ -149,6 +126,27 @@ class DynamicContentSubscriberTest extends TestCase
             ->expects($this->never())
             ->method('addError');
 
-        $this->dynamicContentSubscriber->evaluateFilters($this->evaluateEvent);
+        $this->dynamicContentSubscriber->evaluateFilters($event);
+    }
+
+    private function buildEventWithFilters(): ContactFiltersEvaluateEvent
+    {
+        return new ContactFiltersEvaluateEvent(
+            [
+                'custom_field_1' => [
+                    'type'          => CustomFieldFilterQueryBuilder::getServiceId(),
+                    'table'         => 'custom_field_text',
+                    'field'         => 'cfwq_1',
+                    'foreign_table' => 'custom_objects',
+                ],
+                'custom_item_1'  => [
+                    'type'          => CustomItemNameFilterQueryBuilder::getServiceId(),
+                    'table'         => 'custom_field_text',
+                    'field'         => 'cowq_2',
+                    'foreign_table' => 'custom_objects',
+                ],
+            ],
+            new Lead()
+        );
     }
 }
