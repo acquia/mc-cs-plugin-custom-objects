@@ -7,15 +7,15 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomItem;
 use Mautic\CoreBundle\Service\FlashBag;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\UnlinkController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
-use UnexpectedValueException;
-use PHPUnit\Framework\MockObject\MockObject;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
+use UnexpectedValueException;
 
 class UnlinkControllerTest extends ControllerTestCase
 {

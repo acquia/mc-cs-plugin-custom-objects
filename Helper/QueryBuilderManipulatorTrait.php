@@ -14,7 +14,6 @@ trait QueryBuilderManipulatorTrait
 {
     /**
      * @param QueryBuilder|UnionQueryContainer $fromQueryBuilder
-     * @param QueryBuilder $toQueryBuilder
      */
     private function copyParams($fromQueryBuilder, QueryBuilder $toQueryBuilder): void
     {

@@ -8,6 +8,7 @@ use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Type;
@@ -31,7 +32,6 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 /**
  * @ApiResource(
@@ -143,6 +143,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
      * @ManyToOne(targetEntity="CustomObject", inversedBy="customFields")
      * @JoinColumn(name="custom_object_id", referencedColumnName="id")
      * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
+     *
      * @var CustomObject|null
      */
     private $customObject;
@@ -158,6 +159,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
      *         }
      *     }
      * )
+     *
      * @var int|null
      */
     private $order;
@@ -669,6 +671,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
 
     /**
      * @Groups({"custom_field:write", "custom_object:write"})
+     *
      * @param bool $isPublished
      *
      * @return $this

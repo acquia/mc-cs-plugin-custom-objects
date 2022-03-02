@@ -51,10 +51,10 @@ class QueryFilterFactory
         Calculator $calculator,
         int $itemRelationLevelLimit
     ) {
-        $this->entityManager = $entityManager;
-        $this->fieldTypeProvider = $fieldTypeProvider;
-        $this->customFieldRepository = $customFieldRepository;
-        $this->calculator = $calculator;
+        $this->entityManager          = $entityManager;
+        $this->fieldTypeProvider      = $fieldTypeProvider;
+        $this->customFieldRepository  = $customFieldRepository;
+        $this->calculator             = $calculator;
         $this->itemRelationLevelLimit = $itemRelationLevelLimit;
     }
 
@@ -75,7 +75,7 @@ class QueryFilterFactory
         $currentLevel = 2;
         while ($currentLevel <= $this->itemRelationLevelLimit) {
             $this->createMultilevelQueries($alias, $segmentFilterFieldId, $dataTable, $currentLevel);
-            $currentLevel ++;
+            ++$currentLevel;
         }
 
         return $this->unionQueryContainer;
@@ -107,10 +107,10 @@ class QueryFilterFactory
         // starting from 0 to level -1;
         $this->calculator->init($level);
         $totalQueryCount = $this->calculator->getTotalQueryCount();
-        $joinCount = $this->calculator->getJoinCountPerQuery();
-        $totalIterator = 0;
+        $joinCount       = $this->calculator->getJoinCountPerQuery();
+        $totalIterator   = 0;
 
-        for ($queryIterator = 1; $queryIterator <= $totalQueryCount; $queryIterator++) {
+        for ($queryIterator = 1; $queryIterator <= $totalQueryCount; ++$queryIterator) {
             // Create query to be added in UNION
             $qb = new SegmentQueryBuilder($this->entityManager->getConnection());
             $qb
@@ -118,10 +118,10 @@ class QueryFilterFactory
                 ->from($dataTable, "{$alias}_value");
 
             $columnSuffix = '';
-            $lastAlias = false;
-            $lastSuffix = false;
+            $lastAlias    = false;
+            $lastSuffix   = false;
 
-            for ($joinIterator = 1; $joinIterator <= $joinCount; $joinIterator++) {
+            for ($joinIterator = 1; $joinIterator <= $joinCount; ++$joinIterator) {
                 $columnSuffix = $this->calculator->getSuffixByIterator($totalIterator);
 
                 $joinTo = "{$alias}_value.custom_item_id";
@@ -139,16 +139,16 @@ class QueryFilterFactory
                     "{$currentAlias}.custom_item_id_{$columnSuffix} = {$joinTo}"
                 );
 
-                $lastAlias = $currentAlias;
+                $lastAlias  = $currentAlias;
                 $lastSuffix = $columnSuffix;
 
-                $totalIterator++;
+                ++$totalIterator;
             }
 
             // custom_item_xref_contact join has always opposite suffix than last join
             $finalColumnSuffix = $this->calculator->getOppositeSuffix($columnSuffix);
 
-            $joinIterator--; // Decrease value to one last used in iteration
+            --$joinIterator; // Decrease value to one last used in iteration
 
             $qb->innerJoin(
                 "{$alias}_value",

@@ -24,7 +24,7 @@ class CalculatorTest extends TestCase
 
     public function test2LevelMatrix(): void
     {
-        $level = 2;
+        $level          = 2;
         $expectedMatrix = [
             '0',
             '1',
@@ -41,7 +41,7 @@ class CalculatorTest extends TestCase
 
     public function test3LevelMatrix(): void
     {
-        $level = 3;
+        $level          = 3;
         $expectedMatrix = [
             '00',
             '01',
@@ -57,7 +57,7 @@ class CalculatorTest extends TestCase
 
     public function test4LevelMatrix(): void
     {
-        $level = 4;
+        $level          = 4;
         $expectedMatrix = [
             '000',
             '001',
@@ -77,7 +77,7 @@ class CalculatorTest extends TestCase
 
     public function test5LevelMatrix(): void
     {
-        $level = 5;
+        $level          = 5;
         $expectedMatrix = [
             '0000',
             '0001',
@@ -107,8 +107,8 @@ class CalculatorTest extends TestCase
     {
         $expectedMatrix = implode('', $expectedMatrix);
 
-        for ($i = 0; $i < strlen($expectedMatrix); $i++) {
-            $decisionValue = (bool) $expectedMatrix[$i];
+        for ($i = 0; $i < strlen($expectedMatrix); ++$i) {
+            $decisionValue  = (bool) $expectedMatrix[$i];
             $expectedSuffix = $decisionValue ? self::COLUMN_SUFFIX_HIGHER : self::COLUMN_SUFFIX_LOWER;
             $this->assertEquals($expectedSuffix, $calculator->getSuffixByIterator($i));
         }

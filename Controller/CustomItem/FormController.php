@@ -128,6 +128,7 @@ class FormController extends AbstractFormController
         }
 
         $this->customItemModel->lockEntity($customItem);
+
         return $this->renderFormForItem($customItem, $this->routeProvider->buildEditRoute($objectId, $itemId));
     }
 
@@ -161,7 +162,7 @@ class FormController extends AbstractFormController
         }
 
         $this->customItemModel->lockEntity($customItem);
-        
+
         return $this->renderFormForItem($customItem, $this->routeProvider->buildEditRouteWithRedirectToContact($objectId, $itemId, $contactId), $contactId);
     }
 

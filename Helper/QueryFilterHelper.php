@@ -42,7 +42,7 @@ class QueryFilterHelper
         EntityManager $entityManager,
         QueryFilterFactory $queryFilterFactory
     ) {
-        $this->entityManager = $entityManager;
+        $this->entityManager      = $entityManager;
         $this->queryFilterFactory = $queryFilterFactory;
     }
 
@@ -283,9 +283,7 @@ class QueryFilterHelper
     }
 
     /**
-     * Get all tables currently registered in the queryBuilder and check is alias is present
-     *
-     * @return bool
+     * Get all tables currently registered in the queryBuilder and check is alias is present.
      */
     private function hasQueryJoinAlias(SegmentQueryBuilder $queryBuilder, $alias): bool
     {

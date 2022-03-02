@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Helper\QueryFilterFactory;
 
 /**
- * Parameter and join combination query counter
+ * Parameter and join combination query counter.
  */
 class Calculator
 {
@@ -18,14 +18,14 @@ class Calculator
     private $level;
 
     /**
-     * Matrix ciphers - joins per query
+     * Matrix ciphers - joins per query.
      *
      * @var int
      */
     private $cipherCount;
 
     /**
-     * Number of union queries to be generated
+     * Number of union queries to be generated.
      *
      * @var int
      */
@@ -37,23 +37,21 @@ class Calculator
     private $matrix;
 
     /**
-     * Reset counter with new level
-     *
-     * @param int $level
+     * Reset counter with new level.
      */
     public function init(int $level): void
     {
-        $this->level = $level;
+        $this->level       = $level;
         $this->cipherCount = $this->level - 1;
 
-        $highestCombinationNumberBin = str_repeat('1', $this->cipherCount);
+        $highestCombinationNumberBin   = str_repeat('1', $this->cipherCount);
         $this->totalQueryCountPerLevel = bindec($highestCombinationNumberBin) + 1;
 
         $this->calculateMatrix();
     }
 
     /**
-     * Number of union queries to be generated
+     * Number of union queries to be generated.
      */
     public function getTotalQueryCount(): int
     {
@@ -69,6 +67,7 @@ class Calculator
     {
         if (isset($this->matrix[$i])) {
             $decisionValue = (bool) $this->matrix[$i];
+
             return $decisionValue ? self::COLUMN_SUFFIX_HIGHER : self::COLUMN_SUFFIX_LOWER;
         }
 
@@ -77,25 +76,25 @@ class Calculator
 
     public function getOppositeSuffix(string $suffix): string
     {
-        return ($suffix === self::COLUMN_SUFFIX_LOWER) ? self::COLUMN_SUFFIX_HIGHER : self::COLUMN_SUFFIX_LOWER;
+        return (self::COLUMN_SUFFIX_LOWER === $suffix) ? self::COLUMN_SUFFIX_HIGHER : self::COLUMN_SUFFIX_LOWER;
     }
 
     private function calculateMatrix(): void
     {
         $this->matrix = '';
 
-        for ($i = 0; $i < $this->totalQueryCountPerLevel; $i++) {
+        for ($i = 0; $i < $this->totalQueryCountPerLevel; ++$i) {
             $this->matrix .= $this->dec2bin($i);
         }
     }
 
     private function dec2bin(int $value): string
     {
-        $value = decbin($value);
+        $value              = decbin($value);
         $missingCipherCount = $this->cipherCount - strlen($value);
 
         if ($missingCipherCount) {
-            $value = str_repeat('0', $missingCipherCount) . $value;
+            $value = str_repeat('0', $missingCipherCount).$value;
         }
 
         return $value;

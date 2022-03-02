@@ -1,4 +1,5 @@
 <?php
+
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\DTO;
 
 use MauticPlugin\CustomObjectsBundle\DTO\Token;

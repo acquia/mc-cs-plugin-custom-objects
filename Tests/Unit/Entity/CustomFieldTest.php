@@ -242,7 +242,7 @@ class CustomFieldTest extends \PHPUnit\Framework\TestCase
                 'data-placeholder' => 'Select one',
             ],
             'choices'    => [
-                'Red label' => 'red value',
+                'Red label'  => 'red value',
                 'Blue label' => 'blue value',
             ],
         ];

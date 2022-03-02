@@ -33,13 +33,13 @@ class CustomObjectButtonSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->itemPermissionProvider   = $this->createMock(CustomItemPermissionProvider::class);
-        $this->objectPermissionProvider = $this->createMock(CustomObjectPermissionProvider::class);
-        $this->objectRouteProvider      = $this->createMock(CustomObjectRouteProvider::class);
-        $this->itemRouteProvider        = $this->createMock(CustomItemRouteProvider::class);
-        $this->translator               = $this->createMock(TranslatorInterface::class);
-        $this->customObject             = $this->createMock(CustomObject::class);
-        $this->event                    = $this->createMock(CustomButtonEvent::class);
+        $this->itemPermissionProvider    = $this->createMock(CustomItemPermissionProvider::class);
+        $this->objectPermissionProvider  = $this->createMock(CustomObjectPermissionProvider::class);
+        $this->objectRouteProvider       = $this->createMock(CustomObjectRouteProvider::class);
+        $this->itemRouteProvider         = $this->createMock(CustomItemRouteProvider::class);
+        $this->translator                = $this->createMock(TranslatorInterface::class);
+        $this->customObject              = $this->createMock(CustomObject::class);
+        $this->event                     = $this->createMock(CustomButtonEvent::class);
         $this->subscriber                = new CustomObjectButtonSubscriber(
             $this->objectPermissionProvider,
             $this->objectRouteProvider,
@@ -110,13 +110,13 @@ class CustomObjectButtonSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('addButton')
             ->withConsecutive([[
                 'attr' => [
-                    'href' => 'generated/delete/route',
-                    'data-toggle' => 'confirmation',
-                    'data-message' => 'translated string',
-                    'data-confirm-text' => 'translated string',
+                    'href'                  => 'generated/delete/route',
+                    'data-toggle'           => 'confirmation',
+                    'data-message'          => 'translated string',
+                    'data-confirm-text'     => 'translated string',
                     'data-confirm-callback' => 'executeAction',
-                    'data-cancel-text' => 'translated string',
-                    'data-cancel-callback' => 'dismissConfirmation',
+                    'data-cancel-text'      => 'translated string',
+                    'data-cancel-callback'  => 'dismissConfirmation',
                 ],
                 'btnText'   => 'mautic.core.form.delete',
                 'iconClass' => 'fa fa-fw fa-trash-o text-danger',
@@ -251,13 +251,13 @@ class CustomObjectButtonSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('addButton')
             ->withConsecutive([[
                 'attr' => [
-                    'href' => 'generated/delete/route',
-                    'data-toggle' => 'confirmation',
-                    'data-message' => null,
-                    'data-confirm-text' => null,
+                    'href'                  => 'generated/delete/route',
+                    'data-toggle'           => 'confirmation',
+                    'data-message'          => null,
+                    'data-confirm-text'     => null,
                     'data-confirm-callback' => 'executeAction',
-                    'data-cancel-text' => null,
-                    'data-cancel-callback' => 'dismissConfirmation'                    ,
+                    'data-cancel-text'      => null,
+                    'data-cancel-callback'  => 'dismissConfirmation',
                 ],
                 'btnText'   => 'mautic.core.form.delete',
                 'iconClass' => 'fa fa-fw fa-trash-o text-danger',

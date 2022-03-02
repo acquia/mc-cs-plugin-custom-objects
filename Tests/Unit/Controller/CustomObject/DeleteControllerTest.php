@@ -160,7 +160,7 @@ class DeleteControllerTest extends ControllerTestCase
             ->method('getPage')
             ->willReturn(3);
 
-        $segments = $this->createSegments(2);
+        $segments       = $this->createSegments(2);
         $inUseException = new InUseException();
         $inUseException->setSegmentList($segments->toArray());
 

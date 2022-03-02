@@ -46,7 +46,7 @@ class CampaignConditionFieldValueType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $fields = $this->customFieldModel->fetchCustomFieldsForObject($options['customObject']);
+        $fields  = $this->customFieldModel->fetchCustomFieldsForObject($options['customObject']);
         $choices = [];
         foreach ($fields as $field) {
             $choices[$field->getLabel()] = $field->getId();
@@ -71,7 +71,7 @@ class CampaignConditionFieldValueType extends AbstractType
                     ];
                     },
                     $fields
-                )
+                ),
             ]
         );
 

@@ -8,9 +8,9 @@ use App\Entity\User;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Exception\PermissionNotFoundException;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Security\Permissions\CustomObjectPermissions;
-use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 
 class CustomItemListeningExtension implements QueryCollectionExtensionInterface
 {
@@ -27,11 +27,11 @@ class CustomItemListeningExtension implements QueryCollectionExtensionInterface
     public function __construct(UserHelper $userHelper, CorePermissions $security)
     {
         $this->userHelper = $userHelper;
-        $this->security = $security;
+        $this->security   = $security;
     }
 
     /**
-     * Limit just items that the user can view
+     * Limit just items that the user can view.
      */
     public function applyToCollection(
         QueryBuilder $queryBuilder,
@@ -50,7 +50,7 @@ class CustomItemListeningExtension implements QueryCollectionExtensionInterface
         }
 
         $customObjectActivePermissions = [];
-        $activePermissions = ($userEntity instanceof \Mautic\UserBundle\Entity\User) ? $userEntity->getActivePermissions() : [];
+        $activePermissions             = ($userEntity instanceof \Mautic\UserBundle\Entity\User) ? $userEntity->getActivePermissions() : [];
         if (array_key_exists('custom_objects', $activePermissions)) {
             $customObjectActivePermissions = $activePermissions['custom_objects'];
         }

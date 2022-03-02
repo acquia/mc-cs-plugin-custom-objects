@@ -6,9 +6,9 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefCustomItemRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
 
 final class CustomItemPostDeleteSubscriber implements EventSubscriberInterface
 {
