@@ -11,7 +11,7 @@ pipeline {
   agent {
     kubernetes {
       inheritFrom 'with-mysql'
-      yaml libraryResource('mautic-tester.yaml')
+      yaml libraryResource('mautic-tester-74.yaml')
     }
   }
   stages {
