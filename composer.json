@@ -1,15 +1,20 @@
 {
-    "name": "mautic/custom-objects-bundle",
+    "name": "acquia/mautic-custom-objects",
     "description": "This plugin adds custom objects feature.",
     "type": "mautic-plugin",
+    "version": "1.0",
     "config": {
         "process-timeout": 2000
     },
     "keywords": [
         "custom",
+        "objects",
         "mautic",
         "plugin"
     ],
+    "extra": {
+        "install-directory-name": "CustomObjectsBundle"
+    },
     "license": "GPL-3.0-or-later",
     "authors": [
         {
@@ -24,8 +29,12 @@
         "wiki": "https://github.com/acquia/mc-cs-plugin-custom-objects/wiki"
     },
     "require": {
-        "php": ">=7.3 <7.5",
-        "ext-mbstring": "*"
+        "php": ">=7.3",
+        "ext-mbstring": "*",
+        "mautic/core-lib": "^4.0"
+    },
+    "require-dev": {
+        "theofidry/alice-data-fixtures": "^1.1",
     },
     "minimum-stability": "dev",
     "scripts": {
