@@ -1,5 +1,5 @@
 {
-    "name": "acquia/mautic-custom-objects",
+    "name": "acquia/mc-cs-plugin-custom-objects",
     "description": "This plugin adds custom objects feature.",
     "type": "mautic-plugin",
     "version": "1.0",
@@ -34,7 +34,7 @@
         "mautic/core-lib": "^4.0"
     },
     "require-dev": {
-        "theofidry/alice-data-fixtures": "^1.1",
+        "theofidry/alice-data-fixtures": "^1.1"
     },
     "minimum-stability": "dev",
     "scripts": {
