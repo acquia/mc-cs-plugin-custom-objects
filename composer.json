@@ -36,7 +36,6 @@
     "require-dev": {
         "theofidry/alice-data-fixtures": "^1.1"
     },
-    "minimum-stability": "dev",
     "scripts": {
         "test": [
             "@phpunit",
