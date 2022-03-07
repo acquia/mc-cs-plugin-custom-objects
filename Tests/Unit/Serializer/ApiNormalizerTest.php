@@ -51,12 +51,17 @@ class ApiNormalizerTest extends TestCase
 
     public function setUp(): void
     {
-        $this->normalizerInterface     = $this->createMock(Normalizer::class);
-        $this->customFieldTypeProvider = $this->createMock(CustomFieldTypeProvider::class);
-        $this->iriConverter            = $this->createMock(IriConverterInterface::class);
-        $this->customItemModel         = $this->createMock(CustomItemModel::class);
-        $this->em                      = $this->createMock(EntityManager::class);
-        $this->apiNormalizer           = new ApiNormalizer($this->normalizerInterface, $this->customFieldTypeProvider, $this->customItemModel, $this->iriConverter, $this->em);
+        if (interface_exists('ApiPlatform\\Core\\Api\\IriConverterInterface')) {
+            $this->normalizerInterface     = $this->createMock(Normalizer::class);
+            $this->customFieldTypeProvider = $this->createMock(CustomFieldTypeProvider::class);
+            $this->iriConverter            = $this->createMock(IriConverterInterface::class);
+            $this->customItemModel         = $this->createMock(CustomItemModel::class);
+            $this->em                      = $this->createMock(EntityManager::class);
+            $this->apiNormalizer           = new ApiNormalizer($this->normalizerInterface, $this->customFieldTypeProvider, $this->customItemModel, $this->iriConverter, $this->em);
+        } else {
+            $this->markTestSkipped('ApiPlatform is not available');
+        }
+
         parent::setUp();
     }
 
@@ -127,6 +132,8 @@ class ApiNormalizerTest extends TestCase
     }
 }
 
-abstract class Normalizer implements NormalizerInterface, DenormalizerInterface
-{
+if (interface_exists('ApiPlatform\\Core\\Api\\IriConverterInterface')) {
+    abstract class Normalizer implements NormalizerInterface, DenormalizerInterface
+    {
+    }
 }
