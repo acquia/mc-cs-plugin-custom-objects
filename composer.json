@@ -11,6 +11,14 @@
         "plugin"
     ],
     "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Acquia",
+            "email": "engineering@acquia.com",
+            "homepage": "https://www.acquia.com",
+            "role": "Developer"
+        }
+    ],
     "support": {
         "issues": "https://github.com/acquia/mc-cs-plugin-custom-objects/issues",
         "wiki": "https://github.com/acquia/mc-cs-plugin-custom-objects/wiki"
