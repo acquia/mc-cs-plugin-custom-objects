@@ -1,5 +1,5 @@
 # Contributing to the Acquia Custom Objects plugin
-Feature requests and bugs are tracked via the [Acquia Custom Objects GitHub issue queue](https://github.com/acquia/rd-open-source-template/issues).
+Feature requests and bugs are tracked via the [Acquia Custom Objects GitHub issue queue](https://github.com/acquia/mc-cs-plugin-custom-objects/issues).
 
 Before submitting an issue or pull request, please read and take the time to understand this guide. Issues not adhering to these guidelines may be closed.
 
