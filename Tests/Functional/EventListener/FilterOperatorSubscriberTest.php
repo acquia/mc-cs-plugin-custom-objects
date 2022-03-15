@@ -19,6 +19,7 @@ class FilterOperatorSubscriberTest extends MauticMysqlTestCase
         // Create a segment
         $segment = new LeadList();
         $segment->setName('Test Segment A');
+        $segment->setPublicName('Test Segment A');
         $segment->setAlias('test-segment-a');
 
         $this->em->persist($segment);
@@ -73,7 +74,10 @@ class FilterOperatorSubscriberTest extends MauticMysqlTestCase
                 'display'    => null,
             ]];
         $segment = new LeadList();
-        $segment->setName('Test Segment A')->setAlias('test-segment-a')->setFilters($filters);
+        $segment->setName('Test Segment A');
+        $segment->setPublicName('Test Segment A');
+        $segment->setAlias('test-segment-a');
+        $segment->setFilters($filters);
         $this->em->persist($segment);
         $this->em->flush();
 
