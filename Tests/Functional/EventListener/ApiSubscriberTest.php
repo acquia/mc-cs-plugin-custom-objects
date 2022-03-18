@@ -54,10 +54,10 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $this->assertSame('Custom Object with alias = unicorn was not found', $responseData['errors'][0]['message']);
 
         /** @var CustomItemRepository $customItemRepository */
-        $customItemRepository = $this->container->get('custom_item.repository');
+        $customItemRepository = self::$container->get('custom_item.repository');
 
         /** @var LeadModel $contactModel */
-        $contactModel = $this->container->get('mautic.lead.model.lead');
+        $contactModel = self::$container->get('mautic.lead.model.lead');
 
         $this->assertNull($customItemRepository->findOneBy(['name' => 'Custom Item Created Via Contact API 2']));
         $this->assertNull($contactModel->getRepository()->findOneBy(['email' => 'contact1@api.test']));
@@ -68,7 +68,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
      */
     public function testCreatingContactWithCustomItemsWithoutTheFlagToReturnCustomObjects(): void
     {
-        $customObject = $this->createCustomObjectWithAllFields($this->container, 'Product');
+        $customObject = $this->createCustomObjectWithAllFields(self::$container, 'Product');
 
         $contact = [
             'email'         => 'contact1@api.test',
@@ -109,7 +109,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
 
     public function testCreatingContactWithCustomItemsButFieldDoesNotExist(): void
     {
-        $customObject = $this->createCustomObjectWithAllFields($this->container, 'Product');
+        $customObject = $this->createCustomObjectWithAllFields(self::$container, 'Product');
         $contact      = [
             'email'         => 'contact1@api.test',
             'customObjects' => [
@@ -140,7 +140,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
 
     public function testCreatingContactWithCustomItemsWithMultiselectAsString(): void
     {
-        $customObject = $this->createCustomObjectWithAllFields($this->container, 'Product');
+        $customObject = $this->createCustomObjectWithAllFields(self::$container, 'Product');
         $contact      = [
             'email'         => 'contact1@api.test',
             'customObjects' => [
@@ -174,7 +174,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
 
     public function testCreatingContactWithCustomItemsAndEditAndClearValues(): void
     {
-        $customObject = $this->createCustomObjectWithAllFields($this->container, 'Product');
+        $customObject = $this->createCustomObjectWithAllFields(self::$container, 'Product');
         $contact      = [
             'email'         => 'contact1@api.test',
             'customObjects' => [
@@ -368,7 +368,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
             }
         };
 
-        $customObject = $this->createCustomObjectWithAllFields($this->container, 'Product', $configureFieldCallback);
+        $customObject = $this->createCustomObjectWithAllFields(self::$container, 'Product', $configureFieldCallback);
         $contact      = [
             'email'         => 'contact1@api.test',
             'customObjects' => [
@@ -422,7 +422,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
             }
         };
 
-        $customObject = $this->createCustomObjectWithAllFields($this->container, 'Product', $configureFieldCallback);
+        $customObject = $this->createCustomObjectWithAllFields(self::$container, 'Product', $configureFieldCallback);
         $contact      = [
             'email'         => 'contact1@api.test',
             'customObjects' => [
@@ -472,7 +472,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
             }
         };
 
-        $customObject = $this->createCustomObjectWithAllFields($this->container, 'Product', $configureFieldCallback);
+        $customObject = $this->createCustomObjectWithAllFields(self::$container, 'Product', $configureFieldCallback);
         $contact      = [
             'email'         => 'contact1@api.test',
             'customObjects' => [
@@ -507,7 +507,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
 
     public function testEditingContactWithCustomItems(): void
     {
-        $customObject = $this->createCustomObjectWithAllFields($this->container, 'Product');
+        $customObject = $this->createCustomObjectWithAllFields(self::$container, 'Product');
 
         $contact = [
             'email'         => 'contact1@api.test',
@@ -619,7 +619,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
 
     public function testBatchCreatingContactWithCustomItems(): void
     {
-        $customObject = $this->createCustomObjectWithAllFields($this->container, 'Product');
+        $customObject = $this->createCustomObjectWithAllFields(self::$container, 'Product');
         $contacts     = [
             [
                 'email'         => 'contact3@api.test',

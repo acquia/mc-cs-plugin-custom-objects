@@ -14,7 +14,7 @@ abstract class AbstractApiPlatformFunctionalTest extends MauticMysqlTestCase
     /**
      * @var array
      */
-    protected $clientServer = [
+    protected array $clientServer = [
         'PHP_AUTH_USER' => 'sales',
         'PHP_AUTH_PW'   => 'mautic',
     ];
@@ -46,7 +46,7 @@ abstract class AbstractApiPlatformFunctionalTest extends MauticMysqlTestCase
             ->getQuery()
             ->execute();
 
-        $roleModel = $this->container->get('mautic.user.model.role');
+        $roleModel = self::$container->get('mautic.user.model.role');
         $roleModel->setRolePermissions($role, $permissions);
         $this->em->persist($role);
         $this->em->flush();
@@ -54,7 +54,7 @@ abstract class AbstractApiPlatformFunctionalTest extends MauticMysqlTestCase
         // reset in-memory permission cache
         $property = (new ReflectionClass(CorePermissions::class))->getProperty('grantedPermissions');
         $property->setAccessible(true);
-        $property->setValue($this->container->get('mautic.security'), []);
+        $property->setValue(self::$container->get('mautic.security'), []);
     }
 
     protected function createEntity(string $shortName, array $payload): Response

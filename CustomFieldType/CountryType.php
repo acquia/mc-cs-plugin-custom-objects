@@ -49,7 +49,6 @@ class CountryType extends SelectType implements StaticChoiceTypeInterface
     {
         $resolver->setDefaults([
             'choices'                   => ['choices' => $this->getChoices()],
-            'choices_as_values'         => true,
             'choice_translation_domain' => false,
         ]);
     }
