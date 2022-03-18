@@ -26,11 +26,15 @@ class QueryFilterFactoryTest extends TestCase
      */
     private $segmentFilter;
 
+    private string $prefix = '';
+
     public function setUp(): void
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', '');
+        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', '___');
+
+        $this->prefix = MAUTIC_TABLE_PREFIX;
 
         $this->segmentFilter = $this->createMock(ContactSegmentFilter::class);
         $this->segmentFilter
@@ -45,8 +49,8 @@ class QueryFilterFactoryTest extends TestCase
     {
         $expectedQuery = <<<SQL
 SELECT contact_id
-FROM custom_field_value_int alias_value
-         INNER JOIN custom_item_xref_contact alias_contact ON alias_value.custom_item_id = alias_contact.custom_item_id
+FROM {$this->prefix}custom_field_value_int alias_value
+         INNER JOIN {$this->prefix}custom_item_xref_contact alias_contact ON alias_value.custom_item_id = alias_contact.custom_item_id
 WHERE alias_value.custom_field_id = :alias_custom_field_id
 SQL;
 
@@ -62,23 +66,23 @@ SQL;
     {
         $expectedQuery = <<<SQL
 SELECT contact_id
-FROM custom_field_value_int alias_value
-         INNER JOIN custom_item_xref_contact alias_contact ON alias_value.custom_item_id = alias_contact.custom_item_id
+FROM {$this->prefix}custom_field_value_int alias_value
+         INNER JOIN {$this->prefix}custom_item_xref_contact alias_contact ON alias_value.custom_item_id = alias_contact.custom_item_id
 WHERE alias_value.custom_field_id = :alias_custom_field_id
 UNION ALL
 SELECT contact_id
-FROM custom_field_value_int alias_value
-         INNER JOIN custom_item_xref_custom_item alias_item_xref_1
+FROM {$this->prefix}custom_field_value_int alias_value
+         INNER JOIN {$this->prefix}custom_item_xref_custom_item alias_item_xref_1
                     ON alias_item_xref_1.custom_item_id_lower = alias_value.custom_item_id
-         INNER JOIN custom_item_xref_contact alias_contact
+         INNER JOIN {$this->prefix}custom_item_xref_contact alias_contact
                     ON alias_contact.custom_item_id = alias_item_xref_1.custom_item_id_higher
 WHERE alias_value.custom_field_id = :alias_custom_field_id
 UNION ALL
 SELECT contact_id
-FROM custom_field_value_int alias_value
-         INNER JOIN custom_item_xref_custom_item alias_item_xref_1
+FROM {$this->prefix}custom_field_value_int alias_value
+         INNER JOIN {$this->prefix}custom_item_xref_custom_item alias_item_xref_1
                     ON alias_item_xref_1.custom_item_id_higher = alias_value.custom_item_id
-         INNER JOIN custom_item_xref_contact alias_contact
+         INNER JOIN {$this->prefix}custom_item_xref_contact alias_contact
                     ON alias_contact.custom_item_id = alias_item_xref_1.custom_item_id_lower
 WHERE alias_value.custom_field_id = :alias_custom_field_id
 SQL;
@@ -95,63 +99,63 @@ SQL;
     {
         $expectedQuery = <<<SQL
 SELECT contact_id
-FROM custom_field_value_int alias_value
-         INNER JOIN custom_item_xref_contact alias_contact ON alias_value.custom_item_id = alias_contact.custom_item_id
+FROM {$this->prefix}custom_field_value_int alias_value
+         INNER JOIN {$this->prefix}custom_item_xref_contact alias_contact ON alias_value.custom_item_id = alias_contact.custom_item_id
 WHERE alias_value.custom_field_id = :alias_custom_field_id
 UNION ALL
 SELECT contact_id
-FROM custom_field_value_int alias_value
-         INNER JOIN custom_item_xref_custom_item alias_item_xref_1
+FROM {$this->prefix}custom_field_value_int alias_value
+         INNER JOIN {$this->prefix}custom_item_xref_custom_item alias_item_xref_1
                     ON alias_item_xref_1.custom_item_id_lower = alias_value.custom_item_id
-         INNER JOIN custom_item_xref_contact alias_contact
+         INNER JOIN {$this->prefix}custom_item_xref_contact alias_contact
                     ON alias_contact.custom_item_id = alias_item_xref_1.custom_item_id_higher
 WHERE alias_value.custom_field_id = :alias_custom_field_id
 UNION ALL
 SELECT contact_id
-FROM custom_field_value_int alias_value
-         INNER JOIN custom_item_xref_custom_item alias_item_xref_1
+FROM {$this->prefix}custom_field_value_int alias_value
+         INNER JOIN {$this->prefix}custom_item_xref_custom_item alias_item_xref_1
                     ON alias_item_xref_1.custom_item_id_higher = alias_value.custom_item_id
-         INNER JOIN custom_item_xref_contact alias_contact
+         INNER JOIN {$this->prefix}custom_item_xref_contact alias_contact
                     ON alias_contact.custom_item_id = alias_item_xref_1.custom_item_id_lower
 WHERE alias_value.custom_field_id = :alias_custom_field_id
 UNION ALL
 SELECT contact_id
-FROM custom_field_value_int alias_value
-         INNER JOIN custom_item_xref_custom_item alias_item_xref_1
+FROM {$this->prefix}custom_field_value_int alias_value
+         INNER JOIN {$this->prefix}custom_item_xref_custom_item alias_item_xref_1
                     ON alias_item_xref_1.custom_item_id_lower = alias_value.custom_item_id
-         INNER JOIN custom_item_xref_custom_item alias_item_xref_2
+         INNER JOIN {$this->prefix}custom_item_xref_custom_item alias_item_xref_2
                     ON alias_item_xref_2.custom_item_id_lower = alias_item_xref_1.custom_item_id_higher
-         INNER JOIN custom_item_xref_contact alias_contact
+         INNER JOIN {$this->prefix}custom_item_xref_contact alias_contact
                     ON alias_contact.custom_item_id = alias_item_xref_2.custom_item_id_higher
 WHERE alias_value.custom_field_id = :alias_custom_field_id
 UNION ALL
 SELECT contact_id
-FROM custom_field_value_int alias_value
-         INNER JOIN custom_item_xref_custom_item alias_item_xref_1
+FROM {$this->prefix}custom_field_value_int alias_value
+         INNER JOIN {$this->prefix}custom_item_xref_custom_item alias_item_xref_1
                     ON alias_item_xref_1.custom_item_id_lower = alias_value.custom_item_id
-         INNER JOIN custom_item_xref_custom_item alias_item_xref_2
+         INNER JOIN {$this->prefix}custom_item_xref_custom_item alias_item_xref_2
                     ON alias_item_xref_2.custom_item_id_higher = alias_item_xref_1.custom_item_id_higher
-         INNER JOIN custom_item_xref_contact alias_contact
+         INNER JOIN {$this->prefix}custom_item_xref_contact alias_contact
                     ON alias_contact.custom_item_id = alias_item_xref_2.custom_item_id_lower
 WHERE alias_value.custom_field_id = :alias_custom_field_id
 UNION ALL
 SELECT contact_id
-FROM custom_field_value_int alias_value
-         INNER JOIN custom_item_xref_custom_item alias_item_xref_1
+FROM {$this->prefix}custom_field_value_int alias_value
+         INNER JOIN {$this->prefix}custom_item_xref_custom_item alias_item_xref_1
                     ON alias_item_xref_1.custom_item_id_higher = alias_value.custom_item_id
-         INNER JOIN custom_item_xref_custom_item alias_item_xref_2
+         INNER JOIN {$this->prefix}custom_item_xref_custom_item alias_item_xref_2
                     ON alias_item_xref_2.custom_item_id_lower = alias_item_xref_1.custom_item_id_lower
-         INNER JOIN custom_item_xref_contact alias_contact
+         INNER JOIN {$this->prefix}custom_item_xref_contact alias_contact
                     ON alias_contact.custom_item_id = alias_item_xref_2.custom_item_id_higher
 WHERE alias_value.custom_field_id = :alias_custom_field_id
 UNION ALL
 SELECT contact_id
-FROM custom_field_value_int alias_value
-         INNER JOIN custom_item_xref_custom_item alias_item_xref_1
+FROM {$this->prefix}custom_field_value_int alias_value
+         INNER JOIN {$this->prefix}custom_item_xref_custom_item alias_item_xref_1
                     ON alias_item_xref_1.custom_item_id_higher = alias_value.custom_item_id
-         INNER JOIN custom_item_xref_custom_item alias_item_xref_2
+         INNER JOIN {$this->prefix}custom_item_xref_custom_item alias_item_xref_2
                     ON alias_item_xref_2.custom_item_id_higher = alias_item_xref_1.custom_item_id_lower
-         INNER JOIN custom_item_xref_contact alias_contact
+         INNER JOIN {$this->prefix}custom_item_xref_contact alias_contact
                     ON alias_contact.custom_item_id = alias_item_xref_2.custom_item_id_lower
 WHERE alias_value.custom_field_id = :alias_custom_field_id
 SQL;

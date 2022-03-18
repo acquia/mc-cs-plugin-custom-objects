@@ -77,7 +77,12 @@ class AbstractCustomFieldTypeTest extends \PHPUnit\Framework\TestCase
 
     public function testGetTableName(): void
     {
-        $this->assertSame(MAUTIC_TABLE_PREFIX.'undefined', $this->fieldType->getTableName());
+        $this->assertSame('undefined', $this->fieldType->getTableName());
+    }
+
+    public function testGetPrefixedTableName(): void
+    {
+        $this->assertSame(MAUTIC_TABLE_PREFIX.'undefined', $this->fieldType->getPrefixedTableName());
     }
 
     public function testGetOperatorOptions(): void
