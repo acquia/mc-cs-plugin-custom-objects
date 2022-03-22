@@ -19,6 +19,15 @@ abstract class AbstractApiPlatformFunctionalTest extends MauticMysqlTestCase
         'PHP_AUTH_PW'   => 'mautic',
     ];
 
+    protected function setUp(): void
+    {
+        if (!interface_exists('ApiPlatform\\Core\\Api\\IriConverterInterface')) {
+            $this->markTestSkipped('ApiPlatform is not installed');
+        }
+        
+        parent::setUp();
+    }
+
     protected function getUser(): ?User
     {
         $repository = $this->em->getRepository(User::class);

@@ -91,8 +91,9 @@ class SegmentFiltersChoicesGenerateSubscriberTest extends TestCase
         $criteria = new Criteria(Criteria::expr()->eq('isPublished', 1));
 
         $keyTypeMapping = [
-            'custom.field.type.int'  => 'int',
-            'custom.field.type.text' => 'text',
+            'custom.field.type.int'    => 'int',
+            'custom.field.type.text'   => 'text',
+            'custom.field.type.hidden' => 'hidden',
         ];
 
         $allOperators = [

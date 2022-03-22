@@ -65,7 +65,6 @@ class QueryFilterFactory
         $segmentFilterFieldId   = (int) $segmentFilter->getField();
         $segmentFilterFieldType = $segmentFilter->getType();
         $segmentFilterFieldType = $segmentFilterFieldType ?: $this->customFieldRepository->getCustomFieldTypeById($segmentFilterFieldId);
-        // This value is prefixed
         $dataTable              = $this->fieldTypeProvider->getType($segmentFilterFieldType)->getTableName();
 
         $this->unionQueryContainer = new UnionQueryContainer();
@@ -86,7 +85,7 @@ class QueryFilterFactory
         $qb = new SegmentQueryBuilder($this->entityManager->getConnection());
         $qb
             ->select('contact_id')
-            ->from($dataTable, "{$alias}_value")
+            ->from(MAUTIC_TABLE_PREFIX.$dataTable, "{$alias}_value")
             ->innerJoin(
                 "{$alias}_value",
                 MAUTIC_TABLE_PREFIX.'custom_item_xref_contact',
@@ -115,7 +114,7 @@ class QueryFilterFactory
             $qb = new SegmentQueryBuilder($this->entityManager->getConnection());
             $qb
                 ->select('contact_id')
-                ->from($dataTable, "{$alias}_value");
+                ->from(MAUTIC_TABLE_PREFIX.$dataTable, "{$alias}_value");
 
             $columnSuffix = '';
             $lastAlias    = false;
