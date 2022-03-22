@@ -2,7 +2,6 @@
     "name": "acquia/mc-cs-plugin-custom-objects",
     "description": "This plugin adds custom objects feature.",
     "type": "mautic-plugin",
-    "version": "1.0",
     "config": {
         "process-timeout": 2000
     },
