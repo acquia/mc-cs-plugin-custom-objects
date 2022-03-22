@@ -53,6 +53,8 @@ interface CustomFieldTypeInterface
 
     public function getTableName(): string;
 
+    public function getPrefixedTableName(): string;
+
     public function getTableAlias(): string;
 
     /**

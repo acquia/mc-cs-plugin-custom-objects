@@ -208,7 +208,7 @@ class CustomFieldValueModel
             $alias        = $type->getTableAlias();
             $queryBuilder = $this->entityManager->getConnection()->createQueryBuilder();
             $queryBuilder->select("{$alias}.custom_field_id, {$alias}.custom_item_id, {$alias}.value, '{$type->getKey()}' AS type");
-            $queryBuilder->from($type->getTableName(), $alias);
+            $queryBuilder->from($type->getPrefixedTableName(), $alias);
             $queryBuilder->where("{$alias}.custom_item_id = {$customItem->getId()}");
             $queryBuilder->andWhere("{$alias}.custom_field_id = {$customField->getId()}");
 
@@ -252,7 +252,7 @@ class CustomFieldValueModel
     {
         // create a map [tableName] = [fieldId, fieldId, ...] for creating queries
         $tableToCustomFieldIds = array_reduce($customFields, function (array $tables, CustomField $customField) {
-            $tableName = $customField->getTypeObject()->getTableName();
+            $tableName = $customField->getTypeObject()->getPrefixedTableName();
 
             if (!isset($tables[$tableName])) {
                 $tables[$tableName] = [];

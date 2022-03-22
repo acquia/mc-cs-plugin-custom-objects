@@ -4,22 +4,43 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Repository;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class CustomObjectRepositoryTest extends TestCase
 {
+    /**
+     * @var MockObject&EntityManagerInterface
+     */
     private $entityManager;
+
+    /**
+     * @var MockObject&ClassMetadata
+     */
     private $classMetadata;
+
+    /**
+     * @var MockObject&QueryBuilder
+     */
     private $queryBuilder;
+
+    /**
+     * @var MockObject&AbstractQuery
+     */
     private $query;
+
+    /**
+     * @var MockObject&Expr
+     */
     private $expression;
 
     /**
@@ -36,7 +57,7 @@ class CustomObjectRepositoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->classMetadata = $this->createMock(ClassMetadata::class);
         $this->queryBuilder  = $this->createMock(QueryBuilder::class);
         $this->query         = $this->createMock(AbstractQuery::class);
@@ -127,15 +148,15 @@ class CustomObjectRepositoryTest extends TestCase
 
     public function testGetFilterSegmentsMethod(): void
     {
-        $customObjectId = random_int(1, 100);
-        $this->customObject->expects($this->once())
-            ->method('getId')
-            ->willReturn($customObjectId);
+        $customObject = new class extends CustomObject
+        {
+            public function getId()
+            {
+                return random_int(1, 100);
+            }
+        };
 
-        $customFields = $this->createCustomFields(2);
-        $this->customObject->expects($this->once())
-            ->method('getCustomFields')
-            ->willReturn($customFields);
+        $customObject->setCustomFields($this->createCustomFields(2));
 
         $this->queryBuilder->expects($this->once())
             ->method('select')
@@ -161,7 +182,10 @@ class CustomObjectRepositoryTest extends TestCase
         $this->repository->getFilterSegments($this->customObject);
     }
 
-    private function createCustomFields(int $quantity): array
+    /**
+     * @return ArrayCollection<int,CustomField>
+     */
+    private function createCustomFields(int $quantity): ArrayCollection
     {
         $customFields = [];
         for ($id = 1; $id <= $quantity; ++$id) {
@@ -170,6 +194,6 @@ class CustomObjectRepositoryTest extends TestCase
             $customFields[] = $customField;
         }
 
-        return $customFields;
+        return new ArrayCollection($customFields);
     }
 }

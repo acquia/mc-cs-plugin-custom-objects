@@ -152,6 +152,9 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         /** @var \PHPUnit\Framework\MockObject\MockObject|QueryBuilder $queryBuilderMock */
         $queryBuilderMock = $this->createMock(QueryBuilder::class);
+
+        $queryBuilderMock->method('getTableAlias')->willReturn('t');
+
         /** @var \PHPUnit\Framework\MockObject\MockObject|ContactSegmentFilter $contactSegmentFilterMock */
         $contactSegmentFilterMock = $this->createMock(ContactSegmentFilter::class);
         $contactSegmentFilterMock->expects($this->once())
