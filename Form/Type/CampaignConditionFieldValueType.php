@@ -75,7 +75,7 @@ class CampaignConditionFieldValueType extends AbstractType
             ]
         );
 
-        if (isset($options['data']) && isset($options['data']['field']) && isset($fields[$options['data']['field']])) {
+        if (isset($options['data']['field']) && isset($fields[$options['data']['field']])) {
             $selectedField = $fields[$options['data']['field']];
         } else {
             $selectedField = array_values($fields)[0];
