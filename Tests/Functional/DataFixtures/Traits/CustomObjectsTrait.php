@@ -51,6 +51,9 @@ trait CustomObjectsTrait
         return $customObject;
     }
 
+    /**
+     * @param array<string,mixed> $fieldValues
+     */
     public function createCustomItem(ContainerInterface $container, CustomObject $customObject, string $name, array $fieldValues): CustomItem
     {
         $customItem = new CustomItem($customObject);

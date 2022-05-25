@@ -44,11 +44,6 @@ class CustomObjectRepositoryTest extends TestCase
     private $expression;
 
     /**
-     * @var CustomObject
-     */
-    private $customObject;
-
-    /**
      * @var CustomObjectRepository
      */
     private $repository;
@@ -70,7 +65,6 @@ class CustomObjectRepositoryTest extends TestCase
         $this->entityManager->method('createQueryBuilder')->willReturn($this->queryBuilder);
         $this->queryBuilder->method('getQuery')->willReturn($this->query);
         $this->queryBuilder->method('expr')->willReturn($this->expression);
-        $this->customObject = $this->createMock(CustomObject::class);
     }
 
     public function testCheckAliasExists(): void
@@ -179,7 +173,7 @@ class CustomObjectRepositoryTest extends TestCase
             ->method('getResult')
             ->willReturn([]);
 
-        $this->repository->getFilterSegments($this->customObject);
+        $this->repository->getFilterSegments($customObject);
     }
 
     /**
