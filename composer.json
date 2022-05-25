@@ -12,7 +12,8 @@
         "plugin"
     ],
     "extra": {
-        "install-directory-name": "CustomObjectsBundle"
+        "install-directory-name": "CustomObjectsBundle",
+        "display-name": "Custom Objects"
     },
     "license": "GPL-3.0-or-later",
     "authors": [
@@ -30,7 +31,7 @@
     "require": {
         "php": ">=7.4",
         "ext-mbstring": "*",
-        "mautic/core-lib": "^4.1"
+        "mautic/core-lib": "^4.3"
     },
     "require-dev": {
         "theofidry/alice-data-fixtures": "^1.1"
