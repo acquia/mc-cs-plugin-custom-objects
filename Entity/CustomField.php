@@ -12,6 +12,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
@@ -200,6 +201,11 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
      */
     private $showInContactDetailList = true;
 
+    /**
+     * @var bool
+     */
+    private $isUniqueIdentifier = false;
+
     public function __construct()
     {
         $this->options = new ArrayCollection();
@@ -284,6 +290,11 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
         $builder->createField('showInContactDetailList', Type::BOOLEAN)
             ->columnName('show_in_contact_detail_list')
             ->option('default', true)
+            ->build();
+
+        $builder->createField('isUniqueIdentifier', Types::BOOLEAN)
+            ->columnName('is_unique_identifier')
+            ->option('default', false)
             ->build();
 
         static::addUuidField($builder);
@@ -681,5 +692,18 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
         parent::setIsPublished($isPublished);
 
         return $this;
+    }
+
+    public function getUniqueIdentifier(): bool
+    {
+        return $this->isUniqueIdentifier;
+    }
+
+    /**
+     * @param bool $isUniqueIdentifier
+     */
+    public function setUniqueIdentifier(bool $isUniqueIdentifier) :void
+    {
+        $this->isUniqueIdentifier = $isUniqueIdentifier;
     }
 }
