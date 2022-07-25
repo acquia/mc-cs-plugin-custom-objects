@@ -191,6 +191,7 @@ class CustomFieldType extends AbstractType
                 'attr'  => [
                     // Need for JS call of method used for changing values dynamically in the frontend. Check co-form.js
                     'data-toggle-button' => true,
+                    'readonly' => (bool)$customField->getIsUniqueIdentifier()
                 ],
             ]
         );
