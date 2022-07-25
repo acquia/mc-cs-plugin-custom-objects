@@ -460,7 +460,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
      */
     public function setRequired(?bool $required): void
     {
-        $this->required = (bool) $required;
+        $this->required = $this->isUniqueIdentifier ?: (bool) $required;
     }
 
     /**
@@ -694,15 +694,12 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
         return $this;
     }
 
-    public function getUniqueIdentifier(): bool
+    public function getIsUniqueIdentifier(): bool
     {
         return $this->isUniqueIdentifier;
     }
 
-    /**
-     * @param bool $isUniqueIdentifier
-     */
-    public function setUniqueIdentifier(bool $isUniqueIdentifier) :void
+    public function setIsUniqueIdentifier(bool $isUniqueIdentifier): void
     {
         $this->isUniqueIdentifier = $isUniqueIdentifier;
     }
