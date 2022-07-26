@@ -415,7 +415,7 @@ CustomObjectsForm = {
 
                         order = order + 1;
                     }
-                } else if (-1 !== ['required', 'showInCustomObjectDetailList', 'showInContactDetailList'].indexOf(propertyName)) {
+                } else if (-1 !== ['required', 'showInCustomObjectDetailList', 'showInContactDetailList', 'isUniqueIdentifier'].indexOf(propertyName)) {
                     CustomObjectsForm.setChoiceRequiredVal(value, propertyName);
                 } else {
                     mQuery('#objectFieldModal').find(target).val(value);
