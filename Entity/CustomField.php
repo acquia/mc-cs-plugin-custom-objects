@@ -702,8 +702,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
     public function setIsUniqueIdentifier(bool $isUniqueIdentifier): void
     {
         $this->isUniqueIdentifier = $isUniqueIdentifier;
-        if($isUniqueIdentifier)
-        {
+        if ($isUniqueIdentifier) {
             $this->setRequired($isUniqueIdentifier);
         }
     }
