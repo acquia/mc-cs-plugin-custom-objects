@@ -237,6 +237,14 @@ class CustomFieldType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'isUniqueIdentifier',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'custom.field.is_unique_identifier.label',
+            ]
+        );
+
         $this->recreateDefaultValueBeforePost($builder);
 
         $builder->add(
