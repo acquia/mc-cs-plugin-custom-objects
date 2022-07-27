@@ -191,7 +191,7 @@ class CustomFieldType extends AbstractType
                 'attr'  => [
                     // Need for JS call of method used for changing values dynamically in the frontend. Check co-form.js
                     'data-toggle-button' => true,
-                    'readonly' => (bool)$customField->getIsUniqueIdentifier()
+                    'readonly'           => (bool) $customField->getIsUniqueIdentifier(),
                 ],
             ]
         );
@@ -237,6 +237,18 @@ class CustomFieldType extends AbstractType
             ]
         );
 
+        $builder->add(
+            'isUniqueIdentifier',
+            YesNoButtonGroupType::class,
+            [
+                'label' => 'custom.field.is_unique_identifier.label',
+                'attr'  => [
+                    'data-toggle-button' => true,
+                    'readonly'           => (bool) $customField->getIsUniqueIdentifier(),
+                ],
+            ]
+        );
+
         $this->recreateDefaultValueBeforePost($builder);
 
         $builder->add(
@@ -277,6 +289,7 @@ class CustomFieldType extends AbstractType
         $builder->add('required', HiddenType::class);
         $builder->add('showInCustomObjectDetailList', HiddenType::class);
         $builder->add('showInContactDetailList', HiddenType::class);
+        $builder->add('isUniqueIdentifier', HiddenType::class);
 
         $builder->add(
             $builder->create(
