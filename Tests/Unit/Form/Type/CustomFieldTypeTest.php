@@ -71,7 +71,7 @@ class CustomFieldTypeTest extends \PHPUnit\Framework\TestCase
             ->method('addModelTransFormer')
             ->with(new CustomObjectHiddenTransformer($this->customObjectRepository));
 
-        $this->formBuilder->expects($this->exactly(11))
+        $this->formBuilder->expects($this->exactly(12))
             ->method('add')
             ->withConsecutive(
                 [
@@ -154,12 +154,15 @@ class CustomFieldTypeTest extends \PHPUnit\Framework\TestCase
                     ],
                 ],
                 [
-                    'buttons',
-                    FormButtonsType::class,
+                    'isUniqueIdentifier',
+                    YesNoButtonGroupType::class,
                     [
-                        'apply_text'     => '',
-                        'cancel_onclick' => "mQuery('form[name=custom_field]').attr('method', 'get').attr('action', mQuery('form[name=custom_field]').attr('action').replace('/save', '/cancel'));",
-                    ],
+                        'label' => 'custom.field.is_unique_identifier.label',
+                        'attr'  => [
+                            'data-toggle-button' => true,
+                            'readonly'           => false,
+                        ],
+                    ]
                 ]
             );
 
