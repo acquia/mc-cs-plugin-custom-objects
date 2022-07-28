@@ -28,7 +28,7 @@ class SegmentFiltersChoicesGenerateSubscriberTest extends TestCase
     private $customObjectRepository;
 
     /**
-     * @var MockObject|TranslatorInterface
+     * @var TranslatorInterface|MockObject
      */
     private $translator;
 
