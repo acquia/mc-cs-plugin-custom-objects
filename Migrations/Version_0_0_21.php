@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\IntegrationsBundle\Migration\AbstractMigration;
 
-class Version_0_0_20 extends AbstractMigration
+class Version_0_0_21 extends AbstractMigration
 {
     private string $table = 'custom_field';
 
