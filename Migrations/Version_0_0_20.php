@@ -10,7 +10,7 @@ use Mautic\IntegrationsBundle\Migration\AbstractMigration;
 
 class Version_0_0_20 extends AbstractMigration
 {
-    private string $table = 'custom_object';
+    private string $table = 'custom_field';
 
     protected function isApplicable(Schema $schema): bool
     {
