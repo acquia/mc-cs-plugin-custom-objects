@@ -244,7 +244,6 @@ class CustomFieldType extends AbstractType
                 'label' => 'custom.field.is_unique_identifier.label',
                 'attr'  => [
                     'data-toggle-button' => true,
-                    'readonly'           => (bool) $customField->getIsUniqueIdentifier(),
                 ],
             ]
         );
