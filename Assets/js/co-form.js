@@ -417,6 +417,14 @@ CustomObjectsForm = {
                     }
                 } else if (-1 !== ['required', 'showInCustomObjectDetailList', 'showInContactDetailList', 'isUniqueIdentifier'].indexOf(propertyName)) {
                     CustomObjectsForm.setChoiceRequiredVal(value, propertyName);
+                    if(propertyName === 'isUniqueIdentifier' && value) {
+                        CustomObjectsForm.setChoiceRequiredVal(true, 'required' );
+                        mQuery("#custom_field_required_0").prop("readonly",true);
+                        mQuery("#custom_field_required_1").prop("readonly",true);
+                    } else {
+                        mQuery("#custom_field_required_0").prop("readonly",false);
+                        mQuery("#custom_field_required_1").prop("readonly",false);
+                    }
                 } else {
                     mQuery('#objectFieldModal').find(target).val(value);
                 }
@@ -529,17 +537,11 @@ CustomObjectsForm = {
             no.removeClass('btn-danger active').addClass('btn-default');
             yes.find('input').attr('checked', 'checked');
             no.find('input').removeAttr('checked');
-            if(name === 'isUniqueIdentifier'){
-                mQuery("#custom_field_required_0").prop("readonly",true);
-                mQuery("#custom_field_required_1").prop("readonly",true);
-            }
         } else {
             yes.removeClass('btn-success active').addClass('btn-default');
             no.removeClass('btn-default').addClass('btn-danger active');
             yes.find('input').removeAttr('checked');
             no.find('input').attr('checked', 'checked');
-            mQuery("#custom_field_required_0").prop("readonly",false);
-            mQuery("#custom_field_required_1").prop("readonly",false);
         }
     }
 };
