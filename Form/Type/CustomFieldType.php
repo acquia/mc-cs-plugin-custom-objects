@@ -244,7 +244,7 @@ class CustomFieldType extends AbstractType
                 'label' => 'custom.field.is_unique_identifier.label',
                 'attr'  => [
                     'data-toggle-button' => true,
-                    'tooltip' => 'custom.field.help.is_unique_identifier',
+                    'tooltip'            => 'custom.field.help.is_unique_identifier',
                 ],
             ]
         );
