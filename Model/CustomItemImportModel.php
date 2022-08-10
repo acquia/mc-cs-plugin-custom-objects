@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
@@ -51,8 +52,14 @@ class CustomItemImportModel extends FormModel
         $customItem    = $this->getCustomItem($import, $customObject, $rowData);
         $merged        = (bool) $customItem->getId();
         $contactIds    = [];
+        $uniqueIdentifierFields = $customObject->getFieldsIsUniqueIdentifier();
+        $uniqueKey = null;
 
         $this->setOwner($import, $customItem);
+
+        if(!empty($uniqueIdentifierFields)){
+            $uniqueKey = $this->getUniqueKey($uniqueIdentifierFields, $rowData);
+        }
 
         foreach ($matchedFields as $csvField => $customFieldId) {
             if (!isset($rowData[$csvField])) {
@@ -90,8 +97,21 @@ class CustomItemImportModel extends FormModel
 
         $customItem->setDefaultValuesForMissingFields();
 
+        if($uniqueKey) {
+            $customItemUpdateId = null;
+            foreach($this->customItemModel->getAllCustomItemsForCustomObject($customObject->getId()) as $existingCustomItem){
+                //TODO: getUniqueKey() definition to be reviewed. Also, I am not sure the (array) typecasting works here correctly
+                if($this->getUniqueKey($uniqueIdentifierFields, (array) $existingCustomItem) == $this->getUniqueKey($uniqueIdentifierFields, (array) $customItem)){
+                    $customItemUpdateId = $existingCustomItem->getId();
+                    break;
+                }
+            }
+            //TODO: insert and update are not real functions. This is for a skeletal structure understanding purposes. To be replaced
+            $customItemUpdateId == null ? $customItem->insert() : $customItem->update($customItemUpdateId);
+        }
+        //TODO: to be covered in the insert update scenario
         $customItem = $this->customItemModel->save($customItem);
-
+        //TODO: contacts to be linked on the basis of uniquekey if available
         $this->linkContacts($customItem, $contactIds);
 
         return $merged;
@@ -146,5 +166,19 @@ class CustomItemImportModel extends FormModel
         }
 
         return $customItem;
+    }
+
+    /**
+     * @param \Doctrine\Common\Collections\Collection $uniqueIdentifierFields
+     * @param array $rowData
+     * @return false|string
+     */
+    private function getUniqueKey(\Doctrine\Common\Collections\Collection $uniqueIdentifierFields, array $rowData)
+    {
+        $compositeKeyString = "";
+        foreach ($uniqueIdentifierFields as $uniqueIdentifierField) {
+            $compositeKeyString = $compositeKeyString . $rowData[$uniqueIdentifierField]; //don't really  know how $rowdata actually works
+        }
+        return hash('sha256', $compositeKeyString);
     }
 }

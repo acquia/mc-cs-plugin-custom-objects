@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
@@ -314,6 +315,19 @@ class CustomItemModel extends FormModel
     public function getPermissionBase(): string
     {
         return 'custom_objects:custom_objects';
+    }
+
+    public function getAllCustomItemsForCustomObject($customObjectId): ArrayCollection
+    {
+        $queryBuilder = $this->entityManager->createQueryBuilder();
+        $queryBuilder->select(CustomItem::TABLE_ALIAS.'.*');
+        $queryBuilder->from(MAUTIC_TABLE_PREFIX.CustomItem::TABLE_NAME, CustomItem::TABLE_ALIAS);
+        $queryBuilder->where(CustomItem::TABLE_ALIAS . '.customObject = :customObjectId');
+        $queryBuilder->setParameter('customObjectId', $customObjectId);
+
+        $query = $queryBuilder->getQuery();
+
+        return new ArrayCollection($query->getResult());
     }
 
     /**
