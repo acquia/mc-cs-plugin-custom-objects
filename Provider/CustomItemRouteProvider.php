@@ -44,6 +44,8 @@ class CustomItemRouteProvider
 
     public const ROUTE_IMPORT_LIST   = 'mautic_import_index';
 
+    public const ROUTE_EXPORT_ACTION   = 'mautic_export_action';
+
     public const ROUTE_CONTACT_LIST  = 'mautic_custom_item_contacts';
 
     /**
@@ -153,17 +155,22 @@ class CustomItemRouteProvider
     public function buildNewImportRoute(int $objectId): string
     {
         return $this->router->generate(static::ROUTE_IMPORT_ACTION, [
-            'object'       => $this->buildImportRouteObject($objectId),
+            'object'       => $this->buildImportOrExportRouteObject($objectId),
             'objectAction' => 'new',
         ]);
     }
 
     public function buildListImportRoute(int $objectId): string
     {
-        return $this->router->generate(static::ROUTE_IMPORT_LIST, ['object' => $this->buildImportRouteObject($objectId)]);
+        return $this->router->generate(static::ROUTE_IMPORT_LIST, ['object' => $this->buildImportOrExportRouteObject($objectId)]);
     }
 
-    private function buildImportRouteObject(int $objectId): string
+    public function buildExportRoute(int $objectId): string
+    {
+        return $this->router->generate(static::ROUTE_EXPORT_ACTION, ['object' => $objectId]);
+    }
+
+    private function buildImportOrExportRouteObject(int $objectId): string
     {
         return "custom-object:{$objectId}";
     }

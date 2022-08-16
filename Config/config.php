@@ -10,7 +10,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 $coParams = [
     'name'        => 'Custom Objects',
     'description' => 'Adds custom objects and fields features to Mautic',
-    'version'     => '0.0.19',
+    'version'     => '0.0.20',
     'author'      => 'Mautic, Inc.',
 
     'routes' => [
@@ -123,6 +123,11 @@ $coParams = [
             CustomItemRouteProvider::ROUTE_CONTACT_LIST => [
                 'path'       => '/custom/item/{objectId}/contact/{page}',
                 'controller' => 'CustomObjectsBundle:CustomItem\ContactList:list',
+            ],
+            CustomItemRouteProvider::ROUTE_EXPORT_ACTION => [
+                'path'       => 'custom/object/{object}/export',
+                'controller' => 'CustomObjectsBundle:CustomItem\Export:export',
+                'method'     => 'GET',
             ],
 
             // Custom Objects
@@ -391,6 +396,15 @@ $coParams = [
                     ],
                 ],
             ],
+            'custom_item.export_controller' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ExportController::class,
+                'arguments' => [
+                    'mautic.custom.model.object',
+                    'custom_item.permission.provider',
+                    'mautic.custom.model.field.value',
+                    'mautic.custom.model.export_scheduler'
+                ]
+            ],
 
             // Custom Objects
             'custom_object.list_controller' => [
@@ -552,6 +566,17 @@ $coParams = [
                     'mautic.lead.model.list',
                 ],
             ],
+            'mautic.custom.model.export_scheduler' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomItemExportSchedulerModel::class,
+                'arguments' => [
+                    'session',
+                    'request_stack',
+                    'mautic.helper.export',
+                    'mautic.helper.mailer',
+                    'mautic.custom.model.field.value',
+
+                ],
+            ],
         ],
         'permissions' => [
             'custom_object.permissions' => [
@@ -695,6 +720,12 @@ $coParams = [
                     'doctrine.orm.entity_manager',
                     'mautic.helper.user',
                     'custom_item.repository',
+                ],
+            ],
+            'custom_item.export.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomItemScheduledExportSubscriber::class,
+                'arguments' => [
+                    'mautic.custom.model.export_scheduler',
                 ],
             ],
             'custom_item.xref_item.subscriber' => [
