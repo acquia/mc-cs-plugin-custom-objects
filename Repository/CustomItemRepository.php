@@ -108,6 +108,12 @@ class CustomItemRepository extends CommonRepository
         return $queryBuilder;
     }
 
+    /**
+     * @param int $customObjectId
+     * @param int $limit
+     * @param int $offset
+     * @return int|mixed|string
+     */
     public function getCustomItemsRelatedToProvidedCustomObject(int $customObjectId, int $limit, int $offset)
     {
         return $this->createQueryBuilder('mautic_custom_item')
@@ -115,7 +121,7 @@ class CustomItemRepository extends CommonRepository
             ->where('mautic_custom_item.customObject = :customObjectId')
             ->setParameter('customObjectId', $customObjectId)
             ->setMaxResults(1)
-            ->setFirstResult($offset)
+            ->setFirstResult(0)
             ->getQuery()
             ->getResult();
     }

@@ -14,11 +14,13 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemExportScheduler;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemExportSchedulerRepository;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CustomItemExportSchedulerModel extends AbstractCommonModel
 {
@@ -27,15 +29,20 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
     private RequestStack $requestStack;
     private ExportHelper $exportHelper;
     private MailHelper $mailHelper;
+    private CustomItemRouteProvider $customItemRouteProvider;
     private string $filePath;
     private CustomFieldValueModel $customFieldValueModel;
+    private $handler;
+    private const CUSTOM_ITEM_LIMIT = 200;
+    private const CONTACT_LIMIT = 1000000;
 
     public function __construct(
         SessionInterface $session,
         RequestStack     $requestStack,
         ExportHelper     $exportHelper,
         MailHelper       $mailHelper,
-        CustomFieldValueModel $customFieldValueModel
+        CustomFieldValueModel $customFieldValueModel,
+        CustomItemRouteProvider $customItemRouteProvider
     )
     {
         $this->session = $session;
@@ -43,6 +50,7 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
         $this->exportHelper = $exportHelper;
         $this->mailHelper = $mailHelper;
         $this->customFieldValueModel = $customFieldValueModel;
+        $this->customItemRouteProvider = $customItemRouteProvider;
     }
 
     /**
@@ -91,9 +99,7 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
 
         $this->processCustomItemData($customItemExportScheduler);
 
-//        return $this->exportHelper->zipFile($this->filePath);
-
-        return $this->filePath;
+        return $this->exportHelper->zipFile($this->filePath, 'custom_item_exports.csv');
     }
 
     /**
@@ -107,10 +113,11 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
 
         $customFields = $customObject->getCustomFields()->toArray();
 
+        $this->openFileHandler();
         $this->addExportFileHeaderToCsvFile($customFields);
 
-
         $this->addCustomItemsToCsvFile($customFields, $customObject);
+        $this->closeFile();
     }
 
     /**
@@ -136,22 +143,21 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
      */
     private function addCustomItemsToCsvFile(array $customFields, CustomObject $customObject): void
     {
-        $limit = 1;
         $offset = 0;
         $result = true;
 
         while($result) {
             $customItems = $this->em->getRepository(CustomItem::class)
-                ->getCustomItemsRelatedToProvidedCustomObject($customObject->getId(), $limit, $offset);
-
-            if (count($customItems) < $limit) {
-                $result = false;
-            } else {
-                $offset += $limit;
-            }
+                ->getCustomItemsRelatedToProvidedCustomObject($customObject->getId(), self::CUSTOM_ITEM_LIMIT, $offset);
 
             if (count($customItems) == 0) {
                 return;
+            }
+
+            if (count($customItems) < self::CUSTOM_ITEM_LIMIT) {
+                $result = false;
+            } else {
+                $offset += self::CUSTOM_ITEM_LIMIT;
             }
 
             $listData = $this->customFieldValueModel->getItemsListData($customObject->getCustomFields(), $customItems);
@@ -165,22 +171,28 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
                     $rowData[] = $listData->getFields($customItem->getId())[$customField->getId()]->getValue();
                 }
 
-//                $fetchResult = true;
+                $fetchResult = true;
                 $savedRow = $rowData;
-//                $limit = 1;
-//                $offset = 0;
+                $contactLimit = 200;
+                $contactOffset = 0;
 
-//                while($fetchResult) {
-                    $results = $this->getContactIds($customItem);
+                while($fetchResult) {
+                    $results = $this->getContactIds($customItem, $contactLimit, $contactOffset);
 
-//                    if(count($results) < $limit) {
-//                        $fetchResult = false;
-//                    }
+                    if (count($results) == 0) {
+                        break;
+                    }
+
+                    if(count($results) < $contactLimit) {
+                        $fetchResult = false;
+                    } else {
+                        $contactOffset+=$contactLimit;
+                    }
 
                     $rowData = $savedRow;
                     $rowData[] = implode(',', $results);
                     $this->addToCsvFile($rowData);
-//                }
+                }
             }
         }
     }
@@ -207,19 +219,34 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
             ->getContactIdsLinkedToCustomItem($customItem->getId(), $limit, $offset);
 
         foreach($contactIds as $row) {
-            $rowData[] = $row['contact_id'];
+            $rowData[] = $row->getContact()->getId();
         }
 
         return $rowData;
     }
 
-    private function addToCsvFile($data)
+    private function openFileHandler(): void
     {
-        $handle = fopen($this->filePath, 'ab');
-        fputcsv($handle, $data);
-        fclose($handle);
+        $this->handler = fopen($this->filePath, 'ab');
     }
 
+    /**
+     * @param $data
+     */
+    private function addToCsvFile($data): void
+    {
+        fputcsv($this->handler, $data);
+    }
+
+    private function closeFile(): void
+    {
+        fclose($this->handler);
+    }
+
+    /**
+     * @param CustomItemExportScheduler $customItemExportScheduler
+     * @param string $filePath
+     */
     public function sendEmail(CustomItemExportScheduler $customItemExportScheduler, string $filePath): void
     {
         $user = $customItemExportScheduler->getUser();
@@ -235,13 +262,13 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
         $this->mailHelper->send(true);
     }
 
+    /**
+     * @param string $filePath
+     * @return string
+     */
     public function getEmailMessageWithLink(string $filePath): string
     {
-        $link = $this->router->generate(
-            'mautic_contact_export_download',
-            ['fileName' => basename($filePath)],
-            UrlGeneratorInterface::ABSOLUTE_URL
-        );
+        $link = $this->customItemRouteProvider->buildExportDownloadRoute(basename($filePath));
 
         return $this->translator->trans(
             'custom.item.export.email',
@@ -263,5 +290,23 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
     {
 //        $this->em->remove($contactExportScheduler);
 //        $this->em->flush();
+    }
+
+
+    public function getExportFileToDownload(string $fileName): BinaryFileResponse
+    {
+        $filePath    = $this->coreParametersHelper->get('custom_item_export_dir').'/'.$fileName;
+
+        return new BinaryFileResponse(
+            $filePath,
+            Response::HTTP_OK,
+            [
+                'Content-Type'        => 'application/zip',
+                'Content-Disposition' => 'attachment; filename="'.$fileName.'"',
+                'Expires'             => 0,
+                'Cache-Control'       => 'must-revalidate',
+                'Pragma'              => 'public',
+            ]
+        );
     }
 }

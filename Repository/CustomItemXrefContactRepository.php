@@ -55,17 +55,12 @@ class CustomItemXrefContactRepository extends CommonRepository
      */
     public function getContactIdsLinkedToCustomItem(int $customItemId, int $limit, int $offset)
     {
-        $conn = $this->getEntityManager()->getConnection();
-
-        $sql = '
-            SELECT c.contact_id FROM mautic_custom_item_xref_contact c
-            WHERE c.custom_item_id = :customItemId
-            ';
-
-        $stmt = $conn->prepare($sql);
-        $resultSet = $stmt->executeQuery(['customItemId' => $customItemId]);
-
-        // returns an array of arrays (i.e. a raw data set)
-        return $resultSet->fetchAllAssociative();
+        return $this->createQueryBuilder(CustomItemXrefContact::TABLE_ALIAS)
+            ->where(CustomItemXrefContact::TABLE_ALIAS.'.customItem = :customItemId')
+            ->setParameter('customItemId', $customItemId)
+            ->setMaxResults($limit)
+            ->setFirstResult($offset)
+            ->getQuery()
+            ->getResult();
     }
 }

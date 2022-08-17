@@ -12,6 +12,7 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldValueModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -66,5 +67,23 @@ class ExportController extends AbstractFormController
         $response['flashes'] = $this->getFlashContent();
 
         return new JsonResponse($response);
+    }
+
+    public function downloadExportAction(string $fileName): Response
+    {
+        //Todo: add permission here
+
+//        $permissions = $this->get('mautic.security')
+//            ->isGranted(['lead:leads:viewown', 'lead:leads:viewother'], 'RETURN_ARRAY');
+//
+//        if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
+//            return $this->accessDenied();
+//        }
+
+        try {
+            return $this->model->getExportFileToDownload($fileName);
+        } catch (FileNotFoundException $exception) {
+            return $this->notFound();
+        }
     }
 }

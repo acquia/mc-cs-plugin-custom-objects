@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Provider;
 
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 class CustomItemRouteProvider
@@ -45,6 +46,8 @@ class CustomItemRouteProvider
     public const ROUTE_IMPORT_LIST   = 'mautic_import_index';
 
     public const ROUTE_EXPORT_ACTION   = 'mautic_export_action';
+
+    public const ROUTE_EXPORT_DOWNLOAD_ACTION   = 'mautic_export_download_action';
 
     public const ROUTE_CONTACT_LIST  = 'mautic_custom_item_contacts';
 
@@ -168,6 +171,11 @@ class CustomItemRouteProvider
     public function buildExportRoute(int $objectId): string
     {
         return $this->router->generate(static::ROUTE_EXPORT_ACTION, ['object' => $objectId]);
+    }
+
+    public function buildExportDownloadRoute(string $fileName): string
+    {
+        return $this->router->generate(static::ROUTE_EXPORT_DOWNLOAD_ACTION, ['fileName' => $fileName],  UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
     private function buildImportOrExportRouteObject(int $objectId): string
