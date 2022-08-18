@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit;
 
 use DateTimeImmutable;
@@ -45,7 +47,7 @@ class CustomObjectTestCase extends MauticMysqlTestCase
 
     /**
      * @param CustomObject $customObject
-     * @param array $data
+     * @param array<string,string> $data
      * @return CustomItem
      * @throws \MauticPlugin\CustomObjectsBundle\Exception\NotFoundException
      */

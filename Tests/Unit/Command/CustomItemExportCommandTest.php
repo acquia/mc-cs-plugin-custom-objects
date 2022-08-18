@@ -49,18 +49,14 @@ class CustomItemExportCommandTest extends CustomObjectTestCase
             ]
         );
 
-//        $client->getProfile()->getCollector('swiftmailer');
-
        $this->assertEquals(0, $commandTester->getStatusCode());
        $outputMessage = $commandTester->getDisplay();
        $this->assertStringContainsString("CustomItem export email(s) sent: 1", $outputMessage);
-
-//        $this->assertEmailIsQueued($this->getMailerEvent(0));
-//        $email = $this->getMailerMessage(0);
-//        $this->assertEmailHeaderSame($email, 'To', 'admin@mautic.com');
-//        $this->assertEmailTextBodyContains($email, 'Your requested custom item export:');
     }
 
+    /**
+     * @return CommandTester
+     */
     private function getCustomItemExportCommandTester()
     {
         $kernel      = self::$kernel;

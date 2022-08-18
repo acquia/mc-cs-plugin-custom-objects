@@ -8,8 +8,6 @@ use Mautic\CoreBundle\Controller\AbstractFormController;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemExportSchedulerEvent;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemExportSchedulerModel;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use MauticPlugin\CustomObjectsBundle\Model\CustomFieldValueModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
@@ -26,15 +24,11 @@ class ExportController extends AbstractFormController
     private CustomItemExportSchedulerModel $model;
 
     /**
-     * @param CustomObjectModel $customObjectModel
      * @param CustomItemPermissionProvider $permissionProvider
-     * @param CustomFieldValueModel $customFieldValueModel
      * @param CustomItemExportSchedulerModel $model
      */
     public function __construct(
-        CustomObjectModel            $customObjectModel,
         CustomItemPermissionProvider $permissionProvider,
-        CustomFieldValueModel $customFieldValueModel,
         CustomItemExportSchedulerModel $model
     )
     {
@@ -69,17 +63,12 @@ class ExportController extends AbstractFormController
         return new JsonResponse($response);
     }
 
+    /**
+     * @param string $fileName
+     * @return Response
+     */
     public function downloadExportAction(string $fileName): Response
     {
-        //Todo: add permission here
-
-//        $permissions = $this->get('mautic.security')
-//            ->isGranted(['lead:leads:viewown', 'lead:leads:viewother'], 'RETURN_ARRAY');
-//
-//        if (!$permissions['lead:leads:viewown'] && !$permissions['lead:leads:viewother']) {
-//            return $this->accessDenied();
-//        }
-
         try {
             return $this->model->getExportFileToDownload($fileName);
         } catch (FileNotFoundException $exception) {

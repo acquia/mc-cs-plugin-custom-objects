@@ -35,6 +35,9 @@ class CustomItemExportScheduler
      */
     private int $customObjectId;
 
+    /** @var array<mixed> */
+    private array $changes = [];
+
     public static function loadMetadata(ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);

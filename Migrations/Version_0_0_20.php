@@ -34,13 +34,5 @@ class Version_0_0_20 extends AbstractMigration
                 PRIMARY KEY (`id`)
             ) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB
         ");
-
-//        $this->addSql($this->generateAlterTableForeignKeyStatement(
-//            $this->table,
-//            ['custom_field_id'],
-//            'custom_field',
-//            ['id'],
-//            'ON DELETE CASCADE'
-//        ));
     }
 }

@@ -403,9 +403,7 @@ $coParams = [
             'custom_item.export_controller' => [
                 'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ExportController::class,
                 'arguments' => [
-                    'mautic.custom.model.object',
                     'custom_item.permission.provider',
-                    'mautic.custom.model.field.value',
                     'mautic.custom.model.export_scheduler'
                 ]
             ],
@@ -573,13 +571,12 @@ $coParams = [
             'mautic.custom.model.export_scheduler' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomItemExportSchedulerModel::class,
                 'arguments' => [
-                    'session',
-                    'request_stack',
                     'mautic.helper.export',
                     'mautic.helper.mailer',
                     'mautic.custom.model.field.value',
-                    'custom_item.route.provider'
-
+                    'custom_item.route.provider',
+                    'custom_item.xref.contact.repository',
+                    'custom_item.repository',
                 ],
             ],
         ],

@@ -22,7 +22,7 @@ class ExportControllerTest extends CustomObjectTestCase
         parent::setUp();
     }
 
-    public function testCustomItemExportScheduled()
+    public function testCustomItemExportScheduled(): void
     {
         $this->createMockData();
         $url = '/s/custom/object/'.$this->customObject->getId().'/export';
