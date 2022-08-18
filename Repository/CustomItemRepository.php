@@ -120,8 +120,8 @@ class CustomItemRepository extends CommonRepository
             ->select('mautic_custom_item')
             ->where('mautic_custom_item.customObject = :customObjectId')
             ->setParameter('customObjectId', $customObjectId)
-            ->setMaxResults(1)
-            ->setFirstResult(0)
+            ->setMaxResults($limit)
+            ->setFirstResult($offset)
             ->getQuery()
             ->getResult();
     }

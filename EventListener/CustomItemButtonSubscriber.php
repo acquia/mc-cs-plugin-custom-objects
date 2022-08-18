@@ -377,7 +377,6 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
         return [
             'attr' => [
                 'href' => $this->routeProvider->buildExportRoute($customObjectId),
-                'data-toggle' => null,
                 'data-method' => "POST",
             ],
             'btnText'   => 'custom.item.export',

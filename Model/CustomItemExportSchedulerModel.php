@@ -9,7 +9,6 @@ use DateTimeZone;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\EmailBundle\Helper\MailHelper;
-use Mautic\LeadBundle\Entity\ContactExportScheduler;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemExportScheduler;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
@@ -175,11 +174,12 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
                 $savedRow = $rowData;
                 $contactLimit = 200;
                 $contactOffset = 0;
+                $customItemAdded = false;
 
                 while($fetchResult) {
                     $results = $this->getContactIds($customItem, $contactLimit, $contactOffset);
 
-                    if (count($results) == 0) {
+                    if (count($results) == 0 && $customItemAdded) {
                         break;
                     }
 
@@ -192,6 +192,7 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
                     $rowData = $savedRow;
                     $rowData[] = implode(',', $results);
                     $this->addToCsvFile($rowData);
+                    $customItemAdded = true;
                 }
             }
         }
@@ -282,17 +283,20 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
     }
 
     /**
-     * @param ContactExportScheduler $contactExportScheduler
+     * @param CustomItemExportScheduler $customItemExportScheduler
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      */
-    public function deleteEntity(ContactExportScheduler $contactExportScheduler): void
+    public function deleteEntity(CustomItemExportScheduler $customItemExportScheduler): void
     {
-//        $this->em->remove($contactExportScheduler);
-//        $this->em->flush();
+        $this->em->remove($customItemExportScheduler);
+        $this->em->flush();
     }
 
-
+    /**
+     * @param string $fileName
+     * @return BinaryFileResponse
+     */
     public function getExportFileToDownload(string $fileName): BinaryFileResponse
     {
         $filePath    = $this->coreParametersHelper->get('custom_item_export_dir').'/'.$fileName;
