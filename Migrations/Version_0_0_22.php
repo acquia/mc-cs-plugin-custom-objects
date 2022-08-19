@@ -7,7 +7,7 @@ namespace MauticPlugin\CustomObjectsBundle\Migrations;
 use Doctrine\DBAL\Schema\Schema;
 use Mautic\IntegrationsBundle\Migration\AbstractMigration;
 
-class Version_0_0_20 extends AbstractMigration
+class Version_0_0_22 extends AbstractMigration
 {
     /**
      * @var string
