@@ -292,8 +292,8 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
      */
     public function deleteEntity(CustomItemExportScheduler $customItemExportScheduler): void
     {
-//        $this->em->remove($customItemExportScheduler);
-//        $this->em->flush();
+        $this->em->remove($customItemExportScheduler);
+        $this->em->flush();
     }
 
     /**

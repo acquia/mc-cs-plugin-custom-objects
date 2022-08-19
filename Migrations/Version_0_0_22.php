@@ -27,12 +27,32 @@ class Version_0_0_22 extends AbstractMigration
      */
     protected function up(): void
     {
-        $this->addSql("CREATE TABLE {$this->concatPrefix($this->table)} (
-                `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-                `custom_object_id` int(10) unsigned NOT NULL,
-                `user_id` int(10) unsigned,
-                PRIMARY KEY (`id`)
+        $customItemExportSchedulerTableName = $this->concatPrefix($this->table);
+        $userIdColumnType =  $this->getUserIdColumnType();
+
+        $this->addSql(
+            "# Creating Table {$customItemExportSchedulerTableName}
+            # -------------------------------------------------------------
+            CREATE TABLE {$customItemExportSchedulerTableName} (
+                id int(10) unsigned NOT NULL AUTO_INCREMENT,
+                custom_object_id int(10) unsigned NOT NULL,
+                user_id INT {$userIdColumnType} NOT NULL,
+                scheduled_datetime DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)',
+                PRIMARY KEY (id)
             ) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB
         ");
+    }
+
+    /**
+     * @return string
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     */
+    private function getUserIdColumnType(): string
+    {
+        $schema = new Schema();
+        $usersTable = $schema->getTable($this->concatPrefix('users'));
+        $column = $usersTable->getColumn('id');
+
+        return $column->getUnsigned() ? 'UNSIGNED' : 'SIGNED';
     }
 }
