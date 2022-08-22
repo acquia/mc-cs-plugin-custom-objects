@@ -37,7 +37,6 @@ class Version_0_0_22 extends AbstractMigration
                 id int(10) unsigned NOT NULL AUTO_INCREMENT,
                 custom_object_id int(10) unsigned NOT NULL,
                 user_id INT {$userIdColumnType} NOT NULL,
-                scheduled_datetime DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)',
                 PRIMARY KEY (id)
             ) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB
         ");
