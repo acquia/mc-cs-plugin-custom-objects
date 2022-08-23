@@ -64,7 +64,7 @@ class UnlinkController extends JsonController
                 'custom.item.unlinked',
                 ['%itemId%' => $customItem->getId(), '%itemName%' => $customItem->getName(), '%entityType%' => $entityType, '%entityId%' => $entityId]
             );
-        } catch (ForbiddenException | NotFoundException | UnexpectedValueException $e) {
+        } catch (ForbiddenException|NotFoundException|UnexpectedValueException $e) {
             $this->flashBag->add($e->getMessage(), [], FlashBag::LEVEL_ERROR);
         }
 

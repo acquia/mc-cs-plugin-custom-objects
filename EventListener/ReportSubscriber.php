@@ -13,9 +13,7 @@ use Mautic\ReportBundle\Event\ReportGeneratorEvent;
 use Mautic\ReportBundle\Helper\ReportHelper;
 use Mautic\ReportBundle\ReportEvents;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCompany;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Report\ReportColumnsBuilder;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
@@ -24,18 +22,18 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
-    const CUSTOM_OBJECTS_CONTEXT_GROUP    = 'custom.objects';
-    const CHILD_CUSTOM_OBJECT_NAME_PREFIX = '&nbsp;&nbsp;&nbsp;&nbsp;';
+    public const CUSTOM_OBJECTS_CONTEXT_GROUP    = 'custom.objects';
+    public const CHILD_CUSTOM_OBJECT_NAME_PREFIX = '&nbsp;&nbsp;&nbsp;&nbsp;';
 
-    const CUSTOM_ITEM_TABLE_ALIAS                  = 'ci';
-    const PARENT_CUSTOM_ITEM_TABLE_ALIAS           = 'pci';
-    const CUSTOM_ITEM_XREF_CUSTOM_ITEM_TABLE_ALIAS = 'cixci';
-    const CUSTOM_ITEM_XREF_CUSTOM_ITEM_TABLE_NAME  = 'custom_item_xref_custom_item';
-    const CUSTOM_ITEM_XREF_CONTACT_TABLE_ALIAS     = 'cil';
-    const CONTACTS_COMPANIES_XREF                  = 'cic';
-    const LEADS_TABLE_ALIAS                        = 'l';
-    const USERS_TABLE_ALIAS                        = 'u';
-    const COMPANIES_TABLE_ALIAS                    = 'comp';
+    public const CUSTOM_ITEM_TABLE_ALIAS                  = 'ci';
+    public const PARENT_CUSTOM_ITEM_TABLE_ALIAS           = 'pci';
+    public const CUSTOM_ITEM_XREF_CUSTOM_ITEM_TABLE_ALIAS = 'cixci';
+    public const CUSTOM_ITEM_XREF_CUSTOM_ITEM_TABLE_NAME  = 'custom_item_xref_custom_item';
+    public const CUSTOM_ITEM_XREF_CONTACT_TABLE_ALIAS     = 'cil';
+    public const CONTACTS_COMPANIES_XREF                  = 'cic';
+    public const LEADS_TABLE_ALIAS                        = 'l';
+    public const USERS_TABLE_ALIAS                        = 'u';
+    public const COMPANIES_TABLE_ALIAS                    = 'comp';
 
     /**
      * @var ArrayCollection
