@@ -15,24 +15,12 @@ use Symfony\Component\Validator\Mapping\ClassMetadata as ValidatorClassMetadata;
 
 class CustomItemExportScheduler
 {
-    /**
-     * @var int
-     */
     private int $id;
 
-    /**
-     * @var User
-     */
     private User $user; // Created by
 
-    /**
-     * @var DateTimeImmutable
-     */
     private DateTimeImmutable $scheduledDateTime;
 
-    /**
-     * @var int
-     */
     private int $customObjectId;
 
     /** @var array<mixed> */
@@ -50,7 +38,7 @@ class CustomItemExportScheduler
         $builder->createField('scheduledDateTime', Types::DATETIME_IMMUTABLE)
             ->columnName('scheduled_datetime')
             ->build();
-       $builder->createField('customObjectId', Types::BIGINT)
+        $builder->createField('customObjectId', Types::BIGINT)
            ->columnName('custom_object_id')
            ->build();
     }
@@ -103,16 +91,12 @@ class CustomItemExportScheduler
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getCustomObject(): int
     {
         return $this->customObjectId;
     }
 
     /**
-     * @param int $customObjectId
      * @return $this
      */
     public function setCustomObjectId(int $customObjectId)

@@ -16,29 +16,19 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ExportController extends AbstractFormController
 {
-    /**
-     * @var CustomItemPermissionProvider
-     */
-    private $permissionProvider;
+    private CustomItemPermissionProvider $permissionProvider;
 
     private CustomItemExportSchedulerModel $model;
 
-    /**
-     * @param CustomItemPermissionProvider $permissionProvider
-     * @param CustomItemExportSchedulerModel $model
-     */
     public function __construct(
         CustomItemPermissionProvider $permissionProvider,
         CustomItemExportSchedulerModel $model
-    )
-    {
+    ) {
         $this->permissionProvider = $permissionProvider;
-        $this->model = $model;
+        $this->model              = $model;
     }
 
     /**
-     * @param int $object
-     * @return Response
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException

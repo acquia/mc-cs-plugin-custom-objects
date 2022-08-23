@@ -40,12 +40,12 @@ class CustomItemsScheduledExportCommand extends Command
     {
         $this
             ->setName(self::COMMAND_NAME)
-            ->setDescription('Export customItems which are scheduled in `customItem_export_scheduler` table.')
+            ->setDescription('Export custom items which are scheduled in `custom_item_export_scheduler` table.')
             ->addOption(
                 '--ids',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Comma separated customItem_export_scheduler ids.'
+                'Comma separated custom_item_export_scheduler ids.'
             );
 
         parent::configure();

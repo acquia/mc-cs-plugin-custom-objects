@@ -14,16 +14,10 @@ class CustomItemExportCommandTest extends CustomObjectTestCase
 {
     protected $useCleanupRollback = false;
 
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
+    private CustomItemModel $customItemModel;
 
     private string $customItemExportSchedulerIds;
 
-    /**
-     * @var CustomObject
-     */
     private CustomObject $customObject;
 
     protected function setUp(): void
@@ -49,9 +43,9 @@ class CustomItemExportCommandTest extends CustomObjectTestCase
             ]
         );
 
-       $this->assertEquals(0, $commandTester->getStatusCode());
-       $outputMessage = $commandTester->getDisplay();
-       $this->assertStringContainsString("CustomItem export email(s) sent: 1", $outputMessage);
+        $this->assertEquals(0, $commandTester->getStatusCode());
+        $outputMessage = $commandTester->getDisplay();
+        $this->assertStringContainsString('CustomItem export email(s) sent: 1', $outputMessage);
     }
 
     /**
@@ -94,7 +88,7 @@ class CustomItemExportCommandTest extends CustomObjectTestCase
 
         $total_linked_contacts = 2;
 
-        for ($i = 0; $i < $total_linked_contacts; $i++) {
+        for ($i = 0; $i < $total_linked_contacts; ++$i) {
             $contact = $this->createContact();
             $this->em->persist($contact);
             $this->em->flush();
@@ -102,18 +96,17 @@ class CustomItemExportCommandTest extends CustomObjectTestCase
             $contacts[] = $contact;
         }
 
-
-        for ($i = 0; $i<$total_custom_items; $i++) {
-            $customItem = $this->createCustomItem($customObject, $data, "custom_item_".$i);
+        for ($i = 0; $i < $total_custom_items; ++$i) {
+            $customItem = $this->createCustomItem($customObject, $data, 'custom_item_'.$i);
             $this->em->persist($customItem);
             $this->em->flush();
 
-            foreach($contacts as $contact) {
-                $this->customItemModel->linkEntity($customItem, 'contact', (int)$contact->getId());
+            foreach ($contacts as $contact) {
+                $this->customItemModel->linkEntity($customItem, 'contact', (int) $contact->getId());
             }
         }
 
-        $customItemExportScheduler = $this->createCustomItemExportScheduleEntity($this->customObject);
+        $customItemExportScheduler          = $this->createCustomItemExportScheduleEntity($this->customObject);
         $this->customItemExportSchedulerIds = (string) $customItemExportScheduler->getId();
     }
 }

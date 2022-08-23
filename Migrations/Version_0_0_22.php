@@ -9,10 +9,7 @@ use Mautic\IntegrationsBundle\Migration\AbstractMigration;
 
 class Version_0_0_22 extends AbstractMigration
 {
-    /**
-     * @var string
-     */
-    private $table = 'custom_item_export_scheduler';
+    private string $table = 'custom_item_export_scheduler';
 
     /**
      * {@inheritdoc}
@@ -28,7 +25,7 @@ class Version_0_0_22 extends AbstractMigration
     protected function up(): void
     {
         $customItemExportSchedulerTableName = $this->concatPrefix($this->table);
-        $userIdColumnType =  $this->getUserIdColumnType();
+        $userIdColumnType                   =  $this->getUserIdColumnType();
 
         $this->addSql(
             "# Creating Table {$customItemExportSchedulerTableName}
@@ -43,14 +40,13 @@ class Version_0_0_22 extends AbstractMigration
     }
 
     /**
-     * @return string
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     private function getUserIdColumnType(): string
     {
-        $schema = new Schema();
+        $schema     = new Schema();
         $usersTable = $schema->getTable($this->concatPrefix('users'));
-        $column = $usersTable->getColumn('id');
+        $column     = $usersTable->getColumn('id');
 
         return $column->getUnsigned() ? 'UNSIGNED' : 'SIGNED';
     }

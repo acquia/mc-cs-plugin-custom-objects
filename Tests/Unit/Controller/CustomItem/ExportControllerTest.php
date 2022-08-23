@@ -12,9 +12,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ExportControllerTest extends CustomObjectTestCase
 {
-    /**
-     * @var CustomObject
-     */
     private CustomObject $customObject;
 
     protected function setUp(): void
@@ -25,8 +22,8 @@ class ExportControllerTest extends CustomObjectTestCase
     public function testCustomItemExportScheduled(): void
     {
         $this->createMockData();
-        $url = '/s/custom/object/'.$this->customObject->getId().'/export';
-        $crawler = $this->client->request(Request::METHOD_POST, $url);
+        $url                    = '/s/custom/object/'.$this->customObject->getId().'/export';
+        $crawler                = $this->client->request(Request::METHOD_POST, $url);
         $clientResponse         = $this->client->getResponse();
         $clientResponseContent  = $clientResponse->getContent();
 
