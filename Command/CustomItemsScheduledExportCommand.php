@@ -6,7 +6,6 @@ namespace MauticPlugin\CustomObjectsBundle\Command;
 
 use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
-use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemExportSchedulerEvent;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemExportSchedulerModel;
@@ -30,8 +29,8 @@ class CustomItemsScheduledExportCommand extends Command
         FormatterHelper $formatterHelper
     ) {
         $this->customItemExportSchedulerModel = $customItemExportSchedulerModel;
-        $this->eventDispatcher             = $eventDispatcher;
-        $this->formatterHelper             = $formatterHelper;
+        $this->eventDispatcher                = $eventDispatcher;
+        $this->formatterHelper                = $formatterHelper;
 
         parent::__construct();
     }
@@ -53,9 +52,9 @@ class CustomItemsScheduledExportCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $ids                     = $this->formatterHelper->simpleCsvToArray($input->getOption('ids'), 'int');
+        $ids                        = $this->formatterHelper->simpleCsvToArray($input->getOption('ids'), 'int');
         $customItemExportSchedulers = $this->customItemExportSchedulerModel->getRepository()->findBy(['id' => $ids]);
-        $count                   = 0;
+        $count                      = 0;
 
         foreach ($customItemExportSchedulers as $customItemExportScheduler) {
             $customItemExportSchedulerEvent = new CustomItemExportSchedulerEvent($customItemExportScheduler);

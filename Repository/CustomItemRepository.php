@@ -109,9 +109,6 @@ class CustomItemRepository extends CommonRepository
     }
 
     /**
-     * @param int $customObjectId
-     * @param int $limit
-     * @param int $offset
      * @return int|mixed|string
      */
     public function getCustomItemsRelatedToProvidedCustomObject(int $customObjectId, int $limit, int $offset)

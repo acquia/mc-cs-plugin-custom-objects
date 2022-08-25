@@ -10,7 +10,7 @@ use Symfony\Component\EventDispatcher\Event;
 class CustomItemExportSchedulerEvent extends Event
 {
     private CustomItemExportScheduler $customItemExportScheduler;
-    
+
     private string $filePath;
 
     public function __construct(CustomItemExportScheduler $customItemExportScheduler)

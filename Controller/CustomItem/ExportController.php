@@ -53,10 +53,6 @@ class ExportController extends AbstractFormController
         return new JsonResponse($response);
     }
 
-    /**
-     * @param string $fileName
-     * @return Response
-     */
     public function downloadExportAction(string $fileName): Response
     {
         try {

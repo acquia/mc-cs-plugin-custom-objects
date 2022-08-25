@@ -16,11 +16,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 class CustomObjectTestCase extends MauticMysqlTestCase
 {
-    /**
-     * @param string $name
-     * @return CustomObject
-     */
-    protected function createCustomObject(string $name = "custom object"): CustomObject
+    protected function createCustomObject(string $name = 'custom object'): CustomObject
     {
         $customObject = new CustomObject();
         $customObject->setAlias($name);
@@ -30,15 +26,10 @@ class CustomObjectTestCase extends MauticMysqlTestCase
         return $customObject;
     }
 
-    /**
-     * @param string $type
-     * @param CustomObject $customObject
-     * @return CustomField
-     */
     protected function createCustomField(string $type, CustomObject $customObject): CustomField
     {
         $customFieldFactory = self::$container->get('custom_object.custom_field_factory');
-        $customField = $customFieldFactory->create('text', $customObject);
+        $customField        = $customFieldFactory->create('text', $customObject);
         $customField->setLabel($type);
         $customField->setAlias($type);
 
@@ -46,9 +37,8 @@ class CustomObjectTestCase extends MauticMysqlTestCase
     }
 
     /**
-     * @param CustomObject $customObject
      * @param array<string,string> $data
-     * @return CustomItem
+     *
      * @throws \MauticPlugin\CustomObjectsBundle\Exception\NotFoundException
      */
     protected function createCustomItem(CustomObject $customObject, array $data, string $name): CustomItem
@@ -60,12 +50,7 @@ class CustomObjectTestCase extends MauticMysqlTestCase
         return $customItem;
     }
 
-    /**
-     * @param string $firstName
-     * @param string $lastName
-     * @return Lead
-     */
-    protected function createContact(string $firstName = "name", string $lastName = "second"): Lead
+    protected function createContact(string $firstName = 'name', string $lastName = 'second'): Lead
     {
         $contact =  new Lead();
         $contact->setFirstname($firstName);

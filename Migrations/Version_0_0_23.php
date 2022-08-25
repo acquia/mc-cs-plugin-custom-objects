@@ -31,6 +31,6 @@ class Version_0_0_23 extends AbstractMigration
     {
         $customItemExportSchedulerTableName = $this->concatPrefix($this->table);
 
-        $this->addSql("ALTER TABLE ".$customItemExportSchedulerTableName." ADD scheduled_datetime DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)'");
+        $this->addSql('ALTER TABLE '.$customItemExportSchedulerTableName." ADD scheduled_datetime DATETIME NOT NULL COMMENT '(DC2Type:datetime_immutable)'");
     }
 }

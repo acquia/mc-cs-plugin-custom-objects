@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemExportSchedulerEvent;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemExportSchedulerModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemExportSchedulerEvent;
 
 class CustomItemScheduledExportSubscriber implements EventSubscriberInterface
 {
@@ -25,15 +25,15 @@ class CustomItemScheduledExportSubscriber implements EventSubscriberInterface
     {
         return [
             CustomItemEvents::CUSTOM_ITEM_PREPARE_EXPORT_FILE => 'onCustomItemExportScheduled',
-            CustomItemEvents::CUSTOM_ITEM_MAIL_EXPORT_FILE => 'sendEmail',
-            CustomItemEvents::POST_EXPORT_MAIL_SENT => 'onExportEmailSent',
+            CustomItemEvents::CUSTOM_ITEM_MAIL_EXPORT_FILE    => 'sendEmail',
+            CustomItemEvents::POST_EXPORT_MAIL_SENT           => 'onExportEmailSent',
         ];
     }
 
     public function onCustomItemExportScheduled(CustomItemExportSchedulerEvent $event): void
     {
         $customItemExportScheduler = $event->getCustomItemExportScheduler();
-        $filePath               = $this->customItemExportSchedulerModel->processDataAndGetExportFilePath($customItemExportScheduler);
+        $filePath                  = $this->customItemExportSchedulerModel->processDataAndGetExportFilePath($customItemExportScheduler);
         $event->setFilePath($filePath);
     }
 
@@ -48,5 +48,4 @@ class CustomItemScheduledExportSubscriber implements EventSubscriberInterface
         $customItemExportScheduler = $event->getCustomItemExportScheduler();
         $this->customItemExportSchedulerModel->deleteEntity($customItemExportScheduler);
     }
-
 }

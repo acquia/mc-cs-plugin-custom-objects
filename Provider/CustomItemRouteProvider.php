@@ -175,7 +175,7 @@ class CustomItemRouteProvider
 
     public function buildExportDownloadRoute(string $fileName): string
     {
-        return $this->router->generate(static::ROUTE_EXPORT_DOWNLOAD_ACTION, ['fileName' => $fileName],  UrlGeneratorInterface::ABSOLUTE_URL);
+        return $this->router->generate(static::ROUTE_EXPORT_DOWNLOAD_ACTION, ['fileName' => $fileName], UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
     private function buildImportOrExportRouteObject(int $objectId): string

@@ -50,7 +50,6 @@ class CustomItemXrefContactRepository extends CommonRepository
     }
 
     /**
-     * @param int $customItemId
      * @return int|mixed|string
      */
     public function getContactIdsLinkedToCustomItem(int $customItemId, int $limit, int $offset)

@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class  CustomItemButtonSubscriberTest extends TestCase
+class CustomItemButtonSubscriberTest extends TestCase
 {
     private const OBJECT_ID  = 555;
     private const ITEM_ID    = 222;
@@ -264,15 +264,15 @@ class  CustomItemButtonSubscriberTest extends TestCase
                 'btnText'   => 'mautic.lead.lead.import.index',
                 'iconClass' => 'fa fa-history',
                 'priority'  => 300,
-            ]],[[
+            ]], [[
                 'attr' => [
-                    'href'       => '',
+                    'href'        => '',
                     'data-method' => 'POST',
                 ],
                 'btnText'   => 'custom.item.export',
                 'iconClass' => 'fa fa-file-text-o',
                 'priority'  => 250,
-            ]],[[
+            ]], [[
                 'confirm' => [
                     'message'       => 'translated string',
                     'confirmAction' => 'generated/batch/delete/route',

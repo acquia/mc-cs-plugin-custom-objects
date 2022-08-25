@@ -401,11 +401,11 @@ $coParams = [
                 ],
             ],
             'custom_item.export_controller' => [
-                'class' => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ExportController::class,
+                'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ExportController::class,
                 'arguments' => [
                     'custom_item.permission.provider',
-                    'mautic.custom.model.export_scheduler'
-                ]
+                    'mautic.custom.model.export_scheduler',
+                ],
             ],
 
             // Custom Objects
@@ -1155,7 +1155,7 @@ $coParams = [
     'parameters' => [
         ConfigProvider::CONFIG_PARAM_ENABLED                              => true,
         ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT => 3,
-        'custom_item_export_dir'                                          => '%kernel.root_dir%/../media/files/temp'
+        'custom_item_export_dir'                                          => '%kernel.root_dir%/../media/files/temp',
     ],
 ];
 
@@ -1168,7 +1168,7 @@ if (interface_exists('ApiPlatform\\Core\\Api\\IriConverterInterface')) {
             'custom_field.type.provider',
             'mautic.custom.model.item',
             'api_platform.iri_converter',
-            'doctrine.orm.entity_manager'
+            'doctrine.orm.entity_manager',
         ],
     ];
     $coParams['services']['other']['api_platform.custom_object.serializer.api_normalizer_json'] = [
@@ -1179,14 +1179,14 @@ if (interface_exists('ApiPlatform\\Core\\Api\\IriConverterInterface')) {
             'custom_field.type.provider',
             'mautic.custom.model.item',
             'api_platform.iri_converter',
-            'doctrine.orm.entity_manager'
+            'doctrine.orm.entity_manager',
         ],
     ];
     $coParams['services']['other']['api_platform.custom_object.custom_item.extension'] = [
-        'class' => \MauticPlugin\CustomObjectsBundle\Extension\CustomItemListeningExtension::class,
+        'class'     => \MauticPlugin\CustomObjectsBundle\Extension\CustomItemListeningExtension::class,
         'arguments' => [
             'mautic.helper.user',
-            'mautic.security'
+            'mautic.security',
         ],
         'tag' => 'api_platform.doctrine.orm.query_extension.collection',
     ];
