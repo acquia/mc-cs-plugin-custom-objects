@@ -366,6 +366,14 @@ CustomObjectsForm = {
 
         // Activate content specific stuff
         Mautic.onPageLoad(target, response, true);
+
+        mQuery('#custom_field_isUniqueIdentifier_1').on('change', function() {
+            CustomObjectsForm.setChoiceRequiredVal(true, 'required')
+            mQuery('#objectFieldModal .chosen-required .choice-wrapper').find('label').attr('disabled', true);
+        });
+        mQuery('#custom_field_isUniqueIdentifier_0').on('change', function() {
+            mQuery('#objectFieldModal .chosen-required .choice-wrapper').find('label').removeAttr('disabled');
+        });
     },
 
     /**
@@ -529,17 +537,11 @@ CustomObjectsForm = {
             no.removeClass('btn-danger active').addClass('btn-default');
             yes.find('input').attr('checked', 'checked');
             no.find('input').removeAttr('checked');
-            if(name === 'isUniqueIdentifier'){
-                mQuery("#custom_field_required_0").prop("readonly",true);
-                mQuery("#custom_field_required_1").prop("readonly",true);
-            }
         } else {
             yes.removeClass('btn-success active').addClass('btn-default');
             no.removeClass('btn-default').addClass('btn-danger active');
             yes.find('input').removeAttr('checked');
             no.find('input').attr('checked', 'checked');
-            mQuery("#custom_field_required_0").prop("readonly",false);
-            mQuery("#custom_field_required_1").prop("readonly",false);
         }
     }
 };

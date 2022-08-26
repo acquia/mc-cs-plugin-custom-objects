@@ -160,7 +160,7 @@ class CustomFieldTypeTest extends \PHPUnit\Framework\TestCase
                         'label' => 'custom.field.is_unique_identifier.label',
                         'attr'  => [
                             'data-toggle-button' => true,
-                            'readonly'           => false,
+                            'tooltip' => 'custom.field.help.is_unique_identifier'
                         ],
                     ]
                 ]
