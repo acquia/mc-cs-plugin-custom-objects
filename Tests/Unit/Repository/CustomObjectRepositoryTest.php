@@ -142,8 +142,7 @@ class CustomObjectRepositoryTest extends TestCase
 
     public function testGetFilterSegmentsMethod(): void
     {
-        $customObject = new class extends CustomObject
-        {
+        $customObject = new class() extends CustomObject {
             public function getId()
             {
                 return random_int(1, 100);

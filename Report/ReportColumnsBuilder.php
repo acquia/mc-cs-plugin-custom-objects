@@ -11,7 +11,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
 class ReportColumnsBuilder
 {
-    const DEFAULT_COLUMN_TYPE = 'string';
+    public const DEFAULT_COLUMN_TYPE = 'string';
 
     /**
      * @var CustomObject
