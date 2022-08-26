@@ -143,6 +143,7 @@ class CustomFieldTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($customField->getCustomObject());
         $this->assertNull($customField->getOrder());
         $this->assertFalse($customField->isRequired());
+        $this->assertFalse($customField->getIsUniqueIdentifier());
 
         // Type object defined without transformer
         $typeObject = $this->createMock(DateType::class);
@@ -161,7 +162,7 @@ class CustomFieldTest extends \PHPUnit\Framework\TestCase
         $customField->setType('date');
         $customField->setCustomObject($customObject);
         $customField->setOrder(4);
-        $customField->setRequired(true);
+        $customField->setIsUniqueIdentifier(true);
         $customField->setDefaultValue(new \DateTime('2019-04-04'));
         $customField->setParams(['placeholder' => 'param']);
 
@@ -177,6 +178,7 @@ class CustomFieldTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('2019-04-04', $customField->getDefaultValue()->format('Y-m-d'));
         $this->assertInstanceOf(Params::class, $customField->getParams());
         $this->assertSame('param', $customField->getParams()->getPlaceholder());
+        $this->assertTrue($customField->getIsUniqueIdentifier());
     }
 
     public function testGetFormFieldOptions(): void

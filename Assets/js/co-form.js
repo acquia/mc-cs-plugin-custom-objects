@@ -366,6 +366,14 @@ CustomObjectsForm = {
 
         // Activate content specific stuff
         Mautic.onPageLoad(target, response, true);
+
+        mQuery('#custom_field_isUniqueIdentifier_1').on('change', function() {
+            CustomObjectsForm.setChoiceRequiredVal(true, 'required')
+            mQuery('#objectFieldModal .chosen-required .choice-wrapper').find('label').attr('disabled', true);
+        });
+        mQuery('#custom_field_isUniqueIdentifier_0').on('change', function() {
+            mQuery('#objectFieldModal .chosen-required .choice-wrapper').find('label').removeAttr('disabled');
+        });
     },
 
     /**
@@ -415,7 +423,7 @@ CustomObjectsForm = {
 
                         order = order + 1;
                     }
-                } else if (-1 !== ['required', 'showInCustomObjectDetailList', 'showInContactDetailList'].indexOf(propertyName)) {
+                } else if (-1 !== ['required', 'showInCustomObjectDetailList', 'showInContactDetailList', 'isUniqueIdentifier'].indexOf(propertyName)) {
                     CustomObjectsForm.setChoiceRequiredVal(value, propertyName);
                 } else {
                     mQuery('#objectFieldModal').find(target).val(value);
