@@ -36,11 +36,11 @@ class CampaignConditionTest extends MauticMysqlTestCase
         $html = json_decode($this->client->getResponse()->getContent(), true)['newContent'];
 
         $crawler->addHtmlContent($html);
-        
+
         $textField = $customObject->getCustomFields()->filter(
             fn (CustomField $customField) => 'text' === $customField->getTypeObject()->getKey()
         )->first();
-        
+
         $saveButton = $crawler->selectButton('campaignevent[buttons][save]');
         $form       = $saveButton->form();
         $form['campaignevent[properties][value]']->setValue('unicorn');

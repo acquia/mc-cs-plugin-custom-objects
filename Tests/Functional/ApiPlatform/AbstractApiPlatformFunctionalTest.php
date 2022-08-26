@@ -11,9 +11,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 abstract class AbstractApiPlatformFunctionalTest extends MauticMysqlTestCase
 {
-    /**
-     * @var array
-     */
     protected array $clientServer = [
         'PHP_AUTH_USER' => 'sales',
         'PHP_AUTH_PW'   => 'mautic',
@@ -24,7 +21,7 @@ abstract class AbstractApiPlatformFunctionalTest extends MauticMysqlTestCase
         if (!interface_exists('ApiPlatform\\Core\\Api\\IriConverterInterface')) {
             $this->markTestSkipped('ApiPlatform is not installed');
         }
-        
+
         parent::setUp();
     }
 

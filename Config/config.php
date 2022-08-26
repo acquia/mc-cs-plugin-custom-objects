@@ -1134,7 +1134,7 @@ if (interface_exists('ApiPlatform\\Core\\Api\\IriConverterInterface')) {
             'custom_field.type.provider',
             'mautic.custom.model.item',
             'api_platform.iri_converter',
-            'doctrine.orm.entity_manager'
+            'doctrine.orm.entity_manager',
         ],
     ];
     $coParams['services']['other']['api_platform.custom_object.serializer.api_normalizer_json'] = [
@@ -1145,14 +1145,14 @@ if (interface_exists('ApiPlatform\\Core\\Api\\IriConverterInterface')) {
             'custom_field.type.provider',
             'mautic.custom.model.item',
             'api_platform.iri_converter',
-            'doctrine.orm.entity_manager'
+            'doctrine.orm.entity_manager',
         ],
     ];
     $coParams['services']['other']['api_platform.custom_object.custom_item.extension'] = [
-        'class' => \MauticPlugin\CustomObjectsBundle\Extension\CustomItemListeningExtension::class,
+        'class'     => \MauticPlugin\CustomObjectsBundle\Extension\CustomItemListeningExtension::class,
         'arguments' => [
             'mautic.helper.user',
-            'mautic.security'
+            'mautic.security',
         ],
         'tag' => 'api_platform.doctrine.orm.query_extension.collection',
     ];
