@@ -103,7 +103,7 @@ class LinkFormController extends AbstractFormController
                     ],
                 ]
             );
-        } catch (ForbiddenException | NotFoundException | UnexpectedValueException | NoRelationshipException $e) {
+        } catch (ForbiddenException|NotFoundException|UnexpectedValueException|NoRelationshipException $e) {
             $this->flashBag->add($e->getMessage(), [], FlashBag::LEVEL_ERROR);
         }
 
@@ -157,7 +157,7 @@ class LinkFormController extends AbstractFormController
 
                 return new JsonResponse($responseData);
             }
-        } catch (ForbiddenException | NoRelationshipException | NotFoundException $e) {
+        } catch (ForbiddenException|NoRelationshipException|NotFoundException $e) {
             $this->flashBag->add($e->getMessage(), [], FlashBag::LEVEL_ERROR);
         }
 
