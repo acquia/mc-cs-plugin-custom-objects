@@ -11,11 +11,15 @@ class Version_0_0_22 extends AbstractMigration
 {
     private string $table = 'custom_item_export_scheduler';
 
+    private Schema $schema;
+
     /**
      * {@inheritdoc}
      */
     protected function isApplicable(Schema $schema): bool
     {
+        $this->schema = $schema;
+
         return !$schema->hasTable($this->concatPrefix($this->table));
     }
 
@@ -44,8 +48,7 @@ class Version_0_0_22 extends AbstractMigration
      */
     private function getUserIdColumnType(): string
     {
-        $schema     = new Schema();
-        $usersTable = $schema->getTable($this->concatPrefix('users'));
+        $usersTable = $this->schema->getTable($this->concatPrefix('users'));
         $column     = $usersTable->getColumn('id');
 
         return $column->getUnsigned() ? 'UNSIGNED' : 'SIGNED';
