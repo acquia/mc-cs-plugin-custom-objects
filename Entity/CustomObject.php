@@ -42,12 +42,12 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  */
 class CustomObject extends FormEntity implements UniqueEntityInterface
 {
-    const TABLE_NAME  = 'custom_object';
-    const TABLE_ALIAS = 'CustomObject';
+    public const TABLE_NAME  = 'custom_object';
+    public const TABLE_ALIAS = 'CustomObject';
 
     // Object type constants for $type field
-    const TYPE_MASTER       = 0;
-    const TYPE_RELATIONSHIP = 1;
+    public const TYPE_MASTER       = 0;
+    public const TYPE_RELATIONSHIP = 1;
 
     /**
      * @var int|null
@@ -420,7 +420,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         );
     }
 
-    public function getFieldsIsUniqueIdentifier(): Collection
+    public function getFieldsIsUniqueIdentifier(): ?ArrayCollection
     {
         return $this->customFields->filter(
             function (CustomField $customField) {
@@ -470,5 +470,16 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         foreach ($deletedFields as $deletedField) {
             $this->addChange("customfield:{$deletedField['id']}", [null, 'deleted']);
         }
+    }
+
+    public function createUniqueHash(ArrayCollection $uniqueIdentifierFields, array $rowData): string
+    {
+        $uniqueHash = [];
+        foreach ((array) $uniqueIdentifierFields as $uniqueIdentifierField) {
+            $uniqueHash = array_merge($uniqueHash, [$uniqueIdentifierField => $rowData[$uniqueIdentifierField]]);
+        }
+        ksort($uniqueHash); //sort array on the basis of key so that the order of keys is the same everytime
+
+        return hash('sha256', serialize($uniqueHash));
     }
 }

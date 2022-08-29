@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
@@ -58,7 +57,7 @@ class CustomItemImportModel extends FormModel
         $this->setOwner($import, $customItem);
 
         if (!empty($uniqueIdentifierFields)) {
-            $uniqueHash = $this->createUniqueHash($uniqueIdentifierFields, $rowData);
+            $uniqueHash = $customObject->createUniqueHash($uniqueIdentifierFields, $rowData);
         }
 
         foreach ($matchedFields as $csvField => $customFieldId) {
@@ -153,16 +152,5 @@ class CustomItemImportModel extends FormModel
         }
 
         return $customItem;
-    }
-
-    private function createUniqueHash(Collection $uniqueIdentifierFields, array $rowData): string
-    {
-        $uniqueHash = [];
-        foreach ((array) $uniqueIdentifierFields as $uniqueIdentifierField) {
-            $uniqueHash = array_merge($uniqueHash, [$uniqueIdentifierField => $rowData[$uniqueIdentifierField]]); //TODO: check the rowdata uniqueidentifier fields
-        }
-        ksort($uniqueHash); //sort array on the basis of key so that the order of keys is the same everytime
-
-        return hash('sha256', serialize($uniqueHash));
     }
 }
