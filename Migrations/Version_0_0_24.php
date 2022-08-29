@@ -8,7 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Mautic\CoreBundle\Exception\SchemaException;
 use Mautic\IntegrationsBundle\Migration\AbstractMigration;
 
-class Version_0_0_22 extends AbstractMigration
+class Version_0_0_24 extends AbstractMigration
 {
     private string $table = 'custom_item';
 
