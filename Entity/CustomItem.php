@@ -170,6 +170,9 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     private $customItemLowerReferences;
 
+    /**
+     * @var string|null
+     */
     private $uniqueHash;
 
     public function __construct(CustomObject $customObject)
@@ -621,12 +624,18 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         }
     }
 
-    public function getUniqueHash()
+    /**
+     * @return string|null
+     */
+    public function getUniqueHash(): ?string
     {
         return $this->uniqueHash;
     }
 
-    public function setUniqueHash($uniqueHash)
+    /**
+     * @param string|null $uniqueHash
+     */
+    public function setUniqueHash(?string $uniqueHash): void
     {
         $this->uniqueHash = $uniqueHash;
     }

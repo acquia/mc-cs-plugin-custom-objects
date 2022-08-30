@@ -321,7 +321,7 @@ class CustomItemImportModelTest extends \PHPUnit\Framework\TestCase
                 return hash('sha256', serialize($uniqueHash));
             }));
 
-        $this->customItemModel->expects($this->once()) //TODO: refactor this for unique id
+        $this->customItemModel->expects($this->once())
             ->method('save')
             ->with($this->callback(function (CustomItem $customItem) {
                 $this->assertSame('Mautic Demo', $customItem->getName());

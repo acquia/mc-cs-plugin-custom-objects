@@ -95,6 +95,7 @@ class CustomItemModel extends FormModel
         $customItem->setModifiedBy($user);
         $customItem->setModifiedByUser($user->getName());
         $customItem->setDateModified($now->getUtcDateTime());
+        $customItem->setUniqueHash($uniqueHash);
 
         if (!$dryRun) {
             $this->entityManager->persist($customItem);
