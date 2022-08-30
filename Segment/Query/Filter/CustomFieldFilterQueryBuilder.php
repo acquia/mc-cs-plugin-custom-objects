@@ -9,7 +9,6 @@ use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
