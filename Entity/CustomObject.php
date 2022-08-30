@@ -19,6 +19,7 @@ use Mautic\CoreBundle\Helper\ArrayHelper;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Form\Validator\Constraints\CustomObjectTypeValues;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
+use function PHPUnit\Framework\isEmpty;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -472,7 +473,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         }
     }
 
-    public function createUniqueHash(ArrayCollection $uniqueIdentifierFields, array $rowData): string
+    public function createUniqueHash(ArrayCollection $uniqueIdentifierFields, array $rowData): ?string
     {
         $uniqueHash = [];
         foreach ((array) $uniqueIdentifierFields as $uniqueIdentifierField) {
@@ -480,6 +481,6 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         }
         ksort($uniqueHash); //sort array on the basis of key so that the order of keys is the same everytime
 
-        return hash('sha256', serialize($uniqueHash));
+        return $uniqueHash == [] ? null : hash('sha256', serialize($uniqueHash));
     }
 }
