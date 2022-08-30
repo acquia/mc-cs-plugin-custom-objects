@@ -473,10 +473,15 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         }
     }
 
+    /**
+     * @param ArrayCollection $uniqueIdentifierFields
+     * @param array<mixed> $rowData
+     * @return string|null
+     */
     public function createUniqueHash(ArrayCollection $uniqueIdentifierFields, array $rowData): ?string
     {
         $uniqueHash = [];
-        foreach ((array) $uniqueIdentifierFields as $uniqueIdentifierField) {
+        foreach ($uniqueIdentifierFields as $uniqueIdentifierField) {
             $uniqueHash = array_merge($uniqueHash, [$uniqueIdentifierField => $rowData[$uniqueIdentifierField]]);
         }
         ksort($uniqueHash); //sort array on the basis of key so that the order of keys is the same everytime
