@@ -130,9 +130,36 @@ class CustomItemModelTest extends TestCase
                 [CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $this->isInstanceOf(CustomItemEvent::class)]
             );
         $this->entityManager->expects($this->once())->method('flush');
+        $this->customItemRepository->expects($this->never())->method('upsert');
         $this->validator->expects($this->once())->method('validate')->with($this->customItem)->willReturn($this->violationList);
 
         $this->assertSame($this->customItem, $this->customItemModel->save($this->customItem));
+    }
+
+    public function testSaveNewWithUniqueIdentifier(): void
+    {
+        $this->user->expects($this->exactly(2))->method('getName')->willReturn('John Doe');
+        $this->userHelper->expects($this->once())->method('getUser')->willReturn($this->user);
+        $this->customItem->expects($this->exactly(2))->method('isNew')->willReturn(true);
+        $this->customItem->expects($this->once())->method('setCreatedBy')->with($this->user);
+        $this->customItem->expects($this->once())->method('setCreatedByUser')->with('John Doe');
+        $this->customItem->expects($this->once())->method('setDateAdded');
+        $this->customItem->expects($this->once())->method('setModifiedBy')->with($this->user);
+        $this->customItem->expects($this->once())->method('setModifiedByUser')->with('John Doe');
+        $this->customItem->expects($this->once())->method('setDateModified');
+        $this->entityManager->expects($this->once())->method('persist')->with($this->customItem);
+        $this->customItem->expects($this->once())->method('getCustomFieldValues')->willReturn(new ArrayCollection());
+        $this->customItem->expects($this->once())->method('recordCustomFieldValueChanges');
+        $this->dispatcher->method('dispatch')
+            ->withConsecutive(
+                [CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, $this->isInstanceOf(CustomItemEvent::class)],
+                [CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $this->isInstanceOf(CustomItemEvent::class)]
+            );
+        $this->customItemRepository->expects($this->once())->method('upsert')->with($this->customItem);
+        $this->entityManager->expects($this->never())->method('flush');
+        $this->validator->expects($this->once())->method('validate')->with($this->customItem)->willReturn($this->violationList);
+
+        $this->assertSame($this->customItem, $this->customItemModel->save($this->customItem,false, 'dcvukyewcfuyerfcu'));
     }
 
     public function testSaveEdit(): void

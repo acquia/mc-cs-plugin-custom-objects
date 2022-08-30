@@ -47,12 +47,18 @@ class CustomItemImportModel extends FormModel
      */
     public function import(Import $import, array $rowData, CustomObject $customObject): bool
     {
-        $matchedFields = $import->getMatchedFields();
-        $customItem    = $this->getCustomItem($import, $customObject, $rowData);
-        $merged        = (bool) $customItem->getId();
-        $contactIds    = [];
+        $matchedFields          = $import->getMatchedFields();
+        $customItem             = $this->getCustomItem($import, $customObject, $rowData);
+        $merged                 = (bool) $customItem->getId();
+        $contactIds             = [];
+        $uniqueIdentifierFields = $customObject->getFieldsIsUniqueIdentifier();
+        $uniqueHash             = null;
 
         $this->setOwner($import, $customItem);
+
+        if (!empty($uniqueIdentifierFields)) {
+            $uniqueHash = $customObject->createUniqueHash($uniqueIdentifierFields, $rowData);
+        }
 
         foreach ($matchedFields as $csvField => $customFieldId) {
             if (!isset($rowData[$csvField])) {
@@ -90,7 +96,7 @@ class CustomItemImportModel extends FormModel
 
         $customItem->setDefaultValuesForMissingFields();
 
-        $customItem = $this->customItemModel->save($customItem);
+        $customItem = $this->customItemModel->save($customItem, false, $uniqueHash);
 
         $this->linkContacts($customItem, $contactIds);
 
