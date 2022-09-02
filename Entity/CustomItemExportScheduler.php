@@ -96,10 +96,7 @@ class CustomItemExportScheduler
         return $this->customObjectId;
     }
 
-    /**
-     * @return $this
-     */
-    public function setCustomObjectId(int $customObjectId)
+    public function setCustomObjectId(int $customObjectId): self
     {
         $this->customObjectId = $customObjectId;
         $this->addChange('customObject', $customObjectId);

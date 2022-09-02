@@ -9,10 +9,7 @@ use Mautic\IntegrationsBundle\Migration\AbstractMigration;
 
 class Version_0_0_23 extends AbstractMigration
 {
-    /**
-     * @var string
-     */
-    private $table = 'custom_item_export_scheduler';
+    private string $table = 'custom_item_export_scheduler';
 
     /**
      * {@inheritdoc}

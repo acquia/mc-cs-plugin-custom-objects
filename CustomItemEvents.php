@@ -144,8 +144,6 @@ final class CustomItemEvents
     /**
      * The custom.item.on_custom_item_export event is fired when the custom item is being exported.
      *
-     * The event listener receives a
-     *
      * @see MauticPlugin\CustomObjectsBundle\Event\CustomItemExportSchedulerEvent
      *
      * @var string
@@ -154,8 +152,6 @@ final class CustomItemEvents
 
     /**
      * The custom.item.custom_item_prepare_export_file event is fired when the custom item data is being prepared to be exported.
-     *
-     * The event listener receives a
      *
      * @see MauticPlugin\CustomObjectsBundle\Event\CustomItemExportSchedulerEvent
      *
