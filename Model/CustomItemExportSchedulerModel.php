@@ -24,7 +24,7 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
 {
     private const EXPORT_FILE_NAME_DATE_FORMAT = 'Y_m_d_H_i_s';
     private const CUSTOM_ITEM_LIMIT            = 200;
-    private const CONTACT_LIMIT                = 1000000;
+    private const CONTACT_LIMIT                = 5000;
 
     private ExportHelper $exportHelper;
 
