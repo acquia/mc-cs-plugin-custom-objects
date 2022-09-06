@@ -102,6 +102,11 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
                             $event->getRoute()
                         );
                         $event->addButton(
+                            $this->defineExportButton($customObjectId),
+                            ButtonHelper::LOCATION_PAGE_ACTIONS,
+                            $event->getRoute()
+                        );
+                        $event->addButton(
                             $this->defineBatchDeleteButton($customObjectId),
                             ButtonHelper::LOCATION_BULK_ACTIONS,
                             $event->getRoute()
@@ -357,6 +362,26 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
             'btnText'   => 'mautic.lead.lead.import.index',
             'iconClass' => 'fa fa-history',
             'priority'  => 300,
+        ];
+    }
+
+    /**
+     * @return mixed[]
+     *
+     * @throws ForbiddenException
+     */
+    private function defineExportButton(int $customObjectId): array
+    {
+        $this->permissionProvider->canViewAtAll($customObjectId);
+
+        return [
+            'attr' => [
+                'href'        => $this->routeProvider->buildExportRoute($customObjectId),
+                'data-method' => 'POST',
+            ],
+            'btnText'   => 'custom.item.export',
+            'iconClass' => 'fa fa-file-text-o',
+            'priority'  => 250,
         ];
     }
 

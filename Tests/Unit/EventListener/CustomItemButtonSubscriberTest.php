@@ -190,7 +190,7 @@ class CustomItemButtonSubscriberTest extends TestCase
             ->with(self::OBJECT_ID)
             ->willReturn('generated/new/import/route');
 
-        $this->permissionProvider->expects($this->once())
+        $this->permissionProvider->expects($this->exactly(2))
             ->method('canViewAtAll')
             ->with(self::OBJECT_ID);
 
@@ -214,7 +214,7 @@ class CustomItemButtonSubscriberTest extends TestCase
             )
             ->willReturn('translated string');
 
-        $this->event->expects($this->exactly(7))
+        $this->event->expects($this->exactly(8))
             ->method('addButton')
             ->withConsecutive([[
                 'attr' => [
@@ -264,6 +264,14 @@ class CustomItemButtonSubscriberTest extends TestCase
                 'btnText'   => 'mautic.lead.lead.import.index',
                 'iconClass' => 'fa fa-history',
                 'priority'  => 300,
+            ]], [[
+                'attr' => [
+                    'href'        => '',
+                    'data-method' => 'POST',
+                ],
+                'btnText'   => 'custom.item.export',
+                'iconClass' => 'fa fa-file-text-o',
+                'priority'  => 250,
             ]], [[
                 'confirm' => [
                     'message'       => 'translated string',
