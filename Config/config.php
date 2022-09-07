@@ -10,7 +10,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 $coParams = [
     'name'        => 'Custom Objects',
     'description' => 'Adds custom objects and fields features to Mautic',
-    'version'     => '0.0.21',
+    'version'     => '0.0.23',
     'author'      => 'Mautic, Inc.',
 
     'routes' => [
@@ -123,6 +123,15 @@ $coParams = [
             CustomItemRouteProvider::ROUTE_CONTACT_LIST => [
                 'path'       => '/custom/item/{objectId}/contact/{page}',
                 'controller' => 'CustomObjectsBundle:CustomItem\ContactList:list',
+            ],
+            CustomItemRouteProvider::ROUTE_EXPORT_ACTION => [
+                'path'       => 'custom/object/{object}/export',
+                'controller' => 'CustomObjectsBundle:CustomItem\Export:export',
+                'method'     => 'POST',
+            ],
+            CustomItemRouteProvider::ROUTE_EXPORT_DOWNLOAD_ACTION => [
+                'path'       => '/custom/item/export/download/{fileName}',
+                'controller' => 'CustomObjectsBundle:CustomItem\Export:downloadExport',
             ],
 
             // Custom Objects
@@ -391,6 +400,13 @@ $coParams = [
                     ],
                 ],
             ],
+            'custom_item.export_controller' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ExportController::class,
+                'arguments' => [
+                    'custom_item.permission.provider',
+                    'mautic.custom.model.export_scheduler',
+                ],
+            ],
 
             // Custom Objects
             'custom_object.list_controller' => [
@@ -552,6 +568,17 @@ $coParams = [
                     'mautic.lead.model.list',
                 ],
             ],
+            'mautic.custom.model.export_scheduler' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomItemExportSchedulerModel::class,
+                'arguments' => [
+                    'mautic.helper.export',
+                    'mautic.helper.mailer',
+                    'mautic.custom.model.field.value',
+                    'custom_item.route.provider',
+                    'custom_item.xref.contact.repository',
+                    'custom_item.repository',
+                ],
+            ],
         ],
         'permissions' => [
             'custom_object.permissions' => [
@@ -695,6 +722,12 @@ $coParams = [
                     'doctrine.orm.entity_manager',
                     'mautic.helper.user',
                     'custom_item.repository',
+                ],
+            ],
+            'custom_item.export.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomItemScheduledExportSubscriber::class,
+                'arguments' => [
+                    'mautic.custom.model.export_scheduler',
                 ],
             ],
             'custom_item.xref_item.subscriber' => [
@@ -1122,6 +1155,7 @@ $coParams = [
     'parameters' => [
         ConfigProvider::CONFIG_PARAM_ENABLED                              => true,
         ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT => 3,
+        'custom_item_export_dir'                                          => '%kernel.root_dir%/../media/files/temp',
     ],
 ];
 
