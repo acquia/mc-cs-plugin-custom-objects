@@ -9,6 +9,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
@@ -169,6 +170,8 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     private $customItemLowerReferences;
 
+    private ?string $uniqueHash = null;
+
     public function __construct(CustomObject $customObject)
     {
         $this->customObject              = $customObject;
@@ -194,6 +197,12 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         $builder->createManyToOne('customObject', CustomObject::class)
             ->addJoinColumn('custom_object_id', 'id', false, false, 'CASCADE')
             ->fetchExtraLazy()
+            ->build();
+
+        $builder->createField('uniqueHash', Types::STRING)
+            ->columnName('unique_hash')
+            ->unique()
+            ->nullable()
             ->build();
 
         $builder->createOneToMany('contactReferences', CustomItemXrefContact::class)
@@ -610,5 +619,15 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
             default:
                 return new ArrayCollection([]);
         }
+    }
+
+    public function getUniqueHash(): ?string
+    {
+        return $this->uniqueHash;
+    }
+
+    public function setUniqueHash(?string $uniqueHash): void
+    {
+        $this->uniqueHash = $uniqueHash;
     }
 }
