@@ -27,6 +27,7 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldType\StaticChoiceTypeInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
+use MauticPlugin\CustomObjectsBundle\Form\Validator\Constraints\AllowUniqueIdentifier;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -204,7 +205,9 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
     /**
      * @var bool
      */
-    private $isUniqueIdentifier = false;
+    private bool $isUniqueIdentifier = false;
+    
+    private bool $wasChangeIsUniqueIdentifier = false;
 
     public function __construct()
     {
@@ -310,6 +313,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
         $metadata->addPropertyConstraint('customObject', new Assert\NotBlank());
         $metadata->addPropertyConstraint('defaultValue', new Assert\Length(['max' => 255]));
         $metadata->addConstraint(new Assert\Callback('validateDefaultValue'));
+        $metadata->addConstraint(new AllowUniqueIdentifier());
     }
 
     /**
@@ -694,6 +698,11 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
         return $this;
     }
 
+    public function wasChangeIsUniqueIdentifier(): bool
+    {
+        return $this->wasChangeIsUniqueIdentifier;
+    }
+
     public function getIsUniqueIdentifier(): bool
     {
         return $this->isUniqueIdentifier;
@@ -701,6 +710,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
 
     public function setIsUniqueIdentifier(?bool $isUniqueIdentifier): void
     {
+        $this->wasChangeIsUniqueIdentifier = $this->isUniqueIdentifier != $isUniqueIdentifier;
         $this->isUniqueIdentifier = (bool) $isUniqueIdentifier;
         if ($isUniqueIdentifier) {
             $this->setRequired($isUniqueIdentifier);

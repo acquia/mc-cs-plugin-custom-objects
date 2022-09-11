@@ -101,11 +101,6 @@ class SaveController extends CommonController
         }
 
         try {
-            // If custom object data is available then do not add or modify the unique identifier for fields.
-            if (!$this->allowAddOrUpdateUniqueIdentifier($customObject->getId(), $request)) {
-                return new JsonResponse(['error' => ""], Response::HTTP_BAD_REQUEST);
-            }
-
             if ($fieldId) {
                 $customField = $this->customFieldModel->fetchEntity($fieldId);
                 $this->permissionProvider->canEdit($customField);
@@ -236,31 +231,5 @@ class SaveController extends CommonController
         foreach ($optionsFromPost as $optionFromPost) {
             $customField->addOption($optionFromPost);
         }
-    }
-
-    /**
-     * @return bool
-     * @throws NotFoundException
-     */
-    private function allowAddOrUpdateUniqueIdentifier($customObjectId, $request): bool
-    {
-        $rawCustomField = $request->get('custom_field');
-        $isUniqueIdentifier = (bool) $rawCustomField['isUniqueIdentifier'] ?? false;
-        $isCheckCount = false !== $isUniqueIdentifier;
-        if (!empty($rawCustomField['id'])) {
-            $customField = $this->customFieldModel->fetchEntity((int) $rawCustomField['id']);
-            $isCheckCount = $isUniqueIdentifier !== $customField->getIsUniqueIdentifier();
-        }
-
-        if (!$isCheckCount) {
-            return true;
-        }
-
-        /** @var CustomItemModel $customItemModel */
-        $customItemModel = $this->getModel('custom.item');
-
-        /** @var CustomItemRepository $customItemRepository */
-        $customItemRepository = $customItemModel->getRepository();
-        return !$customItemRepository->getItemCount($customObjectId);
     }
 }
