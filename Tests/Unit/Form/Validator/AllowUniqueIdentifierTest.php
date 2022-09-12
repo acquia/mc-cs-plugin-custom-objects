@@ -18,12 +18,12 @@ class AllowUniqueIdentifierTest extends TestCase
         $this->constraint = new AllowUniqueIdentifier();
     }
 
-    public function testValidatedBy()
+    public function testValidatedBy(): void
     {
         $this->assertSame(AllowUniqueIdentifierValidator::class, $this->constraint->validatedBy());
     }
 
-    public function testGetTargets()
+    public function testGetTargets(): void
     {
         $this->assertSame(AllowUniqueIdentifier::CLASS_CONSTRAINT, $this->constraint->getTargets());
     }

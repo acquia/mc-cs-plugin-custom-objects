@@ -1122,7 +1122,6 @@ $coParams = [
             'custom_object.allow.unique_identifier.validator' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Form\Validator\Constraints\AllowUniqueIdentifierValidator::class,
                 'arguments' => [
-                    'mautic.custom.model.field',
                     'mautic.custom.model.item',
                     'translator',
                 ],

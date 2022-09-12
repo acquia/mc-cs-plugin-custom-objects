@@ -4,6 +4,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Form\Validator;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Form\Validator\Constraints\AllowUniqueIdentifier;
 use MauticPlugin\CustomObjectsBundle\Form\Validator\Constraints\AllowUniqueIdentifierValidator;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
@@ -20,7 +21,7 @@ class AllowUniqueIdentifierValidatorTest extends TestCase
     /**
      * @var CustomField|MockObject
      */
-    private CustomField $customField;
+    private $customField;
 
     /**
      * @var MockObject|Constraint
@@ -37,12 +38,7 @@ class AllowUniqueIdentifierValidatorTest extends TestCase
     /**
      * @var CustomItemModel|MockObject
      */
-    private CustomItemModel $customItemModel;
-
-    /**
-     * @var CustomFieldModel|MockObject
-     */
-    private CustomFieldModel $customFieldModel;
+    private $customItemModel;
 
     protected function setUp(): void
     {
@@ -50,9 +46,8 @@ class AllowUniqueIdentifierValidatorTest extends TestCase
         $this->constraint  = $this->createMock(Constraint::class);
         $this->context     = $this->createMock(ExecutionContextInterface::class);
 
-        $this->customFieldModel = $this->createMock(CustomFieldModel::class);
         $this->customItemModel  = $this->createMock(CustomItemModel::class);
-        $this->validator        = new AllowUniqueIdentifierValidator($this->customFieldModel, $this->customItemModel);
+        $this->validator        = new AllowUniqueIdentifierValidator($this->customItemModel);
         $this->validator->initialize($this->context);
 
         parent::setUp();
@@ -109,9 +104,11 @@ class AllowUniqueIdentifierValidatorTest extends TestCase
         $violationBuilder->expects($this->once())
             ->method('addViolation');
 
+        /** @phpstan-ignore-next-line */
+        $message = $this->constraint->message;
         $this->context->expects($this->once())
             ->method('buildViolation')
-            ->with($this->constraint->message)
+            ->with($message)
             ->willReturn($violationBuilder);
 
         $this->validator->validate($this->customField, $this->constraint);

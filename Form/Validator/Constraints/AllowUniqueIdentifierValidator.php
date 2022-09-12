@@ -3,7 +3,6 @@
 namespace MauticPlugin\CustomObjectsBundle\Form\Validator\Constraints;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
@@ -12,13 +11,10 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class AllowUniqueIdentifierValidator extends ConstraintValidator
 {
-    private CustomFieldModel $customFieldModel;
-
     private CustomItemModel $customItemModel;
 
-    public function __construct(CustomFieldModel $customFieldModel, CustomItemModel $customItemModel)
+    public function __construct(CustomItemModel $customItemModel)
     {
-        $this->customFieldModel = $customFieldModel;
         $this->customItemModel  = $customItemModel;
     }
 
@@ -42,7 +38,9 @@ class AllowUniqueIdentifierValidator extends ConstraintValidator
             return;
         }
 
+        /** AllowUniqueIdentifier $constraint */
         if ($this->checkCustomItemCount($value)) {
+            /** @phpstan-ignore-next-line */
             $this->context->buildViolation($constraint->message)
                 ->atPath('isUniqueIdentifier')
                 ->addViolation();
@@ -55,7 +53,7 @@ class AllowUniqueIdentifierValidator extends ConstraintValidator
      */
     private function checkCustomItemCount(CustomField $customField): bool
     {
-        $customObjectId = $customField->getCustomObject()->getId();
+        $customObjectId = (int) $customField->getCustomObject()->getId();
 
         /** @var CustomItemRepository $customItemRepository */
         $customItemRepository = $this->customItemModel->getRepository();
