@@ -8,7 +8,6 @@ use MauticPlugin\CustomObjectsBundle\Form\Validator\Constraints\AllowUniqueIdent
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
-use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
@@ -48,12 +47,12 @@ class AllowUniqueIdentifierValidatorTest extends TestCase
     protected function setUp(): void
     {
         $this->customField = $this->createMock(CustomField::class);
-        $this->constraint   = $this->createMock(Constraint::class);
-        $this->context      = $this->createMock(ExecutionContextInterface::class);
+        $this->constraint  = $this->createMock(Constraint::class);
+        $this->context     = $this->createMock(ExecutionContextInterface::class);
 
         $this->customFieldModel = $this->createMock(CustomFieldModel::class);
-        $this->customItemModel = $this->createMock(CustomItemModel::class);
-        $this->validator    = new AllowUniqueIdentifierValidator($this->customFieldModel, $this->customItemModel);
+        $this->customItemModel  = $this->createMock(CustomItemModel::class);
+        $this->validator        = new AllowUniqueIdentifierValidator($this->customFieldModel, $this->customItemModel);
         $this->validator->initialize($this->context);
 
         parent::setUp();

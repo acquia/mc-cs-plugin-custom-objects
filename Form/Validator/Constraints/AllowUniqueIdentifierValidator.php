@@ -16,13 +16,10 @@ class AllowUniqueIdentifierValidator extends ConstraintValidator
 
     private CustomItemModel $customItemModel;
 
-    /**
-     * @param CustomFieldModel $customFieldModel
-     */
     public function __construct(CustomFieldModel $customFieldModel, CustomItemModel $customItemModel)
     {
         $this->customFieldModel = $customFieldModel;
-        $this->customItemModel = $customItemModel;
+        $this->customItemModel  = $customItemModel;
     }
 
     /**
@@ -53,8 +50,6 @@ class AllowUniqueIdentifierValidator extends ConstraintValidator
     }
 
     /**
-     * @param CustomField $customField
-     * @return bool
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -64,6 +59,7 @@ class AllowUniqueIdentifierValidator extends ConstraintValidator
 
         /** @var CustomItemRepository $customItemRepository */
         $customItemRepository = $this->customItemModel->getRepository();
+
         return (bool) $customItemRepository->getItemCount($customObjectId);
     }
 }
