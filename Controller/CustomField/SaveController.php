@@ -14,11 +14,9 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -89,7 +87,7 @@ class SaveController extends CommonController
     public function saveAction(Request $request)
     {
         $objectId   = (int) $request->get('objectId');
-        $fieldId    = (int) $request->query->get('fieldId');
+        $fieldId    = (int) $request->get('fieldId');
         $fieldType  = $request->get('fieldType');
         $panelId    = is_numeric($request->get('panelId')) ? (int) $request->get('panelId') : null; // Is edit of existing panel in view
         $panelCount = is_numeric($request->get('panelCount')) ? (int) $request->get('panelCount') : null;
