@@ -46,7 +46,9 @@ class AllowUniqueIdentifierValidator extends ConstraintValidator
         }
 
         if ($this->checkCustomItemCount($value)) {
-            $this->context->buildViolation($constraint->message)->addViolation();
+            $this->context->buildViolation($constraint->message)
+                ->atPath('isUniqueIdentifier')
+                ->addViolation();
         }
     }
 
