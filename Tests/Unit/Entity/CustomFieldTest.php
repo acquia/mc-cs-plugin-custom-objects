@@ -16,6 +16,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
+use MauticPlugin\CustomObjectsBundle\Form\Validator\Constraints\AllowUniqueIdentifier;
 use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -55,9 +56,12 @@ class CustomFieldTest extends \PHPUnit\Framework\TestCase
                 ['defaultValue', $this->isInstanceOf(Length::class)]
             );
 
-        $metadata->expects($this->once())
+        $metadata->expects($this->exactly(2))
             ->method('addConstraint')
-            ->with($this->isInstanceOf(Callback::class));
+            ->withConsecutive(
+                [$this->isInstanceOf(Callback::class)],
+                [$this->isInstanceOf(AllowUniqueIdentifier::class)]
+            );
 
         $object->loadValidatorMetadata($metadata);
     }

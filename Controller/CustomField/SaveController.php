@@ -87,7 +87,7 @@ class SaveController extends CommonController
     public function saveAction(Request $request)
     {
         $objectId   = (int) $request->get('objectId');
-        $fieldId    = (int) $request->get('fieldId');
+        $fieldId    = (int) $request->query->get('fieldId');
         $fieldType  = $request->get('fieldType');
         $panelId    = is_numeric($request->get('panelId')) ? (int) $request->get('panelId') : null; // Is edit of existing panel in view
         $panelCount = is_numeric($request->get('panelCount')) ? (int) $request->get('panelCount') : null;
