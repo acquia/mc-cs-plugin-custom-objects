@@ -230,6 +230,10 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
      */
     private function addToCsvFile(array $data): void
     {
+        /**
+         * echo to stdout to keep long jobs running.
+         */
+        $this->exportHelper->echoTouchJob();
         $handler = @fopen($this->filePath, 'ab');
         fputcsv($handler, $data);
         fclose($handler);
