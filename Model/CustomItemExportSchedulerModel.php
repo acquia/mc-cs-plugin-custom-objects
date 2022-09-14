@@ -135,6 +135,8 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
         $offset = 0;
         $result = true;
 
+        $handler = @fopen($this->filePath, 'ab+');
+
         while ($result) {
             $customItems = $this->customItemRepository
                 ->getCustomItemsRelatedToProvidedCustomObject($customObject->getId(), self::CUSTOM_ITEM_LIMIT, $offset);
@@ -197,11 +199,14 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
 
                     $rowData   = $savedRow;
                     $rowData[] = implode(',', $results);
-                    $this->addToCsvFile($rowData);
+                    $this->exportHelper->echoTouchJob();
+                    fputcsv($handler, $rowData);
                     $customItemAdded = true;
                 }
             }
         }
+
+        fclose($handler);
     }
 
     /**
@@ -209,9 +214,10 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
      */
     private function addExportFileHeaderToCsvFile(array $customFields): void
     {
-        $header = $this->getCSVHeader($customFields);
-
-        $this->addToCsvFile($header);
+        $header  = $this->getCSVHeader($customFields);
+        $handler = @fopen($this->filePath, 'ab+');
+        fputcsv($handler, $header);
+        fclose($handler);
     }
 
     /**
@@ -223,20 +229,6 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
             ->getContactIdsLinkedToCustomItem($customItem->getId(), $limit, $offset);
 
         return array_column($contactIds, 'contact_id');
-    }
-
-    /**
-     * @param array<mixed> $data
-     */
-    private function addToCsvFile(array $data): void
-    {
-        /**
-         * echo to stdout to keep long jobs running.
-         */
-        $this->exportHelper->echoTouchJob();
-        $handler = @fopen($this->filePath, 'ab');
-        fputcsv($handler, $data);
-        fclose($handler);
     }
 
     public function sendEmail(CustomItemExportScheduler $customItemExportScheduler, string $filePath): void
