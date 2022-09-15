@@ -9,7 +9,6 @@ use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemExportSchedulerEvent;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemExportSchedulerModel;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -23,18 +22,15 @@ class CustomItemsScheduledExportCommand extends Command
     private CustomItemExportSchedulerModel $customItemExportSchedulerModel;
     private EventDispatcherInterface $eventDispatcher;
     private FormatterHelper $formatterHelper;
-    private LoggerInterface $logger;
 
     public function __construct(
         CustomItemExportSchedulerModel $customItemExportSchedulerModel,
         EventDispatcherInterface $eventDispatcher,
-        FormatterHelper $formatterHelper,
-        LoggerInterface $logger
+        FormatterHelper $formatterHelper
     ) {
         $this->customItemExportSchedulerModel = $customItemExportSchedulerModel;
         $this->eventDispatcher                = $eventDispatcher;
         $this->formatterHelper                = $formatterHelper;
-        $this->logger                         = $logger;
 
         parent::__construct();
     }
@@ -62,11 +58,8 @@ class CustomItemsScheduledExportCommand extends Command
 
         foreach ($customItemExportSchedulers as $customItemExportScheduler) {
             $customItemExportSchedulerEvent = new CustomItemExportSchedulerEvent($customItemExportScheduler);
-            $this->logger->info('starting exporting custom items for customItemExportScheduler id: '.$customItemExportScheduler->getId());
             $this->eventDispatcher->dispatch(CustomItemEvents::CUSTOM_ITEM_PREPARE_EXPORT_FILE, $customItemExportSchedulerEvent);
-            $this->logger->info('sending email for custom items for customItemExportScheduler id: '.$customItemExportScheduler->getId());
             $this->eventDispatcher->dispatch(CustomItemEvents::CUSTOM_ITEM_MAIL_EXPORT_FILE, $customItemExportSchedulerEvent);
-            $this->logger->info('removing customItemExportScheduler id: '.$customItemExportScheduler->getId());
             $this->eventDispatcher->dispatch(CustomItemEvents::POST_EXPORT_MAIL_SENT, $customItemExportSchedulerEvent);
             ++$count;
         }

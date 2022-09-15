@@ -9,6 +9,7 @@ use DateTimeZone;
 use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\EmailBundle\Helper\MailHelper;
+use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemExportScheduler;
@@ -17,6 +18,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemExportSchedulerRepository;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -38,6 +40,8 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
 
     private CustomItemRepository $customItemRepository;
 
+    private EventDispatcherInterface $eventDispatcher;
+
     private string $filePath;
 
     public function __construct(
@@ -46,7 +50,8 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
         CustomFieldValueModel $customFieldValueModel,
         CustomItemRouteProvider $customItemRouteProvider,
         CustomItemXrefContactRepository $customItemXrefContactRepository,
-        CustomItemRepository $customItemRepository
+        CustomItemRepository $customItemRepository,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->exportHelper                    = $exportHelper;
         $this->mailHelper                      = $mailHelper;
@@ -54,6 +59,7 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
         $this->customItemRouteProvider         = $customItemRouteProvider;
         $this->customItemXrefContactRepository = $customItemXrefContactRepository;
         $this->customItemRepository            = $customItemRepository;
+        $this->eventDispatcher                 = $eventDispatcher;
     }
 
     public function getRepository(): CustomItemExportSchedulerRepository
@@ -199,7 +205,7 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
 
                     $rowData   = $savedRow;
                     $rowData[] = implode(',', $results);
-                    $this->exportHelper->echoTouchJob();
+                    $this->eventDispatcher->dispatch(CustomItemEvents::ON_PROCESSING_FILE);
                     fputcsv($handler, $rowData);
                     $customItemAdded = true;
                 }
