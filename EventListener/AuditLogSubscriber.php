@@ -9,6 +9,7 @@ use Mautic\CoreBundle\Model\AuditLogModel;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemExportSchedulerEvent;
 use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -36,10 +37,12 @@ class AuditLogSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE       => 'onCustomItemPostSave',
-            CustomItemEvents::ON_CUSTOM_ITEM_POST_DELETE     => 'onCustomItemPostDelete',
-            CustomObjectEvents::ON_CUSTOM_OBJECT_POST_SAVE   => 'onCustomObjectPostSave',
-            CustomObjectEvents::ON_CUSTOM_OBJECT_POST_DELETE => 'onCustomObjectPostDelete',
+            CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE        => 'onCustomItemPostSave',
+            CustomItemEvents::ON_CUSTOM_ITEM_POST_DELETE      => 'onCustomItemPostDelete',
+            CustomItemEvents::CUSTOM_ITEM_PREPARE_EXPORT_FILE => 'onCustomItemPrepareExportFile',
+            CustomItemEvents::CUSTOM_ITEM_MAIL_EXPORT_FILE    => 'onCustomItemMailPreparingToSend',
+            CustomObjectEvents::ON_CUSTOM_OBJECT_POST_SAVE    => 'onCustomObjectPostSave',
+            CustomObjectEvents::ON_CUSTOM_OBJECT_POST_DELETE  => 'onCustomObjectPostDelete',
         ];
     }
 
@@ -113,5 +116,33 @@ class AuditLogSubscriber implements EventSubscriberInterface
             'details'   => ['name' => $customObject->getName()],
             'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
         ]);
+    }
+
+    public function onCustomItemPrepareExportFile(CustomItemExportSchedulerEvent $event): void
+    {
+        $this->auditLogModel->writeToLog(
+            [
+                'bundle'    => 'customObjects',
+                'object'    => 'CustomItemExportScheduler',
+                'objectId'  => $event->getCustomItemExportScheduler()->getId(),
+                'action'    => 'preparingExportFile',
+                'details'   => $event->getCustomItemExportScheduler()->getChanges(),
+                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+            ]
+        );
+    }
+
+    public function onCustomItemMailPreparingToSend(CustomItemExportSchedulerEvent $event): void
+    {
+        $this->auditLogModel->writeToLog(
+            [
+                'bundle'    => 'customObjects',
+                'object'    => 'CustomItemExportScheduler',
+                'objectId'  => $event->getCustomItemExportScheduler()->getId(),
+                'action'    => 'sendingEmail',
+                'details'   => $event->getCustomItemExportScheduler()->getChanges(),
+                'ipAddress' => $this->ipLookupHelper->getIpAddressFromRequest(),
+            ]
+        );
     }
 }

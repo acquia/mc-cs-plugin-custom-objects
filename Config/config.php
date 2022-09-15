@@ -577,6 +577,7 @@ $coParams = [
                     'custom_item.route.provider',
                     'custom_item.xref.contact.repository',
                     'custom_item.repository',
+                    'event_dispatcher',
                 ],
             ],
         ],

@@ -162,4 +162,6 @@ final class CustomItemEvents
     public const CUSTOM_ITEM_MAIL_EXPORT_FILE = 'custom.item.custom_item_mail_export_file';
 
     public const POST_EXPORT_MAIL_SENT = 'custom.item.post_export_mail_sent';
+
+    public const ON_PROCESSING_FILE = 'custom.item.on_processing_file';
 }
