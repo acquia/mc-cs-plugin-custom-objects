@@ -135,6 +135,8 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
         $offset = 0;
         $result = true;
 
+        $handler = @fopen($this->filePath, 'ab+');
+
         while ($result) {
             $customItems = $this->customItemRepository
                 ->getCustomItemsRelatedToProvidedCustomObject($customObject->getId(), self::CUSTOM_ITEM_LIMIT, $offset);
@@ -157,7 +159,24 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
                 $rowData[] = $customItem->getName();
 
                 foreach ($customFields as $customField) {
-                    $rowData[] = $listData->getFields($customItem->getId())[$customField->getId()]->getValue();
+                    $fieldValue = $listData->getFields($customItem->getId())[$customField->getId()]->getValue();
+
+                    switch ($customField->getType()) {
+                        case 'date':
+                            $value = $fieldValue instanceof \DateTimeInterface ? $fieldValue->format('Y-m-d') : $fieldValue;
+                            break;
+
+                        case 'datetime':
+                            $value = $fieldValue instanceof \DateTimeInterface ? $fieldValue->format('Y-m-d H:i:s') : $fieldValue;
+                            break;
+
+                        case 'multiselect': $value = is_array($fieldValue) ? implode(',', $fieldValue) : $fieldValue;
+                            break;
+
+                            default: $value = $fieldValue;
+                    }
+
+                    $rowData[] = $value;
                 }
 
                 $fetchResult     = true;
@@ -180,11 +199,14 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
 
                     $rowData   = $savedRow;
                     $rowData[] = implode(',', $results);
-                    $this->addToCsvFile($rowData);
+                    $this->exportHelper->echoTouchJob();
+                    fputcsv($handler, $rowData);
                     $customItemAdded = true;
                 }
             }
         }
+
+        fclose($handler);
     }
 
     /**
@@ -192,9 +214,10 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
      */
     private function addExportFileHeaderToCsvFile(array $customFields): void
     {
-        $header = $this->getCSVHeader($customFields);
-
-        $this->addToCsvFile($header);
+        $header  = $this->getCSVHeader($customFields);
+        $handler = @fopen($this->filePath, 'ab+');
+        fputcsv($handler, $header);
+        fclose($handler);
     }
 
     /**
@@ -206,16 +229,6 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
             ->getContactIdsLinkedToCustomItem($customItem->getId(), $limit, $offset);
 
         return array_column($contactIds, 'contact_id');
-    }
-
-    /**
-     * @param array<mixed> $data
-     */
-    private function addToCsvFile(array $data): void
-    {
-        $handler = @fopen($this->filePath, 'ab');
-        fputcsv($handler, $data);
-        fclose($handler);
     }
 
     public function sendEmail(CustomItemExportScheduler $customItemExportScheduler, string $filePath): void
