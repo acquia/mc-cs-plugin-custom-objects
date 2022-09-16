@@ -205,7 +205,11 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
 
                     $rowData   = $savedRow;
                     $rowData[] = implode(',', $results);
-                    $this->eventDispatcher->dispatch(CustomItemEvents::ON_PROCESSING_FILE);
+
+                    if ($this->eventDispatcher->hasListeners(CustomItemEvents::ON_PROCESSING_FILE)) {
+                        $this->eventDispatcher->dispatch(CustomItemEvents::ON_PROCESSING_FILE);
+                    }
+
                     fputcsv($handler, $rowData);
                     $customItemAdded = true;
                 }
