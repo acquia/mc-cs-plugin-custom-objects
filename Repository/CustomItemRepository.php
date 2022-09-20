@@ -78,6 +78,21 @@ class CustomItemRepository extends CommonRepository
         return CustomItem::TABLE_ALIAS;
     }
 
+    /**
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     * @throws \Doctrine\ORM\NoResultException
+     */
+    public function getItemCount(int $customObjectId): int
+    {
+        $queryBuilder = $this->getEntityManager()->createQueryBuilder();
+        $queryBuilder->select('count('.CustomItem::TABLE_ALIAS.'.id)');
+        $queryBuilder->from(CustomItem::class, CustomItem::TABLE_ALIAS);
+        $queryBuilder->where(CustomItem::TABLE_ALIAS.'.customObject = :customObjectId');
+        $queryBuilder->setParameter('customObjectId', $customObjectId);
+        $queryBuilder->setMaxResults(1);
+        return (int) $queryBuilder->getQuery()->getSingleScalarResult();
+    }
+
     private function createContactReferencesBuilder(): QueryBuilder
     {
         $queryBuilder = $this->getEntityManager()->createQueryBuilder();
@@ -106,5 +121,20 @@ class CustomItemRepository extends CommonRepository
         $queryBuilder->where('higher.customItemLower = :customItemId');
 
         return $queryBuilder;
+    }
+
+    /**
+     * @return int|mixed|string
+     */
+    public function getCustomItemsRelatedToProvidedCustomObject(int $customObjectId, int $limit, int $offset)
+    {
+        return $this->createQueryBuilder('mautic_custom_item')
+            ->select('mautic_custom_item')
+            ->where('mautic_custom_item.customObject = :customObjectId')
+            ->setParameter('customObjectId', $customObjectId)
+            ->setMaxResults($limit)
+            ->setFirstResult($offset)
+            ->getQuery()
+            ->getResult();
     }
 }

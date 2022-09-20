@@ -60,7 +60,7 @@ class LinkController extends JsonController
                 ['%itemId%' => $itemId, '%entityType%' => $entityType, '%entityId%' => $entityId],
                 FlashBag::LEVEL_ERROR
             );
-        } catch (ForbiddenException | NotFoundException | UnexpectedValueException $e) {
+        } catch (ForbiddenException|NotFoundException|UnexpectedValueException $e) {
             $this->flashBag->add($e->getMessage(), [], FlashBag::LEVEL_ERROR);
         }
 

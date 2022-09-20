@@ -140,4 +140,28 @@ final class CustomItemEvents
      * @var string
      */
     public const ON_CAMPAIGN_TRIGGER_CONDITION = 'custom.item.on_campaign_trigger_notification';
+
+    /**
+     * The custom.item.on_custom_item_export event is fired when the custom item is being exported.
+     *
+     * @see MauticPlugin\CustomObjectsBundle\Event\CustomItemExportSchedulerEvent
+     *
+     * @var string
+     */
+    public const ON_CUSTOM_ITEM_SCHEDULE_EXPORT = 'custom.item.on_custom_item_export_scheduled';
+
+    /**
+     * The custom.item.custom_item_prepare_export_file event is fired when the custom item data is being prepared to be exported.
+     *
+     * @see MauticPlugin\CustomObjectsBundle\Event\CustomItemExportSchedulerEvent
+     *
+     * @var string
+     */
+    public const CUSTOM_ITEM_PREPARE_EXPORT_FILE = 'custom.item.custom_item_prepare_export_file';
+
+    public const CUSTOM_ITEM_MAIL_EXPORT_FILE = 'custom.item.custom_item_mail_export_file';
+
+    public const POST_EXPORT_MAIL_SENT = 'custom.item.post_export_mail_sent';
+
+    public const ON_PROCESSING_FILE = 'custom.item.on_processing_file';
 }

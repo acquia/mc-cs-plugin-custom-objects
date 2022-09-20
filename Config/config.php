@@ -124,6 +124,15 @@ $coParams = [
                 'path'       => '/custom/item/{objectId}/contact/{page}',
                 'controller' => 'CustomObjectsBundle:CustomItem\ContactList:list',
             ],
+            CustomItemRouteProvider::ROUTE_EXPORT_ACTION => [
+                'path'       => 'custom/object/{object}/export',
+                'controller' => 'CustomObjectsBundle:CustomItem\Export:export',
+                'method'     => 'POST',
+            ],
+            CustomItemRouteProvider::ROUTE_EXPORT_DOWNLOAD_ACTION => [
+                'path'       => '/custom/item/export/download/{fileName}',
+                'controller' => 'CustomObjectsBundle:CustomItem\Export:downloadExport',
+            ],
 
             // Custom Objects
             CustomObjectRouteProvider::ROUTE_LIST => [
@@ -391,6 +400,13 @@ $coParams = [
                     ],
                 ],
             ],
+            'custom_item.export_controller' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ExportController::class,
+                'arguments' => [
+                    'custom_item.permission.provider',
+                    'mautic.custom.model.export_scheduler',
+                ],
+            ],
 
             // Custom Objects
             'custom_object.list_controller' => [
@@ -552,6 +568,18 @@ $coParams = [
                     'mautic.lead.model.list',
                 ],
             ],
+            'mautic.custom.model.export_scheduler' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomItemExportSchedulerModel::class,
+                'arguments' => [
+                    'mautic.helper.export',
+                    'mautic.helper.mailer',
+                    'mautic.custom.model.field.value',
+                    'custom_item.route.provider',
+                    'custom_item.xref.contact.repository',
+                    'custom_item.repository',
+                    'event_dispatcher',
+                ],
+            ],
         ],
         'permissions' => [
             'custom_object.permissions' => [
@@ -695,6 +723,12 @@ $coParams = [
                     'doctrine.orm.entity_manager',
                     'mautic.helper.user',
                     'custom_item.repository',
+                ],
+            ],
+            'custom_item.export.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomItemScheduledExportSubscriber::class,
+                'arguments' => [
+                    'mautic.custom.model.export_scheduler',
                 ],
             ],
             'custom_item.xref_item.subscriber' => [
@@ -1118,10 +1152,21 @@ $coParams = [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Helper\TokenFormatter::class,
             ],
         ],
+        'validators' => [
+            'custom_object.allow.unique_identifier.validator' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Form\Validator\Constraints\AllowUniqueIdentifierValidator::class,
+                'arguments' => [
+                    'mautic.custom.model.item',
+                    'translator',
+                ],
+                'tag' => 'validator.constraint_validator',
+            ],
+        ],
     ],
     'parameters' => [
         ConfigProvider::CONFIG_PARAM_ENABLED                              => true,
         ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT => 3,
+        'custom_item_export_dir'                                          => '%kernel.root_dir%/../media/files/temp',
     ],
 ];
 
@@ -1134,7 +1179,7 @@ if (interface_exists('ApiPlatform\\Core\\Api\\IriConverterInterface')) {
             'custom_field.type.provider',
             'mautic.custom.model.item',
             'api_platform.iri_converter',
-            'doctrine.orm.entity_manager'
+            'doctrine.orm.entity_manager',
         ],
     ];
     $coParams['services']['other']['api_platform.custom_object.serializer.api_normalizer_json'] = [
@@ -1145,14 +1190,14 @@ if (interface_exists('ApiPlatform\\Core\\Api\\IriConverterInterface')) {
             'custom_field.type.provider',
             'mautic.custom.model.item',
             'api_platform.iri_converter',
-            'doctrine.orm.entity_manager'
+            'doctrine.orm.entity_manager',
         ],
     ];
     $coParams['services']['other']['api_platform.custom_object.custom_item.extension'] = [
-        'class' => \MauticPlugin\CustomObjectsBundle\Extension\CustomItemListeningExtension::class,
+        'class'     => \MauticPlugin\CustomObjectsBundle\Extension\CustomItemListeningExtension::class,
         'arguments' => [
             'mautic.helper.user',
-            'mautic.security'
+            'mautic.security',
         ],
         'tag' => 'api_platform.doctrine.orm.query_extension.collection',
     ];
