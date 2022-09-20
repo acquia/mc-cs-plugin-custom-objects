@@ -80,7 +80,7 @@ class CustomItemModel extends FormModel
         $this->validator             = $validator;
     }
 
-    public function save(CustomItem $customItem, bool $dryRun = false, string $uniqueHash = null): CustomItem
+    public function save(CustomItem $customItem, bool $dryRun = false): CustomItem
     {
         $user  = $this->userHelper->getUser();
         $now   = new DateTimeHelper();
@@ -95,7 +95,7 @@ class CustomItemModel extends FormModel
         $customItem->setModifiedBy($user);
         $customItem->setModifiedByUser($user->getName());
         $customItem->setDateModified($now->getUtcDateTime());
-        $customItem->setUniqueHash($uniqueHash);
+        $customItem->setUniqueHash($customItem->createUniqueHash());
 
         if (!$dryRun) {
             $this->entityManager->persist($customItem);
@@ -116,7 +116,8 @@ class CustomItemModel extends FormModel
         $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, $event);
 
         if (!$dryRun) {
-            is_null($uniqueHash) ? $this->entityManager->flush($customItem) : $this->customItemRepository->upsert($customItem);
+            $this->entityManager->flush($customItem); //WIP
+            //is_null($customItem->getUniqueHash()) ? $this->entityManager->flush($customItem) : $this->customItemRepository->upsert($customItem);
             $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $event);
         }
 

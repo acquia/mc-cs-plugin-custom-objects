@@ -471,19 +471,4 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
             $this->addChange("customfield:{$deletedField['id']}", [null, 'deleted']);
         }
     }
-
-    /**
-     * @param ArrayCollection<int,string> $uniqueIdentifierFields
-     * @param array<mixed>                $rowData
-     */
-    public function createUniqueHash(ArrayCollection $uniqueIdentifierFields, array $rowData): ?string
-    {
-        $uniqueHash = [];
-        foreach ($uniqueIdentifierFields as $uniqueIdentifierField) {
-            $uniqueHash = array_merge($uniqueHash, [$uniqueIdentifierField => $rowData[$uniqueIdentifierField]]);
-        }
-        ksort($uniqueHash); //sort array on the basis of key so that the order of keys is the same everytime
-
-        return [] == $uniqueHash ? null : hash('sha256', serialize($uniqueHash));
-    }
 }
