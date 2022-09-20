@@ -61,9 +61,6 @@ $showProperties = isset($form['options']) || $customField->getTypeObject()->useP
                     <div class="col-md-6">
                         <?php echo $view['form']->row($form['defaultValue']); ?>
                     </div>
-                    <div class="col-md-6 chosen-isUniqueIdentifier">
-                        <?php echo $view['form']->row($form['isUniqueIdentifier']); ?>
-                    </div>
                 </div>
 
             </div>
