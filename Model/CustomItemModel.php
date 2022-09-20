@@ -116,9 +116,19 @@ class CustomItemModel extends FormModel
         $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, $event);
 
         if (!$dryRun) {
-            $this->entityManager->flush($customItem); //WIP
-            //is_null($customItem->getUniqueHash()) ? $this->entityManager->flush($customItem) : $this->customItemRepository->upsert($customItem);
-            $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $event);
+            if(is_null($customItem->getUniqueHash())) {
+                $this->entityManager->flush($customItem);
+                $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $event);
+            } else {
+                //WIP. TODO: find a way to stop the entity manager from executing a separate insert query after upsert
+                $this->customItemRepository->upsert($customItem);
+                $CI = $this->entityManager->find(CustomItem::class, $customItem->getId());
+                //$this->entityManager->refresh($customItem);
+                $event = new CustomItemEvent($CI, $CI->isNew());
+                //$this->entityManager->getConnection()->executeStatement('LOCK TABLES mautic_custom_item WRITE;'); -> BAD IDEA
+                $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $event);
+                //$this->entityManager->getConnection()->executeStatement('UNLOCK TABLES;');
+            }
         }
 
         return $customItem;
