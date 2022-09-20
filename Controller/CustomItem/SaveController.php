@@ -111,7 +111,7 @@ class SaveController extends AbstractFormController
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        if ($this->customObjectModel->isLocked($customItem)) {
+        if ($this->customItemModel->isLocked($customItem)) {
             $this->lockFlashMessageHelper->addFlash(
                 $customItem,
                 $this->routeProvider->buildEditRoute($objectId, $itemId),
@@ -180,7 +180,7 @@ class SaveController extends AbstractFormController
 
             $request->setMethod(Request::METHOD_GET);
 
-            if ($saveClicked) {
+            if ($saveClicked && $this->customItemModel->isLocked($customItem)) {
                 $this->customItemModel->unlockEntity($customItem);
             }
 
