@@ -136,7 +136,7 @@ class SaveController extends AbstractFormController
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $this->customItemModel->save($customItem);
+            $customItem = $this->customItemModel->save($customItem);
 
             if ($customItem->getChildCustomItem()) {
                 $customItem->getChildCustomItem()->generateNameForChildObject('contact', $contactId, $customItem);
@@ -180,7 +180,7 @@ class SaveController extends AbstractFormController
 
             $request->setMethod(Request::METHOD_GET);
 
-            if ($saveClicked && $this->customItemModel->isLocked($customItem)) {
+            if ($saveClicked) {
                 $this->customItemModel->unlockEntity($customItem);
             }
 
