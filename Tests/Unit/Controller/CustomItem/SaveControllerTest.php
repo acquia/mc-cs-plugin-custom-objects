@@ -180,7 +180,7 @@ class SaveControllerTest extends ControllerTestCase
         $this->permissionProvider->expects($this->never())
             ->method('canCreate');
 
-        $this->customObjectModel->expects($this->once())
+        $this->customItemModel->expects($this->once())
             ->method('isLocked')
             ->with($this->customItem)
             ->willReturn(false);
@@ -278,7 +278,7 @@ class SaveControllerTest extends ControllerTestCase
         $this->permissionProvider->expects($this->never())
             ->method('canCreate');
 
-        $this->customObjectModel->expects($this->once())
+        $this->customItemModel->expects($this->once())
             ->method('isLocked')
             ->with($this->customItem)
             ->willReturn(false);
@@ -506,7 +506,7 @@ class SaveControllerTest extends ControllerTestCase
         $this->permissionProvider->expects($this->never())
             ->method('canCreate');
 
-        $this->customObjectModel->expects($this->once())
+        $this->customItemModel->expects($this->once())
             ->method('isLocked')
             ->with($this->customItem)
             ->willReturn(true);
@@ -556,7 +556,7 @@ class SaveControllerTest extends ControllerTestCase
         $this->permissionProvider->expects($this->never())
             ->method('canCreate');
 
-        $this->customObjectModel->expects($this->once())
+        $this->customItemModel->expects($this->once())
             ->method('isLocked')
             ->with($this->customItem)
             ->willReturn(false);
