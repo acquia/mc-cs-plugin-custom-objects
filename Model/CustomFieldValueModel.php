@@ -56,6 +56,7 @@ class CustomFieldValueModel
      */
     public function save(CustomFieldValueInterface $customFieldValue, bool $dryRun = false): void
     {
+        $customFieldValue->setCustomItem($this->entityManager->getReference(CustomItem::class, $customFieldValue->getCustomItem()->getId()));
         if ($customFieldValue->getCustomField()->canHaveMultipleValues()) {
             $this->deleteOptionsForField($customFieldValue);
             $options = $customFieldValue->getValue();

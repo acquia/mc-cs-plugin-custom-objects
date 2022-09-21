@@ -82,9 +82,8 @@ class CustomItemModel extends FormModel
 
     public function save(CustomItem $customItem, bool $dryRun = false): CustomItem
     {
-        $user  = $this->userHelper->getUser();
-        $now   = new DateTimeHelper();
-        $event = new CustomItemEvent($customItem, $customItem->isNew());
+        $user = $this->userHelper->getUser();
+        $now  = new DateTimeHelper();
 
         if ($customItem->isNew()) {
             $customItem->setCreatedBy($user);
@@ -97,42 +96,38 @@ class CustomItemModel extends FormModel
         $customItem->setDateModified($now->getUtcDateTime());
         $customItem->setUniqueHash($customItem->createUniqueHash());
 
-        if (!$dryRun) {
-            $this->entityManager->persist($customItem);
-        }
-
-        $customItem->getCustomFieldValues()->map(function (CustomFieldValueInterface $customFieldValue) use ($dryRun): void {
-            $this->customFieldValueModel->save($customFieldValue, $dryRun);
-        });
-
         $errors = $this->validator->validate($customItem);
 
         if ($errors->count() > 0) {
             throw new InvalidValueException($errors->get(0)->getMessage());
         }
 
-        $customItem->recordCustomFieldValueChanges();
-
-        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, $event);
+        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, new CustomItemEvent($customItem, $customItem->isNew()));
 
         if (!$dryRun) {
-            if(is_null($customItem->getUniqueHash())) {
-                $this->entityManager->flush($customItem);
-                
-            } else {
-                //WIP. TODO: find a way to stop the entity manager from executing a separate insert query after upsert
-                $this->customItemRepository->upsert($customItem);
-                $customItem = $this->entityManager->find(CustomItem::class, $customItem->getId());
-                //$this->entityManager->refresh($customItem);
-                $event = new CustomItemEvent($customItem, $customItem->isNew());
-                //$this->entityManager->getConnection()->executeStatement('LOCK TABLES mautic_custom_item WRITE;'); -> BAD IDEA
-                //$this->entityManager->getConnection()->executeStatement('UNLOCK TABLES;');
-            }
+            $this->customItemRepository->upsert($customItem);
 
-            $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $event);
+            $customItem->getCustomFieldValues()->map(
+                fn (CustomFieldValueInterface $customFieldValue) => $this->customFieldValueModel->save($customFieldValue, $dryRun)
+            );
+
+            $customItem->recordCustomFieldValueChanges();
+
+
+            $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, new CustomItemEvent($customItem, $customItem->isNew()));
         }
 
         return $customItem;
+    }
+
+    public function unlockEntity($entity, $extra = null)
+    {
+        if ($entity->getId()) {
+            $entity->setCheckedOut(null);
+            $entity->setCheckedOutBy(null);
+
+            $this->save($entity);
+        }
     }
 
     /**
