@@ -124,7 +124,7 @@ class SaveController extends AbstractFormController
 
         $action = $this->routeProvider->buildSaveRoute($objectId, $itemId);
 
-        if (!$customItem->getId() && $customItem->getCustomObject()->getRelationshipObject() && $contactId) {
+        if (!$customItem->getId() && $customItem->getCustomObject() && $customItem->getCustomObject()->getRelationshipObject() && $contactId) {
             $customItem->setChildCustomItem(
                 $this->customItemModel->populateCustomFields(
                     new CustomItem($customItem->getCustomObject()->getRelationshipObject())
@@ -134,6 +134,9 @@ class SaveController extends AbstractFormController
         $form = $this->formFactory->create(CustomItemType::class, $customItem, ['action' => $action, 'objectId' => $objectId]);
 
         $form->handleRequest($request);
+
+        $customItemId = $customItem->getId();
+        $customItemName = $customItem->getName();
 
         if ($form->isValid()) {
             $customItem = $this->customItemModel->save($customItem);
@@ -146,8 +149,8 @@ class SaveController extends AbstractFormController
             $this->flashBag->add(
                 $message,
                 [
-                    '%name%' => $customItem->getName(),
-                    '%url%'  => $this->routeProvider->buildEditRoute($objectId, $customItem->getId()),
+                    '%name%' => $customItemName,
+                    '%url%'  => $this->routeProvider->buildEditRoute($objectId, $customItemId),
                 ]
             );
 
