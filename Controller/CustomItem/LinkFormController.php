@@ -146,8 +146,8 @@ class LinkFormController extends AbstractFormController
             $form->handleRequest($this->request);
 
             if ($form->isValid()) {
-                $callback = $relationshipItem->getId() ? null : 'customItemLinkFormPostSubmit';
-                $this->customItemModel->save($relationshipItem);
+                $callback         = $relationshipItem->getId() ? null : 'customItemLinkFormPostSubmit';
+                $relationshipItem = $this->customItemModel->save($relationshipItem);
 
                 $responseData = [
                     'closeModal' => true,
