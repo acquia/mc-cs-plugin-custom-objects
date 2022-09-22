@@ -53,7 +53,7 @@ class CampaignSubscriberTest extends MauticMysqlTestCase
         $urlValue = $customItem->findCustomFieldValueForFieldAlias('url-test-field');
 
         // Save the values
-        $customItemModel->save($customItem);
+        $customItem = $customItemModel->save($customItem);
         $customItemModel->linkEntity($customItem, 'contact', (int) $contact->getId());
 
         // Test the multiselect value less than 2019-08-05.
