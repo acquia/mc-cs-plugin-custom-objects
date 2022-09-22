@@ -631,7 +631,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         $this->uniqueHash = $uniqueHash;
     }
 
-    public function createUniqueHash()
+    public function createUniqueHash(): ?string
     {
         $rowData                = [];
         $uniqueHash             = [];

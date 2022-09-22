@@ -124,7 +124,7 @@ class SaveController extends AbstractFormController
 
         $action = $this->routeProvider->buildSaveRoute($objectId, $itemId);
 
-        if (!$customItem->getId() && $customItem->getCustomObject() && $customItem->getCustomObject()->getRelationshipObject() && $contactId) {
+        if (!$customItem->getId() && $customItem->getCustomObject()->getRelationshipObject() && $contactId) {
             $customItem->setChildCustomItem(
                 $this->customItemModel->populateCustomFields(
                     new CustomItem($customItem->getCustomObject()->getRelationshipObject())
