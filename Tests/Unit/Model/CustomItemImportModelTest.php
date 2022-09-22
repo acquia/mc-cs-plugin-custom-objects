@@ -38,8 +38,6 @@ class CustomItemImportModelTest extends \PHPUnit\Framework\TestCase
         'name'        => 'customItemName',
     ];
 
-    private const UNIQUE_IDENTIFIER_FIELDS = ['name', 'date'];
-
     /**
      * @var MockObject|CustomObject
      */
@@ -281,66 +279,5 @@ class CustomItemImportModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn($customItem);
 
         $this->customItemImportModel->import($this->import, $rowData, $this->customObject);
-    }
-
-    public function testImportForCreatedWithUniqueIdentifierField(): void
-    {
-        $uniqueIdentifierFields = self::UNIQUE_IDENTIFIER_FIELDS;
-        $rowData                = self::ROW_DATA;
-
-        $this->import->expects($this->exactly(2))
-            ->method('getMatchedFields')
-            ->willReturn(self::MAPPED_FIELDS);
-
-        $this->customItemModel->expects($this->never())
-            ->method('fetchEntity');
-
-        $this->formatterHelper->expects($this->once())
-            ->method('simpleCsvToArray')
-            ->with('3262739,3262738,3262737')
-            ->willReturn([3262739, 3262738, 3262737]);
-
-        $this->customObject->expects($this->exactly(3))
-            ->method('getCustomFields')
-            ->willReturn(new ArrayCollection([$this->descriptionField, $this->dateField]));
-
-        $customItem = $this->createMock(CustomItem::class);
-
-        $this->customObject->method('getFieldsIsUniqueIdentifier')->willReturn(new ArrayCollection($uniqueIdentifierFields));
-
-        $this->customObject->expects($this->once())
-            ->method('createUniqueHash')
-            ->with(new ArrayCollection($uniqueIdentifierFields), $rowData)
-            ->will($this->returnCallback(function ($uniqueIdentifierFields, $rowData) {
-                $uniqueHash = [];
-                foreach ((array) $uniqueIdentifierFields as $uniqueIdentifierField) {
-                    $uniqueHash = array_merge($uniqueHash, [$uniqueIdentifierField => $rowData[$uniqueIdentifierField]]);
-                }
-                ksort($uniqueHash);
-
-                return hash('sha256', serialize($uniqueHash));
-            }));
-
-        $this->customItemModel->expects($this->once())
-            ->method('save')
-            ->with($this->callback(function (CustomItem $customItem) {
-                $this->assertSame('Mautic Demo', $customItem->getName());
-                $this->assertSame($this->customObject, $customItem->getCustomObject());
-                $fieldValues      = $customItem->getCustomFieldValues();
-                $descriptionField = $fieldValues->get(33);
-                $dateField        = $fieldValues->get(34);
-                $this->assertSame('2019-03-04', $dateField->getValue()->format('Y-m-d'));
-                $this->assertSame($this->dateField, $dateField->getCustomField());
-                $this->assertSame('Showing demo of Mautic to potential clients.', $descriptionField->getValue());
-                $this->assertSame($this->descriptionField, $descriptionField->getCustomField());
-
-                return true;
-            }))
-            ->willReturn($customItem);
-
-        $this->assertSame(
-            false,
-            $this->customItemImportModel->import($this->import, self::ROW_DATA, $this->customObject)
-        );
     }
 }

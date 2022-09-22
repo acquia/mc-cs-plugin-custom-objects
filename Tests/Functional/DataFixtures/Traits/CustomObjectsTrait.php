@@ -65,9 +65,7 @@ trait CustomObjectsTrait
 
         /** @var CustomItemModel $customItemModel */
         $customItemModel = $container->get('mautic.custom.model.item');
-        $customItemModel->save($customItem);
-
-        return $customItem;
+        return $customItemModel->save($customItem);
     }
 
     private function addFieldOption(CustomField $customField, string $label, string $value): void

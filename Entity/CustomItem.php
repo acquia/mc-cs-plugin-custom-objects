@@ -630,4 +630,29 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     {
         $this->uniqueHash = $uniqueHash;
     }
+
+    public function createUniqueHash()
+    {
+        $rowData                = [];
+        $uniqueHash             = [];
+        $uniqueIdentifierFields = $this->customObject->getFieldsIsUniqueIdentifier();
+
+        if (is_null($uniqueIdentifierFields)) {
+            return null;
+        }
+
+        foreach ($this->getCustomObject()->getCustomFields()->getValues() as $customField) {
+            try {
+                $rowData[$customField->getAlias()] = $this->findCustomFieldValueForFieldAlias($customField->getAlias())->getValue();
+            } catch (NotFoundException $exception) {
+            }
+        }
+
+        foreach ($uniqueIdentifierFields as $uniqueIdentifierField) {
+            $uniqueHash = array_merge($uniqueHash, [$uniqueIdentifierField->getAlias() => $rowData[$uniqueIdentifierField->getAlias()]]);
+        }
+        ksort($uniqueHash); //sort array on the basis of key so that the order of keys is the same everytime
+
+        return [] == $uniqueHash ? null : hash('sha256', serialize($uniqueHash));
+    }
 }

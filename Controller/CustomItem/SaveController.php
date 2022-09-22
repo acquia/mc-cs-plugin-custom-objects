@@ -111,7 +111,7 @@ class SaveController extends AbstractFormController
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        if ($this->customObjectModel->isLocked($customItem)) {
+        if ($this->customItemModel->isLocked($customItem)) {
             $this->lockFlashMessageHelper->addFlash(
                 $customItem,
                 $this->routeProvider->buildEditRoute($objectId, $itemId),
@@ -124,7 +124,7 @@ class SaveController extends AbstractFormController
 
         $action = $this->routeProvider->buildSaveRoute($objectId, $itemId);
 
-        if (!$customItem->getId() && $customItem->getCustomObject()->getRelationshipObject() && $contactId) {
+        if (!$customItem->getId() && $customItem->getCustomObject() && $customItem->getCustomObject()->getRelationshipObject() && $contactId) {
             $customItem->setChildCustomItem(
                 $this->customItemModel->populateCustomFields(
                     new CustomItem($customItem->getCustomObject()->getRelationshipObject())
@@ -135,19 +135,22 @@ class SaveController extends AbstractFormController
 
         $form->handleRequest($request);
 
+        $customItemId = $customItem->getId();
+        $customItemName = $customItem->getName();
+
         if ($form->isValid()) {
-            $this->customItemModel->save($customItem);
+            $customItem = $this->customItemModel->save($customItem);
 
             if ($customItem->getChildCustomItem()) {
                 $customItem->getChildCustomItem()->generateNameForChildObject('contact', $contactId, $customItem);
-                $this->customItemModel->save($customItem->getChildCustomItem());
+                $customItem = $this->customItemModel->save($customItem->getChildCustomItem());
             }
 
             $this->flashBag->add(
                 $message,
                 [
-                    '%name%' => $customItem->getName(),
-                    '%url%'  => $this->routeProvider->buildEditRoute($objectId, $customItem->getId()),
+                    '%name%' => $customItemName,
+                    '%url%'  => $this->routeProvider->buildEditRoute($objectId, $customItemId),
                 ]
             );
 
