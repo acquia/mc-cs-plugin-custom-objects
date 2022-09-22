@@ -32,7 +32,7 @@ class UpsertFunctionalTest extends \Mautic\CoreBundle\Test\MauticMysqlTestCase
         $this->existingCustomItem = $this->customItemModel->save($this->existingCustomItem);
     }
 
-    public function testCreateNewCustomItemWithNewUniqueHash()
+    public function testCreateNewCustomItemWithNewUniqueHash(): void
     {
         $this->assertEquals(1, $this->customItemRepository->getItemCount($this->customObject->getId()));
         $this->assertEquals('Sapiens', $this->existingCustomItem->getName());
@@ -46,7 +46,7 @@ class UpsertFunctionalTest extends \Mautic\CoreBundle\Test\MauticMysqlTestCase
         $this->assertEquals('Factfulness', $newCustomItem->getName());
     }
 
-    public function testCreateNewCustomItemWithExistingUniqueHash()
+    public function testCreateNewCustomItemWithExistingUniqueHash(): void
     {
         $this->assertEquals(1, $this->customItemRepository->getItemCount($this->customObject->getId()));
 
