@@ -112,7 +112,7 @@ class CustomItemModel extends FormModel
 
                 // We need to re-attach the entity to the entity manager so that it can be saved by the rest of the code.
                 $customFieldValues = $customItem->getCustomFieldValues();
-                $customItem = $this->fetchEntity($customItem->getId());
+                $customItem        = $this->fetchEntity($customItem->getId());
 
                 foreach ($customFieldValues as $customFieldValue) {
                     $customFieldValue->setCustomItem($customItem);
@@ -122,13 +122,12 @@ class CustomItemModel extends FormModel
                 $this->entityManager->persist($customItem);
                 $this->entityManager->flush();
             }
-            
+
             $customItem->getCustomFieldValues()->map(
                 fn (CustomFieldValueInterface $customFieldValue) => $this->customFieldValueModel->save($customFieldValue, $dryRun)
             );
 
             $customItem->recordCustomFieldValueChanges();
-
 
             $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, new CustomItemEvent($customItem, $customItem->isNew()));
         }
@@ -136,7 +135,12 @@ class CustomItemModel extends FormModel
         return $customItem;
     }
 
-    public function unlockEntity($entity, $extra = null)
+    /**
+     * @param object $entity
+     * @param null $extra
+     * @throws InvalidValueException
+     */
+    public function unlockEntity($entity, $extra = null): void
     {
         if ($entity->getId()) {
             $entity->setCheckedOut(null);
