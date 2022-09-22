@@ -642,9 +642,10 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         }
 
         foreach ($this->getCustomObject()->getCustomFields()->getValues() as $customField) {
-            try{
+            try {
                 $rowData[$customField->getAlias()] = $this->findCustomFieldValueForFieldAlias($customField->getAlias())->getValue();
-            } catch (NotFoundException $exception){}
+            } catch (NotFoundException $exception) {
+            }
         }
 
         foreach ($uniqueIdentifierFields as $uniqueIdentifierField) {
