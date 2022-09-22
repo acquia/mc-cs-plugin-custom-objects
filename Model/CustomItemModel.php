@@ -105,8 +105,24 @@ class CustomItemModel extends FormModel
         $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, new CustomItemEvent($customItem, $customItem->isNew()));
 
         if (!$dryRun) {
-            $this->customItemRepository->upsert($customItem);
+            if ($customItem->isNew()) {
+                // Custom item is new so we need to upsert it to atomically find whether it exists based on unique fields or not.
+                $this->entityManager->detach($customItem);
+                $this->customItemRepository->upsert($customItem);
 
+                // We need to re-attach the entity to the entity manager so that it can be saved by the rest of the code.
+                $customFieldValues = $customItem->getCustomFieldValues();
+                $customItem = $this->fetchEntity($customItem->getId());
+
+                foreach ($customFieldValues as $customFieldValue) {
+                    $customFieldValue->setCustomItem($customItem);
+                    $customItem->addCustomFieldValue($customFieldValue);
+                }
+            } else {
+                $this->entityManager->persist($customItem);
+                $this->entityManager->flush();
+            }
+            
             $customItem->getCustomFieldValues()->map(
                 fn (CustomFieldValueInterface $customFieldValue) => $this->customFieldValueModel->save($customFieldValue, $dryRun)
             );
