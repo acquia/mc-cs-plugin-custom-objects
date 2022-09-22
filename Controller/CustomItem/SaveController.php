@@ -143,7 +143,7 @@ class SaveController extends AbstractFormController
 
             if ($customItem->getChildCustomItem()) {
                 $customItem->getChildCustomItem()->generateNameForChildObject('contact', $contactId, $customItem);
-                $this->customItemModel->save($customItem->getChildCustomItem());
+                $customItem = $this->customItemModel->save($customItem->getChildCustomItem());
             }
 
             $this->flashBag->add(
