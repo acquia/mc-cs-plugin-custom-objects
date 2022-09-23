@@ -68,7 +68,7 @@ abstract class AbstractCustomFieldValue implements CustomFieldValueInterface
         return $this->customField;
     }
 
-    public function setCustomItem(?CustomItem $customItem): void
+    public function setCustomItem(CustomItem $customItem): void
     {
         $this->customItem = $customItem;
     }

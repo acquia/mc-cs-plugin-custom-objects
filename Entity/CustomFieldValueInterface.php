@@ -21,7 +21,7 @@ interface CustomFieldValueInterface extends UniqueEntityInterface
      */
     public function getCustomItem();
 
-    public function setCustomItem(?CustomItem $customItem): void;
+    public function setCustomItem(CustomItem $customItem): void;
 
     /**
      * @return mixed
