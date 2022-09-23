@@ -10,6 +10,7 @@ use Mautic\CoreBundle\Helper\ExportHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
 use Mautic\EmailBundle\Helper\MailHelper;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
+use MauticPlugin\CustomObjectsBundle\DTO\CustomItemFieldListData;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemExportScheduler;
@@ -18,6 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemExportSchedulerRepository;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
+use phpDocumentor\Reflection\Types\Resource_;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -65,7 +67,7 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
     public function getRepository(): CustomItemExportSchedulerRepository
     {
         $repo = $this->em->getRepository(CustomItemExportScheduler::class);
-        \assert($repo instanceof CustomItemExportScheduler);
+        \assert($repo instanceof CustomItemExportSchedulerRepository);
 
         return $repo;
     }
@@ -164,55 +166,7 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
                 $rowData[] = $customItem->getId();
                 $rowData[] = $customItem->getName();
 
-                foreach ($customFields as $customField) {
-                    $fieldValue = $listData->getFields($customItem->getId())[$customField->getId()]->getValue();
-
-                    switch ($customField->getType()) {
-                        case 'date':
-                            $value = $fieldValue instanceof \DateTimeInterface ? $fieldValue->format('Y-m-d') : $fieldValue;
-                            break;
-
-                        case 'datetime':
-                            $value = $fieldValue instanceof \DateTimeInterface ? $fieldValue->format('Y-m-d H:i:s') : $fieldValue;
-                            break;
-
-                        case 'multiselect': $value = is_array($fieldValue) ? implode(',', $fieldValue) : $fieldValue;
-                            break;
-
-                            default: $value = $fieldValue;
-                    }
-
-                    $rowData[] = $value;
-                }
-
-                $fetchResult     = true;
-                $savedRow        = $rowData;
-                $contactOffset   = 0;
-                $customItemAdded = false;
-
-                while ($fetchResult) {
-                    $results = $this->getContactIds($customItem, self::CONTACT_LIMIT, $contactOffset);
-
-                    if (0 == count($results) && $customItemAdded) {
-                        break;
-                    }
-
-                    if (count($results) < self::CONTACT_LIMIT) {
-                        $fetchResult = false;
-                    } else {
-                        $contactOffset += self::CONTACT_LIMIT;
-                    }
-
-                    $rowData   = $savedRow;
-                    $rowData[] = implode(',', $results);
-
-                    if ($this->eventDispatcher->hasListeners(CustomItemEvents::ON_PROCESSING_FILE)) {
-                        $this->eventDispatcher->dispatch(CustomItemEvents::ON_PROCESSING_FILE);
-                    }
-
-                    fputcsv($handler, $rowData);
-                    $customItemAdded = true;
-                }
+                $rowData = $this->getRowData($customFields, $listData, $customItem, $rowData, $handler);
             }
         }
 
@@ -290,5 +244,70 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
                 'Pragma'              => 'public',
             ]
         );
+    }
+
+    /**
+     * @param array<mixed> $customFields
+     * @param CustomItemFieldListData|null $listData
+     * @param mixed $customItem
+     * @param array<mixed> $rowData
+     * @param mixed $handler
+     * @return array<mixed>
+     */
+    private function getRowData(array $customFields, ?CustomItemFieldListData $listData, $customItem, array $rowData, $handler): array
+    {
+        foreach ($customFields as $customField) {
+            $fieldValue = $listData->getFields($customItem->getId())[$customField->getId()]->getValue();
+
+            switch ($customField->getType()) {
+                case 'date':
+                    $value = $fieldValue instanceof \DateTimeInterface ? $fieldValue->format('Y-m-d') : $fieldValue;
+                    break;
+
+                case 'datetime':
+                    $value = $fieldValue instanceof \DateTimeInterface ? $fieldValue->format('Y-m-d H:i:s') : $fieldValue;
+                    break;
+
+                case 'multiselect':
+                    $value = is_array($fieldValue) ? implode(',', $fieldValue) : $fieldValue;
+                    break;
+
+                default:
+                    $value = $fieldValue;
+            }
+
+            $rowData[] = $value;
+        }
+
+        $fetchResult     = true;
+        $savedRow        = $rowData;
+        $contactOffset   = 0;
+        $customItemAdded = false;
+
+        while ($fetchResult) {
+            $results = $this->getContactIds($customItem, self::CONTACT_LIMIT, $contactOffset);
+
+            if (0 == count($results) && $customItemAdded) {
+                break;
+            }
+
+            if (count($results) < self::CONTACT_LIMIT) {
+                $fetchResult = false;
+            } else {
+                $contactOffset += self::CONTACT_LIMIT;
+            }
+
+            $rowData   = $savedRow;
+            $rowData[] = implode(',', $results);
+
+            if ($this->eventDispatcher->hasListeners(CustomItemEvents::ON_PROCESSING_FILE)) {
+                $this->eventDispatcher->dispatch(CustomItemEvents::ON_PROCESSING_FILE);
+            }
+
+            fputcsv($handler, $rowData);
+            $customItemAdded = true;
+        }
+
+        return $rowData;
     }
 }
