@@ -203,12 +203,11 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
     private $showInContactDetailList = true;
 
     /**
-     * @var bool
      * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
      */
     private bool $isUniqueIdentifier = false;
     
-    private bool $wasChangeIsUniqueIdentifier = false;
+    private bool $hasChangedIsUniqueIdentifier = false;
 
     public function __construct()
     {
@@ -699,9 +698,9 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
         return $this;
     }
 
-    public function wasChangeIsUniqueIdentifier(): bool
+    public function hasChangedIsUniqueIdentifier(): bool
     {
-        return $this->wasChangeIsUniqueIdentifier;
+        return $this->hasChangedIsUniqueIdentifier;
     }
 
     public function getIsUniqueIdentifier(): bool
@@ -711,7 +710,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
 
     public function setIsUniqueIdentifier(?bool $isUniqueIdentifier): void
     {
-        $this->wasChangeIsUniqueIdentifier = $this->isUniqueIdentifier != $isUniqueIdentifier;
+        $this->hasChangedIsUniqueIdentifier = $this->isUniqueIdentifier != $isUniqueIdentifier;
         $this->isUniqueIdentifier          = (bool) $isUniqueIdentifier;
         if ($isUniqueIdentifier) {
             $this->setRequired($isUniqueIdentifier);
