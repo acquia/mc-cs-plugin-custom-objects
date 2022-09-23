@@ -62,7 +62,7 @@ class TokenSubscriberTest extends MauticMysqlTestCase
         $textValue->setValue('abracadabra');
         $mutiselectValue->setValue('option_b');
 
-        $this->customItemModel->save($customItem);
+        $customItem = $this->customItemModel->save($customItem);
         $this->customItemModel->linkEntity($customItem, 'contact', (int) $contact->getId());
 
         $filters = [
@@ -142,7 +142,7 @@ class TokenSubscriberTest extends MauticMysqlTestCase
 
         $value->setValue('2019-07-17 13:00:00');
 
-        $this->customItemModel->save($customItem);
+        $customItem = $this->customItemModel->save($customItem);
         $this->customItemModel->linkEntity($customItem, 'contact', (int) $contact->getId());
 
         $filters = [
@@ -211,7 +211,7 @@ class TokenSubscriberTest extends MauticMysqlTestCase
 
         $value->setValue(['option_a', 'option_b']);
 
-        $this->customItemModel->save($customItem);
+        $customItem = $this->customItemModel->save($customItem);
         $this->customItemModel->linkEntity($customItem, 'contact', (int) $contact->getId());
 
         $filters = [
@@ -280,7 +280,7 @@ class TokenSubscriberTest extends MauticMysqlTestCase
 
         $value->setValue('option_b');
 
-        $this->customItemModel->save($customItem);
+        $customItem = $this->customItemModel->save($customItem);
         $this->customItemModel->linkEntity($customItem, 'contact', (int) $contact->getId());
 
         $filters = [

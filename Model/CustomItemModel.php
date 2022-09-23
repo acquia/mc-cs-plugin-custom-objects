@@ -80,11 +80,10 @@ class CustomItemModel extends FormModel
         $this->validator             = $validator;
     }
 
-    public function save(CustomItem $customItem, bool $dryRun = false, string $uniqueHash = null): CustomItem
+    public function save(CustomItem $customItem, bool $dryRun = false): CustomItem
     {
-        $user  = $this->userHelper->getUser();
-        $now   = new DateTimeHelper();
-        $event = new CustomItemEvent($customItem, $customItem->isNew());
+        $user = $this->userHelper->getUser();
+        $now  = new DateTimeHelper();
 
         if ($customItem->isNew()) {
             $customItem->setCreatedBy($user);
@@ -95,15 +94,7 @@ class CustomItemModel extends FormModel
         $customItem->setModifiedBy($user);
         $customItem->setModifiedByUser($user->getName());
         $customItem->setDateModified($now->getUtcDateTime());
-        $customItem->setUniqueHash($uniqueHash);
-
-        if (!$dryRun) {
-            $this->entityManager->persist($customItem);
-        }
-
-        $customItem->getCustomFieldValues()->map(function (CustomFieldValueInterface $customFieldValue) use ($dryRun): void {
-            $this->customFieldValueModel->save($customFieldValue, $dryRun);
-        });
+        $customItem->setUniqueHash($customItem->createUniqueHash());
 
         $errors = $this->validator->validate($customItem);
 
@@ -111,16 +102,52 @@ class CustomItemModel extends FormModel
             throw new InvalidValueException($errors->get(0)->getMessage());
         }
 
-        $customItem->recordCustomFieldValueChanges();
-
-        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, $event);
+        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, new CustomItemEvent($customItem, $customItem->isNew()));
 
         if (!$dryRun) {
-            is_null($uniqueHash) ? $this->entityManager->flush($customItem) : $this->customItemRepository->upsert($customItem);
-            $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $event);
+            if ($customItem->isNew()) {
+                // Custom item is new so we need to upsert it to atomically find whether it exists based on unique fields or not.
+                $this->entityManager->detach($customItem);
+                $this->customItemRepository->upsert($customItem);
+
+                // We need to re-attach the entity to the entity manager so that it can be saved by the rest of the code.
+                $customFieldValues = $customItem->getCustomFieldValues();
+                $customItem        = $this->fetchEntity($customItem->getId());
+
+                foreach ($customFieldValues as $customFieldValue) {
+                    $customFieldValue->setCustomItem($customItem);
+                    $customItem->addCustomFieldValue($customFieldValue);
+                }
+            } else {
+                $this->entityManager->persist($customItem);
+                $this->entityManager->flush();
+            }
+
+            $customItem->getCustomFieldValues()->map(
+                fn (CustomFieldValueInterface $customFieldValue) => $this->customFieldValueModel->save($customFieldValue, $dryRun)
+            );
+
+            $customItem->recordCustomFieldValueChanges();
+
+            $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, new CustomItemEvent($customItem, $customItem->isNew()));
         }
 
         return $customItem;
+    }
+
+    /**
+     * @param object $entity
+     * @param null $extra
+     * @throws InvalidValueException
+     */
+    public function unlockEntity($entity, $extra = null): void
+    {
+        if ($entity->getId()) {
+            $entity->setCheckedOut(null);
+            $entity->setCheckedOutBy(null);
+
+            $this->save($entity);
+        }
     }
 
     /**

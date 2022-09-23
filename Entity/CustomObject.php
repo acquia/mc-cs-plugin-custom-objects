@@ -423,11 +423,10 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     public function getFieldsIsUniqueIdentifier(): ?ArrayCollection
     {
         return $this->customFields->filter(
-            function (CustomField $customField) {
-                return $customField->getIsUniqueIdentifier();
-            }
+            static fn(CustomField $customField) => $customField->getIsUniqueIdentifier()
         );
     }
+
 
     /**
      * Called when the custom fields are loaded from the database.
@@ -470,20 +469,5 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         foreach ($deletedFields as $deletedField) {
             $this->addChange("customfield:{$deletedField['id']}", [null, 'deleted']);
         }
-    }
-
-    /**
-     * @param ArrayCollection<int,string> $uniqueIdentifierFields
-     * @param array<mixed>                $rowData
-     */
-    public function createUniqueHash(ArrayCollection $uniqueIdentifierFields, array $rowData): ?string
-    {
-        $uniqueHash = [];
-        foreach ($uniqueIdentifierFields as $uniqueIdentifierField) {
-            $uniqueHash = array_merge($uniqueHash, [$uniqueIdentifierField => $rowData[$uniqueIdentifierField]]);
-        }
-        ksort($uniqueHash); //sort array on the basis of key so that the order of keys is the same everytime
-
-        return [] == $uniqueHash ? null : hash('sha256', serialize($uniqueHash));
     }
 }
