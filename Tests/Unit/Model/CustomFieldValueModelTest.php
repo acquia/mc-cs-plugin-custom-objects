@@ -58,6 +58,8 @@ class CustomFieldValueModelTest extends \PHPUnit\Framework\TestCase
             $this->entityManager,
             $this->validator
         );
+
+        $this->entityManager->method('getReference')->willReturn($this->customItem);
     }
 
     public function testGetValuesForItemIfItemDoesNotHaveId(): void
