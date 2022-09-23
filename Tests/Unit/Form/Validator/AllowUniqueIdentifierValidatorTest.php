@@ -74,7 +74,7 @@ class AllowUniqueIdentifierValidatorTest extends TestCase
             ->willReturn(false);
 
         $this->customField->expects($this->once())
-            ->method('wasChangeIsUniqueIdentifier')
+            ->method('hasChangedIsUniqueIdentifier')
             ->willReturn(true);
 
         $customObject = $this->createMock(CustomObject::class);

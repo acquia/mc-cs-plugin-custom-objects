@@ -34,11 +34,11 @@ class AllowUniqueIdentifierValidator extends ConstraintValidator
         }
 
         // If isUniqueIdentifier is not changed then allow to edit custom field
-        if (!$value->wasChangeIsUniqueIdentifier()) {
+        if (!$value->hasChangedIsUniqueIdentifier()) {
             return;
         }
 
-        /** AllowUniqueIdentifier $constraint */
+        \assert($constraint instanceof AllowUniqueIdentifier);
         if ($this->checkCustomItemCount($value)) {
             /** @phpstan-ignore-next-line */
             $this->context->buildViolation($constraint->message)
@@ -55,8 +55,8 @@ class AllowUniqueIdentifierValidator extends ConstraintValidator
     {
         $customObjectId = (int) $customField->getCustomObject()->getId();
 
-        /** @var CustomItemRepository $customItemRepository */
         $customItemRepository = $this->customItemModel->getRepository();
+        \assert($customItemRepository instanceof CustomItemRepository);
 
         return (bool) $customItemRepository->getItemCount($customObjectId);
     }

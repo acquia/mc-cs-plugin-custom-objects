@@ -64,8 +64,8 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
 
     public function getRepository(): CustomItemExportSchedulerRepository
     {
-        /** @var CustomItemExportSchedulerRepository $repo */
         $repo = $this->em->getRepository(CustomItemExportScheduler::class);
+        \assert($repo instanceof CustomItemExportScheduler);
 
         return $repo;
     }
