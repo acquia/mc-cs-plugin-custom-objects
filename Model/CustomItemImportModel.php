@@ -89,7 +89,7 @@ class CustomItemImportModel extends FormModel
 
         $customItem->setDefaultValuesForMissingFields();
 
-        $customItem = $customItem = $this->customItemModel->save($customItem);
+        $customItem = $this->customItemModel->save($customItem);
         $this->linkContacts($customItem, $contactIds);
 
         return $merged;
