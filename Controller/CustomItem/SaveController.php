@@ -135,7 +135,7 @@ class SaveController extends AbstractFormController
 
         $form->handleRequest($request);
 
-        $customItemId = $customItem->getId();
+        $customItemId   = $customItem->getId();
         $customItemName = $customItem->getName();
 
         if ($form->isValid()) {
