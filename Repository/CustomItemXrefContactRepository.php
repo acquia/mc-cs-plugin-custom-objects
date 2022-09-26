@@ -48,4 +48,19 @@ class CustomItemXrefContactRepository extends CommonRepository
     {
         return CustomItemXrefContact::TABLE_ALIAS;
     }
+
+    /**
+     * @return int|mixed|string
+     */
+    public function getContactIdsLinkedToCustomItem(int $customItemId, int $limit, int $offset)
+    {
+        return $this->createQueryBuilder(CustomItemXrefContact::TABLE_ALIAS)
+            ->select('IDENTITY('.CustomItemXrefContact::TABLE_ALIAS.'.contact) AS contact_id')
+            ->where(CustomItemXrefContact::TABLE_ALIAS.'.customItem = :customItemId')
+            ->setParameter('customItemId', $customItemId)
+            ->setMaxResults($limit)
+            ->setFirstResult($offset)
+            ->getQuery()
+            ->getResult();
+    }
 }
