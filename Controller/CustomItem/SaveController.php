@@ -135,9 +135,6 @@ class SaveController extends AbstractFormController
 
         $form->handleRequest($request);
 
-        $customItemId   = $customItem->getId();
-        $customItemName = $customItem->getName();
-
         if ($form->isValid()) {
             $customItem = $this->customItemModel->save($customItem);
 
@@ -149,8 +146,8 @@ class SaveController extends AbstractFormController
             $this->flashBag->add(
                 $message,
                 [
-                    '%name%' => $customItemName,
-                    '%url%'  => $this->routeProvider->buildEditRoute($objectId, $customItemId),
+                    '%name%' => $customItem->getName(),
+                    '%url%'  => $this->routeProvider->buildEditRoute($objectId, $customItem->getId()),
                 ]
             );
 
