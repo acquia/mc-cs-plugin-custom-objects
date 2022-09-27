@@ -32,36 +32,24 @@ class UpsertFunctionalTest extends \Mautic\CoreBundle\Test\MauticMysqlTestCase
         $this->existingCustomItem = $this->customItemModel->save($this->existingCustomItem);
     }
 
-    public function testCreateNewCustomItemWithNewUniqueHash(): void
+    public function testCreateNewCustomItemWithUniqueHash(): void
     {
-        $this->assertEquals(1, $this->customItemRepository->getItemCount($this->customObject->getId()));
+        $this->assertEquals(1, $this->customItemRepository->count(['customObject' => $this->customObject->getId()]));
         $this->assertEquals('Sapiens', $this->existingCustomItem->getName());
 
         $newCustomItem = $this->createCustomItem($this->customObject, 'Factfulness');
         $newCustomItem->createNewCustomFieldValueByFieldAlias('unique_id_field', 'SomeOtherUniqueHash');
         $newCustomItem = $this->customItemModel->save($newCustomItem);
 
-        $this->assertEquals(2, $this->customItemRepository->getItemCount($this->customObject->getId()));
+        $this->assertEquals(2, $this->customItemRepository->count(['customObject' => $this->customObject->getId()]));
         $this->assertNotEquals($this->existingCustomItem->getUniqueHash(), $newCustomItem->getUniqueHash());
         $this->assertEquals('Factfulness', $newCustomItem->getName());
-    }
-
-    public function testCreateNewCustomItemWithExistingUniqueHash(): void
-    {
-        $this->assertEquals(1, $this->customItemRepository->getItemCount($this->customObject->getId()));
-
-        $newCustomItem = $this->createCustomItem($this->customObject, 'Factfulness');
-        $newCustomItem->createNewCustomFieldValueByFieldAlias('unique_id_field', 'SomeOtherUniqueHash');
-        $newCustomItem = $this->customItemModel->save($newCustomItem);
-
-        $this->assertEquals(2, $this->customItemRepository->getItemCount($this->customObject->getId()));
-        $this->assertNotEquals($this->existingCustomItem->getUniqueHash(), $newCustomItem->getUniqueHash());
 
         $duplicateCustomItem = $this->createCustomItem($this->customObject, 'Inferno');
         $duplicateCustomItem->createNewCustomFieldValueByFieldAlias('unique_id_field', 'SomeUniqueHash');
         $duplicateCustomItem = $this->customItemModel->save($duplicateCustomItem);
 
-        $this->assertEquals(2, $this->customItemRepository->getItemCount($this->customObject->getId()));
+        $this->assertEquals(2, $this->customItemRepository->count(['customObject' => $this->customObject->getId()]));
         $this->assertNotEquals($duplicateCustomItem->getUniqueHash(), $newCustomItem->getUniqueHash());
     }
 
