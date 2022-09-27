@@ -117,6 +117,7 @@ class SaveControllerTest extends ControllerTestCase
         $reflectionProperty             = $saveControllerReflectionObject->getProperty('permissionBase');
         $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($this->saveController, 'somePermissionBase');
+        $this->customItemModel->method('save')->willReturn($this->customItem);
     }
 
     public function testSaveActionIfExistingCustomItemNotFound(): void

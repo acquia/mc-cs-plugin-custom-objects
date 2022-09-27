@@ -635,9 +635,9 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
     {
         $rowData                = [];
         $uniqueHash             = [];
-        $uniqueIdentifierFields = $this->customObject->getFieldsIsUniqueIdentifier();
+        $uniqueIdentifierFields = $this->customObject->getUniqueIdentifierFields();
 
-        if (is_null($uniqueIdentifierFields)) {
+        if (0 === $uniqueIdentifierFields->count()) {
             return null;
         }
 
@@ -653,6 +653,6 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         }
         ksort($uniqueHash); //sort array on the basis of key so that the order of keys is the same everytime
 
-        return [] == $uniqueHash ? null : hash('sha256', serialize($uniqueHash));
+        return [] == $uniqueHash ? null : hash('sha256', json_encode($uniqueHash));
     }
 }
