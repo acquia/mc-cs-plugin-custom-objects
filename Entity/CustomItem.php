@@ -631,13 +631,14 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         $this->uniqueHash = $uniqueHash;
     }
 
-    public function createUniqueHash(): ?string
+    public function updateUniqueHash(): void
     {
         $uniqueHash             = [];
         $uniqueIdentifierFields = $this->customObject->getUniqueIdentifierFields();
 
         if (0 === $uniqueIdentifierFields->count()) {
-            return null;
+            $this->setUniqueHash(null);
+            return;
         }
 
         foreach ($uniqueIdentifierFields->getValues() as $uniqueIdentifierField) {
@@ -648,6 +649,6 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         // Eg. {id => 1, name => "Jay"} and {name => "Jay", id => 1} are duplicates
         ksort($uniqueHash);
 
-        return [] == $uniqueHash ? null : hash('sha256', json_encode($uniqueHash));
+        [] == $uniqueHash ? $this->setUniqueHash(null) : $this->setUniqueHash(hash('sha256', json_encode($uniqueHash)));
     }
 }
