@@ -633,7 +633,6 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
 
     public function createUniqueHash(): ?string
     {
-        $rowData                = [];
         $uniqueHash             = [];
         $uniqueIdentifierFields = $this->customObject->getUniqueIdentifierFields();
 
@@ -641,15 +640,9 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
             return null;
         }
 
-        foreach ($this->getCustomObject()->getCustomFields()->getValues() as $customField) {
-            try {
-                $rowData[$customField->getAlias()] = $this->findCustomFieldValueForFieldAlias($customField->getAlias())->getValue();
-            } catch (NotFoundException $exception) {
-            }
-        }
-
-        foreach ($uniqueIdentifierFields as $uniqueIdentifierField) {
-            $uniqueHash = array_merge($uniqueHash, [$uniqueIdentifierField->getAlias() => $rowData[$uniqueIdentifierField->getAlias()]]);
+        foreach ($uniqueIdentifierFields->getValues() as $uniqueIdentifierField) {
+            $uniqueIdentifierFieldAlias              = $uniqueIdentifierField->getAlias();
+            $uniqueHash[$uniqueIdentifierFieldAlias] = $this->findCustomFieldValueForFieldAlias($uniqueIdentifierFieldAlias)->getValue();
         }
         ksort($uniqueHash); //sort array on the basis of key so that the order of keys is the same everytime
 

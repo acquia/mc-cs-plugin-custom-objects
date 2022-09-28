@@ -94,9 +94,9 @@ class CustomItemModel extends FormModel
         $customItem->setModifiedBy($user);
         $customItem->setModifiedByUser($user->getName());
         $customItem->setDateModified($now->getUtcDateTime());
-        $customItem->setUniqueHash($customItem->createUniqueHash());
 
         $errors = $this->validator->validate($customItem);
+        $customItem->setUniqueHash($customItem->createUniqueHash());
 
         if ($errors->count() > 0) {
             throw new InvalidValueException($errors->get(0)->getMessage());
@@ -137,7 +137,8 @@ class CustomItemModel extends FormModel
 
     /**
      * @param object $entity
-     * @param null $extra
+     * @param null   $extra
+     *
      * @throws InvalidValueException
      */
     public function unlockEntity($entity, $extra = null): void
