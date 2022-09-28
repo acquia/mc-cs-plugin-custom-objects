@@ -96,7 +96,7 @@ class CustomItemModel extends FormModel
         $customItem->setDateModified($now->getUtcDateTime());
 
         $errors = $this->validator->validate($customItem);
-        $customItem->setUniqueHash($customItem->createUniqueHash());
+        $customItem->updateUniqueHash();
 
         if ($errors->count() > 0) {
             throw new InvalidValueException($errors->get(0)->getMessage());
