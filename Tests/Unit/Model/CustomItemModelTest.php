@@ -122,8 +122,7 @@ class CustomItemModelTest extends TestCase
         $this->customItem->expects($this->once())->method('setModifiedBy')->with($this->user);
         $this->customItem->expects($this->once())->method('setModifiedByUser')->with('John Doe');
         $this->customItem->expects($this->once())->method('setDateModified');
-        $this->customItem->expects($this->once())->method('createUniqueHash');
-        $this->customItem->expects($this->once())->method('setUniqueHash');
+        $this->customItem->expects($this->once())->method('updateUniqueHash');
         $this->customItem->expects($this->once())->method('getCustomFieldValues')->willReturn(new ArrayCollection());
         $this->customItem->expects($this->never())->method('recordCustomFieldValueChanges');
         $this->dispatcher->method('dispatch')
