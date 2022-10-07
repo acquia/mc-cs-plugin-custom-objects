@@ -90,7 +90,12 @@ class CustomItemImportModel extends FormModel
 
         $customItem->setDefaultValuesForMissingFields();
 
+        $itemId     = $customItem->getId();
+        $itemCount  = $this->customItemModel->getRepository()->count(['customObject' => $customItem->getCustomObject()->getId()]);
         $customItem = $this->customItemModel->save($customItem);
+        if (!$itemId && $itemCount == $this->customItemModel->getRepository()->count(['customObject' => $customItem->getCustomObject()->getId()])) {
+            $merged = true;
+        }
 
         $this->linkContacts($customItem, $contactIds);
 
