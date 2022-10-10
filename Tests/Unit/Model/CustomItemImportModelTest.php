@@ -131,7 +131,6 @@ class CustomItemImportModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new ArrayCollection([$this->descriptionField, $this->dateField]));
 
         $customItem = $this->createMock(CustomItem::class);
-        $customItem->method('getCustomObject')->willReturn($this->customObject);
 
         $this->customItemModel->expects($this->once())
             ->method('save')
@@ -150,7 +149,10 @@ class CustomItemImportModelTest extends \PHPUnit\Framework\TestCase
             }))
             ->willReturn($customItem);
 
-        $this->customItemImportModel->import($this->import, self::ROW_DATA, $this->customObject);
+        $this->assertSame(
+            false,
+            $this->customItemImportModel->import($this->import, self::ROW_DATA, $this->customObject)
+        );
     }
 
     public function testImportForCreatedWhenObjectHasNoFields(): void
@@ -183,13 +185,12 @@ class CustomItemImportModelTest extends \PHPUnit\Framework\TestCase
         $mappedFields['id'] = 'customItemId';
         $rowData['id']      = '555';
         $customItem         = $this->createMock(CustomItem::class);
-        $customItem->method('getCustomObject')->willReturn($this->customObject);
 
         $customItem->expects($this->exactly(2))
             ->method('findCustomFieldValueForFieldId')
             ->willReturn($this->createMock(CustomFieldValueInterface::class));
 
-        $customItem->expects($this->exactly(2))
+        $customItem->expects($this->once())
             ->method('getId')
             ->willReturn(555);
 
@@ -245,7 +246,6 @@ class CustomItemImportModelTest extends \PHPUnit\Framework\TestCase
         $mappedFields['id'] = 'customItemId';
         $rowData['id']      = '555';
         $customItem         = $this->createMock(CustomItem::class);
-        $customItem->method('getCustomObject')->willReturn($this->customObject);
 
         $this->import->expects($this->exactly(2))
             ->method('getMatchedFields')

@@ -53,7 +53,6 @@ class CustomItemImportModel extends FormModel
         $contactIds    = [];
 
         $this->setOwner($import, $customItem);
-
         foreach ($matchedFields as $csvField => $customFieldId) {
             if (!isset($rowData[$csvField])) {
                 continue;
@@ -90,10 +89,8 @@ class CustomItemImportModel extends FormModel
 
         $customItem->setDefaultValuesForMissingFields();
 
-        $itemId     = $customItem->getId();
-        $itemCount  = $this->customItemModel->getRepository()->count(['customObject' => $customItem->getCustomObject()->getId()]);
         $customItem = $this->customItemModel->save($customItem);
-        if (!$itemId && $itemCount == $this->customItemModel->getRepository()->count(['customObject' => $customItem->getCustomObject()->getId()])) {
+        if ($customItem->wasUpdated()) {
             $merged = true;
         }
 

@@ -136,7 +136,6 @@ class SaveController extends AbstractFormController
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $itemCount = $this->customItemModel->getRepository()->count(['customObject' => $this->customObjectModel->fetchEntity($objectId)->getId()]);
             $customItem = $this->customItemModel->save($customItem);
 
             if ($customItem->getChildCustomItem()) {
@@ -144,7 +143,7 @@ class SaveController extends AbstractFormController
                 $customItem = $this->customItemModel->save($customItem->getChildCustomItem());
             }
 
-            if(!$itemId && $itemCount === $this->customItemModel->getRepository()->count(['customObject' => $this->customObjectModel->fetchEntity($objectId)->getId()])){
+            if($customItem->wasUpdated()){
                 $message = 'custom.item.notice.merged';
             }
 
@@ -153,7 +152,6 @@ class SaveController extends AbstractFormController
                 [
                     '%name%' => $customItem->getName(),
                     '%url%'  => $this->routeProvider->buildEditRoute($objectId, $customItem->getId()),
-                    '%uniqueHash%' => $customItem->getUniqueHash(),
                 ]
             );
 
