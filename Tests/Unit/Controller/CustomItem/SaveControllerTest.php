@@ -239,7 +239,6 @@ class SaveControllerTest extends ControllerTestCase
                 [
                     '%name%' => 'Umpalumpa',
                     '%url%'  => 'https://edit.item',
-                    '%uniqueHash%' => null,
                 ]
             );
 
@@ -617,7 +616,6 @@ class SaveControllerTest extends ControllerTestCase
                 [
                     '%name%' => 'Umpalumpa',
                     '%url%'  => 'https://edit.item',
-                    '%uniqueHash%' => null,
                 ]
             );
 
