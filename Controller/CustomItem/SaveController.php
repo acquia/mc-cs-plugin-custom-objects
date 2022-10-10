@@ -143,6 +143,10 @@ class SaveController extends AbstractFormController
                 $customItem = $this->customItemModel->save($customItem->getChildCustomItem());
             }
 
+            if($customItem->wasUpdated()){
+                $message = 'custom.item.notice.merged';
+            }
+
             $this->flashBag->add(
                 $message,
                 [

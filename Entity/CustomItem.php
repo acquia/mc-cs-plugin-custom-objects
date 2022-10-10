@@ -16,6 +16,8 @@ use Doctrine\ORM\Mapping\ManyToOne;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\UpsertInterface;
+use Mautic\CoreBundle\Entity\UpsertTrait;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
@@ -40,8 +42,9 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  *     denormalizationContext={"groups"={"custom_item:write"}, "swagger_definition_name"="Write"}
  * )
  */
-class CustomItem extends FormEntity implements UniqueEntityInterface
+class CustomItem extends FormEntity implements UniqueEntityInterface, UpsertInterface
 {
+    use UpsertTrait;
     public const TABLE_NAME  = 'custom_item';
     public const TABLE_ALIAS = 'CustomItem';
 
@@ -638,6 +641,7 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
 
         if (0 === $uniqueIdentifierFields->count()) {
             $this->setUniqueHash(null);
+
             return;
         }
 
