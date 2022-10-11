@@ -90,7 +90,7 @@ class CustomItemImportModel extends FormModel
         $customItem->setDefaultValuesForMissingFields();
 
         $customItem = $this->customItemModel->save($customItem);
-        if ($customItem->wasUpdated()) {
+        if ($customItem->hasBeenUpdated()) {
             $merged = true;
         }
 

@@ -41,6 +41,8 @@ class UpsertFunctionalTest extends \Mautic\CoreBundle\Test\MauticMysqlTestCase
         $newCustomItem->createNewCustomFieldValueByFieldAlias('unique_id_field', 'SomeOtherUniqueHash');
         $newCustomItem = $this->customItemModel->save($newCustomItem);
 
+        $this->assertTrue($newCustomItem->hasBeenInserted());
+        $this->assertFalse($newCustomItem->hasBeenUpdated());
         $this->assertEquals(2, $this->customItemRepository->count(['customObject' => $this->customObject->getId()]));
         $this->assertNotEquals($this->existingCustomItem->getUniqueHash(), $newCustomItem->getUniqueHash());
         $this->assertEquals('Factfulness', $newCustomItem->getName());
@@ -49,6 +51,8 @@ class UpsertFunctionalTest extends \Mautic\CoreBundle\Test\MauticMysqlTestCase
         $duplicateCustomItem->createNewCustomFieldValueByFieldAlias('unique_id_field', 'SomeUniqueHash');
         $duplicateCustomItem = $this->customItemModel->save($duplicateCustomItem);
 
+        $this->assertTrue($duplicateCustomItem->hasBeenUpdated());
+        $this->assertFalse($duplicateCustomItem->hasBeenInserted());
         $this->assertEquals(2, $this->customItemRepository->count(['customObject' => $this->customObject->getId()]));
         $this->assertNotEquals($duplicateCustomItem->getUniqueHash(), $newCustomItem->getUniqueHash());
     }
