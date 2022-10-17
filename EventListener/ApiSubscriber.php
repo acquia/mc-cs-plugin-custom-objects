@@ -97,7 +97,7 @@ class ApiSubscriber implements EventSubscriberInterface
                 $customItem = $this->populateCustomItemWithRequestData($customItem, $customItemData);
                 $customItem->setDefaultValuesForMissingFields();
 
-                $this->customItemModel->save($customItem, $dryRun);
+                $customItem = $this->customItemModel->save($customItem, $dryRun);
 
                 if (!$dryRun) {
                     $this->customItemModel->linkEntity($customItem, 'contact', (int) $contact->getId());

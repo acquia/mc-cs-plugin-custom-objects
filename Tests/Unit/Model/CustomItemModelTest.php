@@ -108,30 +108,32 @@ class CustomItemModelTest extends TestCase
         $this->connection->method('createQueryBuilder')->willReturn($this->dbalQueryBuilder);
         $this->queryBuilder->method('getQuery')->willReturn($this->query);
         $this->userHelper->method('getUser')->willReturn($this->user);
+        $this->customItem->method('getId')->willReturn(1);
     }
 
     public function testSaveNew(): void
     {
         $this->user->expects($this->exactly(2))->method('getName')->willReturn('John Doe');
         $this->userHelper->expects($this->once())->method('getUser')->willReturn($this->user);
-        $this->customItem->expects($this->exactly(2))->method('isNew')->willReturn(true);
+        $this->customItem->expects($this->exactly(3))->method('isNew')->willReturn(true);
         $this->customItem->expects($this->once())->method('setCreatedBy')->with($this->user);
         $this->customItem->expects($this->once())->method('setCreatedByUser')->with('John Doe');
         $this->customItem->expects($this->once())->method('setDateAdded');
         $this->customItem->expects($this->once())->method('setModifiedBy')->with($this->user);
         $this->customItem->expects($this->once())->method('setModifiedByUser')->with('John Doe');
         $this->customItem->expects($this->once())->method('setDateModified');
-        $this->entityManager->expects($this->once())->method('persist')->with($this->customItem);
+        $this->customItem->expects($this->once())->method('updateUniqueHash');
         $this->customItem->expects($this->once())->method('getCustomFieldValues')->willReturn(new ArrayCollection());
-        $this->customItem->expects($this->once())->method('recordCustomFieldValueChanges');
+        $this->customItem->expects($this->never())->method('recordCustomFieldValueChanges');
         $this->dispatcher->method('dispatch')
             ->withConsecutive(
                 [CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, $this->isInstanceOf(CustomItemEvent::class)],
                 [CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $this->isInstanceOf(CustomItemEvent::class)]
             );
-        $this->entityManager->expects($this->once())->method('flush');
+        $this->customItemRepository->expects($this->once())->method('upsert')->with($this->customItem);
         $this->validator->expects($this->once())->method('validate')->with($this->customItem)->willReturn($this->violationList);
 
+        $this->expectException(NotFoundException::class); //since the fetchEntity() method is called on save and there's no customItem in the DB with ID 1
         $this->assertSame($this->customItem, $this->customItemModel->save($this->customItem));
     }
 
@@ -140,11 +142,10 @@ class CustomItemModelTest extends TestCase
         $customFieldValue = $this->createMock(CustomFieldValueText::class);
         $this->user->expects($this->once())->method('getName')->willReturn('John Doe');
         $this->userHelper->expects($this->once())->method('getUser')->willReturn($this->user);
-        $this->customItem->expects($this->exactly(2))->method('isNew')->willReturn(false);
+        $this->customItem->expects($this->exactly(4))->method('isNew')->willReturn(false);
         $this->customItem->expects($this->once())->method('setModifiedBy')->with($this->user);
         $this->customItem->expects($this->once())->method('setModifiedByUser')->with('John Doe');
         $this->customItem->expects($this->once())->method('setDateModified');
-        $this->entityManager->expects($this->once())->method('persist')->with($this->customItem);
         $this->customItem->expects($this->once())->method('getCustomFieldValues')->willReturn(new ArrayCollection([$customFieldValue]));
         $this->customItem->expects($this->once())->method('recordCustomFieldValueChanges');
         $this->customFieldValueModel->expects($this->once())->method('save')->with($customFieldValue);
@@ -153,7 +154,6 @@ class CustomItemModelTest extends TestCase
                 [CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, $this->isInstanceOf(CustomItemEvent::class)],
                 [CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $this->isInstanceOf(CustomItemEvent::class)]
             );
-        $this->entityManager->expects($this->once())->method('flush');
         $this->validator->expects($this->once())->method('validate')->with($this->customItem)->willReturn($this->violationList);
 
         $this->assertSame($this->customItem, $this->customItemModel->save($this->customItem));
