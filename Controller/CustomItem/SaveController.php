@@ -111,7 +111,7 @@ class SaveController extends AbstractFormController
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        if ($this->customObjectModel->isLocked($customItem)) {
+        if ($this->customItemModel->isLocked($customItem)) {
             $this->lockFlashMessageHelper->addFlash(
                 $customItem,
                 $this->routeProvider->buildEditRoute($objectId, $itemId),
@@ -136,11 +136,15 @@ class SaveController extends AbstractFormController
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $this->customItemModel->save($customItem);
+            $customItem = $this->customItemModel->save($customItem);
 
             if ($customItem->getChildCustomItem()) {
                 $customItem->getChildCustomItem()->generateNameForChildObject('contact', $contactId, $customItem);
-                $this->customItemModel->save($customItem->getChildCustomItem());
+                $customItem = $this->customItemModel->save($customItem->getChildCustomItem());
+            }
+
+            if($customItem->hasBeenUpdated()){
+                $message = 'custom.item.notice.merged';
             }
 
             $this->flashBag->add(

@@ -9,12 +9,15 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
 use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\CoreBundle\Entity\FormEntity;
+use Mautic\CoreBundle\Entity\UpsertInterface;
+use Mautic\CoreBundle\Entity\UpsertTrait;
 use Mautic\CoreBundle\Helper\ArrayHelper;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
@@ -39,8 +42,9 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  *     denormalizationContext={"groups"={"custom_item:write"}, "swagger_definition_name"="Write"}
  * )
  */
-class CustomItem extends FormEntity implements UniqueEntityInterface
+class CustomItem extends FormEntity implements UniqueEntityInterface, UpsertInterface
 {
+    use UpsertTrait;
     public const TABLE_NAME  = 'custom_item';
     public const TABLE_ALIAS = 'CustomItem';
 
@@ -169,6 +173,8 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
      */
     private $customItemLowerReferences;
 
+    private ?string $uniqueHash = null;
+
     public function __construct(CustomObject $customObject)
     {
         $this->customObject              = $customObject;
@@ -194,6 +200,12 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
         $builder->createManyToOne('customObject', CustomObject::class)
             ->addJoinColumn('custom_object_id', 'id', false, false, 'CASCADE')
             ->fetchExtraLazy()
+            ->build();
+
+        $builder->createField('uniqueHash', Types::STRING)
+            ->columnName('unique_hash')
+            ->unique()
+            ->nullable()
             ->build();
 
         $builder->createOneToMany('contactReferences', CustomItemXrefContact::class)
@@ -610,5 +622,37 @@ class CustomItem extends FormEntity implements UniqueEntityInterface
             default:
                 return new ArrayCollection([]);
         }
+    }
+
+    public function getUniqueHash(): ?string
+    {
+        return $this->uniqueHash;
+    }
+
+    public function setUniqueHash(?string $uniqueHash): void
+    {
+        $this->uniqueHash = $uniqueHash;
+    }
+
+    public function updateUniqueHash(): void
+    {
+        $uniqueHash             = [];
+        $uniqueIdentifierFields = $this->customObject->getUniqueIdentifierFields();
+
+        if (0 === $uniqueIdentifierFields->count()) {
+            $this->setUniqueHash(null);
+
+            return;
+        }
+
+        foreach ($uniqueIdentifierFields->getValues() as $uniqueIdentifierField) {
+            $uniqueIdentifierFieldAlias              = $uniqueIdentifierField->getAlias();
+            $uniqueHash[$uniqueIdentifierFieldAlias] = $this->findCustomFieldValueForFieldAlias($uniqueIdentifierFieldAlias)->getValue();
+        }
+        //To prevent creation of duplicates (in case of multiple unique ID fields) due to the order of key-values in the array
+        // Eg. {id => 1, name => "Jay"} and {name => "Jay", id => 1} are duplicates
+        ksort($uniqueHash);
+
+        [] == $uniqueHash ? $this->setUniqueHash(null) : $this->setUniqueHash(hash('sha256', json_encode($uniqueHash)));
     }
 }

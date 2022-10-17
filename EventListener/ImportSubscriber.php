@@ -101,7 +101,7 @@ class ImportSubscriber implements EventSubscriberInterface
             $event->activeLink      = "#mautic_custom_object_$customObjectId";
             $event->setIndexRoute(CustomItemRouteProvider::ROUTE_LIST, ['objectId' => $customObjectId]);
             $event->stopPropagation();
-        } catch (NotFoundException | ForbiddenException $e) {
+        } catch (NotFoundException|ForbiddenException $e) {
         }
     }
 
@@ -133,7 +133,7 @@ class ImportSubscriber implements EventSubscriberInterface
                 $customObject->getNamePlural() => $fieldList,
                 'mautic.lead.special_fields'   => $specialFields,
             ];
-        } catch (NotFoundException | ForbiddenException $e) {
+        } catch (NotFoundException|ForbiddenException $e) {
         }
     }
 

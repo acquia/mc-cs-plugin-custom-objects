@@ -53,7 +53,6 @@ class CustomItemImportModel extends FormModel
         $contactIds    = [];
 
         $this->setOwner($import, $customItem);
-
         foreach ($matchedFields as $csvField => $customFieldId) {
             if (!isset($rowData[$csvField])) {
                 continue;
@@ -91,6 +90,9 @@ class CustomItemImportModel extends FormModel
         $customItem->setDefaultValuesForMissingFields();
 
         $customItem = $this->customItemModel->save($customItem);
+        if ($customItem->hasBeenUpdated()) {
+            $merged = true;
+        }
 
         $this->linkContacts($customItem, $contactIds);
 

@@ -58,6 +58,8 @@ class CustomFieldValueModelTest extends \PHPUnit\Framework\TestCase
             $this->entityManager,
             $this->validator
         );
+
+        $this->entityManager->method('getReference')->willReturn($this->customItem);
     }
 
     public function testGetValuesForItemIfItemDoesNotHaveId(): void
@@ -212,11 +214,11 @@ class CustomFieldValueModelTest extends \PHPUnit\Framework\TestCase
             ->method('getCustomField')
             ->willReturn($this->customField);
 
-        $customFieldValue->expects($this->once())
+        $customFieldValue->expects($this->exactly(2))
             ->method('getCustomItem')
             ->willReturn($this->customItem);
 
-        $this->customItem->expects($this->once())
+        $this->customItem->expects($this->exactly(2))
             ->method('getId')
             ->willReturn(99);
 
@@ -240,11 +242,11 @@ class CustomFieldValueModelTest extends \PHPUnit\Framework\TestCase
             ->method('getCustomField')
             ->willReturn($this->customField);
 
-        $customFieldValue->expects($this->once())
+        $customFieldValue->expects($this->exactly(2))
             ->method('getCustomItem')
             ->willReturn($this->customItem);
 
-        $this->customItem->expects($this->once())
+        $this->customItem->expects($this->exactly(2))
             ->method('getId')
             ->willReturn(null);
 
@@ -269,7 +271,7 @@ class CustomFieldValueModelTest extends \PHPUnit\Framework\TestCase
             ->method('getCustomField')
             ->willReturn($this->customField);
 
-        $customFieldValue->expects($this->once())
+        $customFieldValue->expects($this->exactly(2))
             ->method('getCustomItem')
             ->willReturn($this->customItem);
 
@@ -281,7 +283,7 @@ class CustomFieldValueModelTest extends \PHPUnit\Framework\TestCase
             ->method('setValue')
             ->withConsecutive(['red'], ['green'], [4]);
 
-        $this->customItem->expects($this->once())
+        $this->customItem->expects($this->exactly(2))
             ->method('getId')
             ->willReturn(99);
 
@@ -327,7 +329,7 @@ class CustomFieldValueModelTest extends \PHPUnit\Framework\TestCase
             ->method('getCustomField')
             ->willReturn($this->customField);
 
-        $customFieldValue->expects($this->once())
+        $customFieldValue->expects($this->exactly(2))
             ->method('getCustomItem')
             ->willReturn($this->customItem);
 
@@ -338,7 +340,7 @@ class CustomFieldValueModelTest extends \PHPUnit\Framework\TestCase
         $customFieldValue->expects($this->never())
             ->method('setValue');
 
-        $this->customItem->expects($this->once())
+        $this->customItem->expects($this->exactly(2))
             ->method('getId')
             ->willReturn(99);
 

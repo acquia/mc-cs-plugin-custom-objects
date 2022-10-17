@@ -11,7 +11,7 @@ use Mautic\IntegrationsBundle\Migration\AbstractMigration;
 
 class Version_0_0_19 extends AbstractMigration
 {
-    const FOREIGN_KEY_TO_DELETE = '/^FK_\d+594D0CC2$/';
+    public const FOREIGN_KEY_TO_DELETE = '/^FK_\d+594D0CC2$/';
 
     /** @var Schema */
     private $schema;

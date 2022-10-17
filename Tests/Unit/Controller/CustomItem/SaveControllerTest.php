@@ -117,6 +117,7 @@ class SaveControllerTest extends ControllerTestCase
         $reflectionProperty             = $saveControllerReflectionObject->getProperty('permissionBase');
         $reflectionProperty->setAccessible(true);
         $reflectionProperty->setValue($this->saveController, 'somePermissionBase');
+        $this->customItemModel->method('save')->willReturn($this->customItem);
     }
 
     public function testSaveActionIfExistingCustomItemNotFound(): void
@@ -180,7 +181,7 @@ class SaveControllerTest extends ControllerTestCase
         $this->permissionProvider->expects($this->never())
             ->method('canCreate');
 
-        $this->customObjectModel->expects($this->once())
+        $this->customItemModel->expects($this->once())
             ->method('isLocked')
             ->with($this->customItem)
             ->willReturn(false);
@@ -278,7 +279,7 @@ class SaveControllerTest extends ControllerTestCase
         $this->permissionProvider->expects($this->never())
             ->method('canCreate');
 
-        $this->customObjectModel->expects($this->once())
+        $this->customItemModel->expects($this->once())
             ->method('isLocked')
             ->with($this->customItem)
             ->willReturn(false);
@@ -506,7 +507,7 @@ class SaveControllerTest extends ControllerTestCase
         $this->permissionProvider->expects($this->never())
             ->method('canCreate');
 
-        $this->customObjectModel->expects($this->once())
+        $this->customItemModel->expects($this->once())
             ->method('isLocked')
             ->with($this->customItem)
             ->willReturn(true);
@@ -556,7 +557,7 @@ class SaveControllerTest extends ControllerTestCase
         $this->permissionProvider->expects($this->never())
             ->method('canCreate');
 
-        $this->customObjectModel->expects($this->once())
+        $this->customItemModel->expects($this->once())
             ->method('isLocked')
             ->with($this->customItem)
             ->willReturn(false);

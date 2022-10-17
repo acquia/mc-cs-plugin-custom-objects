@@ -1152,6 +1152,16 @@ $coParams = [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Helper\TokenFormatter::class,
             ],
         ],
+        'validators' => [
+            'custom_object.allow.unique_identifier.validator' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Form\Validator\Constraints\AllowUniqueIdentifierValidator::class,
+                'arguments' => [
+                    'mautic.custom.model.item',
+                    'translator',
+                ],
+                'tag' => 'validator.constraint_validator',
+            ],
+        ],
     ],
     'parameters' => [
         ConfigProvider::CONFIG_PARAM_ENABLED                              => true,

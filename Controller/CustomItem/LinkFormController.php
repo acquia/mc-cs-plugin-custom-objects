@@ -103,7 +103,7 @@ class LinkFormController extends AbstractFormController
                     ],
                 ]
             );
-        } catch (ForbiddenException | NotFoundException | UnexpectedValueException | NoRelationshipException $e) {
+        } catch (ForbiddenException|NotFoundException|UnexpectedValueException|NoRelationshipException $e) {
             $this->flashBag->add($e->getMessage(), [], FlashBag::LEVEL_ERROR);
         }
 
@@ -146,8 +146,8 @@ class LinkFormController extends AbstractFormController
             $form->handleRequest($this->request);
 
             if ($form->isValid()) {
-                $callback = $relationshipItem->getId() ? null : 'customItemLinkFormPostSubmit';
-                $this->customItemModel->save($relationshipItem);
+                $callback         = $relationshipItem->getId() ? null : 'customItemLinkFormPostSubmit';
+                $relationshipItem = $this->customItemModel->save($relationshipItem);
 
                 $responseData = [
                     'closeModal' => true,
@@ -157,7 +157,7 @@ class LinkFormController extends AbstractFormController
 
                 return new JsonResponse($responseData);
             }
-        } catch (ForbiddenException | NoRelationshipException | NotFoundException $e) {
+        } catch (ForbiddenException|NoRelationshipException|NotFoundException $e) {
             $this->flashBag->add($e->getMessage(), [], FlashBag::LEVEL_ERROR);
         }
 
