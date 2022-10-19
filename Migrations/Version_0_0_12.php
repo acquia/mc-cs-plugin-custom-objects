@@ -34,7 +34,7 @@ class Version_0_0_12 extends AbstractMigration
             $parts[] = 'DROP INDEX `unique`';
         }
 
-        if (!$schema->getTable($this->concatPrefix('custom_field_value_option'))->hasIndex('value_fulltext')) {
+        if (!$schema->getTable($this->concatPrefix('custom_field_value_option'))->hasIndex("{$this->tablePrefix}value_fulltext")) {
             $parts[] = "ADD FULLTEXT INDEX {$this->tablePrefix}value_fulltext (value)";
         }
         if (!$schema->getTable($this->concatPrefix('custom_field_value_option'))->hasColumn('id')) {
@@ -43,7 +43,7 @@ class Version_0_0_12 extends AbstractMigration
             }
             $parts[] =  'ADD id BIGINT UNSIGNED AUTO_INCREMENT NOT NULL, ADD PRIMARY KEY (id)';
         }
-        if (!$schema->getTable($this->concatPrefix('custom_field_value_option'))->hasIndex('unique')) {
+        if (!$schema->getTable($this->concatPrefix('custom_field_value_option'))->hasIndex("{$this->tablePrefix}unique")) {
             $parts[] =  "ADD UNIQUE INDEX `{$this->tablePrefix}unique` (value, custom_field_id, custom_item_id)";
         }
 
