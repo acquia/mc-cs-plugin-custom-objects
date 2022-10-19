@@ -27,10 +27,10 @@ class Version_0_0_12 extends AbstractMigration
         }
 
         $parts = [];
-        if (!$schema->getTable($this->concatPrefix('custom_field_value_option'))->hasIndex('value_fulltext')) {
+        if ($schema->getTable($this->concatPrefix('custom_field_value_option'))->hasIndex('value_fulltext')) {
             $parts[] = 'DROP INDEX value_fulltext';
         }
-        if (!$schema->getTable($this->concatPrefix('custom_field_value_option'))->hasIndex('unique')) {
+        if ($schema->getTable($this->concatPrefix('custom_field_value_option'))->hasIndex('unique')) {
             $parts[] = 'DROP INDEX `unique`';
         }
 
