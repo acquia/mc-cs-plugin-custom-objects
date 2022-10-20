@@ -19,11 +19,32 @@ class Version_0_0_12 extends AbstractMigration
      */
     protected function isApplicable(Schema $schema): bool
     {
-        if (!$schema->getTable($this->concatPrefix('custom_field_value_text'))->hasIndex('value_fulltext')) {
-            $this->sql[] = "CREATE FULLTEXT INDEX name_fulltext ON {$this->concatPrefix('custom_item')} (name)";
+        $parts = [];
+
+        if ($schema->getTable($this->concatPrefix('custom_item'))->hasIndex('name_fulltext')) {
+            $parts[] = 'DROP INDEX name_fulltext';
         }
-        if (!$schema->getTable($this->concatPrefix('custom_field_value_text'))->hasIndex('value_fulltext')) {
-            $this->sql[] = "CREATE FULLTEXT INDEX value_fulltext ON {$this->concatPrefix('custom_field_value_text')} (value)";
+
+        if (!$schema->getTable($this->concatPrefix('custom_item'))->hasIndex("{$this->tablePrefix}name_fulltext")) {
+            $parts[] = "ADD FULLTEXT INDEX {$this->tablePrefix}name_fulltext (name)";
+        }
+
+        if ($parts) {
+            $this->sql[] = sprintf('ALTER TABLE %s %s', $this->concatPrefix('custom_item'), implode(','.PHP_EOL, $parts));
+        }
+
+        $parts = [];
+
+        if ($schema->getTable($this->concatPrefix('custom_field_value_text'))->hasIndex('value_fulltext')) {
+            $parts[] = 'DROP INDEX value_fulltext';
+        }
+
+        if (!$schema->getTable($this->concatPrefix('custom_field_value_text'))->hasIndex("{$this->tablePrefix}value_fulltext")) {
+            $parts[] = "ADD FULLTEXT INDEX {$this->tablePrefix}value_fulltext (value)";
+        }
+
+        if ($parts) {
+            $this->sql[] = sprintf('ALTER TABLE %s %s', $this->concatPrefix('custom_field_value_text'), implode(','.PHP_EOL, $parts));
         }
 
         $parts = [];
@@ -54,9 +75,6 @@ class Version_0_0_12 extends AbstractMigration
         return (bool) count($this->sql);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function up(): void
     {
         foreach ($this->sql as $sql) {
