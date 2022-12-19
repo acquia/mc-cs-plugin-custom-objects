@@ -39,6 +39,11 @@ class ConfigProvider
      */
     public function pluginIsEnabled(): bool
     {
+        $pluginEnabled = (bool) $this->coreParametersHelper->get(self::CONFIG_PARAM_ENABLED, true);
+        if (!$pluginEnabled) {
+            return false;
+        }
+
         try {
             $pluginWasInstalledBefore = $this->connection
                 ->executeQuery('SELECT id FROM plugins WHERE bundle=:pluginName', ['pluginName' => self::CONFIG_PLUGIN_NAME])
