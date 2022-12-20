@@ -31,7 +31,7 @@ class ConfigProvider
     public function __construct(CoreParametersHelper $coreParametersHelper, Connection $connection)
     {
         $this->coreParametersHelper = $coreParametersHelper;
-        $this->connection = $connection;
+        $this->connection           = $connection;
     }
 
     /**
