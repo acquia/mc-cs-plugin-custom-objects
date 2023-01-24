@@ -19,7 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
 use MauticPlugin\CustomObjectsBundle\Form\Validator\Constraints\AllowUniqueIdentifier;
 use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;

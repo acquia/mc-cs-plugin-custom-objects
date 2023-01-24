@@ -21,7 +21,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use Symfony\Component\Form\Form;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ImportSubscriberTest extends \PHPUnit\Framework\TestCase
 {

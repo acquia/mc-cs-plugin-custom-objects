@@ -16,7 +16,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AbstractMultivalueTypeTest extends \PHPUnit\Framework\TestCase
 {

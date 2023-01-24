@@ -17,7 +17,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ContactTabSubscriberTest extends TestCase
 {

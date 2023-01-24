@@ -20,7 +20,7 @@ use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DeleteControllerTest extends ControllerTestCase
 {

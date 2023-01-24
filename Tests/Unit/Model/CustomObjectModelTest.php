@@ -29,7 +29,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomObjectModelTest extends TestCase
 {

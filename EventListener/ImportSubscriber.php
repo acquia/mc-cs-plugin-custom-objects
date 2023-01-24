@@ -22,7 +22,7 @@ use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ImportSubscriber implements EventSubscriberInterface
 {

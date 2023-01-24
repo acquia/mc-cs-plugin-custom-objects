@@ -20,7 +20,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemImportModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomItemImportModelTest extends \PHPUnit\Framework\TestCase
 {

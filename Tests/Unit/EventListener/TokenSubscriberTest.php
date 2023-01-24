@@ -36,7 +36,7 @@ use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TokenSubscriberTest extends TestCase
 {

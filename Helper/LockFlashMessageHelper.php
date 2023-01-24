@@ -7,7 +7,7 @@ namespace MauticPlugin\CustomObjectsBundle\Helper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Service\FlashBag;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LockFlashMessageHelper
 {

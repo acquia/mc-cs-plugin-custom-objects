@@ -11,7 +11,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SelectTypeTest extends \PHPUnit\Framework\TestCase
 {

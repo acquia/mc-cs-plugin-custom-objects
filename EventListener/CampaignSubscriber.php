@@ -31,7 +31,7 @@ use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\UnionQueryContainer;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {

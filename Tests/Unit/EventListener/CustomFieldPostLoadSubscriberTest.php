@@ -12,7 +12,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldPostLoadSubscriber;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomFieldPostLoadSubscriberTest extends \PHPUnit\Framework\TestCase
 {

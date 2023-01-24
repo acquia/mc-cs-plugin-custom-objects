@@ -18,7 +18,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Report\ReportColumnsBuilder;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {

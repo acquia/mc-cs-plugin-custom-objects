@@ -20,7 +20,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SaveControllerTest extends AbstractFieldControllerTest
 {

@@ -13,7 +13,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomItemTabSubscriber implements EventSubscriberInterface
 {
