@@ -594,42 +594,42 @@ $coParams = [
         ],
         'repositories' => [
             'custom_field.repository' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository::class,
+                'class'     => Doctrine\ORM\EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \MauticPlugin\CustomObjectsBundle\Entity\CustomField::class,
                 ],
             ],
             'custom_item.repository' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository::class,
+                'class'     => Doctrine\ORM\EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \MauticPlugin\CustomObjectsBundle\Entity\CustomItem::class,
                 ],
             ],
             'custom_object.repository' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository::class,
+                'class'     => Doctrine\ORM\EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \MauticPlugin\CustomObjectsBundle\Entity\CustomObject::class,
                 ],
             ],
             'custom_item.xref.contact.repository' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository::class,
+                'class'     => Doctrine\ORM\EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact::class,
                 ],
             ],
             'custom_item.xref.custom_item.repository' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefCustomItemRepository::class,
+                'class'     => Doctrine\ORM\EntityRepository::class,
                 'factory'   => ['@doctrine.orm.entity_manager', 'getRepository'],
                 'arguments' => [
                     \MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem::class,
                 ],
             ],
             'custom_object.segment_decorator_multiselect' => [
-                'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Decorator\MultiselectDecorator::class,
+                'class'     => Doctrine\ORM\EntityRepository::class,
                 'arguments' => [
                     'mautic.lead.model.lead_segment_filter_operator',
                     'mautic.lead.repository.lead_segment_filter_descriptor',

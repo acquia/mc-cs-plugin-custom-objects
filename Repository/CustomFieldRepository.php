@@ -5,11 +5,18 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Repository;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 
 class CustomFieldRepository extends CommonRepository
 {
+    public function __construct(ManagerRegistry $registry, string $entityFQCN = null)
+    {
+        $entityFQCN = $entityFQCN ?? preg_replace('/(.*)\\\\Repository(.*)Repository?/', '$1\Entity$2', get_class($this));
+        parent::__construct($registry, $entityFQCN);
+    }
+
     public function isAliasUnique(string $alias, ?int $id = null): bool
     {
         $q = $this->createQueryBuilder(CustomField::TABLE_ALIAS);
