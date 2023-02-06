@@ -4,22 +4,14 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Repository;
 
-use Doctrine\Persistence\ManagerRegistry;
-use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
-class CustomItemXrefContactRepository extends CommonRepository
+class CustomItemXrefContactRepository extends CustomCommonRepository
 {
-    public function __construct(ManagerRegistry $registry, string $entityFQCN = null)
-    {
-        $entityFQCN = $entityFQCN ?? preg_replace('/(.*)\\\\Repository(.*)Repository?/', '$1\Entity$2', get_class($this));
-        parent::__construct($registry, $entityFQCN);
-    }
-
     /**
      * @return int[]
      */
