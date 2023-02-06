@@ -629,10 +629,71 @@ $coParams = [
                 ],
             ],
             'custom_object.segment_decorator_multiselect' => [
-                'class'     => Doctrine\ORM\EntityRepository::class,
+                'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Decorator\MultiselectDecorator::class,
                 'arguments' => [
                     'mautic.lead.model.lead_segment_filter_operator',
                     'mautic.lead.repository.lead_segment_filter_descriptor',
+                ],
+            ],
+        ],
+        'events' => [
+            'custom_field.post_load.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldPostLoadSubscriber::class,
+                'arguments' => [
+                    'custom_field.type.provider',
+                ],
+                'tag'          => 'doctrine.event_listener',
+                'tagArguments' => [
+                    'event' => 'postLoad',
+                    'lazy'  => true,
+                ],
+            ],
+            // There's a problem with multiple tags and arguments definition using array.
+            // So subscriber above should contain subscriber method below. But it is not possible now.
+            'custom_field.pre_save.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CustomFieldPreSaveSubscriber::class,
+                'arguments' => [
+                    'mautic.custom.model.field.option',
+                ],
+            ],
+            'custom_item.campaign.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\CampaignSubscriber::class,
+                'arguments' => [
+                    'mautic.custom.model.field',
+                    'mautic.custom.model.object',
+                    'mautic.custom.model.item',
+                    'translator',
+                    'custom_object.config.provider',
+                    'custom_object.query.filter.helper',
+                    'custom_object.query.filter.factory',
+                    'database_connection',
+                ],
+            ],
+            'custom_object.serializer.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\SerializerSubscriber::class,
+                'arguments' => [
+                    'custom_object.config.provider',
+                    'custom_item.xref.contact.repository',
+                    'mautic.custom.model.item',
+                    'request_stack',
+                ],
+                'tag'          => 'jms_serializer.event_subscriber',
+                'tagArguments' => [
+                    'event' => \JMS\Serializer\EventDispatcher\Events::POST_SERIALIZE,
+                ],
+            ],
+            'custom_object.emailtoken.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\TokenSubscriber::class,
+                'arguments' => [
+                    'custom_object.config.provider',
+                    'custom_object.query.filter.helper',
+                    'custom_object.query.filter.factory',
+                    'mautic.custom.model.object',
+                    'mautic.custom.model.item',
+                    'custom_object.token.parser',
+                    'mautic.campaign.model.event',
+                    'event_dispatcher',
+                    'custom_object.helper.token_formatter',
                 ],
             ],
         ],
@@ -650,6 +711,80 @@ $coParams = [
                     'mautic.custom.model.field',
                 ],
             ],
+        ],
+        'fieldTypes' => [
+            'custom.field.type.country' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\CountryType::class,
+                'arguments' => ['translator', 'mautic.lead.provider.fillterOperator'],
+                'tag'       => 'custom.field.type',
+            ],
+            'custom.field.type.date' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\DateType::class,
+                'arguments' => ['translator', 'mautic.lead.provider.fillterOperator'],
+                'tag'       => 'custom.field.type',
+            ],
+            'custom.field.type.datetime' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\DateTimeType::class,
+                'arguments' => ['translator', 'mautic.lead.provider.fillterOperator'],
+                'tag'       => 'custom.field.type',
+            ],
+            'custom.field.type.email' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\EmailType::class,
+                'arguments' => ['translator', 'mautic.lead.provider.fillterOperator'],
+                'tag'       => 'custom.field.type',
+            ],
+            'custom.field.type.hidden' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\HiddenType::class,
+                'arguments' => ['translator', 'mautic.lead.provider.fillterOperator'],
+                'tag'       => 'custom.field.type',
+            ],
+            'custom.field.type.int' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType::class,
+                'arguments' => ['translator', 'mautic.lead.provider.fillterOperator'],
+                'tag'       => 'custom.field.type',
+            ],
+            'custom.field.type.phone' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\PhoneType::class,
+                'arguments' => ['translator', 'mautic.lead.provider.fillterOperator'],
+                'tag'       => 'custom.field.type',
+            ],
+            'custom.field.type.select' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\SelectType::class,
+                'arguments' => ['translator', 'mautic.lead.provider.fillterOperator'],
+                'tag'       => 'custom.field.type',
+            ],
+            'custom.field.type.multiselect' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\MultiselectType::class,
+                'arguments' => ['translator', 'mautic.lead.provider.fillterOperator', 'custom_object.csv.helper'],
+                'tag'       => 'custom.field.type',
+            ],
+            'custom.field.type.text' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType::class,
+                'arguments' => ['translator', 'mautic.lead.provider.fillterOperator'],
+                'tag'       => 'custom.field.type',
+            ],
+            'custom.field.type.textarea' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\TextareaType::class,
+                'arguments' => ['translator', 'mautic.lead.provider.fillterOperator'],
+                'tag'       => 'custom.field.type',
+            ],
+            'custom.field.type.url' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\UrlType::class,
+                'arguments' => ['translator', 'mautic.lead.provider.fillterOperator'],
+                'tag'       => 'custom.field.type',
+            ],
+            // Hiding these as they duplicate the select and multiselect field type functionality.
+            // Remove these field types if no one will miss them.
+            // 'custom.field.type.checkbox_group' => [
+            //     'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\CheckboxGroupType::class,
+            //     'arguments' => ['translator', 'mautic.lead.provider.fillterOperator', 'custom_object.csv.helper'],
+            //     'tag'       => 'custom.field.type',
+            // ],
+            // 'custom.field.type.radio_group' => [
+            //     'class'     => \MauticPlugin\CustomObjectsBundle\CustomFieldType\RadioGroupType::class,
+            //     'arguments' => ['translator', 'mautic.lead.provider.fillterOperator'],
+            //     'tag'       => 'custom.field.type',
+            // ],
         ],
         'other' => [
             'custom_object.config.provider' => [
