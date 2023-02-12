@@ -919,37 +919,37 @@ $coParams = [
     ],
 ];
 
-if (interface_exists('ApiPlatform\\Core\\Api\\IriConverterInterface')) {
-    $coParams['services']['other']['api_platform.custom_object.serializer.api_normalizer_jsonld'] = [
-        'class'            => \MauticPlugin\CustomObjectsBundle\Serializer\ApiNormalizer::class,
-        'decoratedService' => ['api_platform.jsonld.normalizer.item', 'api_platform.jsonld.normalizer.item.inner'],
-        'arguments'        => [
-            'api_platform.jsonld.normalizer.item.inner',
-            'custom_field.type.provider',
-            'mautic.custom.model.item',
-            'api_platform.iri_converter',
-            'doctrine.orm.entity_manager',
-        ],
-    ];
-    $coParams['services']['other']['api_platform.custom_object.serializer.api_normalizer_json'] = [
-        'class'            => \MauticPlugin\CustomObjectsBundle\Serializer\ApiNormalizer::class,
-        'decoratedService' => ['api_platform.serializer.normalizer.item', 'api_platform.serializer.normalizer.item.inner'],
-        'arguments'        => [
-            'api_platform.serializer.normalizer.item.inner',
-            'custom_field.type.provider',
-            'mautic.custom.model.item',
-            'api_platform.iri_converter',
-            'doctrine.orm.entity_manager',
-        ],
-    ];
-    $coParams['services']['other']['api_platform.custom_object.custom_item.extension'] = [
-        'class'     => \MauticPlugin\CustomObjectsBundle\Extension\CustomItemListeningExtension::class,
-        'arguments' => [
-            'mautic.helper.user',
-            'mautic.security',
-        ],
-        'tag' => 'api_platform.doctrine.orm.query_extension.collection',
-    ];
-}
+//if (interface_exists('ApiPlatform\\Core\\Api\\IriConverterInterface')) {
+//    $coParams['services']['other']['api_platform.custom_object.serializer.api_normalizer_jsonld'] = [
+//        'class'            => \MauticPlugin\CustomObjectsBundle\Serializer\ApiNormalizer::class,
+//        'decoratedService' => ['api_platform.jsonld.normalizer.item', 'api_platform.jsonld.normalizer.item.inner'],
+//        'arguments'        => [
+//            'api_platform.jsonld.normalizer.item.inner',
+//            'custom_field.type.provider',
+//            'mautic.custom.model.item',
+//            'api_platform.iri_converter',
+//            'doctrine.orm.entity_manager',
+//        ],
+//    ];
+//    $coParams['services']['other']['api_platform.custom_object.serializer.api_normalizer_json'] = [
+//        'class'            => \MauticPlugin\CustomObjectsBundle\Serializer\ApiNormalizer::class,
+//        'decoratedService' => ['api_platform.serializer.normalizer.item', 'api_platform.serializer.normalizer.item.inner'],
+//        'arguments'        => [
+//            'api_platform.serializer.normalizer.item.inner',
+//            'custom_field.type.provider',
+//            'mautic.custom.model.item',
+//            'api_platform.iri_converter',
+//            'doctrine.orm.entity_manager',
+//        ],
+//    ];
+//    $coParams['services']['other']['api_platform.custom_object.custom_item.extension'] = [
+//        'class'     => \MauticPlugin\CustomObjectsBundle\Extension\CustomItemListeningExtension::class,
+//        'arguments' => [
+//            'mautic.helper.user',
+//            'mautic.security',
+//        ],
+//        'tag' => 'api_platform.doctrine.orm.query_extension.collection',
+//    ];
+//}
 
 return $coParams;
