@@ -48,7 +48,7 @@ class CustomItemImportModel extends FormModel
     public function import(Import $import, array $rowData, CustomObject $customObject): bool
     {
         $matchedFields = $import->getMatchedFields();
-        $customItem    = $this->getCustomItem($import, $customObject, $rowData);
+        $customItem    = $this->getCustomItem($matchedFields, $customObject, $rowData);
         $merged        = (bool) $customItem->getId();
         $contactIds    = [];
 
@@ -99,6 +99,57 @@ class CustomItemImportModel extends FormModel
         return $merged;
     }
 
+    public function externalImport(Import $import, array $matchedFields, array $rowData, CustomObject $customObject): int
+    {
+        $customItem = $this->getCustomItem($matchedFields, $customObject, $rowData);
+        $this->setOwner($import, $customItem);
+
+        foreach ($matchedFields as $csvField => $customFieldId) {
+            if (!isset($rowData[$csvField])) {
+                continue;
+            }
+
+            $csvValue = $rowData[$csvField];
+            if (is_string($customFieldId)) {
+                if (0 === strcasecmp('customItemName', $customFieldId)) {
+                    $customItem->setName($csvValue);
+
+                    continue;
+                }
+
+                if (0 === strcasecmp('customItemId', $customFieldId)) {
+                    continue;
+                }
+            }
+
+            try {
+                $customFieldValue = $customItem->findCustomFieldValueForFieldId((int) $customFieldId);
+            } catch (NotFoundException $e) {
+                $customFieldValue = $customItem->createNewCustomFieldValueByFieldId((int) $customFieldId, $csvValue);
+            }
+
+            $customFieldValue->setValue($csvValue);
+        }
+
+        $customItem->setDefaultValuesForMissingFields();
+
+        $customItem = $this->customItemModel->save($customItem);
+
+        return $customItem->getId();
+    }
+
+    /**
+     * @throws NotFoundException
+     */
+    public function linkContact(int $customItemId, int $contactId): CustomItem
+    {
+        $customItem = $this->customItemModel->fetchEntity($customItemId);
+        $xref = $this->customItemModel->linkEntity($customItem, 'contact', $contactId);
+        $customItem->addContactReference($xref);
+
+        return $customItem;
+    }
+
     /**
      * @param int[] $contactIds
      */
@@ -127,11 +178,11 @@ class CustomItemImportModel extends FormModel
     }
 
     /**
+     * @param mixed[] $matchedFields
      * @param mixed[] $rowData
      */
-    private function getCustomItem(Import $import, CustomObject $customObject, array $rowData): CustomItem
+    private function getCustomItem(array $matchedFields, CustomObject $customObject, array $rowData): CustomItem
     {
-        $matchedFields = $import->getMatchedFields();
         $customItem    = new CustomItem($customObject);
         $idKey         = array_search(
             strtolower('customItemId'),

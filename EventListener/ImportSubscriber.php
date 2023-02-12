@@ -11,6 +11,7 @@ use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Event\ImportValidateEvent;
 use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemImportModel;
@@ -79,8 +80,15 @@ class ImportSubscriber implements EventSubscriberInterface
     {
         return [
             LeadEvents::IMPORT_ON_INITIALIZE    => 'onImportInit',
-            LeadEvents::IMPORT_ON_FIELD_MAPPING => 'onFieldMapping',
-            LeadEvents::IMPORT_ON_PROCESS       => 'onImportProcess',
+            LeadEvents::IMPORT_ON_FIELD_MAPPING => [
+                ['onFieldMapping', 0],
+                ['onContactImportFieldMapping', 0],
+            ],
+            LeadEvents::IMPORT_ON_PROCESS       => [
+                ['onImportProcess', 0],
+                ['onPreContactImportProcess', 1],
+                ['onPostContactImportProcess', -1],
+            ],
             LeadEvents::IMPORT_ON_VALIDATE      => 'onValidateImport',
         ];
     }
@@ -115,25 +123,35 @@ class ImportSubscriber implements EventSubscriberInterface
             $customObjectId = $this->getCustomObjectId($event->routeObjectName);
             $this->permissionProvider->canCreate($customObjectId);
             $customObject  = $this->customObjectModel->fetchEntity($customObjectId);
-            $customFields  = $customObject->getCustomFields();
+            $fieldList     = $this->getFieldList($customObject);
+
             $specialFields = [
                 'linkedContactIds' => 'custom.item.link.contact.ids',
             ];
-
-            $fieldList = [
-                'customItemId'   => 'mautic.core.id',
-                'customItemName' => 'custom.item.name.label',
-            ];
-
-            foreach ($customFields as $customField) {
-                $fieldList[$customField->getId()] = $customField->getName();
-            }
 
             $event->fields = [
                 $customObject->getNamePlural() => $fieldList,
                 'mautic.lead.special_fields'   => $specialFields,
             ];
         } catch (NotFoundException|ForbiddenException $e) {
+        }
+    }
+
+    public function onContactImportFieldMapping(ImportMappingEvent $event): void
+    {
+        if (!$this->configProvider->pluginIsEnabled() || !$event->importIsForRouteObject('contacts')) {
+            return;
+        }
+
+        $customObjects = $this->customObjectModel->fetchEntities();
+        foreach ($customObjects as $customObject) {
+            $prefix    = sprintf('custom-object-%d:', $customObject->getId());
+            $fieldList = $this->getFieldList($customObject, $prefix);
+
+            $event->fields = array_merge(
+                $event->fields,
+                [$customObject->getNamePlural() => $fieldList,]
+            );
         }
     }
 
@@ -194,6 +212,71 @@ class ImportSubscriber implements EventSubscriberInterface
         }
     }
 
+    public function onPreContactImportProcess(ImportProcessEvent $event): void
+    {
+        if (!$this->configProvider->pluginIsEnabled() || 'lead' !== $event->import->getObject()) {
+            return;
+        }
+
+        $matchedFields = $event->import->getMatchedFields();
+        $rawData       = $event->rowData;
+
+        $matchedFields = array_filter(
+            $matchedFields,
+            fn($item) => preg_match('/^custom-object-\d*:/', $item)
+        );
+
+        $customObjectMatchedFields = [];
+        array_walk(
+            $matchedFields,
+            function ($item, $key) use (&$customObjectMatchedFields) {
+                $objectField = explode(':', $item);
+                $customObjectMatchedFields[$objectField[0]] = array_merge(
+                    $customObjectMatchedFields[$objectField[0]] ?? [],
+                    [
+                        $objectField[1] => $key
+                    ]
+                );
+            }
+        );
+
+
+        foreach ($rawData as $key => $value) {
+            if (array_key_exists($key, $matchedFields)) {
+                $customRawData[$key] = $value;
+                unset($rawData[$key]);
+            }
+        }
+
+        $properties = $event->getProperties();
+        foreach ($customObjectMatchedFields as $object => $matchedFields) {
+            if (preg_match('/^custom-object-(\d)*/', $object, $matches)) {
+                $this->permissionProvider->canCreate((int) $matches[1]);
+                $customObject  = $this->customObjectModel->fetchEntity((int) $matches[1]);
+                $itemId        = $this->customItemImportModel->externalImport($event->import, array_flip($matchedFields), $customRawData ?? [], $customObject);
+
+                $properties['customItems'] = array_merge($properties['customItems'] ?? [], [$itemId]);
+            }
+        }
+
+        $event->setProperties($properties);
+        $event->rowData = $rawData;
+    }
+
+    public function onPostContactImportProcess(ImportProcessEvent $event): void
+    {
+        if (!$this->configProvider->pluginIsEnabled() || 'lead' !== $event->import->getObject()) {
+            return;
+        }
+
+        $properties = $event->getProperties();
+        if (isset($event->rowData['id']) && isset($properties['customItems'])) {
+            foreach($properties['customItems'] as $customItemId) {
+                $this->customItemImportModel->linkContact((int) $customItemId, (int) $event->rowData['id']);
+            }
+        }
+    }
+
     /**
      * @throws NotFoundException
      */
@@ -206,6 +289,24 @@ class ImportSubscriber implements EventSubscriberInterface
         }
 
         throw new NotFoundException("{$routeObjectName} is not a custom object import");
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function getFieldList(CustomObject $customObject, string $prefix = ''): array
+    {
+        $fieldList = [
+            $prefix.'customItemId'   => 'mautic.core.id',
+            $prefix.'customItemName' => 'custom.item.name.label',
+        ];
+
+        $customFields = $customObject->getCustomFields();
+        foreach ($customFields as $customField) {
+            $fieldList[$prefix.$customField->getId()] = $customField->getName();
+        }
+
+        return $fieldList;
     }
 
     /**
