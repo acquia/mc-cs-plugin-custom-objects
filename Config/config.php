@@ -185,6 +185,13 @@ $coParams = [
                 'method'     => 'GET|POST',
             ],
         ],
+        'api' => [
+            'custom_item_api_remove' => [
+                'path'       => '/custom/item/delete/{itemId}',
+                'controller' => 'CustomObjectsBundle:CustomItem\Api:delete',
+                'method'     => 'GET',
+            ],
+        ],
     ],
 
     'services' => [
@@ -306,6 +313,13 @@ $coParams = [
                     'setContainer' => [
                         '@service_container',
                     ],
+                ],
+            ],'custom_item.api_controller' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ApiController::class,
+                'arguments' => [
+                    'mautic.custom.model.item',
+                    'custom_item.permission.provider',
+                    'logger',
                 ],
             ],
             'custom_item.batch_delete_controller' => [
