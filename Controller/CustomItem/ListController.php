@@ -124,7 +124,7 @@ class ListController extends CommonController
                 'sessionVar'       => $namespace,
                 'namespace'        => $namespace,
             ],
-            'contentTemplate' => 'CustomObjectsBundle:CustomItem:list.html.php',
+            'contentTemplate' => 'CustomObjectsBundle:CustomItem:list.html.twig',
             'passthroughVars' => [
                 'mauticContent' => 'customItem',
                 'route'         => $filterEntityType ? null : $route,

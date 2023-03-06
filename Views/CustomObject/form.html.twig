@@ -1,0 +1,98 @@
+{% extends 'MauticCoreBundle:Default:content.html.twig' %}
+
+{% block mauticContent %}customObject{% endblock %}
+
+{% block headerTitle %}
+    {% if customObject.getId() %}
+        {{ 'custom.object.edit'|trans({'%name%' : customObject.getName()|trans}) }}
+    {% else %}
+        {% trans %}custom.object.new{% endtrans %}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {{ form_start(form) }}
+    <div class="box-layout">
+        <!-- container -->
+        <div class="col-md-9 bg-auto height-auto bg-white">
+            <div class="row">
+                <div class="col-xs-12">
+                    <!-- tabs controls -->
+                    <ul class="bg-auto nav nav-tabs pr-md pl-md">
+                        <li class="active">
+                            <a href="#details-container" role="tab" data-toggle="tab"> {{ 'mautic.core.details'|trans }}</a>
+                        </li>
+                        <li id="fields-tab">
+                            <a href="#fields-container" role="tab" data-toggle="tab"> {{ 'mautic.form.tab.fields'|trans }}</a>
+                        </li>
+                    </ul>
+                    <!--/ tabs controls -->
+                    <div class="tab-content pa-md">
+                        <div class="tab-pane fade in active bdr-w-0" id="details-container">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ form_row(form.nameSingular) }}
+                                    {{ form_row(form.namePlural) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.alias) }}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    {{ form_row(form.description) }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane fade bdr-w-0" id="fields-container">
+                            {{- include('MauticFormBundle:Builder:_style.html.twig') -}}
+                            <div id="mauticforms_fields">
+                                <div class="row">
+                                    <div class="available-fields mb-md col-sm-4">
+                                        <select class="chosen form-builder-new-component" data-placeholder="{{ 'mautic.form.form.component.fields'|trans }}">
+                                            <option value=""></option>
+                                            {% set routeForm = constant('MauticPlugin\\CustomObjectsBundle\\Provider\\CustomFieldRouteProvider::ROUTE_FORM') %}
+                                            {% for fieldType in availableFieldTypes %}
+                                                <option data-toggle="ajaxmodal"
+                                                        data-target="#objectFieldModal"
+                                                        data-href="{{ path(routeForm, {'objectId': customObject.getId(), 'fieldType': fieldType.getKey()}) }}">
+                                                    {{ fieldType.getName() }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="drop-here">
+                                    {{- include('CustomObjectsBundle:CustomObject:_form-fields.html.twig') -}}
+                                </div>
+                                {% if 0 == customFields|length %}
+                                    <div class="alert alert-info" id="form-field-placeholder">
+                                        <p>{{ 'mautic.form.form.addfield'|trans }}</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 bg-white height-auto">
+            <div class="pr-lg pl-lg pt-md pb-md">
+                {{ form_row(form.type) }}
+                {{ form_row(form.masterObject) }}
+                {{ form_row(form.category) }}
+                {{ form_row(form.isPublished) }}
+            </div>
+        </div>
+    </div>
+    {{ form_end(form) }}
+{% endblock %}
+
+{% block modal %}
+    {{ include('MauticCoreBundle:Helper:modal.html.twig', {
+        'id': 'objectFieldModal',
+        'header': false,
+        'footerButtons': true,
+    }) }}
+{% endblock %}

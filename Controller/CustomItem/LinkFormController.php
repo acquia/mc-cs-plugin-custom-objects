@@ -95,7 +95,7 @@ class LinkFormController extends AbstractFormController
                         'customObject' => $relationshipObject,
                         'form'         => $form->createView(),
                     ],
-                    'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.php',
+                    'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.twig',
                     'passthroughVars' => [
                         'callback'      => 'customItemLinkFormLoad',
                         'mauticContent' => 'customItem',
@@ -109,7 +109,7 @@ class LinkFormController extends AbstractFormController
 
         $responseData = [
             'closeModal' => true,
-            'flashes'    => $this->renderView('MauticCoreBundle:Notification:flash_messages.html.php'),
+            'flashes'    => $this->renderView('MauticCoreBundle:Notification:flash_messages.html.twig'),
         ];
 
         return new JsonResponse($responseData);
@@ -152,7 +152,7 @@ class LinkFormController extends AbstractFormController
                 $responseData = [
                     'closeModal' => true,
                     'callback'   => $callback,
-                    'flashes'    => $this->renderView('MauticCoreBundle:Notification:flash_messages.html.php'),
+                    'flashes'    => $this->renderView('MauticCoreBundle:Notification:flash_messages.html.twig'),
                 ];
 
                 return new JsonResponse($responseData);
@@ -170,7 +170,7 @@ class LinkFormController extends AbstractFormController
                     'form'         => $form->createView(),
                     'tmpl'         => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.php',
+                'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.twig',
                 'passthroughVars' => [
                     'closeModal'    => false,
                     'callback'      => 'customItemLinkFormLoad',

@@ -203,7 +203,7 @@ class SaveController extends AbstractFormController
                     'form'         => $form->createView(),
                     'tmpl'         => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.php',
+                'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customItem',
                     'route'         => $route,
