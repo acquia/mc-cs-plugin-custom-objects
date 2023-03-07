@@ -1,6 +1,6 @@
-{% set tableAlias = constant('MauticPlugin\\CustomObjectsBundle\\Entity\\CustomObject::TABLE_ALIAS') %}
-{% set routeView = constant('MauticPlugin\\CustomObjectsBundle\\Provider\\CustomObjectRouteProvider::ROUTE_VIEW') %}
-{% set routeList = constant('MauticPlugin\\CustomObjectsBundle\\Provider\\CustomObjectRouteProvider::ROUTE_LIST') %}
+{% set tableAlias = constant('MauticPlugin\\CustomObjectsBundle\\Entity\\CustomItem::TABLE_ALIAS') %}
+{% set routeView = constant('MauticPlugin\\CustomObjectsBundle\\Provider\\CustomItemRouteProvider::ROUTE_VIEW') %}
+{% set routeList = constant('MauticPlugin\\CustomObjectsBundle\\Provider\\CustomItemRouteProvider::ROUTE_LIST') %}
 
 {% set routerSelf = path(routeList, {
     'objectId': customObject.getId(),
