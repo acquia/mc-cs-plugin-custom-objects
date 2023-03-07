@@ -16,7 +16,7 @@ class JsonController extends Controller
      */
     protected function renderJson(array $responseData = []): JsonResponse
     {
-        $responseData['flashes'] = $this->renderView('MauticCoreBundle:Notification:flash_messages.html.php');
+        $responseData['flashes'] = $this->renderView('MauticCoreBundle:Notification:flash_messages.html.twig');
 
         return new JsonResponse($responseData);
     }

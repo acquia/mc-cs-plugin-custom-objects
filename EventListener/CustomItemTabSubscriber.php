@@ -73,7 +73,7 @@ class CustomItemTabSubscriber implements EventSubscriberInterface
 
     public function injectTabs(CustomContentEvent $event): void
     {
-        if ($event->checkContext('CustomObjectsBundle:CustomItem:detail.html.php', 'tabs')) {
+        if ($event->checkContext('CustomObjectsBundle:CustomItem:detail.html.twig', 'tabs')) {
             $vars    = $event->getVars();
             $objects = $this->customObjectModel->getMasterCustomObjects();
 
@@ -92,13 +92,13 @@ class CustomItemTabSubscriber implements EventSubscriberInterface
                     'tabId' => "custom-object-{$object->getId()}",
                 ];
 
-                $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:link.html.php', $data);
+                $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:link.html.twig', $data);
             }
 
-            $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:modal.html.php');
+            $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:modal.html.twig');
         }
 
-        if ($event->checkContext('CustomObjectsBundle:CustomItem:detail.html.php', 'tabs.content')) {
+        if ($event->checkContext('CustomObjectsBundle:CustomItem:detail.html.twig', 'tabs.content')) {
             $vars    = $event->getVars();
             $objects = $this->getCustomObjects();
 
@@ -129,7 +129,7 @@ class CustomItemTabSubscriber implements EventSubscriberInterface
                     'namespace'         => $sessionProvider->getNamespace(),
                 ];
 
-                $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:content.html.php', $data);
+                $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:content.html.twig', $data);
             }
         }
     }

@@ -1,0 +1,47 @@
+<div class="tab-pane fade bdr-w-0 custom-object-tab" id="<?php echo $tabId; ?>-container">
+    <div class="row">
+        <div class="col-md-3">
+            {{ include('MauticCoreBundle:Helper:search.html.twig', {
+                'searchValue': searchValue,
+                'action': searchRoute,
+                'searchId': searchId,
+                'target': '#'~namespace,
+                'searchHelp': ''
+            }) }}
+        </div>
+        <div class="col-md-9 text-right">
+            <a href="{{ path(linkRoute) }}"
+               class="btn btn-default"
+               data-toggle="ajaxmodal"
+               data-target="#customItemLookupModal"
+               data-header="{{ linkHeader }}">
+                <span>
+                    <i class="fa fa-link"></i>
+                    <span class="hidden-xs hidden-sm">
+                        {{ 'custom.item.link.existing'|trans }}
+                    </span>
+                </span>
+            </a>
+            <a href="{{ path(newRoute) }}" class="btn btn-default" data-toggle="ajax">
+                <span>
+                    <i class="fa fa-plus"></i>
+                    <span class="hidden-xs hidden-sm">
+                        {{ 'custom.item.link.new'|trans }}
+                    </span>
+                </span>
+            </a>
+        </div>
+    </div>
+    <div class='custom-item-list page-list mt-20' id="{{ namespace }}>">
+        Loading...
+    </div>
+</div>
+
+<script type="text/javascript">
+    CustomObjects.reloadItemsTable(
+        {{ customObjectId }},
+        {{ currentEntityId }},
+        {{ currentEntityType }},
+        {{ tabId }}
+    );
+</script>

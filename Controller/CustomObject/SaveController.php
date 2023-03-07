@@ -180,7 +180,7 @@ class SaveController extends AbstractFormController
                     'deletedFields'       => [],
                     'form'                => $form->createView(),
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.php',
+                'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
                     'route'         => $objectId ? $this->routeProvider->buildEditRoute($customObject->getId()) : $this->routeProvider->buildNewRoute(),

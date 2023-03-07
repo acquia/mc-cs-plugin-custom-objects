@@ -1,0 +1,37 @@
+{% set isIndex = tmpl == 'index' ? true : false %}
+{% set tmpl = 'list' %}
+{% set fieldData = fieldData ?? null %}
+{% set target = '#'~namespace %}
+
+{% extends isIndex ? 'MauticCoreBundle:Default:content.html.twig' : 'MauticCoreBundle:Default:raw_output.html.twig' %}
+
+{% block mauticContent %}customItem{% endblock %}
+
+{% block headerTitle %}
+    {{ customObject.getName() }}
+{% endblock %}
+
+{% block actions %}
+    {{ include('MauticCoreBundle:Helper:page_actions.html.twig') }}
+{% endblock %}
+
+{% block content %}
+    <div class="clearfix">
+        {% if isIndex %}
+            <div class="panel panel-default mb-0 {%- if not lookup -%}bdr-t-wdh-0{%- endif -%}">
+                {{ include('MauticCoreBundle:Helper:list_toolbar.html.twig', {
+                    'searchValue': searchValue,
+                    'action': currentRoute,
+                    'target': '#'~namespace,
+                    'overlayDisabled': lookup
+                }) }}
+
+                <div class="page-list" id="{{ namespace }}">
+                    {{ include('CustomObjectsBundle:CustomItem:_list.html.twig') }}
+                </div>
+            </div>
+        {% else %}
+            {{ include('CustomObjectsBundle:CustomItem:_list.html.twig') }}
+        {% endif %}
+    </div>
+{% endblock %}
