@@ -143,7 +143,7 @@ class SaveController extends AbstractFormController
                 $customItem = $this->customItemModel->save($customItem->getChildCustomItem());
             }
 
-            if($customItem->hasBeenUpdated()){
+            if ($customItem->hasBeenUpdated()) {
                 $message = 'custom.item.notice.merged';
             }
 

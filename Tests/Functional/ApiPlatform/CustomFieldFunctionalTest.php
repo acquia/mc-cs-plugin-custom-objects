@@ -85,7 +85,7 @@ final class CustomFieldFunctionalTest extends AbstractApiPlatformFunctionalTest
                 'string1',
                 'string2',
             ],
-            'isPublished'    => false,
+            'isPublished'        => false,
             'isUniqueIdentifier' => false,
         ];
     }
@@ -102,7 +102,7 @@ final class CustomFieldFunctionalTest extends AbstractApiPlatformFunctionalTest
                 'string1',
                 'string2',
             ],
-            'isPublished'    => true,
+            'isPublished'        => true,
             'isUniqueIdentifier' => true,
         ];
     }
