@@ -16,8 +16,8 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['7.4', '8.0'] # The supported PHP versions
-        db-types: ['mysql', 'mariadb'] # can be: ['mysql', 'mariadb'] but not necessary for this plugin that does not add any DB schema
+        php-versions: ['8.0'] # The supported PHP versions
+        db-types: ['mysql'] # can be: ['mysql', 'mariadb'] but not necessary for this plugin that does not add any DB schema
         mautic-versions: ['4.4'] # The supported Mautic versions
 
     name: Tests on PHP ${{ matrix.php-versions }}, ${{ matrix.db-types }}, Mautic ${{ matrix.mautic-versions }}
@@ -100,8 +100,11 @@ jobs:
     - name: Run Code Style check
       run: bin/php-cs-fixer fix ${{ env.PLUGIN_DIR }} --config=.php-cs-fixer.php -v --dry-run --show-progress=dots --diff
 
+    # - name: PHPSTAN - baseline (debug)
+    #   run: bin/phpstan --configuration=plugins/CustomObjectsBundle/phpstan.neon --generate-baseline=var/logs/phpstan-baseline-${{ matrix.php-versions }}.neon
+
     - name: PHPSTAN
-      run: composer phpstan -- ${{ env.PLUGIN_DIR }}
+      run: bin/phpstan --configuration=${{ env.PLUGIN_DIR }}/phpstan.neon
 
     - name: Rector
       run: composer rector -- --dry-run --no-progress-bar ${{ env.PLUGIN_DIR }}
@@ -114,7 +117,7 @@ jobs:
         DB_PORT: ${{ job.services.database.ports[3306] }}
       run: XDEBUG_MODE=coverage APP_DEBUG=0 php -dpcov.enabled=1 -dpcov.directory=. -dpcov.exclude="~tests|themes|vendor~" bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration ${{ env.PLUGIN_DIR }}/phpunit.xml --coverage-clover=${{ env.PLUGIN_DIR }}/coverage.xml --coverage-text
 
-    - name: Coverage report
+    - name: Coverage report (debug)
       run: cat ${{ env.PLUGIN_DIR }}/coverage.xml
 
     #  - name: Upload coverage report
