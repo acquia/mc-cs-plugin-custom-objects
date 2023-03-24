@@ -42,7 +42,7 @@ Once some of your contacts buy a Mautic T-shirt or hoodie you can link them with
 
 ## Documentation
 
-See [Wiki](wiki)
+See [Wiki](https://github.com/acquia/mc-cs-plugin-custom-objects/wiki)
 
 ## Tests
 
