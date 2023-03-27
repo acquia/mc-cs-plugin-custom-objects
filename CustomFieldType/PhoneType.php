@@ -38,8 +38,6 @@ class PhoneType extends AbstractTextType
             $phoneNumber = $phoneUtil->parse($value, PhoneNumberUtil::UNKNOWN_REGION);
         } catch (NumberParseException $e) {
             throw new \UnexpectedValueException($message);
-
-            return;
         }
 
         if (false === $phoneUtil->isValidNumber($phoneNumber)) {

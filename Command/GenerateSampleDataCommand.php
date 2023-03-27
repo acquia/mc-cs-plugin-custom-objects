@@ -235,13 +235,10 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
                     switch (gettype($value)) {
                         case 'string':
                             return "'$value'";
-                            break;
                         case 'integer':
                             return (string) $value;
-                            break;
                         case 'boolean':
                             return (bool) $value;
-                            break;
                         default:
                             $type = gettype($value);
                             throw new \InvalidArgumentException("Unsupported type '$type' for insert query");

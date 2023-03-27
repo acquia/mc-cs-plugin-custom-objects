@@ -221,9 +221,9 @@ class CampaignSubscriber implements EventSubscriberInterface
         );
 
         if ($innerQueryBuilder instanceof UnionQueryContainer) {
-            $this->applyParamsToMultipleQueries($innerQueryBuilder, $queryAlias, $contact, $operator);
+            $this->applyParamsToMultipleQueries($innerQueryBuilder, $queryAlias, $contact);
         } else {
-            $this->applyParamsToQuery($innerQueryBuilder, $queryAlias, $contact, $operator);
+            $this->applyParamsToQuery($innerQueryBuilder, $queryAlias, $contact);
         }
 
         $queryBuilder = $this->buildOuterQuery($innerQueryBuilder, $queryAlias);
@@ -238,14 +238,14 @@ class CampaignSubscriber implements EventSubscriberInterface
         }
     }
 
-    private function applyParamsToMultipleQueries(UnionQueryContainer $unionQueryContainer, string $queryAlias, Lead $contact, string $operator): void
+    private function applyParamsToMultipleQueries(UnionQueryContainer $unionQueryContainer, string $queryAlias, Lead $contact): void
     {
         foreach ($unionQueryContainer as $segmentQueryBuilder) {
-            $this->applyParamsToQuery($segmentQueryBuilder, $queryAlias, $contact, $operator);
+            $this->applyParamsToQuery($segmentQueryBuilder, $queryAlias, $contact);
         }
     }
 
-    private function applyParamsToQuery(SegmentQueryBuilder $innerQueryBuilder, string $queryAlias, Lead $contact, string $operator): void
+    private function applyParamsToQuery(SegmentQueryBuilder $innerQueryBuilder, string $queryAlias, Lead $contact): void
     {
         $innerQueryBuilder->select($queryAlias.'_value.custom_item_id');
         $this->queryFilterHelper->addContactIdRestriction($innerQueryBuilder, $queryAlias, (int) $contact->getId());
