@@ -83,7 +83,7 @@ jobs:
         restore-keys: ${{ runner.os }}-composer-
 
     - name: Install Composer dependencies
-      run: composer install
+      run: composer install && composer require --dev theofidry/alice-data-fixtures
 
     - name: Install Mautic
       env:
@@ -116,7 +116,7 @@ jobs:
       env:
         DB_PORT: ${{ job.services.database.ports[3306] }}
       # run: XDEBUG_MODE=coverage APP_DEBUG=0 php -dpcov.enabled=1 -dpcov.directory=. -dpcov.exclude="~tests|themes|vendor~" bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration ${{ env.PLUGIN_DIR }}/phpunit.xml --coverage-clover=${{ env.PLUGIN_DIR }}/coverage.xml --coverage-text
-      run: XDEBUG_MODE=coverage APP_DEBUG=0 php -dpcov.enabled=1 -dpcov.directory=. -dpcov.exclude="~tests|themes|vendor|app~" bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=${{ env.PLUGIN_DIR }}/coverage.xml --coverage-text
+      run: XDEBUG_MODE=coverage APP_DEBUG=0 php -dpcov.enabled=1 -dpcov.directory=. -dpcov.exclude="~tests|themes|vendor|app~" bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --filter=CustomObjectsBundle --coverage-clover=${{ env.PLUGIN_DIR }}/coverage.xml --coverage-text
 
     - name: Coverage report (debug)
       run: cat ${{ env.PLUGIN_DIR }}/coverage.xml
