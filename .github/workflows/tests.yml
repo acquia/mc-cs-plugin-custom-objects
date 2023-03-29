@@ -100,25 +100,25 @@ jobs:
     - name: Run Code Style check
       run: bin/php-cs-fixer fix ${{ env.PLUGIN_DIR }} --config=.php-cs-fixer.php -v --dry-run --show-progress=dots --diff
 
-    - name: PHPSTAN - baseline (debug)
-      run: bin/phpstan --configuration=plugins/CustomObjectsBundle/phpstan.neon --generate-baseline=var/logs/phpstan-baseline-${{ matrix.php-versions }}.neon
+    # - name: PHPSTAN - baseline (debug)
+    #   run: bin/phpstan --configuration=plugins/CustomObjectsBundle/phpstan.neon --generate-baseline=var/logs/phpstan-baseline-${{ matrix.php-versions }}.neon
 
-    # - name: PHPSTAN
-    #   run: bin/phpstan --configuration=${{ env.PLUGIN_DIR }}/phpstan.neon
+    - name: PHPSTAN
+      run: bin/phpstan --configuration=${{ env.PLUGIN_DIR }}/phpstan.neon
 
-    # - name: Rector
-    #   run: composer rector -- --dry-run --no-progress-bar ${{ env.PLUGIN_DIR }}
+    - name: Rector
+      run: composer rector -- --dry-run --no-progress-bar ${{ env.PLUGIN_DIR }}
 
-    # - name: Twig Lint
-    #   run: bin/console lint:twig ${{ env.PLUGIN_DIR }}
+    - name: Twig Lint
+      run: bin/console lint:twig ${{ env.PLUGIN_DIR }}
 
-    # - name: Run PHPUNIT tests
-    #   env:
-    #     DB_PORT: ${{ job.services.database.ports[3306] }}
-    #   run: XDEBUG_MODE=coverage APP_DEBUG=0 php -dpcov.enabled=1 -dpcov.directory=. -dpcov.exclude="~tests|themes|vendor~" bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration ${{ env.PLUGIN_DIR }}/phpunit.xml --coverage-clover=${{ env.PLUGIN_DIR }}/coverage.xml --coverage-text
+    - name: Run PHPUNIT tests
+      env:
+        DB_PORT: ${{ job.services.database.ports[3306] }}
+      run: XDEBUG_MODE=coverage APP_DEBUG=0 php -dpcov.enabled=1 -dpcov.directory=. -dpcov.exclude="~tests|themes|vendor~" bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration ${{ env.PLUGIN_DIR }}/phpunit.xml --coverage-clover=${{ env.PLUGIN_DIR }}/coverage.xml --coverage-text
 
-    # - name: Coverage report (debug)
-    #   run: cat ${{ env.PLUGIN_DIR }}/coverage.xml
+    - name: Coverage report (debug)
+      run: cat ${{ env.PLUGIN_DIR }}/coverage.xml
 
     #  - name: Upload coverage report
     #     if: ${{ matrix.php-versions == '8.0' && matrix.db-types == 'mysql' && matrix.mautic-versions == '4.4' }} # upload just once, change for your matrix
