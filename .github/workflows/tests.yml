@@ -100,8 +100,8 @@ jobs:
     - name: Run Code Style check
       run: bin/php-cs-fixer fix ${{ env.PLUGIN_DIR }} --config=.php-cs-fixer.php -v --dry-run --show-progress=dots --diff
 
-    # - name: PHPSTAN - baseline (debug)
-    #   run: bin/phpstan --configuration=plugins/CustomObjectsBundle/phpstan.neon --generate-baseline=var/logs/phpstan-baseline-${{ matrix.php-versions }}.neon
+    - name: PHPSTAN - baseline (debug)
+      run: bin/phpstan --configuration=plugins/CustomObjectsBundle/phpstan.neon --generate-baseline=var/logs/phpstan-baseline-${{ matrix.php-versions }}.neon --allow-empty-baseline 
 
     - name: PHPSTAN
       run: bin/phpstan --configuration=${{ env.PLUGIN_DIR }}/phpstan.neon
@@ -115,7 +115,8 @@ jobs:
     - name: Run PHPUNIT tests
       env:
         DB_PORT: ${{ job.services.database.ports[3306] }}
-      run: XDEBUG_MODE=coverage APP_DEBUG=0 php -dpcov.enabled=1 -dpcov.directory=. -dpcov.exclude="~tests|themes|vendor~" bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration ${{ env.PLUGIN_DIR }}/phpunit.xml --coverage-clover=${{ env.PLUGIN_DIR }}/coverage.xml --coverage-text
+      # run: XDEBUG_MODE=coverage APP_DEBUG=0 php -dpcov.enabled=1 -dpcov.directory=. -dpcov.exclude="~tests|themes|vendor~" bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration ${{ env.PLUGIN_DIR }}/phpunit.xml --coverage-clover=${{ env.PLUGIN_DIR }}/coverage.xml --coverage-text
+      run: XDEBUG_MODE=coverage APP_DEBUG=0 php -dpcov.enabled=1 -dpcov.directory=. -dpcov.exclude="~tests|themes|vendor|app~" bin/phpunit -d memory_limit=1G --bootstrap vendor/autoload.php --configuration app/phpunit.xml.dist --coverage-clover=${{ env.PLUGIN_DIR }}/coverage.xml --coverage-text
 
     - name: Coverage report (debug)
       run: cat ${{ env.PLUGIN_DIR }}/coverage.xml
