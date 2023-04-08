@@ -1,0 +1,112 @@
+<!-- left section -->
+<div class="col-md-9 bg-white height-auto">
+    <div class="bg-auto">
+        <!-- page detail header -->
+        <div class="pr-md pl-md pt-lg pb-lg">
+            <div class="box-layout">
+                <div class="col-xs-10">
+                    <div class="text-muted">
+                        {% set nameSingular = item.getCustomObject().getNameSingular() %}
+                        {{ '%s'|format(nameSingular|escape)|raw }}
+                    </div>
+                </div>
+                {# TODO: Check if this block is needed #}
+                <div class="col-xs-2 text-right">
+                    {{ include('@MauticCore/Helper/publishstatus_badge.html.twig', {
+                        entity: item
+                    }) }}
+                </div>
+            </div>
+        </div>
+        <!--/ page detail header -->
+        <div class="collapse" id="custom-item-details">
+            <div class="pr-md pl-md pb-md">
+                <div class="panel shd-none mb-0">
+                    <table class="table table-bordered table-striped mb-0">
+                        <tbody>
+                        {{ include('@MauticCore/Helper/details.html.twig', {
+                            entity: item
+                        }) }}
+                        {% for fieldValue in item.getCustomFieldValues() %}
+                            <tr>
+                                <th>{{ '%s'|format(fieldValue.getCustomField().getName()|escape)|raw }}</th>
+                                <td>
+                                    {{ include('@CustomObjects/CustomField/value.html.twig', {
+                                        fieldValue: fieldValue
+                                    }) }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--/ detail collapseable toggler -->
+    <div class="bg-auto bg-dark-xs">
+        <div class="hr-expand nm">
+                <span data-toggle="tooltip" title="Detail">
+                    <a href="javascript:void(0)" class="arrow text-muted collapsed" data-toggle="collapse"
+                       data-target="#custom-item-details">
+                        <span class="caret"></span>
+                        {{ 'mautic.core.details'|trans }}
+                    </a>
+                </span>
+        </div>
+        <!-- some stats -->
+
+        <!--/ stats -->
+        <div class="pa-md">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="panel">
+                        <div class="panel-body box-layout">
+                            <div class="col-md-3 va-m">
+                                <h5 class="text-white dark-md fw-sb mb-xs">
+                                    <span class="fa fa-line-chart"></span>
+                                    {{ 'custom.item.links.in.time'|trans }}
+                                </h5>
+                            </div>
+                            <div class="col-md-9 va-m">
+                                {{ include('@MauticCore/Helper/graph_dateselect.html.twig', {
+                                    dateRangeForm: dateRangeForm,
+                                    class: 'pull-right'
+                                }) }}
+                            </div>
+                        </div>
+                        <div class="pt-0 pl-15 pb-10 pr-15">
+                            {{ include('@MauticCore/Helper/chart.html.twig', {
+                                chartData: stats,
+                                chartType: 'line',
+                                chartHeight: 300
+                            }) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{ customContent('details.stats.graph.below', mauticTemplateVars is defined ? mauticTemplateVars : []) }}
+    </div>
+
+    <!-- tabs controls -->
+    <ul class="nav nav-tabs pr-md pl-md">
+        <li class="active">
+            <a href="#contacts-container" role="tab" data-toggle="tab">
+                {{ 'mautic.lead.leads'|trans }}
+            </a>
+        </li>
+        {{ customContent('tabs', mauticTemplateVars is defined ? mauticTemplateVars : []) }}
+    </ul>
+    <!--/ tabs controls -->
+
+    <!-- start: tab-content -->
+    <div class="tab-content pa-md">
+        <div class="tab-pane active bdr-w-0 page-list" id="contacts-container">
+            <?php echo $contacts; ?>
+        </div>
+        {{ customContent('tabs.content', mauticTemplateVars is defined ? mauticTemplateVars : []) }}
+    </div>
+    <!-- end: tab-content -->
+</div>

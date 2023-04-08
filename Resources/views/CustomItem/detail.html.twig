@@ -1,0 +1,27 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}customItem{% endblock %}
+
+{% block headerTitle %}
+    {{ item.getName() }}
+{% endblock %}
+
+{% block actions %}
+    {{ include('@MauticCore/Helper/page_actions.html.twig', { 'item': item }) }}
+{% endblock %}
+
+{% block publishStatus %}
+    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity' : item}) -}}
+{% endblock %}
+
+{% block content %}
+    <div class="box-layout">
+        {{ include('@CustomObjects/CustomItem/_detail_left_section.html.twig', {
+            'entity': item,
+            'dateRangeForm': dateRangeForm,
+            'chartData': stats,
+            'mauticTemplateVars': mauticTemplateVars is defined ? mauticTemplateVars : {}
+        }) }}
+        {{ include('@CustomObjects/CustomItem/_detail_right_section.html.twig', {'logs': logs}) }}
+    </div>
+{% endblock %}
