@@ -106,6 +106,8 @@ class SaveController extends AbstractFormController
         $this->paramsToStringTransformer  = $paramsToStringTransformer;
         $this->optionsToStringTransformer = $optionsToStringTransformer;
         $this->lockFlashMessageHelper     = $lockFlashMessageHelper;
+
+        parent::setRequestStack($requestStack);
     }
 
     public function saveAction(?int $objectId = null): Response
@@ -180,7 +182,7 @@ class SaveController extends AbstractFormController
                     'deletedFields'       => [],
                     'form'                => $form->createView(),
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.twig',
+                'contentTemplate' => '@CustomObjects/CustomObject/form.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
                     'route'         => $objectId ? $this->routeProvider->buildEditRoute($customObject->getId()) : $this->routeProvider->buildNewRoute(),

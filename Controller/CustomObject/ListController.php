@@ -55,6 +55,8 @@ class ListController extends CommonController
         $this->customObjectModel         = $customObjectModel;
         $this->permissionProvider        = $permissionProvider;
         $this->routeProvider             = $routeProvider;
+
+        parent::setRequestStack($requestStack);
     }
 
     public function listAction(int $page = 1): Response
@@ -98,7 +100,7 @@ class ListController extends CommonController
                     'tmpl'           => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                     'sessionVar'     => $sessionProvider->getNamespace(),
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObject:list.html.twig',
+                'contentTemplate' => '@CustomObjects/CustomObject/list.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
                     'route'         => $route,

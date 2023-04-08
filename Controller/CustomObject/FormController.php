@@ -16,12 +16,15 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 class FormController extends AbstractFormController
 {
     /**
-     * @var FormFactory
+     * @var FormFactoryInterface
      */
     private $formFactory;
 
@@ -54,15 +57,17 @@ class FormController extends AbstractFormController
      * @var LockFlashMessageHelper
      */
     private $lockFlashMessageHelper;
+    private RequestStack $requestStack;
 
     public function __construct(
-        FormFactory $formFactory,
+        FormFactoryInterface $formFactory,
         CustomObjectModel $customObjectModel,
         CustomFieldModel $customFieldModel,
         CustomObjectPermissionProvider $permissionProvider,
         CustomObjectRouteProvider $routeProvider,
         CustomFieldTypeProvider $customFieldTypeProvider,
-        LockFlashMessageHelper $lockFlashMessageHelper
+        LockFlashMessageHelper $lockFlashMessageHelper,
+        RequestStack $requestStack
     ) {
         $this->formFactory             = $formFactory;
         $this->customObjectModel       = $customObjectModel;
@@ -71,9 +76,12 @@ class FormController extends AbstractFormController
         $this->routeProvider           = $routeProvider;
         $this->customFieldTypeProvider = $customFieldTypeProvider;
         $this->lockFlashMessageHelper  = $lockFlashMessageHelper;
+
+        $this->requestStack           = $requestStack;
+        parent::setRequestStack($requestStack);
     }
 
-    public function newAction(): Response
+    public function newAction(Request $request): Response
     {
         try {
             $this->permissionProvider->canCreate();
@@ -144,7 +152,7 @@ class FormController extends AbstractFormController
                     'deletedFields'       => [],
                     'form'                => $form->createView(),
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.twig',
+                'contentTemplate' => '@CustomObjects/CustomObject/form.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
                     'route'         => $route,

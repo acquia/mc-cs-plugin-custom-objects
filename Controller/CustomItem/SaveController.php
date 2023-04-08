@@ -80,6 +80,8 @@ class SaveController extends AbstractFormController
         $this->permissionProvider     = $permissionProvider;
         $this->routeProvider          = $routeProvider;
         $this->lockFlashMessageHelper = $lockFlashMessageHelper;
+
+        parent::setRequestStack($requestStack);
     }
 
     public function saveAction(int $objectId, ?int $itemId = null): Response
@@ -203,7 +205,7 @@ class SaveController extends AbstractFormController
                     'form'         => $form->createView(),
                     'tmpl'         => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.twig',
+                'contentTemplate' => '@CustomObjects/CustomItem/form.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customItem',
                     'route'         => $route,

@@ -18,6 +18,7 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
 use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,7 +33,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class SaveController extends CommonController
 {
     /**
-     * @var FormFactory
+     * @var FormFactoryInterface
      */
     private $formFactory;
 
@@ -62,7 +63,7 @@ class SaveController extends CommonController
     private $customObjectModel;
 
     public function __construct(
-        FormFactory $formFactory,
+        FormFactoryInterface $formFactory,
         TranslatorInterface $translator,
         CustomFieldModel $customFieldModel,
         CustomFieldFactory $customFieldFactory,
@@ -134,7 +135,7 @@ class SaveController extends CommonController
                     'customField' => $customField,
                     'form'        => $form->createView(),
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomField:form.html.twig',
+                'contentTemplate' => '@CustomObjects/CustomField/form.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customField',
                     'route'         => $route,
@@ -178,7 +179,7 @@ class SaveController extends CommonController
         );
 
         $template = $this->render(
-            'CustomObjectsBundle:CustomObject:_form-fields.html.twig',
+            '@CustomObjects/CustomObject/_form-fields.html.twig',
             [
                 'form'          => $form->createView(),
                 'panelId'       => $panelId, // Panel id to me replaced if edit

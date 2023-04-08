@@ -70,6 +70,8 @@ class ViewController extends CommonController
         $this->auditLogModel              = $auditLogModel;
         $this->permissionProvider         = $permissionProvider;
         $this->routeProvider              = $routeProvider;
+
+        parent::setRequestStack($requestStack);
     }
 
     public function viewAction(int $objectId, int $itemId): Response
@@ -114,7 +116,7 @@ class ViewController extends CommonController
                         ]
                     )->getContent(),
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomItem:detail.html.twig',
+                'contentTemplate' => '@CustomObjects/CustomItem/detail.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customItem',
                     'activeLink'    => "#mautic_custom_object_{$objectId}",
