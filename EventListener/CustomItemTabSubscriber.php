@@ -73,7 +73,7 @@ class CustomItemTabSubscriber implements EventSubscriberInterface
 
     public function injectTabs(CustomContentEvent $event): void
     {
-        if ($event->checkContext('CustomObjectsBundle:CustomItem:detail.html.twig', 'tabs')) {
+        if ($event->checkContext('@CustomObjects/CustomItem/detail.html.twig', 'tabs')) {
             $vars    = $event->getVars();
             $objects = $this->customObjectModel->getMasterCustomObjects();
 
@@ -98,7 +98,7 @@ class CustomItemTabSubscriber implements EventSubscriberInterface
             $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:modal.html.twig');
         }
 
-        if ($event->checkContext('CustomObjectsBundle:CustomItem:detail.html.twig', 'tabs.content')) {
+        if ($event->checkContext('@CustomObjects/CustomItem/detail.html.twig', 'tabs.content')) {
             $vars    = $event->getVars();
             $objects = $this->getCustomObjects();
 
