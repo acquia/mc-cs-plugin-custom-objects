@@ -39,8 +39,8 @@ class ExportController extends AbstractFormController
 
         $customItemExportScheduler = $this->model->saveEntity($object);
 
+        /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = $this->get('event_dispatcher');
-        \assert($dispatcher instanceof EventDispatcherInterface);
         $dispatcher->dispatch(
             CustomItemEvents::ON_CUSTOM_ITEM_SCHEDULE_EXPORT,
             new CustomItemExportSchedulerEvent($customItemExportScheduler)
