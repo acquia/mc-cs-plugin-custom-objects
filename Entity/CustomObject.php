@@ -420,12 +420,10 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         );
     }
 
-    public function getFieldsIsUniqueIdentifier(): ?ArrayCollection
+    public function getUniqueIdentifierFields(): ?ArrayCollection
     {
         return $this->customFields->filter(
-            function (CustomField $customField) {
-                return $customField->getIsUniqueIdentifier();
-            }
+            static fn(CustomField $customField) => $customField->getIsUniqueIdentifier()
         );
     }
 
