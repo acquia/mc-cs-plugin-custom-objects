@@ -29,7 +29,7 @@
         "wiki": "https://github.com/acquia/mc-cs-plugin-custom-objects/wiki"
     },
     "require": {
-        "php": ">=7.4",
+        "php": ">=7.4.0 <8.1",
         "ext-mbstring": "*",
         "mautic/core-lib": "^4.3"
     },
