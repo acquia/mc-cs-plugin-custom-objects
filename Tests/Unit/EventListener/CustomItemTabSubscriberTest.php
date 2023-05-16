@@ -105,8 +105,8 @@ class CustomItemTabSubscriberTest extends TestCase
         $this->customContentEvent
             ->method('checkContext')
             ->withConsecutive(
-                ['CustomObjectsBundle:CustomItem:detail.html.twig', 'tabs'],
-                ['CustomObjectsBundle:CustomItem:detail.html.twig', 'tabs.content']
+                ['@CustomObjects/CustomItem/detail.html.twig', 'tabs'],
+                ['@CustomObjects/CustomItem/detail.html.twig', 'tabs.content']
             )
             ->willReturnOnConsecutiveCalls(true, false);
 
@@ -158,8 +158,8 @@ class CustomItemTabSubscriberTest extends TestCase
         $this->customContentEvent
             ->method('checkContext')
             ->withConsecutive(
-                ['CustomObjectsBundle:CustomItem:detail.html.twig', 'tabs'],
-                ['CustomObjectsBundle:CustomItem:detail.html.twig', 'tabs.content']
+                ['@CustomObjects/CustomItem/detail.html.twig', 'tabs'],
+                ['@CustomObjects/CustomItem/detail.html.twig', 'tabs.content']
             )
             ->willReturn(true, false);
 
@@ -194,8 +194,8 @@ class CustomItemTabSubscriberTest extends TestCase
         $this->customContentEvent
             ->method('checkContext')
             ->withConsecutive(
-                ['CustomObjectsBundle:CustomItem:detail.html.twig', 'tabs'],
-                ['CustomObjectsBundle:CustomItem:detail.html.twig', 'tabs.content']
+                ['@CustomObjects/CustomItem/detail.html.twig', 'tabs'],
+                ['@CustomObjects/CustomItem/detail.html.twig', 'tabs.content']
             )
             ->willReturn(false, true);
 
