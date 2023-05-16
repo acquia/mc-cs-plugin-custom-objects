@@ -540,7 +540,7 @@ $coParams = [
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.custom.model.item',
-                    'mautic.helper.template.formatter',
+                    'mautic.helper.twig.formatter',
                 ],
             ],
             'mautic.custom.model.import.xref.contact' => [

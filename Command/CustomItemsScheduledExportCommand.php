@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Command;
 
 use Mautic\CoreBundle\Helper\ExitCode;
-use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemExportSchedulerEvent;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemExportSchedulerModel;

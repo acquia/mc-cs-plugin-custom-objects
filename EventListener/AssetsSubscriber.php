@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
