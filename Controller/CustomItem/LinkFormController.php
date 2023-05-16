@@ -95,7 +95,7 @@ class LinkFormController extends AbstractFormController
                         'customObject' => $relationshipObject,
                         'form'         => $form->createView(),
                     ],
-                    'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.twig',
+                    'contentTemplate' => '@CustomObjects/CustomItem/form.html.twig',
                     'passthroughVars' => [
                         'callback'      => 'customItemLinkFormLoad',
                         'mauticContent' => 'customItem',
@@ -170,7 +170,7 @@ class LinkFormController extends AbstractFormController
                     'form'         => $form->createView(),
                     'tmpl'         => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.twig',
+                'contentTemplate' => '@CustomObjects/CustomItem/form.html.twig',
                 'passthroughVars' => [
                     'closeModal'    => false,
                     'callback'      => 'customItemLinkFormLoad',

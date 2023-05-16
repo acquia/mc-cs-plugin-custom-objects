@@ -114,7 +114,7 @@ class FormController extends CommonController
                     'customField'  => $customField,
                     'form'         => $form->createView(),
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomField:form.html.twig',
+                'contentTemplate' => '@CustomObjects/CustomField/form.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customField',
                     'route'         => $route,
