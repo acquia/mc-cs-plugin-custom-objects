@@ -403,6 +403,7 @@ class ReportSubscriber implements EventSubscriberInterface
     {
         $contextFormResult     = 'form.results';
         $prefixFormResultTable = 'fr';
+        $joinCustomObjectField = 'custom_object';
 
         $context               = $event->getContext();
 
@@ -425,7 +426,8 @@ class ReportSubscriber implements EventSubscriberInterface
                 $joinCondition  = sprintf(
                     '`%s`.`%s` = `%s`.`name` AND `%s`.`custom_object_id` = %s',
                     $prefixFormResultTable,
-                    $column['fieldAlias'],
+//                    $column['fieldAlias'],
+                    $joinCustomObjectField,
                     $customItemTablePrefix,
                     $customItemTablePrefix,
                     $customObject->getId()
