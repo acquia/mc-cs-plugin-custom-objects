@@ -239,10 +239,7 @@ class ReportSubscriber implements EventSubscriberInterface
             $customObjectColumns,
             function (&$item, $index) use ($customObject, $properties) {
                 $item['idCustomObject'] = $customObject->getId();
-                $item['fieldAlias']     = $properties['fieldAlias'] ?? '';
-                $item['mappedObject']   = $properties['mappedObject'] ?? '';
-                $item['mappedField']    = $properties['mappedField'] ?? '';
-            }
+                $item                   = array_merge($item, $properties);            }
         );
 
         $columns = array_merge(
@@ -406,6 +403,7 @@ class ReportSubscriber implements EventSubscriberInterface
     {
         $contextFormResult     = 'form.results';
         $prefixFormResultTable = 'fr';
+        $multipleChoice        = ['checkboxgrp', 'select'];
 
         $context               = $event->getContext();
 
@@ -425,17 +423,18 @@ class ReportSubscriber implements EventSubscriberInterface
             $customObject = $this->customObjectRepository->find($column['idCustomObject']);
             if (!in_array($column['idCustomObject'], $addedCustomObjects)) {
                 $customItemTablePrefix = static::CUSTOM_ITEM_TABLE_ALIAS.'_'.$customObject->getId();
-                $joinCondition  = sprintf(
-                    '`%s`.`%s` = `%s`.`name` AND `%s`.`custom_object_id` = %s',
-                    $prefixFormResultTable,
-                    $column['fieldAlias'],
-                    $customItemTablePrefix,
-                    $customItemTablePrefix,
-                    $customObject->getId()
-                );
-                $queryBuilder->leftJoin($prefixFormResultTable, CustomItem::TABLE_NAME, $customItemTablePrefix, $joinCondition);
-                $addedCustomObjects[] = $column['idCustomObject'];
 
+                $colCustomObjectName = sprintf('`%s`.`name`', $customItemTablePrefix);
+                $colMappedField      = sprintf('`%s`.`%s`', $prefixFormResultTable, $column['fieldAlias']);
+                $colCustomItemObjectId = sprintf('`%s`.`custom_object_id`', $customItemTablePrefix);
+                $colCustomObjectId   = sprintf('%s', $customObject->getId());
+
+                $joinCondition = in_array($column['fieldType'], $multipleChoice)
+                    ? "{$colMappedField} LIKE CONCAT('%', {$colCustomObjectName}, '%') AND {$colCustomItemObjectId} = {$colCustomObjectId}"
+                    : "{$colMappedField} = {$colCustomObjectName} AND {$colCustomItemObjectId} = {$colCustomObjectId}";
+                $queryBuilder->leftJoin($prefixFormResultTable, CustomItem::TABLE_NAME, $customItemTablePrefix, $joinCondition);
+
+                $addedCustomObjects[] = $column['idCustomObject'];
                 $reportColumnsBuilder = new ReportColumnsBuilder($customObject);
                 $reportColumnsBuilder->setFilterColumnsCallback([$event, 'usesColumn']);
                 $reportColumnsBuilder->joinReportColumns($queryBuilder, $customItemTablePrefix);
