@@ -52,7 +52,15 @@ class FormSubscriber implements EventSubscriberInterface
 
         $items = $this->customItemModel->fetchCustomItemsForObject($object);
 
-        foreach ($object->getCustomFields() as $field) {
+        if (count($items) > 0) {
+            foreach ($items as $item) {
+                $list[$item->getId()] = $item->getName();
+            }
+
+            $event->appendField(new FieldCrate($object->getAlias(), 'Name', 'text', ['list' => $list ?? []]));
+        }
+
+        foreach ($object->getCustomFields()->getValues() as $field) {
             $list = $this->getCustomFieldValues($field, $items);
             $event->appendField(new FieldCrate($field->getAlias(), $field->getName(), $field->getType(), ['list' => $list]));
         }
