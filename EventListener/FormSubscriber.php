@@ -108,7 +108,6 @@ class FormSubscriber implements EventSubscriberInterface
         $value = '';
 
         foreach ($ids as $id) {
-            $value .= strlen($value) > 0 ? ', ' : '';
             $item = $this->customItemModel->getEntity($id);
             if ($item) {
                 $viewParameters = [
@@ -116,7 +115,7 @@ class FormSubscriber implements EventSubscriberInterface
                     'itemId' => $item->getId(),
                 ];
                 $route = $this->router->generate(CustomItemRouteProvider::ROUTE_VIEW, $viewParameters);
-                $value .= '<a href="' . $route . '" class=""> ' . $item->getName() . '</a>';
+                $value .= '<a href="' . $route . '" class="label label-success mr-5"> '.$item->getId().'</a>';
             }
         }
         $event->setValue($value);
