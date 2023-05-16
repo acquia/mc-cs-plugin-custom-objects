@@ -15,6 +15,8 @@ return function (ContainerConfigurator $configurator) {
     $excludes = [
         'Provider/SessionProvider.php',
         'Report/ReportColumnsBuilder.php',
+        'Serializer/ApiNormalizer.php',
+        'Extension/CustomItemListeningExtension.php'
     ];
 
     $services->load('MauticPlugin\\CustomObjectsBundle\\', '../')
