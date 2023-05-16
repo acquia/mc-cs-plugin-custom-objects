@@ -392,14 +392,14 @@ $coParams = [
                     ],
                 ],
             ],
-            'custom_item.contact_list_controller' => [
-                'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ContactListController::class,
-                'methodCalls' => [
-                    'setContainer' => [
-                        '@service_container',
-                    ],
-                ],
-            ],
+//            'custom_item.contact_list_controller' => [
+//                'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ContactListController::class,
+//                'methodCalls' => [
+//                    'setContainer' => [
+//                        '@service_container',
+//                    ],
+//                ],
+//            ],
             'custom_item.export_controller' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ExportController::class,
                 'arguments' => [

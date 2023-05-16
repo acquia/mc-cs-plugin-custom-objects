@@ -83,7 +83,7 @@ class DeleteController extends CommonController
             [
                 'returnUrl'       => $this->routeProvider->buildListRoute($objectId, $page),
                 'viewParameters'  => ['objectId' => $objectId, 'page' => $page],
-                'contentTemplate' => 'CustomObjectsBundle:CustomItem\List:list',
+                'contentTemplate' => '@CustomObjects/CustomObject/List/list.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customItem',
                 ],

@@ -50,7 +50,7 @@ class CancelController extends CommonController
             [
                 'returnUrl'       => $this->routeProvider->buildListRoute($page),
                 'viewParameters'  => ['page' => $page],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObject\List:list',
+                'contentTemplate' => '@CustomObjects/CustomObject/List/list.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
                 ],

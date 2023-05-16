@@ -142,7 +142,7 @@ class ContactSubscriber implements EventSubscriberInterface
                     'icon'            => "fa-{$action}",
                     'extra'           => $link,
                     'contactId'       => $link['lead_id'],
-                    'contentTemplate' => 'CustomObjectsBundle:SubscribedEvents\Timeline:link.html.twig',
+                    'contentTemplate' => '@CustomObjects/SubscribedEvents/Timeline/link.html.twig',
                 ]);
             }
         }

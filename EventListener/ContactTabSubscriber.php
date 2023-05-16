@@ -85,7 +85,7 @@ class ContactTabSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if ($event->checkContext('MauticLeadBundle:Lead:lead.html.twig', 'tabs')) {
+        if ($event->checkContext('tabs')) {
             $vars    = $event->getVars();
             $objects = $this->customObjectModel->getMasterCustomObjects();
 
@@ -100,13 +100,13 @@ class ContactTabSubscriber implements EventSubscriberInterface
                     'tabId' => "custom-object-{$object->getId()}",
                 ];
 
-                $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:link.html.twig', $data);
+                $event->addTemplate('@CustomObjects/SubscribedEvents/Tab/link.html.twig', $data);
             }
 
-            $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:modal.html.twig');
+            $event->addTemplate('@CustomObjects/SubscribedEvents/Tab/modal.html.twig');
         }
 
-        if ($event->checkContext('MauticLeadBundle:Lead:lead.html.twig', 'tabs.content')) {
+        if ($event->checkContext( 'tabs.content')) {
             $vars    = $event->getVars();
             $objects = $this->getCustomObjects();
 
@@ -133,7 +133,7 @@ class ContactTabSubscriber implements EventSubscriberInterface
                     'namespace'         => $sessionProvider->getNamespace(),
                 ];
 
-                $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:content.html.twig', $data);
+                $event->addTemplate('@CustomObjects/SubscribedEvents/Tab/content.html.twig', $data);
             }
         }
     }
