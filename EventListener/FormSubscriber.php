@@ -13,17 +13,23 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class FormSubscriber implements EventSubscriberInterface
 {
     private CustomObjectModel $customObjectModel;
     private CustomItemModel $customItemModel;
+    private CustomItemXrefContactRepository $customItemXrefContactRepository;
 
-    public function __construct(CustomObjectModel $customObjectModel, CustomItemModel $customItemModel)
-    {
-        $this->customObjectModel = $customObjectModel;
-        $this->customItemModel   = $customItemModel;
+    public function __construct(
+        CustomObjectModel $customObjectModel,
+        CustomItemModel $customItemModel,
+        CustomItemXrefContactRepository $customItemXrefContactRepository
+    ) {
+        $this->customObjectModel               = $customObjectModel;
+        $this->customItemModel                 = $customItemModel;
+        $this->customItemXrefContactRepository = $customItemXrefContactRepository;
     }
 
     public static function getSubscribedEvents(): array
@@ -51,6 +57,22 @@ class FormSubscriber implements EventSubscriberInterface
         }
 
         $items = $this->customItemModel->fetchCustomItemsForObject($object);
+
+        if ($event->isAssigned()) {
+            $contactId = $event->getLead()?->getId();
+
+            $items = array_filter(
+                $items,
+                function ($item) use ($contactId) {
+                    $ids = $this->customItemXrefContactRepository->getContactIdsLinkedToCustomItem((int)$item->getId(), 200, 0);
+                    $ids = array_column($ids, 'contact_id');
+                    return in_array($contactId, $ids);
+                }
+            );
+
+            $event->removeFields();
+        }
+
         if (count($items) > 0) {
             foreach ($items as $item) {
                 $list[$item->getId()] = $item->getName();
