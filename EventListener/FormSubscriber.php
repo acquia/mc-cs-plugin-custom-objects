@@ -54,7 +54,7 @@ class FormSubscriber implements EventSubscriberInterface
 
         if (count($items) > 0) {
             foreach ($items as $item) {
-                $list[$item->getId()] = $item->getName();
+                $list[$item->getName()] = $item->getName();
             }
 
             $event->appendField(new FieldCrate($object->getAlias(), 'Name', 'text', ['list' => $list ?? []]));

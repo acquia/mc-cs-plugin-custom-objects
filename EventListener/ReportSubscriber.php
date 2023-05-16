@@ -260,7 +260,7 @@ class ReportSubscriber implements EventSubscriberInterface
     {
         $companyColumns = $this->companyReportData->getCompanyData();
         // We don't need this column because we fetch company/lead relationships via custom objects
-        unset($companyColumns['companies_lead.is_primary']);
+        unset($companyColumns['companies_lead.is_primary'], $companyColumns['companies_lead.date_added']);
 
         return $companyColumns;
     }
@@ -403,7 +403,6 @@ class ReportSubscriber implements EventSubscriberInterface
     {
         $contextFormResult     = 'form.results';
         $prefixFormResultTable = 'fr';
-        $joinCustomObjectField = 'custom_object';
 
         $context               = $event->getContext();
 
@@ -426,8 +425,7 @@ class ReportSubscriber implements EventSubscriberInterface
                 $joinCondition  = sprintf(
                     '`%s`.`%s` = `%s`.`name` AND `%s`.`custom_object_id` = %s',
                     $prefixFormResultTable,
-//                    $column['fieldAlias'],
-                    $joinCustomObjectField,
+                    $column['fieldAlias'],
                     $customItemTablePrefix,
                     $customItemTablePrefix,
                     $customObject->getId()
