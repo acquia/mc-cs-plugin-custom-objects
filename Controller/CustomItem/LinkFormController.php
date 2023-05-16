@@ -109,7 +109,7 @@ class LinkFormController extends AbstractFormController
 
         $responseData = [
             'closeModal' => true,
-            'flashes'    => $this->renderView('MauticCoreBundle:Notification:flash_messages.html.twig'),
+            'flashes'    => $this->renderView('@MauticCore/Notification/flash_messages.html.twig'),
         ];
 
         return new JsonResponse($responseData);
@@ -152,7 +152,7 @@ class LinkFormController extends AbstractFormController
                 $responseData = [
                     'closeModal' => true,
                     'callback'   => $callback,
-                    'flashes'    => $this->renderView('MauticCoreBundle:Notification:flash_messages.html.twig'),
+                    'flashes'    => $this->renderView('@MauticCore/Notification/flash_messages.html.twig'),
                 ];
 
                 return new JsonResponse($responseData);

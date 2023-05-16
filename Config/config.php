@@ -126,12 +126,12 @@ $coParams = [
             ],
             CustomItemRouteProvider::ROUTE_EXPORT_ACTION => [
                 'path'       => 'custom/object/{object}/export',
-                'controller' => 'CustomObjectsBundle:CustomItem\Export:export',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ExportController::exportAction',
                 'method'     => 'POST',
             ],
             CustomItemRouteProvider::ROUTE_EXPORT_DOWNLOAD_ACTION => [
                 'path'       => '/custom/item/export/download/{fileName}',
-                'controller' => 'CustomObjectsBundle:CustomItem\Export:downloadExport',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ExportController::downloadExportAction',
             ],
 
             // Custom Objects

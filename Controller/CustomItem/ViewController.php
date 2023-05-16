@@ -106,7 +106,7 @@ class ViewController extends CommonController
                     'stats'         => $stats,
                     'logs'          => $auditLogs,
                     'contacts'      => $this->forward(
-                        'CustomObjectsBundle:CustomItem\ContactList:list',
+                        'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ContactListController::listAction',
                         [
                             'objectId'   => $itemId,
                             'page'       => 1,

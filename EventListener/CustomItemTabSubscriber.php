@@ -92,10 +92,10 @@ class CustomItemTabSubscriber implements EventSubscriberInterface
                     'tabId' => "custom-object-{$object->getId()}",
                 ];
 
-                $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:link.html.twig', $data);
+                $event->addTemplate('@CustomObjects/SubscribedEvents/Tab/link.html.twig', $data);
             }
 
-            $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:modal.html.twig');
+            $event->addTemplate('@CustomObjects/SubscribedEvents/Tab/modal.html.twig');
         }
 
         if ($event->checkContext('@CustomObjects/CustomItem/detail.html.twig', 'tabs.content')) {
@@ -129,8 +129,7 @@ class CustomItemTabSubscriber implements EventSubscriberInterface
                     'namespace'         => $sessionProvider->getNamespace(),
                 ];
 
-                $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:content.html.twig', $data);
-            }
+                $event->addTemplate('@CustomObjects/SubscribedEvents/Tab/content.html.twig', $data);            }
         }
     }
 
