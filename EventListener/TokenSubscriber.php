@@ -180,8 +180,8 @@ class TokenSubscriber implements EventSubscriberInterface
                         $formatEvent = new CustomObjectListFormatEvent($fieldValues, $token->getFormat());
 
                         $this->eventDispatcher->dispatch(
-                            CustomObjectEvents::ON_CUSTOM_OBJECT_LIST_FORMAT,
-                            $formatEvent
+                            $formatEvent,
+                            CustomObjectEvents::ON_CUSTOM_OBJECT_LIST_FORMAT
                         );
 
                         $result = $formatEvent->hasBeenFormatted() ?
