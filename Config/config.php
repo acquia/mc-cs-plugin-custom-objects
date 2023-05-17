@@ -79,7 +79,7 @@ $coParams = [
             ],
             CustomItemRouteProvider::ROUTE_SAVE => [
                 'path'       => '/custom/object/{objectId}/item/save/{itemId}',
-                'controller' => 'CustomObjectsBundle:CustomItem\Save:save',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\SaveController:saveAction',
                 'method'     => 'POST',
                 'defaults'   => [
                     'itemId' => null,
@@ -137,7 +137,7 @@ $coParams = [
             // Custom Objects
             CustomObjectRouteProvider::ROUTE_LIST => [
                 'path'       => '/custom/object/{page}',
-                'controller' => 'CustomObjectsBundle:CustomObject\List:list',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomObject\ListController:listAction',
                 'method'     => 'GET|POST',
                 'defaults'   => [
                     'page' => 1,
@@ -268,6 +268,7 @@ $coParams = [
                     'custom_item.permission.provider',
                     'custom_item.route.provider',
                     'custom_object.lock_flash_message.helper',
+                    'request_stack',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -450,6 +451,7 @@ $coParams = [
                     'custom_object.route.provider',
                     'custom_field.type.provider',
                     'custom_object.lock_flash_message.helper',
+                    'request_stack',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
