@@ -18,12 +18,12 @@ $coParams = [
             // Custom Fields
             CustomFieldRouteProvider::ROUTE_FORM => [
                 'path'       => '/custom/field/edit',
-                'controller' => 'CustomObjectsBundle:CustomField\Form:renderForm',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomField\FormController::renderFormAction',
                 'method'     => 'GET',
             ],
             CustomFieldRouteProvider::ROUTE_SAVE => [
                 'path'       => '/custom/field/save/{fieldType}',
-                'controller' => 'CustomObjectsBundle:CustomField\Save:save',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomField\SaveController::saveAction',
                 'method'     => 'POST',
                 'defaults'   => [
                     'fieldId' => null,
@@ -33,7 +33,7 @@ $coParams = [
             // Custom Items
             CustomItemRouteProvider::ROUTE_LIST => [
                 'path'       => '/custom/object/{objectId}/item/{page}',
-                'controller' => 'CustomObjectsBundle:CustomItem\List:list',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ListController::listAction',
                 'method'     => 'GET|POST',
                 'defaults'   => [
                     'page' => 1,
@@ -41,45 +41,45 @@ $coParams = [
             ],
             CustomItemRouteProvider::ROUTE_VIEW => [
                 'path'       => '/custom/object/{objectId}/item/view/{itemId}',
-                'controller' => 'CustomObjectsBundle:CustomItem\View:view',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ViewController::viewAction',
                 'method'     => 'GET|POST',
             ],
             CustomItemRouteProvider::ROUTE_NEW => [
                 'path'       => '/custom/object/{objectId}/item/new',
-                'controller' => 'CustomObjectsBundle:CustomItem\Form:new',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\FormController::newAction',
                 'method'     => 'GET',
             ],
             CustomItemRouteProvider::ROUTE_NEW_REDIRECT_TO_CONTACT => [
                 'path'       => '/custom/object/{objectId}/contact/{contactId}/item/new',
-                'controller' => 'CustomObjectsBundle:CustomItem\Form:newWithRedirectToContact',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\FormController::newWithRedirectToContactAction',
                 'method'     => 'GET',
             ],
             CustomItemRouteProvider::ROUTE_EDIT => [
                 'path'       => '/custom/object/{objectId}/item/edit/{itemId}',
-                'controller' => 'CustomObjectsBundle:CustomItem\Form:edit',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\FormController::editAction',
                 'method'     => 'GET',
             ],
             CustomItemRouteProvider::ROUTE_EDIT_REDIRECT_TO_CONTACT => [
                 'path'       => '/custom/object/{objectId}/item/edit/{itemId}/contact/{contactId}',
-                'controller' => 'CustomObjectsBundle:CustomItem\Form:editWithRedirectToContact',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\FormController::editWithRedirectToContactAction',
                 'method'     => 'GET',
             ],
             CustomItemRouteProvider::ROUTE_CLONE => [
                 'path'       => '/custom/object/{objectId}/item/clone/{itemId}',
-                'controller' => 'CustomObjectsBundle:CustomItem\Form:clone',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\FormController::cloneAction',
                 'method'     => 'GET',
             ],
             CustomItemRouteProvider::ROUTE_CANCEL => [
                 'path'       => '/custom/object/{objectId}/item/cancel/{itemId}',
-                'controller' => 'CustomObjectsBundle:CustomItem\Cancel:cancel',
-                'method'     => 'POST',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\CancelController::cancelAction',
+//                'method'     => 'POST',
                 'defaults'   => [
                     'itemId' => null,
                 ],
             ],
             CustomItemRouteProvider::ROUTE_SAVE => [
                 'path'       => '/custom/object/{objectId}/item/save/{itemId}',
-                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\SaveController:saveAction',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\SaveController::saveAction',
                 'method'     => 'POST',
                 'defaults'   => [
                     'itemId' => null,
@@ -87,57 +87,57 @@ $coParams = [
             ],
             CustomItemRouteProvider::ROUTE_DELETE => [
                 'path'       => '/custom/object/{objectId}/item/delete/{itemId}',
-                'controller' => 'CustomObjectsBundle:CustomItem\Delete:delete',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\DeleteController::deleteAction',
                 'method'     => 'GET|POST',
             ],
             CustomItemRouteProvider::ROUTE_BATCH_DELETE => [
                 'path'       => '/custom/object/{objectId}/item/batch/delete',
-                'controller' => 'CustomObjectsBundle:CustomItem\BatchDelete:delete',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\BatchDeleteController::deleteAction',
                 'method'     => 'POST',
             ],
             CustomItemRouteProvider::ROUTE_LOOKUP => [
                 'path'       => '/custom/object/{objectId}/item/lookup.json',
-                'controller' => 'CustomObjectsBundle:CustomItem\Lookup:list',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\LookupController::listAction',
                 'method'     => 'GET',
             ],
             CustomItemRouteProvider::ROUTE_LINK => [
                 'path'       => '/custom/item/{itemId}/link/{entityType}/{entityId}.json',
-                'controller' => 'CustomObjectsBundle:CustomItem\Link:save',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\LinkController::saveAction',
                 'method'     => 'POST',
             ],
             CustomItemRouteProvider::ROUTE_LINK_FORM => [
                 'path'       => '/custom/item/{itemId}/link-form/{entityType}/{entityId}',
-                'controller' => 'CustomObjectsBundle:CustomItem\LinkForm:form',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\LinkFormController::formAction',
                 'method'     => 'GET',
             ],
             CustomItemRouteProvider::ROUTE_LINK_FORM_SAVE => [
                 'path'       => '/custom/item/{itemId}/link-form/{entityType}/{entityId}',
-                'controller' => 'CustomObjectsBundle:CustomItem\LinkForm:save',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\LinkFormController::saveAction',
                 'method'     => 'POST',
             ],
             CustomItemRouteProvider::ROUTE_UNLINK => [
                 'path'       => '/custom/item/{itemId}/unlink/{entityType}/{entityId}.json',
-                'controller' => 'CustomObjectsBundle:CustomItem\Unlink:save',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\UnlinkController::saveAction',
                 'method'     => 'POST',
             ],
             CustomItemRouteProvider::ROUTE_CONTACT_LIST => [
                 'path'       => '/custom/item/{objectId}/contact/{page}',
-                'controller' => 'CustomObjectsBundle:CustomItem\ContactList:list',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ContactListController::listAction',
             ],
             CustomItemRouteProvider::ROUTE_EXPORT_ACTION => [
                 'path'       => 'custom/object/{object}/export',
-                'controller' => 'CustomObjectsBundle:CustomItem\Export:export',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\Export::exportAction',
                 'method'     => 'POST',
             ],
             CustomItemRouteProvider::ROUTE_EXPORT_DOWNLOAD_ACTION => [
                 'path'       => '/custom/item/export/download/{fileName}',
-                'controller' => 'CustomObjectsBundle:CustomItem\Export:downloadExport',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\Export::downloadExportAction',
             ],
 
             // Custom Objects
             CustomObjectRouteProvider::ROUTE_LIST => [
                 'path'       => '/custom/object/{page}',
-                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomObject\ListController:listAction',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomObject\ListController::listAction',
                 'method'     => 'GET|POST',
                 'defaults'   => [
                     'page' => 1,
@@ -145,35 +145,34 @@ $coParams = [
             ],
             CustomObjectRouteProvider::ROUTE_VIEW => [
                 'path'       => '/custom/object/view/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomObject\View:view',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomObject\ViewController::viewAction',
                 'method'     => 'GET|POST',
             ],
             CustomObjectRouteProvider::ROUTE_NEW => [
                 'path'       => '/custom/object/new',
-                'controller' => 'CustomObjectsBundle:CustomObject\Form:new',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomObject\FormController::newAction',
                 'method'     => 'GET',
             ],
             CustomObjectRouteProvider::ROUTE_EDIT => [
                 'path'       => '/custom/object/edit/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomObject\Form:edit',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomObject\FormController::editAction',
                 'method'     => 'GET',
             ],
             CustomObjectRouteProvider::ROUTE_CLONE => [
                 'path'       => '/custom/object/clone/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomObject\Form:clone',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomObject\FormController::cloneAction',
                 'method'     => 'GET',
             ],
             CustomObjectRouteProvider::ROUTE_CANCEL => [
                 'path'       => '/custom/object/cancel/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomObject\Cancel:cancel',
-                'method'     => 'POST',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomObject\CancelController::cancelAction',
                 'defaults'   => [
                     'objectId' => null,
                 ],
             ],
             CustomObjectRouteProvider::ROUTE_SAVE => [
                 'path'       => '/custom/object/save/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomObject\Save:save',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomObject\SaveController::saveAction',
                 'method'     => 'POST',
                 'defaults'   => [
                     'objectId' => null,
@@ -181,7 +180,7 @@ $coParams = [
             ],
             CustomObjectRouteProvider::ROUTE_DELETE => [
                 'path'       => '/custom/object/delete/{objectId}',
-                'controller' => 'CustomObjectsBundle:CustomObject\Delete:delete',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomObject\DeleteController::deleteAction',
                 'method'     => 'GET|POST',
             ],
         ],
@@ -200,6 +199,7 @@ $coParams = [
                     'custom_field.route.provider',
                     'mautic.custom.model.object',
                     'custom_object.route.provider',
+                    'request_stack',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -331,6 +331,7 @@ $coParams = [
                     'custom_object.session.provider_factory',
                     'custom_item.route.provider',
                     'mautic.custom.model.item',
+                    'request_stack',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
@@ -501,6 +502,7 @@ $coParams = [
                     'custom_object.session.provider_factory',
                     'custom_object.route.provider',
                     'mautic.custom.model.object',
+                    'request_stack',
                 ],
                 'methodCalls' => [
                     'setContainer' => [
