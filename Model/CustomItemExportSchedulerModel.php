@@ -129,6 +129,7 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
         }
 
         $header[] = 'linkedContactIds';
+        $header[] = 'linkedCustomItemsIds';
 
         return $header;
     }
