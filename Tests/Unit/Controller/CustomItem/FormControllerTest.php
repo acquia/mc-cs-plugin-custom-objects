@@ -106,12 +106,10 @@ class FormControllerTest extends ControllerTestCase
             ->method('getCurrentRequest')
             ->willReturn($this->request);
 
-//        $this->security               = $this->createMock(CorePermissions::class);
-//        $this->userHelper             = $this->createMock(UserHelper::class);
         $this->translator             = $this->createMock(Translator::class);
         $this->modelFactory           = $this->createMock(ModelFactory::class);
         $this->model                  = $this->createMock(NotificationModel::class);
-        $this->formController         = new FormController($this->security, $this->userHelper, $this->requestStack);
+        $this->formController         = new FormController($this->security, $this->userHelper, $this->managerRegistry, $this->requestStack);
         $this->formController->setTranslator($this->translator);
         $this->formController->setModelFactory($this->modelFactory);
 

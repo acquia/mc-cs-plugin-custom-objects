@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -23,11 +24,15 @@ use Symfony\Component\HttpFoundation\Response;
 
 class FormController extends AbstractFormController
 {
-    public function __construct(CorePermissions $security, UserHelper $userHelper, RequestStack $requestStack)
-    {
+    public function __construct(
+        CorePermissions $security,
+        UserHelper $userHelper,
+        ManagerRegistry $managerRegistry,
+        RequestStack $requestStack
+    ) {
         $this->setRequestStack($requestStack);
 
-        parent::__construct($security, $userHelper);
+        parent::__construct($security, $userHelper, $managerRegistry);
     }
 
     public function newAction(
@@ -44,7 +49,7 @@ class FormController extends AbstractFormController
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        return $this->renderForm(
+        return $this->renderCustomObjectForm(
             $formFactory,
             $routeProvider,
             $customFieldTypeProvider,
@@ -86,7 +91,7 @@ class FormController extends AbstractFormController
 
         $customObjectModel->lockEntity($customObject);
 
-        return $this->renderForm(
+        return $this->renderCustomObjectForm(
             $formFactory,
             $routeProvider,
             $customFieldTypeProvider,
@@ -114,7 +119,7 @@ class FormController extends AbstractFormController
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        return $this->renderForm(
+        return $this->renderCustomObjectForm(
             $formFactory,
             $routeProvider,
             $customFieldTypeProvider,
@@ -124,7 +129,7 @@ class FormController extends AbstractFormController
         );
     }
 
-    private function renderForm(
+    private function renderCustomObjectForm(
         FormFactoryInterface $formFactory,
         CustomObjectRouteProvider $routeProvider,
         CustomFieldTypeProvider $customFieldTypeProvider,

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Controller\CommonController;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
@@ -22,6 +23,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\Routing\Router;
 use Symfony\Component\Routing\RouterInterface;
+
 use Twig\Environment;
 
 /**
@@ -55,14 +57,20 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase
      */
     protected $userHelper;
 
+    /**
+     * @var MockObject|ManagerRegistry
+     */
+    protected $managerRegistry;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->security   = $this->createMock(CorePermissions::class);
-        $this->userHelper = $this->createMock(UserHelper::class);
-        $this->container  = $this->createMock(ContainerInterface::class);
-        $this->router     = $this->createMock(RouterInterface::class);
+        $this->security        = $this->createMock(CorePermissions::class);
+        $this->userHelper      = $this->createMock(UserHelper::class);
+        $this->container       = $this->createMock(ContainerInterface::class);
+        $this->router          = $this->createMock(RouterInterface::class);
+        $this->managerRegistry = $this->createMock(ManagerRegistry::class);
     }
 
     protected function addSymfonyDependencies(CommonController|Controller $controller): void

@@ -69,7 +69,7 @@ class FormControllerTest extends ControllerTestCase
         $this->modelFactory           = $this->createMock(ModelFactory::class);
         $this->model                  = $this->createMock(NotificationModel::class);
 
-        $this->formController         = new FormController($this->security, $this->userHelper, $this->requestStack);
+        $this->formController         = new FormController($this->security, $this->userHelper, $this->managerRegistry, $this->requestStack);
         $this->formController->setTranslator($this->translator);
         $this->formController->setModelFactory($this->modelFactory);
 

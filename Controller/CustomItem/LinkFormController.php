@@ -16,7 +16,6 @@ use MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,45 +24,6 @@ use UnexpectedValueException;
 
 class LinkFormController extends AbstractFormController
 {
-    /**
-     * @var FormFactoryInterface
-     */
-    private $formFactory;
-
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
-     * @var CustomItemPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var FlashBag
-     */
-    private $flashBag;
-
-    /**
-     * @var CustomItemRouteProvider
-     */
-    private $routeProvider;
-
-    public function __construct(
-        FormFactoryInterface $formFactory,
-        CustomItemModel $customItemModel,
-        CustomItemPermissionProvider $permissionProvider,
-        CustomItemRouteProvider $customItemRouteProvider,
-        FlashBag $flashBag
-    ) {
-        $formFactory        = $formFactory;
-        $customItemModel    = $customItemModel;
-        $permissionProvider = $permissionProvider;
-        $customItemRouteProvider      = $customItemRouteProvider;
-        $flashBag           = $flashBag;
-    }
-
     public function formAction(
         FormFactoryInterface $formFactory,
         CustomItemModel $customItemModel,
