@@ -102,7 +102,7 @@ class CustomItemModel extends FormModel
             throw new InvalidValueException($errors->get(0)->getMessage());
         }
 
-        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, new CustomItemEvent($customItem, $customItem->isNew()));
+        $this->dispatcher->dispatch(new CustomItemEvent($customItem, $customItem->isNew(), CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE));
 
         if (!$dryRun) {
             if ($customItem->isNew()) {
@@ -134,7 +134,7 @@ class CustomItemModel extends FormModel
 
             $customItem->recordCustomFieldValueChanges();
 
-            $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, new CustomItemEvent($customItem, $customItem->isNew()));
+            $this->dispatcher->dispatch(new CustomItemEvent($customItem, $customItem->isNew(), CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE));
         }
 
         return $customItem;
@@ -163,13 +163,13 @@ class CustomItemModel extends FormModel
     {
         $event = new CustomItemXrefEntityDiscoveryEvent($customItem, $entityType, $entityId);
 
-        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY, $event);
+        $this->dispatcher->dispatch($event, CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY);
 
         if (!$event->getXrefEntity() instanceof CustomItemXrefInterface) {
             throw new UnexpectedValueException("Entity {$entityType} was not able to be linked to {$customItem->getName()} ({$customItem->getId()})");
         }
 
-        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY, new CustomItemXrefEntityEvent($event->getXrefEntity()));
+        $this->dispatcher->dispatch(new CustomItemXrefEntityEvent($event->getXrefEntity(), CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY));
 
         return $event->getXrefEntity();
     }
@@ -181,13 +181,13 @@ class CustomItemModel extends FormModel
     {
         $event = new CustomItemXrefEntityDiscoveryEvent($customItem, $entityType, $entityId);
 
-        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY, $event);
+        $this->dispatcher->dispatch($event, CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY);
 
         if (!$event->getXrefEntity() instanceof CustomItemXrefInterface) {
             throw new UnexpectedValueException("Entity {$entityType} was not able to be unlinked from {$customItem->getName()} ({$customItem->getId()})");
         }
 
-        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_UNLINK_ENTITY, new CustomItemXrefEntityEvent($event->getXrefEntity()));
+        $this->dispatcher->dispatch(new CustomItemXrefEntityEvent($event->getXrefEntity(), CustomItemEvents::ON_CUSTOM_ITEM_UNLINK_ENTITY));
 
         return $event->getXrefEntity();
     }
@@ -197,14 +197,14 @@ class CustomItemModel extends FormModel
         //take note of ID before doctrine wipes it out
         $id    = $customItem->getId();
         $event = new CustomItemEvent($customItem);
-        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_PRE_DELETE, $event);
+        $this->dispatcher->dispatch($event, CustomItemEvents::ON_CUSTOM_ITEM_PRE_DELETE);
 
         $this->entityManager->remove($customItem);
         $this->entityManager->flush();
 
         //set the id for use in events
         $customItem->deletedId = $id;
-        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_POST_DELETE, $event);
+        $this->dispatcher->dispatch($event, CustomItemEvents::ON_CUSTOM_ITEM_POST_DELETE);
     }
 
     /**
@@ -232,9 +232,9 @@ class CustomItemModel extends FormModel
         $queryBuilder = $this->createListOrmQueryBuilder($tableConfig);
 
         $this->dispatcher->dispatch(
-            CustomItemEvents::ON_CUSTOM_ITEM_LIST_ORM_QUERY,
-            new CustomItemListQueryEvent($queryBuilder, $tableConfig)
-        );
+            new CustomItemListQueryEvent($queryBuilder, $tableConfig),
+            CustomItemEvents::ON_CUSTOM_ITEM_LIST_ORM_QUERY
+         );
 
         return $queryBuilder->getQuery()->getResult();
     }
@@ -247,8 +247,8 @@ class CustomItemModel extends FormModel
         $queryBuilder = $this->createListDbalQueryBuilder($tableConfig);
 
         $this->dispatcher->dispatch(
-            CustomItemEvents::ON_CUSTOM_ITEM_LIST_DBAL_QUERY,
-            new CustomItemListDbalQueryEvent($queryBuilder, $tableConfig)
+            new CustomItemListDbalQueryEvent($queryBuilder, $tableConfig),
+            CustomItemEvents::ON_CUSTOM_ITEM_LIST_DBAL_QUERY
         );
 
         return $queryBuilder->execute()->fetchAll();
@@ -263,8 +263,8 @@ class CustomItemModel extends FormModel
         $queryBuilder->resetDQLPart('orderBy');
 
         $this->dispatcher->dispatch(
-            CustomItemEvents::ON_CUSTOM_ITEM_LIST_ORM_QUERY,
-            new CustomItemListQueryEvent($queryBuilder, $tableConfig)
+            new CustomItemListQueryEvent($queryBuilder, $tableConfig),
+            CustomItemEvents::ON_CUSTOM_ITEM_LIST_ORM_QUERY
         );
 
         return (int) $queryBuilder->getQuery()->getSingleScalarResult();
@@ -280,8 +280,8 @@ class CustomItemModel extends FormModel
         $queryBuilder->select("{$rootAlias}.name as value, {$rootAlias}.id");
 
         $this->dispatcher->dispatch(
-            CustomItemEvents::ON_CUSTOM_ITEM_LOOKUP_QUERY,
-            new CustomItemListQueryEvent($queryBuilder, $tableConfig)
+            new CustomItemListQueryEvent($queryBuilder, $tableConfig),
+            CustomItemEvents::ON_CUSTOM_ITEM_LOOKUP_QUERY
         );
 
         $rows = $queryBuilder->getQuery()->getArrayResult();

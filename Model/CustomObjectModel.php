@@ -97,12 +97,12 @@ class CustomObjectModel extends FormModel
 
         $this->setCustomFieldsMetadata($customObject);
 
-        $this->dispatcher->dispatch(CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_SAVE, $event);
+        $this->dispatcher->dispatch($event, CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_SAVE);
 
         $this->entityManager->persist($customObject);
         $this->entityManager->flush();
 
-        $this->dispatcher->dispatch(CustomObjectEvents::ON_CUSTOM_OBJECT_POST_SAVE, $event);
+        $this->dispatcher->dispatch($event, CustomObjectEvents::ON_CUSTOM_OBJECT_POST_SAVE);
 
         return $customObject;
     }
@@ -112,14 +112,14 @@ class CustomObjectModel extends FormModel
         // Take note of ID before doctrine wipes it out
         $id    = $customObject->getId();
         $event = new CustomObjectEvent($customObject);
-        $this->dispatcher->dispatch(CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_DELETE, $event);
+        $this->dispatcher->dispatch($event, CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_DELETE);
 
         $this->entityManager->remove($customObject);
         $this->entityManager->flush();
 
         // Set the id for use in events
         $customObject->deletedId = $id;
-        $this->dispatcher->dispatch(CustomObjectEvents::ON_CUSTOM_OBJECT_POST_DELETE, $event);
+        $this->dispatcher->dispatch($event, CustomObjectEvents::ON_CUSTOM_OBJECT_POST_DELETE);
     }
 
     /**
