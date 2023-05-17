@@ -126,12 +126,12 @@ $coParams = [
             ],
             CustomItemRouteProvider::ROUTE_EXPORT_ACTION => [
                 'path'       => 'custom/object/{object}/export',
-                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\Export::exportAction',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ExportController::exportAction',
                 'method'     => 'POST',
             ],
             CustomItemRouteProvider::ROUTE_EXPORT_DOWNLOAD_ACTION => [
                 'path'       => '/custom/item/export/download/{fileName}',
-                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\Export::downloadExportAction',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ExportController::downloadExportAction',
             ],
 
             // Custom Objects
@@ -846,7 +846,7 @@ $coParams = [
     'parameters' => [
         ConfigProvider::CONFIG_PARAM_ENABLED                              => true,
         ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT => 3,
-        'custom_item_export_dir'                                          => '%kernel.root_dir%/../media/files/temp',
+        'custom_item_export_dir'                                          => '%kernel.project_dir%/media/files/temp',
     ],
 ];
 
