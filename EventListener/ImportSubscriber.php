@@ -117,7 +117,8 @@ class ImportSubscriber implements EventSubscriberInterface
             $customObject  = $this->customObjectModel->fetchEntity($customObjectId);
             $customFields  = $customObject->getCustomFields();
             $specialFields = [
-                'linkedContactIds' => 'custom.item.link.contact.ids',
+                'linkedContactIds'     => 'custom.item.link.contact.ids',
+                'linkedCustomItemsIds' => 'custom.item.link.custom_items.ids',
             ];
 
             $fieldList = [

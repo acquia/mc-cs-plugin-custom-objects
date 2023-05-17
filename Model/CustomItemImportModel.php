@@ -47,10 +47,11 @@ class CustomItemImportModel extends FormModel
      */
     public function import(Import $import, array $rowData, CustomObject $customObject): bool
     {
-        $matchedFields = $import->getMatchedFields();
-        $customItem    = $this->getCustomItem($import, $customObject, $rowData);
-        $merged        = (bool) $customItem->getId();
-        $contactIds    = [];
+        $matchedFields  = $import->getMatchedFields();
+        $customItem     = $this->getCustomItem($import, $customObject, $rowData);
+        $merged         = (bool) $customItem->getId();
+        $contactIds     = [];
+        $customItemsIds = [];
 
         $this->setOwner($import, $customItem);
         foreach ($matchedFields as $csvField => $customFieldId) {
@@ -63,6 +64,12 @@ class CustomItemImportModel extends FormModel
             if (is_string($customFieldId)) {
                 if (0 === strcasecmp('linkedContactIds', $customFieldId)) {
                     $contactIds = $this->formatterHelper->simpleCsvToArray($csvValue, 'int');
+
+                    continue;
+                }
+
+                if (0 === strcasecmp('linkedCustomItemsIds', $customFieldId)) {
+                    $customItemsIds = $this->formatterHelper->simpleCsvToArray($csvValue, 'int');
 
                     continue;
                 }
@@ -95,6 +102,7 @@ class CustomItemImportModel extends FormModel
         }
 
         $this->linkContacts($customItem, $contactIds);
+        $this->linkCustomObjects($customItem, $customItemsIds);
 
         return $merged;
     }
@@ -107,6 +115,16 @@ class CustomItemImportModel extends FormModel
         foreach ($contactIds as $contactId) {
             $xref = $this->customItemModel->linkEntity($customItem, 'contact', $contactId);
             $customItem->addContactReference($xref);
+        }
+
+        return $customItem;
+    }
+
+    private function linkCustomObjects(CustomItem $customItem, array $customItemsIds): CustomItem
+    {
+        foreach ($customItemsIds as $customItemsId) {
+            $xref = $this->customItemModel->linkEntity($customItem, 'customItem', $customItemsId);
+            $customItem->addCustomItemReference($xref);
         }
 
         return $customItem;
