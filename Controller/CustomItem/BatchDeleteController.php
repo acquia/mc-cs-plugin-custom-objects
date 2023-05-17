@@ -61,6 +61,8 @@ class BatchDeleteController extends CommonController
         $this->permissionProvider     = $permissionProvider;
         $this->routeProvider          = $routeProvider;
         $this->flashBag               = $flashBag;
+
+        parent::setRequestStack($requestStack);
     }
 
     public function deleteAction(int $objectId): Response

@@ -70,6 +70,8 @@ class ViewController extends CommonController
         $this->auditLogModel              = $auditLogModel;
         $this->permissionProvider         = $permissionProvider;
         $this->routeProvider              = $routeProvider;
+
+        parent::setRequestStack($requestStack);
     }
 
     public function viewAction(int $objectId, int $itemId): Response

@@ -80,6 +80,8 @@ class SaveController extends AbstractFormController
         $this->permissionProvider     = $permissionProvider;
         $this->routeProvider          = $routeProvider;
         $this->lockFlashMessageHelper = $lockFlashMessageHelper;
+
+        parent::setRequestStack($requestStack);
     }
 
     public function saveAction(int $objectId, ?int $itemId = null): Response

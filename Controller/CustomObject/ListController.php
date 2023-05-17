@@ -55,6 +55,8 @@ class ListController extends CommonController
         $this->customObjectModel         = $customObjectModel;
         $this->permissionProvider        = $permissionProvider;
         $this->routeProvider             = $routeProvider;
+
+        parent::setRequestStack($requestStack);
     }
 
     public function listAction(int $page = 1): Response

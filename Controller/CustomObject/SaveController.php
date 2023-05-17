@@ -106,6 +106,8 @@ class SaveController extends AbstractFormController
         $this->paramsToStringTransformer  = $paramsToStringTransformer;
         $this->optionsToStringTransformer = $optionsToStringTransformer;
         $this->lockFlashMessageHelper     = $lockFlashMessageHelper;
+
+        parent::setRequestStack($requestStack);
     }
 
     public function saveAction(?int $objectId = null): Response

@@ -15,12 +15,14 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 class FormController extends AbstractFormController
 {
     /**
-     * @var FormFactory
+     * @var FormFactoryInterface
      */
     private $formFactory;
 
@@ -49,13 +51,16 @@ class FormController extends AbstractFormController
      */
     private $lockFlashMessageHelper;
 
+    private RequestStack $requestStack;
+
     public function __construct(
-        FormFactory $formFactory,
+        FormFactoryInterface $formFactory,
         CustomObjectModel $customObjectModel,
         CustomItemModel $customItemModel,
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider,
-        LockFlashMessageHelper $lockFlashMessageHelper
+        LockFlashMessageHelper $lockFlashMessageHelper,
+        RequestStack $requestStack
     ) {
         $this->formFactory            = $formFactory;
         $this->customObjectModel      = $customObjectModel;
@@ -63,6 +68,9 @@ class FormController extends AbstractFormController
         $this->permissionProvider     = $permissionProvider;
         $this->routeProvider          = $routeProvider;
         $this->lockFlashMessageHelper = $lockFlashMessageHelper;
+
+        $this->requestStack           = $requestStack;
+        parent::setRequestStack($requestStack);
     }
 
     public function newAction(int $objectId): Response
