@@ -15,65 +15,36 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 class DeleteController extends CommonController
 {
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    /**
-     * @var SessionProviderFactory
-     */
-    private $sessionProviderFactory;
-
-    /**
-     * @var FlashBag
-     */
-    private $flashBag;
-
-    /**
-     * @var CustomObjectPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    public function __construct(
-        CustomObjectModel $customObjectModel,
+    public function deleteAction(
+        RequestStack $requestStack,
         SessionProviderFactory $sessionProviderFactory,
+        CustomObjectModel $customObjectModel,
         FlashBag $flashBag,
         CustomObjectPermissionProvider $permissionProvider,
-        EventDispatcherInterface $eventDispatcher
-    ) {
-        $this->customObjectModel      = $customObjectModel;
-        $this->sessionProviderFactory = $sessionProviderFactory;
-        $this->flashBag               = $flashBag;
-        $this->permissionProvider     = $permissionProvider;
-        $this->eventDispatcher        = $eventDispatcher;
-    }
+        EventDispatcherInterface $eventDispatcher,
+        int $objectId
+    ): Response {
+        $this->setRequestStack($requestStack);
 
-    public function deleteAction(int $objectId): Response
-    {
-        $controller = 'CustomObjectsBundle:CustomObject\List:list';
+        $controller = 'MauticPlugin\CustomObjectsBundle\Controller\CustomObject\ListController:listAction';
         $page       = [
-            'page' => $this->sessionProviderFactory->createObjectProvider()->getPage(),
+            'page' => $sessionProviderFactory->createObjectProvider()->getPage(),
         ];
 
         try {
-            $customObject          = $this->customObjectModel->fetchEntity($objectId);
+            $customObject          = $customObjectModel->fetchEntity($objectId);
             $translationParameters = [
                 '%name%' => $customObject->getName(),
                 '%id%'   => $customObject->getId(),
             ];
 
-            $this->permissionProvider->canDelete($customObject);
-            $this->customObjectModel->checkIfTheCustomObjectIsUsedInSegmentFilters($customObject);
+            $permissionProvider->canDelete($customObject);
+            $customObjectModel->checkIfTheCustomObjectIsUsedInSegmentFilters($customObject);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
@@ -85,7 +56,7 @@ class DeleteController extends CommonController
             }
 
             $translationParameters['%segments%'] = implode(', ', $segments);
-            $this->flashBag->add('custom.object.error.used.in.segments', $translationParameters, FlashBag::LEVEL_ERROR);
+            $flashBag->add('custom.object.error.used.in.segments', $translationParameters, FlashBag::LEVEL_ERROR);
 
             return $this->forward(
                 $controller,
@@ -94,8 +65,8 @@ class DeleteController extends CommonController
         }
 
         $customObjectEvent = new CustomObjectEvent($customObject);
-        $customObjectEvent->setFlashBag($this->flashBag);
-        $this->eventDispatcher->dispatch(CustomObjectEvents::ON_CUSTOM_OBJECT_USER_PRE_DELETE, $customObjectEvent);
+        $customObjectEvent->setFlashBag($flashBag);
+        $eventDispatcher->dispatch(CustomObjectEvents::ON_CUSTOM_OBJECT_USER_PRE_DELETE, $customObjectEvent);
 
         return $this->forward(
             $controller,

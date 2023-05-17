@@ -20,70 +20,32 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ListController extends CommonController
 {
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var SessionProviderFactory
-     */
-    private $sessionProviderFactory;
-
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    /**
-     * @var CustomItemPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var CustomItemRouteProvider
-     */
-    private $routeProvider;
-
-    public function __construct(
+    public function listAction(
         RequestStack $requestStack,
         SessionProviderFactory $sessionProviderFactory,
         CustomItemModel $customItemModel,
         CustomObjectModel $customObjectModel,
         CustomItemPermissionProvider $permissionProvider,
-        CustomItemRouteProvider $routeProvider
-    ) {
-        $this->requestStack           = $requestStack;
-        $this->sessionProviderFactory = $sessionProviderFactory;
-        $this->customItemModel        = $customItemModel;
-        $this->customObjectModel      = $customObjectModel;
-        $this->permissionProvider     = $permissionProvider;
-        $this->routeProvider          = $routeProvider;
+        CustomItemRouteProvider $routeProvider,
+        int $objectId,
+        int $page = 1
+    ): Response {
+        $this->setRequestStack($requestStack);
+        $request = $this->getCurrentRequest();
 
-        parent::setRequestStack($requestStack);
-    }
-
-    public function listAction(int $objectId, int $page = 1): Response
-    {
         try {
-            $this->permissionProvider->canViewAtAll($objectId);
-            $customObject = $this->customObjectModel->fetchEntity($objectId);
+            $permissionProvider->canViewAtAll($objectId);
+            $customObject = $customObjectModel->fetchEntity($objectId);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        $request          = $this->requestStack->getCurrentRequest();
         $filterEntityId   = (int) $request->get('filterEntityId');
         $filterEntityType = InputHelper::clean($request->get('filterEntityType'));
         $lookup           = (bool) $request->get('lookup');
-        $sessionProvider  = $this->sessionProviderFactory->createItemProvider($objectId, $filterEntityType, $filterEntityId, $lookup);
+        $sessionProvider  = $sessionProviderFactory->createItemProvider($objectId, $filterEntityType, $filterEntityId, $lookup);
         $search           = InputHelper::clean($request->get('search', $sessionProvider->getFilter()));
         $limit            = (int) $request->get('limit', $sessionProvider->getPageLimit());
         $orderBy          = $sessionProvider->getOrderBy(CustomItem::TABLE_ALIAS.'.id');
@@ -107,8 +69,8 @@ class ListController extends CommonController
         $sessionProvider->setPageLimit($limit);
         $sessionProvider->setFilter($search);
 
-        $route     = $this->routeProvider->buildListRoute($objectId, $page, $filterEntityType ?: null, $filterEntityId ?: null, ['lookup' => $lookup ?: null]);
-        $items     = $this->customItemModel->getTableData($tableConfig);
+        $route     = $routeProvider->buildListRoute($objectId, $page, $filterEntityType ?: null, $filterEntityId ?: null, ['lookup' => $lookup ?: null]);
+        $items     = $customItemModel->getTableData($tableConfig);
         $namespace = $sessionProvider->getNamespace();
         $response  = [
             'viewParameters' => [
@@ -118,7 +80,7 @@ class ListController extends CommonController
                 'filterEntityType' => $filterEntityType,
                 'lookup'           => $lookup,
                 'items'            => $items,
-                'itemCount'        => $this->customItemModel->getCountForTable($tableConfig),
+                'itemCount'        => $customItemModel->getCountForTable($tableConfig),
                 'page'             => $page,
                 'limit'            => $limit,
                 'tmpl'             => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
@@ -126,7 +88,7 @@ class ListController extends CommonController
                 'sessionVar'       => $namespace,
                 'namespace'        => $namespace,
             ],
-            'contentTemplate' => 'CustomObjectsBundle:CustomItem:list.html.php',
+            'contentTemplate' => '@CustomObjects/CustomItem/list.html.twig',
             'passthroughVars' => [
                 'mauticContent' => 'customItem',
                 'route'         => $filterEntityType ? null : $route,
@@ -134,7 +96,7 @@ class ListController extends CommonController
         ];
 
         if ($filterEntityId) {
-            $response['viewParameters']['fieldData'] = $this->customItemModel->getFieldListData($customObject, $items, $filterEntityType);
+            $response['viewParameters']['fieldData'] = $customItemModel->getFieldListData($customObject, $items, $filterEntityType);
         }
 
         if (!$request->isXmlHttpRequest()) {

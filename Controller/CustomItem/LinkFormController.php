@@ -19,6 +19,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use UnexpectedValueException;
 
@@ -56,32 +57,40 @@ class LinkFormController extends AbstractFormController
         CustomItemRouteProvider $customItemRouteProvider,
         FlashBag $flashBag
     ) {
-        $this->formFactory        = $formFactory;
-        $this->customItemModel    = $customItemModel;
-        $this->permissionProvider = $permissionProvider;
-        $this->routeProvider      = $customItemRouteProvider;
-        $this->flashBag           = $flashBag;
+        $formFactory        = $formFactory;
+        $customItemModel    = $customItemModel;
+        $permissionProvider = $permissionProvider;
+        $customItemRouteProvider      = $customItemRouteProvider;
+        $flashBag           = $flashBag;
     }
 
-    public function formAction(int $itemId, string $entityType, int $entityId): Response
-    {
+    public function formAction(
+        FormFactoryInterface $formFactory,
+        CustomItemModel $customItemModel,
+        CustomItemPermissionProvider $permissionProvider,
+        CustomItemRouteProvider $customItemRouteProvider,
+        FlashBag $flashBag,
+        int $itemId,
+        string $entityType,
+        int $entityId
+    ): Response {
         try {
-            $customItem = $this->customItemModel->fetchEntity($itemId);
+            $customItem = $customItemModel->fetchEntity($itemId);
 
             if (null === $relationshipObject = $customItem->getCustomObject()->getRelationshipObject()) {
                 throw new NoRelationshipException();
             }
 
-            $this->permissionProvider->canEdit($customItem);
+            $permissionProvider->canEdit($customItem);
 
-            $relationshipItem = $this->getRelationshipItem($relationshipObject, $customItem, $entityType, $entityId);
+            $relationshipItem = $this->getRelationshipItem($customItemModel, $relationshipObject, $customItem, $entityType, $entityId);
             $relationshipItem->generateNameForChildObject($entityType, $entityId, $customItem);
 
-            $form             = $this->formFactory->create(
+            $form             = $formFactory->create(
                 CustomItemType::class,
                 $relationshipItem,
                 [
-                    'action'    => $this->routeProvider->buildLinkFormSaveRoute($customItem->getId(), $entityType, $entityId),
+                    'action'    => $customItemRouteProvider->buildLinkFormSaveRoute($customItem->getId(), $entityType, $entityId),
                     'objectId'  => $relationshipObject->getId(),
                     'contactId' => $entityId,
                     'cancelUrl' => '',
@@ -90,100 +99,114 @@ class LinkFormController extends AbstractFormController
 
             return $this->delegateView(
                 [
-                    'returnUrl'      => $this->routeProvider->buildContactViewRoute($entityId),
+                    'returnUrl'      => $customItemRouteProvider->buildContactViewRoute($entityId),
                     'viewParameters' => [
                         'entity'       => $relationshipItem,
                         'customObject' => $relationshipObject,
                         'form'         => $form->createView(),
                     ],
-                    'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.php',
+                    'contentTemplate' => '@CustomObjects/CustomItem/form.html.twig',
                     'passthroughVars' => [
                         'callback'      => 'customItemLinkFormLoad',
                         'mauticContent' => 'customItem',
-                        'route'         => $this->routeProvider->buildNewRoute($relationshipObject->getId()),
+                        'route'         => $customItemRouteProvider->buildNewRoute($relationshipObject->getId()),
                     ],
                 ]
             );
         } catch (ForbiddenException|NotFoundException|UnexpectedValueException|NoRelationshipException $e) {
-            $this->flashBag->add($e->getMessage(), [], FlashBag::LEVEL_ERROR);
+            $flashBag->add($e->getMessage(), [], FlashBag::LEVEL_ERROR);
         }
 
         $responseData = [
             'closeModal' => true,
-            'flashes'    => $this->renderView('MauticCoreBundle:Notification:flash_messages.html.php'),
+            'flashes'    => $this->renderView('@MauticCore/Notification/flash_messages.html.twig'),
         ];
 
         return new JsonResponse($responseData);
     }
 
-    public function saveAction(int $itemId, string $entityType, int $entityId): Response
-    {
+    public function saveAction(
+        Request $request,
+        FormFactoryInterface $formFactory,
+        CustomItemModel $customItemModel,
+        CustomItemPermissionProvider $permissionProvider,
+        CustomItemRouteProvider $customItemRouteProvider,
+        FlashBag $flashBag,
+        int $itemId,
+        string $entityType,
+        int $entityId
+    ): Response {
         $relationshipItem   = null;
         $relationshipObject = null;
         $form               = null;
 
         try {
-            $customItem = $this->customItemModel->fetchEntity($itemId);
+            $customItem = $customItemModel->fetchEntity($itemId);
 
             if (null === $relationshipObject = $customItem->getCustomObject()->getRelationshipObject()) {
                 throw new NoRelationshipException();
             }
 
-            $this->permissionProvider->canCreate($relationshipObject->getId());
+            $permissionProvider->canCreate($relationshipObject->getId());
 
-            $relationshipItem = $this->getRelationshipItem($relationshipObject, $customItem, $entityType, $entityId);
+            $relationshipItem = $this->getRelationshipItem($customItemModel, $relationshipObject, $customItem, $entityType, $entityId);
             $relationshipItem->generateNameForChildObject($entityType, $entityId, $customItem);
 
-            $form             = $this->formFactory->create(
+            $form             = $formFactory->create(
                 CustomItemType::class,
                 $relationshipItem,
                 [
-                    'action'    => $this->routeProvider->buildLinkFormSaveRoute($customItem->getId(), $entityType, $entityId),
+                    'action'    => $customItemRouteProvider->buildLinkFormSaveRoute($customItem->getId(), $entityType, $entityId),
                     'objectId'  => $relationshipObject->getId(),
                     'contactId' => $entityId,
                 ]
             );
 
-            $form->handleRequest($this->request);
+            $form->handleRequest($request);
 
             if ($form->isValid()) {
                 $callback         = $relationshipItem->getId() ? null : 'customItemLinkFormPostSubmit';
-                $relationshipItem = $this->customItemModel->save($relationshipItem);
+                $relationshipItem = $customItemModel->save($relationshipItem);
 
                 $responseData = [
                     'closeModal' => true,
                     'callback'   => $callback,
-                    'flashes'    => $this->renderView('MauticCoreBundle:Notification:flash_messages.html.php'),
+                    'flashes'    => $this->renderView('@MauticCore/Notification/flash_messages.html.twig'),
                 ];
 
                 return new JsonResponse($responseData);
             }
         } catch (ForbiddenException|NoRelationshipException|NotFoundException $e) {
-            $this->flashBag->add($e->getMessage(), [], FlashBag::LEVEL_ERROR);
+            $flashBag->add($e->getMessage(), [], FlashBag::LEVEL_ERROR);
         }
 
         return $this->delegateView(
             [
-                'returnUrl'      => $this->routeProvider->buildContactViewRoute($entityId),
+                'returnUrl'      => $customItemRouteProvider->buildContactViewRoute($entityId),
                 'viewParameters' => [
                     'entity'       => $relationshipItem,
                     'customObject' => $relationshipObject,
                     'form'         => $form->createView(),
-                    'tmpl'         => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
+                    'tmpl'         => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.php',
+                'contentTemplate' => '@CustomObjects/CustomItem/form.html.twig',
                 'passthroughVars' => [
                     'closeModal'    => false,
                     'callback'      => 'customItemLinkFormLoad',
                     'mauticContent' => 'customItem',
-                    'route'         => $this->routeProvider->buildLinkFormRoute($itemId, $entityType, $entityId),
+                    'route'         => $customItemRouteProvider->buildLinkFormRoute($itemId, $entityType, $entityId),
                 ],
             ]
         );
     }
 
-    protected function getRelationshipItem(CustomObject $relationshipObject, CustomItem $customItem, string $entityType, int $entityId): CustomItem
-    {
+    protected function getRelationshipItem(
+        CustomItemModel $customItemModel,
+        CustomObject $relationshipObject,
+        CustomItem $customItem,
+        string $entityType,
+        int $entityId
+    ): CustomItem {
         /** @var CustomItemXrefCustomItem|null $relationshipItemXref */
         $relationshipItemXref = $customItem->getCustomItemLowerReferences()
             ->filter(function (CustomItemXrefCustomItem $item) use ($entityType, $entityId) {
@@ -195,7 +218,7 @@ class LinkFormController extends AbstractFormController
                         })->count() > 0;
             })->first();
 
-        return $this->customItemModel->populateCustomFields(
+        return $customItemModel->populateCustomFields(
             $relationshipItemXref ? $relationshipItemXref->getCustomItemHigher() : new CustomItem($relationshipObject)
         );
     }

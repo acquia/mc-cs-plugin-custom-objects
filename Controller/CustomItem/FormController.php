@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
@@ -14,179 +16,185 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 class FormController extends AbstractFormController
 {
-    /**
-     * @var FormFactoryInterface
-     */
-    private $formFactory;
+    public function __construct(CorePermissions $security, UserHelper $userHelper, RequestStack $requestStack)
+    {
+        $this->setRequestStack($requestStack);
 
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    /**
-     * @var CustomItemPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var CustomItemRouteProvider
-     */
-    private $routeProvider;
-
-    /**
-     * @var LockFlashMessageHelper
-     */
-    private $lockFlashMessageHelper;
-
-    private RequestStack $requestStack;
-
-    public function __construct(
-        FormFactoryInterface $formFactory,
-        CustomObjectModel $customObjectModel,
-        CustomItemModel $customItemModel,
-        CustomItemPermissionProvider $permissionProvider,
-        CustomItemRouteProvider $routeProvider,
-        LockFlashMessageHelper $lockFlashMessageHelper,
-        RequestStack $requestStack
-    ) {
-        $this->formFactory            = $formFactory;
-        $this->customObjectModel      = $customObjectModel;
-        $this->customItemModel        = $customItemModel;
-        $this->permissionProvider     = $permissionProvider;
-        $this->routeProvider          = $routeProvider;
-        $this->lockFlashMessageHelper = $lockFlashMessageHelper;
-
-        $this->requestStack           = $requestStack;
-        parent::setRequestStack($requestStack);
+        parent::__construct($security, $userHelper);
     }
 
-    public function newAction(int $objectId): Response
-    {
+    public function newAction(
+        FormFactoryInterface $formFactory,
+        CustomItemRouteProvider $routeProvider,
+        CustomItemModel $customItemModel,
+        CustomObjectModel $customObjectModel,
+        CustomItemPermissionProvider $permissionProvider,
+        int $objectId
+    ): Response {
         try {
-            $customItem = $this->performNewAction($objectId);
+            $customItem = $this->performNewAction($customObjectModel, $customItemModel, $permissionProvider, $objectId);
         } catch (ForbiddenException $e) {
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        return $this->renderFormForItem($customItem, $this->routeProvider->buildNewRoute($objectId));
+        return $this->renderFormForItem(
+            $formFactory,
+            $routeProvider,
+            $customItem,
+            $routeProvider->buildNewRoute($objectId)
+        );
     }
 
-    public function newWithRedirectToContactAction(int $objectId, int $contactId): Response
-    {
+    public function newWithRedirectToContactAction(
+        FormFactoryInterface $formFactory,
+        CustomItemRouteProvider $routeProvider,
+        CustomItemModel $customItemModel,
+        CustomObjectModel $customObjectModel,
+        CustomItemPermissionProvider $permissionProvider,
+        int $objectId,
+        int $contactId
+    ): Response {
         try {
-            $customItem = $this->performNewAction($objectId);
+            $customItem = $this->performNewAction($customObjectModel, $customItemModel, $permissionProvider, $objectId);
         } catch (ForbiddenException $e) {
             return $this->accessDenied(false, $e->getMessage());
         }
 
         if ($customItem->getCustomObject()->getRelationshipObject()) {
             $customItem->setChildCustomItem(
-                $this->customItemModel->populateCustomFields(
+                $customItemModel->populateCustomFields(
                     new CustomItem($customItem->getCustomObject()->getRelationshipObject())
                 )
             );
         }
 
-        return $this->renderFormForItem($customItem, $this->routeProvider->buildNewRouteWithRedirectToContact($objectId, $contactId), $contactId);
+        return $this->renderFormForItem(
+            $formFactory,
+            $routeProvider,
+            $customItem,
+            $routeProvider->buildNewRouteWithRedirectToContact($objectId, $contactId),
+            $contactId
+        );
     }
 
-    private function performNewAction(int $objectId): CustomItem
-    {
-        $this->permissionProvider->canCreate($objectId);
+    private function performNewAction(
+        CustomObjectModel $customObjectModel,
+        CustomItemModel $customItemModel,
+        CustomItemPermissionProvider $permissionProvider,
+        int $objectId
+    ): CustomItem {
+        $permissionProvider->canCreate($objectId);
 
-        return $this->customItemModel->populateCustomFields(
+        return $customItemModel->populateCustomFields(
             new CustomItem(
-                $this->customObjectModel->fetchEntity($objectId)
+                $customObjectModel->fetchEntity($objectId)
             )
         );
     }
 
-    public function editAction(int $objectId, int $itemId): Response
-    {
+    public function editAction(
+        FormFactoryInterface $formFactory,
+        CustomItemRouteProvider $routeProvider,
+        CustomItemModel $customItemModel,
+        LockFlashMessageHelper $lockFlashMessageHelper,
+        CustomItemPermissionProvider $permissionProvider,
+        int $objectId,
+        int $itemId
+    ): Response {
         try {
-            $customItem = $this->performEditAction($itemId);
+            $customItem = $this->performEditAction($customItemModel, $permissionProvider, $itemId);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        if ($this->customItemModel->isLocked($customItem)) {
-            $this->lockFlashMessageHelper->addFlash(
+        if ($customItemModel->isLocked($customItem)) {
+            $lockFlashMessageHelper->addFlash(
                 $customItem,
-                $this->routeProvider->buildEditRoute($objectId, $itemId),
+                $routeProvider->buildEditRoute($objectId, $itemId),
                 $this->canEdit($customItem),
                 'custom.item'
             );
 
-            return $this->redirect($this->routeProvider->buildViewRoute($objectId, $itemId));
+            return $this->redirect($routeProvider->buildViewRoute($objectId, $itemId));
         }
 
-        $this->customItemModel->lockEntity($customItem);
+        $customItemModel->lockEntity($customItem);
 
-        return $this->renderFormForItem($customItem, $this->routeProvider->buildEditRoute($objectId, $itemId));
+        return $this->renderFormForItem(
+            $formFactory,
+            $routeProvider,
+            $customItem,
+            $routeProvider->buildEditRoute($objectId, $itemId)
+        );
     }
 
-    public function editWithRedirectToContactAction(int $objectId, int $itemId, int $contactId): Response
-    {
+    public function editWithRedirectToContactAction(
+        FormFactoryInterface $formFactory,
+        CustomItemRouteProvider $routeProvider,
+        CustomItemModel $customItemModel,
+        LockFlashMessageHelper $lockFlashMessageHelper,
+        CustomItemPermissionProvider $permissionProvider,
+        int $objectId,
+        int $itemId,
+        int $contactId
+    ): Response {
         try {
-            $customItem = $this->performEditAction($itemId);
+            $customItem = $this->performEditAction($customItemModel, $permissionProvider, $itemId);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        if ($this->customItemModel->isLocked($customItem)) {
-            $this->lockFlashMessageHelper->addFlash(
+        if ($customItemModel->isLocked($customItem)) {
+            $lockFlashMessageHelper->addFlash(
                 $customItem,
-                $this->routeProvider->buildEditRouteWithRedirectToContact($objectId, $itemId, $contactId),
+                $routeProvider->buildEditRouteWithRedirectToContact($objectId, $itemId, $contactId),
                 $this->canEdit($customItem),
                 'custom.item'
             );
 
-            return $this->redirect($this->routeProvider->buildViewRoute($objectId, $itemId));
+            return $this->redirect($routeProvider->buildViewRoute($objectId, $itemId));
         }
 
         if ($customItem->getCustomObject()->getRelationshipObject()) {
             $customItem->setChildCustomItem(
-                $this->customItemModel->populateCustomFields(
+                $customItemModel->populateCustomFields(
                     $customItem->findChildCustomItem()
                 )
             );
         }
 
-        $this->customItemModel->lockEntity($customItem);
+        $customItemModel->lockEntity($customItem);
 
-        return $this->renderFormForItem($customItem, $this->routeProvider->buildEditRouteWithRedirectToContact($objectId, $itemId, $contactId), $contactId);
+        return $this->renderFormForItem(
+            $formFactory,
+            $routeProvider,
+            $customItem,
+            $routeProvider->buildEditRouteWithRedirectToContact($objectId, $itemId, $contactId),
+            $contactId
+        );
     }
 
-    private function performEditAction(int $itemId): CustomItem
-    {
-        $customItem = $this->customItemModel->fetchEntity($itemId);
-        $this->permissionProvider->canEdit($customItem);
-
-        return $customItem;
-    }
-
-    public function cloneAction(int $objectId, int $itemId): Response
-    {
+    public function cloneAction(
+        FormFactoryInterface $formFactory,
+        CustomItemRouteProvider $routeProvider,
+        CustomItemModel $customItemModel,
+        CustomItemPermissionProvider $permissionProvider,
+        int $objectId,
+        int $itemId
+    ): Response {
         try {
-            $customItem = clone $this->customItemModel->fetchEntity($itemId);
-            $this->permissionProvider->canClone($customItem);
+            $customItem = clone $customItemModel->fetchEntity($itemId);
+            $permissionProvider->canClone($customItem);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
@@ -195,20 +203,41 @@ class FormController extends AbstractFormController
 
         $customItem->setName($customItem->getName().' '.$this->translator->trans('mautic.core.form.clone'));
 
-        return $this->renderFormForItem($customItem, $this->routeProvider->buildCloneRoute($objectId, $itemId));
+        return $this->renderFormForItem(
+            $formFactory,
+            $routeProvider,
+            $customItem,
+            $routeProvider->buildCloneRoute($objectId, $itemId)
+        );
     }
 
-    private function renderFormForItem(CustomItem $customItem, string $route, ?int $contactId = null): Response
-    {
-        $action  = $this->routeProvider->buildSaveRoute($customItem->getCustomObject()->getId(), $customItem->getId());
+    private function performEditAction(
+        CustomItemModel $customItemModel,
+        CustomItemPermissionProvider $permissionProvider,
+        int $itemId
+    ): CustomItem {
+        $customItem = $customItemModel->fetchEntity($itemId);
+        $permissionProvider->canEdit($customItem);
+
+        return $customItem;
+    }
+
+    private function renderFormForItem(
+        FormFactoryInterface $formFactory,
+        CustomItemRouteProvider $routeProvider,
+        CustomItem $customItem,
+        string $route,
+        ?int $contactId = null
+    ): Response {
+        $action  = $routeProvider->buildSaveRoute($customItem->getCustomObject()->getId(), $customItem->getId());
         $options = [
             'action'    => $action,
             'objectId'  => $customItem->getCustomObject()->getId(),
             'contactId' => $contactId,
-            'cancelUrl' => 0 < $contactId ? $this->routeProvider->buildContactViewRoute($contactId) : null,
+            'cancelUrl' => 0 < $contactId ? $routeProvider->buildContactViewRoute($contactId) : null,
         ];
 
-        $form = $this->formFactory->create(
+        $form = $formFactory->create(
             CustomItemType::class,
             $customItem,
             $options
@@ -216,13 +245,13 @@ class FormController extends AbstractFormController
 
         return $this->delegateView(
             [
-                'returnUrl'      => $this->routeProvider->buildListRoute($customItem->getCustomObject()->getId()),
+                'returnUrl'      => $routeProvider->buildListRoute($customItem->getCustomObject()->getId()),
                 'viewParameters' => [
                     'entity'       => $customItem,
                     'customObject' => $customItem->getCustomObject(),
                     'form'         => $form->createView(),
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.php',
+                'contentTemplate' => '@CustomObjects/CustomItem/form.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customItem',
                     'route'         => $route,

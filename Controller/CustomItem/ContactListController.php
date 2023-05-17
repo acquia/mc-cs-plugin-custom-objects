@@ -21,7 +21,8 @@ class ContactListController extends CommonController
         Request $request,
         PageHelperFactoryInterface $pageHelperFactory,
         int $objectId,
-        int $page = 1): Response {
+        int $page = 1
+    ): Response {
         return $this->generateContactsGrid(
             $request,
             $pageHelperFactory,

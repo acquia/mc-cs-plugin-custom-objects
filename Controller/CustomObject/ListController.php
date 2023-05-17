@@ -18,62 +18,29 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ListController extends CommonController
 {
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var SessionProviderFactory
-     */
-    private $sessionProviderFactory;
-
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    /**
-     * @var CustomObjectPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var CustomObjectRouteProvider
-     */
-    private $routeProvider;
-
-    public function __construct(
+    public function listAction(
         RequestStack $requestStack,
         SessionProviderFactory $sessionProviderFactory,
         CustomObjectModel $customObjectModel,
         CustomObjectPermissionProvider $permissionProvider,
-        CustomObjectRouteProvider $routeProvider
-    ) {
-        $this->requestStack              = $requestStack;
-        $this->sessionProviderFactory    = $sessionProviderFactory;
-        $this->customObjectModel         = $customObjectModel;
-        $this->permissionProvider        = $permissionProvider;
-        $this->routeProvider             = $routeProvider;
+        CustomObjectRouteProvider $routeProvider,
+        int $page = 1
+    ): Response {
+        $this->setRequestStack($requestStack);
+        $request = $this->getCurrentRequest();
 
-        parent::setRequestStack($requestStack);
-    }
-
-    public function listAction(int $page = 1): Response
-    {
         try {
-            $this->permissionProvider->canViewAtAll();
+            $permissionProvider->canViewAtAll();
         } catch (ForbiddenException $e) {
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        $request         = $this->requestStack->getCurrentRequest();
-        $sessionProvider = $this->sessionProviderFactory->createObjectProvider();
+        $sessionProvider = $sessionProviderFactory->createObjectProvider();
         $search          = InputHelper::clean($request->get('search', $sessionProvider->getFilter()));
         $limit           = (int) $request->get('limit', $sessionProvider->getPageLimit());
         $orderBy         = $sessionProvider->getOrderBy(CustomObject::TABLE_ALIAS.'.id');
         $orderByDir      = $sessionProvider->getOrderByDir('ASC');
-        $route           = $this->routeProvider->buildListRoute($page);
+        $route           = $routeProvider->buildListRoute($page);
 
         if ($request->query->has('orderby')) {
             $orderBy    = InputHelper::clean($request->query->get('orderby'), true);
@@ -93,14 +60,14 @@ class ListController extends CommonController
                 'returnUrl'      => $route,
                 'viewParameters' => [
                     'searchValue'    => $search,
-                    'items'          => $this->customObjectModel->getTableData($tableConfig),
-                    'count'          => $this->customObjectModel->getCountForTable($tableConfig),
+                    'items'          => $customObjectModel->getTableData($tableConfig),
+                    'count'          => $customObjectModel->getCountForTable($tableConfig),
                     'page'           => $page,
                     'limit'          => $limit,
                     'tmpl'           => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                     'sessionVar'     => $sessionProvider->getNamespace(),
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObject:list.html.php',
+                'contentTemplate' => '@CustomObjects/CustomObject/list.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
                     'route'         => $route,

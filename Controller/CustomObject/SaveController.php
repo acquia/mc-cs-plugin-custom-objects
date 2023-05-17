@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
@@ -27,63 +29,14 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SaveController extends AbstractFormController
 {
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
+    public function __construct(CorePermissions $security, UserHelper $userHelper, RequestStack $requestStack)
+    {
+        $this->setRequestStack($requestStack);
 
-    /**
-     * @var FlashBag
-     */
-    private $flashBag;
+        parent::__construct($security, $userHelper);
+    }
 
-    /**
-     * @var FormFactoryInterface
-     */
-    private $formFactory;
-
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    /**
-     * @var CustomFieldModel
-     */
-    private $customFieldModel;
-
-    /**
-     * @var CustomObjectPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var CustomObjectRouteProvider
-     */
-    private $routeProvider;
-
-    /**
-     * @var CustomFieldTypeProvider
-     */
-    private $customFieldTypeProvider;
-
-    /**
-     * @var ParamsToStringTransformer
-     */
-    private $paramsToStringTransformer;
-
-    /**
-     * @var OptionsToStringTransformer
-     */
-    private $optionsToStringTransformer;
-
-    /**
-     * @var LockFlashMessageHelper
-     */
-    private $lockFlashMessageHelper;
-
-    public function __construct(
-        RequestStack $requestStack,
+    public function saveAction(
         FlashBag $flashBag,
         FormFactoryInterface $formFactory,
         CustomObjectModel $customObjectModel,
@@ -93,31 +46,17 @@ class SaveController extends AbstractFormController
         CustomFieldTypeProvider $customFieldTypeProvider,
         ParamsToStringTransformer $paramsToStringTransformer,
         OptionsToStringTransformer $optionsToStringTransformer,
-        LockFlashMessageHelper $lockFlashMessageHelper
-    ) {
-        $this->requestStack               = $requestStack;
-        $this->flashBag                   = $flashBag;
-        $this->formFactory                = $formFactory;
-        $this->customObjectModel          = $customObjectModel;
-        $this->customFieldModel           = $customFieldModel;
-        $this->permissionProvider         = $permissionProvider;
-        $this->routeProvider              = $routeProvider;
-        $this->customFieldTypeProvider    = $customFieldTypeProvider;
-        $this->paramsToStringTransformer  = $paramsToStringTransformer;
-        $this->optionsToStringTransformer = $optionsToStringTransformer;
-        $this->lockFlashMessageHelper     = $lockFlashMessageHelper;
+        LockFlashMessageHelper $lockFlashMessageHelper,
+        ?int $objectId = null
+    ): Response {
+        $request = $this->getCurrentRequest();
 
-        parent::setRequestStack($requestStack);
-    }
-
-    public function saveAction(?int $objectId = null): Response
-    {
         try {
-            $customObject = $objectId ? $this->customObjectModel->fetchEntity($objectId) : new CustomObject();
+            $customObject = $objectId ? $customObjectModel->fetchEntity($objectId) : new CustomObject();
             if ($customObject->isNew()) {
-                $this->permissionProvider->canCreate();
+                $permissionProvider->canCreate();
             } else {
-                $this->permissionProvider->canEdit($customObject);
+                $permissionProvider->canEdit($customObject);
             }
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
@@ -125,20 +64,19 @@ class SaveController extends AbstractFormController
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        if ($this->customObjectModel->isLocked($customObject)) {
-            $this->lockFlashMessageHelper->addFlash(
+        if ($customObjectModel->isLocked($customObject)) {
+            $lockFlashMessageHelper->addFlash(
                 $customObject,
-                $this->routeProvider->buildEditRoute($objectId),
+                $routeProvider->buildEditRoute($objectId),
                 $this->canEdit($customObject),
                 'custom.object'
             );
 
-            return $this->redirect($this->routeProvider->buildViewRoute($objectId));
+            return $this->redirect($routeProvider->buildViewRoute($objectId));
         }
 
-        $request = $this->requestStack->getCurrentRequest();
-        $action  = $this->routeProvider->buildSaveRoute($objectId);
-        $form    = $this->formFactory->create(
+        $action  = $routeProvider->buildSaveRoute($objectId);
+        $form    = $formFactory->create(
             CustomObjectType::class,
             $customObject,
             ['action' => $action]
@@ -150,23 +88,29 @@ class SaveController extends AbstractFormController
         $form->submit($postData, false);
 
         if ($form->isValid()) {
-            $this->handleRawPost($customObject, $postData);
+            $this->handleRawPost(
+                $customObjectModel,
+                $paramsToStringTransformer,
+                $optionsToStringTransformer,
+                $customObject,
+                $postData
+            );
 
-            $this->customObjectModel->save($customObject);
+            $customObjectModel->save($customObject);
 
-            $this->flashBag->add(
+            $flashBag->add(
                 $objectId ? 'mautic.core.notice.updated' : 'mautic.core.notice.created',
                 [
                     '%name%' => $customObject->getName(),
-                    '%url%'  => $this->routeProvider->buildEditRoute($objectId),
+                    '%url%'  => $routeProvider->buildEditRoute($objectId),
                 ]
             );
 
             if ($form->get('buttons')->get('save')->isClicked()) {
-                $this->customObjectModel->unlockEntity($customObject);
-                $route = $this->routeProvider->buildViewRoute($customObject->getId());
+                $customObjectModel->unlockEntity($customObject);
+                $route = $routeProvider->buildViewRoute($customObject->getId());
             } else {
-                $route = $this->routeProvider->buildEditRoute($customObject->getId());
+                $route = $routeProvider->buildEditRoute($customObject->getId());
             }
 
             return $this->redirectWithCompletePageRefresh($request, $route);
@@ -174,18 +118,18 @@ class SaveController extends AbstractFormController
 
         return $this->delegateView(
             [
-                'returnUrl'      => $this->routeProvider->buildListRoute(),
+                'returnUrl'      => $routeProvider->buildListRoute(),
                 'viewParameters' => [
                     'customObject'        => $customObject,
-                    'availableFieldTypes' => $this->customFieldTypeProvider->getTypes(),
-                    'customFields'        => $this->customFieldModel->fetchCustomFieldsForObject($customObject),
+                    'availableFieldTypes' => $customFieldTypeProvider->getTypes(),
+                    'customFields'        => $customFieldModel->fetchCustomFieldsForObject($customObject),
                     'deletedFields'       => [],
                     'form'                => $form->createView(),
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.php',
+                'contentTemplate' => '@CustomObjects/CustomObject/form.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
-                    'route'         => $objectId ? $this->routeProvider->buildEditRoute($customObject->getId()) : $this->routeProvider->buildNewRoute(),
+                    'route'         => $objectId ? $routeProvider->buildEditRoute($customObject->getId()) : $routeProvider->buildNewRoute(),
                 ],
             ]
         );
@@ -194,18 +138,23 @@ class SaveController extends AbstractFormController
     /**
      * @param string[] $rawCustomObject
      */
-    private function handleRawPost(CustomObject $customObject, array $rawCustomObject): void
-    {
+    private function handleRawPost(
+        CustomObjectModel $customObjectModel,
+        ParamsToStringTransformer $paramsToStringTransformer,
+        OptionsToStringTransformer $optionsToStringTransformer,
+        CustomObject $customObject,
+        array $rawCustomObject
+    ): void {
         if (empty($rawCustomObject['customFields'])) {
             return;
         }
 
-        // Let's order received $_POST data and apply delete for existing CFs
+        // Let's order received $_POST data and apply to delete for existing CFs
         $customFields = [];
         foreach ($rawCustomObject['customFields'] as $customField) {
             if ($customField['deleted'] && $customField['id']) {
                 // Remove deleted custom fields
-                $this->customObjectModel->removeCustomFieldById($customObject, (int) $customField['id']);
+                $customObjectModel->removeCustomFieldById($customObject, (int) $customField['id']);
             } else {
                 // We are using order key as key to access collection of CustomFields below
                 $customFields[(int) $customField['order']] = $customField;
@@ -215,10 +164,10 @@ class SaveController extends AbstractFormController
         foreach ($customFields as $order => $rawCustomField) {
             // Should be resolved better in form/transformer, but here it is more clear
             $params = $rawCustomField['params'];
-            $params = $this->paramsToStringTransformer->reverseTransform($params);
+            $params = $paramsToStringTransformer->reverseTransform($params);
 
             $options = $rawCustomField['options'];
-            $options = $this->optionsToStringTransformer->reverseTransform($options);
+            $options = $optionsToStringTransformer->reverseTransform($options);
 
             /** @var CustomField $customField */
             $customField = $customObject->getCustomFieldByOrder((int) $order);

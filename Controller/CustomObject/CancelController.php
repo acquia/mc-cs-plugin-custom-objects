@@ -13,51 +13,26 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CancelController extends CommonController
 {
-    /**
-     * @var SessionProviderFactory
-     */
-    private $sessionProviderFactory;
-
-    /**
-     * @var CustomObjectRouteProvider
-     */
-    private $routeProvider;
-
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    private RequestStack $requestStack;
-
-    public function __construct(
+    public function cancelAction(
+        RequestStack $requestStack,
         SessionProviderFactory $sessionProviderFactory,
         CustomObjectRouteProvider $routeProvider,
         CustomObjectModel $customObjectModel,
-        RequestStack $requestStack
-    ) {
-        $this->sessionProviderFactory = $sessionProviderFactory;
-        $this->routeProvider          = $routeProvider;
-        $this->customObjectModel      = $customObjectModel;
-
-        $this->requestStack           = $requestStack;
-        parent::setRequestStack($requestStack);
-    }
-
-    public function cancelAction(?int $objectId): Response
-    {
-        $page = $this->sessionProviderFactory->createObjectProvider()->getPage();
+        ?int $objectId
+    ): Response {
+        $this->setRequestStack($requestStack);
+        $page = $sessionProviderFactory->createObjectProvider()->getPage();
 
         if ($objectId) {
-            $customObject = $this->customObjectModel->fetchEntity($objectId);
-            $this->customObjectModel->unlockEntity($customObject);
+            $customObject = $customObjectModel->fetchEntity($objectId);
+            $customObjectModel->unlockEntity($customObject);
         }
 
         return $this->postActionRedirect(
             [
-                'returnUrl'       => $this->routeProvider->buildListRoute($page),
+                'returnUrl'       => $routeProvider->buildListRoute($page),
                 'viewParameters'  => ['page' => $page],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObject\List:list',
+                'contentTemplate' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomObject\ListController:listAction',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
                 ],
