@@ -915,7 +915,7 @@ $coParams = [
     'parameters' => [
         ConfigProvider::CONFIG_PARAM_ENABLED                              => true,
         ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT => 3,
-        'custom_item_export_dir'                                          => '%kernel.root_dir%/../media/files/temp',
+        'custom_item_export_dir'                                          => '%kernel.project_dir%/media/files/temp',
     ],
 ];
 
