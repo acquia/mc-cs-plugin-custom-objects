@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomField;
 
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomField\FormController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
@@ -45,28 +47,28 @@ class FormControllerTest extends AbstractFieldControllerTest
         $this->objectRouteProvider = $this->createMock(CustomObjectRouteProvider::class);
         $this->form                = $this->createMock(FormInterface::class);
 
-        $this->formController = new FormController(
-            $this->formFactory,
-            $this->customFieldModel,
-            $this->customFieldFactory,
-            $this->permissionProvider,
-            $this->fieldRouteProvider,
-            $this->customObjectModel,
-            $this->objectRouteProvider
-        );
+        $this->translator          = $this->createMock(Translator::class);
+
+        $this->formController      = new FormController();
+        $this->formController->setTranslator($this->translator);
+        $this->formController->setSecurity($this->security);
 
         $this->addSymfonyDependencies($this->formController);
+        $this->addSymfonyDependencies($this->formController);
+        $this->container->get('http_kernel')->expects($this->any())
+            ->method('handle')
+            ->willreturn(null);
     }
 
-    public function testRenderFormIfCustomFieldNotFound(): void
+    public function testRenderFormIfCustomFieldNotFoundFormController(): void
     {
-        $objectId   = 1;
-        $fieldId    = 2;
-        $fieldType  = 'text';
-        $panelId    = null;
-        $panelCount = null;
+        $objectId     = 1;
+        $fieldId      = 2;
+        $fieldType    = 'text';
+        $panelId      = null;
+        $panelCount   = null;
 
-        $request = $this->createRequestMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
+        $requestStack = $this->createRequestStackMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
 
         $this->customFieldModel->expects($this->once())
             ->method('fetchEntity')
@@ -75,18 +77,37 @@ class FormControllerTest extends AbstractFieldControllerTest
         $this->permissionProvider->expects($this->never())
             ->method('canEdit');
 
-        $this->formController->renderFormAction($request);
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->with(
+                'not found message',
+                [
+                    '%url%' => null,
+                ]
+            )
+            ->willReturn('not found message');
+
+        $this->formController->renderFormAction(
+            $requestStack,
+            $this->formFactory,
+            $this->customFieldModel,
+            $this->customFieldFactory,
+            $this->permissionProvider,
+            $this->fieldRouteProvider,
+            $this->customObjectModel,
+            $this->objectRouteProvider
+        );
     }
 
     public function testRenderFormIfCustomFieldAccessDenied(): void
     {
-        $objectId   = 1;
-        $fieldId    = 2;
-        $fieldType  = 'text';
-        $panelId    = null;
-        $panelCount = null;
+        $objectId     = 1;
+        $fieldId      = 2;
+        $fieldType    = 'text';
+        $panelId      = null;
+        $panelCount   = null;
 
-        $request = $this->createRequestMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
+        $requestStack = $this->createRequestStackMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
 
         $this->customFieldModel->expects($this->once())
             ->method('fetchEntity')
@@ -97,20 +118,33 @@ class FormControllerTest extends AbstractFieldControllerTest
             ->method('canEdit')
             ->will($this->throwException(new ForbiddenException('forbidden message')));
 
+        $this->security->expects($this->once())
+            ->method('isAnonymous')
+            ->willReturn(true);
+
         $this->expectException(AccessDeniedHttpException::class);
 
-        $this->formController->renderFormAction($request);
+        $this->formController->renderFormAction(
+            $requestStack,
+            $this->formFactory,
+            $this->customFieldModel,
+            $this->customFieldFactory,
+            $this->permissionProvider,
+            $this->fieldRouteProvider,
+            $this->customObjectModel,
+            $this->objectRouteProvider
+        );
     }
 
     public function testRenderFormActionEditField(): void
     {
-        $objectId   = 1;
-        $fieldId    = 2;
-        $fieldType  = 'text';
-        $panelId    = null;
-        $panelCount = null;
+        $objectId     = 1;
+        $fieldId      = 2;
+        $fieldType    = 'text';
+        $panelId      = null;
+        $panelCount   = null;
 
-        $request = $this->createRequestMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
+        $requestStack = $this->createRequestStackMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
 
         $customObject = new CustomObject();
         $this->customObjectModel->expects($this->once())
@@ -157,7 +191,16 @@ class FormControllerTest extends AbstractFieldControllerTest
             ->method('createView')
             ->willReturn($view);
 
-        $this->formController->renderFormAction($request);
+        $this->formController->renderFormAction(
+            $requestStack,
+            $this->formFactory,
+            $this->customFieldModel,
+            $this->customFieldFactory,
+            $this->permissionProvider,
+            $this->fieldRouteProvider,
+            $this->customObjectModel,
+            $this->objectRouteProvider
+        );
     }
 
     public function testRenderFormActionCreateField(): void
@@ -168,7 +211,7 @@ class FormControllerTest extends AbstractFieldControllerTest
         $panelId    = null;
         $panelCount = null;
 
-        $request = $this->createRequestMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
+        $requestStack = $this->createRequestStackMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
 
         $this->permissionProvider->expects($this->once())
             ->method('canCreate');
@@ -209,6 +252,15 @@ class FormControllerTest extends AbstractFieldControllerTest
             ->method('createView')
             ->willReturn($view);
 
-        $this->formController->renderFormAction($request);
+        $this->formController->renderFormAction(
+            $requestStack,
+            $this->formFactory,
+            $this->customFieldModel,
+            $this->customFieldFactory,
+            $this->permissionProvider,
+            $this->fieldRouteProvider,
+            $this->customObjectModel,
+            $this->objectRouteProvider
+        );
     }
 }

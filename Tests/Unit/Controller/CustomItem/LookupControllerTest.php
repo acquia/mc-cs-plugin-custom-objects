@@ -36,12 +36,7 @@ class LookupControllerTest extends ControllerTestCase
         $this->permissionProvider = $this->createMock(CustomItemPermissionProvider::class);
         $this->flashBag           = $this->createMock(FlashBag::class);
         $this->request            = $this->createMock(Request::class);
-        $this->lookupController   = new LookupController(
-            $this->requestStack,
-            $this->customItemModel,
-            $this->permissionProvider,
-            $this->flashBag
-        );
+        $this->lookupController   = new LookupController();
 
         $this->addSymfonyDependencies($this->lookupController);
     }
@@ -59,7 +54,13 @@ class LookupControllerTest extends ControllerTestCase
         $this->customItemModel->expects($this->never())
             ->method('getLookupData');
 
-        $this->lookupController->listAction(self::OBJECT_ID);
+        $this->lookupController->listAction(
+            $this->requestStack,
+            $this->customItemModel,
+            $this->permissionProvider,
+            $this->flashBag,
+            self::OBJECT_ID
+        );
     }
 
     public function testListAction(): void
@@ -85,7 +86,13 @@ class LookupControllerTest extends ControllerTestCase
                 return true;
             }));
 
-        $this->lookupController->listAction(self::OBJECT_ID);
+        $this->lookupController->listAction(
+            $this->requestStack,
+            $this->customItemModel,
+            $this->permissionProvider,
+            $this->flashBag,
+            self::OBJECT_ID
+        );
     }
 
     public function testListActionForContactEntity(): void
@@ -116,6 +123,12 @@ class LookupControllerTest extends ControllerTestCase
                 return true;
             }));
 
-        $this->lookupController->listAction(self::OBJECT_ID);
+        $this->lookupController->listAction(
+            $this->requestStack,
+            $this->customItemModel,
+            $this->permissionProvider,
+            $this->flashBag,
+            self::OBJECT_ID
+        );
     }
 }
