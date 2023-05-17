@@ -60,7 +60,7 @@ class ListControllerTest extends ControllerTestCase
         $this->modelFactory           = $this->createMock(ModelFactory::class);
         $this->model                  = $this->createMock(NotificationModel::class);
 
-        $this->listController         = new ListController();
+        $this->listController         = new ListController($this->managerRegistry);
         $this->listController->setTranslator($this->translator);
         $this->listController->setModelFactory($this->modelFactory);
         $this->listController->setSecurity($this->security);

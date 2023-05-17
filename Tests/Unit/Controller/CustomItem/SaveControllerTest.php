@@ -103,7 +103,7 @@ class SaveControllerTest extends ControllerTestCase
         $this->form                   = $this->createMock(FormInterface::class);
 
         $this->translator             = $this->createMock(Translator::class);
-        $this->saveController         = new SaveController($this->security, $this->userHelper);
+        $this->saveController         = new SaveController($this->security, $this->userHelper, $this->managerRegistry);
         $this->saveController->setTranslator($this->translator);
 
         $this->addSymfonyDependencies($this->saveController);

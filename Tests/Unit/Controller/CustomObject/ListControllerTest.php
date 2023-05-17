@@ -44,7 +44,7 @@ class ListControllerTest extends ControllerTestCase
         $this->permissionProvider     = $this->createMock(CustomObjectPermissionProvider::class);
         $this->routeProvider          = $this->createMock(CustomObjectRouteProvider::class);
         $this->request                = $this->createMock(Request::class);
-        $this->listController         = new ListController();
+        $this->listController         = new ListController($this->managerRegistry);
 
         $this->addSymfonyDependencies($this->listController);
 

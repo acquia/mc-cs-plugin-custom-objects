@@ -35,7 +35,7 @@ class CancelControllerTest extends ControllerTestCase
         $this->customObjectModel = $this->createMock(CustomObjectModel::class);
         $this->requestStack      = $this->createMock(RequestStack::class);
 
-        $this->cancelController = new CancelController();
+        $this->cancelController = new CancelController($this->managerRegistry);
 
         $this->addSymfonyDependencies($this->cancelController);
         $this->sessionProviderFactory->method('createObjectProvider')->willReturn($this->sessionProvider);

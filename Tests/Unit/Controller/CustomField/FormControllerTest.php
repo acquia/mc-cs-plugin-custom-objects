@@ -49,7 +49,7 @@ class FormControllerTest extends AbstractFieldControllerTest
 
         $this->translator          = $this->createMock(Translator::class);
 
-        $this->formController      = new FormController();
+        $this->formController      = new FormController($this->managerRegistry);
         $this->formController->setTranslator($this->translator);
         $this->formController->setSecurity($this->security);
 

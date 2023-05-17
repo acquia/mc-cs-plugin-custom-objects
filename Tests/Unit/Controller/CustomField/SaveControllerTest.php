@@ -51,7 +51,7 @@ class SaveControllerTest extends AbstractFieldControllerTest
 
         $this->translator          = $this->createMock(Translator::class);
         $this->security            = $this->createMock(CorePermissions::class);
-        $this->saveController      = new SaveController();
+        $this->saveController      = new SaveController($this->managerRegistry);
         $this->saveController->setTranslator($this->translator);
         $this->saveController->setSecurity($this->security);
 

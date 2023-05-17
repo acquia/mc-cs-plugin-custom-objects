@@ -55,7 +55,7 @@ class ViewControllerTest extends ControllerTestCase
 
         $this->translator         = $this->createMock(Translator::class);
 
-        $this->viewController     = new ViewController();
+        $this->viewController     = new ViewController($this->managerRegistry);
         $this->viewController->setTranslator($this->translator);
         $this->viewController->setSecurity($this->security);
 

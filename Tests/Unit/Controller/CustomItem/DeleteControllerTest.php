@@ -64,7 +64,7 @@ class DeleteControllerTest extends ControllerTestCase
         $this->modelFactory           = $this->createMock(ModelFactory::class);
         $this->model                  = $this->createMock(NotificationModel::class);
 
-        $this->deleteController       = new DeleteController();
+        $this->deleteController       = new DeleteController($this->managerRegistry);
         $this->deleteController->setTranslator($this->translator);
         $this->deleteController->setSecurity($this->security);
         $this->deleteController->setModelFactory($this->modelFactory);

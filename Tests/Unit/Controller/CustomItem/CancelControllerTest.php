@@ -44,7 +44,7 @@ class CancelControllerTest extends ControllerTestCase
             ->method('getCurrentRequest')
             ->willReturn($this->request);
 
-        $this->cancelController       = new CancelController();
+        $this->cancelController       = new CancelController($this->managerRegistry);
 
         $this->addSymfonyDependencies($this->cancelController);
 

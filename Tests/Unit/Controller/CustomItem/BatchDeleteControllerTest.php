@@ -64,7 +64,7 @@ class BatchDeleteControllerTest extends ControllerTestCase
             ->method('getModel')
             ->willReturn($this->model);
 
-        $this->batchDeleteController  = new BatchDeleteController();
+        $this->batchDeleteController  = new BatchDeleteController($this->managerRegistry);
         $this->batchDeleteController->setTranslator($this->translator);
         $this->batchDeleteController->setSecurity($this->security);
         $this->batchDeleteController->setModelFactory($this->modelFactory);

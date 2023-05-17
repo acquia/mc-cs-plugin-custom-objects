@@ -71,7 +71,7 @@ class DeleteControllerTest extends ControllerTestCase
             ->method('getCurrentRequest')
             ->willReturn($this->request);
 
-        $this->deleteController   = new DeleteController();
+        $this->deleteController   = new DeleteController($this->managerRegistry);
         $this->translator         = $this->createMock(Translator::class);
         $this->deleteController->setTranslator($this->translator);
         $this->deleteController->setSecurity($this->security);
