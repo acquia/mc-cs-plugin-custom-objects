@@ -49,7 +49,7 @@ class FormController extends AbstractFormController
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        return $this->renderCustomObjectForm(
+        return $this->renderFormForObject(
             $formFactory,
             $routeProvider,
             $customFieldTypeProvider,
@@ -91,7 +91,7 @@ class FormController extends AbstractFormController
 
         $customObjectModel->lockEntity($customObject);
 
-        return $this->renderCustomObjectForm(
+        return $this->renderFormForObject(
             $formFactory,
             $routeProvider,
             $customFieldTypeProvider,
@@ -119,7 +119,7 @@ class FormController extends AbstractFormController
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        return $this->renderCustomObjectForm(
+        return $this->renderFormForObject(
             $formFactory,
             $routeProvider,
             $customFieldTypeProvider,
@@ -129,7 +129,7 @@ class FormController extends AbstractFormController
         );
     }
 
-    private function renderCustomObjectForm(
+    private function renderFormForObject(
         FormFactoryInterface $formFactory,
         CustomObjectRouteProvider $routeProvider,
         CustomFieldTypeProvider $customFieldTypeProvider,
