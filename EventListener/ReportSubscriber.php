@@ -445,7 +445,7 @@ class ReportSubscriber implements EventSubscriberInterface
             $colCustomItemObjectId = sprintf('`%s`.`custom_object_id`', $customItemTableAlias);
             $colCustomObjectId     = sprintf('%s', $customObject->getId());
 
-            $joinCondition         = $this->fieldModel->hasChoices($field)
+            $joinCondition         = $field->hasChoices()
                 ? "{$colMappedField} LIKE CONCAT('%', {$colCustomObjectName}, '%') AND {$colCustomItemObjectId} = {$colCustomObjectId}"
                 : "{$colMappedField} = {$colCustomObjectName} AND {$colCustomItemObjectId} = {$colCustomObjectId}";
             $queryBuilder->leftJoin($prefixFormResultTable, CustomItem::TABLE_NAME, $customItemTableAlias, $joinCondition);

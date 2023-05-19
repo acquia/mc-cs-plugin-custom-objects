@@ -106,7 +106,7 @@ class ReportSubscriberTest extends TestCase
         $this->reportHelper                    = new ReportHelper($this->createMock(EventDispatcherInterface::class));
         $this->translatorInterface             = $this->createMock(\Symfony\Contracts\Translation\TranslatorInterface::class);
         $this->leadFieldModelMock              = $this->createMock(FieldModel::class);
-        $this->reportSubscriber                = new ReportSubscriber($this->customObjectRepository, $this->fieldsBuilder, $this->companyReportData, $this->reportHelper, $this->translatorInterface, $this->fieldModelMock);
+        $this->reportSubscriber                = new ReportSubscriber($this->customObjectRepository, $this->fieldsBuilder, $this->companyReportData, $this->reportHelper, $this->translatorInterface, $this->leadFieldModelMock);
         $this->reportBuilderEvent              = $this->createMock(ReportBuilderEvent::class);
         $this->filterOperatorProviderInterface = $this->createMock(FilterOperatorProviderInterface::class);
         $this->csvHelper                       = $this->createMock(CsvHelper::class);
@@ -194,7 +194,7 @@ class ReportSubscriberTest extends TestCase
         $this->assertArrayHasKey(ReportEvents::REPORT_ON_BUILD, $events);
         $this->assertArrayHasKey(ReportEvents::REPORT_ON_GENERATE, $events);
         $this->assertContains('onReportBuilder', $events[ReportEvents::REPORT_ON_BUILD]);
-        $this->assertContains('onReportGenerate', $events[ReportEvents::REPORT_ON_GENERATE]);
+        $this->assertContains('onReportGenerate', $events[ReportEvents::REPORT_ON_GENERATE][0]);
     }
 
     public function testOnReportBuilderMethod(): void
