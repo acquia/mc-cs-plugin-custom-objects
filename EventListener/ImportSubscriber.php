@@ -185,7 +185,9 @@ class ImportSubscriber implements EventSubscriberInterface
 
         try {
             $customObjectId = $this->getCustomObjectId($event->import->getObject());
-            $this->permissionProvider->canCreate($customObjectId);
+            if (!$event->import->isBackgroundProcess()) {
+                $this->permissionProvider->canCreate($customObjectId);
+            }
             $customObject = $this->customObjectModel->fetchEntity($customObjectId);
             $merged       = $this->customItemImportModel->import($event->import, $event->rowData, $customObject);
             $event->setWasMerged($merged);
