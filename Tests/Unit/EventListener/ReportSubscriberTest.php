@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\Expression\ExpressionBuilder;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Mautic\FormBundle\Model\FieldModel;
 use Mautic\LeadBundle\Model\CompanyReportData;
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use Mautic\LeadBundle\Report\FieldsBuilder;
@@ -25,6 +26,7 @@ use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class ReportSubscriberTest extends TestCase
@@ -58,6 +60,11 @@ class ReportSubscriberTest extends TestCase
      * @var MockObject|TranslatorInterface
      */
     private $translatorInterface;
+
+    /**
+     * @var MockObject|FieldModel
+     */
+    private $fieldModelMock;
 
     /**
      * @var MockObject|FilterOperatorProviderInterface
@@ -96,9 +103,10 @@ class ReportSubscriberTest extends TestCase
         $this->customObjectRepository          = $this->createMock(CustomObjectRepository::class);
         $this->fieldsBuilder                   = $this->createMock(FieldsBuilder::class);
         $this->companyReportData               = $this->createMock(CompanyReportData::class);
-        $this->reportHelper                    = new ReportHelper();
-        $this->translatorInterface             = $this->createMock(TranslatorInterface::class);
-        $this->reportSubscriber                = new ReportSubscriber($this->customObjectRepository, $this->fieldsBuilder, $this->companyReportData, $this->reportHelper, $this->translatorInterface);
+        $this->reportHelper                    = new ReportHelper($this->createMock(EventDispatcherInterface::class));
+        $this->translatorInterface             = $this->createMock(\Symfony\Contracts\Translation\TranslatorInterface::class);
+        $this->leadFieldModelMock              = $this->createMock(FieldModel::class);
+        $this->reportSubscriber                = new ReportSubscriber($this->customObjectRepository, $this->fieldsBuilder, $this->companyReportData, $this->reportHelper, $this->translatorInterface, $this->fieldModelMock);
         $this->reportBuilderEvent              = $this->createMock(ReportBuilderEvent::class);
         $this->filterOperatorProviderInterface = $this->createMock(FilterOperatorProviderInterface::class);
         $this->csvHelper                       = $this->createMock(CsvHelper::class);
