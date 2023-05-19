@@ -131,9 +131,9 @@ class ReportSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            ReportEvents::REPORT_ON_BUILD    => ['onReportBuilder', 0],
-            ReportEvents::ON_COLUMN_COLLECT  => ['onColumnCollect', 0],
-            ReportEvents::REPORT_ON_GENERATE => [
+            ReportEvents::REPORT_ON_BUILD           => ['onReportBuilder', 0],
+            ReportEvents::REPORT_ON_COLUMN_COLLECT  => ['onReportColumnCollect', 0],
+            ReportEvents::REPORT_ON_GENERATE        => [
                 ['onReportGenerate', 0],
                 ['onFormResultReportGenerate', -1],
             ],
@@ -232,7 +232,7 @@ class ReportSubscriber implements EventSubscriberInterface
         }
     }
 
-    public function onColumnCollect(ColumnCollectEvent $event): void
+    public function onReportColumnCollect(ColumnCollectEvent $event): void
     {
         $object = $event->getObject();
 
