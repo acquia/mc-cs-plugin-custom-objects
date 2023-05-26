@@ -190,9 +190,9 @@ class ImportSubscriber implements EventSubscriberInterface
 
         try {
             $customObjectId = $this->getCustomObjectId($event->import->getObject());
-            $customObject   = $this->customObjectModel->fetchEntity($customObjectId);
             $user           = $event->import->isBackgroundProcess() ? $this->userModel->getEntity($event->import->getCreatedBy()) : null;
             $this->permissionProvider->canCreate($customObjectId, $user);
+            $customObject   = $this->customObjectModel->fetchEntity($customObjectId);
             $merged       = $this->customItemImportModel->import($event->import, $event->rowData, $customObject);
             $event->setWasMerged($merged);
         } catch (NotFoundException $e) {
