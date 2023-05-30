@@ -17,6 +17,7 @@ use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\DTO\Token;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInt;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
@@ -312,7 +313,9 @@ class TokenSubscriber implements EventSubscriberInterface
             try {
                 $fieldValue    = $customItem->findCustomFieldValueForFieldAlias($token->getCustomFieldAlias());
                 // If the CO item doesn't have a value, get the default value
-                if ('' === $fieldValue->getValue() || 0 === $fieldValue->getValue()) {
+                // Since PHP8, (if $fieldValue->getValue() === 0), it would return false
+                // So, we need to exclusively check if the field value is 0 for int fields
+                if ('' == $fieldValue->getValue() || ($fieldValue instanceof CustomFieldValueInt && 0 === $fieldValue->getValue())) {
                     $fieldValue->setValue($fieldValue->getCustomField()->getDefaultValue());
                 }
                 $fieldValues[] = $fieldValue->getCustomField()->getTypeObject()->valueToString($fieldValue);
