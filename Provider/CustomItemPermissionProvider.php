@@ -25,7 +25,7 @@ class CustomItemPermissionProvider
     /**
      * @throws ForbiddenException
      */
-    public function isGranted(string $permission, int $customObjectId, ?User $user): void
+    public function isGranted(string $permission, int $customObjectId, ?User $user = null): void
     {
         if (!$this->corePermissions->isGranted($this->getPermissionName($customObjectId, $permission), 'MATCH_ALL', $user)) {
             throw new ForbiddenException($permission, 'Items for Custom Object', $customObjectId);
