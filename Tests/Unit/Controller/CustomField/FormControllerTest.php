@@ -4,7 +4,13 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomField;
 
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Factory\MauticFactory;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Translation\Translator;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomField\FormController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
@@ -18,40 +24,147 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class FormControllerTest extends AbstractFieldControllerTest
 {
+    /**
+     * @var MockObject|ManagerRegistry
+     */
+    private $doctrine;
+
+    /**
+     * @var MockObject|MauticFactory
+     */
+    private $factory;
+
+    /**
+     * @var MockObject|ModelFactory
+     */
+    private $modelFactory;
+
+    /**
+     * @var MockObject|UserHelper
+     */
+    protected $userHelper;
+
+    /**
+     * @var MockObject|CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
+    /**
+     * @var MockObject|EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    /**
+     * @var MockObject|Translator
+     */
+    private $translator;
+
+    /**
+     * @var MockObject|FlashBag
+     */
+    private FlashBag|MockObject $flashBag;
+
+    /**
+     * @var MockObject|RequestStack
+     */
+    protected $requestStack;
+
+    /**
+     * @var MockObject|CorePermissions
+     */
+    protected $security;
+
+    /**
+     * @var MockObject|FormFactory
+     */
     private $formFactory;
+
+    /**
+     * @var MockObject|CustomFieldModel
+     */
     private $customFieldModel;
+
+    /**
+     * @var MockObject|CustomFieldFactory
+     */
     private $customFieldFactory;
+
+    /**
+     * @var MockObject|CustomFieldPermissionProvider
+     */
     private $permissionProvider;
+
+    /**
+     * @var MockObject|CustomFieldRouteProvider
+     */
     private $fieldRouteProvider;
+
+    /**
+     * @var MockObject|CustomObjectModel
+     */
     private $customObjectModel;
+
+    /**
+     * @var MockObject|CustomObjectRouteProvider
+     */
     private $objectRouteProvider;
+
+    /**
+     * @var MockObject|FormInterface
+     */
     private $form;
+
+    /**
+     * @var MockObject|FormFactory
+     */
     private $formController;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->formFactory         = $this->createMock(FormFactory::class);
-        $this->customFieldModel    = $this->createMock(CustomFieldModel::class);
-        $this->customFieldFactory  = $this->createMock(CustomFieldFactory::class);
-        $this->permissionProvider  = $this->createMock(CustomFieldPermissionProvider::class);
-        $this->fieldRouteProvider  = $this->createMock(CustomFieldRouteProvider::class);
-        $this->customObjectModel   = $this->createMock(CustomObjectModel::class);
-        $this->objectRouteProvider = $this->createMock(CustomObjectRouteProvider::class);
-        $this->form                = $this->createMock(FormInterface::class);
+        $this->doctrine             = $this->createMock(ManagerRegistry::class);
+        $this->factory              = $this->createMock(MauticFactory::class);
+        $this->modelFactory         = $this->createMock(ModelFactory::class);
+        $this->userHelper           = $this->createMock(UserHelper::class);
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->dispatcher           = $this->createMock(EventDispatcherInterface::class);
+        $this->translator           = $this->createMock(Translator::class);
+        $this->flashBag             = $this->createMock(FlashBag::class);
+        $this->requestStack         = $this->createMock(RequestStack::class);
+        $this->security             = $this->createMock(CorePermissions::class);
 
-        $this->translator          = $this->createMock(Translator::class);
+        $this->formFactory          = $this->createMock(FormFactory::class);
+        $this->customFieldModel     = $this->createMock(CustomFieldModel::class);
+        $this->customFieldFactory   = $this->createMock(CustomFieldFactory::class);
+        $this->permissionProvider   = $this->createMock(CustomFieldPermissionProvider::class);
+        $this->fieldRouteProvider   = $this->createMock(CustomFieldRouteProvider::class);
+        $this->customObjectModel    = $this->createMock(CustomObjectModel::class);
+        $this->objectRouteProvider  = $this->createMock(CustomObjectRouteProvider::class);
+        $this->form                 = $this->createMock(FormInterface::class);
 
-        $this->formController      = new FormController($this->managerRegistry);
-        $this->formController->setTranslator($this->translator);
-        $this->formController->setSecurity($this->security);
+        $this->formController       = new FormController(
+            $this->doctrine,
+            $this->factory,
+            $this->modelFactory,
+            $this->userHelper,
+            $this->coreParametersHelper,
+            $this->dispatcher,
+            $this->translator,
+            $this->flashBag,
+            $this->requestStack,
+            $this->security
+        );
 
         $this->addSymfonyDependencies($this->formController);
         $this->addSymfonyDependencies($this->formController);
@@ -68,7 +181,7 @@ class FormControllerTest extends AbstractFieldControllerTest
         $panelId      = null;
         $panelCount   = null;
 
-        $requestStack = $this->createRequestStackMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
+        $request = $this->createMock(Request::class);
 
         $this->customFieldModel->expects($this->once())
             ->method('fetchEntity')
@@ -88,7 +201,7 @@ class FormControllerTest extends AbstractFieldControllerTest
             ->willReturn('not found message');
 
         $this->formController->renderFormAction(
-            $requestStack,
+            $request,
             $this->formFactory,
             $this->customFieldModel,
             $this->customFieldFactory,
@@ -107,7 +220,7 @@ class FormControllerTest extends AbstractFieldControllerTest
         $panelId      = null;
         $panelCount   = null;
 
-        $requestStack = $this->createRequestStackMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
+        $request = $this->createMock(Request::class);
 
         $this->customFieldModel->expects($this->once())
             ->method('fetchEntity')
@@ -125,7 +238,7 @@ class FormControllerTest extends AbstractFieldControllerTest
         $this->expectException(AccessDeniedHttpException::class);
 
         $this->formController->renderFormAction(
-            $requestStack,
+            $request,
             $this->formFactory,
             $this->customFieldModel,
             $this->customFieldFactory,
@@ -144,7 +257,7 @@ class FormControllerTest extends AbstractFieldControllerTest
         $panelId      = null;
         $panelCount   = null;
 
-        $requestStack = $this->createRequestStackMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
+        $request = $this->createMock(Request::class);
 
         $customObject = new CustomObject();
         $this->customObjectModel->expects($this->once())
@@ -192,7 +305,7 @@ class FormControllerTest extends AbstractFieldControllerTest
             ->willReturn($view);
 
         $this->formController->renderFormAction(
-            $requestStack,
+            $request,
             $this->formFactory,
             $this->customFieldModel,
             $this->customFieldFactory,
@@ -211,7 +324,7 @@ class FormControllerTest extends AbstractFieldControllerTest
         $panelId    = null;
         $panelCount = null;
 
-        $requestStack = $this->createRequestStackMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
+        $request = $this->createMock(Request::class);
 
         $this->permissionProvider->expects($this->once())
             ->method('canCreate');
@@ -253,7 +366,7 @@ class FormControllerTest extends AbstractFieldControllerTest
             ->willReturn($view);
 
         $this->formController->renderFormAction(
-            $requestStack,
+            $request,
             $this->formFactory,
             $this->customFieldModel,
             $this->customFieldFactory,
