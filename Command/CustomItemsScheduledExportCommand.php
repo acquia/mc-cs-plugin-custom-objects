@@ -66,6 +66,6 @@ class CustomItemsScheduledExportCommand extends Command
 
         $output->writeln('CustomItem export email(s) sent: '.$count);
 
-        return ExitCode::SUCCESS;
+        return Command::SUCCESS;
     }
 }
