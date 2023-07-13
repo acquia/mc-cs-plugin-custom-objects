@@ -8,7 +8,6 @@ use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
@@ -225,8 +224,8 @@ class CustomItem extends FormEntity implements UniqueEntityInterface, UpsertInte
 
         $builder->addBigIntIdField();
         $builder->addCategory();
-        $builder->addField('name', Type::STRING);
-        $builder->addNullableField('language', Type::STRING, 'lang');
+        $builder->addField('name', Types::STRING);
+        $builder->addNullableField('language', Types::STRING, 'lang');
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
@@ -30,7 +30,7 @@ class CustomFieldValueText extends AbstractCustomFieldValue
     {
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('custom_field_value_text')
-            ->addNullableField('value', Type::TEXT)
+            ->addNullableField('value', Types::TEXT)
             ->addFulltextIndex(['value'], 'value_fulltext');
 
         parent::addReferenceColumns($builder);

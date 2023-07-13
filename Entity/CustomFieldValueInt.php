@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
@@ -27,7 +27,7 @@ class CustomFieldValueInt extends AbstractCustomFieldValue
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('custom_field_value_int');
         $builder->addIndex(['value'], 'value_index');
-        $builder->addNullableField('value', Type::INTEGER);
+        $builder->addNullableField('value', Types::INTEGER);
 
         parent::addReferenceColumns($builder);
     }

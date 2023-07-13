@@ -11,7 +11,6 @@ use ApiPlatform\Core\Annotation\ApiSubresource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
@@ -256,20 +255,20 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
             ->build();
 
         $builder->addId();
-        $builder->addField('label', Type::STRING);
-        $builder->addField('alias', Type::STRING);
-        $builder->addField('type', Type::STRING);
+        $builder->addField('label', Types::STRING);
+        $builder->addField('alias', Types::STRING);
+        $builder->addField('type', Types::STRING);
         $builder->createField('order', 'integer')
             ->columnName('field_order')
             ->nullable()
             ->build();
 
-        $builder->createField('required', Type::BOOLEAN)
+        $builder->createField('required', Types::BOOLEAN)
             ->columnName('required')
             ->option('default', false)
             ->build();
 
-        $builder->createField('defaultValue', Type::STRING)
+        $builder->createField('defaultValue', Types::STRING)
             ->columnName('default_value')
             ->nullable()
             ->build();
@@ -281,17 +280,17 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createField('params', Type::JSON_ARRAY)
+        $builder->createField('params', Types::JSON)
             ->columnName('params')
             ->nullable()
             ->build();
 
-        $builder->createField('showInCustomObjectDetailList', Type::BOOLEAN)
+        $builder->createField('showInCustomObjectDetailList', Types::BOOLEAN)
             ->columnName('show_in_custom_object_detail_list')
             ->option('default', true)
             ->build();
 
-        $builder->createField('showInContactDetailList', Type::BOOLEAN)
+        $builder->createField('showInContactDetailList', Types::BOOLEAN)
             ->columnName('show_in_contact_detail_list')
             ->option('default', true)
             ->build();

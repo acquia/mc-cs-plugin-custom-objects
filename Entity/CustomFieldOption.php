@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
@@ -99,11 +98,11 @@ class CustomFieldOption implements \ArrayAccess
             ->makePrimaryKey()
             ->build();
 
-        $builder->createField('value', Type::STRING)
+        $builder->createField('value', Types::STRING)
             ->makePrimaryKey()
             ->build();
 
-        $builder->addField('label', Type::STRING);
+        $builder->addField('label', Types::STRING);
 
         $builder->createField('order', 'integer')
             ->columnName('option_order')
