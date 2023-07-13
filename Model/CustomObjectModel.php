@@ -271,7 +271,7 @@ class CustomObjectModel extends FormModel
         if (empty($dirtyAlias)) {
             $dirtyAlias = $entity->getName();
         }
-        $cleanAlias = $this->cleanAlias($dirtyAlias, '', false, '-');
+        $cleanAlias = $this->cleanAlias($dirtyAlias, '', 0, '-');
         $entity->setAlias($cleanAlias);
 
         return $entity;
