@@ -16,13 +16,13 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class FormController extends CommonController
 {
     public function renderFormAction(
-        RequestStack $requestStack,
+        Request $request,
         FormFactoryInterface $formFactory,
         CustomFieldModel $customFieldModel,
         CustomFieldFactory $customFieldFactory,
@@ -31,9 +31,6 @@ class FormController extends CommonController
         CustomObjectModel $customObjectModel,
         CustomObjectRouteProvider $objectRouteProvider
     ): Response {
-        $this->setRequestStack($requestStack);
-
-        $request    = $requestStack->getCurrentRequest();
         $objectId   = (int) $request->get('objectId');
         $fieldId    = (int) $request->get('fieldId');
         $fieldType  = $request->get('fieldType');

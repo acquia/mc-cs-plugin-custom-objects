@@ -15,13 +15,13 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class ListController extends CommonController
 {
     public function listAction(
-        RequestStack $requestStack,
+        Request $request,
         SessionProviderFactory $sessionProviderFactory,
         CustomItemModel $customItemModel,
         CustomObjectModel $customObjectModel,
@@ -30,9 +30,6 @@ class ListController extends CommonController
         int $objectId,
         int $page = 1
     ): Response {
-        $this->setRequestStack($requestStack);
-        $request = $this->getCurrentRequest();
-
         try {
             $permissionProvider->canViewAtAll($objectId);
             $customObject = $customObjectModel->fetchEntity($objectId);

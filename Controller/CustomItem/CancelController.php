@@ -9,7 +9,6 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 class CancelController extends CommonController
@@ -18,15 +17,12 @@ class CancelController extends CommonController
      * @throws NotFoundException
      */
     public function cancelAction(
-        RequestStack $requestStack,
         SessionProviderFactory $sessionProviderFactory,
         CustomItemRouteProvider $routeProvider,
         CustomItemModel $customItemModel,
         int $objectId,
         ?int $itemId = null
     ): Response {
-        $this->setRequestStack($requestStack);
-
         $page = $sessionProviderFactory->createItemProvider($objectId)->getPage();
 
         if ($itemId) {

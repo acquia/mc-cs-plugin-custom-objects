@@ -13,19 +13,17 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 
 class LookupController extends JsonController
 {
     public function listAction(
-        RequestStack $requestStack,
+        Request $request,
         CustomItemModel $customItemModel,
         CustomItemPermissionProvider $permissionProvider,
         FlashBag $flashBag,
         int $objectId
     ): JsonResponse {
-        $request = $requestStack->getCurrentRequest();
-
         try {
             $permissionProvider->canViewAtAll($objectId);
         } catch (ForbiddenException $e) {

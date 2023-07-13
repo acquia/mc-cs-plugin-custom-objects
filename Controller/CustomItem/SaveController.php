@@ -17,13 +17,12 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 class SaveController extends AbstractFormController
 {
     public function saveAction(
-        RequestStack $requestStack,
+        Request $request,
         FormFactoryInterface $formFactory,
         FlashBag $flashBag,
         CustomItemModel $customItemModel,
@@ -34,9 +33,6 @@ class SaveController extends AbstractFormController
         int $objectId,
         ?int $itemId = null
     ): Response {
-        $this->setRequestStack($requestStack);
-        $request        = $this->getCurrentRequest();
-
         $customItemData = $request->request->get('custom_item');
         $contactId      = intval($customItemData['contact_id'] ?? 0);
 
