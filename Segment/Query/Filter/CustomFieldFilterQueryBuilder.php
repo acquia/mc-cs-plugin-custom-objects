@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Segment\Query\Filter;
 
-use Doctrine\DBAL\DBALException;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
@@ -35,15 +34,13 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
         return 'mautic.lead.query.builder.custom_field.value';
     }
 
-    /**
-     * @throws DBALException
-     */
+    /** {@inheritDoc}  */
     public function applyQuery(SegmentQueryBuilder $queryBuilder, ContactSegmentFilter $filter): SegmentQueryBuilder
     {
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
         $filterOperator  = $filter->getOperator();
 
-        $tableAlias = 'cfwq_'.(int) $filter->getField();
+        $tableAlias = sprintf('cfwq_%d_%s', (int) $filter->getField(), uniqid());
 
         $unionQueryContainer = $this->filterHelper->createValueQuery(
             $tableAlias,
