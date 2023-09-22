@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
+use Mautic\LeadBundle\Segment\RandomParameterName;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
@@ -38,12 +39,16 @@ class QueryFilterHelper
      */
     private $itemRelationLevelLimit;
 
+    private RandomParameterName $randomParameterNameService;
+
     public function __construct(
         EntityManager $entityManager,
-        QueryFilterFactory $queryFilterFactory
+        QueryFilterFactory $queryFilterFactory,
+        RandomParameterName $randomParameterNameService
     ) {
-        $this->entityManager      = $entityManager;
-        $this->queryFilterFactory = $queryFilterFactory;
+        $this->entityManager              = $entityManager;
+        $this->queryFilterFactory         = $queryFilterFactory;
+        $this->randomParameterNameService = $randomParameterNameService;
     }
 
     public function createValueQuery(
@@ -91,14 +96,20 @@ class QueryFilterHelper
         ContactSegmentFilter $filter
     ): void {
         foreach ($unionQueryContainer as $segmentQueryBuilder) {
-            $expression = $this->getCustomValueValueExpression($segmentQueryBuilder, $tableAlias, $filter->getOperator());
+            $valueParameter = $this->randomParameterNameService->generateRandomParameterName();
+            $expression     = $this->getCustomValueValueExpression(
+                $segmentQueryBuilder,
+                $tableAlias,
+                $filter->getOperator(),
+                $valueParameter
+            );
 
             $this->addOperatorExpression(
                 $segmentQueryBuilder,
-                $tableAlias,
                 $expression,
                 $filter->getOperator(),
-                $filter->getParameterValue()
+                $filter->getParameterValue(),
+                $valueParameter
             );
         }
     }
@@ -109,8 +120,9 @@ class QueryFilterHelper
         string $operator,
         ?string $value
     ): void {
-        $expression = $this->getCustomObjectNameExpression($queryBuilder, $tableAlias, $operator);
-        $this->addOperatorExpression($queryBuilder, $tableAlias, $expression, $operator, $value);
+        $valueParameter = $this->randomParameterNameService->generateRandomParameterName();
+        $expression     = $this->getCustomObjectNameExpression($queryBuilder, $tableAlias, $operator, $valueParameter);
+        $this->addOperatorExpression($queryBuilder, $expression, $operator, $value, $valueParameter);
     }
 
     /**
@@ -119,10 +131,10 @@ class QueryFilterHelper
      */
     private function addOperatorExpression(
         SegmentQueryBuilder $segmentQueryBuilder,
-        string $tableAlias,
         $expression,
         string $operator,
-        $value
+        $value,
+        string $valueParameter
     ): void {
         $valueType = null;
 
@@ -135,11 +147,10 @@ class QueryFilterHelper
             case 'multiselect':
             case 'in':
                 $valueType      = Connection::PARAM_STR_ARRAY;
-                $valueParameter = $tableAlias.'_value_value';
-
+                $segmentQueryBuilder->setParameter($valueParameter, $value, $valueType);
                 break;
             default:
-                $valueParameter = $tableAlias.'_value_value';
+                $segmentQueryBuilder->setParameter($valueParameter, $value, $valueType);
         }
 
         switch ($operator) {
@@ -147,12 +158,7 @@ class QueryFilterHelper
                 break;
             default:
                 $segmentQueryBuilder->andWhere($expression);
-
                 break;
-        }
-
-        if (isset($valueParameter)) {
-            $segmentQueryBuilder->setParameter($valueParameter, $value, $valueType);
         }
     }
 
@@ -161,8 +167,12 @@ class QueryFilterHelper
      *
      * @return CompositeExpression|string
      */
-    private function getCustomValueValueExpression(SegmentQueryBuilder $customQuery, string $tableAlias, string $operator)
-    {
+    private function getCustomValueValueExpression(
+        SegmentQueryBuilder $customQuery,
+        string $tableAlias,
+        string $operator,
+        string $valueParameter
+    ) {
         switch ($operator) {
             case 'empty':
                 $expression = $customQuery->expr()->orX(
@@ -182,7 +192,6 @@ class QueryFilterHelper
             case '!multiselect':
             case 'in':
             case 'multiselect':
-                $valueParameter = $tableAlias.'_value_value';
                 $expression     = $customQuery->expr()->in(
                     $tableAlias.'_value.value',
                     ":${valueParameter}"
@@ -190,7 +199,6 @@ class QueryFilterHelper
 
                 break;
             case 'neq':
-                $valueParameter = $tableAlias.'_value_value';
                 $expression     = $customQuery->expr()->orX(
                     $customQuery->expr()->neq($tableAlias.'_value.value', ":${valueParameter}"),
                     $customQuery->expr()->isNull($tableAlias.'_value.value')
@@ -198,14 +206,10 @@ class QueryFilterHelper
 
                 break;
             case 'contains':
-                $valueParameter = $tableAlias.'_value_value';
-
                 $expression = $customQuery->expr()->like($tableAlias.'_value.value', "%:{$valueParameter}%");
 
                 break;
             case 'notLike':
-                $valueParameter = $tableAlias.'_value_value';
-
                 $expression = $customQuery->expr()->orX(
                     $customQuery->expr()->isNull($tableAlias.'_value.value'),
                     $customQuery->expr()->like($tableAlias.'_value.value', ":${valueParameter}")
@@ -213,7 +217,6 @@ class QueryFilterHelper
 
                 break;
             default:
-                $valueParameter = $tableAlias.'_value_value';
                 $expression     = $customQuery->expr()->{$operator}(
                     $tableAlias.'_value.value',
                     ":${valueParameter}"
@@ -228,8 +231,12 @@ class QueryFilterHelper
      *
      * @return CompositeExpression|string
      */
-    private function getCustomObjectNameExpression(SegmentQueryBuilder $customQuery, string $tableAlias, string $operator)
-    {
+    private function getCustomObjectNameExpression(
+        SegmentQueryBuilder $customQuery,
+        string $tableAlias,
+        string $operator,
+        string $valueParameter
+    ) {
         switch ($operator) {
             case 'empty':
                 $expression = $customQuery->expr()->orX(
@@ -247,7 +254,6 @@ class QueryFilterHelper
                 break;
             case 'notIn':
             case 'in':
-                $valueParameter = $tableAlias.'_value_value';
                 $expression     = $customQuery->expr()->in(
                     $tableAlias.'_item.name',
                     ":${valueParameter}"
@@ -255,7 +261,6 @@ class QueryFilterHelper
 
                 break;
             case 'neq':
-                $valueParameter = $tableAlias.'_value_value';
                 $expression     = $customQuery->expr()->orX(
                     $customQuery->expr()->eq($tableAlias.'_item.name', ":${valueParameter}"),
                     $customQuery->expr()->isNull($tableAlias.'_item.name')
@@ -263,8 +268,6 @@ class QueryFilterHelper
 
                 break;
             case 'notLike':
-                $valueParameter = $tableAlias.'_value_value';
-
                 $expression = $customQuery->expr()->orX(
                     $customQuery->expr()->isNull($tableAlias.'_item.name'),
                     $customQuery->expr()->like($tableAlias.'_item.name', ":${valueParameter}")
@@ -272,7 +275,6 @@ class QueryFilterHelper
 
                 break;
             default:
-                $valueParameter = $tableAlias.'_value_value';
                 $expression     = $customQuery->expr()->{$operator}(
                     $tableAlias.'_item.name',
                     ":${valueParameter}"

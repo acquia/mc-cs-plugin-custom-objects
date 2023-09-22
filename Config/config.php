@@ -1146,6 +1146,7 @@ $coParams = [
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'query_filter_factory',
+                    'mautic.lead.model.random_parameter_name',
                 ],
             ],
             'custom_object.helper.token_formatter' => [
