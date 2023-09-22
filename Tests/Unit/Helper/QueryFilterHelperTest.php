@@ -8,6 +8,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Segment\Query\Expression\ExpressionBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use Mautic\LeadBundle\Segment\RandomParameterName;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
@@ -49,7 +50,8 @@ class QueryFilterHelperTest extends TestCase
                 $this->createMock(CustomFieldRepository::class),
                 new QueryFilterFactory\Calculator(),
                 1
-            )
+            ),
+            new RandomParameterName()
         );
         $this->queryBuilder      = $this->createMock(QueryBuilder::class);
         $this->expressionBuilder = $this->createMock(ExpressionBuilder::class);
@@ -78,7 +80,7 @@ class QueryFilterHelperTest extends TestCase
         $this->queryBuilder
             ->expects($this->any())
             ->method('setParameter')
-            ->with('test_value_value', 'acquia', null);
+            ->with('par0', 'acquia', null);
 
         $this->queryFilterHelper
             ->addCustomObjectNameExpression($this->queryBuilder, 'test', 'eq', 'acquia');
