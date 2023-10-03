@@ -260,7 +260,7 @@ class CustomFieldType extends AbstractType
             ]
         );
 
-        $builder->setAction($options['action']);
+        $builder->setAction($options['action'] ?? '');
     }
 
     /**
