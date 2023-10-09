@@ -54,7 +54,8 @@ class CustomFieldFilterQueryBuilderTest extends MauticMysqlTestCase
                 $customFieldRepository,
                 new QueryFilterFactory\Calculator(),
                 1
-            )
+            ),
+            new RandomParameterName()
         );
         $queryBuilderService = new CustomFieldFilterQueryBuilder(
             new RandomParameterName(),

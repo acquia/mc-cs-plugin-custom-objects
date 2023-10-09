@@ -7,6 +7,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Helper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
+use Mautic\LeadBundle\Segment\RandomParameterName;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
@@ -46,7 +47,8 @@ class QueryFilterHelperTest extends MauticMysqlTestCase
                 $customFieldRepository,
                 new QueryFilterFactory\Calculator(),
                 1
-            )
+            ),
+            new RandomParameterName()
         );
 
         $fixturesDirectory = $this->getFixturesDirectory();
@@ -65,7 +67,7 @@ class QueryFilterHelperTest extends MauticMysqlTestCase
     public function testGetCustomValueValueExpression(): void
     {
         $this->assertMatchWhere(
-            'test_value.value = :test_value_value',
+            'test_value.value = :par0',
             [
                 'glue'     => 'and',
                 'field'    => 'cmf_'.$this->getFixtureById('custom_field1')->getId(),
@@ -76,7 +78,7 @@ class QueryFilterHelperTest extends MauticMysqlTestCase
         );
 
         $this->assertMatchWhere(
-            'test_value.value LIKE :test_value_value',
+            'test_value.value LIKE :par1',
             [
                 'glue'     => 'and',
                 'field'    => 'cmf_'.$this->getFixtureById('custom_field1')->getId(),
@@ -87,7 +89,7 @@ class QueryFilterHelperTest extends MauticMysqlTestCase
         );
 
         $this->assertMatchWhere(
-            '(test_value.value <> :test_value_value) OR (test_value.value IS NULL)',
+            '(test_value.value <> :par2) OR (test_value.value IS NULL)',
             [
                 'glue'     => 'and',
                 'field'    => 'cmf_'.$this->getFixtureById('custom_field1')->getId(),
@@ -98,7 +100,7 @@ class QueryFilterHelperTest extends MauticMysqlTestCase
         );
 
         $this->assertMatchWhere(
-            'test_value.value > :test_value_value',
+            'test_value.value > :par3',
             [
                 'glue'       => 'and',
                 'field'      => 'cmf_'.$this->getFixtureById('custom_object_product')->getId(),
