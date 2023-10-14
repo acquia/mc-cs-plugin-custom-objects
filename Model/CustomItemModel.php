@@ -7,6 +7,7 @@ namespace MauticPlugin\CustomObjectsBundle\Model;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Doctrine\Helper\FulltextKeyword;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
@@ -220,6 +221,40 @@ class CustomItemModel extends FormModel
         }
 
         return $this->populateCustomFields($customItem);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function fetchCustomItemsForObject(CustomObject $customObject): array
+    {
+        return $this->fetchEntities([
+            'filter' => [
+                'force' => [
+                    [
+                        'column' => CustomItem::TABLE_ALIAS.'.customObject',
+                        'value'  => $customObject->getId(),
+                        'expr'   => 'eq',
+                    ],
+                    [
+                        'column' => CustomItem::TABLE_ALIAS.'.isPublished',
+                        'value'  => true,
+                        'expr'   => 'eq',
+                    ],
+                ],
+            ],
+            'ignore_paginator' => true,
+        ]);
+    }
+
+    /**
+     * @param array<string, mixed> $args
+     *
+     * @return array<string, mixed>
+     */
+    public function fetchEntities(array $args = []): Paginator|array
+    {
+        return parent::getEntities($args);
     }
 
     /**
