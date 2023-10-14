@@ -445,14 +445,8 @@ class ReportSubscriber implements EventSubscriberInterface
             $colCustomItemObjectId = sprintf('`%s`.`custom_object_id`', $customItemTableAlias);
             $colCustomObjectId     = sprintf('%s', $customObject->getId());
 
-            // conditions for join custom objects listed in a form field with multiple selection
-            $condition1 = "{$colMappedField} LIKE {$colCustomObjectName}";
-            $condition2 = "{$colMappedField} LIKE CONCAT({$colCustomObjectName}, ', %')";
-            $condition3 = "{$colMappedField} LIKE CONCAT('% ', {$colCustomObjectName}, ',%')";
-            $condition4 = "{$colMappedField} LIKE CONCAT('% ', {$colCustomObjectName})";
-
             $joinCondition         = $field->hasChoices()
-                ? "({$condition1} OR {$condition2} OR {$condition3} OR {$condition4}) AND {$colCustomItemObjectId} = {$colCustomObjectId}"
+                ? "FIND_IN_SET({$colCustomObjectName}, REPLACE({$colMappedField}, ' ', '')) > 0 AND {$colCustomItemObjectId} = {$colCustomObjectId}"
                 : "{$colMappedField} = {$colCustomObjectName} AND {$colCustomItemObjectId} = {$colCustomObjectId}";
             $queryBuilder->leftJoin($prefixFormResultTable, CustomItem::TABLE_NAME, $customItemTableAlias, $joinCondition);
 
