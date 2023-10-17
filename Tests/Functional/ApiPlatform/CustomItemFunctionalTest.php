@@ -68,13 +68,21 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
             $this->assertEquals($retrievedAlias, json_decode($clientRetrieveResponse->getContent())->name);
             $this->assertEquals($retrievedVariable, json_decode($clientRetrieveResponse->getContent(), true)['fieldValues'][0]['value']);
         }
+        // PATCH
+        $payloadPatch        = $this->getPatchedPayload($customField);
+        $clientPatchResponse = $this->patchEntity($createdId, $payloadPatch);
+        $this->assertEquals($httpUpdated, $clientPatchResponse->getStatusCode());
+        if ($updatedAlias) {
+            $this->assertNotEquals($updatedAlias, json_decode($clientPatchResponse->getContent())->name);
+            $this->assertEquals('test2', json_decode($clientPatchResponse->getContent(), true)['fieldValues'][0]['value']);
+        }
         // UPDATE
         $payloadUpdate        = $this->getEditPayload($customField);
         $clientUpdateResponse = $this->updateEntity($createdId, $payloadUpdate);
         $this->assertEquals($httpUpdated, $clientUpdateResponse->getStatusCode());
         if ($updatedAlias) {
             $this->assertEquals($updatedAlias, json_decode($clientUpdateResponse->getContent())->name);
-            $this->assertEquals($updatedVariable, json_decode($clientUpdateResponse->getContent(), true)['fieldValues'][0]['value']);
+            $this->assertEquals('test3', json_decode($clientUpdateResponse->getContent(), true)['fieldValues'][0]['value']);
         }
         // DELETE
         $clientDeleteResponse = $this->deleteEntity($createdId);
@@ -103,6 +111,19 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         return
             [
                 'name'         => 'Custom Item Edited',
+                'fieldValues'  => [
+                    [
+                        'id'    => '/api/v2/custom_fields/'.$customField->getId(),
+                        'value' => 'test3',
+                    ],
+                ],
+            ];
+    }
+
+    private function getPatchedPayload($customField): array
+    {
+        return
+            [
                 'fieldValues'  => [
                     [
                         'id'    => '/api/v2/custom_fields/'.$customField->getId(),
@@ -139,7 +160,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
                 'test',
                 Response::HTTP_OK,
                 'Custom Item Edited',
-                'test2',
+                'test3',
                 Response::HTTP_FORBIDDEN,
             ],
             'no_update' => [
