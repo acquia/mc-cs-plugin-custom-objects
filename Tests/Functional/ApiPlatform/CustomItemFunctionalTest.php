@@ -13,6 +13,13 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
 {
+    public function setUp(): void
+    {
+        $this->configParams['custom_objects_enabled'] = true;
+
+        parent::setUp();
+    }
+
     public function testCustomItemCRUD(): void
     {
         $customObject = $this->createCustomObject();
