@@ -68,7 +68,8 @@ class CustomItemNameFilterQueryBuilderTest extends TestCase
                 $this->createMock(CustomFieldRepository::class),
                 new QueryFilterFactory\Calculator(),
                 1
-            )
+            ),
+            new RandomParameterName()
         );
 
         $this->queryBuilder         = $this->createMock(QueryBuilder::class);
