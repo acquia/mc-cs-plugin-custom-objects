@@ -20,6 +20,51 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         parent::setUp();
     }
 
+    /**
+     * @param array<string> $permissions
+     *
+     * @dataProvider getCreateCustomItemProvider
+     */
+    public function testCreateCustomItem(array $permissions, int $httpCreated): void
+    {
+        $customObject = $this->createCustomObject();
+        $category     = $this->createCategory();
+        $customField  = $this->createCustomField($customObject);
+        // USER
+        $user = $this->getUser();
+        // PERMISSION
+        $this->setPermission($user, 'custom_objects:'.$customObject->getId(), $permissions);
+        // CREATE
+        $payloadCreate        = $this->getCreatePayload($customObject, $category, $customField);
+        $clientCreateResponse = $this->createEntity('custom_items', $payloadCreate);
+        $this->assertEquals($httpCreated, $clientCreateResponse->getStatusCode());
+    }
+
+    /**
+     * @return array[array<array<string>|int>]
+     */
+    public function getCreateCustomItemProvider(): array
+    {
+        return [
+            [
+                ['viewown', 'viewother', 'editown', 'editother', 'create', 'deleteown', 'deleteother', 'publishown', 'publishother'],
+                Response::HTTP_CREATED,
+            ],
+            [
+                ['viewown', 'viewother', 'editown', 'editother', 'create', 'publishown', 'publishother'],
+                Response::HTTP_CREATED,
+            ],
+            [
+                ['viewown', 'viewother', 'create', 'deleteown', 'deleteother', 'publishown', 'publishother'],
+                Response::HTTP_CREATED,
+            ],
+            [
+                ['viewown', 'viewother', 'editown', 'editother', 'deleteown', 'deleteother', 'publishown', 'publishother'],
+                Response::HTTP_FORBIDDEN,
+            ],
+        ];
+    }
+
     public function testCustomItemCRUD(): void
     {
         $customObject = $this->createCustomObject();
