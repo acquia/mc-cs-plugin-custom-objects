@@ -7,6 +7,8 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -30,13 +32,13 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         $customObject = $this->createCustomObject();
         $category     = $this->createCategory();
         $customField  = $this->createCustomField($customObject);
-        // USER
-        $user = $this->getUser();
-        // PERMISSION
+        $user         = $this->getUser();
+
         $this->setPermission($user, 'custom_objects:'.$customObject->getId(), $permissions);
-        // CREATE
+
         $payloadCreate        = $this->getCreatePayload($customObject, $category, $customField);
         $clientCreateResponse = $this->createEntity('custom_items', $payloadCreate);
+
         $this->assertEquals($httpCreated, $clientCreateResponse->getStatusCode());
     }
 
@@ -63,6 +65,27 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
                 Response::HTTP_FORBIDDEN,
             ],
         ];
+    }
+
+    public function testRetrieveCustomItem(): void
+    {
+        $customItem             = $this->createCustomItem(['viewother']);
+        $clientRetrieveResponse = $this->retrieveEntity('/api/v2/custom_items/'.$customItem->getId());
+        $content                = json_decode($clientRetrieveResponse->getContent(), true);
+
+        self::assertEquals(Response::HTTP_OK, $clientRetrieveResponse->getStatusCode());
+        self::assertEquals($content['@context'], '/api/v2/contexts/custom_items');
+        self::assertEquals($content['@id'], '/api/v2/custom_items/'.$customItem->getId());
+        self::assertEquals($content['@type'], 'custom_items');
+        self::assertEquals($content['@id'], '/api/v2/custom_items/'.$customItem->getId());
+        self::assertEquals($content['name'], 'Custom Item');
+        self::assertEquals($content['customObject'], '/api/v2/custom_objects/'.$customItem->getCustomObject()->getId());
+        self::assertEquals($content['language'], 'en');
+        self::assertEquals($content['category'], '/api/v2/categories/'.$customItem->getCategory()->getId());
+        self::assertEquals($content['fieldValues'][0]['id'], '/api/v2/custom_fields/'.$customItem->getCustomFieldValues()->first()->getCustomField()->getId());
+        self::assertEquals($content['fieldValues'][0]['value'], 'value');
+        self::assertCount(9, $content);
+        self::assertCount(1, $content['fieldValues']);
     }
 
     public function testCustomItemCRUD(): void
@@ -243,6 +266,27 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         $this->em->flush();
 
         return $customObject;
+    }
+
+    private function createCustomItem(array $permissions): CustomItem
+    {
+        $customObject = $this->createCustomObject();
+        $category     = $this->createCategory();
+        $customField  = $this->createCustomField($customObject);
+        $customItem = new CustomItem($customObject);
+        $customItem->setName('Custom Item');
+        $customItem->setLanguage('en');
+        $customItem->setCategory($category);
+        $customFieldValue = new CustomFieldValueText($customField, $customItem, 'value');
+        $customItem->addCustomFieldValue($customFieldValue);
+
+        $this->em->persist($customItem);
+        $this->em->flush();
+
+        $user = $this->getUser();
+        $this->setPermission($user, 'custom_objects:'.$customObject->getId(), $permissions);
+
+        return $customItem;
     }
 
     private function createCategory(): Category
