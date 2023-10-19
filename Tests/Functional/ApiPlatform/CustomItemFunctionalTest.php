@@ -90,6 +90,27 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         self::assertCount(1, $json['fieldValues']);
     }
 
+    public function testPatchCustomItem(): void
+    {
+        $customItem = $this->createCustomItem(['editother']);
+        $payload    = $this->getPatchedPayload($customItem->getCustomObject()->getCustomFields()->first());
+        $response   = $this->patchEntity('/api/v2/custom_items/'.$customItem->getId(), $payload);
+        $json       = json_decode($response->getContent(), true);
+
+        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        self::assertEquals($json['@context'], '/api/v2/contexts/custom_items');
+        self::assertEquals($json['@id'], '/api/v2/custom_items/'.$customItem->getId());
+        self::assertEquals($json['@type'], 'custom_items');
+        self::assertEquals($json['name'], 'Custom Item');
+        self::assertEquals($json['customObject'], '/api/v2/custom_objects/'.$customItem->getCustomObject()->getId());
+        self::assertEquals($json['language'], 'en');
+        self::assertEquals($json['category'], '/api/v2/categories/'.$customItem->getCategory()->getId());
+        self::assertEquals($json['fieldValues'][0]['id'], '/api/v2/custom_fields/'.$customItem->getCustomFieldValues()->first()->getCustomField()->getId());
+        self::assertEquals($json['fieldValues'][0]['value'], 'test2');
+        self::assertCount(9, $json);
+        self::assertCount(1, $json['fieldValues']);
+    }
+
     public function testCustomItemCRUD(): void
     {
         $customObject = $this->createCustomObject();
