@@ -111,6 +111,17 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         self::assertCount(1, $json['fieldValues']);
     }
 
+    public function testDeleteCustomItem(): void
+    {
+        $customItem = $this->createCustomItem(['deleteother']);
+        $response   = $this->deleteEntity('/api/v2/custom_items/'.$customItem->getId());
+        $json       = json_decode($response->getContent(), true);
+
+        self::assertEquals(Response::HTTP_NO_CONTENT, $response->getStatusCode());
+        self::assertNull($json);
+        self::assertNull($this->em->getRepository(CustomItem::class)->find($customItem->getId()));
+    }
+
     public function testCustomItemCRUD(): void
     {
         $customObject = $this->createCustomObject();
