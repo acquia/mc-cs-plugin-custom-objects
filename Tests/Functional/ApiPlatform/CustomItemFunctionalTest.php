@@ -32,7 +32,6 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         self::assertEquals($json['@context'], '/api/v2/contexts/custom_items');
         self::assertEquals($json['@id'], '/api/v2/custom_items/'.$customItem->getId());
         self::assertEquals($json['@type'], 'custom_items');
-        self::assertEquals($json['@id'], '/api/v2/custom_items/'.$customItem->getId());
         self::assertEquals($json['name'], 'Custom Item');
         self::assertEquals($json['customObject'], '/api/v2/custom_objects/'.$customItem->getCustomObject()->getId());
         self::assertEquals($json['language'], 'en');
