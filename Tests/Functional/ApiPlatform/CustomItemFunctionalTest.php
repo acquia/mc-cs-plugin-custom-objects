@@ -104,9 +104,12 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         yield [['viewown', 'viewother', 'editown', 'editother', 'deleteown', 'deleteother', 'publishown', 'publishother'], Response::HTTP_FORBIDDEN,];
     }
 
-    public function testUpdateCustomItem(): void
+    /**
+     * @dataProvider putCustomItemsDataProvider
+     */
+    public function testPutCustomItem(array $permissions, int $expectedResponse): void
     {
-        $customItem = $this->createCustomItem(['editother']);
+        $customItem = $this->createCustomItem($permissions);
         $response   = $this->updateEntity('/api/v2/custom_items/'.$customItem->getId(), [
             'name'         => 'Custom Item Edited',
             'fieldValues'  => [
@@ -118,7 +121,26 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         ]);
         $json       = json_decode($response->getContent(), true);
 
+        self::assertEquals($expectedResponse, $response->getStatusCode());
+
+        if (Response::HTTP_FORBIDDEN == $expectedResponse) {
+            $this->assertAccessForbiddenContent($json);
+
+            return;
+        }
+
         $this->assertSuccessContent($json, $customItem);
+    }
+
+    public function putCustomItemsDataProvider()
+    {
+        yield [['editother'], Response::HTTP_OK,];
+
+        yield [['deleteother'], Response::HTTP_OK,];
+
+        yield [[], Response::HTTP_FORBIDDEN,];
+
+        yield [['viewown', 'viewother', 'editown', 'create', 'deleteown', 'publishown', 'publishother'], Response::HTTP_FORBIDDEN,];
     }
 
     public function testPatchCustomItem(): void
