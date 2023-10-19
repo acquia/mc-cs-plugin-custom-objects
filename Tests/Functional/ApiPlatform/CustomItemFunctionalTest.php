@@ -143,7 +143,6 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         yield [['viewown', 'viewother', 'editown', 'create', 'deleteown', 'publishown', 'publishother'], Response::HTTP_FORBIDDEN,];
     }
 
-
     /**
      * @dataProvider putCustomItemsDataProvider
      */
@@ -172,15 +171,36 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         $this->assertSuccessContent($json, $customItem);
     }
 
-    public function testDeleteCustomItem(): void
+    /**
+     * @dataProvider deleteCustomItemsDataProvider
+     */
+    public function testDeleteCustomItem(array $permissions, int $expectedResponse): void
     {
-        $customItem = $this->createCustomItem(['deleteother']);
+        $customItem = $this->createCustomItem($permissions);
         $response   = $this->deleteEntity('/api/v2/custom_items/'.$customItem->getId());
         $json       = json_decode($response->getContent(), true);
+
+        self::assertEquals($expectedResponse, $response->getStatusCode());
+
+        if (Response::HTTP_FORBIDDEN == $expectedResponse) {
+            $this->assertAccessForbiddenContent($json);
+
+            return;
+        }
 
         self::assertEquals(Response::HTTP_NO_CONTENT, $response->getStatusCode());
         self::assertNull($json);
         self::assertNull($this->em->getRepository(CustomItem::class)->find($customItem->getId()));
+    }
+
+    public function deleteCustomItemsDataProvider()
+    {
+
+        yield [['deleteother'], Response::HTTP_NO_CONTENT,];
+
+        yield [[], Response::HTTP_FORBIDDEN,];
+
+        yield [['viewown', 'viewother', 'editown', 'create', 'deleteown', 'editother', 'publishown', 'publishother'], Response::HTTP_FORBIDDEN,];
     }
 
     private function createCustomObject(): CustomObject
