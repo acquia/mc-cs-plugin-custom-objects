@@ -51,9 +51,19 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
 
         $this->setPermission($user, 'custom_objects:'.$customObject->getId(), ['create']);
 
-        $payloadCreate = $this->getCreatePayload($customObject, $category, $customField);
-        $response      = $this->createEntity('custom_items', $payloadCreate);
-        $json          = json_decode($response->getContent(), true);
+        $response = $this->createEntity('custom_items', [
+            'name'         => 'Custom Item',
+            'customObject' => '/api/v2/custom_objects/'.$customObject->getId(),
+            'language'     => 'en',
+            'category'     => '/api/v2/categories/'.$category->getId(),
+            'fieldValues'  => [
+                [
+                    'id'    => '/api/v2/custom_fields/'.$customField->getId(),
+                    'value' => 'value',
+                ],
+            ],
+        ]);
+        $json     = json_decode($response->getContent(), true);
 
         self::assertEquals(Response::HTTP_CREATED, $response->getStatusCode());
         self::assertEquals($json['@context'], '/api/v2/contexts/custom_items');
@@ -73,7 +83,15 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
     {
         $customItem = $this->createCustomItem(['editother']);
         $payload    = $this->getEditPayload($customItem->getCustomObject()->getCustomFields()->first());
-        $response   = $this->updateEntity('/api/v2/custom_items/'.$customItem->getId(), $payload);
+        $response   = $this->updateEntity('/api/v2/custom_items/'.$customItem->getId(), [
+            'name'         => 'Custom Item Edited',
+            'fieldValues'  => [
+                [
+                    'id'    => '/api/v2/custom_fields/'.$customItem->getCustomObject()->getCustomFields()->first()->getId(),
+                    'value' => 'test3',
+                ],
+            ],
+        ]);
         $json       = json_decode($response->getContent(), true);
 
         self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
@@ -93,8 +111,15 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
     public function testPatchCustomItem(): void
     {
         $customItem = $this->createCustomItem(['editother']);
-        $payload    = $this->getPatchedPayload($customItem->getCustomObject()->getCustomFields()->first());
-        $response   = $this->patchEntity('/api/v2/custom_items/'.$customItem->getId(), $payload);
+        $response   = $this->patchEntity('/api/v2/custom_items/'.$customItem->getId(),
+            [
+                'fieldValues'  => [
+                    [
+                        'id'    => '/api/v2/custom_fields/'.$customItem->getCustomObject()->getCustomFields()->first()->getId(),
+                        'value' => 'test2',
+                    ],
+                ],
+            ]);
         $json       = json_decode($response->getContent(), true);
 
         self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
