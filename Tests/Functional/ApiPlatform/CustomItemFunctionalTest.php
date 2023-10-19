@@ -22,21 +22,6 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         parent::setUp();
     }
 
-    public function testCreateCustomItem(): void
-    {
-        $customObject = $this->createCustomObject();
-        $category     = $this->createCategory();
-        $customField  = $this->createCustomField($customObject);
-        $user         = $this->getUser();
-
-        $this->setPermission($user, 'custom_objects:'.$customObject->getId(), ['create']);
-
-        $payloadCreate        = $this->getCreatePayload($customObject, $category, $customField);
-        $clientCreateResponse = $this->createEntity('custom_items', $payloadCreate);
-
-        $this->assertEquals(Response::HTTP_CREATED, $clientCreateResponse->getStatusCode());
-    }
-
     public function testRetrieveCustomItem(): void
     {
         $customItem             = $this->createCustomItem(['viewother']);
@@ -56,6 +41,21 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         self::assertEquals($content['fieldValues'][0]['value'], 'value');
         self::assertCount(9, $content);
         self::assertCount(1, $content['fieldValues']);
+    }
+
+    public function testCreateCustomItem(): void
+    {
+        $customObject = $this->createCustomObject();
+        $category     = $this->createCategory();
+        $customField  = $this->createCustomField($customObject);
+        $user         = $this->getUser();
+
+        $this->setPermission($user, 'custom_objects:'.$customObject->getId(), ['create']);
+
+        $payloadCreate        = $this->getCreatePayload($customObject, $category, $customField);
+        $clientCreateResponse = $this->createEntity('custom_items', $payloadCreate);
+
+        $this->assertEquals(Response::HTTP_CREATED, $clientCreateResponse->getStatusCode());
     }
 
     public function testCustomItemCRUD(): void
