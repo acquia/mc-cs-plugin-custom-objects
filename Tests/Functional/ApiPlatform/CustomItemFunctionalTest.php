@@ -71,14 +71,17 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         yield [['viewown', 'editown', 'create', 'deleteown', 'publishown'], Response::HTTP_FORBIDDEN,];
     }
 
-    public function testCreateCustomItem(): void
+    /**
+     * @dataProvider postCustomItemsDataProvider
+     */
+    public function testPostCustomItem(array $permissions, int $expectedResponse): void
     {
         $customObject = $this->createCustomObject();
         $category     = $this->createCategory();
         $customField  = $this->createCustomField($customObject);
         $user         = $this->getUser();
 
-        $this->setPermission($user, 'custom_objects:'.$customObject->getId(), ['create']);
+        $this->setPermission($user, 'custom_objects:'.$customObject->getId(), $permissions);
 
         $response = $this->createEntity('custom_items', [
             'name'         => 'Custom Item',
@@ -94,7 +97,18 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         ]);
         $json     = json_decode($response->getContent(), true);
 
-        self::assertEquals(Response::HTTP_CREATED, $response->getStatusCode());
+        self::assertEquals($expectedResponse, $response->getStatusCode());
+
+        if (Response::HTTP_FORBIDDEN == $expectedResponse) {
+            self::assertEquals($json['@context'], '/api/v2/contexts/Error');
+            self::assertEquals($json['@type'], 'hydra:Error');
+            self::assertEquals($json['hydra:title'], 'An error occurred');
+            self::assertEquals($json['hydra:description'], 'Access Denied.');
+            self::assertCount(4, $json);
+
+            return;
+        }
+
         self::assertEquals($json['@context'], '/api/v2/contexts/custom_items');
         self::assertStringStartsWith('/api/v2/custom_items/', $json['@id']);
         self::assertEquals($json['@type'], 'custom_items');
@@ -106,6 +120,15 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         self::assertEquals($json['fieldValues'][0]['value'], 'value');
         self::assertCount(9, $json);
         self::assertCount(1, $json['fieldValues']);
+    }
+
+    public function postCustomItemsDataProvider(): iterable
+    {
+        yield [['create'], Response::HTTP_CREATED,];
+
+        yield [[], Response::HTTP_FORBIDDEN,];
+
+        yield [['viewown', 'viewother', 'editown', 'editother', 'deleteown', 'deleteother', 'publishown', 'publishother'], Response::HTTP_FORBIDDEN,];
     }
 
     public function testUpdateCustomItem(): void
