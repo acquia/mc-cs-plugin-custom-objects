@@ -54,8 +54,20 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
 
         $payloadCreate = $this->getCreatePayload($customObject, $category, $customField);
         $response      = $this->createEntity('custom_items', $payloadCreate);
+        $json          = json_decode($response->getContent(), true);
 
-        $this->assertEquals(Response::HTTP_CREATED, $response->getStatusCode());
+        self::assertEquals(Response::HTTP_CREATED, $response->getStatusCode());
+        self::assertEquals($json['@context'], '/api/v2/contexts/custom_items');
+        self::assertStringStartsWith('/api/v2/custom_items/', $json['@id']);
+        self::assertEquals($json['@type'], 'custom_items');
+        self::assertEquals($json['name'], 'Custom Item');
+        self::assertEquals($json['customObject'], '/api/v2/custom_objects/'.$customObject->getId());
+        self::assertEquals($json['language'], 'en');
+        self::assertEquals($json['category'], '/api/v2/categories/'.$category->getId());
+        self::assertEquals($json['fieldValues'][0]['id'], '/api/v2/custom_fields/'.$customField->getId());
+        self::assertEquals($json['fieldValues'][0]['value'], 'value');
+        self::assertCount(9, $json);
+        self::assertCount(1, $json['fieldValues']);
     }
 
     public function testCustomItemCRUD(): void
@@ -131,14 +143,14 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
     {
         return
             [
-                'name'         => 'Custom Item Created',
+                'name'         => 'Custom Item',
                 'customObject' => '/api/v2/custom_objects/'.$customObject->getId(),
                 'language'     => 'en',
                 'category'     => '/api/v2/categories/'.$category->getId(),
                 'fieldValues'  => [
                     [
                         'id'    => '/api/v2/custom_fields/'.$customField->getId(),
-                        'value' => 'test',
+                        'value' => 'value',
                     ],
                 ],
             ];
