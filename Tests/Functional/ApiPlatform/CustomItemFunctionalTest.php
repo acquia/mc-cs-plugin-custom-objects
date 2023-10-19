@@ -22,13 +22,27 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         parent::setUp();
     }
 
-    public function testRetrieveCustomItem(): void
+    /**
+     * @dataProvider getCustomItemsDataProvider
+     */
+    public function testGetCustomItem(array $permissions, int $expectedResponse): void
     {
-        $customItem = $this->createCustomItem(['viewother']);
+        $customItem = $this->createCustomItem($permissions);
         $response   = $this->retrieveEntity('/api/v2/custom_items/'.$customItem->getId());
         $json       = json_decode($response->getContent(), true);
 
-        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
+        self::assertEquals($expectedResponse, $response->getStatusCode());
+
+        if (Response::HTTP_FORBIDDEN == $expectedResponse) {
+            self::assertEquals($json['@context'], '/api/v2/contexts/Error');
+            self::assertEquals($json['@type'], 'hydra:Error');
+            self::assertEquals($json['hydra:title'], 'An error occurred');
+            self::assertEquals($json['hydra:description'], 'Access Denied.');
+            self::assertCount(4, $json);
+
+            return;
+        }
+
         self::assertEquals($json['@context'], '/api/v2/contexts/custom_items');
         self::assertEquals($json['@id'], '/api/v2/custom_items/'.$customItem->getId());
         self::assertEquals($json['@type'], 'custom_items');
@@ -40,6 +54,21 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         self::assertEquals($json['fieldValues'][0]['value'], 'value');
         self::assertCount(9, $json);
         self::assertCount(1, $json['fieldValues']);
+    }
+
+    public function getCustomItemsDataProvider(): iterable
+    {
+        yield [['viewother'], Response::HTTP_OK,];
+
+        yield [['editother'], Response::HTTP_OK,];
+
+        yield [['deleteother'], Response::HTTP_OK,];
+
+        yield [['publishother'], Response::HTTP_OK,];
+
+        yield [[], Response::HTTP_FORBIDDEN,];
+
+        yield [['viewown', 'editown', 'create', 'deleteown', 'publishown'], Response::HTTP_FORBIDDEN,];
     }
 
     public function testCreateCustomItem(): void
