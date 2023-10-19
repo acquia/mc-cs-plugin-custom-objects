@@ -34,26 +34,12 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         self::assertEquals($expectedResponse, $response->getStatusCode());
 
         if (Response::HTTP_FORBIDDEN == $expectedResponse) {
-            self::assertEquals($json['@context'], '/api/v2/contexts/Error');
-            self::assertEquals($json['@type'], 'hydra:Error');
-            self::assertEquals($json['hydra:title'], 'An error occurred');
-            self::assertEquals($json['hydra:description'], 'Access Denied.');
-            self::assertCount(4, $json);
+            $this->assertAccessForbiddenContent($json);
 
             return;
         }
 
-        self::assertEquals($json['@context'], '/api/v2/contexts/custom_items');
-        self::assertEquals($json['@id'], '/api/v2/custom_items/'.$customItem->getId());
-        self::assertEquals($json['@type'], 'custom_items');
-        self::assertEquals($json['name'], 'Custom Item');
-        self::assertEquals($json['customObject'], '/api/v2/custom_objects/'.$customItem->getCustomObject()->getId());
-        self::assertEquals($json['language'], 'en');
-        self::assertEquals($json['category'], '/api/v2/categories/'.$customItem->getCategory()->getId());
-        self::assertEquals($json['fieldValues'][0]['id'], '/api/v2/custom_fields/'.$customItem->getCustomFieldValues()->first()->getCustomField()->getId());
-        self::assertEquals($json['fieldValues'][0]['value'], 'value');
-        self::assertCount(9, $json);
-        self::assertCount(1, $json['fieldValues']);
+        $this->assertSuccessContent($json, $customItem);
     }
 
     public function getCustomItemsDataProvider(): iterable
@@ -100,26 +86,13 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         self::assertEquals($expectedResponse, $response->getStatusCode());
 
         if (Response::HTTP_FORBIDDEN == $expectedResponse) {
-            self::assertEquals($json['@context'], '/api/v2/contexts/Error');
-            self::assertEquals($json['@type'], 'hydra:Error');
-            self::assertEquals($json['hydra:title'], 'An error occurred');
-            self::assertEquals($json['hydra:description'], 'Access Denied.');
-            self::assertCount(4, $json);
+            $this->assertAccessForbiddenContent($json);
 
             return;
         }
 
-        self::assertEquals($json['@context'], '/api/v2/contexts/custom_items');
-        self::assertStringStartsWith('/api/v2/custom_items/', $json['@id']);
-        self::assertEquals($json['@type'], 'custom_items');
-        self::assertEquals($json['name'], 'Custom Item');
-        self::assertEquals($json['customObject'], '/api/v2/custom_objects/'.$customObject->getId());
-        self::assertEquals($json['language'], 'en');
-        self::assertEquals($json['category'], '/api/v2/categories/'.$category->getId());
-        self::assertEquals($json['fieldValues'][0]['id'], '/api/v2/custom_fields/'.$customField->getId());
-        self::assertEquals($json['fieldValues'][0]['value'], 'value');
-        self::assertCount(9, $json);
-        self::assertCount(1, $json['fieldValues']);
+        $customItem = $this->em->getRepository(CustomItem::class)->find($json['id']);
+        $this->assertSuccessContent($json, $customItem);
     }
 
     public function postCustomItemsDataProvider(): iterable
@@ -145,18 +118,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         ]);
         $json       = json_decode($response->getContent(), true);
 
-        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
-        self::assertEquals($json['@context'], '/api/v2/contexts/custom_items');
-        self::assertEquals($json['@id'], '/api/v2/custom_items/'.$customItem->getId());
-        self::assertEquals($json['@type'], 'custom_items');
-        self::assertEquals($json['name'], 'Custom Item Edited');
-        self::assertEquals($json['customObject'], '/api/v2/custom_objects/'.$customItem->getCustomObject()->getId());
-        self::assertEquals($json['language'], 'en');
-        self::assertEquals($json['category'], '/api/v2/categories/'.$customItem->getCategory()->getId());
-        self::assertEquals($json['fieldValues'][0]['id'], '/api/v2/custom_fields/'.$customItem->getCustomFieldValues()->first()->getCustomField()->getId());
-        self::assertEquals($json['fieldValues'][0]['value'], 'test3');
-        self::assertCount(9, $json);
-        self::assertCount(1, $json['fieldValues']);
+        $this->assertSuccessContent($json, $customItem);
     }
 
     public function testPatchCustomItem(): void
@@ -173,18 +135,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
             ]);
         $json       = json_decode($response->getContent(), true);
 
-        self::assertEquals(Response::HTTP_OK, $response->getStatusCode());
-        self::assertEquals($json['@context'], '/api/v2/contexts/custom_items');
-        self::assertEquals($json['@id'], '/api/v2/custom_items/'.$customItem->getId());
-        self::assertEquals($json['@type'], 'custom_items');
-        self::assertEquals($json['name'], 'Custom Item');
-        self::assertEquals($json['customObject'], '/api/v2/custom_objects/'.$customItem->getCustomObject()->getId());
-        self::assertEquals($json['language'], 'en');
-        self::assertEquals($json['category'], '/api/v2/categories/'.$customItem->getCategory()->getId());
-        self::assertEquals($json['fieldValues'][0]['id'], '/api/v2/custom_fields/'.$customItem->getCustomFieldValues()->first()->getCustomField()->getId());
-        self::assertEquals($json['fieldValues'][0]['value'], 'test2');
-        self::assertCount(9, $json);
-        self::assertCount(1, $json['fieldValues']);
+        $this->assertSuccessContent($json, $customItem);
     }
 
     public function testDeleteCustomItem(): void
@@ -261,5 +212,30 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         $this->em->flush();
 
         return $customField;
+    }
+
+    private function assertAccessForbiddenContent(array $json): void
+    {
+        self::assertEquals($json['@context'], '/api/v2/contexts/Error');
+        self::assertEquals($json['@type'], 'hydra:Error');
+        self::assertEquals($json['hydra:title'], 'An error occurred');
+        self::assertEquals($json['hydra:description'], 'Access Denied.');
+        self::assertCount(4, $json);
+    }
+
+    private function assertSuccessContent(array $json, CustomItem $customItem): void
+    {
+        self::assertEquals($json['@context'], '/api/v2/contexts/custom_items');
+        self::assertEquals($json['@id'], '/api/v2/custom_items/'.$customItem->getId());
+        self::assertEquals($json['@type'], 'custom_items');
+        self::assertEquals($json['id'], $customItem->getId());
+        self::assertEquals($json['name'], $customItem->getName());
+        self::assertEquals($json['customObject'], '/api/v2/custom_objects/'.$customItem->getCustomObject()->getId());
+        self::assertEquals($json['language'], 'en');
+        self::assertEquals($json['category'], '/api/v2/categories/'.$customItem->getCategory()->getId());
+        self::assertEquals($json['fieldValues'][0]['id'], '/api/v2/custom_fields/'.$customItem->getCustomFieldValues()->first()->getId());
+        self::assertEquals($json['fieldValues'][0]['value'], $customItem->getCustomFieldValues()->first()->getValue());
+        self::assertCount(9, $json);
+        self::assertCount(1, $json['fieldValues']);
     }
 }
