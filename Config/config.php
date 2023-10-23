@@ -1152,6 +1152,13 @@ $coParams = [
             'custom_object.helper.token_formatter' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Helper\TokenFormatter::class,
             ],
+            'custom_object.data_persister.custom_item' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\DataPersister\CustomItemDataPersister::class,
+                'tag'       => 'api_platform.data_persister',
+                'arguments' => [
+                    'mautic.custom.model.item',
+                ],
+            ],
         ],
         'validators' => [
             'custom_object.allow.unique_identifier.validator' => [
