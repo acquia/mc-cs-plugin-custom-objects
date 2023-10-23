@@ -91,6 +91,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
             return;
         }
 
+        $this->em->clear();
         $customItem = $this->em->getRepository(CustomItem::class)->find($json['id']);
         $this->assertSuccessContent($json, $customItem);
     }
@@ -129,6 +130,8 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
             return;
         }
 
+        $this->em->clear();
+        $customItem = $this->em->getRepository(CustomItem::class)->find($json['id']);
         $this->assertSuccessContent($json, $customItem);
     }
 
@@ -168,6 +171,8 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
             return;
         }
 
+        $this->em->clear();
+        $customItem = $this->em->getRepository(CustomItem::class)->find($json['id']);
         $this->assertSuccessContent($json, $customItem);
     }
 
