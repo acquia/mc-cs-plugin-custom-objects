@@ -193,9 +193,11 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
             return;
         }
 
+        $this->em->clear();
+        $customItem = $this->em->getRepository(CustomItem::class)->find($customItem->getId());
         self::assertEquals(Response::HTTP_NO_CONTENT, $response->getStatusCode());
         self::assertNull($json);
-        self::assertNull($this->em->getRepository(CustomItem::class)->find($customItem->getId()));
+        self::assertNull($customItem);
     }
 
     public function deleteCustomItemsDataProvider()
