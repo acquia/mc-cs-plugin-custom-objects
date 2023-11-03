@@ -31,6 +31,8 @@ final class CustomItemDataPersister implements DataPersisterInterface
 
     public function remove($data)
     {
-        // TODO: Implement remove() method.
+        \assert($data instanceof CustomItem);
+
+        $this->customItemModel->delete($data);
     }
 }
