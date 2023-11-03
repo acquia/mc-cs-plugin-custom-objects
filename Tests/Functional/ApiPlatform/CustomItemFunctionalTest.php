@@ -10,16 +10,24 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Translation\TranslatorInterface;
 
 final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
 {
+    private CustomItemModel $customItemModel;
+
     public function setUp(): void
     {
         $this->configParams['custom_objects_enabled'] = true;
 
         parent::setUp();
+
+        $customItemModel = $this->getContainer()->get('mautic.custom.model.item');
+        \assert($customItemModel instanceof CustomItemModel);
+
+        $this->customItemModel = $customItemModel;
     }
 
     /**
@@ -93,6 +101,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
 
         $this->em->clear();
         $customItem = $this->em->getRepository(CustomItem::class)->find($json['id']);
+        $this->customItemModel->populateCustomFields($customItem);
         $this->assertSuccessContent($json, $customItem);
     }
 
@@ -132,6 +141,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
 
         $this->em->clear();
         $customItem = $this->em->getRepository(CustomItem::class)->find($json['id']);
+        $this->customItemModel->populateCustomFields($customItem);
         $this->assertSuccessContent($json, $customItem);
     }
 
@@ -173,6 +183,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
 
         $this->em->clear();
         $customItem = $this->em->getRepository(CustomItem::class)->find($json['id']);
+        $this->customItemModel->populateCustomFields($customItem);
         $this->assertSuccessContent($json, $customItem);
     }
 
