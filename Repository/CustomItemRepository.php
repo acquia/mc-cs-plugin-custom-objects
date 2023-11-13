@@ -90,6 +90,7 @@ class CustomItemRepository extends CommonRepository
         $queryBuilder->where(CustomItem::TABLE_ALIAS.'.customObject = :customObjectId');
         $queryBuilder->setParameter('customObjectId', $customObjectId);
         $queryBuilder->setMaxResults(1);
+
         return (int) $queryBuilder->getQuery()->getSingleScalarResult();
     }
 

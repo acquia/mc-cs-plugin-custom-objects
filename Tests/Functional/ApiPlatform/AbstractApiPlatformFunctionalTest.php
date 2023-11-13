@@ -90,7 +90,7 @@ abstract class AbstractApiPlatformFunctionalTest extends MauticMysqlTestCase
 
     protected function requestEntity(string $method, string $path, $payload = null): Response
     {
-        $server = ['CONTENT_TYPE' => $method == 'PATCH' ? 'application/merge-patch+json' : 'application/ld+json', 'HTTP_ACCEPT' => 'application/ld+json'];
+        $server = ['CONTENT_TYPE' => 'PATCH' == $method ? 'application/merge-patch+json' : 'application/ld+json', 'HTTP_ACCEPT' => 'application/ld+json'];
         $this->client->request($method, $path, [], [], $server, $payload ? json_encode($payload) : null);
 
         return $this->client->getResponse();

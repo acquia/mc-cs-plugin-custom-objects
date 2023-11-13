@@ -203,11 +203,10 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
     private $showInContactDetailList = true;
 
     /**
-     * @var bool
      * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
      */
     private bool $isUniqueIdentifier = false;
-    
+
     private bool $wasChangeIsUniqueIdentifier = false;
 
     public function __construct()

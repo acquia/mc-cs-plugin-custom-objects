@@ -52,17 +52,17 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
 
     public function getCustomItemsDataProvider(): iterable
     {
-        yield [['viewother'], Response::HTTP_OK,];
+        yield [['viewother'], Response::HTTP_OK];
 
-        yield [['editother'], Response::HTTP_OK,];
+        yield [['editother'], Response::HTTP_OK];
 
-        yield [['deleteother'], Response::HTTP_OK,];
+        yield [['deleteother'], Response::HTTP_OK];
 
-        yield [['publishother'], Response::HTTP_OK,];
+        yield [['publishother'], Response::HTTP_OK];
 
-        yield [[], Response::HTTP_FORBIDDEN,];
+        yield [[], Response::HTTP_FORBIDDEN];
 
-        yield [['viewown', 'editown', 'create', 'deleteown', 'publishown'], Response::HTTP_FORBIDDEN,];
+        yield [['viewown', 'editown', 'create', 'deleteown', 'publishown'], Response::HTTP_FORBIDDEN];
     }
 
     /**
@@ -107,11 +107,11 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
 
     public function postCustomItemsDataProvider(): iterable
     {
-        yield [['create'], Response::HTTP_CREATED,];
+        yield [['create'], Response::HTTP_CREATED];
 
-        yield [[], Response::HTTP_FORBIDDEN,];
+        yield [[], Response::HTTP_FORBIDDEN];
 
-        yield [['viewown', 'viewother', 'editown', 'editother', 'deleteown', 'deleteother', 'publishown', 'publishother'], Response::HTTP_FORBIDDEN,];
+        yield [['viewown', 'viewother', 'editown', 'editother', 'deleteown', 'deleteother', 'publishown', 'publishother'], Response::HTTP_FORBIDDEN];
     }
 
     /**
@@ -147,13 +147,13 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
 
     public function putCustomItemsDataProvider()
     {
-        yield [['editother'], Response::HTTP_OK,];
+        yield [['editother'], Response::HTTP_OK];
 
-        yield [['deleteother'], Response::HTTP_OK,];
+        yield [['deleteother'], Response::HTTP_OK];
 
-        yield [[], Response::HTTP_FORBIDDEN,];
+        yield [[], Response::HTTP_FORBIDDEN];
 
-        yield [['viewown', 'viewother', 'editown', 'create', 'deleteown', 'publishown', 'publishother'], Response::HTTP_FORBIDDEN,];
+        yield [['viewown', 'viewother', 'editown', 'create', 'deleteown', 'publishown', 'publishother'], Response::HTTP_FORBIDDEN];
     }
 
     /**
@@ -213,12 +213,11 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
 
     public function deleteCustomItemsDataProvider()
     {
+        yield [['deleteother'], Response::HTTP_NO_CONTENT];
 
-        yield [['deleteother'], Response::HTTP_NO_CONTENT,];
+        yield [[], Response::HTTP_FORBIDDEN];
 
-        yield [[], Response::HTTP_FORBIDDEN,];
-
-        yield [['viewown', 'viewother', 'editown', 'create', 'deleteown', 'editother', 'publishown', 'publishother'], Response::HTTP_FORBIDDEN,];
+        yield [['viewown', 'viewother', 'editown', 'create', 'deleteown', 'editother', 'publishown', 'publishother'], Response::HTTP_FORBIDDEN];
     }
 
     private function createCustomObject(): CustomObject
@@ -238,7 +237,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         $customObject = $this->createCustomObject();
         $category     = $this->createCategory();
         $customField  = $this->createCustomField($customObject);
-        $customItem = new CustomItem($customObject);
+        $customItem   = new CustomItem($customObject);
         $customItem->setName('Custom Item');
         $customItem->setLanguage('en');
         $customItem->setCategory($category);
