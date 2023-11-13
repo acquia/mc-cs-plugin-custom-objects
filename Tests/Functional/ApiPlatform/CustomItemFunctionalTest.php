@@ -32,6 +32,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
 
     /**
      * @dataProvider getCustomItemsDataProvider
+     * @param array<int, string> $permissions
      */
     public function testGetCustomItem(array $permissions, int $expectedResponse): void
     {
@@ -50,6 +51,9 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         $this->assertSuccessContent($json, $customItem);
     }
 
+    /**
+     * @return iterable<int, mixed>
+     */
     public function getCustomItemsDataProvider(): iterable
     {
         yield [['viewother'], Response::HTTP_OK];
@@ -67,6 +71,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
 
     /**
      * @dataProvider postCustomItemsDataProvider
+     * @param array<int, string>
      */
     public function testPostCustomItem(array $permissions, int $expectedResponse): void
     {
@@ -105,6 +110,9 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         $this->assertSuccessContent($json, $customItem);
     }
 
+    /**
+     * @return iterable<int, mixed>
+     */
     public function postCustomItemsDataProvider(): iterable
     {
         yield [['create'], Response::HTTP_CREATED];
@@ -116,6 +124,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
 
     /**
      * @dataProvider putCustomItemsDataProvider
+     * @param array<int, string> $permissions
      */
     public function testPutCustomItem(array $permissions, int $expectedResponse): void
     {
@@ -145,7 +154,10 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         $this->assertSuccessContent($json, $customItem);
     }
 
-    public function putCustomItemsDataProvider()
+    /**
+     * @return iterable<int, mixed>
+     */
+    public function putCustomItemsDataProvider(): iterable
     {
         yield [['editother'], Response::HTTP_OK];
 
@@ -158,6 +170,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
 
     /**
      * @dataProvider putCustomItemsDataProvider
+     * @param array<int, string> $permissions
      */
     public function testPatchCustomItem(array $permissions, int $expectedResponse): void
     {
@@ -189,6 +202,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
 
     /**
      * @dataProvider deleteCustomItemsDataProvider
+     * @param array<int, string> $permissions
      */
     public function testDeleteCustomItem(array $permissions, int $expectedResponse): void
     {
@@ -211,7 +225,10 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         self::assertNull($customItem);
     }
 
-    public function deleteCustomItemsDataProvider()
+    /**
+     * @return iterable<int, mixed>
+     */
+    public function deleteCustomItemsDataProvider(): iterable
     {
         yield [['deleteother'], Response::HTTP_NO_CONTENT];
 
@@ -285,6 +302,9 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         return $customField;
     }
 
+    /**
+     * @param array<string, mixed> $json
+     */
     private function assertAccessForbiddenContent(array $json): void
     {
         self::assertEquals($json['@context'], '/api/v2/contexts/Error');
@@ -294,6 +314,9 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         self::assertCount(4, $json);
     }
 
+    /**
+     * @param array<string, mixed> $json
+     */
     private function assertSuccessContent(array $json, CustomItem $customItem): void
     {
         self::assertEquals($json['@context'], '/api/v2/contexts/custom_items');
