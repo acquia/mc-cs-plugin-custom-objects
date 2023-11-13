@@ -16,7 +16,7 @@ final class CustomItemDataPersister implements DataPersisterInterface
     }
 
     /**
-     * @param $data mixed
+     * @param mixed $data
      */
     public function supports($data): bool
     {
@@ -24,7 +24,8 @@ final class CustomItemDataPersister implements DataPersisterInterface
     }
 
     /**
-     * @param $data mixed
+     * @param mixed $data
+     * @return mixed
      */
     public function persist($data)
     {
@@ -36,9 +37,9 @@ final class CustomItemDataPersister implements DataPersisterInterface
     }
 
     /**
-     * @param $data mixed
+     * @param mixed $data
      */
-    public function remove($data)
+    public function remove($data): void
     {
         \assert($data instanceof CustomItem);
 

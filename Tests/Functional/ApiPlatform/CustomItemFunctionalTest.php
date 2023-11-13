@@ -73,7 +73,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
     /**
      * @dataProvider postCustomItemsDataProvider
      *
-     * @param array<int, string>
+     * @param array<int, string> $permissions
      */
     public function testPostCustomItem(array $permissions, int $expectedResponse): void
     {
@@ -254,6 +254,9 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         return $customObject;
     }
 
+    /**
+     * @param array<string, mixed> $permissions
+     */
     private function createCustomItem(array $permissions): CustomItem
     {
         $customObject = $this->createCustomObject();
