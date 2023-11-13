@@ -25,6 +25,7 @@ final class CustomItemDataPersister implements DataPersisterInterface
 
     /**
      * @param mixed $data
+     *
      * @return mixed
      */
     public function persist($data)
