@@ -32,6 +32,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
 
     /**
      * @dataProvider getCustomItemsDataProvider
+     *
      * @param array<int, string> $permissions
      */
     public function testGetCustomItem(array $permissions, int $expectedResponse): void
@@ -71,6 +72,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
 
     /**
      * @dataProvider postCustomItemsDataProvider
+     *
      * @param array<int, string>
      */
     public function testPostCustomItem(array $permissions, int $expectedResponse): void
@@ -124,6 +126,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
 
     /**
      * @dataProvider putCustomItemsDataProvider
+     *
      * @param array<int, string> $permissions
      */
     public function testPutCustomItem(array $permissions, int $expectedResponse): void
@@ -170,6 +173,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
 
     /**
      * @dataProvider putCustomItemsDataProvider
+     *
      * @param array<int, string> $permissions
      */
     public function testPatchCustomItem(array $permissions, int $expectedResponse): void
@@ -202,6 +206,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
 
     /**
      * @dataProvider deleteCustomItemsDataProvider
+     *
      * @param array<int, string> $permissions
      */
     public function testDeleteCustomItem(array $permissions, int $expectedResponse): void
