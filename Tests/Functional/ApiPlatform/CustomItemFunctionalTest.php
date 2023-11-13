@@ -255,7 +255,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
     }
 
     /**
-     * @param array<string, mixed> $permissions
+     * @param array<int, string> $permissions
      */
     private function createCustomItem(array $permissions): CustomItem
     {
