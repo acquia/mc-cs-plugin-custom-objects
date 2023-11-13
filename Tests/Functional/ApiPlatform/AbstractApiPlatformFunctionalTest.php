@@ -79,7 +79,7 @@ abstract class AbstractApiPlatformFunctionalTest extends MauticMysqlTestCase
     }
 
     /**
-     * @param array<int, mixed> $payload
+     * @param array<string, mixed> $payload
      */
     protected function patchEntity(string $createdId, array $payload): Response
     {
