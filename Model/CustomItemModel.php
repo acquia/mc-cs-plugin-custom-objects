@@ -112,8 +112,8 @@ class CustomItemModel extends FormModel
 
                 // We need to re-attach the entity to the entity manager so that it can be saved by the rest of the code.
                 $customFieldValues = $customItem->getCustomFieldValues();
-                $hasBeenUpdated = $customItem->hasBeenUpdated();
-                $hasBeenInserted = $customItem->hasBeenInserted();
+                $hasBeenUpdated    = $customItem->hasBeenUpdated();
+                $hasBeenInserted   = $customItem->hasBeenInserted();
                 $customItem        = $this->fetchEntity($customItem->getId());
 
                 $customItem->setHasBeenUpdated($hasBeenUpdated);
