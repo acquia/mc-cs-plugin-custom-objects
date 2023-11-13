@@ -78,6 +78,9 @@ abstract class AbstractApiPlatformFunctionalTest extends MauticMysqlTestCase
         return $this->requestEntity('PUT', $createdId, $payload);
     }
 
+    /**
+     * @param array<int, mixed> $payload
+     */
     protected function patchEntity(string $createdId, array $payload): Response
     {
         return $this->requestEntity('PATCH', $createdId, $payload);
