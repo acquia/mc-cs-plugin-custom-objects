@@ -6,6 +6,12 @@ You'll be able to
 - filter Segments by values in the Custom Objects
 - create Campaign conditions based on the values in the Custom Objects
 
+## Workflow Update
+
+Until Github Actions' CI/CD are in place, we request to developers to:
+1. Merge their unreviewed and unapproved PRs to `development` branch.
+2. Merge their reviewed and approved PRs to `beta` branch.
+
 ## Glossary
 
 - `Custom Field` represents one piece of information. Example: Price, Description, Color
