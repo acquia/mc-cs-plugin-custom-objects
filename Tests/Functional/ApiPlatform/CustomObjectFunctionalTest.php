@@ -45,7 +45,7 @@ final class CustomObjectFunctionalTest extends AbstractApiPlatformFunctionalTest
         }
         // UPDATE
         $payloadUpdate        = $this->getEditPayload();
-        $clientUpdateResponse = $this->updateEntity($createdId, $payloadUpdate);
+        $clientUpdateResponse = $this->patchEntity($createdId, $payloadUpdate);
         $this->assertEquals($httpUpdated, $clientUpdateResponse->getStatusCode());
         if ($updatedAlias) {
             $this->assertEquals($updatedAlias, json_decode($clientUpdateResponse->getContent())->alias);
