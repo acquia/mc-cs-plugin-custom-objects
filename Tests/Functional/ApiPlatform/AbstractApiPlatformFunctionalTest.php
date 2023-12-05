@@ -78,6 +78,14 @@ abstract class AbstractApiPlatformFunctionalTest extends MauticMysqlTestCase
         return $this->requestEntity('PUT', $createdId, $payload);
     }
 
+    /**
+     * @param array<string, mixed> $payload
+     */
+    protected function patchEntity(string $createdId, array $payload): Response
+    {
+        return $this->requestEntity('PATCH', $createdId, $payload);
+    }
+
     protected function deleteEntity(string $createdId): Response
     {
         return $this->requestEntity('DELETE', $createdId);
@@ -85,7 +93,7 @@ abstract class AbstractApiPlatformFunctionalTest extends MauticMysqlTestCase
 
     protected function requestEntity(string $method, string $path, $payload = null): Response
     {
-        $server = ['CONTENT_TYPE' => 'application/ld+json', 'HTTP_ACCEPT' => 'application/ld+json'];
+        $server = ['CONTENT_TYPE' => 'PATCH' == $method ? 'application/merge-patch+json' : 'application/ld+json', 'HTTP_ACCEPT' => 'application/ld+json'];
         $this->client->request($method, $path, [], [], $server, $payload ? json_encode($payload) : null);
 
         return $this->client->getResponse();
