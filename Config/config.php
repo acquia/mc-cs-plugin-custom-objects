@@ -757,6 +757,7 @@ $coParams = [
                     'custom_item.route.provider',
                     'mautic.custom.model.item',
                     'custom_object.config.provider',
+                    'custom_item.xref.contact.repository',
                 ],
             ],
             'custom_item.post_save.subscriber' => [

@@ -7,12 +7,14 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Entity\LeadEventLog;
 use Mautic\LeadBundle\Entity\LeadEventLogRepository;
+use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -43,18 +45,25 @@ class ContactSubscriber implements EventSubscriberInterface
      */
     private $configProvider;
 
+    /**
+     * @var CustomItemXrefContactRepository
+     */
+    private $customItemXrefContactRepository;
+
     public function __construct(
         EntityManager $entityManager,
         TranslatorInterface $translator,
         CustomItemRouteProvider $routeProvider,
         CustomItemModel $customItemModel,
-        ConfigProvider $configProvider
+        ConfigProvider $configProvider,
+        CustomItemXrefContactRepository $customItemXrefContactRepository,
     ) {
         $this->entityManager   = $entityManager;
         $this->translator      = $translator;
         $this->routeProvider   = $routeProvider;
         $this->customItemModel = $customItemModel;
         $this->configProvider  = $configProvider;
+        $this->customItemXrefContactRepository = $customItemXrefContactRepository;
     }
 
     /**
@@ -64,6 +73,7 @@ class ContactSubscriber implements EventSubscriberInterface
     {
         return [
             LeadEvents::TIMELINE_ON_GENERATE => 'onTimelineGenerate',
+            LeadEvents::LEAD_POST_MERGE      => 'onContactMerge',
         ];
     }
 
@@ -97,6 +107,15 @@ class ContactSubscriber implements EventSubscriberInterface
                 $this->addLinkTimelineEntry($event, $type, $name, 'unlink');
             }
         }
+    }
+
+    public function onContactMerge(LeadMergeEvent $event): void
+    {
+        if (!$this->configProvider->pluginIsEnabled()) {
+            return;
+        }
+
+        $this->customItemXrefContactRepository->mergeLead($event->getVictor(), $event->getLoser());
     }
 
     /**

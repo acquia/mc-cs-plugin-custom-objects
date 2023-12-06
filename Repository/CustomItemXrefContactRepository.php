@@ -63,4 +63,32 @@ class CustomItemXrefContactRepository extends CommonRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function mergeLead(Lead $victor, Lead $loser): void
+    {
+        // Move all custom item references to the victor lead, but only if the victor doesn't already have
+        // a reference to the custom item
+        $existingAlias = CustomItemXrefContact::TABLE_ALIAS.'_Check';
+
+        $this->createQueryBuilder(CustomItemXrefContact::TABLE_ALIAS)
+            ->update()
+            ->set(CustomItemXrefContact::TABLE_ALIAS.'.contact', ':victor')
+            ->where(CustomItemXrefContact::TABLE_ALIAS.'.contact = :loser')
+            ->andWhere(
+                $this->createQueryBuilder(CustomItemXrefContact::TABLE_ALIAS)
+                    ->expr()
+                    ->notIn(
+                        CustomItemXrefContact::TABLE_ALIAS.'.customItem',
+                        $this->createQueryBuilder($existingAlias)
+                            ->select('IDENTITY('.$existingAlias.'.customItem)')
+                            ->where($existingAlias.'.contact = :victor')
+                            ->getDQL()
+                    )
+            )
+            ->setParameter('victor', $victor->getId())
+            ->setParameter('loser', $loser->getId())
+            ->getQuery()
+            ->execute();
+
+    }
 }
