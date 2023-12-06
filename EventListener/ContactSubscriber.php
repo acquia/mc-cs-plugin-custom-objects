@@ -10,7 +10,6 @@ use Mautic\LeadBundle\Entity\LeadEventLogRepository;
 use Mautic\LeadBundle\Event\LeadMergeEvent;
 use Mautic\LeadBundle\Event\LeadTimelineEvent;
 use Mautic\LeadBundle\LeadEvents;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
@@ -38,7 +37,7 @@ class ContactSubscriber implements EventSubscriberInterface
     {
         return [
             LeadEvents::TIMELINE_ON_GENERATE => 'onTimelineGenerate',
-            LeadEvents::LEAD_PRE_MERGE       => 'onCongactPreMerge',
+            LeadEvents::LEAD_POST_MERGE      => 'onContactMerge',
         ];
     }
 
@@ -74,41 +73,13 @@ class ContactSubscriber implements EventSubscriberInterface
         }
     }
 
-    /**
-     * Moves the custom item links from the loser to the victor if they don't exist in the victor's list.
-     * Removes the remaining links from the loser.
-     */
-    public function onCongactPreMerge(LeadMergeEvent $event): void
+    public function onContactMerge(LeadMergeEvent $event): void
     {
         if (!$this->configProvider->pluginIsEnabled()) {
             return;
         }
 
-        $loser = $event->getLoser();
-
-        /** @var CustomItemXrefContact[] $loserLinks */
-        $loserLinks = $this->customItemXrefContactRepository->findBy(['contact' => $loser]);
-
-        if (!$loserLinks) {
-            return;
-        }
-
-        $victor = $event->getVictor();
-
-        /** @var CustomItemXrefContact[] $victorLinks */
-        $victorLinks    = $this->customItemXrefContactRepository->findBy(['contact' => $victor]);
-        $victorItemsIds = array_map(fn (CustomItemXrefContact $link) => $link->getCustomItem()->getId(), $victorLinks);
-
-        foreach ($loserLinks as $loserLink) {
-            if (!in_array($loserLink->getCustomItem()->getId(), $victorItemsIds)) {
-                $newLink = new CustomItemXrefContact($loserLink->getCustomItem(), $victor, $loserLink->getDateAdded());
-                $this->entityManager->persist($newLink);
-            }
-
-            $this->entityManager->remove($loserLink);
-        }
-
-        $this->entityManager->flush();
+        $this->customItemXrefContactRepository->mergeLead($event->getVictor(), $event->getLoser());
     }
 
     /**
