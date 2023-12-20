@@ -107,11 +107,14 @@ class QueryFilterHelper
         }
     }
 
+    /**
+     * @param mixed[]|string|int|null $value
+     */
     public function addCustomObjectValueExpression(
         SegmentQueryBuilder $queryBuilder,
         string $tableAlias,
         string $operator,
-        ?string $value
+        $value
     ): void {
         $valueParameter = $this->randomParameterNameService->generateRandomParameterName();
         $expression     = $this->getCustomValueValueExpression($queryBuilder, $tableAlias, $operator, $valueParameter);
