@@ -7,7 +7,6 @@ namespace MauticPlugin\CustomObjectsBundle\Helper;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
-use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
@@ -97,7 +96,7 @@ class QueryFilterHelper
         ContactSegmentFilter $filter
     ): void {
         foreach ($unionQueryContainer as $segmentQueryBuilder) {
-            if (ContactSegmentFilterFactory::CUSTOM_OPERATOR === $filter->getOperator()) {
+            if (!empty($filter->contactSegmentFilterCrate->getMergedProperty())) {
                 foreach ($filter->contactSegmentFilterCrate->getMergedProperty() as $propertyFilter) {
                     $this->addCustomObjectValueExpression($segmentQueryBuilder, $tableAlias, $propertyFilter['operator'], $propertyFilter['filter_value']);
                 }

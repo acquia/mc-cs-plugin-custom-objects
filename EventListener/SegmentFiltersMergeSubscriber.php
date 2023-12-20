@@ -81,7 +81,6 @@ class SegmentFiltersMergeSubscriber implements EventSubscriberInterface
                 $mergedProperty = [];
                 foreach ($customObjects as $filter) {
                     $mergedProperty[]                    = ['operator' => $filter['operator'], 'filter_value' => $filter['properties']['filter']];
-                    $filter['operator']                  = ContactSegmentFilterFactory::CUSTOM_OPERATOR;
                     $newGroupedArr[$key]['properties'][] = $filter;
                 }
                 unset($newGroupedArr[$key]['properties']['filter']);
