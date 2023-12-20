@@ -90,7 +90,7 @@ trait FixtureObjectsTrait
         $entities = [];
 
         $orderedKeys = $this->entityMap;
-        array_reverse($orderedKeys, true);
+        $orderedKeys = array_reverse($orderedKeys, true);
         foreach ($orderedKeys as $key => $type) {
             $entities[$key] = $this->objects[$type][$key];
         }
