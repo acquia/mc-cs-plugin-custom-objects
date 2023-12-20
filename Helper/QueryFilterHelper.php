@@ -7,6 +7,7 @@ namespace MauticPlugin\CustomObjectsBundle\Helper;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
+use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
@@ -96,22 +97,28 @@ class QueryFilterHelper
         ContactSegmentFilter $filter
     ): void {
         foreach ($unionQueryContainer as $segmentQueryBuilder) {
-            $valueParameter = $this->randomParameterNameService->generateRandomParameterName();
-            $expression     = $this->getCustomValueValueExpression(
-                $segmentQueryBuilder,
-                $tableAlias,
-                $filter->getOperator(),
-                $valueParameter
-            );
-
-            $this->addOperatorExpression(
-                $segmentQueryBuilder,
-                $expression,
-                $filter->getOperator(),
-                $filter->getParameterValue(),
-                $valueParameter
-            );
+            if (ContactSegmentFilterFactory::CUSTOM_OPERATOR === $filter->getOperator()) {
+                foreach ($filter->contactSegmentFilterCrate->getMergedProperty() as $propertyFilter) {
+                    $this->addCustomObjectValueExpression($segmentQueryBuilder, $tableAlias, $propertyFilter['operator'], $propertyFilter['filter_value']);
+                }
+            } else {
+                $this->addCustomObjectValueExpression($segmentQueryBuilder, $tableAlias, $filter->getOperator(), $filter->getParameterValue());
+            }
         }
+    }
+
+    /**
+     * @param mixed[]|string|int|null $value
+     */
+    public function addCustomObjectValueExpression(
+        SegmentQueryBuilder $queryBuilder,
+        string $tableAlias,
+        string $operator,
+        $value
+    ): void {
+        $valueParameter = $this->randomParameterNameService->generateRandomParameterName();
+        $expression     = $this->getCustomValueValueExpression($queryBuilder, $tableAlias, $operator, $valueParameter);
+        $this->addOperatorExpression($queryBuilder, $expression, $operator, $value, $valueParameter);
     }
 
     public function addCustomObjectNameExpression(
