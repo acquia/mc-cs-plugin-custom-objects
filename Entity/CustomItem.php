@@ -450,7 +450,6 @@ class CustomItem extends FormEntity implements UniqueEntityInterface, UpsertInte
                 $this->createNewCustomFieldValueByFieldId((int) $value['id'], $value['value']);
             }
         }
-        $this->setDefaultValuesForMissingFields();
     }
 
     /**
