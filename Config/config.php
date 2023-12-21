@@ -825,6 +825,12 @@ $coParams = [
                     'custom_object.config.provider',
                 ],
             ],
+            'custom_object.segments.filters_merge.subscriber' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\SegmentFiltersMergeSubscriber::class,
+                'arguments' => [
+                    'custom_object.config.provider',
+                ],
+            ],
             'custom_object.dynamic_content.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\DynamicContentSubscriber::class,
                 'arguments' => [
