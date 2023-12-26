@@ -451,6 +451,10 @@ class CustomItem extends FormEntity implements UniqueEntityInterface, UpsertInte
             }
         }
 
+        /**
+         * Using $_SERVER because we could have done it in CustomItemDataPersister but customItem
+         * entity has many public dependencies which could be a BC break.
+         */
         if ('PATCH' !== $_SERVER['REQUEST_METHOD']) {
             $this->setDefaultValuesForMissingFields();
         }
