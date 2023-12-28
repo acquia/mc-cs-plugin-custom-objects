@@ -452,8 +452,10 @@ class CustomItem extends FormEntity implements UniqueEntityInterface, UpsertInte
         }
 
         /**
-         * Using $_SERVER because we could have done it in CustomItemDataPersister but customItem
-         * entity has many public dependencies which could be a BC break.
+         * We could have done it in CustomItemDataPersister::persist() by
+         * injecting Symfony\Component\HttpFoundation\RequestStack and get request method.
+         * Since, CustomItem entity has multiple public methods which could lead to BC break.
+         * Hence, we are using $_SERVER here to get the request method type.
          */
         if ('PATCH' !== $_SERVER['REQUEST_METHOD']) {
             $this->setDefaultValuesForMissingFields();
