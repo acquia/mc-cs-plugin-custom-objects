@@ -6,6 +6,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Segment\Query\Filter
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
+use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterFactory;
@@ -92,7 +93,7 @@ class CustomFieldFilterQueryBuilderTest extends MauticMysqlTestCase
         $filterMock = $this->getMockBuilder(ContactSegmentFilter::class)
             ->disableOriginalConstructor()
             ->getMock();
-
+        $filterMock->contactSegmentFilterCrate = $this->createMock(ContactSegmentFilterCrate::class);
         $filterMock->method('getType')->willReturn($type);
         $filterMock->method('getOperator')->willReturn($operator);
         $filterMock->method('getField')->willReturn((string) $this->getFixtureById($fixtureField)->getId());

@@ -96,22 +96,28 @@ class QueryFilterHelper
         ContactSegmentFilter $filter
     ): void {
         foreach ($unionQueryContainer as $segmentQueryBuilder) {
-            $valueParameter = $this->randomParameterNameService->generateRandomParameterName();
-            $expression     = $this->getCustomValueValueExpression(
-                $segmentQueryBuilder,
-                $tableAlias,
-                $filter->getOperator(),
-                $valueParameter
-            );
-
-            $this->addOperatorExpression(
-                $segmentQueryBuilder,
-                $expression,
-                $filter->getOperator(),
-                $filter->getParameterValue(),
-                $valueParameter
-            );
+            if (!empty($filter->contactSegmentFilterCrate->getMergedProperty())) {
+                foreach ($filter->contactSegmentFilterCrate->getMergedProperty() as $propertyFilter) {
+                    $this->addCustomObjectValueExpression($segmentQueryBuilder, $tableAlias, $propertyFilter['operator'], $propertyFilter['filter_value']);
+                }
+            } else {
+                $this->addCustomObjectValueExpression($segmentQueryBuilder, $tableAlias, $filter->getOperator(), $filter->getParameterValue());
+            }
         }
+    }
+
+    /**
+     * @param mixed[]|string|int|null $value
+     */
+    public function addCustomObjectValueExpression(
+        SegmentQueryBuilder $queryBuilder,
+        string $tableAlias,
+        string $operator,
+        $value
+    ): void {
+        $valueParameter = $this->randomParameterNameService->generateRandomParameterName();
+        $expression     = $this->getCustomValueValueExpression($queryBuilder, $tableAlias, $operator, $valueParameter);
+        $this->addOperatorExpression($queryBuilder, $expression, $operator, $value, $valueParameter);
     }
 
     public function addCustomObjectNameExpression(
