@@ -48,7 +48,7 @@ class SegmentFiltersMergeSubscriber implements EventSubscriberInterface
                 }
             }
 
-            if ('custom_object' !== $filter['object']) {
+            if ('custom_object' !== ($filter['object'] ?? '')) {
                 $finalMergedFilters[] = $filter;
                 continue;
             }
