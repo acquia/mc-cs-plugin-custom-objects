@@ -312,7 +312,7 @@ class TokenSubscriber implements EventSubscriberInterface
             try {
                 $fieldValue    = $customItem->findCustomFieldValueForFieldAlias($token->getCustomFieldAlias());
                 // If the CO item doesn't have a value, get the default value
-                if ('' == $fieldValue->getValue()) {
+                if (empty($fieldValue->getValue())) {
                     $fieldValue->setValue($fieldValue->getCustomField()->getDefaultValue());
                 }
                 $fieldValues[] = $fieldValue->getCustomField()->getTypeObject()->valueToString($fieldValue);
