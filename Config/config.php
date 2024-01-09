@@ -829,6 +829,7 @@ $coParams = [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\SegmentFiltersMergeSubscriber::class,
                 'arguments' => [
                     'custom_object.config.provider',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'custom_object.dynamic_content.subscriber' => [
@@ -1117,6 +1118,7 @@ $coParams = [
                     'mautic.lead.model.random_parameter_name',
                     'event_dispatcher',
                     'custom_object.query.filter.helper',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.lead.query.builder.custom_item.value'  => [
@@ -1178,9 +1180,10 @@ $coParams = [
         ],
     ],
     'parameters' => [
-        ConfigProvider::CONFIG_PARAM_ENABLED                              => true,
-        ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT => 3,
-        'custom_item_export_dir'                                          => '%kernel.root_dir%/../media/files/temp',
+        ConfigProvider::CONFIG_PARAM_ENABLED                                  => true,
+        ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT     => 3,
+        'custom_item_export_dir'                                              => '%kernel.root_dir%/../media/files/temp',
+        'custom_object_merge_filter'                                          => false,
     ],
 ];
 

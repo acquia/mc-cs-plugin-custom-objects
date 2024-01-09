@@ -29,16 +29,6 @@ class QueryFilterHelper
      */
     private $queryFilterFactory;
 
-    /**
-     * @var CustomFieldTypeProvider
-     */
-    private $fieldTypeProvider;
-
-    /**
-     * @var int
-     */
-    private $itemRelationLevelLimit;
-
     private RandomParameterName $randomParameterNameService;
 
     public function __construct(
@@ -96,28 +86,22 @@ class QueryFilterHelper
         ContactSegmentFilter $filter
     ): void {
         foreach ($unionQueryContainer as $segmentQueryBuilder) {
-            if (!empty($filter->contactSegmentFilterCrate->getMergedProperty())) {
-                foreach ($filter->contactSegmentFilterCrate->getMergedProperty() as $propertyFilter) {
-                    $this->addCustomObjectValueExpression($segmentQueryBuilder, $tableAlias, $propertyFilter['operator'], $propertyFilter['filter_value']);
-                }
-            } else {
-                $this->addCustomObjectValueExpression($segmentQueryBuilder, $tableAlias, $filter->getOperator(), $filter->getParameterValue());
-            }
-        }
-    }
+            $valueParameter = $this->randomParameterNameService->generateRandomParameterName();
+            $expression     = $this->getCustomValueValueExpression(
+                $segmentQueryBuilder,
+                $tableAlias,
+                $filter->getOperator(),
+                $valueParameter
+            );
 
-    /**
-     * @param mixed[]|string|int|null $value
-     */
-    public function addCustomObjectValueExpression(
-        SegmentQueryBuilder $queryBuilder,
-        string $tableAlias,
-        string $operator,
-        $value
-    ): void {
-        $valueParameter = $this->randomParameterNameService->generateRandomParameterName();
-        $expression     = $this->getCustomValueValueExpression($queryBuilder, $tableAlias, $operator, $valueParameter);
-        $this->addOperatorExpression($queryBuilder, $expression, $operator, $value, $valueParameter);
+            $this->addOperatorExpression(
+                $segmentQueryBuilder,
+                $expression,
+                $filter->getOperator(),
+                $filter->getParameterValue(),
+                $valueParameter
+            );
+        }
     }
 
     public function addCustomObjectNameExpression(
@@ -320,5 +304,45 @@ class QueryFilterHelper
             );
 
         return $customFieldQueryBuilder;
+    }
+
+    public function createMergeFilterQuery(
+        ContactSegmentFilter $segmentFilter,
+        string $leadsTableAlias
+    ): SegmentQueryBuilder {
+        $qb = new SegmentQueryBuilder($this->entityManager->getConnection());
+        $qb->select('1')
+           ->from(MAUTIC_TABLE_PREFIX.'custom_item_xref_contact', 'cix')
+           ->where(
+               $qb->expr()->eq('cix.contact_id', $leadsTableAlias.'.id')
+           );
+
+        $joinedAlias = [];
+
+        foreach ($segmentFilter->contactSegmentFilterCrate->getMergedProperty() as $filter) {
+            $segmentFilterFieldId       = (int) $filter['field'];
+            $segmentFilterFieldType     = $filter['type'];
+            $segmentFilterFieldType     = $segmentFilterFieldType ?: $this->queryFilterFactory->getCustomFieldTypeById($segmentFilterFieldId);
+            $dataTable                  = $this->queryFilterFactory->getTableNameFromType($segmentFilterFieldType);
+            $segmentFilterFieldOperator = $filter['operator'];
+            $alias                      = 'cix_'.$segmentFilterFieldId.'_'.$filter['type'];
+            $aliasValue                 = $alias.'_value';
+
+            if (!in_array($aliasValue, $joinedAlias, true)) {
+                $qb->innerJoin(
+                    'cix',
+                    MAUTIC_TABLE_PREFIX.$dataTable,
+                    $aliasValue,
+                    "$aliasValue.custom_item_id = cix.custom_item_id AND $aliasValue.custom_field_id = $segmentFilterFieldId"
+                );
+                $joinedAlias[] = $aliasValue;
+            }
+
+            $valueParameter = $this->randomParameterNameService->generateRandomParameterName();
+            $expression     = $this->getCustomValueValueExpression($qb, $alias, $segmentFilterFieldOperator, $valueParameter);
+            $this->addOperatorExpression($qb, $expression, $segmentFilterFieldOperator, $filter['filter_value'], $valueParameter);
+        }
+
+        return $qb;
     }
 }

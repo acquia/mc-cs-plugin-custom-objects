@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Event\LeadListMergeFiltersEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
@@ -14,9 +15,12 @@ class SegmentFiltersMergeSubscriber implements EventSubscriberInterface
 {
     private ConfigProvider $configProvider;
 
-    public function __construct(ConfigProvider $configProvider)
+    private CoreParametersHelper $coreParametersHelper;
+
+    public function __construct(ConfigProvider $configProvider, CoreParametersHelper $coreParametersHelper)
     {
-        $this->configProvider = $configProvider;
+        $this->configProvider       = $configProvider;
+        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     /**
@@ -24,12 +28,16 @@ class SegmentFiltersMergeSubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents(): array
     {
+        if (!defined(LeadEvents::LIST_FILTERS_MERGE)) {
+            return [];
+        }
+
         return [LeadEvents::LIST_FILTERS_MERGE => 'mergeCustomObjectFilters'];
     }
 
     public function mergeCustomObjectFilters(LeadListMergeFiltersEvent $event): void
     {
-        if (!$this->configProvider->pluginIsEnabled()) {
+        if (!$this->configProvider->pluginIsEnabled() || !$this->coreParametersHelper->get('custom_object_merge_filter', false)) {
             return;
         }
 
@@ -40,12 +48,10 @@ class SegmentFiltersMergeSubscriber implements EventSubscriberInterface
         $customObjectIndex  = null;
         foreach ($filters as $index => $filter) {
             $glue = $filter['glue'];
-            if ('or' === strtolower($glue)) {
-                if (!empty($customFieldArr)) {
-                    $finalMergedFilters = array_merge($finalMergedFilters, $this->groupCustomObject($customFieldArr));
-                    $customObjectIndex  = null;
-                    $customFieldArr     = [];
-                }
+            if ('or' === strtolower($glue) && !empty($customFieldArr)) {
+                $finalMergedFilters = array_merge($finalMergedFilters, $this->groupCustomObject($customFieldArr));
+                $customObjectIndex  = null;
+                $customFieldArr     = [];
             }
 
             if ('custom_object' !== ($filter['object'] ?? '')) {
@@ -55,7 +61,7 @@ class SegmentFiltersMergeSubscriber implements EventSubscriberInterface
             if (!$customObjectIndex) {
                 $customObjectIndex = $index;
             }
-            $key                          = implode('_', [$filter['object'], $filter['field'], $filter['glue']]);
+            $key                          = implode('_', [$filter['object'], $filter['glue']]);
             $customFieldArr[$key][$index] = $filter;
         }
         if (!empty($customFieldArr)) {
@@ -80,7 +86,7 @@ class SegmentFiltersMergeSubscriber implements EventSubscriberInterface
                 unset($newGroupedArr[$key]['filter']);
                 $mergedProperty = [];
                 foreach ($customObjects as $filter) {
-                    $mergedProperty[]                    = ['operator' => $filter['operator'], 'filter_value' => $filter['properties']['filter']];
+                    $mergedProperty[]                    = ['operator' => $filter['operator'], 'filter_value' => $filter['properties']['filter'], 'field' => $filter['field']];
                     $newGroupedArr[$key]['properties'][] = $filter;
                 }
                 unset($newGroupedArr[$key]['properties']['filter']);
