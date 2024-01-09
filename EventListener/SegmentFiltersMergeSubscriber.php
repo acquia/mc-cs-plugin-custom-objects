@@ -28,10 +28,6 @@ class SegmentFiltersMergeSubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents(): array
     {
-        if (!defined(LeadEvents::LIST_FILTERS_MERGE)) {
-            return [];
-        }
-
         return [LeadEvents::LIST_FILTERS_MERGE => 'mergeCustomObjectFilters'];
     }
 
