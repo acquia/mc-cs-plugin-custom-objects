@@ -46,6 +46,8 @@ class CustomItemRouteProvider
 
     public const ROUTE_CONTACT_LIST  = 'mautic_custom_item_contacts';
 
+    public const ROUTE_API_DELETE    = 'mautic_custom_item_api_delete';
+
     /**
      * @var RouterInterface
      */

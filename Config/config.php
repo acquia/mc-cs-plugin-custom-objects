@@ -176,6 +176,13 @@ $coParams = [
                 'method'     => 'GET|POST',
             ],
         ],
+        'api' => [
+            CustomItemRouteProvider::ROUTE_API_DELETE => [
+                'path' => '/custom/item/delete/{itemId}',
+                'controller' => 'CustomObjectsBundle:CustomItem\Api:delete',
+                'method' => 'DELETE'
+            ]
+        ]
     ],
 
     'services' => [
@@ -292,6 +299,18 @@ $coParams = [
                     'mautic.core.service.flashbag',
                     'custom_item.permission.provider',
                     'custom_item.route.provider',
+                ],
+                'methodCalls' => [
+                    'setContainer' => [
+                        '@service_container',
+                    ],
+                ],
+            ],
+            'custom_item.api_controller' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ApiController::class,
+                'arguments' => [
+                    'mautic.custom.model.item',
+                    'custom_item.permission.provider',
                 ],
                 'methodCalls' => [
                     'setContainer' => [

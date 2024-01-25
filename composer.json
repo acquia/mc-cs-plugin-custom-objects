@@ -1,9 +1,13 @@
 {
-    "name": "acquia/mc-cs-plugin-custom-objects",
+    "name": "northern-estate-agencies/-custom-objects",
     "description": "This plugin adds custom objects feature.",
     "type": "mautic-plugin",
     "config": {
-        "process-timeout": 2000
+        "process-timeout": 2000,
+        "allow-plugins": {
+            "php-http/discovery": true,
+            "symfony/flex": true
+        }
     },
     "keywords": [
         "custom",
@@ -28,10 +32,12 @@
         "issues": "https://github.com/acquia/mc-cs-plugin-custom-objects/issues",
         "wiki": "https://github.com/acquia/mc-cs-plugin-custom-objects/wiki"
     },
+    "minimum-stability": "dev",
     "require": {
         "php": ">=7.4",
         "ext-mbstring": "*",
-        "mautic/core-lib": "^4.3"
+        "mautic/core-lib": "^4.4.1",
+        "php-http/message-factory": "^1.0@dev"
     },
     "require-dev": {
         "theofidry/alice-data-fixtures": "^1.1"
