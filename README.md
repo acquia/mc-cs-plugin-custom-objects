@@ -1,4 +1,8 @@
-# Custom Objects plugin for Mautic
+# Mautic Custom Objects
+
+This repo is a custom maintained version of [this repository](https://github.com/acquia/mc-cs-plugin-custom-objects) to add in more API features.
+
+---
 
 Allows Mautic users to define Custom Objects with custom fields. Then create multiple custom items of each type and associate them to the Contact or Company entities.
 
