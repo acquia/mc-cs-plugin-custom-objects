@@ -14,6 +14,7 @@ use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateTimeType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextareaType;
+use MauticPlugin\CustomObjectsBundle\DTO\ImportLogDTO;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
@@ -307,5 +308,60 @@ class CustomItemImportModelTest extends \PHPUnit\Framework\TestCase
             ->willReturn($leadRepository);
 
         $this->customItemImportModel->import($this->import, $rowData, $this->customObject);
+    }
+
+    public function testImportWithLinkContactWhenGivenContactIdIsInvalid(): void
+    {
+        $mappedFields       = self::MAPPED_FIELDS;
+        $rowData            = self::ROW_DATA;
+        $mappedFields['id'] = 'customItemId';
+        $rowData['id']      = '555';
+        $customItem         = $this->createMock(CustomItem::class);
+
+        $this->import->expects($this->exactly(2))
+            ->method('getMatchedFields')
+            ->willReturn($mappedFields);
+
+        $this->customObject->expects($this->exactly(3))
+            ->method('getCustomFields')
+            ->willReturn(new ArrayCollection([$this->descriptionField, $this->dateField]));
+
+        $this->customItemModel->expects($this->once())
+            ->method('fetchEntity')
+            ->with(555)
+            ->will($this->throwException(new NotFoundException()));
+
+        $this->formatterHelper->expects($this->once())
+            ->method('simpleCsvToArray')
+            ->with('3262739,3262738,3262737')
+            ->willReturn([3262739, 3262738, 3262737]);
+
+        $this->customItemModel->expects($this->exactly(1))
+            ->method('linkEntity')
+            ->withConsecutive(
+                [$customItem, 'contact', 3262739],
+                [$customItem, 'contact', 3262738],
+                [$customItem, 'contact', 3262737]
+            );
+
+        $this->customItemModel->expects($this->once())
+            ->method('save')
+            ->with($this->isInstanceOf(CustomItem::class))
+            ->willReturn($customItem);
+
+        $leadRepository = $this->createMock(LeadRepository::class);
+        $leadRepository->expects($this->atLeast(3))
+            ->method('exists')
+            ->willReturnOnConsecutiveCalls(true, false, false);
+
+        $this->entityManager->expects($this->any())
+            ->method('getRepository')
+            ->with(Lead::class)
+            ->willReturn($leadRepository);
+
+        $importLogDto = new ImportLogDTO();
+        $this->customItemImportModel->import($this->import, $rowData, $this->customObject, $importLogDto);
+
+        $this->assertTrue($importLogDto->hasWarning());
     }
 }
