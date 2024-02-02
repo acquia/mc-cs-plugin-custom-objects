@@ -8,6 +8,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use Mautic\LeadBundle\Entity\Import;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Entity\LeadRepository;
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateTimeType;
@@ -149,6 +151,12 @@ class CustomItemImportModelTest extends \PHPUnit\Framework\TestCase
             }))
             ->willReturn($customItem);
 
+        $leadRepository = $this->createMock(LeadRepository::class);
+        $this->entityManager->expects($this->any())
+            ->method('getRepository')
+            ->with(Lead::class)
+            ->willReturn($leadRepository);
+
         $this->assertSame(
             false,
             $this->customItemImportModel->import($this->import, self::ROW_DATA, $this->customObject)
@@ -236,6 +244,16 @@ class CustomItemImportModelTest extends \PHPUnit\Framework\TestCase
             ->with($customItem)
             ->willReturn($customItem);
 
+        $leadRepository = $this->createMock(LeadRepository::class);
+        $leadRepository->expects($this->atLeast(3))
+            ->method('exists')
+            ->willReturn(true);
+
+        $this->entityManager->expects($this->any())
+            ->method('getRepository')
+            ->with(Lead::class)
+            ->willReturn($leadRepository);
+
         $this->customItemImportModel->import($this->import, $rowData, $this->customObject);
     }
 
@@ -277,6 +295,16 @@ class CustomItemImportModelTest extends \PHPUnit\Framework\TestCase
             ->method('save')
             ->with($this->isInstanceOf(CustomItem::class))
             ->willReturn($customItem);
+
+        $leadRepository = $this->createMock(LeadRepository::class);
+        $leadRepository->expects($this->atLeast(3))
+            ->method('exists')
+            ->willReturn(true);
+
+        $this->entityManager->expects($this->any())
+            ->method('getRepository')
+            ->with(Lead::class)
+            ->willReturn($leadRepository);
 
         $this->customItemImportModel->import($this->import, $rowData, $this->customObject);
     }
