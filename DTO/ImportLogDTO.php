@@ -21,11 +21,8 @@ class ImportLogDTO
         $this->warnings[] = $warning;
     }
 
-    /**
-     * @return array<string>
-     */
-    public function getWarnings(): array
+    public function getWarningsAsString(): string
     {
-        return $this->warnings;
+        return implode('\n', $this->warnings);
     }
 }

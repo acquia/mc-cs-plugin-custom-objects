@@ -193,7 +193,7 @@ class ImportSubscriber implements EventSubscriberInterface
             $event->setWasMerged($merged);
 
             if ($importLogDto->hasWarning()) {
-                $event->setWarnings($importLogDto->getWarnings());
+                $event->addWarning($importLogDto->getWarningsAsString());
             }
         } catch (NotFoundException $e) {
             // Not a Custom Object import or the custom object doesn't exist anymore. Move on.
