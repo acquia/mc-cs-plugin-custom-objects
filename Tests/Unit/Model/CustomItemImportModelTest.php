@@ -359,6 +359,13 @@ class CustomItemImportModelTest extends \PHPUnit\Framework\TestCase
             ->with(Lead::class)
             ->willReturn($leadRepository);
 
+        $translator = $this->createMock(TranslatorInterface::class);
+        $translator->expects($this->any())
+            ->method('trans')
+            ->willReturn('test warning');
+
+        $this->customItemImportModel->setTranslator($translator);
+
         $importLogDto = new ImportLogDTO();
         $this->customItemImportModel->import($this->import, $rowData, $this->customObject, $importLogDto);
 

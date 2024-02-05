@@ -541,7 +541,6 @@ $coParams = [
                     'doctrine.orm.entity_manager',
                     'mautic.custom.model.item',
                     'mautic.helper.template.formatter',
-                    'translator',
                 ],
             ],
             'mautic.custom.model.import.xref.contact' => [
