@@ -6,6 +6,9 @@ namespace MauticPlugin\CustomObjectsBundle\DTO;
 
 class ImportLogDTO
 {
+    /**
+     * @var array<string>
+     */
     private array $warnings = [];
 
     public function hasWarning(): bool
@@ -18,8 +21,11 @@ class ImportLogDTO
         $this->warnings[] = $warning;
     }
 
-    public function getFormattedWarning(): string
+    /**
+     * @return array<string>
+     */
+    public function getWarnings(): array
     {
-        return implode('\n', $this->warnings);
+        return $this->warnings;
     }
 }

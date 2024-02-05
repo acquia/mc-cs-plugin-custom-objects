@@ -110,7 +110,10 @@ class CustomItemImportModel extends FormModel
             if (!$this->entityManager->getRepository(Lead::class)->exists((string) $contactId)) {
                 if ($importLogDto) {
                     $importLogDto->addWarning(
-                        'warning: Invalid contact '.$contactId.' to link with customItem '.$customItem->getId()
+                        $this->translator->trans('custom.item.import.invalid.contactid.for.link', [
+                            '%contactId%' => $contactId,
+                            '%customItemId%' => $customItem->getId(),
+                        ])
                     );
                 }
                 continue;
