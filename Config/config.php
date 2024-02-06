@@ -747,6 +747,7 @@ $coParams = [
                     'custom_item.permission.provider',
                     'custom_field.repository',
                     'translator',
+                    'mautic.user.model.user',
                 ],
             ],
             'custom_item.contact.subscriber' => [

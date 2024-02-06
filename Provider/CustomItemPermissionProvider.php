@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Provider;
 
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\UserBundle\Entity\User;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Security\Permissions\CustomObjectPermissions;
@@ -24,9 +25,9 @@ class CustomItemPermissionProvider
     /**
      * @throws ForbiddenException
      */
-    public function isGranted(string $permission, int $customObjectId): void
+    public function isGranted(string $permission, int $customObjectId, ?User $user = null): void
     {
-        if (!$this->corePermissions->isGranted($this->getPermissionName($customObjectId, $permission))) {
+        if (!$this->corePermissions->isGranted($this->getPermissionName($customObjectId, $permission), 'MATCH_ALL', $user)) {
             throw new ForbiddenException($permission, 'Items for Custom Object', $customObjectId);
         }
     }
@@ -45,9 +46,9 @@ class CustomItemPermissionProvider
     /**
      * @throws ForbiddenException
      */
-    public function canCreate(int $customObjectId): void
+    public function canCreate(int $customObjectId, ?User $user = null): void
     {
-        $this->isGranted('create', $customObjectId);
+        $this->isGranted('create', $customObjectId, $user);
     }
 
     /**
@@ -94,7 +95,7 @@ class CustomItemPermissionProvider
         $this->hasEntityAccess('delete', $entity);
     }
 
-    private function getPermissionName(int $customObjectId, string $permission): string
+    public function getPermissionName(int $customObjectId, string $permission): string
     {
         return sprintf('%s:%d:%s', CustomObjectPermissions::NAME, $customObjectId, $permission);
     }

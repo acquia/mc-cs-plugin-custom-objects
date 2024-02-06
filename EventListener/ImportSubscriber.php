@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Event\ImportMappingEvent;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Event\ImportValidateEvent;
 use Mautic\LeadBundle\LeadEvents;
+use Mautic\UserBundle\Model\UserModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
@@ -56,13 +57,16 @@ class ImportSubscriber implements EventSubscriberInterface
      */
     private $customFieldRepository;
 
+    private UserModel $userModel;
+
     public function __construct(
         CustomObjectModel $customObjectModel,
         CustomItemImportModel $customItemImportModel,
         ConfigProvider $configProvider,
         CustomItemPermissionProvider $permissionProvider,
         CustomFieldRepository $customFieldRepository,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        UserModel $userModel
     ) {
         $this->customObjectModel     = $customObjectModel;
         $this->customItemImportModel = $customItemImportModel;
@@ -70,6 +74,7 @@ class ImportSubscriber implements EventSubscriberInterface
         $this->permissionProvider    = $permissionProvider;
         $this->customFieldRepository = $customFieldRepository;
         $this->translator            = $translator;
+        $this->userModel             = $userModel;
     }
 
     /**
@@ -185,8 +190,9 @@ class ImportSubscriber implements EventSubscriberInterface
 
         try {
             $customObjectId = $this->getCustomObjectId($event->import->getObject());
-            $this->permissionProvider->canCreate($customObjectId);
-            $customObject = $this->customObjectModel->fetchEntity($customObjectId);
+            $user           = $event->import->isBackgroundProcess() ? $this->userModel->getEntity($event->import->getCreatedBy()) : null;
+            $this->permissionProvider->canCreate($customObjectId, $user);
+            $customObject   = $this->customObjectModel->fetchEntity($customObjectId);
             $merged       = $this->customItemImportModel->import($event->import, $event->rowData, $customObject);
             $event->setWasMerged($merged);
         } catch (NotFoundException $e) {
