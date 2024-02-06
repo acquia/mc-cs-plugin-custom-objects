@@ -107,11 +107,12 @@ class CustomItemImportModel extends FormModel
     private function linkContacts(CustomItem $customItem, array $contactIds, ?ImportLogDTO $importLogDto): void
     {
         foreach ($contactIds as $contactId) {
-            if (!$this->entityManager->getRepository(Lead::class)->exists((string) $contactId)) {
+            $leadRepository = $this->entityManager->getRepository(Lead::class);
+            if (method_exists($leadRepository, 'exists') && !$leadRepository->exists((string) $contactId)) {
                 if ($importLogDto) {
                     $importLogDto->addWarning(
                         $this->translator->trans('custom.item.import.invalid.contactid.for.link', [
-                            '%contactId%' => $contactId,
+                            '%contactId%'    => $contactId,
                             '%customItemId%' => $customItem->getId(),
                         ])
                     );
