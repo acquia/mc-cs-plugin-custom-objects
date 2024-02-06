@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Event\ImportMappingEvent;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Event\ImportValidateEvent;
 use Mautic\LeadBundle\LeadEvents;
+use MauticPlugin\CustomObjectsBundle\DTO\ImportLogDTO;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
@@ -187,8 +188,13 @@ class ImportSubscriber implements EventSubscriberInterface
             $customObjectId = $this->getCustomObjectId($event->import->getObject());
             $this->permissionProvider->canCreate($customObjectId);
             $customObject = $this->customObjectModel->fetchEntity($customObjectId);
-            $merged       = $this->customItemImportModel->import($event->import, $event->rowData, $customObject);
+            $importLogDto = new ImportLogDTO();
+            $merged       = $this->customItemImportModel->import($event->import, $event->rowData, $customObject, $importLogDto);
             $event->setWasMerged($merged);
+
+            if ($importLogDto->hasWarning()) {
+                $event->addWarning($importLogDto->getWarningsAsString());
+            }
         } catch (NotFoundException $e) {
             // Not a Custom Object import or the custom object doesn't exist anymore. Move on.
         }
