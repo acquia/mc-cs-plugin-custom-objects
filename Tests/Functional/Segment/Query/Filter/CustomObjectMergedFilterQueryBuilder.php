@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Command;
+namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Segment\Query\Filter;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -10,7 +10,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
 use PHPUnit\Framework\Assert;
 
-class SegmentUpdateCommandFunctionalTest extends MauticMysqlTestCase
+class CustomObjectMergedFilterQueryBuilder extends MauticMysqlTestCase
 {
     use FixtureObjectsTrait;
 
