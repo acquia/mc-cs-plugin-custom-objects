@@ -14,6 +14,8 @@ class ConfigProvider
     public const CONFIG_PARAM_ENABLED                              = 'custom_objects_enabled';
     public const CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT = 'custom_object_item_value_to_contact_relation_limit';
 
+    public const CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_DEFAULT_LIMIT = 3;
+
     /**
      * @var CoreParametersHelper
      */
@@ -35,6 +37,10 @@ class ConfigProvider
     public function isCustomObjectMergeFilterEnabled(): bool
     {
         return $this->coreParametersHelper->get('custom_object_merge_filter', false)
-            && (0 === (int) $this->coreParametersHelper->get('custom_object_item_value_to_contact_relation_limit', 3));
+            && (0 === (int) $this->coreParametersHelper->get(
+                    self::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT,
+                    self::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_DEFAULT_LIMIT
+                )
+            );
     }
 }

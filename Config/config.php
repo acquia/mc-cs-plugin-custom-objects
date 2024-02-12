@@ -1187,7 +1187,7 @@ $coParams = [
     ],
     'parameters' => [
         ConfigProvider::CONFIG_PARAM_ENABLED                                  => true,
-        ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT     => 3,
+        ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT     => ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_DEFAULT_LIMIT,
         'custom_item_export_dir'                                              => '%kernel.root_dir%/../media/files/temp',
         'custom_object_merge_filter'                                          => false,
     ],
