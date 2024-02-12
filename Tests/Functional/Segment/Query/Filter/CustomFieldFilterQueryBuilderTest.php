@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Segment\Query\Filter;
 
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
@@ -54,9 +53,6 @@ class CustomFieldFilterQueryBuilderTest extends MauticMysqlTestCase
         /** @var CustomFieldRepository $customFieldRepository */
         $customFieldRepository = self::$container->get('custom_field.repository');
 
-        /** @var CoreParametersHelper $coreParametersHelper */
-        $coreParametersHelper = self::$container->get('mautic.helper.core_parameters');
-
         $queryHelper = new QueryFilterHelper(
             $this->em,
             new QueryFilterFactory(
@@ -71,8 +67,7 @@ class CustomFieldFilterQueryBuilderTest extends MauticMysqlTestCase
         $queryBuilderService = new CustomFieldFilterQueryBuilder(
             new RandomParameterName(),
             $dispatcher,
-            $queryHelper,
-            $coreParametersHelper
+            $queryHelper
         );
 
         /** @var ContactSegmentFilter $filterMock */
