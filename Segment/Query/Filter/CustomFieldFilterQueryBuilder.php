@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Segment\Query\Filter;
 
 use Doctrine\DBAL\DBALException;
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\Filter\BaseFilterQueryBuilder;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
@@ -20,18 +19,14 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
      */
     private $filterHelper;
 
-    private CoreParametersHelper $coreParametersHelper;
-
     public function __construct(
         RandomParameterName $randomParameterNameService,
         EventDispatcherInterface $dispatcher,
-        QueryFilterHelper $filterHelper,
-        CoreParametersHelper $coreParametersHelper
+        QueryFilterHelper $filterHelper
     ) {
         parent::__construct($randomParameterNameService, $dispatcher);
 
-        $this->filterHelper         = $filterHelper;
-        $this->coreParametersHelper = $coreParametersHelper;
+        $this->filterHelper  = $filterHelper;
     }
 
     /** {@inheritdoc} */
@@ -50,19 +45,15 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $tableAlias = 'cfwq_'.(int) $filter->getField();
 
-        if ($this->coreParametersHelper->get('custom_object_merge_filter', false)) {
-            $subQuery = $this->filterHelper->createMergeFilterQuery($filter, $leadsTableAlias);
-        } else {
-            $subQuery = $this->filterHelper->createValueQuery(
-                $tableAlias,
-                $filter
-            );
+        $unionQueryContainer = $this->filterHelper->createValueQuery(
+            $tableAlias,
+            $filter
+        );
 
-            foreach ($subQuery as $segmentQueryBuilder) {
-                $segmentQueryBuilder->andWhere(
-                    $segmentQueryBuilder->expr()->eq("{$tableAlias}_contact.contact_id", $leadsTableAlias.'.id')
-                );
-            }
+        foreach ($unionQueryContainer as $segmentQueryBuilder) {
+            $segmentQueryBuilder->andWhere(
+                $segmentQueryBuilder->expr()->eq("{$tableAlias}_contact.contact_id", $leadsTableAlias.'.id')
+            );
         }
 
         switch ($filterOperator) {
@@ -71,19 +62,19 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
             case 'notLike':
             case '!multiselect':
                 $queryBuilder->addLogic(
-                    $queryBuilder->expr()->notExists($subQuery->getSQL()),
+                    $queryBuilder->expr()->notExists($unionQueryContainer->getSQL()),
                     $filter->getGlue()
                 );
 
                 break;
             default:
                 $queryBuilder->addLogic(
-                    $queryBuilder->expr()->exists($subQuery->getSQL()),
+                    $queryBuilder->expr()->exists($unionQueryContainer->getSQL()),
                     $filter->getGlue()
                 );
         }
 
-        $queryBuilder->setParameters($subQuery->getParameters(), $subQuery->getParameterTypes());
+        $queryBuilder->setParameters($unionQueryContainer->getParameters(), $unionQueryContainer->getParameterTypes());
 
         return $queryBuilder;
     }
