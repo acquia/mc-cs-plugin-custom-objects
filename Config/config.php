@@ -829,7 +829,6 @@ $coParams = [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\SegmentFiltersMergeSubscriber::class,
                 'arguments' => [
                     'custom_object.config.provider',
-                    'mautic.helper.core_parameters',
                 ],
             ],
             'custom_object.dynamic_content.subscriber' => [
@@ -1118,7 +1117,6 @@ $coParams = [
                     'mautic.lead.model.random_parameter_name',
                     'event_dispatcher',
                     'custom_object.query.filter.helper',
-                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.lead.query.builder.custom_item.value'  => [
@@ -1127,6 +1125,14 @@ $coParams = [
                     'mautic.lead.model.random_parameter_name',
                     'custom_object.query.filter.helper',
                     'event_dispatcher',
+                ],
+            ],
+            'mautic.lead.query.builder.custom_object.merged.value' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomObjectMergedFilterQueryBuilder::class,
+                'arguments' => [
+                    'mautic.lead.model.random_parameter_name',
+                    'event_dispatcher',
+                    'custom_object.query.filter.helper',
                 ],
             ],
             'custom_object.query.filter.factory' => [
