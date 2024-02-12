@@ -31,4 +31,10 @@ class ConfigProvider
     {
         return (bool) $this->coreParametersHelper->get(self::CONFIG_PARAM_ENABLED, true);
     }
+
+    public function isCustomObjectMergeFilterEnabled(): bool
+    {
+        return $this->coreParametersHelper->get('custom_object_merge_filter', false)
+            && (0 === (int) $this->coreParametersHelper->get('custom_object_item_value_to_contact_relation_limit', 3));
+    }
 }
