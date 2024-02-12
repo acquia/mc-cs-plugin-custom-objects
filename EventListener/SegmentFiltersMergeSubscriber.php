@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\LeadBundle\Event\LeadListMergeFiltersEvent;
-use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -15,12 +13,9 @@ class SegmentFiltersMergeSubscriber implements EventSubscriberInterface
 {
     private ConfigProvider $configProvider;
 
-    private CoreParametersHelper $coreParametersHelper;
-
-    public function __construct(ConfigProvider $configProvider, CoreParametersHelper $coreParametersHelper)
+    public function __construct(ConfigProvider $configProvider)
     {
-        $this->configProvider       = $configProvider;
-        $this->coreParametersHelper = $coreParametersHelper;
+        $this->configProvider = $configProvider;
     }
 
     /**
@@ -28,12 +23,20 @@ class SegmentFiltersMergeSubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents(): array
     {
-        return [LeadEvents::LIST_FILTERS_MERGE => 'mergeCustomObjectFilters'];
+        return [
+            /**
+             * Using string instead of constant for now to avoid issues in custom object plugin.
+             * When \Mautic\LeadBundle\LeadEvents::LIST_FILTERS_MERGE is available in mautic\mautic,
+             * we can use it here instead of string.
+             */
+            // \Mautic\LeadBundle\LeadEvents::LIST_FILTERS_MERGE => 'mergeCustomObjectFilters'
+            'mautic.list_filters_merge' => 'mergeCustomObjectFilters',
+        ];
     }
 
     public function mergeCustomObjectFilters(LeadListMergeFiltersEvent $event): void
     {
-        if (!$this->configProvider->pluginIsEnabled() || !$this->coreParametersHelper->get('custom_object_merge_filter', false)) {
+        if (!$this->configProvider->pluginIsEnabled() || (!$this->configProvider->isCustomObjectMergeFilterEnabled())) {
             return;
         }
 
@@ -82,7 +85,12 @@ class SegmentFiltersMergeSubscriber implements EventSubscriberInterface
                 unset($newGroupedArr[$key]['filter']);
                 $mergedProperty = [];
                 foreach ($customObjects as $filter) {
-                    $mergedProperty[]                    = ['operator' => $filter['operator'], 'filter_value' => $filter['properties']['filter'], 'field' => $filter['field']];
+                    $mergedProperty[] = [
+                        'operator'     => $filter['operator'],
+                        'filter_value' => $filter['properties']['filter'],
+                        'field'        => $filter['field'],
+                        'cmo_filter'   => str_starts_with($filter['field'], 'cmo_'),
+                    ];
                     $newGroupedArr[$key]['properties'][] = $filter;
                 }
                 unset($newGroupedArr[$key]['properties']['filter']);
