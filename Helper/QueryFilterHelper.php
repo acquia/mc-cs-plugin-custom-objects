@@ -11,7 +11,6 @@ use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\UnionQueryContainer;
 
@@ -310,39 +309,115 @@ class QueryFilterHelper
         ContactSegmentFilter $segmentFilter,
         string $leadsTableAlias
     ): SegmentQueryBuilder {
-        $qb = new SegmentQueryBuilder($this->entityManager->getConnection());
+        $customItemXrefContactAlias = 'cix';
+        $qb                         = new SegmentQueryBuilder($this->entityManager->getConnection());
         $qb->select('1')
-           ->from(MAUTIC_TABLE_PREFIX.'custom_item_xref_contact', 'cix')
-           ->where(
-               $qb->expr()->eq('cix.contact_id', $leadsTableAlias.'.id')
-           );
+           ->from(MAUTIC_TABLE_PREFIX.'custom_item_xref_contact', $customItemXrefContactAlias)
+           ->where($qb->expr()->eq($customItemXrefContactAlias.'.contact_id', $leadsTableAlias.'.id'));
 
         $joinedAlias = [];
 
         foreach ($segmentFilter->contactSegmentFilterCrate->getMergedProperty() as $filter) {
             $segmentFilterFieldId       = (int) $filter['field'];
-            $segmentFilterFieldType     = $filter['type'];
-            $segmentFilterFieldType     = $segmentFilterFieldType ?: $this->queryFilterFactory->getCustomFieldTypeById($segmentFilterFieldId);
+            $segmentFilterFieldType     = $filter['type'] ?: $this->queryFilterFactory
+                ->getCustomFieldTypeById($segmentFilterFieldId);
             $dataTable                  = $this->queryFilterFactory->getTableNameFromType($segmentFilterFieldType);
             $segmentFilterFieldOperator = $filter['operator'];
-            $alias                      = 'cix_'.$segmentFilterFieldId.'_'.$filter['type'];
+            $alias                      = $customItemXrefContactAlias.'_'.$segmentFilterFieldId.'_'.$filter['type'];
             $aliasValue                 = $alias.'_value';
+            $isCmoFilter                = $filter['cmo_filter'] ?? false;
+            $cinAlias                   = 'cin_'.$segmentFilterFieldId;
+            $cinAliasItem               = $cinAlias.'_item';
+            $valueParameter             = $this->randomParameterNameService->generateRandomParameterName();
 
-            if (!in_array($aliasValue, $joinedAlias, true)) {
-                $qb->innerJoin(
-                    'cix',
-                    MAUTIC_TABLE_PREFIX.$dataTable,
+            if ($isCmoFilter && !in_array($cinAliasItem, $joinedAlias, true)) {
+                $this->joinMergeCustomItem($qb, $customItemXrefContactAlias, $cinAliasItem, $segmentFilterFieldId);
+                $joinedAlias[] = $cinAliasItem;
+            } elseif (!in_array($aliasValue, $joinedAlias, true)) {
+                $this->joinMergeCustomField(
+                    $qb,
+                    $customItemXrefContactAlias,
+                    $dataTable,
                     $aliasValue,
-                    "$aliasValue.custom_item_id = cix.custom_item_id AND $aliasValue.custom_field_id = $segmentFilterFieldId"
+                    $segmentFilterFieldId
                 );
                 $joinedAlias[] = $aliasValue;
             }
 
-            $valueParameter = $this->randomParameterNameService->generateRandomParameterName();
-            $expression     = $this->getCustomValueValueExpression($qb, $alias, $segmentFilterFieldOperator, $valueParameter);
-            $this->addOperatorExpression($qb, $expression, $segmentFilterFieldOperator, $filter['filter_value'], $valueParameter);
+            $this->addOperatorExpression(
+                $qb,
+                $this->getMergeExpression(
+                    $isCmoFilter,
+                    $qb,
+                    $cinAlias,
+                    $alias,
+                    $segmentFilterFieldOperator,
+                    $valueParameter
+                ),
+                $segmentFilterFieldOperator,
+                $filter['filter_value'],
+                $valueParameter
+            );
         }
 
         return $qb;
+    }
+
+    private function joinMergeCustomItem(
+        SegmentQueryBuilder $qb,
+        string $customItemXrefContactAlias,
+        string $cinAliasItem,
+        int $segmentFilterFieldId
+    ): void {
+        $qb->leftJoin(
+            $customItemXrefContactAlias,
+            MAUTIC_TABLE_PREFIX.'custom_item',
+            $cinAliasItem,
+            "$customItemXrefContactAlias.custom_item_id = $cinAliasItem.id"
+        );
+        $qb->andWhere($qb->expr()->eq($cinAliasItem.'.custom_object_id', $segmentFilterFieldId));
+    }
+
+    private function joinMergeCustomField(
+        SegmentQueryBuilder $qb,
+        string $customItemXrefContactAlias,
+        string $dataTable,
+        string $aliasValue,
+        int $segmentFilterFieldId
+    ): void {
+        $qb->innerJoin(
+            $customItemXrefContactAlias,
+            MAUTIC_TABLE_PREFIX.$dataTable,
+            $aliasValue,
+            "$aliasValue.custom_item_id = $customItemXrefContactAlias.custom_item_id AND "
+            ."$aliasValue.custom_field_id = $segmentFilterFieldId"
+        );
+    }
+
+    private function getMergeExpression(
+        bool $isCmoFilter,
+        SegmentQueryBuilder $qb,
+        string $cinAlias,
+        string $alias,
+        mixed $segmentFilterFieldOperator,
+        string $valueParameter
+    ): CompositeExpression|string {
+        if ($isCmoFilter) {
+            $expression = $this->getCustomObjectNameExpression(
+                $qb,
+                $cinAlias,
+                $segmentFilterFieldOperator,
+                $valueParameter
+            );
+        } else {
+            $expression = $this->getCustomValueValueExpression(
+                $qb,
+                $alias,
+                $segmentFilterFieldOperator,
+                $valueParameter
+            );
+        }
+
+        return $expression;
     }
 }
