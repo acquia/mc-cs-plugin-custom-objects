@@ -16,6 +16,7 @@ class SegmentUpdateCommandFunctionalTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
+        $this->configParams['custom_object_merge_filter']                                      = true;
         $this->configParams[ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT] = 0;
         parent::setUp();
     }
