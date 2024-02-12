@@ -21,7 +21,7 @@ class CustomObjectMergedFilterQueryBuilder extends MauticMysqlTestCase
         parent::setUp();
     }
 
-    public function testMembershipAction(): void
+    public function testMergedSegmentFilters(): void
     {
         $fixturesDirectory = $this->getFixturesDirectory();
         $objects           = $this->loadFixtureFiles([
