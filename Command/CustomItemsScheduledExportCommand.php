@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Command;
 
+use Mautic\CoreBundle\Command\ModeratedCommand;
 use Mautic\CoreBundle\Helper\ExitCode;
 use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemExportSchedulerEvent;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemExportSchedulerModel;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class CustomItemsScheduledExportCommand extends Command
+class CustomItemsScheduledExportCommand extends ModeratedCommand
 {
     public const COMMAND_NAME = 'mautic:custom_items:scheduled_export';
 
@@ -54,8 +54,13 @@ class CustomItemsScheduledExportCommand extends Command
     {
         $ids                        = $this->formatterHelper->simpleCsvToArray($input->getOption('ids'), 'int');
         $customItemExportSchedulers = $this->customItemExportSchedulerModel->getRepository()->findBy(['id' => $ids]);
-        $count                      = 0;
+        $moderationKey = sprintf('%s%s', self::COMMAND_NAME, implode('-', $ids ?? []));
 
+        if (!$this->checkRunStatus($input, $output, $moderationKey)) {
+            return ExitCode::SUCCESS;
+        }
+
+        $count = 0;
         foreach ($customItemExportSchedulers as $customItemExportScheduler) {
             $customItemExportSchedulerEvent = new CustomItemExportSchedulerEvent($customItemExportScheduler);
             $this->eventDispatcher->dispatch(CustomItemEvents::CUSTOM_ITEM_PREPARE_EXPORT_FILE, $customItemExportSchedulerEvent);
@@ -65,6 +70,8 @@ class CustomItemsScheduledExportCommand extends Command
         }
 
         $output->writeln('CustomItem export email(s) sent: '.$count);
+
+        $this->completeRun();
 
         return ExitCode::SUCCESS;
     }
