@@ -23,7 +23,7 @@ class TokenParser
 
         foreach ($matches[1] as $key => $tokenDataRaw) {
             $token = new Token($matches[0][$key]);
-            $parts = $this->getPartsDividedByPipe($tokenDataRaw);
+            $parts = $this->getPartsDividedByPipe(urldecode($tokenDataRaw));
 
             try {
                 $this->extractAliases($parts[0], $token);
