@@ -322,7 +322,7 @@ class QueryFilterHelper
             $segmentFilterFieldType     = $filter['type'] ?: $this->queryFilterFactory
                 ->getCustomFieldTypeById($segmentFilterFieldId);
             $dataTable                  = $this->queryFilterFactory->getTableNameFromType($segmentFilterFieldType);
-            $segmentFilterFieldOperator = $filter['operator'];
+            $segmentFilterFieldOperator = (string) $filter['operator'];
             $alias                      = $customItemXrefContactAlias.'_'.$segmentFilterFieldId.'_'.$filter['type'];
             $aliasValue                 = $alias.'_value';
             $isCmoFilter                = $filter['cmo_filter'] ?? false;
@@ -394,14 +394,19 @@ class QueryFilterHelper
         );
     }
 
+    /**
+     * @phpstan-ignore-next-line
+     *
+     * @return CompositeExpression|string
+     */
     private function getMergeExpression(
         bool $isCmoFilter,
         SegmentQueryBuilder $qb,
         string $cinAlias,
         string $alias,
-        mixed $segmentFilterFieldOperator,
+        string $segmentFilterFieldOperator,
         string $valueParameter
-    ): CompositeExpression|string {
+    ) {
         if ($isCmoFilter) {
             $expression = $this->getCustomObjectNameExpression(
                 $qb,
