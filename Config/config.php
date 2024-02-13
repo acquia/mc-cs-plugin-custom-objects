@@ -1038,6 +1038,7 @@ $coParams = [
                 'class'     => ConfigProvider::class,
                 'arguments' => [
                     'mautic.helper.core_parameters',
+                    'database_connection',
                 ],
             ],
             'custom_field.type.provider' => [
