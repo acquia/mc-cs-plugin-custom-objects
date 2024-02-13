@@ -34,15 +34,14 @@ class CustomObjectMergedFilterQueryBuilderTest extends MauticMysqlTestCase
         ]);
         $this->setFixtureObjects($objects);
 
-        $customField1 = $this->getFixtureById('custom_field1')->getId();
-        $customField2 = $this->getFixtureById('custom_field1')->getId();
+        $customField = $this->getFixtureById('custom_field1')->getId();
 
         $filters = [
             [
                 'glue'       => 'and',
                 'object'     => 'custom_object',
                 'type'       => 'text',
-                'field'      => 'cmf_'.$customField1,
+                'field'      => 'cmf_'.$customField,
                 'properties' => ['filter' => 'l'],
                 'operator'   => 'startsWith',
             ],
@@ -50,7 +49,7 @@ class CustomObjectMergedFilterQueryBuilderTest extends MauticMysqlTestCase
                 'glue'       => 'and',
                 'object'     => 'custom_object',
                 'type'       => 'text',
-                'field'      => 'cmf_'.$customField2,
+                'field'      => 'cmf_'.$customField,
                 'properties' => ['filter' => 'e'],
                 'operator'   => 'endsWith',
             ],
