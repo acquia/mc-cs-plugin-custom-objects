@@ -2,18 +2,26 @@
 
 declare(strict_types=1);
 
-namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Command;
+namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Segment\Query\Filter;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
+use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
 use PHPUnit\Framework\Assert;
 
-class SegmentUpdateCommandFunctionalTest extends MauticMysqlTestCase
+class CustomObjectMergedFilterQueryBuilder extends MauticMysqlTestCase
 {
     use FixtureObjectsTrait;
 
-    public function testMembershipAction(): void
+    protected function setUp(): void
+    {
+        $this->configParams['custom_object_merge_filter']                                      = true;
+        $this->configParams[ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT] = 0;
+        parent::setUp();
+    }
+
+    public function testMergedSegmentFilters(): void
     {
         $fixturesDirectory = $this->getFixturesDirectory();
         $objects           = $this->loadFixtureFiles([
@@ -26,14 +34,15 @@ class SegmentUpdateCommandFunctionalTest extends MauticMysqlTestCase
         ]);
         $this->setFixtureObjects($objects);
 
-        $custom_field = $this->getFixtureById('custom_field1')->getId();
+        $customField1 = $this->getFixtureById('custom_field1')->getId();
+        $customField2 = $this->getFixtureById('custom_field1')->getId();
 
         $filters = [
             [
                 'glue'       => 'and',
                 'object'     => 'custom_object',
                 'type'       => 'text',
-                'field'      => 'cmf_'.$custom_field,
+                'field'      => 'cmf_'.$customField1,
                 'properties' => ['filter' => 'l'],
                 'operator'   => 'startsWith',
             ],
@@ -41,7 +50,7 @@ class SegmentUpdateCommandFunctionalTest extends MauticMysqlTestCase
                 'glue'       => 'and',
                 'object'     => 'custom_object',
                 'type'       => 'text',
-                'field'      => 'cmf_'.$custom_field,
+                'field'      => 'cmf_'.$customField2,
                 'properties' => ['filter' => 'e'],
                 'operator'   => 'endsWith',
             ],
