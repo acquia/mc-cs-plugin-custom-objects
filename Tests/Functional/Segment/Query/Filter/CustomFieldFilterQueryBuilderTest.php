@@ -25,6 +25,12 @@ class CustomFieldFilterQueryBuilderTest extends MauticMysqlTestCase
     use FixtureObjectsTrait;
     use DbalQueryTrait;
 
+    protected function setUp(): void
+    {
+        $this->configParams['custom_object_merge_filter'] = false;
+        parent::setUp();
+    }
+
     public function testApplyQuery(): void
     {
         $fixturesDirectory = $this->getFixturesDirectory();

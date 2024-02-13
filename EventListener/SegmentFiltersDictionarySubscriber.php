@@ -13,6 +13,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemNameFilterQueryBuilder;
+use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomObjectMergedFilterQueryBuilder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
@@ -64,21 +65,28 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
             ->from(MAUTIC_TABLE_PREFIX.'custom_object', 'o')
             ->leftJoin('o', MAUTIC_TABLE_PREFIX.'custom_field', 'f', 'f.custom_object_id = o.id');
 
-        $registeredObjects = [];
-        $fields            = $this->executeSelect($queryBuilder)->fetchAll();
+        $registeredObjects                = [];
+        $fields                           = $this->executeSelect($queryBuilder)->fetchAll();
+        $isCustomObjectMergeFilterEnabled = $this->configProvider->isCustomObjectMergeFilterEnabled();
+        $cmoType                          = CustomItemNameFilterQueryBuilder::getServiceId();
+        $cmfType                          = CustomFieldFilterQueryBuilder::getServiceId();
+
+        if ($isCustomObjectMergeFilterEnabled) {
+            $cmoType = $cmfType = CustomObjectMergedFilterQueryBuilder::getServiceId();
+        }
 
         foreach ($fields as $field) {
             $COId = $field['custom_object_id'];
             if (!in_array($COId, $registeredObjects, true)) {
                 $event->addTranslation('cmo_'.$COId, [
-                    'type'          => CustomItemNameFilterQueryBuilder::getServiceId(),
+                    'type'          => $cmoType,
                     'field'         => $COId,
                     'foreign_table' => 'custom_objects',
                 ]);
                 $registeredObjects[] = $COId;
             }
             if (!$event->hasTranslation('cmf_'.$field['id']) && !empty($field['id'])) {
-                $event->addTranslation('cmf_'.$field['id'], $this->createTranslation($field));
+                $event->addTranslation('cmf_'.$field['id'], $this->createTranslation($field, $cmfType));
             }
         }
     }
@@ -88,12 +96,12 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
      *
      * @return mixed[]
      */
-    private function createTranslation(array $fieldAttributes): array
+    private function createTranslation(array $fieldAttributes, string $cmfType): array
     {
         $segmentValueType = 'custom_field_value_'.$fieldAttributes['type'];
 
         return [
-            'type'          => CustomFieldFilterQueryBuilder::getServiceId(),
+            'type'          => $cmfType,
             'table'         => $segmentValueType,
             'field'         => $fieldAttributes['id'],
             'foreign_table' => 'custom_objects',
