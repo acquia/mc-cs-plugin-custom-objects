@@ -234,7 +234,7 @@ class ImportSubscriber implements EventSubscriberInterface
         $requiredFields = $this->customFieldRepository->getRequiredCustomFieldsForCustomObject($customObjectId);
 
         $missingRequiredFields = $requiredFields->filter(function (CustomField $customField) use ($matchedFields) {
-            return !array_key_exists($customField->getAlias(), $matchedFields);
+            return !array_key_exists($customField->getId(), array_flip($matchedFields));
         })->map(function (CustomField $customField) {
             return "{$customField->getLabel()} ({$customField->getAlias()})";
         });
