@@ -10,7 +10,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
 use PHPUnit\Framework\Assert;
 
-class CustomObjectMergedFilterQueryBuilder extends MauticMysqlTestCase
+class CustomObjectMergedFilterQueryBuilderTest extends MauticMysqlTestCase
 {
     use FixtureObjectsTrait;
 
@@ -34,15 +34,14 @@ class CustomObjectMergedFilterQueryBuilder extends MauticMysqlTestCase
         ]);
         $this->setFixtureObjects($objects);
 
-        $customField1 = $this->getFixtureById('custom_field1')->getId();
-        $customField2 = $this->getFixtureById('custom_field1')->getId();
+        $customField = $this->getFixtureById('custom_field1')->getId();
 
         $filters = [
             [
                 'glue'       => 'and',
                 'object'     => 'custom_object',
                 'type'       => 'text',
-                'field'      => 'cmf_'.$customField1,
+                'field'      => 'cmf_'.$customField,
                 'properties' => ['filter' => 'l'],
                 'operator'   => 'startsWith',
             ],
@@ -50,7 +49,7 @@ class CustomObjectMergedFilterQueryBuilder extends MauticMysqlTestCase
                 'glue'       => 'and',
                 'object'     => 'custom_object',
                 'type'       => 'text',
-                'field'      => 'cmf_'.$customField2,
+                'field'      => 'cmf_'.$customField,
                 'properties' => ['filter' => 'e'],
                 'operator'   => 'endsWith',
             ],
