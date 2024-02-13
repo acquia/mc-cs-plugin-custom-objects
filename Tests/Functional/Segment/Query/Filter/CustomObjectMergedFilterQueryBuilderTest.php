@@ -10,7 +10,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
 use PHPUnit\Framework\Assert;
 
-class CustomObjectMergedFilterQueryBuilder extends MauticMysqlTestCase
+class CustomObjectMergedFilterQueryBuilderTest extends MauticMysqlTestCase
 {
     use FixtureObjectsTrait;
 
