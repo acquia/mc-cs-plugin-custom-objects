@@ -53,6 +53,16 @@ class CustomObjectMergedFilterQueryBuilderTest extends MauticMysqlTestCase
                 'properties' => ['filter' => 'e'],
                 'operator'   => 'endsWith',
             ],
+            [
+                'object'     => 'custom_object',
+                'glue'       => 'and',
+                'field'      => 'cmf_'.$customField,
+                'type'       => 'text',
+                'operator'   => '!=',
+                'properties' => ['filter' => 'some random text'],
+                'filter'     => 'some random text',
+                'display'    => null,
+            ],
         ];
         $segment = $this->createSegment($filters);
 
