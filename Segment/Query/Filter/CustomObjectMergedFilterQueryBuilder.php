@@ -32,27 +32,8 @@ class CustomObjectMergedFilterQueryBuilder extends BaseFilterQueryBuilder
     public function applyQuery(QueryBuilder $queryBuilder, ContactSegmentFilter $filter): QueryBuilder
     {
         $leadsTableAlias = $queryBuilder->getTableAlias(MAUTIC_TABLE_PREFIX.'leads');
-        $filterOperator  = $filter->getOperator();
         $subQuery        = $this->queryFilterHelper->createMergeFilterQuery($filter, $leadsTableAlias);
-
-        switch ($filterOperator) {
-            case 'empty':
-            case 'neq':
-            case 'notLike':
-            case '!multiselect':
-                $queryBuilder->addLogic(
-                    $queryBuilder->expr()->notExists($subQuery->getSQL()),
-                    $filter->getGlue()
-                );
-
-                break;
-            default:
-                $queryBuilder->addLogic(
-                    $queryBuilder->expr()->exists($subQuery->getSQL()),
-                    $filter->getGlue()
-                );
-        }
-
+        $queryBuilder->addLogic($queryBuilder->expr()->exists($subQuery->getSQL()), $filter->getGlue());
         $queryBuilder->setParameters($subQuery->getParameters(), $subQuery->getParameterTypes());
 
         return $queryBuilder;
