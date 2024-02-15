@@ -71,6 +71,40 @@ class CustomObjectMergedFilterQueryBuilderTest extends MauticMysqlTestCase
         Assert::assertStringContainsString('3 total contact(s) to be added in batches of 300', $applicationTester->getDisplay());
     }
 
+    public function testMergedSegmentSingleFilter(): void
+    {
+        $fixturesDirectory = $this->getFixturesDirectory();
+        $objects           = $this->loadFixtureFiles([
+            $fixturesDirectory.'/leads.yml',
+            $fixturesDirectory.'/custom_objects.yml',
+            $fixturesDirectory.'/custom_fields.yml',
+            $fixturesDirectory.'/custom_items.yml',
+            $fixturesDirectory.'/custom_xref.yml',
+            $fixturesDirectory.'/custom_values.yml',
+        ]);
+        $this->setFixtureObjects($objects);
+
+        $customField = $this->getFixtureById('custom_field1')->getId();
+
+        $filters = [
+            [
+                'object'     => 'custom_object',
+                'glue'       => 'and',
+                'field'      => 'cmf_'.$customField,
+                'type'       => 'text',
+                'operator'   => '=',
+                'properties' => ['filter' => 'love'],
+                'filter'     => 'some random text',
+                'display'    => null,
+            ],
+        ];
+        $segment = $this->createSegment($filters);
+
+        $applicationTester = $this->testSymfonyCommand('mautic:segments:update', ['-i' => $segment->getId(), '--env' => 'test']);
+        Assert::assertSame(0, $applicationTester->getStatusCode());
+        Assert::assertStringContainsString('3 total contact(s) to be added in batches of 300', $applicationTester->getDisplay());
+    }
+
     /**
      * @param mixed[] $filters
      */
