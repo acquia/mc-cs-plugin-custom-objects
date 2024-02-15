@@ -78,24 +78,24 @@ class SegmentFiltersMergeSubscriber implements EventSubscriberInterface
     {
         $newGroupedArr = [];
         foreach ($customObjectFilters as $customObjects) {
-            $key                 = key($customObjects);
-            $newGroupedArr[$key] = $customObjects[$key];
-            if (count($customObjects) > 1) {
-                $newGroupedArr[$key]['operator'] = ContactSegmentFilterFactory::CUSTOM_OPERATOR;
-                unset($newGroupedArr[$key]['filter']);
-                $mergedProperty = [];
-                foreach ($customObjects as $filter) {
-                    $mergedProperty[] = [
-                        'operator'     => $filter['operator'],
-                        'filter_value' => $filter['properties']['filter'],
-                        'field'        => $filter['field'],
-                        'cmo_filter'   => str_starts_with($filter['field'], 'cmo_'),
-                    ];
-                    $newGroupedArr[$key]['properties'][] = $filter;
-                }
-                unset($newGroupedArr[$key]['properties']['filter']);
-                $newGroupedArr[$key]['merged_property'] = $mergedProperty;
+            $key                             = key($customObjects);
+            $newGroupedArr[$key]             = $customObjects[$key];
+            $newGroupedArr[$key]['operator'] = ContactSegmentFilterFactory::CUSTOM_OPERATOR;
+            unset($newGroupedArr[$key]['filter']);
+            $mergedProperty = [];
+
+            foreach ($customObjects as $filter) {
+                $mergedProperty[] = [
+                    'operator'     => $filter['operator'],
+                    'filter_value' => $filter['properties']['filter'],
+                    'field'        => $filter['field'],
+                    'cmo_filter'   => str_starts_with($filter['field'], 'cmo_'),
+                ];
+                $newGroupedArr[$key]['properties'][] = $filter;
             }
+
+            unset($newGroupedArr[$key]['properties']['filter']);
+            $newGroupedArr[$key]['merged_property'] = $mergedProperty;
         }
 
         return $newGroupedArr;
