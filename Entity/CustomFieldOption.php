@@ -163,7 +163,7 @@ class CustomFieldOption implements \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($offset)
+    public function offsetExists(mixed $offset): bool
     {
         return isset($this->{$offset});
     }
@@ -171,7 +171,7 @@ class CustomFieldOption implements \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): bool
     {
         return $this->offsetExists($offset) ? $this->{$offset} : null;
     }
@@ -179,7 +179,7 @@ class CustomFieldOption implements \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         $this->{$offset} = $value;
     }
@@ -187,7 +187,7 @@ class CustomFieldOption implements \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
         $this->{$offset} = null;
     }

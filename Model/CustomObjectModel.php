@@ -5,14 +5,18 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Model\ListModel;
 use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
@@ -23,51 +27,36 @@ use MauticPlugin\CustomObjectsBundle\Exception\InUseException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CustomObjectModel extends FormModel
 {
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @var CustomObjectRepository
-     */
-    private $customObjectRepository;
-
-    /**
-     * @var CustomObjectPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var CustomFieldModel
-     */
-    private $customFieldModel;
-
-    /**
-     * @var ListModel
-     */
-    private $listModel;
-
     public function __construct(
-        EntityManager $entityManager,
-        CustomObjectRepository $customObjectRepository,
-        CustomObjectPermissionProvider $permissionProvider,
+        private EntityManager $entityManager,
+        private CustomObjectRepository $customObjectRepository,
+        private CustomObjectPermissionProvider $permissionProvider,
         UserHelper $userHelper,
-        CustomFieldModel $customFieldModel,
+        private CustomFieldModel $customFieldModel,
         EventDispatcherInterface $dispatcher,
-        ListModel $listModel
+        private ListModel $listModel,
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        LoggerInterface $logger,
+        CoreParametersHelper $coreParametersHelper,
     ) {
         $this->entityManager          = $entityManager;
         $this->customObjectRepository = $customObjectRepository;
         $this->permissionProvider     = $permissionProvider;
-        $this->userHelper             = $userHelper;
+//        $this->userHelper             = $userHelper;
         $this->customFieldModel       = $customFieldModel;
-        $this->dispatcher             = $dispatcher;
+//        $this->dispatcher             = $dispatcher;
         $this->listModel              = $listModel;
+
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }
 
     public function save(CustomObject $customObject): CustomObject

@@ -246,6 +246,12 @@ $coParams = [
                     'mautic.custom.model.field',
                     'event_dispatcher',
                     'mautic.lead.model.list',
+                    'doctrine.orm.entity_manager',
+                    'mautic.security',
+                    'router',
+                    'translator',
+                    'monolog.logger',
+                    'mautic.helper.core_parameters',
                 ],
             ],
             'mautic.custom.model.export_scheduler' => [

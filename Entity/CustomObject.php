@@ -390,7 +390,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
             }
         }
 
-        throw new NotFoundException("Custom field with order index '${order}' not found.");
+        throw new NotFoundException('Custom field with order index '.$order.' not found.');
     }
 
     public function getPublishedFields(): Collection

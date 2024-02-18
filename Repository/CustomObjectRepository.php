@@ -101,7 +101,7 @@ class CustomObjectRepository extends CustomCommonRepository
     {
         $alias       = 'cmo_'.$customObject->getId();
         $aliasLength = mb_strlen($alias);
-        $like        = "%;s:5:\"field\";s:${aliasLength}:\"{$alias}\";%";
+        $like        = "%;s:5:\"field\";s:{$aliasLength}:\"{$alias}\";%";
 
         $filterExpression->add(
             $queryBuilder->expr()->like('l.filters', $queryBuilder->expr()->literal($like))
@@ -111,7 +111,7 @@ class CustomObjectRepository extends CustomCommonRepository
         foreach ($customObject->getCustomFields() as $customField) {
             $alias       = 'cmf_'.$customField->getId();
             $aliasLength = mb_strlen($alias);
-            $like        = "%;s:5:\"field\";s:${aliasLength}:\"{$alias}\";%";
+            $like        = "%;s:5:\"field\";s:{$aliasLength}:\"{$alias}\";%";
             $filterExpression->add(
                 $queryBuilder->expr()->like('l.filters', $queryBuilder->expr()->literal($like))
             );
