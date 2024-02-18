@@ -126,12 +126,12 @@ $coParams = [
             ],
             CustomItemRouteProvider::ROUTE_EXPORT_ACTION => [
                 'path'       => 'custom/object/{object}/export',
-                'controller' => 'CustomObjectsBundle:CustomItem\Export:export',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ExportController::exportAction',
                 'method'     => 'POST',
             ],
             CustomItemRouteProvider::ROUTE_EXPORT_DOWNLOAD_ACTION => [
                 'path'       => '/custom/item/export/download/{fileName}',
-                'controller' => 'CustomObjectsBundle:CustomItem\Export:downloadExport',
+                'controller' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ExportController::downloadExportAction',
             ],
 
             // Custom Objects
@@ -392,14 +392,14 @@ $coParams = [
                     ],
                 ],
             ],
-            'custom_item.contact_list_controller' => [
-                'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ContactListController::class,
-                'methodCalls' => [
-                    'setContainer' => [
-                        '@service_container',
-                    ],
-                ],
-            ],
+//            'custom_item.contact_list_controller' => [
+//                'class'       => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ContactListController::class,
+//                'methodCalls' => [
+//                    'setContainer' => [
+//                        '@service_container',
+//                    ],
+//                ],
+//            ],
             'custom_item.export_controller' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ExportController::class,
                 'arguments' => [
@@ -540,7 +540,7 @@ $coParams = [
                 'arguments' => [
                     'doctrine.orm.entity_manager',
                     'mautic.custom.model.item',
-                    'mautic.helper.template.formatter',
+                    'mautic.helper.twig.formatter',
                 ],
             ],
             'mautic.custom.model.import.xref.contact' => [

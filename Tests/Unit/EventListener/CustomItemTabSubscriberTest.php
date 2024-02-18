@@ -105,8 +105,8 @@ class CustomItemTabSubscriberTest extends TestCase
         $this->customContentEvent
             ->method('checkContext')
             ->withConsecutive(
-                ['CustomObjectsBundle:CustomItem:detail.html.php', 'tabs'],
-                ['CustomObjectsBundle:CustomItem:detail.html.php', 'tabs.content']
+                ['@CustomObjects/CustomItem/detail.html.twig', 'tabs'],
+                ['@CustomObjects/CustomItem/detail.html.twig', 'tabs.content']
             )
             ->willReturnOnConsecutiveCalls(true, false);
 
@@ -118,7 +118,7 @@ class CustomItemTabSubscriberTest extends TestCase
             ->method('addTemplate')
             ->withConsecutive(
                 [
-                    'CustomObjectsBundle:SubscribedEvents/Tab:link.html.php',
+                    'CustomObjectsBundle:SubscribedEvents/Tab:link.html.twig',
                     [
                         'count' => 13,
                         'title' => 'Object A',
@@ -126,7 +126,7 @@ class CustomItemTabSubscriberTest extends TestCase
                     ],
                 ],
                 [
-                    'CustomObjectsBundle:SubscribedEvents/Tab:modal.html.php',
+                    'CustomObjectsBundle:SubscribedEvents/Tab:modal.html.twig',
                 ]
             );
 
@@ -158,8 +158,8 @@ class CustomItemTabSubscriberTest extends TestCase
         $this->customContentEvent
             ->method('checkContext')
             ->withConsecutive(
-                ['CustomObjectsBundle:CustomItem:detail.html.php', 'tabs'],
-                ['CustomObjectsBundle:CustomItem:detail.html.php', 'tabs.content']
+                ['@CustomObjects/CustomItem/detail.html.twig', 'tabs'],
+                ['@CustomObjects/CustomItem/detail.html.twig', 'tabs.content']
             )
             ->willReturn(true, false);
 
@@ -169,7 +169,7 @@ class CustomItemTabSubscriberTest extends TestCase
 
         $this->customContentEvent->expects($this->once())
             ->method('addTemplate')
-            ->with('CustomObjectsBundle:SubscribedEvents/Tab:modal.html.php');
+            ->with('CustomObjectsBundle:SubscribedEvents/Tab:modal.html.twig');
 
         $this->customObjectModel->expects($this->once())
             ->method('getMasterCustomObjects')
@@ -194,8 +194,8 @@ class CustomItemTabSubscriberTest extends TestCase
         $this->customContentEvent
             ->method('checkContext')
             ->withConsecutive(
-                ['CustomObjectsBundle:CustomItem:detail.html.php', 'tabs'],
-                ['CustomObjectsBundle:CustomItem:detail.html.php', 'tabs.content']
+                ['@CustomObjects/CustomItem/detail.html.twig', 'tabs'],
+                ['@CustomObjects/CustomItem/detail.html.twig', 'tabs.content']
             )
             ->willReturn(false, true);
 
@@ -236,7 +236,7 @@ class CustomItemTabSubscriberTest extends TestCase
         $this->customContentEvent->expects($this->once())
             ->method('addTemplate')
             ->with(
-                'CustomObjectsBundle:SubscribedEvents/Tab:content.html.php',
+                'CustomObjectsBundle:SubscribedEvents/Tab:content.html.twig',
                 [
                     'customObjectId'    => 555,
                     'currentEntityId'   => 45,

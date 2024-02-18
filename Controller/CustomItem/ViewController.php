@@ -106,7 +106,7 @@ class ViewController extends CommonController
                     'stats'         => $stats,
                     'logs'          => $auditLogs,
                     'contacts'      => $this->forward(
-                        'CustomObjectsBundle:CustomItem\ContactList:list',
+                        'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ContactListController::listAction',
                         [
                             'objectId'   => $itemId,
                             'page'       => 1,
@@ -114,7 +114,7 @@ class ViewController extends CommonController
                         ]
                     )->getContent(),
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomItem:detail.html.php',
+                'contentTemplate' => '@CustomObjects/CustomItem/detail.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customItem',
                     'activeLink'    => "#mautic_custom_object_{$objectId}",

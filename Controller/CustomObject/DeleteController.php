@@ -60,7 +60,7 @@ class DeleteController extends CommonController
 
     public function deleteAction(int $objectId): Response
     {
-        $controller = 'CustomObjectsBundle:CustomObject\List:list';
+        $controller = 'MauticPlugin\CustomObjectsBundle\Controller\CustomObject\ListController:listAction';
         $page       = [
             'page' => $this->sessionProviderFactory->createObjectProvider()->getPage(),
         ];

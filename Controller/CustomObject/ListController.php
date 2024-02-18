@@ -98,7 +98,7 @@ class ListController extends CommonController
                     'tmpl'           => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                     'sessionVar'     => $sessionProvider->getNamespace(),
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObject:list.html.php',
+                'contentTemplate' => '@CustomObjects/CustomObject/list.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
                     'route'         => $route,

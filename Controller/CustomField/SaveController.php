@@ -134,7 +134,7 @@ class SaveController extends CommonController
                     'customField' => $customField,
                     'form'        => $form->createView(),
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomField:form.html.php',
+                'contentTemplate' => '@CustomObjects/CustomField/form.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customField',
                     'route'         => $route,
@@ -178,7 +178,7 @@ class SaveController extends CommonController
         );
 
         $template = $this->render(
-            'CustomObjectsBundle:CustomObject:_form-fields.html.php',
+            '@CustomObjects/CustomObject/_form-fields.html.twig',
             [
                 'form'          => $form->createView(),
                 'panelId'       => $panelId, // Panel id to me replaced if edit

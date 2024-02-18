@@ -1,0 +1,14 @@
+{% set customFieldType = fieldValue.customField.type %}
+{% set fieldTypes = ['select', 'multiselect'] %}
+
+{% if fieldValue.getValue() is instanceof('DateTimeInterface') %}
+    {% set date = 'date' == customFieldType ? dateToDate(fieldValue.getValue()) : dateToFull(fieldValue.getValue()) %}
+    {{ date }}
+{% elseif customFieldType in fieldTypes %}
+{# TODO: Transform to string #}
+    {{ '%s'|format(fieldValue.getCustomField().getTypeObject()|escape)|raw }}
+{% elseif fieldValue.getValue() is iterable %}
+    {{ fieldValue.getValue()|join(', ') }}
+{% else %}
+    {{ '%s'|format(fieldValue.getValue()|escape)|raw }}
+{% endif %}

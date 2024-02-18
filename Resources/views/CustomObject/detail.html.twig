@@ -1,0 +1,27 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}customObject{% endblock %}
+
+{% block headerTitle %}
+    {{ customObject.getNameSingular() }}
+{% endblock %}
+
+{% block actions %}
+    {{ include('@MauticCore/Helper/page_actions.html.twig', { 'item': customObject}) }}
+{% endblock %}
+
+{% block publishStatus %}
+    {{- include('@MauticCore/Helper/publishstatus_badge.html.twig', {'entity' : customObject}) -}}
+{% endblock %}
+
+{% block content %}
+    <div class="box-layout">
+        {{ include('@CustomObjects/CustomObject/_detail_left_section.html.twig', {
+            'entity': customObject,
+            'dateRangeForm': dateRangeForm,
+            'chartData': stats,
+            'mauticTemplateVars': mauticTemplateVars is defined ? mauticTemplateVars : {}
+        }) }}
+        {{ include('@CustomObjects/CustomObject/_detail_right_section.html.twig', {'logs': logs}) }}
+    </div>
+{% endblock %}

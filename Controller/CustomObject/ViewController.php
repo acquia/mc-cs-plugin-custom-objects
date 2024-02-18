@@ -104,7 +104,7 @@ class ViewController extends CommonController
                     'stats'         => $stats,
                     'logs'          => $auditLogs,
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObject:detail.html.php',
+                'contentTemplate' => '@CustomObjects/CustomObject/detail.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
                     'activeLink'    => "#mautic_custom_object_{$objectId}",
