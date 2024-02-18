@@ -37,15 +37,10 @@ class LinkControllerTest extends ControllerTestCase
     {
         parent::setUp();
 
-        $this->customItemModel            = $this->createMock(CustomItemModel::class);
-        $this->flashBag                   = $this->createMock(FlashBag::class);
-        $this->permissionProvider         = $this->createMock(CustomItemPermissionProvider::class);
-        $this->linkController             = new LinkController(
-            $this->customItemModel,
-            $this->permissionProvider,
-            $this->flashBag
-        );
-
+        $this->customItemModel    = $this->createMock(CustomItemModel::class);
+        $this->flashBag           = $this->createMock(FlashBag::class);
+        $this->permissionProvider = $this->createMock(CustomItemPermissionProvider::class);
+        $this->linkController     = new LinkController();
         $this->addSymfonyDependencies($this->linkController);
     }
 
@@ -62,7 +57,14 @@ class LinkControllerTest extends ControllerTestCase
             ->method('add')
             ->with('Item not found message', [], FlashBag::LEVEL_ERROR);
 
-        $this->linkController->saveAction(self::ITEM_ID, self::ENTITY_TYPE, self::ENTITY_ID);
+        $this->linkController->saveAction(
+            $this->customItemModel,
+            $this->permissionProvider,
+            $this->flashBag,
+            self::ITEM_ID,
+            self::ENTITY_TYPE,
+            self::ENTITY_ID
+        );
     }
 
     public function testSaveActionIfCustomItemIsLinkedAlready(): void
@@ -89,7 +91,14 @@ class LinkControllerTest extends ControllerTestCase
                 FlashBag::LEVEL_ERROR
             );
 
-        $this->linkController->saveAction(self::ITEM_ID, self::ENTITY_TYPE, self::ENTITY_ID);
+        $this->linkController->saveAction(
+            $this->customItemModel,
+            $this->permissionProvider,
+            $this->flashBag,
+            self::ITEM_ID,
+            self::ENTITY_TYPE,
+            self::ENTITY_ID
+        );
     }
 
     public function testSaveActionIfCustomItemForbidden(): void
@@ -106,7 +115,14 @@ class LinkControllerTest extends ControllerTestCase
             ->method('add')
             ->with('You do not have permission to edit', [], FlashBag::LEVEL_ERROR);
 
-        $this->linkController->saveAction(self::ITEM_ID, self::ENTITY_TYPE, self::ENTITY_ID);
+        $this->linkController->saveAction(
+            $this->customItemModel,
+            $this->permissionProvider,
+            $this->flashBag,
+            self::ITEM_ID,
+            self::ENTITY_TYPE,
+            self::ENTITY_ID
+        );
     }
 
     public function testSaveActionIfCustomItemLinkedToUnknownEntityType(): void
@@ -129,7 +145,14 @@ class LinkControllerTest extends ControllerTestCase
             ->method('add')
             ->with('Entity unicorn cannot be linked to a custom item', [], FlashBag::LEVEL_ERROR);
 
-        $this->linkController->saveAction(self::ITEM_ID, 'unicorn', self::ENTITY_ID);
+        $this->linkController->saveAction(
+            $this->customItemModel,
+            $this->permissionProvider,
+            $this->flashBag,
+            self::ITEM_ID,
+            'unicorn',
+            self::ENTITY_ID
+        );
     }
 
     public function testSaveAction(): void
@@ -147,6 +170,13 @@ class LinkControllerTest extends ControllerTestCase
             ->method('linkEntity')
             ->with($customItem, self::ENTITY_TYPE, self::ENTITY_ID);
 
-        $this->linkController->saveAction(self::ITEM_ID, self::ENTITY_TYPE, self::ENTITY_ID);
+        $this->linkController->saveAction(
+            $this->customItemModel,
+            $this->permissionProvider,
+            $this->flashBag,
+            self::ITEM_ID,
+            self::ENTITY_TYPE,
+            self::ENTITY_ID
+        );
     }
 }

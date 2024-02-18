@@ -17,93 +17,41 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 
 class SaveController extends AbstractFormController
 {
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var FormFactoryInterface
-     */
-    private $formFactory;
-
-    /**
-     * @var FlashBag
-     */
-    private $flashBag;
-
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    /**
-     * @var CustomItemPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var CustomItemRouteProvider
-     */
-    private $routeProvider;
-
-    /**
-     * @var LockFlashMessageHelper
-     */
-    private $lockFlashMessageHelper;
-
-    public function __construct(
-        RequestStack $requestStack,
+    public function saveAction(
+        Request $request,
         FormFactoryInterface $formFactory,
         FlashBag $flashBag,
         CustomItemModel $customItemModel,
         CustomObjectModel $customObjectModel,
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider,
-        LockFlashMessageHelper $lockFlashMessageHelper
-    ) {
-        $this->requestStack           = $requestStack;
-        $this->formFactory            = $formFactory;
-        $this->flashBag               = $flashBag;
-        $this->customItemModel        = $customItemModel;
-        $this->customObjectModel      = $customObjectModel;
-        $this->permissionProvider     = $permissionProvider;
-        $this->routeProvider          = $routeProvider;
-        $this->lockFlashMessageHelper = $lockFlashMessageHelper;
-    }
-
-    public function saveAction(int $objectId, ?int $itemId = null): Response
-    {
-        $request        = $this->requestStack->getCurrentRequest();
+        LockFlashMessageHelper $lockFlashMessageHelper,
+        int $objectId,
+        ?int $itemId = null
+    ): Response {
         $customItemData = $request->request->get('custom_item');
         $contactId      = intval($customItemData['contact_id'] ?? 0);
 
         try {
             if ($itemId) {
                 $message    = 'mautic.core.notice.updated';
-                $customItem = $this->customItemModel->fetchEntity($itemId);
+                $customItem = $customItemModel->fetchEntity($itemId);
                 $route      = 0 < $contactId
-                    ? $this->routeProvider->buildEditRouteWithRedirectToContact($objectId, $itemId, $contactId)
-                    : $this->routeProvider->buildEditRoute($objectId, $itemId);
-                $this->permissionProvider->canEdit($customItem);
+                    ? $routeProvider->buildEditRouteWithRedirectToContact($objectId, $itemId, $contactId)
+                    : $routeProvider->buildEditRoute($objectId, $itemId);
+                $permissionProvider->canEdit($customItem);
             } else {
-                $this->permissionProvider->canCreate($objectId);
+                $permissionProvider->canCreate($objectId);
                 $message      = 'mautic.core.notice.created';
-                $customObject = $this->customObjectModel->fetchEntity($objectId);
-                $customItem   = $this->customItemModel->populateCustomFields(new CustomItem($customObject));
+                $customObject = $customObjectModel->fetchEntity($objectId);
+                $customItem   = $customItemModel->populateCustomFields(new CustomItem($customObject));
                 $route        = 0 < $contactId
-                    ? $this->routeProvider->buildNewRouteWithRedirectToContact($objectId, $contactId)
-                    : $this->routeProvider->buildNewRoute($objectId);
+                    ? $routeProvider->buildNewRouteWithRedirectToContact($objectId, $contactId)
+                    : $routeProvider->buildNewRoute($objectId);
             }
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
@@ -111,47 +59,47 @@ class SaveController extends AbstractFormController
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        if ($this->customItemModel->isLocked($customItem)) {
-            $this->lockFlashMessageHelper->addFlash(
+        if ($customItemModel->isLocked($customItem)) {
+            $lockFlashMessageHelper->addFlash(
                 $customItem,
-                $this->routeProvider->buildEditRoute($objectId, $itemId),
+                $routeProvider->buildEditRoute($objectId, $itemId),
                 $this->canEdit($customItem),
                 'custom.item'
             );
 
-            return $this->redirect($this->routeProvider->buildViewRoute($objectId, $itemId));
+            return $this->redirect($routeProvider->buildViewRoute($objectId, $itemId));
         }
 
-        $action = $this->routeProvider->buildSaveRoute($objectId, $itemId);
+        $action = $routeProvider->buildSaveRoute($objectId, $itemId);
 
         if (!$customItem->getId() && $customItem->getCustomObject()->getRelationshipObject() && $contactId) {
             $customItem->setChildCustomItem(
-                $this->customItemModel->populateCustomFields(
+                $customItemModel->populateCustomFields(
                     new CustomItem($customItem->getCustomObject()->getRelationshipObject())
                 )
             );
         }
-        $form = $this->formFactory->create(CustomItemType::class, $customItem, ['action' => $action, 'objectId' => $objectId]);
+        $form = $formFactory->create(CustomItemType::class, $customItem, ['action' => $action, 'objectId' => $objectId]);
 
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $customItem = $this->customItemModel->save($customItem);
+            $customItem = $customItemModel->save($customItem);
 
             if ($customItem->getChildCustomItem()) {
                 $customItem->getChildCustomItem()->generateNameForChildObject('contact', $contactId, $customItem);
-                $customItem = $this->customItemModel->save($customItem->getChildCustomItem());
+                $customItem = $customItemModel->save($customItem->getChildCustomItem());
             }
 
             if($customItem->hasBeenUpdated()){
                 $message = 'custom.item.notice.merged';
             }
 
-            $this->flashBag->add(
+            $flashBag->add(
                 $message,
                 [
                     '%name%' => $customItem->getName(),
-                    '%url%'  => $this->routeProvider->buildEditRoute($objectId, $customItem->getId()),
+                    '%url%'  => $routeProvider->buildEditRoute($objectId, $customItem->getId()),
                 ]
             );
 
@@ -167,12 +115,12 @@ class SaveController extends AbstractFormController
             if (0 < $contactId) {
                 // For parent-child items we want to link both items together and the child item with the contact.
                 if ($customItem->getChildCustomItem()) {
-                    $this->customItemModel->linkEntity($customItem->getChildCustomItem(), 'contact', $contactId);
-                    $this->customItemModel->linkEntity($customItem->getChildCustomItem(), 'customItem', $customItem->getId());
+                    $customItemModel->linkEntity($customItem->getChildCustomItem(), 'contact', $contactId);
+                    $customItemModel->linkEntity($customItem->getChildCustomItem(), 'customItem', $customItem->getId());
                 }
 
                 // For parent items we want to connect the parent item directly to the contact.
-                $this->customItemModel->linkEntity($customItem, 'contact', $contactId);
+                $customItemModel->linkEntity($customItem, 'contact', $contactId);
 
                 if ($saveClicked) {
                     return $this->redirectToRoute('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $contactId]);
@@ -185,7 +133,7 @@ class SaveController extends AbstractFormController
             $request->setMethod(Request::METHOD_GET);
 
             if ($saveClicked) {
-                $this->customItemModel->unlockEntity($customItem);
+                $customItemModel->unlockEntity($customItem);
             }
 
             return $this->forward(

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomItem;
 
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\SaveController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
@@ -89,27 +90,21 @@ class SaveControllerTest extends ControllerTestCase
     {
         parent::setUp();
 
-        $this->formFactory             = $this->createMock(FormFactoryInterface::class);
-        $this->customItemModel         = $this->createMock(CustomItemModel::class);
-        $this->customObjectModel       = $this->createMock(CustomObjectModel::class);
-        $this->flashBag                = $this->createMock(FlashBag::class);
-        $this->permissionProvider      = $this->createMock(CustomItemPermissionProvider::class);
-        $this->routeProvider           = $this->createMock(CustomItemRouteProvider::class);
-        $this->lockFlashMessageHelper  = $this->createMock(LockFlashMessageHelper::class);
-        $this->requestStack            = $this->createMock(RequestStack::class);
-        $this->request                 = new Request();
-        $this->customItem              = $this->createMock(CustomItem::class);
-        $this->form                    = $this->createMock(FormInterface::class);
-        $this->saveController          = new SaveController(
-            $this->requestStack,
-            $this->formFactory,
-            $this->flashBag,
-            $this->customItemModel,
-            $this->customObjectModel,
-            $this->permissionProvider,
-            $this->routeProvider,
-            $this->lockFlashMessageHelper
-        );
+        $this->formFactory            = $this->createMock(FormFactoryInterface::class);
+        $this->customItemModel        = $this->createMock(CustomItemModel::class);
+        $this->customObjectModel      = $this->createMock(CustomObjectModel::class);
+        $this->flashBag               = $this->createMock(FlashBag::class);
+        $this->permissionProvider     = $this->createMock(CustomItemPermissionProvider::class);
+        $this->routeProvider          = $this->createMock(CustomItemRouteProvider::class);
+        $this->lockFlashMessageHelper = $this->createMock(LockFlashMessageHelper::class);
+        $this->requestStack           = $this->createMock(RequestStack::class);
+        $this->request                = new Request();
+        $this->customItem             = $this->createMock(CustomItem::class);
+        $this->form                   = $this->createMock(FormInterface::class);
+
+        $this->translator             = $this->createMock(Translator::class);
+        $this->saveController         = new SaveController($this->security, $this->userHelper, $this->managerRegistry);
+        $this->saveController->setTranslator($this->translator);
 
         $this->addSymfonyDependencies($this->saveController);
 
@@ -132,7 +127,18 @@ class SaveControllerTest extends ControllerTestCase
         $this->permissionProvider->expects($this->never())
             ->method('canCreate');
 
-        $this->saveController->saveAction(self::OBJECT_ID, self::ITEM_ID);
+        $this->saveController->saveAction(
+            $this->requestStack,
+            $this->formFactory,
+            $this->flashBag,
+            $this->customItemModel,
+            $this->customObjectModel,
+            $this->permissionProvider,
+            $this->routeProvider,
+            $this->lockFlashMessageHelper,
+            self::OBJECT_ID,
+            self::ITEM_ID
+        );
     }
 
     public function testSaveActionIfExistingCustomItemIsForbidden(): void
@@ -150,7 +156,18 @@ class SaveControllerTest extends ControllerTestCase
 
         $this->expectException(AccessDeniedHttpException::class);
 
-        $this->saveController->saveAction(self::OBJECT_ID, self::ITEM_ID);
+        $this->saveController->saveAction(
+            $this->requestStack,
+            $this->formFactory,
+            $this->flashBag,
+            $this->customItemModel,
+            $this->customObjectModel,
+            $this->permissionProvider,
+            $this->routeProvider,
+            $this->lockFlashMessageHelper,
+            self::OBJECT_ID,
+            self::ITEM_ID
+        );
     }
 
     public function testSaveActionForExistingCustomItemWithValidForm(): void
@@ -248,7 +265,18 @@ class SaveControllerTest extends ControllerTestCase
 
         Assert::assertSame(Request::METHOD_GET, $this->request->getMethod());
 
-        $this->saveController->saveAction(self::OBJECT_ID, self::ITEM_ID);
+        $this->saveController->saveAction(
+            $this->requestStack,
+            $this->formFactory,
+            $this->flashBag,
+            $this->customItemModel,
+            $this->customObjectModel,
+            $this->permissionProvider,
+            $this->routeProvider,
+            $this->lockFlashMessageHelper,
+            self::OBJECT_ID,
+            self::ITEM_ID
+        );
     }
 
     public function testThatSaveActionRedirectToContactViewPageWhenContactIdIsSet(): void
@@ -330,7 +358,18 @@ class SaveControllerTest extends ControllerTestCase
             ->method('generate')
             ->willReturn('someRedirectUrl');
 
-        $this->saveController->saveAction(self::OBJECT_ID, self::ITEM_ID);
+        $this->saveController->saveAction(
+            $this->requestStack,
+            $this->formFactory,
+            $this->flashBag,
+            $this->customItemModel,
+            $this->customObjectModel,
+            $this->permissionProvider,
+            $this->routeProvider,
+            $this->lockFlashMessageHelper,
+            self::OBJECT_ID,
+            self::ITEM_ID
+        );
     }
 
     public function testSaveActionIfNewCustomItemIsForbidden(): void
@@ -353,7 +392,17 @@ class SaveControllerTest extends ControllerTestCase
 
         $this->expectException(AccessDeniedHttpException::class);
 
-        $this->saveController->saveAction(self::OBJECT_ID);
+        $this->saveController->saveAction(
+            $this->requestStack,
+            $this->formFactory,
+            $this->flashBag,
+            $this->customItemModel,
+            $this->customObjectModel,
+            $this->permissionProvider,
+            $this->routeProvider,
+            $this->lockFlashMessageHelper,
+            self::OBJECT_ID
+        );
     }
 
     public function testSaveActionForNewCustomItemWithInvalidForm(): void
@@ -404,7 +453,17 @@ class SaveControllerTest extends ControllerTestCase
         $this->customItemModel->expects($this->never())
             ->method('save');
 
-        $this->saveController->saveAction(self::OBJECT_ID);
+        $this->saveController->saveAction(
+            $this->requestStack,
+            $this->formFactory,
+            $this->flashBag,
+            $this->customItemModel,
+            $this->customObjectModel,
+            $this->permissionProvider,
+            $this->routeProvider,
+            $this->lockFlashMessageHelper,
+            self::OBJECT_ID
+        );
     }
 
     public function testSaveActionForNewCustomItemWithChildItemWhenInvalidForm(): void
@@ -492,7 +551,17 @@ class SaveControllerTest extends ControllerTestCase
         $this->customItemModel->expects($this->never())
             ->method('save');
 
-        $this->saveController->saveAction(self::OBJECT_ID);
+        $this->saveController->saveAction(
+            $this->requestStack,
+            $this->formFactory,
+            $this->flashBag,
+            $this->customItemModel,
+            $this->customObjectModel,
+            $this->permissionProvider,
+            $this->routeProvider,
+            $this->lockFlashMessageHelper,
+            self::OBJECT_ID
+        );
     }
 
     public function testSaveActionWhenTheItemIsLocked(): void
@@ -526,7 +595,18 @@ class SaveControllerTest extends ControllerTestCase
             ->with(static::OBJECT_ID, static::ITEM_ID)
             ->willReturn('https://redirect.url');
 
-        $this->saveController->saveAction(self::OBJECT_ID, self::ITEM_ID);
+        $this->saveController->saveAction(
+            $this->requestStack,
+            $this->formFactory,
+            $this->flashBag,
+            $this->customItemModel,
+            $this->customObjectModel,
+            $this->permissionProvider,
+            $this->routeProvider,
+            $this->lockFlashMessageHelper,
+            self::OBJECT_ID,
+            self::ITEM_ID
+        );
     }
 
     public function testThatUserIsGettingRedirectedWhenWeEditCustomItemAndContactIdIsSpecified(): void
@@ -621,6 +701,17 @@ class SaveControllerTest extends ControllerTestCase
 
         Assert::assertSame(Request::METHOD_GET, $this->request->getMethod());
 
-        $this->saveController->saveAction(self::OBJECT_ID, self::ITEM_ID);
+        $this->saveController->saveAction(
+            $this->requestStack,
+            $this->formFactory,
+            $this->flashBag,
+            $this->customItemModel,
+            $this->customObjectModel,
+            $this->permissionProvider,
+            $this->routeProvider,
+            $this->lockFlashMessageHelper,
+            self::OBJECT_ID,
+            self::ITEM_ID
+        );
     }
 }

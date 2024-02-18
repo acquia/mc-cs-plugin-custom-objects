@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomItem;
 
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Model\NotificationModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\DeleteController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
@@ -15,7 +19,10 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class DeleteControllerTest extends ControllerTestCase
@@ -39,26 +46,34 @@ class DeleteControllerTest extends ControllerTestCase
     {
         parent::setUp();
 
-        $sessionProviderFactory   = $this->createMock(SessionProviderFactory::class);
-        $this->customItemModel    = $this->createMock(CustomItemModel::class);
-        $this->sessionProvider    = $this->createMock(SessionProvider::class);
-        $this->flashBag           = $this->createMock(FlashBag::class);
-        $this->permissionProvider = $this->createMock(CustomItemPermissionProvider::class);
-        $this->routeProvider      = $this->createMock(CustomItemRouteProvider::class);
-        $this->request            = $this->createMock(Request::class);
-        $this->deleteController   = new DeleteController(
-            $this->customItemModel,
-            $sessionProviderFactory,
-            $this->flashBag,
-            $this->permissionProvider,
-            $this->routeProvider
-        );
+        $this->sessionProviderFactory = $this->createMock(SessionProviderFactory::class);
+        $this->customItemModel        = $this->createMock(CustomItemModel::class);
+        $this->sessionProvider        = $this->createMock(SessionProvider::class);
+        $this->flashBag               = $this->createMock(FlashBag::class);
+        $this->permissionProvider     = $this->createMock(CustomItemPermissionProvider::class);
+        $this->routeProvider          = $this->createMock(CustomItemRouteProvider::class);
+        $this->request                = $this->createMock(Request::class);
+        $this->requestStack           = $this->createMock(RequestStack::class);
+
+        $this->requestStack->expects($this->any())
+            ->method('getCurrentRequest')
+            ->willReturn($this->request);
+
+        $this->translator             = $this->createMock(Translator::class);
+        $this->security               = $this->createMock(CorePermissions::class);
+        $this->modelFactory           = $this->createMock(ModelFactory::class);
+        $this->model                  = $this->createMock(NotificationModel::class);
+
+        $this->deleteController       = new DeleteController($this->managerRegistry);
+        $this->deleteController->setTranslator($this->translator);
+        $this->deleteController->setSecurity($this->security);
+        $this->deleteController->setModelFactory($this->modelFactory);
 
         $this->addSymfonyDependencies($this->deleteController);
 
         $this->request->method('isXmlHttpRequest')->willReturn(true);
         $this->request->method('getRequestUri')->willReturn('https://a.b');
-        $sessionProviderFactory->method('createItemProvider')->willReturn($this->sessionProvider);
+        $this->sessionProviderFactory->method('createItemProvider')->willReturn($this->sessionProvider);
     }
 
     public function testDeleteActionIfCustomItemNotFound(): void
@@ -73,7 +88,26 @@ class DeleteControllerTest extends ControllerTestCase
         $this->flashBag->expects($this->never())
             ->method('add');
 
-        $this->deleteController->deleteAction(self::OBJECT_ID, self::ITEM_ID);
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->willReturn('Item not found message');
+
+        $post  = $this->createMock(ParameterBag::class);
+        $this->request->request = $post;
+        $post->expects($this->once())
+            ->method('all')
+            ->willReturn([]);
+
+        $this->deleteController->deleteAction(
+            $this->requestStack,
+            $this->customItemModel,
+            $this->sessionProviderFactory,
+            $this->flashBag,
+            $this->permissionProvider,
+            $this->routeProvider,
+            self::OBJECT_ID,
+            self::ITEM_ID
+        );
     }
 
     public function testDeleteActionIfCustomItemForbidden(): void
@@ -92,9 +126,22 @@ class DeleteControllerTest extends ControllerTestCase
         $this->flashBag->expects($this->never())
             ->method('add');
 
+        $this->security->expects($this->once())
+            ->method('isAnonymous')
+            ->willReturn(true);
+
         $this->expectException(AccessDeniedHttpException::class);
 
-        $this->deleteController->deleteAction(self::OBJECT_ID, self::ITEM_ID);
+        $this->deleteController->deleteAction(
+            $this->requestStack,
+            $this->customItemModel,
+            $this->sessionProviderFactory,
+            $this->flashBag,
+            $this->permissionProvider,
+            $this->routeProvider,
+            self::OBJECT_ID,
+            self::ITEM_ID
+        );
     }
 
     public function testDeleteAction(): void
@@ -124,6 +171,32 @@ class DeleteControllerTest extends ControllerTestCase
             ->method('buildListRoute')
             ->with(self::OBJECT_ID, 3);
 
-        $this->deleteController->deleteAction(self::OBJECT_ID, self::ITEM_ID);
+        $this->modelFactory->expects($this->once())
+            ->method('getModel')
+            ->willReturn($this->model);
+
+        $session = $this->createMock(SessionInterface::class);
+        $session->expects($this->once())
+            ->method('get')
+            ->willReturn('test');
+
+        $this->request->expects($this->exactly(2))
+            ->method('getSession')
+            ->willReturn($session);
+
+        $this->model->expects($this->once())
+            ->method('getNotificationContent')
+            ->willReturn([[], 'test', 'test']);
+
+        $this->deleteController->deleteAction(
+            $this->requestStack,
+            $this->customItemModel,
+            $this->sessionProviderFactory,
+            $this->flashBag,
+            $this->permissionProvider,
+            $this->routeProvider,
+            self::OBJECT_ID,
+            self::ITEM_ID
+        );
     }
 }

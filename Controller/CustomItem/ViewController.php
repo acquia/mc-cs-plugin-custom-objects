@@ -14,88 +14,44 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class ViewController extends CommonController
 {
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
-     * @var CustomItemXrefContactModel
-     */
-    private $customItemXrefContactModel;
-
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
-    /**
-     * @var CustomItemPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var CustomItemRouteProvider
-     */
-    private $routeProvider;
-
-    /**
-     * @var FormFactoryInterface
-     */
-    private $formFactory;
-
-    public function __construct(
-        RequestStack $requestStack,
+    public function viewAction(
+        Request $request,
         FormFactoryInterface $formFactory,
         CustomItemModel $customItemModel,
         CustomItemXrefContactModel $customItemXrefContactModel,
         AuditLogModel $auditLogModel,
         CustomItemPermissionProvider $permissionProvider,
-        CustomItemRouteProvider $routeProvider
-    ) {
-        $this->requestStack               = $requestStack;
-        $this->formFactory                = $formFactory;
-        $this->customItemModel            = $customItemModel;
-        $this->customItemXrefContactModel = $customItemXrefContactModel;
-        $this->auditLogModel              = $auditLogModel;
-        $this->permissionProvider         = $permissionProvider;
-        $this->routeProvider              = $routeProvider;
-    }
-
-    public function viewAction(int $objectId, int $itemId): Response
-    {
+        CustomItemRouteProvider $routeProvider,
+        int $objectId,
+        int $itemId
+    ): Response {
         try {
-            $customItem = $this->customItemModel->fetchEntity($itemId);
-            $this->permissionProvider->canView($customItem);
+            $customItem = $customItemModel->fetchEntity($itemId);
+            $permissionProvider->canView($customItem);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        $route         = $this->routeProvider->buildViewRoute($objectId, $itemId);
-        $dateRangeForm = $this->formFactory->create(
+        $route         = $routeProvider->buildViewRoute($objectId, $itemId);
+        $dateRangeForm = $formFactory->create(
             DateRangeType::class,
-            $this->requestStack->getCurrentRequest()->get('daterange', []),
+            $request->get('daterange', []),
             ['action' => $route]
         );
-        $stats = $this->customItemXrefContactModel->getLinksLineChartData(
+        $stats = $customItemXrefContactModel->getLinksLineChartData(
             new \DateTime($dateRangeForm->get('date_from')->getData()),
             new \DateTime($dateRangeForm->get('date_to')->getData()),
             $customItem
         );
 
-        $auditLogs = $this->auditLogModel->getLogForObject('customItem', $itemId, $customItem->getDateAdded(), 10, 'customObjects');
+        $auditLogs = $auditLogModel->getLogForObject('customItem', $itemId, $customItem->getDateAdded(), 10, 'customObjects');
 
         return $this->delegateView(
             [

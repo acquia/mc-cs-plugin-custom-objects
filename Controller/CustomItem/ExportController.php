@@ -4,46 +4,37 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemExportSchedulerEvent;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemExportSchedulerModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 class ExportController extends AbstractFormController
 {
-    private CustomItemPermissionProvider $permissionProvider;
-
-    private CustomItemExportSchedulerModel $model;
-
-    public function __construct(
-        CustomItemPermissionProvider $permissionProvider,
-        CustomItemExportSchedulerModel $model
-    ) {
-        $this->permissionProvider = $permissionProvider;
-        $this->model              = $model;
-    }
-
     /**
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException
+     * @throws ORMException
+     * @throws OptimisticLockException
+     * @throws ForbiddenException
      */
-    public function exportAction(int $object): Response
-    {
-        $this->permissionProvider->canCreate($object);
+    public function exportAction(
+        CustomItemPermissionProvider $permissionProvider,
+        CustomItemExportSchedulerModel $model,
+        int $object
+    ): Response {
+        $permissionProvider->canCreate($object);
 
-        $customItemExportScheduler = $this->model->saveEntity($object);
+        $customItemExportScheduler = $model->saveEntity($object);
 
-        /** @var EventDispatcherInterface $dispatcher */
-        $dispatcher = $this->get('event_dispatcher');
-        $dispatcher->dispatch(
-            CustomItemEvents::ON_CUSTOM_ITEM_SCHEDULE_EXPORT,
-            new CustomItemExportSchedulerEvent($customItemExportScheduler)
+        $this->dispatcher->dispatch(
+            new CustomItemExportSchedulerEvent($customItemExportScheduler),
+            CustomItemEvents::ON_CUSTOM_ITEM_SCHEDULE_EXPORT
         );
 
         $this->addFlash('custom.item.export.being.prepared', ['%user_email%' => $this->user->getEmail()]);
@@ -53,10 +44,10 @@ class ExportController extends AbstractFormController
         return new JsonResponse($response);
     }
 
-    public function downloadExportAction(string $fileName): Response
+    public function downloadExportAction(CustomItemExportSchedulerModel $model, string $fileName): Response
     {
         try {
-            return $this->model->getExportFileToDownload($fileName);
+            return $model->getExportFileToDownload($fileName);
         } catch (FileNotFoundException $exception) {
             return $this->notFound();
         }

@@ -16,59 +16,27 @@ use Symfony\Component\HttpFoundation\Response;
 
 class DeleteController extends CommonController
 {
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
-     * @var SessionProviderFactory
-     */
-    private $sessionProviderFactory;
-
-    /**
-     * @var CustomItemPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var CustomItemRouteProvider
-     */
-    private $routeProvider;
-
-    /**
-     * @var FlashBag
-     */
-    private $flashBag;
-
-    public function __construct(
+    public function deleteAction(
         CustomItemModel $customItemModel,
         SessionProviderFactory $sessionProviderFactory,
         FlashBag $flashBag,
         CustomItemPermissionProvider $permissionProvider,
-        CustomItemRouteProvider $routeProvider
-    ) {
-        $this->customItemModel        = $customItemModel;
-        $this->sessionProviderFactory = $sessionProviderFactory;
-        $this->flashBag               = $flashBag;
-        $this->permissionProvider     = $permissionProvider;
-        $this->routeProvider          = $routeProvider;
-    }
-
-    public function deleteAction(int $objectId, int $itemId): Response
-    {
+        CustomItemRouteProvider $routeProvider,
+        int $objectId,
+        int $itemId
+    ): Response {
         try {
-            $customItem = $this->customItemModel->fetchEntity($itemId);
-            $this->permissionProvider->canDelete($customItem);
+            $customItem = $customItemModel->fetchEntity($itemId);
+            $permissionProvider->canDelete($customItem);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        $this->customItemModel->delete($customItem);
+        $customItemModel->delete($customItem);
 
-        $this->flashBag->add(
+        $flashBag->add(
             'mautic.core.notice.deleted',
             [
                 '%name%' => $customItem->getName(),
@@ -76,12 +44,11 @@ class DeleteController extends CommonController
             ]
         );
 
-        $page = $this->sessionProviderFactory->createItemProvider($objectId)
-            ->getPage();
+        $page = $sessionProviderFactory->createItemProvider($objectId)->getPage();
 
         return $this->postActionRedirect(
             [
-                'returnUrl'       => $this->routeProvider->buildListRoute($objectId, $page),
+                'returnUrl'       => $routeProvider->buildListRoute($objectId, $page),
                 'viewParameters'  => ['objectId' => $objectId, 'page' => $page],
                 'contentTemplate' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ListController::listAction',
                 'passthroughVars' => [
