@@ -6,25 +6,33 @@ namespace MauticPlugin\CustomObjectsBundle\Model;
 
 use DateTime;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use Symfony\Contracts\Translation\TranslatorInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CustomItemXrefContactModel extends FormModel
 {
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
     public function __construct(
-        EntityManager $entityManager,
-        TranslatorInterface $translator
+        private EntityManager $entityManager,
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $logger,
+        CoreParametersHelper $coreParametersHelper,
     ) {
-        $this->entityManager = $entityManager;
-        $this->translator    = $translator;
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }
 
     /**

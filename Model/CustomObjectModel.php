@@ -17,7 +17,6 @@ use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Translation\Translator;
-use Mautic\LeadBundle\Model\ListModel;
 use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
@@ -37,25 +36,16 @@ class CustomObjectModel extends FormModel
         private EntityManager $entityManager,
         private CustomObjectRepository $customObjectRepository,
         private CustomObjectPermissionProvider $permissionProvider,
-        UserHelper $userHelper,
         private CustomFieldModel $customFieldModel,
-        EventDispatcherInterface $dispatcher,
-        private ListModel $listModel,
         EntityManagerInterface $em,
         CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
         UrlGeneratorInterface $router,
         Translator $translator,
+        UserHelper $userHelper,
         LoggerInterface $logger,
         CoreParametersHelper $coreParametersHelper,
     ) {
-        $this->entityManager          = $entityManager;
-        $this->customObjectRepository = $customObjectRepository;
-        $this->permissionProvider     = $permissionProvider;
-//        $this->userHelper             = $userHelper;
-        $this->customFieldModel       = $customFieldModel;
-//        $this->dispatcher             = $dispatcher;
-        $this->listModel              = $listModel;
-
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }
 

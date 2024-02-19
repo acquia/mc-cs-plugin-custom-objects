@@ -6,8 +6,13 @@ namespace MauticPlugin\CustomObjectsBundle\Model;
 
 use DateTimeImmutable;
 use DateTimeZone;
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Helper\MailHelper;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
@@ -18,9 +23,11 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemExportSchedulerRepository;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CustomItemExportSchedulerModel extends AbstractCommonModel
 {
@@ -28,38 +35,25 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
     private const CUSTOM_ITEM_LIMIT            = 200;
     private const CONTACT_LIMIT                = 5000;
 
-    private ExportHelper $exportHelper;
-
-    private MailHelper $mailHelper;
-
-    private CustomItemRouteProvider $customItemRouteProvider;
-
-    private CustomFieldValueModel $customFieldValueModel;
-
-    private CustomItemXrefContactRepository $customItemXrefContactRepository;
-
-    private CustomItemRepository $customItemRepository;
-
-    private EventDispatcherInterface $eventDispatcher;
-
     private string $filePath;
 
     public function __construct(
-        ExportHelper $exportHelper,
-        MailHelper $mailHelper,
-        CustomFieldValueModel $customFieldValueModel,
-        CustomItemRouteProvider $customItemRouteProvider,
-        CustomItemXrefContactRepository $customItemXrefContactRepository,
-        CustomItemRepository $customItemRepository,
-        EventDispatcherInterface $eventDispatcher
+        private ExportHelper $exportHelper,
+        private MailHelper $mailHelper,
+        private CustomFieldValueModel $customFieldValueModel,
+        private CustomItemRouteProvider $customItemRouteProvider,
+        private CustomItemXrefContactRepository $customItemXrefContactRepository,
+        private CustomItemRepository $customItemRepository,
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $logger,
+        CoreParametersHelper $coreParametersHelper,
     ) {
-        $this->exportHelper                    = $exportHelper;
-        $this->mailHelper                      = $mailHelper;
-        $this->customFieldValueModel           = $customFieldValueModel;
-        $this->customItemRouteProvider         = $customItemRouteProvider;
-        $this->customItemXrefContactRepository = $customItemXrefContactRepository;
-        $this->customItemRepository            = $customItemRepository;
-        $this->eventDispatcher                 = $eventDispatcher;
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }
 
     public function getRepository(): CustomItemExportSchedulerRepository

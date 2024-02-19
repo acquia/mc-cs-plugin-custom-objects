@@ -6,12 +6,16 @@ namespace MauticPlugin\CustomObjectsBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Doctrine\Helper\FulltextKeyword;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\DTO\CustomItemFieldListData;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
@@ -31,53 +35,30 @@ use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use UnexpectedValueException;
 
 class CustomItemModel extends FormModel
 {
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @var CustomItemRepository
-     */
-    private $customItemRepository;
-
-    /**
-     * @var CustomItemPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var CustomFieldValueModel
-     */
-    private $customFieldValueModel;
-
-    /**
-     * @var ValidatorInterface
-     */
-    private $validator;
-
     public function __construct(
-        EntityManager $entityManager,
-        CustomItemRepository $customItemRepository,
-        CustomItemPermissionProvider $permissionProvider,
-        UserHelper $userHelper,
-        CustomFieldValueModel $customFieldValueModel,
+        private EntityManager $entityManager,
+        private CustomItemRepository $customItemRepository,
+        private CustomItemPermissionProvider $permissionProvider,
+        private CustomFieldValueModel $customFieldValueModel,
+        private ValidatorInterface $validator,
+        EntityManagerInterface $em,
+        CorePermissions $security,
         EventDispatcherInterface $dispatcher,
-        ValidatorInterface $validator
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $logger,
+        CoreParametersHelper $coreParametersHelper,
     ) {
-        $this->entityManager         = $entityManager;
-        $this->customItemRepository  = $customItemRepository;
-        $this->permissionProvider    = $permissionProvider;
-        $this->userHelper            = $userHelper;
-        $this->customFieldValueModel = $customFieldValueModel;
-        $this->dispatcher            = $dispatcher;
-        $this->validator             = $validator;
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }
 
     public function save(CustomItem $customItem, bool $dryRun = false): CustomItem

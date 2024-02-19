@@ -4,38 +4,40 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CustomFieldModel extends FormModel
 {
-    /**
-     * @var CustomFieldRepository
-     */
-    private $customFieldRepository;
-
-    /**
-     * @var CustomFieldPermissionProvider
-     */
-    private $permissionProvider;
-
     public function __construct(
-        CustomFieldRepository $customFieldRepository,
-        CustomFieldPermissionProvider $permissionProvider,
-        UserHelper $userHelper
+        private CustomFieldRepository $customFieldRepository,
+        private CustomFieldPermissionProvider $permissionProvider,
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $logger,
+        CoreParametersHelper $coreParametersHelper,
     ) {
-        $this->customFieldRepository = $customFieldRepository;
-        $this->permissionProvider    = $permissionProvider;
-        $this->userHelper            = $userHelper;
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }
 
     public function setMetadata(CustomField $entity): CustomField

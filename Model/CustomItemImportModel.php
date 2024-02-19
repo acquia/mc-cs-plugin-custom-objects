@@ -5,39 +5,38 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CustomItemImportModel extends FormModel
 {
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
-     * @var FormatterHelper
-     */
-    private $formatterHelper;
-
     public function __construct(
-        EntityManager $entityManager,
-        CustomItemModel $customItemModel,
-        FormatterHelper $formatterHelper
+        private EntityManager $entityManager,
+        private CustomItemModel $customItemModel,
+        private FormatterHelper $formatterHelper,
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $logger,
+        CoreParametersHelper $coreParametersHelper,
     ) {
-        $this->entityManager   = $entityManager;
-        $this->customItemModel = $customItemModel;
-        $this->formatterHelper = $formatterHelper;
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }
 
     /**
