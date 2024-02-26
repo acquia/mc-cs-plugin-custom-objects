@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Doctrine\Helper\FulltextKeyword;
@@ -44,7 +43,6 @@ use UnexpectedValueException;
 class CustomItemModel extends FormModel
 {
     public function __construct(
-        private EntityManager $entityManager,
         private CustomItemRepository $customItemRepository,
         private CustomItemPermissionProvider $permissionProvider,
         private CustomFieldValueModel $customFieldValueModel,
@@ -88,7 +86,7 @@ class CustomItemModel extends FormModel
         if (!$dryRun) {
             if ($customItem->isNew()) {
                 // Custom item is new so we need to upsert it to atomically find whether it exists based on unique fields or not.
-                $this->entityManager->detach($customItem);
+                $this->em->detach($customItem);
                 $this->customItemRepository->upsert($customItem);
 
                 // We need to re-attach the entity to the entity manager so that it can be saved by the rest of the code.
@@ -105,8 +103,8 @@ class CustomItemModel extends FormModel
                     $customItem->addCustomFieldValue($customFieldValue);
                 }
             } else {
-                $this->entityManager->persist($customItem);
-                $this->entityManager->flush();
+                $this->em->persist($customItem);
+                $this->em->flush();
             }
 
             $customItem->getCustomFieldValues()->map(
@@ -180,8 +178,8 @@ class CustomItemModel extends FormModel
         $event = new CustomItemEvent($customItem);
         $this->dispatcher->dispatch($event, CustomItemEvents::ON_CUSTOM_ITEM_PRE_DELETE);
 
-        $this->entityManager->remove($customItem);
-        $this->entityManager->flush();
+        $this->em->remove($customItem);
+        $this->em->flush();
 
         //set the id for use in events
         $customItem->deletedId = $id;
@@ -340,7 +338,7 @@ class CustomItemModel extends FormModel
 
         $customObjectId = $tableConfig->getParameter('customObjectId');
         $search         = $tableConfig->getParameter('search');
-        $queryBuilder   = $this->entityManager->createQueryBuilder();
+        $queryBuilder   = $this->em->createQueryBuilder();
         $queryBuilder   = $tableConfig->configureOrmQueryBuilder($queryBuilder);
 
         $queryBuilder->select(CustomItem::TABLE_ALIAS);
@@ -363,7 +361,7 @@ class CustomItemModel extends FormModel
         $this->validateTableConfig($tableConfig);
 
         $customObjectId = $tableConfig->getParameter('customObjectId');
-        $queryBuilder   = $this->entityManager->getConnection()->createQueryBuilder();
+        $queryBuilder   = $this->em->getConnection()->createQueryBuilder();
         $queryBuilder   = $tableConfig->configureDbalQueryBuilder($queryBuilder);
 
         $queryBuilder->select(CustomItem::TABLE_ALIAS.'.*');
@@ -411,12 +409,12 @@ class CustomItemModel extends FormModel
 
     private function applySearchFilter(QueryBuilder $queryBuilder, string $search): void
     {
-        $valueTextBuilder = $this->entityManager->createQueryBuilder();
+        $valueTextBuilder = $this->em->createQueryBuilder();
         $valueTextBuilder->select('IDENTITY(ValueText.customItem)');
         $valueTextBuilder->from(CustomFieldValueText::class, 'ValueText');
         $valueTextBuilder->andWhere('MATCH (ValueText.value) AGAINST (:search BOOLEAN) > 0');
 
-        $valueOptionBuilder = $this->entityManager->createQueryBuilder();
+        $valueOptionBuilder = $this->em->createQueryBuilder();
         $valueOptionBuilder->select('IDENTITY(ValueOption.customItem)');
         $valueOptionBuilder->from(CustomFieldValueOption::class, 'ValueOption');
         $valueOptionBuilder->andWhere('MATCH (ValueOption.value) AGAINST (:search BOOLEAN) > 0');

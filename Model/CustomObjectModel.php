@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -33,7 +32,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class CustomObjectModel extends FormModel
 {
     public function __construct(
-        private EntityManager $entityManager,
         private CustomObjectRepository $customObjectRepository,
         private CustomObjectPermissionProvider $permissionProvider,
         private CustomFieldModel $customFieldModel,
@@ -78,8 +76,8 @@ class CustomObjectModel extends FormModel
 
         $this->dispatcher->dispatch($event, CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_SAVE);
 
-        $this->entityManager->persist($customObject);
-        $this->entityManager->flush();
+        $this->em->persist($customObject);
+        $this->em->flush();
 
         $this->dispatcher->dispatch($event, CustomObjectEvents::ON_CUSTOM_OBJECT_POST_SAVE);
 
@@ -93,8 +91,8 @@ class CustomObjectModel extends FormModel
         $event = new CustomObjectEvent($customObject);
         $this->dispatcher->dispatch($event, CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_DELETE);
 
-        $this->entityManager->remove($customObject);
-        $this->entityManager->flush();
+        $this->em->remove($customObject);
+        $this->em->flush();
 
         // Set the id for use in events
         $customObject->deletedId = $id;
@@ -190,7 +188,7 @@ class CustomObjectModel extends FormModel
         foreach ($customObject->getCustomFields() as $customField) {
             if ($customField->getId() === $customFieldId) {
                 $customObject->removeCustomField($customField);
-                if ($this->entityManager->contains($customField)) {
+                if ($this->em->contains($customField)) {
                     // We need to ensure that field exists when cloning CO with deleted fields
                     $this->customFieldModel->deleteEntity($customField);
                 }
@@ -220,7 +218,7 @@ class CustomObjectModel extends FormModel
     public function getItemsLineChartData(\DateTime $from, \DateTime $to, CustomObject $customObject): array
     {
         $chart = new LineChart(null, $from, $to);
-        $query = new ChartQuery($this->entityManager->getConnection(), $from, $to);
+        $query = new ChartQuery($this->em->getConnection(), $from, $to);
         $items = $query->fetchTimeData('custom_item', 'date_added', ['custom_object_id' => $customObject->getId()]);
         $chart->setDataset($this->translator->trans('custom.object.created.items'), $items);
 
@@ -229,7 +227,7 @@ class CustomObjectModel extends FormModel
 
     private function createListQueryBuilder(TableConfig $tableConfig): QueryBuilder
     {
-        $queryBuilder = $this->entityManager->createQueryBuilder();
+        $queryBuilder = $this->em->createQueryBuilder();
         $queryBuilder = $tableConfig->configureOrmQueryBuilder($queryBuilder);
         $queryBuilder->select(CustomObject::TABLE_ALIAS);
         $queryBuilder->from(CustomObject::class, CustomObject::TABLE_ALIAS);

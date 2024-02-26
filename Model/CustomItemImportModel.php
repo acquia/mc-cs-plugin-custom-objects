@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
@@ -24,7 +23,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class CustomItemImportModel extends FormModel
 {
     public function __construct(
-        private EntityManager $entityManager,
         private CustomItemModel $customItemModel,
         private FormatterHelper $formatterHelper,
         EntityManagerInterface $em,
@@ -117,7 +115,7 @@ class CustomItemImportModel extends FormModel
 
         if ($owner) {
             /** @var User $user */
-            $user = $this->entityManager->find(User::class, $owner);
+            $user = $this->em->find(User::class, $owner);
 
             $customItem->setCreatedBy($user);
         }

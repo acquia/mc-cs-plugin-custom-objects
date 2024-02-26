@@ -97,7 +97,7 @@
                 {{ 'mautic.lead.leads'|trans }}
             </a>
         </li>
-        {{ customContent('tabs', mauticTemplateVars|default({'mauticTemplate': '@CustomObjects/CustomItem/detail.html.twig', 'item': item})) }}
+        {{ customContent('tabs', mauticTemplateVars|default({'mauticTemplate': '@CustomObjects/CustomItem/detail.html.twig', 'item': item}), '@CustomObjects/CustomItem/detail.html.twig') }}
     </ul>
     <!--/ tabs controls -->
 
@@ -106,7 +106,7 @@
         <div class="tab-pane active bdr-w-0 page-list" id="contacts-container">
             {{ contacts|raw }}
         </div>
-        {{ customContent('tabs.content', mauticTemplateVars|default({'mauticTemplate': '@CustomObjects/CustomItem/detail.html.twig', 'item': item})) }}
+        {{ customContent('tabs.content', mauticTemplateVars|default({'mauticTemplate': '@CustomObjects/CustomItem/detail.html.twig', 'item': item}), '@CustomObjects/CustomItem/detail.html.twig') }}
     </div>
     <!-- end: tab-content -->
 </div>

@@ -286,7 +286,7 @@ class CustomFieldValueModel
             $types[$table]  = Connection::PARAM_INT_ARRAY;
         }
 
-        return $this->entityManager->getConnection()->fetchAll(implode(' UNION ALL ', $queries), $params, $types);
+        return $this->entityManager->getConnection()->fetchAllAssociative(implode(' UNION ALL ', $queries), $params, $types);
     }
 
     /**

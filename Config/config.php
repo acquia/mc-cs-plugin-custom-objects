@@ -213,7 +213,6 @@ $coParams = [
             'mautic.custom.model.item' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomItemModel::class,
                 'arguments' => [
-                    'doctrine.orm.entity_manager',
                     'custom_item.repository',
                     'custom_item.permission.provider',
                     'mautic.custom.model.field.value',
@@ -231,7 +230,6 @@ $coParams = [
             'mautic.custom.model.import.item' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomItemImportModel::class,
                 'arguments' => [
-                    'doctrine.orm.entity_manager',
                     'mautic.custom.model.item',
                     'mautic.helper.twig.formatter',
                     'doctrine.orm.entity_manager',
@@ -247,8 +245,6 @@ $coParams = [
             'mautic.custom.model.import.xref.contact' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel::class,
                 'arguments' => [
-                    'doctrine.orm.entity_manager',
-                    'translator',
                     'doctrine.orm.entity_manager',
                     'mautic.security',
                     'event_dispatcher',
@@ -268,11 +264,9 @@ $coParams = [
             'mautic.custom.model.object' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel::class,
                 'arguments' => [
-                    'doctrine.orm.entity_manager',
                     'custom_object.repository',
                     'custom_object.permission.provider',
                     'mautic.custom.model.field',
-//                    'mautic.lead.model.list',
                     'doctrine.orm.entity_manager',
                     'mautic.security',
                     'event_dispatcher',
