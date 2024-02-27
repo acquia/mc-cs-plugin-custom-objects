@@ -102,7 +102,7 @@ class CustomItemImportModel extends FormModel
     private function linkContacts(CustomItem $customItem, array $contactIds): CustomItem
     {
         foreach ($contactIds as $contactId) {
-            $xref = $this->customItemModel->linkEntity($customItem, 'contact', $contactId);
+            $xref = $this->customItemModel->linkEntity($customItem, 'contact', (int) $contactId);
             $customItem->addContactReference($xref);
         }
 
