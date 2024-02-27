@@ -26,8 +26,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class CustomFieldModel extends FormModel
 {
     public function __construct(
-        private CustomFieldRepository $customFieldRepository,
-        private CustomFieldPermissionProvider $permissionProvider,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -36,6 +34,8 @@ class CustomFieldModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $logger,
         CoreParametersHelper $coreParametersHelper,
+        private CustomFieldRepository $customFieldRepository,
+        private CustomFieldPermissionProvider $permissionProvider,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }

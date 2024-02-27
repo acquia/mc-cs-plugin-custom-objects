@@ -38,12 +38,6 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
     private string $filePath;
 
     public function __construct(
-        private ExportHelper $exportHelper,
-        private MailHelper $mailHelper,
-        private CustomFieldValueModel $customFieldValueModel,
-        private CustomItemRouteProvider $customItemRouteProvider,
-        private CustomItemXrefContactRepository $customItemXrefContactRepository,
-        private CustomItemRepository $customItemRepository,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -52,6 +46,12 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
         UserHelper $userHelper,
         LoggerInterface $logger,
         CoreParametersHelper $coreParametersHelper,
+        private ExportHelper $exportHelper,
+        private MailHelper $mailHelper,
+        private CustomFieldValueModel $customFieldValueModel,
+        private CustomItemRouteProvider $customItemRouteProvider,
+        private CustomItemXrefContactRepository $customItemXrefContactRepository,
+        private CustomItemRepository $customItemRepository,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }

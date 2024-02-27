@@ -43,10 +43,6 @@ use UnexpectedValueException;
 class CustomItemModel extends FormModel
 {
     public function __construct(
-        private CustomItemRepository $customItemRepository,
-        private CustomItemPermissionProvider $permissionProvider,
-        private CustomFieldValueModel $customFieldValueModel,
-        private ValidatorInterface $validator,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -55,6 +51,10 @@ class CustomItemModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $logger,
         CoreParametersHelper $coreParametersHelper,
+        private CustomItemRepository $customItemRepository,
+        private CustomItemPermissionProvider $permissionProvider,
+        private CustomFieldValueModel $customFieldValueModel,
+        private ValidatorInterface $validator,
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }

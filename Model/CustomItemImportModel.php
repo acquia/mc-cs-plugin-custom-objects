@@ -23,8 +23,6 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 class CustomItemImportModel extends FormModel
 {
     public function __construct(
-        private CustomItemModel $customItemModel,
-        private FormatterHelper $formatterHelper,
         EntityManagerInterface $em,
         CorePermissions $security,
         EventDispatcherInterface $dispatcher,
@@ -33,6 +31,9 @@ class CustomItemImportModel extends FormModel
         UserHelper $userHelper,
         LoggerInterface $logger,
         CoreParametersHelper $coreParametersHelper,
+        private CustomItemModel $customItemModel,
+        private FormatterHelper $formatterHelper,
+
     ) {
         parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }
