@@ -148,7 +148,7 @@ class CustomItemModel extends FormModel
             throw new UnexpectedValueException("Entity {$entityType} was not able to be linked to {$customItem->getName()} ({$customItem->getId()})");
         }
 
-        $this->dispatcher->dispatch(new CustomItemXrefEntityEvent($event->getXrefEntity(), CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY));
+        $this->dispatcher->dispatch(new CustomItemXrefEntityEvent($event->getXrefEntity()), CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY);
 
         return $event->getXrefEntity();
     }
@@ -166,7 +166,7 @@ class CustomItemModel extends FormModel
             throw new UnexpectedValueException("Entity {$entityType} was not able to be unlinked from {$customItem->getName()} ({$customItem->getId()})");
         }
 
-        $this->dispatcher->dispatch(new CustomItemXrefEntityEvent($event->getXrefEntity(), CustomItemEvents::ON_CUSTOM_ITEM_UNLINK_ENTITY));
+        $this->dispatcher->dispatch(new CustomItemXrefEntityEvent($event->getXrefEntity()), CustomItemEvents::ON_CUSTOM_ITEM_UNLINK_ENTITY);
 
         return $event->getXrefEntity();
     }
