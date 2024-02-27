@@ -30,7 +30,7 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
     }
 
     /** {@inheritdoc} */
-    public static function getServiceId()
+    public static function getServiceId(): string
     {
         return 'mautic.lead.query.builder.custom_field.value';
     }

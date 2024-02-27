@@ -12,7 +12,7 @@ use MauticPlugin\CustomObjectsBundle\Security\Permissions\CustomObjectPermission
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomObjectPermissionsTest extends TestCase
 {

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Command;
 
 use Mautic\CoreBundle\Helper\ExitCode;
-use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemExportSchedulerEvent;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemExportSchedulerModel;
@@ -58,14 +58,14 @@ class CustomItemsScheduledExportCommand extends Command
 
         foreach ($customItemExportSchedulers as $customItemExportScheduler) {
             $customItemExportSchedulerEvent = new CustomItemExportSchedulerEvent($customItemExportScheduler);
-            $this->eventDispatcher->dispatch(CustomItemEvents::CUSTOM_ITEM_PREPARE_EXPORT_FILE, $customItemExportSchedulerEvent);
-            $this->eventDispatcher->dispatch(CustomItemEvents::CUSTOM_ITEM_MAIL_EXPORT_FILE, $customItemExportSchedulerEvent);
-            $this->eventDispatcher->dispatch(CustomItemEvents::POST_EXPORT_MAIL_SENT, $customItemExportSchedulerEvent);
+            $this->eventDispatcher->dispatch($customItemExportSchedulerEvent, CustomItemEvents::CUSTOM_ITEM_PREPARE_EXPORT_FILE);
+            $this->eventDispatcher->dispatch($customItemExportSchedulerEvent, CustomItemEvents::CUSTOM_ITEM_MAIL_EXPORT_FILE);
+            $this->eventDispatcher->dispatch($customItemExportSchedulerEvent, CustomItemEvents::POST_EXPORT_MAIL_SENT);
             ++$count;
         }
 
         $output->writeln('CustomItem export email(s) sent: '.$count);
 
-        return ExitCode::SUCCESS;
+        return Command::SUCCESS;
     }
 }

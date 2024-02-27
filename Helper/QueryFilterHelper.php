@@ -185,14 +185,14 @@ class QueryFilterHelper
                 $valueParameter = $tableAlias.'_value_value';
                 $expression     = $customQuery->expr()->in(
                     $tableAlias.'_value.value',
-                    ":${valueParameter}"
+                    ":{$valueParameter}"
                 );
 
                 break;
             case 'neq':
                 $valueParameter = $tableAlias.'_value_value';
                 $expression     = $customQuery->expr()->orX(
-                    $customQuery->expr()->neq($tableAlias.'_value.value', ":${valueParameter}"),
+                    $customQuery->expr()->neq($tableAlias.'_value.value', ":{$valueParameter}"),
                     $customQuery->expr()->isNull($tableAlias.'_value.value')
                 );
 
@@ -208,7 +208,7 @@ class QueryFilterHelper
 
                 $expression = $customQuery->expr()->orX(
                     $customQuery->expr()->isNull($tableAlias.'_value.value'),
-                    $customQuery->expr()->like($tableAlias.'_value.value', ":${valueParameter}")
+                    $customQuery->expr()->like($tableAlias.'_value.value', ":{$valueParameter}")
                 );
 
                 break;
@@ -216,7 +216,7 @@ class QueryFilterHelper
                 $valueParameter = $tableAlias.'_value_value';
                 $expression     = $customQuery->expr()->{$operator}(
                     $tableAlias.'_value.value',
-                    ":${valueParameter}"
+                    ":{$valueParameter}"
                 );
         }
 
@@ -250,14 +250,14 @@ class QueryFilterHelper
                 $valueParameter = $tableAlias.'_value_value';
                 $expression     = $customQuery->expr()->in(
                     $tableAlias.'_item.name',
-                    ":${valueParameter}"
+                    ":{$valueParameter}"
                 );
 
                 break;
             case 'neq':
                 $valueParameter = $tableAlias.'_value_value';
                 $expression     = $customQuery->expr()->orX(
-                    $customQuery->expr()->eq($tableAlias.'_item.name', ":${valueParameter}"),
+                    $customQuery->expr()->eq($tableAlias.'_item.name', ':'.$valueParameter),
                     $customQuery->expr()->isNull($tableAlias.'_item.name')
                 );
 
@@ -267,7 +267,7 @@ class QueryFilterHelper
 
                 $expression = $customQuery->expr()->orX(
                     $customQuery->expr()->isNull($tableAlias.'_item.name'),
-                    $customQuery->expr()->like($tableAlias.'_item.name', ":${valueParameter}")
+                    $customQuery->expr()->like($tableAlias.'_item.name', ":{$valueParameter}")
                 );
 
                 break;
@@ -275,7 +275,7 @@ class QueryFilterHelper
                 $valueParameter = $tableAlias.'_value_value';
                 $expression     = $customQuery->expr()->{$operator}(
                     $tableAlias.'_item.name',
-                    ":${valueParameter}"
+                    ":{$valueParameter}"
                 );
         }
 

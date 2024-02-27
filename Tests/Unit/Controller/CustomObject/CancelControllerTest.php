@@ -11,6 +11,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class CancelControllerTest extends ControllerTestCase
 {
@@ -22,24 +23,22 @@ class CancelControllerTest extends ControllerTestCase
      * @var CancelController
      */
     private $cancelController;
+    private $sessionProviderFactory;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $sessionProviderFactory  = $this->createMock(SessionProviderFactory::class);
+        $this->sessionProviderFactory  = $this->createMock(SessionProviderFactory::class);
         $this->sessionProvider   = $this->createMock(SessionProvider::class);
         $this->routeProvider     = $this->createMock(CustomObjectRouteProvider::class);
         $this->customObjectModel = $this->createMock(CustomObjectModel::class);
+        $this->requestStack      = $this->createMock(RequestStack::class);
 
-        $this->cancelController = new CancelController(
-            $sessionProviderFactory,
-            $this->routeProvider,
-            $this->customObjectModel
-        );
+        $this->cancelController = new CancelController($this->managerRegistry);
 
         $this->addSymfonyDependencies($this->cancelController);
-        $sessionProviderFactory->method('createObjectProvider')->willReturn($this->sessionProvider);
+        $this->sessionProviderFactory->method('createObjectProvider')->willReturn($this->sessionProvider);
     }
 
     public function testCancelAction(): void
@@ -58,7 +57,13 @@ class CancelControllerTest extends ControllerTestCase
             ->with($pageNumber)
             ->willReturn('some/route');
 
-        $this->cancelController->cancelAction(null);
+        $this->cancelController->cancelAction(
+            $this->requestStack,
+            $this->sessionProviderFactory,
+            $this->routeProvider,
+            $this->customObjectModel,
+            null
+        );
     }
 
     public function testCancelActionWithEntityUnlock(): void
@@ -85,6 +90,12 @@ class CancelControllerTest extends ControllerTestCase
             ->with($pageNumber)
             ->willReturn('some/route');
 
-        $this->cancelController->cancelAction($customObjectId);
+        $this->cancelController->cancelAction(
+            $this->requestStack,
+            $this->sessionProviderFactory,
+            $this->routeProvider,
+            $this->customObjectModel,
+            $customObjectId
+        );
     }
 }

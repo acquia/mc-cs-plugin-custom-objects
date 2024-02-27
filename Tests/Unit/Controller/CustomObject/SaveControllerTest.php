@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomObject;
 
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomObject\SaveController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
@@ -23,6 +24,7 @@ use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -67,21 +69,17 @@ class SaveControllerTest extends ControllerTestCase
         $this->request                    = $this->createMock(Request::class);
         $this->customObject               = $this->createMock(CustomObject::class);
         $this->form                       = $this->createMock(FormInterface::class);
-        $this->saveController             = new SaveController(
-            $this->requestStack,
-            $this->flashBag,
-            $this->formFactory,
-            $this->customObjectModel,
-            $this->customFieldModel,
-            $this->permissionProvider,
-            $this->routeProvider,
-            $this->customFieldTypeProvider,
-            $this->paramsToStringTransformer,
-            $this->optionsToStringTransformer,
-            $this->lockFlashMessageHelper
-        );
+
+        $this->translator                 = $this->createMock(Translator::class);
+
+        $this->saveController             = new SaveController($this->security, $this->userHelper, $this->managerRegistry, $this->requestStack);
+        $this->saveController->setTranslator($this->translator);
 
         $this->addSymfonyDependencies($this->saveController);
+
+        $this->requestStack->expects($this->any())
+            ->method('getCurrentRequest')
+            ->willReturn($this->request);
     }
 
     public function testSaveActionIfExistingCustomObjectNotFound(): void
@@ -96,7 +94,25 @@ class SaveControllerTest extends ControllerTestCase
         $this->permissionProvider->expects($this->never())
             ->method('canCreate');
 
-        $this->saveController->saveAction(self::OBJECT_ID);
+        $post  = $this->createMock(ParameterBag::class);
+        $this->request->request = $post;
+        $post->expects($this->once())
+            ->method('all')
+            ->willReturn([]);
+
+        $this->saveController->saveAction(
+            $this->flashBag,
+            $this->formFactory,
+            $this->customObjectModel,
+            $this->customFieldModel,
+            $this->permissionProvider,
+            $this->routeProvider,
+            $this->customFieldTypeProvider,
+            $this->paramsToStringTransformer,
+            $this->optionsToStringTransformer,
+            $this->lockFlashMessageHelper,
+            self::OBJECT_ID
+        );
     }
 
     public function testSaveActionIfExistingCustomObjectIsForbidden(): void
@@ -114,7 +130,19 @@ class SaveControllerTest extends ControllerTestCase
 
         $this->expectException(AccessDeniedHttpException::class);
 
-        $this->saveController->saveAction(self::OBJECT_ID);
+        $this->saveController->saveAction(
+            $this->flashBag,
+            $this->formFactory,
+            $this->customObjectModel,
+            $this->customFieldModel,
+            $this->permissionProvider,
+            $this->routeProvider,
+            $this->customFieldTypeProvider,
+            $this->paramsToStringTransformer,
+            $this->optionsToStringTransformer,
+            $this->lockFlashMessageHelper,
+            self::OBJECT_ID
+        );
     }
 
     public function testSaveActionForExistingCustomObjectWithValidFormClickingApply(): void
@@ -196,7 +224,19 @@ class SaveControllerTest extends ControllerTestCase
             ->with('custom_object')
             ->willReturn([]);
 
-        $this->saveController->saveAction(self::OBJECT_ID);
+        $this->saveController->saveAction(
+            $this->flashBag,
+            $this->formFactory,
+            $this->customObjectModel,
+            $this->customFieldModel,
+            $this->permissionProvider,
+            $this->routeProvider,
+            $this->customFieldTypeProvider,
+            $this->paramsToStringTransformer,
+            $this->optionsToStringTransformer,
+            $this->lockFlashMessageHelper,
+            self::OBJECT_ID
+        );
     }
 
     public function testSaveActionForExistingCustomObjectWithValidFormClickingSaveAndAjax(): void
@@ -298,7 +338,19 @@ class SaveControllerTest extends ControllerTestCase
             ->willReturn([]);
 
         /** @var JsonResponse $jsonResponse */
-        $jsonResponse = $this->saveController->saveAction(self::OBJECT_ID);
+        $jsonResponse = $this->saveController->saveAction(
+            $this->flashBag,
+            $this->formFactory,
+            $this->customObjectModel,
+            $this->customFieldModel,
+            $this->permissionProvider,
+            $this->routeProvider,
+            $this->customFieldTypeProvider,
+            $this->paramsToStringTransformer,
+            $this->optionsToStringTransformer,
+            $this->lockFlashMessageHelper,
+            self::OBJECT_ID
+        );
 
         $this->assertMatchesRegularExpression('/Redirecting to https:\/\/view.object/', $jsonResponse->getContent());
     }
@@ -352,6 +404,17 @@ class SaveControllerTest extends ControllerTestCase
         $this->customFieldTypeProvider->expects($this->once())
             ->method('getTypes');
 
-        $this->saveController->saveAction();
+        $this->saveController->saveAction(
+            $this->flashBag,
+            $this->formFactory,
+            $this->customObjectModel,
+            $this->customFieldModel,
+            $this->permissionProvider,
+            $this->routeProvider,
+            $this->customFieldTypeProvider,
+            $this->paramsToStringTransformer,
+            $this->optionsToStringTransformer,
+            $this->lockFlashMessageHelper,
+        );
     }
 }

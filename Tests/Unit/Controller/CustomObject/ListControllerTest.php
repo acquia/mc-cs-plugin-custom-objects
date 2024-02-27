@@ -37,25 +37,23 @@ class ListControllerTest extends ControllerTestCase
     {
         parent::setUp();
 
-        $sessionProviderFactory   = $this->createMock(SessionProviderFactory::class);
-        $this->requestStack       = $this->createMock(RequestStack::class);
-        $this->customObjectModel  = $this->createMock(CustomObjectModel::class);
-        $this->sessionProvider    = $this->createMock(SessionProvider::class);
-        $this->permissionProvider = $this->createMock(CustomObjectPermissionProvider::class);
-        $this->routeProvider      = $this->createMock(CustomObjectRouteProvider::class);
-        $this->request            = $this->createMock(Request::class);
-        $this->listController     = new ListController(
-            $this->requestStack,
-            $sessionProviderFactory,
-            $this->customObjectModel,
-            $this->permissionProvider,
-            $this->routeProvider
-        );
+        $this->sessionProviderFactory = $this->createMock(SessionProviderFactory::class);
+        $this->requestStack           = $this->createMock(RequestStack::class);
+        $this->customObjectModel      = $this->createMock(CustomObjectModel::class);
+        $this->sessionProvider        = $this->createMock(SessionProvider::class);
+        $this->permissionProvider     = $this->createMock(CustomObjectPermissionProvider::class);
+        $this->routeProvider          = $this->createMock(CustomObjectRouteProvider::class);
+        $this->request                = $this->createMock(Request::class);
+        $this->listController         = new ListController($this->managerRegistry);
 
         $this->addSymfonyDependencies($this->listController);
 
         $this->requestStack->method('getCurrentRequest')->willReturn($this->request);
-        $sessionProviderFactory->method('createObjectProvider')->willReturn($this->sessionProvider);
+        $this->sessionProviderFactory->method('createObjectProvider')->willReturn($this->sessionProvider);
+
+        $this->requestStack->expects($this->any())
+            ->method('getCurrentRequest')
+            ->willReturn($this->request);
     }
 
     public function testListActionIfForbidden(): void
@@ -69,7 +67,14 @@ class ListControllerTest extends ControllerTestCase
 
         $this->expectException(AccessDeniedHttpException::class);
 
-        $this->listController->listAction(self::PAGE);
+        $this->listController->listAction(
+            $this->requestStack,
+            $this->sessionProviderFactory,
+            $this->customObjectModel,
+            $this->permissionProvider,
+            $this->routeProvider,
+            self::PAGE
+        );
     }
 
     public function testListAction(): void
@@ -123,7 +128,14 @@ class ListControllerTest extends ControllerTestCase
             ->method('setPageLimit')
             ->with($pageLimit);
 
-        $this->listController->listAction(self::PAGE);
+        $this->listController->listAction(
+            $this->requestStack,
+            $this->sessionProviderFactory,
+            $this->customObjectModel,
+            $this->permissionProvider,
+            $this->routeProvider,
+            self::PAGE
+        );
     }
 
     public function testListActionWithOrderByQueryParamAndAjax(): void
@@ -189,6 +201,13 @@ class ListControllerTest extends ControllerTestCase
             ->method('setPageLimit')
             ->with($pageLimit);
 
-        $this->listController->listAction(self::PAGE);
+        $this->listController->listAction(
+            $this->requestStack,
+            $this->sessionProviderFactory,
+            $this->customObjectModel,
+            $this->permissionProvider,
+            $this->routeProvider,
+            self::PAGE
+        );
     }
 }

@@ -17,7 +17,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ContactTabSubscriberTest extends TestCase
 {
@@ -123,8 +123,8 @@ class ContactTabSubscriberTest extends TestCase
             ->method('checkContext')
             ->willReturnMap(
                 [
-                    ['MauticLeadBundle:Lead:lead.html.php', 'tabs', true],
-                    ['MauticLeadBundle:Lead:lead.html.php', 'tabs.content', false],
+                    ['MauticLeadBundle:Lead:lead.html.twig', 'tabs', true],
+                    ['MauticLeadBundle:Lead:lead.html.twig', 'tabs.content', false],
                 ]
             );
 
@@ -136,7 +136,7 @@ class ContactTabSubscriberTest extends TestCase
             ->method('addTemplate')
             ->withConsecutive(
                 [
-                    'CustomObjectsBundle:SubscribedEvents/Tab:link.html.php',
+                    'CustomObjectsBundle:SubscribedEvents/Tab:link.html.twig',
                     [
                         'count' => 13,
                         'title' => 'Object A',
@@ -144,7 +144,7 @@ class ContactTabSubscriberTest extends TestCase
                     ],
                 ],
                 [
-                    'CustomObjectsBundle:SubscribedEvents/Tab:modal.html.php',
+                    'CustomObjectsBundle:SubscribedEvents/Tab:modal.html.twig',
                 ]
             );
 
@@ -176,8 +176,8 @@ class ContactTabSubscriberTest extends TestCase
             ->method('checkContext')
             ->willReturnMap(
                 [
-                    ['MauticLeadBundle:Lead:lead.html.php', 'tabs', false],
-                    ['MauticLeadBundle:Lead:lead.html.php', 'tabs.content', true],
+                    ['MauticLeadBundle:Lead:lead.html.twig', 'tabs', false],
+                    ['MauticLeadBundle:Lead:lead.html.twig', 'tabs.content', true],
                 ]
             );
 
@@ -218,7 +218,7 @@ class ContactTabSubscriberTest extends TestCase
         $this->customContentEvent->expects($this->once())
             ->method('addTemplate')
             ->with(
-                'CustomObjectsBundle:SubscribedEvents/Tab:content.html.php',
+                'CustomObjectsBundle:SubscribedEvents/Tab:content.html.twig',
                 [
                     'customObjectId'       => 555,
                     'currentEntityId'      => 45,

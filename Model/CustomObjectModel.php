@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\LeadBundle\Model\ListModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
@@ -23,51 +25,26 @@ use MauticPlugin\CustomObjectsBundle\Exception\InUseException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CustomObjectModel extends FormModel
 {
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @var CustomObjectRepository
-     */
-    private $customObjectRepository;
-
-    /**
-     * @var CustomObjectPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var CustomFieldModel
-     */
-    private $customFieldModel;
-
-    /**
-     * @var ListModel
-     */
-    private $listModel;
-
     public function __construct(
-        EntityManager $entityManager,
-        CustomObjectRepository $customObjectRepository,
-        CustomObjectPermissionProvider $permissionProvider,
-        UserHelper $userHelper,
-        CustomFieldModel $customFieldModel,
+        EntityManagerInterface $em,
+        CorePermissions $security,
         EventDispatcherInterface $dispatcher,
-        ListModel $listModel
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $logger,
+        CoreParametersHelper $coreParametersHelper,
+        private CustomObjectRepository $customObjectRepository,
+        private CustomObjectPermissionProvider $permissionProvider,
+        private CustomFieldModel $customFieldModel,
     ) {
-        $this->entityManager          = $entityManager;
-        $this->customObjectRepository = $customObjectRepository;
-        $this->permissionProvider     = $permissionProvider;
-        $this->userHelper             = $userHelper;
-        $this->customFieldModel       = $customFieldModel;
-        $this->dispatcher             = $dispatcher;
-        $this->listModel              = $listModel;
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }
 
     public function save(CustomObject $customObject): CustomObject
@@ -97,12 +74,12 @@ class CustomObjectModel extends FormModel
 
         $this->setCustomFieldsMetadata($customObject);
 
-        $this->dispatcher->dispatch(CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_SAVE, $event);
+        $this->dispatcher->dispatch($event, CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_SAVE);
 
-        $this->entityManager->persist($customObject);
-        $this->entityManager->flush();
+        $this->em->persist($customObject);
+        $this->em->flush();
 
-        $this->dispatcher->dispatch(CustomObjectEvents::ON_CUSTOM_OBJECT_POST_SAVE, $event);
+        $this->dispatcher->dispatch($event, CustomObjectEvents::ON_CUSTOM_OBJECT_POST_SAVE);
 
         return $customObject;
     }
@@ -112,14 +89,14 @@ class CustomObjectModel extends FormModel
         // Take note of ID before doctrine wipes it out
         $id    = $customObject->getId();
         $event = new CustomObjectEvent($customObject);
-        $this->dispatcher->dispatch(CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_DELETE, $event);
+        $this->dispatcher->dispatch($event, CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_DELETE);
 
-        $this->entityManager->remove($customObject);
-        $this->entityManager->flush();
+        $this->em->remove($customObject);
+        $this->em->flush();
 
         // Set the id for use in events
         $customObject->deletedId = $id;
-        $this->dispatcher->dispatch(CustomObjectEvents::ON_CUSTOM_OBJECT_POST_DELETE, $event);
+        $this->dispatcher->dispatch($event, CustomObjectEvents::ON_CUSTOM_OBJECT_POST_DELETE);
     }
 
     /**
@@ -211,7 +188,7 @@ class CustomObjectModel extends FormModel
         foreach ($customObject->getCustomFields() as $customField) {
             if ($customField->getId() === $customFieldId) {
                 $customObject->removeCustomField($customField);
-                if ($this->entityManager->contains($customField)) {
+                if ($this->em->contains($customField)) {
                     // We need to ensure that field exists when cloning CO with deleted fields
                     $this->customFieldModel->deleteEntity($customField);
                 }
@@ -241,7 +218,7 @@ class CustomObjectModel extends FormModel
     public function getItemsLineChartData(\DateTime $from, \DateTime $to, CustomObject $customObject): array
     {
         $chart = new LineChart(null, $from, $to);
-        $query = new ChartQuery($this->entityManager->getConnection(), $from, $to);
+        $query = new ChartQuery($this->em->getConnection(), $from, $to);
         $items = $query->fetchTimeData('custom_item', 'date_added', ['custom_object_id' => $customObject->getId()]);
         $chart->setDataset($this->translator->trans('custom.object.created.items'), $items);
 
@@ -250,7 +227,7 @@ class CustomObjectModel extends FormModel
 
     private function createListQueryBuilder(TableConfig $tableConfig): QueryBuilder
     {
-        $queryBuilder = $this->entityManager->createQueryBuilder();
+        $queryBuilder = $this->em->createQueryBuilder();
         $queryBuilder = $tableConfig->configureOrmQueryBuilder($queryBuilder);
         $queryBuilder->select(CustomObject::TABLE_ALIAS);
         $queryBuilder->from(CustomObject::class, CustomObject::TABLE_ALIAS);
@@ -271,7 +248,7 @@ class CustomObjectModel extends FormModel
         if (empty($dirtyAlias)) {
             $dirtyAlias = $entity->getName();
         }
-        $cleanAlias = $this->cleanAlias($dirtyAlias, '', false, '-');
+        $cleanAlias = $this->cleanAlias($dirtyAlias, '', 0, '-');
         $entity->setAlias($cleanAlias);
 
         return $entity;

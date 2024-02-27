@@ -17,11 +17,10 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
-use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * This controller is not used for saving to database, it is used only to generate forms and data validation.
@@ -32,60 +31,19 @@ use Symfony\Component\Translation\TranslatorInterface;
 class SaveController extends CommonController
 {
     /**
-     * @var FormFactory
+     * Not save but validate Custom Field data and return proper response. Check class description.
+     *
+     * @return Response|JsonResponse
      */
-    private $formFactory;
-
-    /**
-     * @var CustomFieldModel
-     */
-    private $customFieldModel;
-
-    /**
-     * @var CustomFieldFactory
-     */
-    private $customFieldFactory;
-
-    /**
-     * @var CustomFieldPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var CustomFieldRouteProvider
-     */
-    private $fieldRouteProvider;
-
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    public function __construct(
-        FormFactory $formFactory,
-        TranslatorInterface $translator,
+    public function saveAction(
+        Request $request,
+        FormFactoryInterface $formFactory,
         CustomFieldModel $customFieldModel,
         CustomFieldFactory $customFieldFactory,
         CustomFieldPermissionProvider $permissionProvider,
         CustomFieldRouteProvider $fieldRouteProvider,
         CustomObjectModel $customObjectModel
     ) {
-        $this->formFactory             = $formFactory;
-        $this->translator              = $translator;
-        $this->customFieldModel        = $customFieldModel;
-        $this->customFieldFactory      = $customFieldFactory;
-        $this->permissionProvider      = $permissionProvider;
-        $this->fieldRouteProvider      = $fieldRouteProvider;
-        $this->customObjectModel       = $customObjectModel;
-    }
-
-    /**
-     * Not save but validate Custom Field data and return proper response. Check class description.
-     *
-     * @return Response|JsonResponse
-     */
-    public function saveAction(Request $request)
-    {
         $objectId   = (int) $request->get('objectId');
         $fieldId    = (int) $request->query->get('fieldId');
         $fieldType  = $request->get('fieldType');
@@ -93,18 +51,18 @@ class SaveController extends CommonController
         $panelCount = is_numeric($request->get('panelCount')) ? (int) $request->get('panelCount') : null;
 
         if ($objectId) {
-            $customObject = $this->customObjectModel->fetchEntity($objectId);
+            $customObject = $customObjectModel->fetchEntity($objectId);
         } else {
             $customObject = new CustomObject();
         }
 
         try {
             if ($fieldId) {
-                $customField = $this->customFieldModel->fetchEntity($fieldId);
-                $this->permissionProvider->canEdit($customField);
+                $customField = $customFieldModel->fetchEntity($fieldId);
+                $permissionProvider->canEdit($customField);
             } else {
-                $this->permissionProvider->canCreate();
-                $customField = $this->customFieldFactory->create($fieldType, $customObject);
+                $permissionProvider->canCreate();
+                $customField = $customFieldFactory->create($fieldType, $customObject);
             }
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
@@ -114,17 +72,17 @@ class SaveController extends CommonController
 
         $this->recreateOptionsFromPost($request->get('custom_field'), $customField);
 
-        $action = $this->fieldRouteProvider->buildSaveRoute($fieldType, $fieldId, $customObject->getId(), $panelCount, $panelId);
-        $form   = $this->formFactory->create(CustomFieldType::class, $customField, ['action' => $action]);
+        $action = $fieldRouteProvider->buildSaveRoute($fieldType, $fieldId, $customObject->getId(), $panelCount, $panelId);
+        $form   = $formFactory->create(CustomFieldType::class, $customField, ['action' => $action]);
 
         $form->handleRequest($request);
 
         if ($form->isValid()) {
             // Render Custom Field form RAT for Custom Object form.
-            return $this->buildSuccessForm($customObject, $form->getData(), $request);
+            return $this->buildSuccessForm($customObject, $form->getData(), $request, $customFieldModel, $formFactory);
         }
 
-        $route = $fieldId ? $this->fieldRouteProvider->buildFormRoute($fieldId) : '';
+        $route = $fieldId ? $fieldRouteProvider->buildFormRoute($fieldId) : '';
 
         // Render Custom Field form for modal.
         return $this->delegateView(
@@ -134,7 +92,7 @@ class SaveController extends CommonController
                     'customField' => $customField,
                     'form'        => $form->createView(),
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomField:form.html.php',
+                'contentTemplate' => '@CustomObjects/CustomField/form.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customField',
                     'route'         => $route,
@@ -147,8 +105,13 @@ class SaveController extends CommonController
     /**
      * Here is CO form panel part build and injected in the frontend as part of existing CO form.
      */
-    private function buildSuccessForm(CustomObject $customObject, CustomField $customField, Request $request): JsonResponse
-    {
+    private function buildSuccessForm(
+        CustomObject $customObject,
+        CustomField $customField,
+        Request $request,
+        CustomFieldModel $customFieldModel,
+        FormFactoryInterface $formFactory
+    ): JsonResponse {
         $panelId = is_numeric($request->get('panelId')) ? (int) $request->get('panelId') : null; // Is edit of existing panel in view
 
         if (null === $panelId) {
@@ -167,18 +130,18 @@ class SaveController extends CommonController
             $option->setCustomField($customField);
         }
 
-        $this->customFieldModel->setAlias($customField);
+        $customFieldModel->setAlias($customField);
 
         $customFields = new ArrayCollection([$customField]);
         $customObject->setCustomFields($customFields);
 
-        $form = $this->formFactory->create(
+        $form = $formFactory->create(
             CustomObjectType::class,
             $customObject
         );
 
         $template = $this->render(
-            'CustomObjectsBundle:CustomObject:_form-fields.html.php',
+            '@CustomObjects/CustomObject/_form-fields.html.twig',
             [
                 'form'          => $form->createView(),
                 'panelId'       => $panelId, // Panel id to me replaced if edit

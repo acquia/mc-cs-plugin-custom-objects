@@ -13,81 +13,42 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class ViewController extends CommonController
 {
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var FormFactoryInterface
-     */
-    private $formFactory;
-
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
-    /**
-     * @var CustomObjectPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var CustomObjectRouteProvider
-     */
-    private $routeProvider;
-
-    public function __construct(
-        RequestStack $requestStack,
+    public function viewAction(
+        Request $request,
         FormFactoryInterface $formFactory,
         CustomObjectModel $customObjectModel,
         AuditLogModel $auditLogModel,
         CustomObjectPermissionProvider $permissionProvider,
-        CustomObjectRouteProvider $routeProvider
-    ) {
-        $this->requestStack         = $requestStack;
-        $this->formFactory          = $formFactory;
-        $this->customObjectModel    = $customObjectModel;
-        $this->auditLogModel        = $auditLogModel;
-        $this->permissionProvider   = $permissionProvider;
-        $this->routeProvider        = $routeProvider;
-    }
-
-    public function viewAction(int $objectId): Response
-    {
+        CustomObjectRouteProvider $routeProvider,
+        int $objectId
+    ): Response {
         try {
-            $customObject = $this->customObjectModel->fetchEntity($objectId);
-            $this->permissionProvider->canView($customObject);
+            $customObject = $customObjectModel->fetchEntity($objectId);
+            $permissionProvider->canView($customObject);
         } catch (NotFoundException $e) {
             return $this->notFound($e->getMessage());
         } catch (ForbiddenException $e) {
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        $route         = $this->routeProvider->buildViewRoute($objectId);
-        $dateRangeForm = $this->formFactory->create(
+        $route         = $routeProvider->buildViewRoute($objectId);
+        $dateRangeForm = $formFactory->create(
             DateRangeType::class,
-            $this->requestStack->getCurrentRequest()->get('daterange', []),
+            $request->get('daterange', []),
             ['action' => $route]
         );
-        $stats = $this->customObjectModel->getItemsLineChartData(
+        $stats = $customObjectModel->getItemsLineChartData(
             new \DateTime($dateRangeForm->get('date_from')->getData()),
             new \DateTime($dateRangeForm->get('date_to')->getData()),
             $customObject
         );
 
-        $auditLogs = $this->auditLogModel->getLogForObject(
+        $auditLogs = $auditLogModel->getLogForObject(
             'customObject',
             $objectId,
             $customObject->getDateAdded(),
@@ -104,7 +65,7 @@ class ViewController extends CommonController
                     'stats'         => $stats,
                     'logs'          => $auditLogs,
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObject:detail.html.php',
+                'contentTemplate' => '@CustomObjects/CustomObject/detail.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
                     'activeLink'    => "#mautic_custom_object_{$objectId}",

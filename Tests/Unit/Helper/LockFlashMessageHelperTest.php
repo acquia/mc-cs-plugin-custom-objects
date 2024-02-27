@@ -10,7 +10,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LockFlashMessageHelperTest extends TestCase
 {

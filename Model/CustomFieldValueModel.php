@@ -192,9 +192,7 @@ class CustomFieldValueModel
         $query     = implode(' UNION ALL ', $queries->toArray());
         $statement = $this->entityManager->getConnection()->prepare($query);
 
-        $statement->execute();
-
-        return new ArrayCollection($statement->fetchAll());
+        return new ArrayCollection($statement->execute()->fetchAll());
     }
 
     private function buildQueriesForUnion(CustomItem $customItem, Collection $customFields): Collection
@@ -288,7 +286,7 @@ class CustomFieldValueModel
             $types[$table]  = Connection::PARAM_INT_ARRAY;
         }
 
-        return $this->entityManager->getConnection()->fetchAll(implode(' UNION ALL ', $queries), $params, $types);
+        return $this->entityManager->getConnection()->fetchAllAssociative(implode(' UNION ALL ', $queries), $params, $types);
     }
 
     /**

@@ -1,0 +1,12 @@
+{% set link = event.extra %}
+
+<dl class="dl-horizontal">
+    {% if link.user_id is not empty %}
+        <dt> {{ 'mautic.core.createdby'|trans }} </dt>
+        <dd>
+            <a href="{{ path('mautic_user_action', {'objectAction': 'view', 'objectId': link.user_id }) }}" data-toggle="ajax">
+                {{ link.user_name }}
+            </a>
+        </dd>
+    {% endif %}
+</dl>

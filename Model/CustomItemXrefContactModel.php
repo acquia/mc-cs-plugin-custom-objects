@@ -5,28 +5,13 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
 use DateTime;
-use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Model\FormModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomItemXrefContactModel extends FormModel
 {
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    public function __construct(
-        EntityManager $entityManager,
-        TranslatorInterface $translator
-    ) {
-        $this->entityManager = $entityManager;
-        $this->translator    = $translator;
-    }
-
     /**
      * @return mixed[]
      */
@@ -36,7 +21,7 @@ class CustomItemXrefContactModel extends FormModel
         CustomItem $customItem
     ): array {
         $chart = new LineChart(null, $from, $to);
-        $query = new ChartQuery($this->entityManager->getConnection(), $from, $to);
+        $query = new ChartQuery($this->em->getConnection(), $from, $to);
         $links = $query->fetchTimeData(
             'custom_item_xref_contact',
             'date_added',

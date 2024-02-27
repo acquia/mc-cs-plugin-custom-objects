@@ -14,7 +14,7 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ContactSubscriber implements EventSubscriberInterface
 {
@@ -142,7 +142,7 @@ class ContactSubscriber implements EventSubscriberInterface
                     'icon'            => "fa-{$action}",
                     'extra'           => $link,
                     'contactId'       => $link['lead_id'],
-                    'contentTemplate' => 'CustomObjectsBundle:SubscribedEvents\Timeline:link.html.php',
+                    'contentTemplate' => '@CustomObjects/SubscribedEvents/Timeline/link.html.twig',
                 ]);
             }
         }

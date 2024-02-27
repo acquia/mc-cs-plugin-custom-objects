@@ -8,7 +8,7 @@ use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\OneToOne;
@@ -165,12 +165,12 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
 
         $builder->addId();
         $builder->addCategory();
-        $builder->addField('alias', Type::STRING);
-        $builder->addNamedField('nameSingular', Type::STRING, 'name_singular');
-        $builder->addNamedField('namePlural', Type::STRING, 'name_plural');
-        $builder->addNullableField('description', Type::STRING, 'description');
-        $builder->addNullableField('language', Type::STRING, 'lang');
-        $builder->addNullableField('type', Type::INTEGER);
+        $builder->addField('alias', Types::STRING);
+        $builder->addNamedField('nameSingular', Types::STRING, 'name_singular');
+        $builder->addNamedField('namePlural', Types::STRING, 'name_plural');
+        $builder->addNullableField('description', Types::STRING, 'description');
+        $builder->addNullableField('language', Types::STRING, 'lang');
+        $builder->addNullableField('type', Types::INTEGER);
 
         $builder->createOneToOne('relationshipObject', CustomObject::class)
             ->addJoinColumn('relationship_object', 'id', true, false, 'SET NULL')
@@ -390,7 +390,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
             }
         }
 
-        throw new NotFoundException("Custom field with order index '${order}' not found.");
+        throw new NotFoundException('Custom field with order index '.$order.' not found.');
     }
 
     public function getPublishedFields(): Collection

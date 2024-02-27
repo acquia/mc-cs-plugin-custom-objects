@@ -6,6 +6,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomItem;
 
 use Mautic\CoreBundle\Form\Type\DateRangeType;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Translation\Translator;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ViewController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
@@ -17,6 +18,8 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -49,19 +52,20 @@ class ViewControllerTest extends ControllerTestCase
         $this->auditLog                   = $this->createMock(AuditLogModel::class);
         $this->permissionProvider         = $this->createMock(CustomItemPermissionProvider::class);
         $this->routeProvider              = $this->createMock(CustomItemRouteProvider::class);
-        $this->requestStack               = $this->createMock(RequestStack::class);
         $this->formFactory                = $this->createMock(FormFactoryInterface::class);
         $this->form                       = $this->createMock(FormInterface::class);
         $this->customItem                 = $this->createMock(CustomItem::class);
-        $this->viewController             = new ViewController(
-            $this->requestStack,
-            $this->formFactory,
-            $this->customItemModel,
-            $this->customItemXrefContactModel,
-            $this->auditLog,
-            $this->permissionProvider,
-            $this->routeProvider
-        );
+        $this->requestStack               = $this->createMock(RequestStack::class);
+        $this->request                    = $this->createMock(Request::class);
+        $this->requestStack->expects($this->any())
+            ->method('getCurrentRequest')
+            ->willReturn($this->request);
+
+        $this->translator                 = $this->createMock(Translator::class);
+
+        $this->viewController             = new ViewController($this->managerRegistry);
+        $this->viewController->setTranslator($this->translator);
+        $this->viewController->setSecurity($this->security);
 
         $this->addSymfonyDependencies($this->viewController);
     }
@@ -78,7 +82,23 @@ class ViewControllerTest extends ControllerTestCase
         $this->routeProvider->expects($this->never())
             ->method('buildViewRoute');
 
-        $this->viewController->viewAction(self::OBJECT_ID, self::ITEM_ID);
+        $post  = $this->createMock(ParameterBag::class);
+        $this->request->request = $post;
+        $post->expects($this->once())
+            ->method('all')
+            ->willReturn([]);
+
+        $this->viewController->viewAction(
+            $this->requestStack,
+            $this->formFactory,
+            $this->customItemModel,
+            $this->customItemXrefContactModel,
+            $this->auditLog,
+            $this->permissionProvider,
+            $this->routeProvider,
+            self::OBJECT_ID,
+            self::ITEM_ID
+        );
     }
 
     public function testViewActionIfCustomItemForbidden(): void
@@ -94,9 +114,23 @@ class ViewControllerTest extends ControllerTestCase
         $this->routeProvider->expects($this->never())
             ->method('buildViewRoute');
 
+        $this->security->expects($this->once())
+            ->method('isAnonymous')
+            ->willReturn(true);
+
         $this->expectException(AccessDeniedHttpException::class);
 
-        $this->viewController->viewAction(self::OBJECT_ID, self::ITEM_ID);
+        $this->viewController->viewAction(
+            $this->requestStack,
+            $this->formFactory,
+            $this->customItemModel,
+            $this->customItemXrefContactModel,
+            $this->auditLog,
+            $this->permissionProvider,
+            $this->routeProvider,
+            self::OBJECT_ID,
+            self::ITEM_ID
+        );
     }
 
     public function testViewAction(): void
@@ -154,6 +188,16 @@ class ViewControllerTest extends ControllerTestCase
             ->method('getLogForObject')
             ->with('customItem', self::ITEM_ID, '2019-01-04 10:20:30', 10, 'customObjects');
 
-        $this->viewController->viewAction(self::OBJECT_ID, self::ITEM_ID);
+        $this->viewController->viewAction(
+            $this->requestStack,
+            $this->formFactory,
+            $this->customItemModel,
+            $this->customItemXrefContactModel,
+            $this->auditLog,
+            $this->permissionProvider,
+            $this->routeProvider,
+            self::OBJECT_ID,
+            self::ITEM_ID
+        );
     }
 }

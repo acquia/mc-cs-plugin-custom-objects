@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
@@ -99,11 +98,11 @@ class CustomFieldOption implements \ArrayAccess
             ->makePrimaryKey()
             ->build();
 
-        $builder->createField('value', Type::STRING)
+        $builder->createField('value', Types::STRING)
             ->makePrimaryKey()
             ->build();
 
-        $builder->addField('label', Type::STRING);
+        $builder->addField('label', Types::STRING);
 
         $builder->createField('order', 'integer')
             ->columnName('option_order')
@@ -164,7 +163,7 @@ class CustomFieldOption implements \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($offset)
+    public function offsetExists(mixed $offset): bool
     {
         return isset($this->{$offset});
     }
@@ -172,7 +171,7 @@ class CustomFieldOption implements \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): bool
     {
         return $this->offsetExists($offset) ? $this->{$offset} : null;
     }
@@ -180,7 +179,7 @@ class CustomFieldOption implements \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         $this->{$offset} = $value;
     }
@@ -188,7 +187,7 @@ class CustomFieldOption implements \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
         $this->{$offset} = null;
     }

@@ -16,7 +16,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ContactSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -176,7 +176,7 @@ class ContactSubscriberTest extends \PHPUnit\Framework\TestCase
                     'id'         => 444,
                 ],
                 'contactId'       => 333,
-                'contentTemplate' => 'CustomObjectsBundle:SubscribedEvents\Timeline:link.html.php',
+                '@CustomObjects/SubscribedEvents/Timeline/link.html.twig',
             ]);
 
         $this->subscriber->onTimelineGenerate($this->leadTimelineEvent);
@@ -273,7 +273,7 @@ class ContactSubscriberTest extends \PHPUnit\Framework\TestCase
                     'id'         => 444,
                 ],
                 'contactId'       => 333,
-                'contentTemplate' => 'CustomObjectsBundle:SubscribedEvents\Timeline:link.html.php',
+                'contentTemplate' => '@CustomObjects/SubscribedEvents/Timeline/link.html.twig',
             ]);
 
         $this->subscriber->onTimelineGenerate($this->leadTimelineEvent);

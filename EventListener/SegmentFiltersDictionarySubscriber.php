@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\DBAL\Connection;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -19,17 +19,11 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
 {
     use DbalQueryTrait;
 
-    /**
-     * @var Registry
-     */
-    private $doctrineRegistry;
+    private ManagerRegistry $doctrineRegistry;
 
-    /**
-     * @var ConfigProvider
-     */
-    private $configProvider;
+    private ConfigProvider $configProvider;
 
-    public function __construct(Registry $registry, ConfigProvider $configProvider)
+    public function __construct(ManagerRegistry $registry, ConfigProvider $configProvider)
     {
         $this->doctrineRegistry = $registry;
         $this->configProvider   = $configProvider;

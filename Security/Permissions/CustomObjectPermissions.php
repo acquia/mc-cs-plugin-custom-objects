@@ -10,26 +10,11 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomObjectPermissions extends AbstractPermissions
 {
     public const NAME = 'custom_objects';
-
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    /**
-     * @var ConfigProvider
-     */
-    private $configProvider;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
 
     /**
      * Cached custom objects.
@@ -40,15 +25,11 @@ class CustomObjectPermissions extends AbstractPermissions
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
-        CustomObjectModel $customObjectModel,
-        ConfigProvider $configProvider,
-        TranslatorInterface $translator
+        private CustomObjectModel $customObjectModel,
+        private ConfigProvider $configProvider,
+        private TranslatorInterface $translator
     ) {
         parent::__construct($coreParametersHelper->all());
-
-        $this->customObjectModel = $customObjectModel;
-        $this->configProvider    = $configProvider;
-        $this->translator        = $translator;
     }
 
     /**

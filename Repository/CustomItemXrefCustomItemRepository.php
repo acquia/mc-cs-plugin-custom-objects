@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Repository;
 
-use Mautic\CoreBundle\Entity\CommonRepository;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
 
-class CustomItemXrefCustomItemRepository extends CommonRepository
+class CustomItemXrefCustomItemRepository extends CustomCommonRepository
 {
     public function deleteAllLinksForCustomItem(int $customItemId): void
     {
