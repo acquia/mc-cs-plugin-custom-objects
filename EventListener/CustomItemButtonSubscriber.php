@@ -295,7 +295,7 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
         return [
             'attr' => [
                 'href'        => '#',
-                'onclick'     => "CustomObjects.linkCustomItemWithEntity(this, event, {$customObjectId}, '{$entityType}', $$entityId}, 'custom-object-{$customObjectId}', ".($relationshipObjectId ?: 'null').');',
+                'onclick'     => "CustomObjects.linkCustomItemWithEntity(this, event, {$customObjectId}, '{$entityType}', {$entityId}, 'custom-object-{$customObjectId}', ".($relationshipObjectId ?: 'null').');',
                 'data-action' => $action,
                 'data-toggle' => '',
             ],
