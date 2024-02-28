@@ -1,0 +1,3047 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Method Symfony\\\\Contracts\\\\EventDispatcher\\\\EventDispatcherInterface\\:\\:dispatch\\(\\) invoked with 2 parameters, 1 required\\.$#"
+			count: 3
+			path: Command/CustomItemsScheduledExportCommand.php
+
+		-
+			message: "#^Parameter \\#1 \\$event of method Symfony\\\\Contracts\\\\EventDispatcher\\\\EventDispatcherInterface\\:\\:dispatch\\(\\) expects object, string given\\.$#"
+			count: 3
+			path: Command/CustomItemsScheduledExportCommand.php
+
+		-
+			message: "#^Constant MAUTIC_TABLE_PREFIX not found\\.$#"
+			count: 3
+			path: Command/GenerateSampleDataCommand.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Command\\\\GenerateSampleDataCommand\\:\\:insertInto\\(\\) has parameter \\$row with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Command/GenerateSampleDataCommand.php
+
+		-
+			message: "#^Offset 'list' on string in empty\\(\\) does not exist\\.$#"
+			count: 1
+			path: Controller/CustomField/SaveController.php
+
+		-
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
+			count: 1
+			path: Controller/CustomField/SaveController.php
+
+		-
+			message: "#^Method Symfony\\\\Contracts\\\\EventDispatcher\\\\EventDispatcherInterface\\:\\:dispatch\\(\\) invoked with 2 parameters, 1 required\\.$#"
+			count: 1
+			path: Controller/CustomItem/ExportController.php
+
+		-
+			message: "#^Parameter \\#1 \\$event of method Symfony\\\\Contracts\\\\EventDispatcher\\\\EventDispatcherInterface\\:\\:dispatch\\(\\) expects object, string given\\.$#"
+			count: 1
+			path: Controller/CustomItem/ExportController.php
+
+		-
+			message: "#^Call to an undefined method Symfony\\\\Component\\\\Form\\\\FormInterface\\:\\:isClicked\\(\\)\\.$#"
+			count: 1
+			path: Controller/CustomItem/SaveController.php
+
+		-
+			message: "#^Method Symfony\\\\Contracts\\\\EventDispatcher\\\\EventDispatcherInterface\\:\\:dispatch\\(\\) invoked with 2 parameters, 1 required\\.$#"
+			count: 1
+			path: Controller/CustomObject/DeleteController.php
+
+		-
+			message: "#^Parameter \\#1 \\$event of method Symfony\\\\Contracts\\\\EventDispatcher\\\\EventDispatcherInterface\\:\\:dispatch\\(\\) expects object, string given\\.$#"
+			count: 1
+			path: Controller/CustomObject/DeleteController.php
+
+		-
+			message: "#^Argument of an invalid type string supplied for foreach, only iterables are supported\\.$#"
+			count: 1
+			path: Controller/CustomObject/SaveController.php
+
+		-
+			message: "#^Call to an undefined method Symfony\\\\Component\\\\Form\\\\FormInterface\\:\\:isClicked\\(\\)\\.$#"
+			count: 1
+			path: Controller/CustomObject/SaveController.php
+
+		-
+			message: "#^Empty array passed to foreach\\.$#"
+			count: 1
+			path: Controller/CustomObject/SaveController.php
+
+		-
+			message: "#^PHPDoc tag @param for parameter \\$fieldValue with type mixed is not subtype of native type MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomFieldValueInterface\\.$#"
+			count: 1
+			path: CustomFieldType/CustomFieldTypeInterface.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\CustomObjectsBundle\\:\\:installAllTablesIfMissing\\(\\) has parameter \\$metadata with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: CustomObjectsBundle.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\DTO\\\\CustomItemFieldListData\\:\\:__construct\\(\\) has parameter \\$columns with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: DTO/CustomItemFieldListData.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\DTO\\\\CustomItemFieldListData\\:\\:__construct\\(\\) has parameter \\$data with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: DTO/CustomItemFieldListData.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\DTO\\\\CustomItemFieldListData\\:\\:getColumnLabels\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: DTO/CustomItemFieldListData.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\DTO\\\\CustomItemFieldListData\\:\\:\\$columns type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: DTO/CustomItemFieldListData.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\DTO\\\\CustomItemFieldListData\\:\\:\\$data type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: DTO/CustomItemFieldListData.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\AbstractCustomFieldValue\\:\\:addValue\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/AbstractCustomFieldValue.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomField\\:\\:setAlias\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/CustomField.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomFieldValueInterface\\:\\:addValue\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/CustomFieldValueInterface.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomFieldValueInterface\\:\\:setValue\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/CustomFieldValueInterface.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomFieldValueOption\\:\\:addValue\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/CustomFieldValueOption.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomFieldValueOption\\:\\:setValue\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/CustomFieldValueOption.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomFieldValueOption\\:\\:\\$id is unused\\.$#"
+			count: 1
+			path: Entity/CustomFieldValueOption.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomItem\\:\\:addCompanyReference\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/CustomItem.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomItem\\:\\:addContactReference\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/CustomItem.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomItem\\:\\:addCustomFieldValue\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/CustomItem.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomItem\\:\\:addCustomItemReference\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/CustomItem.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomItem\\:\\:createFieldValuesSnapshot\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/CustomItem.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomItem\\:\\:getFieldValues\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Entity/CustomItem.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomItem\\:\\:recordCustomFieldValueChanges\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/CustomItem.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomItem\\:\\:setCategory\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/CustomItem.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomItem\\:\\:setCustomFieldValues\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/CustomItem.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomItem\\:\\:setCustomFieldValues\\(\\) has parameter \\$values with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Entity/CustomItem.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomItem\\:\\:setFieldValues\\(\\) has parameter \\$values with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Entity/CustomItem.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomItem\\:\\:setLanguage\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/CustomItem.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomItem\\:\\:setName\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/CustomItem.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomItem\\:\\:\\$fieldValues type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Entity/CustomItem.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomItemExportScheduler\\:\\:\\$id is never written, only read\\.$#"
+			count: 1
+			path: Entity/CustomItemExportScheduler.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomObject\\:\\:addCustomField\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/CustomObject.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomObject\\:\\:createFieldsSnapshot\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/CustomObject.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomObject\\:\\:recordCustomFieldChanges\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/CustomObject.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomObject\\:\\:removeCustomField\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/CustomObject.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomObject\\:\\:setAlias\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/CustomObject.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomObject\\:\\:setCategory\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/CustomObject.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomObject\\:\\:setCustomFields\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/CustomObject.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomObject\\:\\:setDescription\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/CustomObject.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomObject\\:\\:setId\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/CustomObject.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomObject\\:\\:setLanguage\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/CustomObject.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomObject\\:\\:setNamePlural\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/CustomObject.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomObject\\:\\:setNameSingular\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Entity/CustomObject.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Event\\\\CustomObjectListFormatEvent\\:\\:__construct\\(\\) has parameter \\$customObjectValues with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Event/CustomObjectListFormatEvent.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Event\\\\CustomObjectListFormatEvent\\:\\:getCustomObjectValues\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Event/CustomObjectListFormatEvent.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Event\\\\CustomObjectListFormatEvent\\:\\:\\$customObjectValues type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Event/CustomObjectListFormatEvent.php
+
+		-
+			message: "#^Constant MAUTIC_TABLE_PREFIX not found\\.$#"
+			count: 1
+			path: EventListener/CampaignSubscriber.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\EventListener\\\\CampaignSubscriber\\:\\:executeSelect\\(\\) return type has no value type specified in iterable type Doctrine\\\\DBAL\\\\Driver\\\\Statement\\.$#"
+			count: 1
+			path: EventListener/CampaignSubscriber.php
+
+		-
+			message: "#^Variable \\$contact in empty\\(\\) always exists and is not falsy\\.$#"
+			count: 1
+			path: EventListener/CampaignSubscriber.php
+
+		-
+			message: "#^Parameter \\#2 \\$bundle of method Mautic\\\\LeadBundle\\\\Entity\\\\LeadEventLogRepository\\:\\:getEvents\\(\\) expects null, string given\\.$#"
+			count: 1
+			path: EventListener/ContactSubscriber.php
+
+		-
+			message: "#^Parameter \\#3 \\$object of method Mautic\\\\LeadBundle\\\\Entity\\\\LeadEventLogRepository\\:\\:getEvents\\(\\) expects null, string given\\.$#"
+			count: 1
+			path: EventListener/ContactSubscriber.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\EventListener\\\\CustomItemButtonSubscriber\\:\\:defineEditLinkFormButton\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: EventListener/CustomItemButtonSubscriber.php
+
+		-
+			message: "#^Constant MAUTIC_TABLE_PREFIX not found\\.$#"
+			count: 1
+			path: EventListener/CustomItemXrefContactSubscriber.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\EventListener\\\\CustomObjectButtonSubscriber\\:\\:defineCreateNewCustomItemButton\\(\\) should return array\\<string\\> but returns array\\<string, array\\<string, string\\>\\|int\\|string\\>\\.$#"
+			count: 1
+			path: EventListener/CustomObjectButtonSubscriber.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\EventListener\\\\CustomObjectButtonSubscriber\\:\\:defineViewCustomItemsButton\\(\\) should return array\\<string\\> but returns array\\<string, array\\<string, string\\>\\|int\\|string\\>\\.$#"
+			count: 1
+			path: EventListener/CustomObjectButtonSubscriber.php
+
+		-
+			message: "#^Call to an undefined method Psr\\\\Log\\\\LoggerInterface\\:\\:addError\\(\\)\\.$#"
+			count: 1
+			path: EventListener/DynamicContentSubscriber.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\EventListener\\\\DynamicContentSubscriber\\:\\:executeSelect\\(\\) return type has no value type specified in iterable type Doctrine\\\\DBAL\\\\Driver\\\\Statement\\.$#"
+			count: 1
+			path: EventListener/DynamicContentSubscriber.php
+
+		-
+			message: "#^Constant MAUTIC_TABLE_PREFIX not found\\.$#"
+			count: 2
+			path: EventListener/FilterOperatorSubscriber.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\EventListener\\\\FilterOperatorSubscriber\\:\\:onOperatorsGenerate\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: EventListener/FilterOperatorSubscriber.php
+
+		-
+			message: "#^Constant MAUTIC_TABLE_PREFIX not found\\.$#"
+			count: 1
+			path: EventListener/ReportSubscriber.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\EventListener\\\\ReportSubscriber\\:\\:addPrefixToColumnLabel\\(\\) has parameter \\$columns with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: EventListener/ReportSubscriber.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\EventListener\\\\ReportSubscriber\\:\\:addPrefixToColumnLabel\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: EventListener/ReportSubscriber.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\EventListener\\\\ReportSubscriber\\:\\:getCompanyColumns\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: EventListener/ReportSubscriber.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\EventListener\\\\ReportSubscriber\\:\\:getContexts\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: EventListener/ReportSubscriber.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\EventListener\\\\ReportSubscriber\\:\\:getCustomObjectColumns\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: EventListener/ReportSubscriber.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\EventListener\\\\ReportSubscriber\\:\\:getLeadColumns\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: EventListener/ReportSubscriber.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\EventListener\\\\ReportSubscriber\\:\\:getStandardColumns\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: EventListener/ReportSubscriber.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\EventListener\\\\ReportSubscriber\\:\\:\\$customObjects is never written, only read\\.$#"
+			count: 1
+			path: EventListener/ReportSubscriber.php
+
+		-
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
+			count: 1
+			path: EventListener/ReportSubscriber.php
+
+		-
+			message: "#^Constant MAUTIC_TABLE_PREFIX not found\\.$#"
+			count: 2
+			path: EventListener/SegmentFiltersDictionarySubscriber.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\EventListener\\\\SegmentFiltersDictionarySubscriber\\:\\:executeSelect\\(\\) return type has no value type specified in iterable type Doctrine\\\\DBAL\\\\Driver\\\\Statement\\.$#"
+			count: 1
+			path: EventListener/SegmentFiltersDictionarySubscriber.php
+
+		-
+			message: "#^Cannot access offset 'alias' on int\\.$#"
+			count: 1
+			path: EventListener/SerializerSubscriber.php
+
+		-
+			message: "#^Cannot access offset 'id' on int\\.$#"
+			count: 2
+			path: EventListener/SerializerSubscriber.php
+
+		-
+			message: "#^Left side of && is always true\\.$#"
+			count: 1
+			path: EventListener/TokenSubscriber.php
+
+		-
+			message: "#^Method Symfony\\\\Contracts\\\\EventDispatcher\\\\EventDispatcherInterface\\:\\:dispatch\\(\\) invoked with 2 parameters, 1 required\\.$#"
+			count: 1
+			path: EventListener/TokenSubscriber.php
+
+		-
+			message: "#^Negated boolean expression is always false\\.$#"
+			count: 2
+			path: EventListener/TokenSubscriber.php
+
+		-
+			message: "#^Parameter \\#1 \\$event of method Symfony\\\\Contracts\\\\EventDispatcher\\\\EventDispatcherInterface\\:\\:dispatch\\(\\) expects object, string given\\.$#"
+			count: 1
+			path: EventListener/TokenSubscriber.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Exception\\\\InUseException\\:\\:getSegmentList\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Exception/InUseException.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Exception\\\\InUseException\\:\\:setSegmentList\\(\\) has parameter \\$segmentList with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Exception/InUseException.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Exception\\\\InUseException\\:\\:\\$segmentList type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Exception/InUseException.php
+
+		-
+			message: "#^Argument of an invalid type string supplied for foreach, only iterables are supported\\.$#"
+			count: 1
+			path: Form/DataTransformer/OptionsTransformer.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Form\\\\DataTransformer\\\\OptionsTransformer\\:\\:transform\\(\\) should return array\\<string\\> but returns array\\<string, array\\<int, MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomFieldOption\\>\\>\\.$#"
+			count: 1
+			path: Form/DataTransformer/OptionsTransformer.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Form\\\\DataTransformer\\\\OptionsTransformer\\:\\:transform\\(\\) should return array\\<string\\> but returns array\\<string, array\\>\\.$#"
+			count: 1
+			path: Form/DataTransformer/OptionsTransformer.php
+
+		-
+			message: "#^Negated boolean expression is always false\\.$#"
+			count: 1
+			path: Form/DataTransformer/OptionsTransformer.php
+
+		-
+			message: "#^PHPDoc tag @var for variable \\$option has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Form/DataTransformer/OptionsTransformer.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Form\\\\Type\\\\CustomField\\\\OptionsType\\:\\:buildView\\(\\) has parameter \\$form with no value type specified in iterable type Symfony\\\\Component\\\\Form\\\\FormInterface\\.$#"
+			count: 1
+			path: Form/Type/CustomField/OptionsType.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Form\\\\Type\\\\CustomFieldType\\:\\:createDefaultValueInput\\(\\) has parameter \\$form with no value type specified in iterable type Symfony\\\\Component\\\\Form\\\\FormInterface\\.$#"
+			count: 1
+			path: Form/Type/CustomFieldType.php
+
+		-
+			message: "#^Negated boolean expression is always false\\.$#"
+			count: 1
+			path: Form/Type/CustomFieldType.php
+
+		-
+			message: "#^Variable \\$customFields in empty\\(\\) always exists and is not falsy\\.$#"
+			count: 1
+			path: Form/Type/CustomObjectType.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Form\\\\Validator\\\\Constraints\\\\CustomObjectTypeValues\\:\\:\\$missingMasterObject has no type specified\\.$#"
+			count: 1
+			path: Form/Validator/Constraints/CustomObjectTypeValues.php
+
+		-
+			message: "#^Access to an undefined property Symfony\\\\Component\\\\Validator\\\\Constraint\\:\\:\\$missingMasterObject\\.$#"
+			count: 1
+			path: Form/Validator/Constraints/CustomObjectTypeValuesValidator.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Form\\\\Validator\\\\Constraints\\\\CustomObjectTypeValuesValidator\\:\\:validate\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Form/Validator/Constraints/CustomObjectTypeValuesValidator.php
+
+		-
+			message: "#^Constant MAUTIC_TABLE_PREFIX not found\\.$#"
+			count: 5
+			path: Helper/QueryFilterFactory.php
+
+		-
+			message: "#^Constant MAUTIC_TABLE_PREFIX not found\\.$#"
+			count: 2
+			path: Helper/QueryFilterHelper.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Helper\\\\QueryFilterHelper\\:\\:addOperatorExpression\\(\\) has parameter \\$value with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Helper/QueryFilterHelper.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Helper\\\\QueryFilterHelper\\:\\:executeSelect\\(\\) return type has no value type specified in iterable type Doctrine\\\\DBAL\\\\Driver\\\\Statement\\.$#"
+			count: 1
+			path: Helper/QueryFilterHelper.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Helper\\\\QueryFilterHelper\\:\\:hasQueryJoinAlias\\(\\) has parameter \\$alias with no type specified\\.$#"
+			count: 1
+			path: Helper/QueryFilterHelper.php
+
+		-
+			message: "#^Parameter \\#3 \\$type of method Mautic\\\\LeadBundle\\\\Segment\\\\Query\\\\QueryBuilder\\:\\:setParameter\\(\\) expects string\\|null, int\\|null given\\.$#"
+			count: 1
+			path: Helper/QueryFilterHelper.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Helper\\\\QueryFilterHelper\\:\\:\\$fieldTypeProvider is unused\\.$#"
+			count: 1
+			path: Helper/QueryFilterHelper.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Helper\\\\QueryFilterHelper\\:\\:\\$itemRelationLevelLimit is unused\\.$#"
+			count: 1
+			path: Helper/QueryFilterHelper.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Helper\\\\TokenFormatter\\:\\:conjunctionList\\(\\) has parameter \\$values with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Helper/TokenFormatter.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Helper\\\\TokenFormatter\\:\\:format\\(\\) has parameter \\$values with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Helper/TokenFormatter.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Helper\\\\TokenFormatter\\:\\:formatAndList\\(\\) has parameter \\$values with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Helper/TokenFormatter.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Helper\\\\TokenFormatter\\:\\:formatBulletList\\(\\) has parameter \\$values with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Helper/TokenFormatter.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Helper\\\\TokenFormatter\\:\\:formatDefault\\(\\) has parameter \\$values with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Helper/TokenFormatter.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Helper\\\\TokenFormatter\\:\\:formatOrList\\(\\) has parameter \\$values with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Helper/TokenFormatter.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Helper\\\\TokenFormatter\\:\\:formatOrderedList\\(\\) has parameter \\$values with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Helper/TokenFormatter.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Helper\\\\TokenFormatter\\:\\:htmlList\\(\\) has parameter \\$values with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Helper/TokenFormatter.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Helper\\\\TokenFormatter\\:\\:removeEmptyValues\\(\\) has parameter \\$values with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Helper/TokenFormatter.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Helper\\\\TokenFormatter\\:\\:removeEmptyValues\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Helper/TokenFormatter.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Model\\\\CustomFieldModel\\:\\:fetchCustomFieldsForObject\\(\\) should return array\\<MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomField\\> but returns Doctrine\\\\ORM\\\\Tools\\\\Pagination\\\\Paginator&iterable\\<MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomField\\>\\.$#"
+			count: 1
+			path: Model/CustomFieldModel.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Model\\\\CustomFieldModel\\:\\:fetchEntities\\(\\) should return Doctrine\\\\ORM\\\\Tools\\\\Pagination\\\\Paginator&iterable\\<MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomField\\> but returns array\\|Doctrine\\\\ORM\\\\Tools\\\\Pagination\\\\Paginator\\.$#"
+			count: 1
+			path: Model/CustomFieldModel.php
+
+		-
+			message: "#^Constant MAUTIC_TABLE_PREFIX not found\\.$#"
+			count: 1
+			path: Model/CustomFieldOptionModel.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Model\\\\CustomFieldValueModel\\:\\:buildItemsListData\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Model/CustomFieldValueModel.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Model\\\\CustomFieldValueModel\\:\\:fetchItemsListData\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Model/CustomFieldValueModel.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Model\\\\CustomFieldValueModel\\:\\:transformItemsListDataResult\\(\\) has parameter \\$result with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Model/CustomFieldValueModel.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Model\\\\CustomFieldValueModel\\:\\:transformItemsListDataResult\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Model/CustomFieldValueModel.php
+
+		-
+			message: "#^Parameter \\#1 \\$event of method Symfony\\\\Contracts\\\\EventDispatcher\\\\EventDispatcherInterface\\:\\:dispatch\\(\\) expects object, string given\\.$#"
+			count: 1
+			path: Model/CustomItemExportSchedulerModel.php
+
+		-
+			message: "#^Constant MAUTIC_TABLE_PREFIX not found\\.$#"
+			count: 1
+			path: Model/CustomItemModel.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Model\\\\CustomItemModel\\:\\:getArrayTableData\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Model/CustomItemModel.php
+
+		-
+			message: "#^Method Symfony\\\\Contracts\\\\EventDispatcher\\\\EventDispatcherInterface\\:\\:dispatch\\(\\) invoked with 2 parameters, 1 required\\.$#"
+			count: 12
+			path: Model/CustomItemModel.php
+
+		-
+			message: "#^Parameter \\#1 \\$event of method Symfony\\\\Contracts\\\\EventDispatcher\\\\EventDispatcherInterface\\:\\:dispatch\\(\\) expects object, string given\\.$#"
+			count: 12
+			path: Model/CustomItemModel.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Model\\\\CustomObjectModel\\:\\:fetchAllPublishedEntities\\(\\) should return array\\<MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomObject\\> but returns Doctrine\\\\ORM\\\\Tools\\\\Pagination\\\\Paginator&iterable\\<MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomObject\\>\\.$#"
+			count: 1
+			path: Model/CustomObjectModel.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Model\\\\CustomObjectModel\\:\\:fetchEntities\\(\\) should return Doctrine\\\\ORM\\\\Tools\\\\Pagination\\\\Paginator&iterable\\<MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomObject\\> but returns array\\|Doctrine\\\\ORM\\\\Tools\\\\Pagination\\\\Paginator\\.$#"
+			count: 1
+			path: Model/CustomObjectModel.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Model\\\\CustomObjectModel\\:\\:getMasterCustomObjects\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Model/CustomObjectModel.php
+
+		-
+			message: "#^Method Symfony\\\\Contracts\\\\EventDispatcher\\\\EventDispatcherInterface\\:\\:dispatch\\(\\) invoked with 2 parameters, 1 required\\.$#"
+			count: 4
+			path: Model/CustomObjectModel.php
+
+		-
+			message: "#^Parameter \\#1 \\$event of method Symfony\\\\Contracts\\\\EventDispatcher\\\\EventDispatcherInterface\\:\\:dispatch\\(\\) expects object, string given\\.$#"
+			count: 4
+			path: Model/CustomObjectModel.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Model\\\\CustomObjectModel\\:\\:\\$listModel is never read, only written\\.$#"
+			count: 1
+			path: Model/CustomObjectModel.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Provider\\\\CustomItemRouteProvider\\:\\:buildListRoute\\(\\) has parameter \\$parameters with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Provider/CustomItemRouteProvider.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Provider\\\\SessionProvider\\:\\:setValue\\(\\) has parameter \\$value with no type specified\\.$#"
+			count: 1
+			path: Provider/SessionProvider.php
+
+		-
+			message: "#^Unsafe access to private constant MauticPlugin\\\\CustomObjectsBundle\\\\Provider\\\\SessionProvider\\:\\:KEY_FILTER through static\\:\\:\\.$#"
+			count: 2
+			path: Provider/SessionProvider.php
+
+		-
+			message: "#^Unsafe access to private constant MauticPlugin\\\\CustomObjectsBundle\\\\Provider\\\\SessionProvider\\:\\:KEY_LIMIT through static\\:\\:\\.$#"
+			count: 2
+			path: Provider/SessionProvider.php
+
+		-
+			message: "#^Unsafe access to private constant MauticPlugin\\\\CustomObjectsBundle\\\\Provider\\\\SessionProvider\\:\\:KEY_ORDER_BY through static\\:\\:\\.$#"
+			count: 2
+			path: Provider/SessionProvider.php
+
+		-
+			message: "#^Unsafe access to private constant MauticPlugin\\\\CustomObjectsBundle\\\\Provider\\\\SessionProvider\\:\\:KEY_ORDER_BY_DIR through static\\:\\:\\.$#"
+			count: 2
+			path: Provider/SessionProvider.php
+
+		-
+			message: "#^Unsafe access to private constant MauticPlugin\\\\CustomObjectsBundle\\\\Provider\\\\SessionProvider\\:\\:KEY_PAGE through static\\:\\:\\.$#"
+			count: 2
+			path: Provider/SessionProvider.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Report\\\\ReportColumnsBuilder\\:\\:getColumns\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Report/ReportColumnsBuilder.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Report\\\\ReportColumnsBuilder\\:\\:getJoinableColumns\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Report/ReportColumnsBuilder.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Report\\\\ReportColumnsBuilder\\:\\:\\$columnTypeMapping type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Report/ReportColumnsBuilder.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Report\\\\ReportColumnsBuilder\\:\\:\\$columns type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Report/ReportColumnsBuilder.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Repository\\\\CustomItemRepository\\:\\:executeSelect\\(\\) return type has no value type specified in iterable type Doctrine\\\\DBAL\\\\Driver\\\\Statement\\.$#"
+			count: 1
+			path: Repository/CustomItemRepository.php
+
+		-
+			message: "#^Call to method getId\\(\\) on an unknown class MauticPlugin\\\\CustomObjectsBundle\\\\Repository\\\\CustomField\\.$#"
+			count: 1
+			path: Repository/CustomObjectRepository.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Repository\\\\CustomObjectRepository\\:\\:getMasterObjectChoices\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Repository/CustomObjectRepository.php
+
+		-
+			message: "#^PHPDoc tag @var for variable \\$customField contains unknown class MauticPlugin\\\\CustomObjectsBundle\\\\Repository\\\\CustomField\\.$#"
+			count: 1
+			path: Repository/CustomObjectRepository.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Security\\\\Permissions\\\\CustomObjectPermissions\\:\\:buildForm\\(\\) has parameter \\$data with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Security/Permissions/CustomObjectPermissions.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Security\\\\Permissions\\\\CustomObjectPermissions\\:\\:buildForm\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Security/Permissions/CustomObjectPermissions.php
+
+		-
+			message: "#^Parameter \\#2 \\$level of method Mautic\\\\CoreBundle\\\\Security\\\\Permissions\\\\AbstractPermissions\\:\\:addExtendedFormFields\\(\\) expects string, int\\|null given\\.$#"
+			count: 1
+			path: Security/Permissions/CustomObjectPermissions.php
+
+		-
+			message: "#^Constant MAUTIC_TABLE_PREFIX not found\\.$#"
+			count: 1
+			path: Segment/Query/Filter/CustomFieldFilterQueryBuilder.php
+
+		-
+			message: "#^Constant MAUTIC_TABLE_PREFIX not found\\.$#"
+			count: 1
+			path: Segment/Query/Filter/CustomItemNameFilterQueryBuilder.php
+
+		-
+			message: "#^Constant MAUTIC_TABLE_PREFIX not found\\.$#"
+			count: 1
+			path: Segment/Query/Filter/QueryFilterFactory.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Segment\\\\Query\\\\Filter\\\\QueryFilterFactory\\:\\:configureQueryBuilderFromSegmentFilter\\(\\) has parameter \\$segmentFilter with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Segment/Query/Filter/QueryFilterFactory.php
+
+		-
+			message: "#^PHPDoc tag @throws with type MauticPlugin\\\\CustomObjectsBundle\\\\Exception\\\\InvalidSegmentFilterException\\|MauticPlugin\\\\CustomObjectsBundle\\\\Exception\\\\NotFoundException\\|MauticPlugin\\\\CustomObjectsBundle\\\\Segment\\\\Query\\\\Filter\\\\Exception is not subtype of Throwable$#"
+			count: 1
+			path: Segment/Query/Filter/QueryFilterFactory.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Segment\\\\Query\\\\UnionQueryContainer\\:\\:getParameterTypes\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Segment/Query/UnionQueryContainer.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Segment\\\\Query\\\\UnionQueryContainer\\:\\:getParameters\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Segment/Query/UnionQueryContainer.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Segment\\\\Query\\\\UnionQueryContainer\\:\\:\\$parameterTypes type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Segment/Query/UnionQueryContainer.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Segment\\\\Query\\\\UnionQueryContainer\\:\\:\\$parameters type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Segment/Query/UnionQueryContainer.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\AbstractApiPlatformFunctionalTest\\:\\:createEntity\\(\\) has parameter \\$payload with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/AbstractApiPlatformFunctionalTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\AbstractApiPlatformFunctionalTest\\:\\:requestEntity\\(\\) has parameter \\$payload with no type specified\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/AbstractApiPlatformFunctionalTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\AbstractApiPlatformFunctionalTest\\:\\:setPermission\\(\\) has parameter \\$permissionArray with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/AbstractApiPlatformFunctionalTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\AbstractApiPlatformFunctionalTest\\:\\:updateEntity\\(\\) has parameter \\$payload with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/AbstractApiPlatformFunctionalTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\AbstractApiPlatformFunctionalTest\\:\\:\\$clientServer type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/AbstractApiPlatformFunctionalTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\CustomFieldFunctionalTest\\:\\:getCRUDProvider\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/CustomFieldFunctionalTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\CustomFieldFunctionalTest\\:\\:getCRUDWithOptionsProvider\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/CustomFieldFunctionalTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\CustomFieldFunctionalTest\\:\\:getCreatePayload\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/CustomFieldFunctionalTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\CustomFieldFunctionalTest\\:\\:getCreateWithOptionsPayload\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/CustomFieldFunctionalTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\CustomFieldFunctionalTest\\:\\:getEditPayload\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/CustomFieldFunctionalTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\CustomFieldFunctionalTest\\:\\:getEditWithOptionsPayload\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/CustomFieldFunctionalTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\CustomFieldFunctionalTest\\:\\:runTestCustomFieldCRUD\\(\\) has parameter \\$permissions with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/CustomFieldFunctionalTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\CustomFieldFunctionalTest\\:\\:runTestCustomFieldWithOptionsCRUD\\(\\) has parameter \\$permissions with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/CustomFieldFunctionalTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\CustomFieldFunctionalTest\\:\\:runTestCustomFieldWithOptionsCRUD\\(\\) has parameter \\$retrievedOptions with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/CustomFieldFunctionalTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\CustomFieldFunctionalTest\\:\\:runTestCustomFieldWithOptionsCRUD\\(\\) has parameter \\$updatedOptions with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/CustomFieldFunctionalTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\CustomFieldOptionFunctionalTest\\:\\:getCRUDProvider\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/CustomFieldOptionFunctionalTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\CustomFieldOptionFunctionalTest\\:\\:getCreatePayload\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/CustomFieldOptionFunctionalTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\CustomFieldOptionFunctionalTest\\:\\:getEditPayload\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/CustomFieldOptionFunctionalTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\CustomFieldOptionFunctionalTest\\:\\:runTestCustomFieldOptionCRUD\\(\\) has parameter \\$permissions with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/CustomFieldOptionFunctionalTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\CustomItemFunctionalTest\\:\\:getCRUDProvider\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/CustomItemFunctionalTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\CustomItemFunctionalTest\\:\\:getCreatePayload\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/CustomItemFunctionalTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\CustomItemFunctionalTest\\:\\:getEditPayload\\(\\) has parameter \\$customField with no type specified\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/CustomItemFunctionalTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\CustomItemFunctionalTest\\:\\:getEditPayload\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/CustomItemFunctionalTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\CustomItemFunctionalTest\\:\\:runTestCustomItemCRUD\\(\\) has parameter \\$permissions with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/CustomItemFunctionalTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\CustomObjectFunctionalTest\\:\\:getCRUDProvider\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/CustomObjectFunctionalTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\CustomObjectFunctionalTest\\:\\:getCreatePayload\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/CustomObjectFunctionalTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\CustomObjectFunctionalTest\\:\\:getEditPayload\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/CustomObjectFunctionalTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\ApiPlatform\\\\CustomObjectFunctionalTest\\:\\:runTestCustomObjectCRUD\\(\\) has parameter \\$permissions with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/ApiPlatform/CustomObjectFunctionalTest.php
+
+		-
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
+			count: 1
+			path: Tests/Functional/Controller/CustomItemListControllerShownFieldTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\Controller\\\\CustomObject\\\\DeleteControllerTest\\:\\:testDeleteChildObject\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Functional/Controller/CustomObject/DeleteControllerTest.php
+
+		-
+			message: "#^Call to an undefined method MauticPlugin\\\\CustomObjectsBundle\\\\Repository\\\\CustomObjectRepository\\:\\:findOneById\\(\\)\\.$#"
+			count: 1
+			path: Tests/Functional/Controller/CustomObjectFormTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\Controller\\\\CustomObjectFormTest\\:\\:assertCustomObject\\(\\) has parameter \\$expected with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/Controller/CustomObjectFormTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\EventListener\\\\FilterOperatorSubscriberTest\\:\\:testIfNewOperatorNotInCustomObjectsAddedinSegmentFilter\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Functional/EventListener/FilterOperatorSubscriberTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\EventListener\\\\FilterOperatorSubscriberTest\\:\\:testIfProperContactsAreAddedinSegmentWithNotInCustomObjectsFilter\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Functional/EventListener/FilterOperatorSubscriberTest.php
+
+		-
+			message: "#^Negated boolean expression is always false\\.$#"
+			count: 1
+			path: Tests/Functional/EventListener/ImportSubscriberTest.php
+
+		-
+			message: "#^Call to function array_reverse\\(\\) on a separate line has no effect\\.$#"
+			count: 1
+			path: Tests/Functional/EventListener/SegmentFiltersDictionarySubscriberTest.php
+
+		-
+			message: "#^Call to function array_reverse\\(\\) on a separate line has no effect\\.$#"
+			count: 1
+			path: Tests/Functional/Helper/QueryFilterHelperTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\Helper\\\\QueryFilterHelperTest\\:\\:assertMatchWhere\\(\\) has parameter \\$filter with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Functional/Helper/QueryFilterHelperTest.php
+
+		-
+			message: "#^Call to function array_reverse\\(\\) on a separate line has no effect\\.$#"
+			count: 1
+			path: Tests/Functional/Segment/Query/Filter/CustomFieldFilterQueryBuilderTest.php
+
+		-
+			message: "#^Constant MAUTIC_TABLE_PREFIX not found\\.$#"
+			count: 1
+			path: Tests/Functional/Segment/Query/Filter/CustomFieldFilterQueryBuilderTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\Segment\\\\Query\\\\Filter\\\\CustomFieldFilterQueryBuilderTest\\:\\:executeSelect\\(\\) return type has no value type specified in iterable type Doctrine\\\\DBAL\\\\Driver\\\\Statement\\.$#"
+			count: 1
+			path: Tests/Functional/Segment/Query/Filter/CustomFieldFilterQueryBuilderTest.php
+
+		-
+			message: "#^Call to function array_reverse\\(\\) on a separate line has no effect\\.$#"
+			count: 1
+			path: Tests/Functional/Segment/Query/Filter/CustomItemNameFilterQueryBuilderTest.php
+
+		-
+			message: "#^Constant MAUTIC_TABLE_PREFIX not found\\.$#"
+			count: 1
+			path: Tests/Functional/Segment/Query/Filter/CustomItemNameFilterQueryBuilderTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\Segment\\\\Query\\\\Filter\\\\CustomItemNameFilterQueryBuilderTest\\:\\:executeSelect\\(\\) return type has no value type specified in iterable type Doctrine\\\\DBAL\\\\Driver\\\\Statement\\.$#"
+			count: 1
+			path: Tests/Functional/Segment/Query/Filter/CustomItemNameFilterQueryBuilderTest.php
+
+		-
+			message: "#^Call to an undefined method Mautic\\\\LeadBundle\\\\Entity\\\\LeadRepository\\:\\:findOneByEmail\\(\\)\\.$#"
+			count: 1
+			path: Tests/Functional/Segment/Query/Filter/CustomItemRelationQueryBuilderTestCase.php
+
+		-
+			message: "#^Call to function array_reverse\\(\\) on a separate line has no effect\\.$#"
+			count: 1
+			path: Tests/Functional/Segment/Query/Filter/CustomItemRelationQueryBuilderTestCase.php
+
+		-
+			message: "#^Call to an undefined method Mautic\\\\CoreBundle\\\\Controller\\\\MauticController&Symfony\\\\Bundle\\\\FrameworkBundle\\\\Controller\\\\Controller\\:\\:setRequest\\(\\)\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/ControllerTestCase.php
+
+		-
+			message: "#^Call to an undefined method Mautic\\\\CoreBundle\\\\Controller\\\\MauticController&Symfony\\\\Bundle\\\\FrameworkBundle\\\\Controller\\\\Controller\\:\\:setTranslator\\(\\)\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/ControllerTestCase.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\ControllerTestCase\\:\\:\\$request has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/ControllerTestCase.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\ControllerTestCase\\:\\:\\$requestStack has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/ControllerTestCase.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\ControllerTestCase\\:\\:\\$router \\(Symfony\\\\Component\\\\Routing\\\\Router\\) does not accept PHPUnit\\\\Framework\\\\MockObject\\\\MockObject&Symfony\\\\Component\\\\Routing\\\\RouterInterface\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/ControllerTestCase.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\ControllerTestCase\\:\\:\\$session has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/ControllerTestCase.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\AbstractFieldControllerTest\\:\\:createRequestMock\\(\\) has parameter \\$fieldId with no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/AbstractFieldControllerTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\AbstractFieldControllerTest\\:\\:createRequestMock\\(\\) has parameter \\$fieldType with no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/AbstractFieldControllerTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\AbstractFieldControllerTest\\:\\:createRequestMock\\(\\) has parameter \\$mapExtras with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/AbstractFieldControllerTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\AbstractFieldControllerTest\\:\\:createRequestMock\\(\\) has parameter \\$objectId with no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/AbstractFieldControllerTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\AbstractFieldControllerTest\\:\\:createRequestMock\\(\\) has parameter \\$panelCount with no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/AbstractFieldControllerTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\AbstractFieldControllerTest\\:\\:createRequestMock\\(\\) has parameter \\$panelId with no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/AbstractFieldControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\FormControllerTest\\:\\:\\$customFieldFactory has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/FormControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\FormControllerTest\\:\\:\\$customFieldModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/FormControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\FormControllerTest\\:\\:\\$customObjectModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/FormControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\FormControllerTest\\:\\:\\$fieldRouteProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/FormControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\FormControllerTest\\:\\:\\$form has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/FormControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\FormControllerTest\\:\\:\\$formController has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/FormControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\FormControllerTest\\:\\:\\$formFactory has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/FormControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\FormControllerTest\\:\\:\\$objectRouteProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/FormControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\FormControllerTest\\:\\:\\$permissionProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/FormControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\SaveControllerTest\\:\\:\\$customFieldFactory has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/SaveControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\SaveControllerTest\\:\\:\\$customFieldModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/SaveControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\SaveControllerTest\\:\\:\\$customObjectModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/SaveControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\SaveControllerTest\\:\\:\\$fieldRouteProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/SaveControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\SaveControllerTest\\:\\:\\$form has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/SaveControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\SaveControllerTest\\:\\:\\$formFactory has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/SaveControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\SaveControllerTest\\:\\:\\$permissionProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/SaveControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\SaveControllerTest\\:\\:\\$saveController has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/SaveControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\SaveControllerTest\\:\\:\\$translator has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/SaveControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\BatchDeleteControllerTest\\:\\:\\$customItemModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/BatchDeleteControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\BatchDeleteControllerTest\\:\\:\\$flashBag has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/BatchDeleteControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\BatchDeleteControllerTest\\:\\:\\$permissionProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/BatchDeleteControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\BatchDeleteControllerTest\\:\\:\\$routeProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/BatchDeleteControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\BatchDeleteControllerTest\\:\\:\\$sessionProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/BatchDeleteControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\CancelControllerTest\\:\\:\\$customItemModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/CancelControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\CancelControllerTest\\:\\:\\$routeProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/CancelControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\CancelControllerTest\\:\\:\\$sessionProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/CancelControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\DeleteControllerTest\\:\\:\\$customItemModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/DeleteControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\DeleteControllerTest\\:\\:\\$flashBag has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/DeleteControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\DeleteControllerTest\\:\\:\\$permissionProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/DeleteControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\DeleteControllerTest\\:\\:\\$routeProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/DeleteControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\DeleteControllerTest\\:\\:\\$sessionProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/DeleteControllerTest.php
+
+		-
+			message: "#^Call to an undefined method Mautic\\\\CoreBundle\\\\Helper\\\\UserHelper\\:\\:expects\\(\\)\\.$#"
+			count: 2
+			path: Tests/Unit/Controller/CustomItem/FormControllerTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\FormControllerTest\\:\\:testEditActionWhenTheItemIsLocked\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/FormControllerTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\FormControllerTest\\:\\:testEditWithRedirectToContactActionWhenTheItemIsLocked\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/FormControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\FormControllerTest\\:\\:\\$form type has no value type specified in iterable type Symfony\\\\Component\\\\Form\\\\FormInterface\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/FormControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\LinkControllerTest\\:\\:\\$customItemModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/LinkControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\LinkControllerTest\\:\\:\\$flashBag has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/LinkControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\LinkControllerTest\\:\\:\\$permissionProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/LinkControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\ListControllerTest\\:\\:\\$customItemModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/ListControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\ListControllerTest\\:\\:\\$customObjectModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/ListControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\ListControllerTest\\:\\:\\$permissionProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/ListControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\ListControllerTest\\:\\:\\$routeProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/ListControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\ListControllerTest\\:\\:\\$sessionProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/ListControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\LookupControllerTest\\:\\:\\$customItemModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/LookupControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\LookupControllerTest\\:\\:\\$flashBag has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/LookupControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\LookupControllerTest\\:\\:\\$permissionProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/LookupControllerTest.php
+
+		-
+			message: "#^Call to an undefined method Mautic\\\\CoreBundle\\\\Helper\\\\UserHelper\\:\\:expects\\(\\)\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/SaveControllerTest.php
+
+		-
+			message: "#^Call to an undefined method Symfony\\\\Component\\\\Routing\\\\Router\\:\\:expects\\(\\)\\.$#"
+			count: 2
+			path: Tests/Unit/Controller/CustomItem/SaveControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\SaveControllerTest\\:\\:\\$form type has no value type specified in iterable type Symfony\\\\Component\\\\Form\\\\FormInterface\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/SaveControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\ViewControllerTest\\:\\:\\$auditLog has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/ViewControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\ViewControllerTest\\:\\:\\$customItem has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/ViewControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\ViewControllerTest\\:\\:\\$customItemModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/ViewControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\ViewControllerTest\\:\\:\\$customItemXrefContactModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/ViewControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\ViewControllerTest\\:\\:\\$form has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/ViewControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\ViewControllerTest\\:\\:\\$formFactory has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/ViewControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\ViewControllerTest\\:\\:\\$permissionProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/ViewControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\ViewControllerTest\\:\\:\\$routeProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/ViewControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\CancelControllerTest\\:\\:\\$customObjectModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/CancelControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\CancelControllerTest\\:\\:\\$routeProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/CancelControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\CancelControllerTest\\:\\:\\$sessionProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/CancelControllerTest.php
+
+		-
+			message: "#^Call to an undefined method Symfony\\\\Component\\\\EventDispatcher\\\\EventDispatcherInterface\\:\\:expects\\(\\)\\.$#"
+			count: 2
+			path: Tests/Unit/Controller/CustomObject/DeleteControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\DeleteControllerTest\\:\\:\\$customObjectModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/DeleteControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\DeleteControllerTest\\:\\:\\$flashBag has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/DeleteControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\DeleteControllerTest\\:\\:\\$leadListIndex is never read, only written\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/DeleteControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\DeleteControllerTest\\:\\:\\$permissionProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/DeleteControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\DeleteControllerTest\\:\\:\\$sessionProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/DeleteControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\FormControllerTest\\:\\:\\$customFieldModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/FormControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\FormControllerTest\\:\\:\\$customFieldTypeProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/FormControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\FormControllerTest\\:\\:\\$customObject has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/FormControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\FormControllerTest\\:\\:\\$customObjectModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/FormControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\FormControllerTest\\:\\:\\$form has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/FormControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\FormControllerTest\\:\\:\\$formFactory has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/FormControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\FormControllerTest\\:\\:\\$lockFlashMessageHelper has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/FormControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\FormControllerTest\\:\\:\\$permissionProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/FormControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\FormControllerTest\\:\\:\\$routeProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/FormControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\ListControllerTest\\:\\:\\$customObjectModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/ListControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\ListControllerTest\\:\\:\\$permissionProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/ListControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\ListControllerTest\\:\\:\\$routeProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/ListControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\ListControllerTest\\:\\:\\$sessionProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/ListControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\SaveControllerTest\\:\\:\\$customFieldModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/SaveControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\SaveControllerTest\\:\\:\\$customFieldTypeProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/SaveControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\SaveControllerTest\\:\\:\\$customObject has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/SaveControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\SaveControllerTest\\:\\:\\$customObjectModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/SaveControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\SaveControllerTest\\:\\:\\$flashBag has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/SaveControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\SaveControllerTest\\:\\:\\$form has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/SaveControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\SaveControllerTest\\:\\:\\$formFactory has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/SaveControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\SaveControllerTest\\:\\:\\$lockFlashMessageHelper has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/SaveControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\SaveControllerTest\\:\\:\\$optionsToStringTransformer has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/SaveControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\SaveControllerTest\\:\\:\\$paramsToStringTransformer has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/SaveControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\SaveControllerTest\\:\\:\\$permissionProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/SaveControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\SaveControllerTest\\:\\:\\$routeProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/SaveControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\ViewControllerTest\\:\\:\\$auditLog has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/ViewControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\ViewControllerTest\\:\\:\\$customObject has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/ViewControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\ViewControllerTest\\:\\:\\$customObjectModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/ViewControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\ViewControllerTest\\:\\:\\$form has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/ViewControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\ViewControllerTest\\:\\:\\$formFactory has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/ViewControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\ViewControllerTest\\:\\:\\$permissionProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/ViewControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\ViewControllerTest\\:\\:\\$routeProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/ViewControllerTest.php
+
+		-
+			message: "#^Constant MAUTIC_TABLE_PREFIX not found\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/AbstractCustomFieldTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\AbstractCustomFieldTypeTest\\:\\:\\$customField has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/AbstractCustomFieldTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\AbstractCustomFieldTypeTest\\:\\:\\$fieldType \\(MauticPlugin\\\\CustomObjectsBundle\\\\CustomFieldType\\\\EmailType\\) does not accept MauticPlugin\\\\CustomObjectsBundle\\\\CustomFieldType\\\\AbstractCustomFieldType&PHPUnit\\\\Framework\\\\MockObject\\\\MockObject\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/AbstractCustomFieldTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\AbstractCustomFieldTypeTest\\:\\:\\$filterOperatorProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/AbstractCustomFieldTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\AbstractCustomFieldTypeTest\\:\\:\\$translator has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/AbstractCustomFieldTypeTest.php
+
+		-
+			message: "#^Parameter \\#3 \\$value of method MauticPlugin\\\\CustomObjectsBundle\\\\CustomFieldType\\\\AbstractMultivalueType\\:\\:createValueEntity\\(\\) expects null, array\\<int, string\\> given\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/AbstractMultivalueTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\AbstractMultivalueTypeTest\\:\\:\\$customField has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/AbstractMultivalueTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\AbstractMultivalueTypeTest\\:\\:\\$customItem has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/AbstractMultivalueTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\AbstractMultivalueTypeTest\\:\\:\\$provider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/AbstractMultivalueTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\AbstractMultivalueTypeTest\\:\\:\\$translator has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/AbstractMultivalueTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\AbstractTextTypeTest\\:\\:\\$customField has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/AbstractTextTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\AbstractTextTypeTest\\:\\:\\$customItem has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/AbstractTextTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\AbstractTextTypeTest\\:\\:\\$filterOperatorProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/AbstractTextTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\AbstractTextTypeTest\\:\\:\\$translator has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/AbstractTextTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\CountryTypeTest\\:\\:\\$translator has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/CountryTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\DateTimeTypeTest\\:\\:\\$customField has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/DateTimeTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\DateTimeTypeTest\\:\\:\\$customItem has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/DateTimeTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\DateTimeTypeTest\\:\\:\\$filterOperatorProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/DateTimeTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\DateTimeTypeTest\\:\\:\\$translator has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/DateTimeTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\DateTypeTest\\:\\:\\$customField has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/DateTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\DateTypeTest\\:\\:\\$customItem has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/DateTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\DateTypeTest\\:\\:\\$filterOperatorProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/DateTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\DateTypeTest\\:\\:\\$translator has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/DateTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\EmailTypeTest\\:\\:\\$customField has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/EmailTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\EmailTypeTest\\:\\:\\$translator has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/EmailTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\IntTypeTest\\:\\:\\$customField has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/IntTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\IntTypeTest\\:\\:\\$customItem has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/IntTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\IntTypeTest\\:\\:\\$filterOperatorProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/IntTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\IntTypeTest\\:\\:\\$translator has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/IntTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\MultiselectTypeTest\\:\\:\\$translator has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/MultiselectTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\PhoneTypeTest\\:\\:\\$customField has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/PhoneTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\PhoneTypeTest\\:\\:\\$translator has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/PhoneTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\SelectTypeTest\\:\\:\\$customField has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/SelectTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\SelectTypeTest\\:\\:\\$customItem has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/SelectTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\SelectTypeTest\\:\\:\\$filterOperatorProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/SelectTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\SelectTypeTest\\:\\:\\$translator has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/SelectTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\UrlTypeTest\\:\\:\\$customField has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/UrlTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\CustomFieldType\\\\UrlTypeTest\\:\\:\\$translator has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/UrlTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Entity\\\\AbstractCustomFieldValueTest\\:\\:\\$abstractCFValue has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Entity/AbstractCustomFieldValueTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Entity\\\\AbstractCustomFieldValueTest\\:\\:\\$customField has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Entity/AbstractCustomFieldValueTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Entity\\\\AbstractCustomFieldValueTest\\:\\:\\$customItem has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Entity/AbstractCustomFieldValueTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Entity\\\\AbstractCustomFieldValueTest\\:\\:\\$customObject has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Entity/AbstractCustomFieldValueTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Entity\\\\CustomField\\\\ParamsTest\\:\\:testConstructorAndToArray\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Entity/CustomField/ParamsTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Entity\\\\CustomField\\\\ParamsTest\\:\\:testGettersSetters\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Entity/CustomField/ParamsTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Entity\\\\CustomField\\\\ParamsTest\\:\\:testToArrayRemovingFalseAndNullValues\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Entity/CustomField/ParamsTest.php
+
+		-
+			message: "#^Parameter \\#1 \\$array \\(array\\{placeholder\\: null\\}\\) to function array_filter contains falsy values only, the result will always be an empty array\\.$#"
+			count: 1
+			path: Tests/Unit/Entity/CustomField/ParamsTest.php
+
+		-
+			message: "#^Unable to resolve the template type RealInstanceType in call to method PHPUnit\\\\Framework\\\\TestCase\\:\\:createMock\\(\\)$#"
+			count: 1
+			path: Tests/Unit/Entity/CustomFieldFactoryTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Entity\\\\CustomFieldOptionTest\\:\\:testArrayAccessor\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Entity/CustomFieldOptionTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Entity\\\\CustomFieldOptionTest\\:\\:testConstructorAndToArray\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Entity/CustomFieldOptionTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Entity\\\\CustomFieldOptionTest\\:\\:testGettersSetters\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Entity/CustomFieldOptionTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Entity\\\\CustomFieldTest\\:\\:testCanHaveMultipleValuesForCheckboxType\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Entity/CustomFieldTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Entity\\\\CustomFieldTest\\:\\:testCanHaveMultipleValuesForDateType\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Entity/CustomFieldTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Entity\\\\CustomFieldTest\\:\\:testDefaultValueTransformation\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Entity/CustomFieldTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Entity\\\\CustomObjectTest\\:\\:testGetCfByOrder\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Entity/CustomObjectTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ApiSubscriberTest\\:\\:\\$apiEntityEvent has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ApiSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ApiSubscriberTest\\:\\:\\$configProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ApiSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ApiSubscriberTest\\:\\:\\$customItemModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ApiSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ApiSubscriberTest\\:\\:\\$customObjectModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ApiSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ApiSubscriberTest\\:\\:\\$request has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ApiSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\AssetsSubscriberTest\\:\\:\\$assetsHelper has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/AssetsSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\AssetsSubscriberTest\\:\\:\\$assetsSubscriber has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/AssetsSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\AssetsSubscriberTest\\:\\:\\$configProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/AssetsSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\AssetsSubscriberTest\\:\\:\\$getResponseEvent has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/AssetsSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\AssetsSubscriberTest\\:\\:\\$request has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/AssetsSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\AuditLogSubscriberTest\\:\\:\\$auditLogModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/AuditLogSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\AuditLogSubscriberTest\\:\\:\\$auditLogSubscriber has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/AuditLogSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\AuditLogSubscriberTest\\:\\:\\$customItem has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/AuditLogSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\AuditLogSubscriberTest\\:\\:\\$customItemEvent has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/AuditLogSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\AuditLogSubscriberTest\\:\\:\\$customObject has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/AuditLogSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\AuditLogSubscriberTest\\:\\:\\$customObjectEvent has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/AuditLogSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\AuditLogSubscriberTest\\:\\:\\$ipLookupHelper has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/AuditLogSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CampaignSubscriberTest\\:\\:\\$campaignBuilderEvent has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CampaignSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CampaignSubscriberTest\\:\\:\\$campaignExecutionEvent has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CampaignSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CampaignSubscriberTest\\:\\:\\$configProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CampaignSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CampaignSubscriberTest\\:\\:\\$connection has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CampaignSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CampaignSubscriberTest\\:\\:\\$contact has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CampaignSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CampaignSubscriberTest\\:\\:\\$customField has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CampaignSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CampaignSubscriberTest\\:\\:\\$customFieldModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CampaignSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CampaignSubscriberTest\\:\\:\\$customItemModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CampaignSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CampaignSubscriberTest\\:\\:\\$customObject has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CampaignSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CampaignSubscriberTest\\:\\:\\$customObjectModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CampaignSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CampaignSubscriberTest\\:\\:\\$queryBuilder has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CampaignSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CampaignSubscriberTest\\:\\:\\$queryFilterFactory has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CampaignSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CampaignSubscriberTest\\:\\:\\$queryFilterHelper has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CampaignSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CampaignSubscriberTest\\:\\:\\$segmentQueryBuilder has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CampaignSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CampaignSubscriberTest\\:\\:\\$statement has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CampaignSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CampaignSubscriberTest\\:\\:\\$translator has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CampaignSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ContactSubscriberTest\\:\\:\\$configProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ContactSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ContactSubscriberTest\\:\\:\\$customItemModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ContactSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ContactSubscriberTest\\:\\:\\$entityManager has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ContactSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ContactSubscriberTest\\:\\:\\$leadEventLogRepo has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ContactSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ContactSubscriberTest\\:\\:\\$leadTimelineEvent has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ContactSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ContactSubscriberTest\\:\\:\\$routeProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ContactSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ContactSubscriberTest\\:\\:\\$translator has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ContactSubscriberTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ContactTabSubscriberTest\\:\\:testSubscriberEvents\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ContactTabSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomFieldPostLoadSubscriberTest\\:\\:\\$customField has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomFieldPostLoadSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomFieldPostLoadSubscriberTest\\:\\:\\$customFieldTypeProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomFieldPostLoadSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomFieldPostLoadSubscriberTest\\:\\:\\$event has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomFieldPostLoadSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomFieldPostLoadSubscriberTest\\:\\:\\$subscriber has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomFieldPostLoadSubscriberTest.php
+
+		-
+			message: "#^Constant MAUTIC_TABLE_PREFIX not found\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomItemXrefContactSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomItemXrefContactSubscriberTest\\:\\:\\$contact has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomItemXrefContactSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomItemXrefContactSubscriberTest\\:\\:\\$customItem has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomItemXrefContactSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomItemXrefContactSubscriberTest\\:\\:\\$discoveryEvent has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomItemXrefContactSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomItemXrefContactSubscriberTest\\:\\:\\$entityManager has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomItemXrefContactSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomItemXrefContactSubscriberTest\\:\\:\\$event has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomItemXrefContactSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomItemXrefContactSubscriberTest\\:\\:\\$listDbalEvent has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomItemXrefContactSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomItemXrefContactSubscriberTest\\:\\:\\$listEvent has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomItemXrefContactSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomItemXrefContactSubscriberTest\\:\\:\\$query has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomItemXrefContactSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomItemXrefContactSubscriberTest\\:\\:\\$queryBuilder has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomItemXrefContactSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomItemXrefContactSubscriberTest\\:\\:\\$queryBuilderDbal has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomItemXrefContactSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomItemXrefContactSubscriberTest\\:\\:\\$xref has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomItemXrefContactSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomItemXrefCustomItemSubscriberTest\\:\\:\\$customItemA has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomItemXrefCustomItemSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomItemXrefCustomItemSubscriberTest\\:\\:\\$customItemB has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomItemXrefCustomItemSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomItemXrefCustomItemSubscriberTest\\:\\:\\$discoveryEvent has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomItemXrefCustomItemSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomItemXrefCustomItemSubscriberTest\\:\\:\\$entityManager has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomItemXrefCustomItemSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomItemXrefCustomItemSubscriberTest\\:\\:\\$event has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomItemXrefCustomItemSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomItemXrefCustomItemSubscriberTest\\:\\:\\$expr has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomItemXrefCustomItemSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomItemXrefCustomItemSubscriberTest\\:\\:\\$listEvent has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomItemXrefCustomItemSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomItemXrefCustomItemSubscriberTest\\:\\:\\$query has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomItemXrefCustomItemSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomItemXrefCustomItemSubscriberTest\\:\\:\\$queryBuilder has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomItemXrefCustomItemSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomItemXrefCustomItemSubscriberTest\\:\\:\\$xref has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomItemXrefCustomItemSubscriberTest.php
+
+		-
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
+			count: 2
+			path: Tests/Unit/EventListener/CustomItemXrefCustomItemSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomObjectButtonSubscriberTest\\:\\:\\$customObject has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomObjectButtonSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomObjectButtonSubscriberTest\\:\\:\\$event has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomObjectButtonSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomObjectButtonSubscriberTest\\:\\:\\$itemPermissionProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomObjectButtonSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomObjectButtonSubscriberTest\\:\\:\\$itemRouteProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomObjectButtonSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomObjectButtonSubscriberTest\\:\\:\\$objectPermissionProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomObjectButtonSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomObjectButtonSubscriberTest\\:\\:\\$objectRouteProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomObjectButtonSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomObjectButtonSubscriberTest\\:\\:\\$translator has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomObjectButtonSubscriberTest.php
+
+		-
+			message: "#^Constant MAUTIC_TABLE_PREFIX not found\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/FilterOperatorSubscriberTest.php
+
+		-
+			message: "#^PHPDoc tag @var for variable \\$formMock has no value type specified in iterable type Symfony\\\\Component\\\\Form\\\\FormInterface\\.$#"
+			count: 2
+			path: Tests/Unit/EventListener/FilterOperatorSubscriberTest.php
+
+		-
+			message: "#^Parameter \\#1 \\$form of class Mautic\\\\LeadBundle\\\\Event\\\\FormAdjustmentEvent constructor expects iterable\\<Symfony\\\\Component\\\\Form\\\\FormInterface\\>&Symfony\\\\Component\\\\Form\\\\FormInterface, PHPUnit\\\\Framework\\\\MockObject\\\\MockObject\\|Symfony\\\\Component\\\\Form\\\\FormInterface given\\.$#"
+			count: 2
+			path: Tests/Unit/EventListener/FilterOperatorSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ImportSubscriberTest\\:\\:\\$configProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ImportSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ImportSubscriberTest\\:\\:\\$customFieldRepository has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ImportSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ImportSubscriberTest\\:\\:\\$customItemImportModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ImportSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ImportSubscriberTest\\:\\:\\$customObject has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ImportSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ImportSubscriberTest\\:\\:\\$customObjectModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ImportSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ImportSubscriberTest\\:\\:\\$form has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ImportSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ImportSubscriberTest\\:\\:\\$import has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ImportSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ImportSubscriberTest\\:\\:\\$importInitEvent has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ImportSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ImportSubscriberTest\\:\\:\\$importMappingEvent has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ImportSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ImportSubscriberTest\\:\\:\\$importProcessEvent has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ImportSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ImportSubscriberTest\\:\\:\\$importValidateEvent has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ImportSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ImportSubscriberTest\\:\\:\\$permissionProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ImportSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ImportSubscriberTest\\:\\:\\$translator has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ImportSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\MenuSubscriberTest\\:\\:\\$configProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/MenuSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\MenuSubscriberTest\\:\\:\\$customObjectModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/MenuSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\MenuSubscriberTest\\:\\:\\$menuEvent has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/MenuSubscriberTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ReportSubscriberTest\\:\\:getCustomObjectsCollection\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ReportSubscriberTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ReportSubscriberTest\\:\\:testThatIdDoesntProcessContextsWithEmptyOrNotIntCustomObjectsID\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ReportSubscriberTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ReportSubscriberTest\\:\\:testThatIdDoesntProcessNotExistingCustomObjects\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ReportSubscriberTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\ReportSubscriberTest\\:\\:testThatOnReportGenerateMethodDoesntProcessWrongContexts\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/ReportSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\SerializerSubscriberTest\\:\\:\\$configProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/SerializerSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\SerializerSubscriberTest\\:\\:\\$customItemModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/SerializerSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\SerializerSubscriberTest\\:\\:\\$customItemXrefContactRepository has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/SerializerSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\SerializerSubscriberTest\\:\\:\\$objectEvent has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/SerializerSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\SerializerSubscriberTest\\:\\:\\$request has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/SerializerSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\SerializerSubscriberTest\\:\\:\\$requestStack has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/SerializerSubscriberTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Exception\\\\InvalidCustomObjectFormatListExceptionTest\\:\\:testAll\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Exception/InvalidCustomObjectFormatListExceptionTest.php
+
+		-
+			message: "#^Parameter \\#1 \\$value of method MauticPlugin\\\\CustomObjectsBundle\\\\Form\\\\DataTransformer\\\\OptionsTransformer\\:\\:reverseTransform\\(\\) expects array\\<string\\>, array\\<string, array\\<int, array\\<string, string\\>\\>\\> given\\.$#"
+			count: 4
+			path: Tests/Unit/Form/DataTransformer/OptionsTransformerTest.php
+
+		-
+			message: "#^Parameter \\#1 \\$value of method MauticPlugin\\\\CustomObjectsBundle\\\\Form\\\\DataTransformer\\\\OptionsTransformer\\:\\:transform\\(\\) expects Doctrine\\\\ORM\\\\PersistentCollection&iterable\\<MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomFieldOption\\>, Doctrine\\\\Common\\\\Collections\\\\ArrayCollection\\<\\*NEVER\\*, \\*NEVER\\*\\> given\\.$#"
+			count: 1
+			path: Tests/Unit/Form/DataTransformer/OptionsTransformerTest.php
+
+		-
+			message: "#^Parameter \\#1 \\$value of method MauticPlugin\\\\CustomObjectsBundle\\\\Form\\\\DataTransformer\\\\OptionsTransformer\\:\\:transform\\(\\) expects Doctrine\\\\ORM\\\\PersistentCollection&iterable\\<MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomFieldOption\\>, Doctrine\\\\Common\\\\Collections\\\\ArrayCollection\\<int, int\\> given\\.$#"
+			count: 1
+			path: Tests/Unit/Form/DataTransformer/OptionsTransformerTest.php
+
+		-
+			message: "#^Parameter \\#1 \\$value of method MauticPlugin\\\\CustomObjectsBundle\\\\Form\\\\DataTransformer\\\\OptionsTransformer\\:\\:transform\\(\\) expects Doctrine\\\\ORM\\\\PersistentCollection&iterable\\<MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomFieldOption\\>, null given\\.$#"
+			count: 1
+			path: Tests/Unit/Form/DataTransformer/OptionsTransformerTest.php
+
+		-
+			message: "#^Parameter \\#1 \\$params of method MauticPlugin\\\\CustomObjectsBundle\\\\Form\\\\DataTransformer\\\\ParamsToStringTransformer\\:\\:transform\\(\\) expects MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomField\\\\Params\\|null, array given\\.$#"
+			count: 1
+			path: Tests/Unit/Form/DataTransformer/ParamsToStringTransformerTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Form\\\\Type\\\\CampaignConditionFieldValueTypeTest\\:\\:testConfigureOptions\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Form/Type/CampaignConditionFieldValueTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Form\\\\Type\\\\CustomFieldValueTypeTest\\:\\:\\$customField has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Form/Type/CustomFieldValueTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Form\\\\Type\\\\CustomFieldValueTypeTest\\:\\:\\$customFieldType has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Form/Type/CustomFieldValueTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Form\\\\Type\\\\CustomFieldValueTypeTest\\:\\:\\$customFieldValue has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Form/Type/CustomFieldValueTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Form\\\\Type\\\\CustomFieldValueTypeTest\\:\\:\\$customItem has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Form/Type/CustomFieldValueTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Form\\\\Type\\\\CustomFieldValueTypeTest\\:\\:\\$formBuilder has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Form/Type/CustomFieldValueTypeTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Form\\\\Type\\\\CustomFieldValueTypeTest\\:\\:\\$optionsResolver has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Form/Type/CustomFieldValueTypeTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Form\\\\Type\\\\CustomObjectTypeTest\\:\\:buildForm\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Form/Type/CustomObjectTypeTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Form\\\\Type\\\\CustomObjectTypeTest\\:\\:testBuildFormExistingObject\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Form/Type/CustomObjectTypeTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Form\\\\Type\\\\CustomObjectTypeTest\\:\\:testBuildFormNewObject\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Form/Type/CustomObjectTypeTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Form\\\\Type\\\\CustomObjectTypeTest\\:\\:testConfigureOptions\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Form/Type/CustomObjectTypeTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Form\\\\Validator\\\\CustomObjectTypeValuesTest\\:\\:testGetTargets\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Form/Validator/CustomObjectTypeValuesTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Form\\\\Validator\\\\CustomObjectTypeValuesTest\\:\\:testValidatedBy\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Form/Validator/CustomObjectTypeValuesTest.php
+
+		-
+			message: "#^Access to an undefined property PHPUnit\\\\Framework\\\\MockObject\\\\MockObject\\|Symfony\\\\Component\\\\Validator\\\\Constraint\\:\\:\\$missingMasterObject\\.$#"
+			count: 1
+			path: Tests/Unit/Form/Validator/CustomObjectTypeValuesValidatorTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Form\\\\Validator\\\\CustomObjectTypeValuesValidatorTest\\:\\:testValidateIgnoreCompletely\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Form/Validator/CustomObjectTypeValuesValidatorTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Form\\\\Validator\\\\CustomObjectTypeValuesValidatorTest\\:\\:testValidateIgnoreMasterObject\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Form/Validator/CustomObjectTypeValuesValidatorTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Form\\\\Validator\\\\CustomObjectTypeValuesValidatorTest\\:\\:testValidateNoCustomObject\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Form/Validator/CustomObjectTypeValuesValidatorTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Helper\\\\CustomFieldQueryBuilder\\\\CalculatorTest\\:\\:assertMatrixEquals\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Helper/CustomFieldQueryBuilder/CalculatorTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Helper\\\\CustomFieldQueryBuilder\\\\CalculatorTest\\:\\:assertMatrixEquals\\(\\) has parameter \\$expectedMatrix with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Unit/Helper/CustomFieldQueryBuilder/CalculatorTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Helper\\\\CustomFieldQueryBuilder\\\\CalculatorTest\\:\\:getSuffix\\(\\) has parameter \\$decisionValue with no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Helper/CustomFieldQueryBuilder/CalculatorTest.php
+
+		-
+			message: "#^Parameter \\#4 \\$value of method MauticPlugin\\\\CustomObjectsBundle\\\\Helper\\\\QueryFilterHelper\\:\\:addCustomObjectNameExpression\\(\\) expects string\\|null, int given\\.$#"
+			count: 1
+			path: Tests/Unit/Helper/QueryFilterHelperTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Helper\\\\TokenFormatterTest\\:\\:testAvailableFormats\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Helper/TokenFormatterTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Helper\\\\TokenFormatterTest\\:\\:testFormatManyValues\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Helper/TokenFormatterTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Helper\\\\TokenFormatterTest\\:\\:testFormatOneValue\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Helper/TokenFormatterTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Helper\\\\TokenFormatterTest\\:\\:testIsValidFormat\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Helper/TokenFormatterTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Helper\\\\TokenFormatterTest\\:\\:\\$availableFormats has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Helper/TokenFormatterTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Helper\\\\TokenFormatterTest\\:\\:\\$manyValues has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Helper/TokenFormatterTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Helper\\\\TokenFormatterTest\\:\\:\\$noValues has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Helper/TokenFormatterTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Helper\\\\TokenFormatterTest\\:\\:\\$oneValue has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Helper/TokenFormatterTest.php
+
+		-
+			message: "#^Constant MAUTIC_TABLE_PREFIX not found\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomFieldOptionModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomFieldOptionModelTest\\:\\:\\$connection has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomFieldOptionModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomFieldOptionModelTest\\:\\:\\$entityManager has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomFieldOptionModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomFieldOptionModelTest\\:\\:\\$queryBuilder has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomFieldOptionModelTest.php
+
+		-
+			message: "#^Constant MAUTIC_TABLE_PREFIX not found\\.$#"
+			count: 2
+			path: Tests/Unit/Model/CustomFieldValueModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomFieldValueModelTest\\:\\:\\$connection has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomFieldValueModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomFieldValueModelTest\\:\\:\\$customField has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomFieldValueModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomFieldValueModelTest\\:\\:\\$customFieldValueModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomFieldValueModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomFieldValueModelTest\\:\\:\\$customItem has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomFieldValueModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomFieldValueModelTest\\:\\:\\$customObject has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomFieldValueModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomFieldValueModelTest\\:\\:\\$entityManager has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomFieldValueModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomFieldValueModelTest\\:\\:\\$filterOperatorProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomFieldValueModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomFieldValueModelTest\\:\\:\\$queryBuilder has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomFieldValueModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomFieldValueModelTest\\:\\:\\$statement has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomFieldValueModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomFieldValueModelTest\\:\\:\\$translator has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomFieldValueModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomFieldValueModelTest\\:\\:\\$validator has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomFieldValueModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomFieldValueModelTest\\:\\:\\$violationList has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomFieldValueModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomItemModelTest\\:\\:\\$connection has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomItemModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomItemModelTest\\:\\:\\$customFieldValueModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomItemModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomItemModelTest\\:\\:\\$customItem has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomItemModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomItemModelTest\\:\\:\\$customItemPermissionProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomItemModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomItemModelTest\\:\\:\\$customItemRepository has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomItemModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomItemModelTest\\:\\:\\$dbalQueryBuilder has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomItemModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomItemModelTest\\:\\:\\$dispatcher has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomItemModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomItemModelTest\\:\\:\\$entityManager has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomItemModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomItemModelTest\\:\\:\\$query has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomItemModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomItemModelTest\\:\\:\\$queryBuilder has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomItemModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomItemModelTest\\:\\:\\$statement has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomItemModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomItemModelTest\\:\\:\\$user has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomItemModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomItemModelTest\\:\\:\\$userHelper has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomItemModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomItemModelTest\\:\\:\\$validator has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomItemModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomItemModelTest\\:\\:\\$violationList has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomItemModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomItemXrefContactModelTest\\:\\:\\$customItem has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomItemXrefContactModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomItemXrefContactModelTest\\:\\:\\$entityManager has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomItemXrefContactModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomItemXrefContactModelTest\\:\\:\\$query has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomItemXrefContactModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomItemXrefContactModelTest\\:\\:\\$queryBuilder has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomItemXrefContactModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomItemXrefContactModelTest\\:\\:\\$translator has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomItemXrefContactModelTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomObjectModelTest\\:\\:testGetMasterCustomObjects\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomObjectModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomObjectModelTest\\:\\:\\$connection has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomObjectModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomObjectModelTest\\:\\:\\$customField has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomObjectModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomObjectModelTest\\:\\:\\$customFieldModel has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomObjectModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomObjectModelTest\\:\\:\\$customObject has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomObjectModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomObjectModelTest\\:\\:\\$customObjectPermissionProvider has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomObjectModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomObjectModelTest\\:\\:\\$customObjectRepository has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomObjectModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomObjectModelTest\\:\\:\\$databasePlatform has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomObjectModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomObjectModelTest\\:\\:\\$dispatcher has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomObjectModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomObjectModelTest\\:\\:\\$entityManager has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomObjectModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomObjectModelTest\\:\\:\\$query has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomObjectModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomObjectModelTest\\:\\:\\$queryBuilder has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomObjectModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomObjectModelTest\\:\\:\\$queryBuilderDbal has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomObjectModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomObjectModelTest\\:\\:\\$statement has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomObjectModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomObjectModelTest\\:\\:\\$translator has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomObjectModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomObjectModelTest\\:\\:\\$user has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomObjectModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomObjectModelTest\\:\\:\\$userHelper has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomObjectModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Provider\\\\CustomFieldRouteProviderTest\\:\\:\\$router has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Provider/CustomFieldRouteProviderTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Provider\\\\CustomItemPermissionProviderTest\\:\\:\\$corePermissions has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Provider/CustomItemPermissionProviderTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Provider\\\\CustomItemPermissionProviderTest\\:\\:\\$customItem has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Provider/CustomItemPermissionProviderTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Provider\\\\CustomItemPermissionProviderTest\\:\\:\\$customObject has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Provider/CustomItemPermissionProviderTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Provider\\\\CustomItemRouteProviderTest\\:\\:testThatBuildContactViewRouteReturnsCorrectUrl\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Provider/CustomItemRouteProviderTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Provider\\\\CustomItemRouteProviderTest\\:\\:testThatBuildEditRouteWithRedirectToContactReturnsCorrectUrl\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Provider/CustomItemRouteProviderTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Provider\\\\CustomItemRouteProviderTest\\:\\:testThatBuildNewRouteWithRedirectToContactReturnsCorrectUrl\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Provider/CustomItemRouteProviderTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Provider\\\\CustomItemRouteProviderTest\\:\\:\\$router has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Provider/CustomItemRouteProviderTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Provider\\\\CustomObjectPermissionProviderTest\\:\\:\\$entity has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Provider/CustomObjectPermissionProviderTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Provider\\\\CustomObjectPermissionProviderTest\\:\\:\\$permissions has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Provider/CustomObjectPermissionProviderTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Provider\\\\CustomObjectRouteProviderTest\\:\\:\\$router has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Provider/CustomObjectRouteProviderTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Repository\\\\CustomFieldRepositoryTest\\:\\:\\$classMetadata has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Repository/CustomFieldRepositoryTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Repository\\\\CustomFieldRepositoryTest\\:\\:\\$entityManager has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Repository/CustomFieldRepositoryTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Repository\\\\CustomFieldRepositoryTest\\:\\:\\$expression has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Repository/CustomFieldRepositoryTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Repository\\\\CustomFieldRepositoryTest\\:\\:\\$query has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Repository/CustomFieldRepositoryTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Repository\\\\CustomFieldRepositoryTest\\:\\:\\$queryBuilder has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Repository/CustomFieldRepositoryTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Repository\\\\CustomItemRepositoryTest\\:\\:\\$contact has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Repository/CustomItemRepositoryTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Repository\\\\CustomItemRepositoryTest\\:\\:\\$customObject has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Repository/CustomItemRepositoryTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Repository\\\\CustomItemRepositoryTest\\:\\:\\$entityManager has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Repository/CustomItemRepositoryTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Repository\\\\CustomItemRepositoryTest\\:\\:\\$expr has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Repository/CustomItemRepositoryTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Repository\\\\CustomItemRepositoryTest\\:\\:\\$query has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Repository/CustomItemRepositoryTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Repository\\\\CustomItemRepositoryTest\\:\\:\\$queryBuilder has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Repository/CustomItemRepositoryTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Repository\\\\CustomItemXrefContactRepositoryTest\\:\\:\\$classMetadata has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Repository/CustomItemXrefContactRepositoryTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Repository\\\\CustomItemXrefContactRepositoryTest\\:\\:\\$connection has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Repository/CustomItemXrefContactRepositoryTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Repository\\\\CustomItemXrefContactRepositoryTest\\:\\:\\$contact has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Repository/CustomItemXrefContactRepositoryTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Repository\\\\CustomItemXrefContactRepositoryTest\\:\\:\\$entityManager has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Repository/CustomItemXrefContactRepositoryTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Repository\\\\CustomItemXrefContactRepositoryTest\\:\\:\\$expr has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Repository/CustomItemXrefContactRepositoryTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Repository\\\\CustomItemXrefContactRepositoryTest\\:\\:\\$expressionBuilder has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Repository/CustomItemXrefContactRepositoryTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Repository\\\\CustomItemXrefContactRepositoryTest\\:\\:\\$query has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Repository/CustomItemXrefContactRepositoryTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Repository\\\\CustomItemXrefContactRepositoryTest\\:\\:\\$queryBuilder has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Repository/CustomItemXrefContactRepositoryTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Repository\\\\CustomItemXrefContactRepositoryTest\\:\\:\\$queryBuilderDbal has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Repository/CustomItemXrefContactRepositoryTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Repository\\\\CustomItemXrefContactRepositoryTest\\:\\:\\$statement has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Repository/CustomItemXrefContactRepositoryTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Segment\\\\Query\\\\Filter\\\\CustomItemNameFilterQueryBuilderTest\\:\\:parameterValueProvider\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Segment/Query/Filter/CustomItemNameFilterQueryBuilderTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Segment\\\\Query\\\\Filter\\\\CustomItemNameFilterQueryBuilderTest\\:\\:testApplyQuery\\(\\) has parameter \\$parameterValue with no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Segment/Query/Filter/CustomItemNameFilterQueryBuilderTest.php
+
+		-
+			message: "#^PHPDoc tag @param has invalid value \\(\\$parameterValue\\)\\: Unexpected token \"\\$parameterValue\", expected type at offset 69$#"
+			count: 1
+			path: Tests/Unit/Segment/Query/Filter/CustomItemNameFilterQueryBuilderTest.php
+
+		-
+			message: "#^Constant MAUTIC_TABLE_PREFIX not found\\.$#"
+			count: 3
+			path: Tests/Unit/Segment/Query/Filter/QueryFilterFactoryTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Segment\\\\Query\\\\UnionQueryContainerTest\\:\\:testParameterTypesCheck\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Segment/Query/UnionQueryContainerTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Segment\\\\Query\\\\UnionQueryContainerTest\\:\\:testParametersCheck\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Segment/Query/UnionQueryContainerTest.php
+
+		-
+			message: "#^Parameter \\#3 \\$type of method Mautic\\\\LeadBundle\\\\Segment\\\\Query\\\\QueryBuilder\\:\\:setParameter\\(\\) expects string\\|null, int given\\.$#"
+			count: 1
+			path: Tests/Unit/Segment/Query/UnionQueryContainerTest.php
+
