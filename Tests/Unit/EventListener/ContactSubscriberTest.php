@@ -16,6 +16,8 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Translation\TranslatorInterface;
 
 class ContactSubscriberTest extends \PHPUnit\Framework\TestCase
@@ -27,6 +29,11 @@ class ContactSubscriberTest extends \PHPUnit\Framework\TestCase
     private $configProvider;
     private $leadTimelineEvent;
     private $leadEventLogRepo;
+
+    /**
+     * @var MockObject&CustomItemXrefContactRepository
+     */
+    private MockObject $ciXcontactRepo;
 
     /**
      * @var ContactSubscriber
@@ -44,12 +51,14 @@ class ContactSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->configProvider    = $this->createMock(ConfigProvider::class);
         $this->leadTimelineEvent = $this->createMock(LeadTimelineEvent::class);
         $this->leadEventLogRepo  = $this->createMock(LeadEventLogRepository::class);
+        $this->ciXcontactRepo    = $this->createMock(CustomItemXrefContactRepository::class);
         $this->subscriber        = new ContactSubscriber(
             $this->entityManager,
             $this->translator,
             $this->routeProvider,
             $this->customItemModel,
-            $this->configProvider
+            $this->configProvider,
+            $this->ciXcontactRepo
         );
     }
 
