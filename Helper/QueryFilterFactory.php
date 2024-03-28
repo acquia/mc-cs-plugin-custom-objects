@@ -164,4 +164,14 @@ class QueryFilterFactory
             $this->unionQueryContainer->add($qb);
         }
     }
+
+    public function getCustomFieldTypeById(int $segmentFilterFieldId): string
+    {
+        return $this->customFieldRepository->getCustomFieldTypeById($segmentFilterFieldId);
+    }
+
+    public function getTableNameFromType(string $segmentFilterFieldType): string
+    {
+        return $this->fieldTypeProvider->getType($segmentFilterFieldType)->getTableName();
+    }
 }

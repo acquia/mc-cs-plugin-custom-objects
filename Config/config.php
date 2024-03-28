@@ -1128,6 +1128,14 @@ $coParams = [
                     'event_dispatcher',
                 ],
             ],
+            'mautic.lead.query.builder.custom_object.merged.value' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomObjectMergedFilterQueryBuilder::class,
+                'arguments' => [
+                    'mautic.lead.model.random_parameter_name',
+                    'event_dispatcher',
+                    'custom_object.query.filter.helper',
+                ],
+            ],
             'custom_object.query.filter.factory' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory::class,
                 'arguments' => [
@@ -1179,9 +1187,10 @@ $coParams = [
         ],
     ],
     'parameters' => [
-        ConfigProvider::CONFIG_PARAM_ENABLED                              => true,
-        ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT => 3,
-        'custom_item_export_dir'                                          => '%kernel.root_dir%/../media/files/temp',
+        ConfigProvider::CONFIG_PARAM_ENABLED                                  => true,
+        ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_LIMIT     => ConfigProvider::CONFIG_PARAM_ITEM_VALUE_TO_CONTACT_RELATION_DEFAULT_LIMIT,
+        'custom_item_export_dir'                                              => '%kernel.root_dir%/../media/files/temp',
+        'custom_object_merge_filter'                                          => false,
     ],
 ];
 
