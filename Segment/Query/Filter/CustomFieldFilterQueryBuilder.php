@@ -57,8 +57,6 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
         }
 
         switch ($filterOperator) {
-            case 'empty':
-            case 'neq':
             case 'notLike':
             case '!multiselect':
                 $queryBuilder->addLogic(
