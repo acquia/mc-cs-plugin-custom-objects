@@ -839,7 +839,7 @@ $coParams = [
                     'custom_object.query.filter.factory',
                     'custom_object.query.filter.helper',
                     'custom_object.config.provider',
-                    'logger',
+                    'monolog.logger.mautic',
                 ],
             ],
             'custom_object.serializer.subscriber' => [
