@@ -8,24 +8,14 @@ use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
 use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomObjectPreDeleteSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(CustomObjectModel $customObjectModel, TranslatorInterface $translator)
-    {
-        $this->customObjectModel = $customObjectModel;
-        $this->translator        = $translator;
+    public function __construct(
+        private CustomObjectModel $customObjectModel,
+        private TranslatorInterface $translator
+    ) {
     }
 
     public static function getSubscribedEvents()

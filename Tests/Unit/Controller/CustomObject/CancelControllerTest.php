@@ -22,24 +22,32 @@ class CancelControllerTest extends ControllerTestCase
      * @var CancelController
      */
     private $cancelController;
+    private $sessionProviderFactory;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $sessionProviderFactory  = $this->createMock(SessionProviderFactory::class);
-        $this->sessionProvider   = $this->createMock(SessionProvider::class);
-        $this->routeProvider     = $this->createMock(CustomObjectRouteProvider::class);
-        $this->customObjectModel = $this->createMock(CustomObjectModel::class);
+        $this->sessionProviderFactory  = $this->createMock(SessionProviderFactory::class);
+        $this->sessionProvider         = $this->createMock(SessionProvider::class);
+        $this->routeProvider           = $this->createMock(CustomObjectRouteProvider::class);
+        $this->customObjectModel       = $this->createMock(CustomObjectModel::class);
 
         $this->cancelController = new CancelController(
-            $sessionProviderFactory,
-            $this->routeProvider,
-            $this->customObjectModel
+            $this->managerRegistry,
+            $this->mauticFactory,
+            $this->modelFactory,
+            $this->userHelper,
+            $this->coreParametersHelper,
+            $this->dispatcher,
+            $this->translator,
+            $this->flashBag,
+            $this->requestStack,
+            $this->security
         );
 
         $this->addSymfonyDependencies($this->cancelController);
-        $sessionProviderFactory->method('createObjectProvider')->willReturn($this->sessionProvider);
+        $this->sessionProviderFactory->method('createObjectProvider')->willReturn($this->sessionProvider);
     }
 
     public function testCancelAction(): void
@@ -58,7 +66,12 @@ class CancelControllerTest extends ControllerTestCase
             ->with($pageNumber)
             ->willReturn('some/route');
 
-        $this->cancelController->cancelAction(null);
+        $this->cancelController->cancelAction(
+            $this->sessionProviderFactory,
+            $this->routeProvider,
+            $this->customObjectModel,
+            null
+        );
     }
 
     public function testCancelActionWithEntityUnlock(): void
@@ -85,6 +98,11 @@ class CancelControllerTest extends ControllerTestCase
             ->with($pageNumber)
             ->willReturn('some/route');
 
-        $this->cancelController->cancelAction($customObjectId);
+        $this->cancelController->cancelAction(
+            $this->sessionProviderFactory,
+            $this->routeProvider,
+            $this->customObjectModel,
+            $customObjectId
+        );
     }
 }

@@ -14,7 +14,7 @@ final class CustomItemEvents
      *
      * The event listener receives a
      *
-     * @see \MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent
+     * @see Event\CustomItemEvent
      *
      * @var string
      */
@@ -25,7 +25,7 @@ final class CustomItemEvents
      *
      * The event listener receives a
      *
-     * @see \MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent
+     * @see Event\CustomItemEvent
      *
      * @var string
      */
@@ -36,7 +36,7 @@ final class CustomItemEvents
      *
      * The event listener receives a
      *
-     * @see \MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent
+     * @see Event\CustomItemEvent
      *
      * @var string
      */
@@ -47,7 +47,7 @@ final class CustomItemEvents
      *
      * The event listener receives a
      *
-     * @see \MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent
+     * @see Event\CustomItemEvent
      *
      * @var string
      */
@@ -58,7 +58,7 @@ final class CustomItemEvents
      *
      * The event listener receives a
      *
-     * @see \MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent
+     * @see Event\CustomItemListQueryEvent
      *
      * @var string
      */
@@ -69,7 +69,7 @@ final class CustomItemEvents
      *
      * The event listener receives a
      *
-     * @see \MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent
+     * @see Event\CustomItemListQueryEvent
      *
      * @var string
      */
@@ -80,7 +80,7 @@ final class CustomItemEvents
      *
      * The event listener receives a
      *
-     * @see \MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent
+     * @see Event\CustomItemListQueryEvent
      *
      * @var string
      */
@@ -91,7 +91,7 @@ final class CustomItemEvents
      *
      * The event listener receives a
      *
-     * @see \MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent
+     * @see Event\CustomItemXrefEntityDiscoveryEvent
      *
      * @var string
      */
@@ -102,7 +102,7 @@ final class CustomItemEvents
      *
      * The event listener receives a
      *
-     * @see \MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent
+     * @see Event\CustomItemXrefEntityEvent
      *
      * @var string
      */
@@ -113,7 +113,7 @@ final class CustomItemEvents
      *
      * The event listener receives a
      *
-     * @see \MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent
+     * @see Event\CustomItemXrefEntityEvent
      *
      * @var string
      */
@@ -124,7 +124,7 @@ final class CustomItemEvents
      *
      * The event listener receives a
      *
-     * @see \Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     * @see Event\CampaignExecutionEvent
      *
      * @var string
      */
@@ -135,7 +135,7 @@ final class CustomItemEvents
      *
      * The event listener receives a
      *
-     * @see \Mautic\CampaignBundle\Event\CampaignExecutionEvent
+     * @see Event\CampaignExecutionEvent
      *
      * @var string
      */
@@ -144,7 +144,7 @@ final class CustomItemEvents
     /**
      * The custom.item.on_custom_item_export event is fired when the custom item is being exported.
      *
-     * @see MauticPlugin\CustomObjectsBundle\Event\CustomItemExportSchedulerEvent
+     * @see Event\CustomItemExportSchedulerEvent
      *
      * @var string
      */
@@ -153,7 +153,7 @@ final class CustomItemEvents
     /**
      * The custom.item.custom_item_prepare_export_file event is fired when the custom item data is being prepared to be exported.
      *
-     * @see MauticPlugin\CustomObjectsBundle\Event\CustomItemExportSchedulerEvent
+     * @see Event\CustomItemExportSchedulerEvent
      *
      * @var string
      */

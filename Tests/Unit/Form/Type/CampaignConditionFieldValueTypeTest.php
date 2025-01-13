@@ -10,6 +10,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CampaignConditionFieldValueType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -19,7 +20,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormConfigBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CampaignConditionFieldValueTypeTest extends TestCase
 {
@@ -27,6 +28,11 @@ final class CampaignConditionFieldValueTypeTest extends TestCase
      * @var MockObject|CustomFieldModel
      */
     private $customFieldModelMock;
+
+    /**
+     * @var MockObject|CustomObjectModel
+     */
+    private $customObjectModelMock;
 
     /**
      * @var MockObject|CustomItemRouteProvider
@@ -48,10 +54,12 @@ final class CampaignConditionFieldValueTypeTest extends TestCase
         parent::setUp();
 
         $this->customFieldModelMock            = $this->createMock(CustomFieldModel::class);
+        $this->customObjectModelMock           = $this->createMock(CustomObjectModel::class);
         $this->customItemRouterMock            = $this->createMock(CustomItemRouteProvider::class);
         $this->translatorMock                  = $this->createMock(TranslatorInterface::class);
         $this->campaignConditionFieldValueType = new CampaignConditionFieldValueType(
             $this->customFieldModelMock,
+            $this->customObjectModelMock,
             $this->customItemRouterMock,
             $this->translatorMock
         );
@@ -80,6 +88,11 @@ final class CampaignConditionFieldValueTypeTest extends TestCase
 
         $customField->setTypeObject(new IntType($this->translatorMock, $filterOperatorProviderInterfaceMock));
         $customFields = [42 => $customField];
+        $this->customObjectModelMock
+            ->expects(self::once())
+            ->method('fetchEntity')
+            ->with($customObject->getId())
+            ->willReturn($customObject);
         $this->customFieldModelMock
             ->expects(self::once())
             ->method('fetchCustomFieldsForObject')
@@ -102,7 +115,7 @@ final class CampaignConditionFieldValueTypeTest extends TestCase
                             'class' => 'form-control',
                         ],
                         'choice_attr' => [
-                            42 => [
+                            'Cheese' => [
                                 'data-operators'  => '{"=":"a","!=":"b"}',
                                 'data-options'    => '[]',
                                 'data-field-type' => 'int',
@@ -139,8 +152,8 @@ final class CampaignConditionFieldValueTypeTest extends TestCase
                 ]
             );
         $options = [
-            'customObject' => $customObject,
-            'data'         => [
+            'customObjectId' => $customObject->getId(),
+            'data'           => [
                 'field' => 42,
             ],
         ];
@@ -160,7 +173,7 @@ final class CampaignConditionFieldValueTypeTest extends TestCase
         $resolver
             ->expects(self::once())
             ->method('setRequired')
-            ->with(['customObject']);
+            ->with(['customObjectId']);
 
         $this->campaignConditionFieldValueType->configureOptions($resolver);
     }

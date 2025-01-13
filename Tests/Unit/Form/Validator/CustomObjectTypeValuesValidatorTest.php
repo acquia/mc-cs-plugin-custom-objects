@@ -86,6 +86,10 @@ class CustomObjectTypeValuesValidatorTest extends \PHPUnit\Framework\TestCase
         $violationBuilder->expects($this->once())
             ->method('addViolation');
 
+        $this->constraint->method('__get')
+            ->with('missingMasterObject')
+            ->willReturn("Objects of type 'Relationship' must select a master object.");
+
         $this->context->expects($this->once())
             ->method('buildViolation')
             ->with($this->constraint->missingMasterObject)

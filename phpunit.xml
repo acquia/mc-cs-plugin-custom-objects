@@ -22,10 +22,13 @@
     </testsuites>
 
     <php>
-        <env name="KERNEL_CLASS" value="AppTestKernel" />
-        <server name="KERNEL_DIR" value="../../app" />
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak" />
-    </php>
+    <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/>
+    <env name="KERNEL_CLASS" value="AppTestKernel" />
+    <env name="APP_ENV" value="test" force="true"/>
+    <const name="IS_PHPUNIT" value="true"/>
+    <const name="MAUTIC_ENV" value="test"/>
+    <server name="APP_DEBUG" value="0"/>
+  </php>
 
     <filter>
         <whitelist>

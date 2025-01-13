@@ -4,23 +4,15 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
-use DateTimeInterface;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
 class CustomFieldValueDateTime extends AbstractCustomFieldValue
 {
-    /**
-     * @var DateTimeInterface|null
-     */
-    private $value;
-
-    public function __construct(CustomField $customField, CustomItem $customItem, ?DateTimeInterface $value = null)
+    public function __construct(CustomField $customField, CustomItem $customItem, private ?\DateTimeInterface $value = null)
     {
         parent::__construct($customField, $customItem);
-
-        $this->value = $value;
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -28,7 +20,7 @@ class CustomFieldValueDateTime extends AbstractCustomFieldValue
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('custom_field_value_datetime');
         $builder->addIndex(['value'], 'value_index');
-        $builder->addNullableField('value', Type::DATETIME);
+        $builder->addNullableField('value', Types::DATETIME_MUTABLE);
 
         parent::addReferenceColumns($builder);
     }
@@ -44,7 +36,7 @@ class CustomFieldValueDateTime extends AbstractCustomFieldValue
             return;
         }
 
-        if (!$value instanceof DateTimeInterface) {
+        if (!$value instanceof \DateTimeInterface) {
             $value = new \DateTimeImmutable($value);
         }
 

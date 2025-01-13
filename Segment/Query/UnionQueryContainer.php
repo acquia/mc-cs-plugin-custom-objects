@@ -17,29 +17,24 @@ class UnionQueryContainer implements \Iterator
     /**
      * @var SegmentQueryBuilder[]
      */
-    private $queries = [];
+    private array $queries = [];
 
     /**
-     * @var array
+     * @var mixed[]
      */
-    private $parameters = [];
+    private array $parameters = [];
 
     /**
-     * @var array
+     * @var mixed[]
      */
-    private $parameterTypes = [];
+    private array $parameterTypes = [];
 
-    /**
-     * @var int
-     */
-    private $position = 0;
+    private int $position = 0;
 
     /**
      * Whether parameters needs to be rebuild.
-     *
-     * @var bool
      */
-    private $needsRebuild = false;
+    private bool $needsRebuild = false;
 
     public function add(SegmentQueryBuilder $queryBuilder): void
     {

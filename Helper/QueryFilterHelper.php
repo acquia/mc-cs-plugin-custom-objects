@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Helper;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
-use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
+use Mautic\LeadBundle\Segment\RandomParameterName;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\UnionQueryContainer;
 
@@ -18,40 +18,20 @@ class QueryFilterHelper
 {
     use DbalQueryTrait;
 
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @var QueryFilterFactory
-     */
-    private $queryFilterFactory;
-
-    /**
-     * @var CustomFieldTypeProvider
-     */
-    private $fieldTypeProvider;
-
-    /**
-     * @var int
-     */
-    private $itemRelationLevelLimit;
-
     public function __construct(
-        EntityManager $entityManager,
-        QueryFilterFactory $queryFilterFactory
+        private EntityManager $entityManager,
+        private QueryFilterFactory $queryFilterFactory,
+        private RandomParameterName $randomParameterNameService
     ) {
-        $this->entityManager      = $entityManager;
-        $this->queryFilterFactory = $queryFilterFactory;
     }
 
     public function createValueQuery(
         string $alias,
-        ContactSegmentFilter $segmentFilter
+        ContactSegmentFilter $segmentFilter,
+        bool $filterAlreadyNegated = false
     ): UnionQueryContainer {
         $unionQueryContainer = $this->queryFilterFactory->createQuery($alias, $segmentFilter);
-        $this->addCustomFieldValueExpressionFromSegmentFilter($unionQueryContainer, $alias, $segmentFilter);
+        $this->addCustomFieldValueExpressionFromSegmentFilter($unionQueryContainer, $alias, $segmentFilter, $filterAlreadyNegated);
 
         return $unionQueryContainer;
     }
@@ -88,17 +68,27 @@ class QueryFilterHelper
     public function addCustomFieldValueExpressionFromSegmentFilter(
         UnionQueryContainer $unionQueryContainer,
         string $tableAlias,
-        ContactSegmentFilter $filter
+        ContactSegmentFilter $filter,
+        bool $filterAlreadyNegated = false
     ): void {
+        $filterValue = $filter->getParameterValue();
         foreach ($unionQueryContainer as $segmentQueryBuilder) {
-            $expression = $this->getCustomValueValueExpression($segmentQueryBuilder, $tableAlias, $filter->getOperator());
+            $valueParameter = $this->randomParameterNameService->generateRandomParameterName();
+            $expression     = $this->getCustomValueValueExpression(
+                $segmentQueryBuilder,
+                $tableAlias,
+                $filter,
+                $valueParameter,
+                $filterAlreadyNegated,
+                $filterValue
+            );
 
             $this->addOperatorExpression(
                 $segmentQueryBuilder,
-                $tableAlias,
                 $expression,
                 $filter->getOperator(),
-                $filter->getParameterValue()
+                $filterValue,
+                $valueParameter
             );
         }
     }
@@ -109,8 +99,9 @@ class QueryFilterHelper
         string $operator,
         ?string $value
     ): void {
-        $expression = $this->getCustomObjectNameExpression($queryBuilder, $tableAlias, $operator);
-        $this->addOperatorExpression($queryBuilder, $tableAlias, $expression, $operator, $value);
+        $valueParameter = $this->randomParameterNameService->generateRandomParameterName();
+        $expression     = $this->getCustomObjectNameExpression($queryBuilder, $tableAlias, $operator, $valueParameter);
+        $this->addOperatorExpression($queryBuilder, $expression, $operator, $value, $valueParameter);
     }
 
     /**
@@ -119,10 +110,10 @@ class QueryFilterHelper
      */
     private function addOperatorExpression(
         SegmentQueryBuilder $segmentQueryBuilder,
-        string $tableAlias,
         $expression,
         string $operator,
-        $value
+        $value,
+        string $valueParameter
     ): void {
         $valueType = null;
 
@@ -134,12 +125,11 @@ class QueryFilterHelper
             case 'notIn':
             case 'multiselect':
             case 'in':
-                $valueType      = Connection::PARAM_STR_ARRAY;
-                $valueParameter = $tableAlias.'_value_value';
-
+                $valueType      = ArrayParameterType::STRING;
+                $segmentQueryBuilder->setParameter($valueParameter, $value, $valueType);
                 break;
             default:
-                $valueParameter = $tableAlias.'_value_value';
+                $segmentQueryBuilder->setParameter($valueParameter, $value, $valueType);
         }
 
         switch ($operator) {
@@ -147,76 +137,108 @@ class QueryFilterHelper
                 break;
             default:
                 $segmentQueryBuilder->andWhere($expression);
-
                 break;
-        }
-
-        if (isset($valueParameter)) {
-            $segmentQueryBuilder->setParameter($valueParameter, $value, $valueType);
         }
     }
 
     /**
      * Form the logical expression needed to limit the CustomValue's value for given operator.
      *
+     * @param mixed $filterParameterValue
+     *
      * @return CompositeExpression|string
      */
-    private function getCustomValueValueExpression(SegmentQueryBuilder $customQuery, string $tableAlias, string $operator)
-    {
+    private function getCustomValueValueExpression(
+        SegmentQueryBuilder $customQuery,
+        string $tableAlias,
+        ContactSegmentFilter $filter,
+        string $valueParameter,
+        bool $alreadyNegated = false,
+        $filterParameterValue = null
+    ) {
+        $operator = $filter->getOperator();
+        if ($alreadyNegated) {
+            switch ($operator) {
+                case 'empty':
+                    $operator = 'notEmpty';
+                    break;
+                case 'neq':
+                    $operator = 'eq';
+                    break;
+                case '!between':
+                case 'notBetween':
+                    $operator = 'between';
+                    break;
+            }
+        }
+
         switch ($operator) {
             case 'empty':
                 $expression = $customQuery->expr()->orX(
                     $customQuery->expr()->isNull($tableAlias.'_value.value'),
-                    $customQuery->expr()->eq($tableAlias.'_value.value', $customQuery->expr()->literal(''))
                 );
-
+                if ($filter->doesColumnSupportEmptyValue()) {
+                    $expression->add(
+                        $customQuery->expr()->eq($tableAlias.'_value.value', $customQuery->expr()->literal(''))
+                    );
+                }
                 break;
             case 'notEmpty':
-                $expression = $customQuery->expr()->andX(
+                $expression = $customQuery->expr()->and(
                     $customQuery->expr()->isNotNull($tableAlias.'_value.value'),
-                    $customQuery->expr()->neq($tableAlias.'_value.value', $customQuery->expr()->literal(''))
                 );
+                if ($filter->doesColumnSupportEmptyValue()) {
+                    $expression->add(
+                        $customQuery->expr()->neq($tableAlias.'_value.value', $customQuery->expr()->literal(''))
+                    );
+                }
 
                 break;
             case 'notIn':
             case '!multiselect':
             case 'in':
             case 'multiselect':
-                $valueParameter = $tableAlias.'_value_value';
                 $expression     = $customQuery->expr()->in(
                     $tableAlias.'_value.value',
-                    ":${valueParameter}"
+                    ":{$valueParameter}"
                 );
 
                 break;
             case 'neq':
-                $valueParameter = $tableAlias.'_value_value';
-                $expression     = $customQuery->expr()->orX(
-                    $customQuery->expr()->neq($tableAlias.'_value.value', ":${valueParameter}"),
+                $expression     = $customQuery->expr()->or(
+                    $customQuery->expr()->neq($tableAlias.'_value.value', ":{$valueParameter}"),
                     $customQuery->expr()->isNull($tableAlias.'_value.value')
                 );
 
                 break;
             case 'contains':
-                $valueParameter = $tableAlias.'_value_value';
-
                 $expression = $customQuery->expr()->like($tableAlias.'_value.value', "%:{$valueParameter}%");
 
                 break;
             case 'notLike':
-                $valueParameter = $tableAlias.'_value_value';
-
-                $expression = $customQuery->expr()->orX(
+                $expression = $customQuery->expr()->or(
                     $customQuery->expr()->isNull($tableAlias.'_value.value'),
-                    $customQuery->expr()->like($tableAlias.'_value.value', ":${valueParameter}")
+                    $customQuery->expr()->like($tableAlias.'_value.value', ":{$valueParameter}")
                 );
 
                 break;
+            case 'between':
+            case 'notBetween':
+                if (is_array($filterParameterValue)) {
+                    $expression = $customQuery->expr()->{$operator}(
+                        $tableAlias.'_value.value',
+                        array_map(function (mixed $val) use ($customQuery): mixed {
+                            return is_numeric($val) && intval($val) === $val ?
+                                $val : $customQuery->expr()->literal($val);
+                        }, array_values($filterParameterValue))
+                    );
+                    break;
+                }
+                // no break
             default:
-                $valueParameter = $tableAlias.'_value_value';
                 $expression     = $customQuery->expr()->{$operator}(
                     $tableAlias.'_value.value',
-                    ":${valueParameter}"
+                    ":{$valueParameter}"
                 );
         }
 
@@ -228,58 +250,38 @@ class QueryFilterHelper
      *
      * @return CompositeExpression|string
      */
-    private function getCustomObjectNameExpression(SegmentQueryBuilder $customQuery, string $tableAlias, string $operator)
-    {
-        switch ($operator) {
-            case 'empty':
-                $expression = $customQuery->expr()->orX(
-                    $customQuery->expr()->isNull($tableAlias.'_item.name'),
-                    $customQuery->expr()->eq($tableAlias.'_item.name', $customQuery->expr()->literal(''))
-                );
-
-                break;
-            case 'notEmpty':
-                $expression = $customQuery->expr()->andX(
-                    $customQuery->expr()->isNotNull($tableAlias.'_item.name'),
-                    $customQuery->expr()->neq($tableAlias.'_item.name', $customQuery->expr()->literal(''))
-                );
-
-                break;
-            case 'notIn':
-            case 'in':
-                $valueParameter = $tableAlias.'_value_value';
-                $expression     = $customQuery->expr()->in(
-                    $tableAlias.'_item.name',
-                    ":${valueParameter}"
-                );
-
-                break;
-            case 'neq':
-                $valueParameter = $tableAlias.'_value_value';
-                $expression     = $customQuery->expr()->orX(
-                    $customQuery->expr()->eq($tableAlias.'_item.name', ":${valueParameter}"),
-                    $customQuery->expr()->isNull($tableAlias.'_item.name')
-                );
-
-                break;
-            case 'notLike':
-                $valueParameter = $tableAlias.'_value_value';
-
-                $expression = $customQuery->expr()->orX(
-                    $customQuery->expr()->isNull($tableAlias.'_item.name'),
-                    $customQuery->expr()->like($tableAlias.'_item.name', ":${valueParameter}")
-                );
-
-                break;
-            default:
-                $valueParameter = $tableAlias.'_value_value';
-                $expression     = $customQuery->expr()->{$operator}(
-                    $tableAlias.'_item.name',
-                    ":${valueParameter}"
-                );
-        }
-
-        return $expression;
+    private function getCustomObjectNameExpression(
+        SegmentQueryBuilder $customQuery,
+        string $tableAlias,
+        string $operator,
+        string $valueParameter
+    ) {
+        return match ($operator) {
+            'empty' => $customQuery->expr()->or(
+                $customQuery->expr()->isNull($tableAlias.'_item.name'),
+                $customQuery->expr()->eq($tableAlias.'_item.name', $customQuery->expr()->literal(''))
+            ),
+            'notEmpty' => $customQuery->expr()->and(
+                $customQuery->expr()->isNotNull($tableAlias.'_item.name'),
+                $customQuery->expr()->neq($tableAlias.'_item.name', $customQuery->expr()->literal(''))
+            ),
+            'notIn', 'in' => $customQuery->expr()->in(
+                $tableAlias.'_item.name',
+                ":{$valueParameter}"
+            ),
+            'neq' => $customQuery->expr()->orX(
+                $customQuery->expr()->eq($tableAlias.'_item.name', ':'.$valueParameter),
+                $customQuery->expr()->isNull($tableAlias.'_item.name')
+            ),
+            'notLike' => $customQuery->expr()->or(
+                $customQuery->expr()->isNull($tableAlias.'_item.name'),
+                $customQuery->expr()->like($tableAlias.'_item.name', ":{$valueParameter}")
+            ),
+            default => $customQuery->expr()->{$operator}(
+                $tableAlias.'_item.name',
+                ":{$valueParameter}"
+            ),
+        };
     }
 
     /**
@@ -312,5 +314,131 @@ class QueryFilterHelper
             );
 
         return $customFieldQueryBuilder;
+    }
+
+    public function createMergeFilterQuery(
+        ContactSegmentFilter $segmentFilter,
+        string $leadsTableAlias
+    ): SegmentQueryBuilder {
+        $customItemXrefContactAlias = 'cix';
+        $qb                         = new SegmentQueryBuilder($this->entityManager->getConnection());
+        $qb->select('1')
+           ->from(MAUTIC_TABLE_PREFIX.'custom_item_xref_contact', $customItemXrefContactAlias)
+           ->where($qb->expr()->eq($customItemXrefContactAlias.'.contact_id', $leadsTableAlias.'.id'));
+
+        $joinedAlias = [];
+
+        foreach ($segmentFilter->contactSegmentFilterCrate->getMergedProperty() as $filter) {
+            $segmentFilterFieldId       = (int) $filter['field'];
+            $segmentFilterFieldType     = $filter['type'] ?: $this->queryFilterFactory
+                ->getCustomFieldTypeById($segmentFilterFieldId);
+            $dataTable                  = $this->queryFilterFactory->getTableNameFromType($segmentFilterFieldType);
+            $segmentMergedFilter        = $segmentFilter;
+            $segmentFilterFieldOperator = (string) $filter['operator'];
+
+            $alias                      = $customItemXrefContactAlias.'_'.$segmentFilterFieldId.'_'.$filter['type'];
+            $aliasValue                 = $alias.'_value';
+            $isCmoFilter                = $filter['cmo_filter'] ?? false;
+            $cinAlias                   = 'cin_'.$segmentFilterFieldId;
+            $cinAliasItem               = $cinAlias.'_item';
+            $valueParameter             = $this->randomParameterNameService->generateRandomParameterName();
+
+            if ($isCmoFilter && !in_array($cinAliasItem, $joinedAlias, true)) {
+                $this->joinMergeCustomItem($qb, $customItemXrefContactAlias, $cinAliasItem, $segmentFilterFieldId);
+                $joinedAlias[] = $cinAliasItem;
+            } elseif (!in_array($aliasValue, $joinedAlias, true)) {
+                $this->joinMergeCustomField(
+                    $qb,
+                    $customItemXrefContactAlias,
+                    $dataTable,
+                    $aliasValue,
+                    $segmentFilterFieldId
+                );
+                $joinedAlias[] = $aliasValue;
+            }
+
+            $this->addOperatorExpression(
+                $qb,
+                $this->getMergeExpression(
+                    $isCmoFilter,
+                    $qb,
+                    $cinAlias,
+                    $alias,
+                    $segmentMergedFilter,
+                    $valueParameter
+                ),
+                $segmentFilterFieldOperator,
+                $filter['filter_value'],
+                $valueParameter
+            );
+        }
+
+        return $qb;
+    }
+
+    private function joinMergeCustomItem(
+        SegmentQueryBuilder $qb,
+        string $customItemXrefContactAlias,
+        string $cinAliasItem,
+        int $segmentFilterFieldId
+    ): void {
+        $qb->leftJoin(
+            $customItemXrefContactAlias,
+            MAUTIC_TABLE_PREFIX.'custom_item',
+            $cinAliasItem,
+            "$customItemXrefContactAlias.custom_item_id = $cinAliasItem.id"
+        );
+        $qb->andWhere($qb->expr()->eq($cinAliasItem.'.custom_object_id', $segmentFilterFieldId));
+    }
+
+    private function joinMergeCustomField(
+        SegmentQueryBuilder $qb,
+        string $customItemXrefContactAlias,
+        string $dataTable,
+        string $aliasValue,
+        int $segmentFilterFieldId
+    ): void {
+        $qb->innerJoin(
+            $customItemXrefContactAlias,
+            MAUTIC_TABLE_PREFIX.$dataTable,
+            $aliasValue,
+            "$aliasValue.custom_item_id = $customItemXrefContactAlias.custom_item_id AND "
+            ."$aliasValue.custom_field_id = $segmentFilterFieldId"
+        );
+    }
+
+    /**
+     * @phpstan-ignore-next-line
+     *
+     * @return CompositeExpression|string
+     */
+    private function getMergeExpression(
+        bool $isCmoFilter,
+        SegmentQueryBuilder $qb,
+        string $cinAlias,
+        string $alias,
+        ContactSegmentFilter $filter,
+        string $valueParameter
+    ) {
+        $segmentFilterFieldOperator = $filter->getOperator();
+        if ($isCmoFilter) {
+            $expression = $this->getCustomObjectNameExpression(
+                $qb,
+                $cinAlias,
+                $segmentFilterFieldOperator,
+                $valueParameter
+            );
+        } else {
+            $expression = $this->getCustomValueValueExpression(
+                $qb,
+                $alias,
+                $filter,
+                $valueParameter,
+                false,
+                $filter->getParameterValue()
+            );
+        }
+
+        return $expression;
     }
 }

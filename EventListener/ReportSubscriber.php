@@ -18,7 +18,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Report\ReportColumnsBuilder;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportSubscriber implements EventSubscriberInterface
 {
@@ -35,43 +35,15 @@ class ReportSubscriber implements EventSubscriberInterface
     public const USERS_TABLE_ALIAS                        = 'u';
     public const COMPANIES_TABLE_ALIAS                    = 'comp';
 
-    /**
-     * @var ArrayCollection
-     */
-    private $customObjects;
+    private ?ArrayCollection $customObjects = null;
 
-    /**
-     * @var CustomObjectRepository
-     */
-    private $customObjectRepository;
-
-    /**
-     * @var FieldsBuilder
-     */
-    private $fieldsBuilder;
-
-    /**
-     * @var CompanyReportData
-     */
-    private $companyReportData;
-
-    /**
-     * @var ReportHelper
-     */
-    private $reportHelper;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    public function __construct(CustomObjectRepository $customObjectRepository, FieldsBuilder $fieldsBuilder, CompanyReportData $companyReportData, ReportHelper $reportHelper, TranslatorInterface $translator)
-    {
-        $this->customObjectRepository = $customObjectRepository;
-        $this->fieldsBuilder          = $fieldsBuilder;
-        $this->companyReportData      = $companyReportData;
-        $this->reportHelper           = $reportHelper;
-        $this->translator             = $translator;
+    public function __construct(
+        private CustomObjectRepository $customObjectRepository,
+        private FieldsBuilder $fieldsBuilder,
+        private CompanyReportData $companyReportData,
+        private ReportHelper $reportHelper,
+        private TranslatorInterface $translator
+    ) {
     }
 
     private function getCustomObjects(): ArrayCollection
@@ -90,10 +62,8 @@ class ReportSubscriber implements EventSubscriberInterface
         foreach ($parentCustomObjects as $parentCustomObject) {
             $this->customObjects->add($parentCustomObject);
             $childCustomObject = $allCustomObjects->filter(function (CustomObject $childCustomObject) use ($parentCustomObject): bool {
-                return $childCustomObject->getMasterObject() ?
-                    $parentCustomObject->getId() === $childCustomObject->getMasterObject()->getId()
-                    :
-                    false;
+                return $childCustomObject->getMasterObject() && $parentCustomObject->getId()
+                    === $childCustomObject->getMasterObject()->getId();
             })->first();
 
             if (!$childCustomObject) {
@@ -133,13 +103,16 @@ class ReportSubscriber implements EventSubscriberInterface
     private function getContexts(): array
     {
         return $this->getCustomObjects()
-            ->map(function (CustomObject $customObject) {
+            ->map(function (CustomObject $customObject): string {
                 return $this->getContext($customObject);
             })
             ->toArray();
     }
 
-    private function getStandardColumns(string $prefix)
+    /**
+     * @return mixed[]
+     */
+    private function getStandardColumns(string $prefix): array
     {
         return $this->reportHelper->getStandardColumns($prefix, ['description', 'publish_up', 'publish_down']);
     }
@@ -148,7 +121,7 @@ class ReportSubscriber implements EventSubscriberInterface
     {
         foreach ($columns as $alias => $column) {
             $columnLabel = $this->translator->trans($columns[$alias]['label']);
-            if (0 === strpos($columnLabel, $prefix)) {
+            if (str_starts_with($columnLabel, $prefix)) {
                 $columns[$alias]['label'] = $columnLabel;
                 // Don't add the prefix twice
                 continue;

@@ -42,12 +42,26 @@ class IntType extends AbstractCustomFieldType
     }
 
     /**
+     * Remove operators that are supported only by segment filters.
+     *
+     * @return string[]
+     */
+    public function getOperatorOptions(): array
+    {
+        $options = parent::getOperatorOptions();
+
+        unset($options['between'], $options['!between']);
+
+        return $options;
+    }
+
+    /**
      * @return mixed[]
      */
     public function getOperators(): array
     {
         $allOperators     = parent::getOperators();
-        $allowedOperators = array_flip(['=', '!=', 'gt', 'gte', 'lt', 'lte', 'empty', '!empty']);
+        $allowedOperators = array_flip(['=', '!=', 'gt', 'gte', 'lt', 'lte', 'empty', '!empty', 'between', '!between']);
 
         return array_intersect_key($allOperators, $allowedOperators);
     }

@@ -12,14 +12,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CustomObjectPostSaveSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    public function __construct(CustomObjectModel $customObjectModel)
+    public function __construct(private CustomObjectModel $customObjectModel)
     {
-        $this->customObjectModel = $customObjectModel;
     }
 
     public static function getSubscribedEvents()

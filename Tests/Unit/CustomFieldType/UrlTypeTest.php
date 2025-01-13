@@ -7,7 +7,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\CustomFieldType;
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\UrlType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UrlTypeTest extends \PHPUnit\Framework\TestCase
 {

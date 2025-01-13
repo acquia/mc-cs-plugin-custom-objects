@@ -6,6 +6,12 @@ You'll be able to
 - filter Segments by values in the Custom Objects
 - create Campaign conditions based on the values in the Custom Objects
 
+## Workflow Update
+
+Until Github Actions' CI/CD are in place, we request to developers to:
+1. Merge their unreviewed and unapproved PRs to `development` branch.
+2. Merge their reviewed and approved PRs to `beta` branch.
+
 ## Glossary
 
 - `Custom Field` represents one piece of information. Example: Price, Description, Color
@@ -47,6 +53,21 @@ See [Wiki](https://github.com/acquia/mc-cs-plugin-custom-objects/wiki)
 ## Tests
 
 The plugin has currently test coverage of 91%. Each new PR must be covered by tests to be considered to be merged. To run the tests execute `composer test -- --filter CustomObjects` from the Mautic root dir.
+
+## Static Analysis
+
+PHPSTAN is used for static analysis. Here is how to run it locally from the Mautic's root dir:
+```
+bin/phpstan --configuration=plugins/CustomObjectsBundle/phpstan.neon
+```
+
+This plugin has its own PHPSTAN configuration because there is too big tech debt pile already and so it must have its own PHPSTAN baseline file.
+
+The tech debt is visible in the phpstan-baseline.neon file and can be regenerated with:
+```
+bin/phpstan --configuration=plugins/CustomObjectsBundle/phpstan.neon --generate-baseline=plugins/CustomObjectsBundle/phpstan-baseline.neon && sed -i 's/plugins\/CustomObjectsBundle\//g' plugins/CustomObjectsBundle/phpstan-neon.php
+```
+Please do not add more tech debt on this pile. Fix all the new PHPSTAN errors and possibly some old ones with your code changes.
 
 ## License
 

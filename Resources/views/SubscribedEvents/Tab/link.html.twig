@@ -1,0 +1,11 @@
+<li>
+    <a href="#{{ tabId }}-container" role="tab" data-toggle="tab" id="{{ tabId }}">
+        {% if count is defined %}
+            <span class="label label-primary mr-sm" id="{{ tabId }}-count">
+                {{ count }}
+            </span>
+        {% endif %}
+
+        {{ title|trans }}
+    </a>
+</li>

@@ -4,14 +4,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Exception;
 
-use Exception;
-
-class InUseException extends Exception
+class InUseException extends \Exception
 {
-    /**
-     * @var array
-     */
-    private $segmentList = [];
+    private array $segmentList = [];
 
     public function setSegmentList(array $segmentList): void
     {

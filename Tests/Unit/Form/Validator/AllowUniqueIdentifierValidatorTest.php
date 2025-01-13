@@ -4,9 +4,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Form\Validator;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Form\Validator\Constraints\AllowUniqueIdentifier;
 use MauticPlugin\CustomObjectsBundle\Form\Validator\Constraints\AllowUniqueIdentifierValidator;
-use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -105,6 +103,10 @@ class AllowUniqueIdentifierValidatorTest extends TestCase
             ->method('addViolation');
 
         /** @phpstan-ignore-next-line */
+        $this->constraint->method('__get')
+            ->with('message')
+            ->willReturn('custom.field.allow.unique_identifier.invalid');
+
         $message = $this->constraint->message;
         $this->context->expects($this->once())
             ->method('buildViolation')

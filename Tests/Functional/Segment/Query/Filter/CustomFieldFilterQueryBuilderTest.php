@@ -6,6 +6,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Segment\Query\Filter
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
+use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterFactory;
@@ -23,6 +24,12 @@ class CustomFieldFilterQueryBuilderTest extends MauticMysqlTestCase
 {
     use FixtureObjectsTrait;
     use DbalQueryTrait;
+
+    protected function setUp(): void
+    {
+        $this->configParams['custom_object_merge_filter'] = false;
+        parent::setUp();
+    }
 
     public function testApplyQuery(): void
     {
@@ -54,7 +61,8 @@ class CustomFieldFilterQueryBuilderTest extends MauticMysqlTestCase
                 $customFieldRepository,
                 new QueryFilterFactory\Calculator(),
                 1
-            )
+            ),
+            new RandomParameterName()
         );
         $queryBuilderService = new CustomFieldFilterQueryBuilder(
             new RandomParameterName(),
@@ -91,12 +99,13 @@ class CustomFieldFilterQueryBuilderTest extends MauticMysqlTestCase
         $filterMock = $this->getMockBuilder(ContactSegmentFilter::class)
             ->disableOriginalConstructor()
             ->getMock();
-
+        $filterMock->contactSegmentFilterCrate = $this->createMock(ContactSegmentFilterCrate::class);
         $filterMock->method('getType')->willReturn($type);
         $filterMock->method('getOperator')->willReturn($operator);
         $filterMock->method('getField')->willReturn((string) $this->getFixtureById($fixtureField)->getId());
         $filterMock->method('getParameterValue')->willReturn($value);
         $filterMock->method('getParameterHolder')->willReturn((string) ':needle');
+        $filterMock->method('getGlue')->willReturn($operator);
 
         return $filterMock;
     }

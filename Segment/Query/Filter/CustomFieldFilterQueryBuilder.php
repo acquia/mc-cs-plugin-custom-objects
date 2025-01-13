@@ -14,23 +14,16 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
 {
-    /**
-     * @var QueryFilterHelper
-     */
-    private $filterHelper;
-
     public function __construct(
         RandomParameterName $randomParameterNameService,
         EventDispatcherInterface $dispatcher,
-        QueryFilterHelper $filterHelper
+        private QueryFilterHelper $filterHelper
     ) {
         parent::__construct($randomParameterNameService, $dispatcher);
-
-        $this->filterHelper  = $filterHelper;
     }
 
     /** {@inheritdoc} */
-    public static function getServiceId()
+    public static function getServiceId(): string
     {
         return 'mautic.lead.query.builder.custom_field.value';
     }
@@ -45,10 +38,7 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $tableAlias = 'cfwq_'.(int) $filter->getField();
 
-        $unionQueryContainer = $this->filterHelper->createValueQuery(
-            $tableAlias,
-            $filter
-        );
+        $unionQueryContainer = $this->filterHelper->createValueQuery($tableAlias, $filter, true);
 
         foreach ($unionQueryContainer as $segmentQueryBuilder) {
             $segmentQueryBuilder->andWhere(
@@ -56,23 +46,16 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
             );
         }
 
-        switch ($filterOperator) {
-            case 'empty':
-            case 'neq':
-            case 'notLike':
-            case '!multiselect':
-                $queryBuilder->addLogic(
-                    $queryBuilder->expr()->notExists($unionQueryContainer->getSQL()),
-                    $filter->getGlue()
-                );
-
-                break;
-            default:
-                $queryBuilder->addLogic(
-                    $queryBuilder->expr()->exists($unionQueryContainer->getSQL()),
-                    $filter->getGlue()
-                );
-        }
+        match ($filterOperator) {
+            'empty', 'neq', 'notLike', '!multiselect', '!between', 'notBetween' => $queryBuilder->addLogic(
+                $queryBuilder->expr()->notExists($unionQueryContainer->getSQL()),
+                $filter->getGlue()
+            ),
+            default => $queryBuilder->addLogic(
+                $queryBuilder->expr()->exists($unionQueryContainer->getSQL()),
+                $filter->getGlue()
+            ),
+        };
 
         $queryBuilder->setParameters($unionQueryContainer->getParameters(), $unionQueryContainer->getParameterTypes());
 

@@ -11,14 +11,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SegmentFilterDecoratorDelegateSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var MultiselectDecorator
-     */
-    private $multiselectDecorator;
-
-    public function __construct(MultiselectDecorator $multiselectDecorator)
+    public function __construct(private MultiselectDecorator $multiselectDecorator)
     {
-        $this->multiselectDecorator = $multiselectDecorator;
     }
 
     /**

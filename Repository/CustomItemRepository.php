@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Repository;
 
 use Doctrine\ORM\QueryBuilder;
-use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 
-class CustomItemRepository extends CommonRepository
+class CustomItemRepository extends CustomCommonRepository
 {
     use DbalQueryTrait;
 
@@ -90,6 +89,7 @@ class CustomItemRepository extends CommonRepository
         $queryBuilder->where(CustomItem::TABLE_ALIAS.'.customObject = :customObjectId');
         $queryBuilder->setParameter('customObjectId', $customObjectId);
         $queryBuilder->setMaxResults(1);
+
         return (int) $queryBuilder->getQuery()->getSingleScalarResult();
     }
 

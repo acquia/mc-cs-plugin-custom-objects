@@ -9,10 +9,7 @@ use Mautic\IntegrationsBundle\Migration\AbstractMigration;
 
 class Version_0_0_3 extends AbstractMigration
 {
-    /**
-     * @var string
-     */
-    private $table = 'custom_field_option';
+    private string $table = 'custom_field_option';
 
     /**
      * {@inheritdoc}

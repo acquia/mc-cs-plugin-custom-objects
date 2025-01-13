@@ -6,7 +6,7 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
-use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
+use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
@@ -14,47 +14,17 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomObjectButtonSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CustomObjectPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var CustomObjectRouteProvider
-     */
-    private $routeProvider;
-
-    /**
-     * @var CustomItemPermissionProvider
-     */
-    private $customItemPermissionProvider;
-
-    /**
-     * @var CustomItemRouteProvider
-     */
-    private $customItemRouteProvider;
-
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
     public function __construct(
-        CustomObjectPermissionProvider $permissionProvider,
-        CustomObjectRouteProvider $routeProvider,
-        CustomItemPermissionProvider $customItemPermissionProvider,
-        CustomItemRouteProvider $customItemRouteProvider,
-        TranslatorInterface $translator
+        private CustomObjectPermissionProvider $permissionProvider,
+        private CustomObjectRouteProvider $routeProvider,
+        private CustomItemPermissionProvider $customItemPermissionProvider,
+        private CustomItemRouteProvider $customItemRouteProvider,
+        private TranslatorInterface $translator
     ) {
-        $this->permissionProvider           = $permissionProvider;
-        $this->routeProvider                = $routeProvider;
-        $this->customItemPermissionProvider = $customItemPermissionProvider;
-        $this->customItemRouteProvider      = $customItemRouteProvider;
-        $this->translator                   = $translator;
     }
 
     /**
@@ -75,7 +45,7 @@ class CustomObjectButtonSubscriber implements EventSubscriberInterface
 
                 try {
                     $event->addButton($this->defineNewButton(), ButtonHelper::LOCATION_PAGE_ACTIONS, $event->getRoute());
-                } catch (ForbiddenException $e) {
+                } catch (ForbiddenException) {
                 }
 
                 break;
@@ -89,12 +59,12 @@ class CustomObjectButtonSubscriber implements EventSubscriberInterface
                 if ($customObject) {
                     try {
                         $event->addButton($this->defineViewCustomItemsButton($customObject), ButtonHelper::LOCATION_PAGE_ACTIONS, $event->getRoute());
-                    } catch (ForbiddenException $e) {
+                    } catch (ForbiddenException) {
                     }
 
                     try {
                         $event->addButton($this->defineCreateNewCustomItemButton($customObject), ButtonHelper::LOCATION_PAGE_ACTIONS, $event->getRoute());
-                    } catch (ForbiddenException $e) {
+                    } catch (ForbiddenException) {
                     }
                 }
 
@@ -108,17 +78,17 @@ class CustomObjectButtonSubscriber implements EventSubscriberInterface
         if ($entity && $entity instanceof CustomObject) {
             try {
                 $event->addButton($this->defineDeleteButton($entity), $location, $event->getRoute());
-            } catch (ForbiddenException $e) {
+            } catch (ForbiddenException) {
             }
 
             try {
                 $event->addButton($this->defineCloneButton($entity), $location, $event->getRoute());
-            } catch (ForbiddenException $e) {
+            } catch (ForbiddenException) {
             }
 
             try {
                 $event->addButton($this->defineEditButton($entity), $location, $event->getRoute());
-            } catch (ForbiddenException $e) {
+            } catch (ForbiddenException) {
             }
         }
     }

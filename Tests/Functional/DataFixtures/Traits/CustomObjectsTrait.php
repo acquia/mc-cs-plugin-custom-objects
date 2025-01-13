@@ -65,6 +65,7 @@ trait CustomObjectsTrait
 
         /** @var CustomItemModel $customItemModel */
         $customItemModel = $container->get('mautic.custom.model.item');
+
         return $customItemModel->save($customItem);
     }
 

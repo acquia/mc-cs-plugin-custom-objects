@@ -12,29 +12,19 @@ class Calculator
     private const COLUMN_SUFFIX_LOWER  = 'lower';
     private const COLUMN_SUFFIX_HIGHER = 'higher';
 
-    /**
-     * @var int
-     */
-    private $level;
+    private ?int $level = null;
 
     /**
      * Matrix ciphers - joins per query.
-     *
-     * @var int
      */
-    private $cipherCount;
+    private ?int $cipherCount = null;
 
     /**
      * Number of union queries to be generated.
-     *
-     * @var int
      */
-    private $totalQueryCountPerLevel;
+    private float|int|null $totalQueryCountPerLevel = null;
 
-    /**
-     * @var string
-     */
-    private $matrix;
+    private ?string $matrix = null;
 
     /**
      * Reset counter with new level.

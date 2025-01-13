@@ -21,16 +21,6 @@ use Symfony\Component\Serializer\SerializerInterface;
 final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface, SerializerAwareInterface
 {
     /**
-     * @var CustomFieldTypeProvider
-     */
-    private $customFieldTypeProvider;
-
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
      * @var NormalizerInterface
      */
     private $decorated;
@@ -40,22 +30,19 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
      */
     private $iriConverter;
 
-    /**
-     * @var EntityManager
-     */
-    private $em;
-
-    public function __construct(NormalizerInterface $decorated, CustomFieldTypeProvider $customFieldTypeProvider, CustomItemModel $customItemModel, IriConverterInterface $iriConverter, EntityManager $em)
+    public function __construct(
+        NormalizerInterface $decorated,
+        private CustomFieldTypeProvider $customFieldTypeProvider,
+        private CustomItemModel $customItemModel,
+        IriConverterInterface $iriConverter,
+        private EntityManager $em)
     {
         if (!$decorated instanceof DenormalizerInterface) {
             throw new InvalidArgumentException(sprintf('The decorated normalizer must implement the %s.', DenormalizerInterface::class));
         }
 
         $this->decorated               = $decorated;
-        $this->customFieldTypeProvider = $customFieldTypeProvider;
-        $this->customItemModel         = $customItemModel;
         $this->iriConverter            = $iriConverter;
-        $this->em                      = $em;
     }
 
     public function supportsNormalization($data, $format = null)
@@ -98,7 +85,7 @@ final class ApiNormalizer implements NormalizerInterface, DenormalizerInterface,
         return $this->decorated->denormalize($data, $class, $format, $context);
     }
 
-    public function setSerializer(SerializerInterface $serializer)
+    public function setSerializer(SerializerInterface $serializer): void
     {
         if ($this->decorated instanceof SerializerAwareInterface) {
             $this->decorated->setSerializer($serializer);

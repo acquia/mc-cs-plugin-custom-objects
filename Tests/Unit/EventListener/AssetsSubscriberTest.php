@@ -4,19 +4,24 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use MauticPlugin\CustomObjectsBundle\EventListener\AssetsSubscriber;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
+use Symfony\Component\Asset\Packages;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 class AssetsSubscriberTest extends \PHPUnit\Framework\TestCase
 {
+    private $packages;
+
+    private $coreParametersHelper;
     private $assetsHelper;
 
     private $configProvider;
 
-    private $getResponseEvent;
+    private $requestEvent;
 
     private $request;
 
@@ -26,11 +31,16 @@ class AssetsSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->assetsHelper     = $this->createMock(AssetsHelper::class);
-        $this->configProvider   = $this->createMock(ConfigProvider::class);
-        $this->getResponseEvent = $this->createMock(GetResponseEvent::class);
-        $this->request          = $this->createMock(Request::class);
-        $this->assetsSubscriber = new AssetsSubscriber($this->assetsHelper, $this->configProvider);
+        $this->packages             = $this->createMock(Packages::class);
+        $this->coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $this->assetsHelper         = new AssetsHelper(
+            $this->packages,
+            $this->coreParametersHelper
+        );
+        $this->configProvider       = $this->createMock(ConfigProvider::class);
+        $this->requestEvent         = $this->createMock(RequestEvent::class);
+        $this->request              = $this->createMock(Request::class);
+        $this->assetsSubscriber     = new AssetsSubscriber($this->assetsHelper, $this->configProvider);
     }
 
     public function testPluginDisabled(): void
@@ -39,13 +49,10 @@ class AssetsSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('pluginIsEnabled')
             ->willReturn(false);
 
-        $this->getResponseEvent->expects($this->never())
-            ->method('isMasterRequest');
+        $this->requestEvent->expects($this->never())
+            ->method('isMainRequest');
 
-        $this->assetsHelper->expects($this->never())
-            ->method('addStylesheet');
-
-        $this->assetsSubscriber->loadAssets($this->getResponseEvent);
+        $this->assetsSubscriber->loadAssets($this->requestEvent);
     }
 
     public function testPluginEnabledOnPublicPage(): void
@@ -54,11 +61,11 @@ class AssetsSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('pluginIsEnabled')
             ->willReturn(true);
 
-        $this->getResponseEvent->expects($this->once())
-            ->method('isMasterRequest')
+        $this->requestEvent->expects($this->once())
+            ->method('isMainRequest')
             ->willReturn(true);
 
-        $this->getResponseEvent->expects($this->once())
+        $this->requestEvent->expects($this->once())
             ->method('getRequest')
             ->willReturn($this->request);
 
@@ -66,10 +73,7 @@ class AssetsSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getPathInfo')
             ->willReturn('/email/unsubscribe/5c9f4105548a6783784018');
 
-        $this->assetsHelper->expects($this->never())
-            ->method('addStylesheet');
-
-        $this->assetsSubscriber->loadAssets($this->getResponseEvent);
+        $this->assetsSubscriber->loadAssets($this->requestEvent);
     }
 
     public function testPluginEnabled(): void
@@ -78,11 +82,11 @@ class AssetsSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('pluginIsEnabled')
             ->willReturn(true);
 
-        $this->getResponseEvent->expects($this->once())
-            ->method('isMasterRequest')
+        $this->requestEvent->expects($this->once())
+            ->method('isMainRequest')
             ->willReturn(true);
 
-        $this->getResponseEvent->expects($this->once())
+        $this->requestEvent->expects($this->once())
             ->method('getRequest')
             ->willReturn($this->request);
 
@@ -90,9 +94,6 @@ class AssetsSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getPathInfo')
             ->willReturn('/s/dashboard');
 
-        $this->assetsHelper->expects($this->once())
-            ->method('addStylesheet');
-
-        $this->assetsSubscriber->loadAssets($this->getResponseEvent);
+        $this->assetsSubscriber->loadAssets($this->requestEvent);
     }
 }

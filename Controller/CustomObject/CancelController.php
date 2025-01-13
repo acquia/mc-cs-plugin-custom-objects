@@ -12,45 +12,24 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CancelController extends CommonController
 {
-    /**
-     * @var SessionProviderFactory
-     */
-    private $sessionProviderFactory;
-
-    /**
-     * @var CustomObjectRouteProvider
-     */
-    private $routeProvider;
-
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    public function __construct(
+    public function cancelAction(
         SessionProviderFactory $sessionProviderFactory,
         CustomObjectRouteProvider $routeProvider,
-        CustomObjectModel $customObjectModel
-    ) {
-        $this->sessionProviderFactory = $sessionProviderFactory;
-        $this->routeProvider          = $routeProvider;
-        $this->customObjectModel      = $customObjectModel;
-    }
-
-    public function cancelAction(?int $objectId): Response
-    {
-        $page = $this->sessionProviderFactory->createObjectProvider()->getPage();
+        CustomObjectModel $customObjectModel,
+        ?int $objectId
+    ): Response {
+        $page = $sessionProviderFactory->createObjectProvider()->getPage();
 
         if ($objectId) {
-            $customObject = $this->customObjectModel->fetchEntity($objectId);
-            $this->customObjectModel->unlockEntity($customObject);
+            $customObject = $customObjectModel->fetchEntity($objectId);
+            $customObjectModel->unlockEntity($customObject);
         }
 
         return $this->postActionRedirect(
             [
-                'returnUrl'       => $this->routeProvider->buildListRoute($page),
+                'returnUrl'       => $routeProvider->buildListRoute($page),
                 'viewParameters'  => ['page' => $page],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObject\List:list',
+                'contentTemplate' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomObject\ListController:listAction',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
                 ],

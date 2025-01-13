@@ -11,14 +11,8 @@ use MauticPlugin\CustomObjectsBundle\Security\Permissions\CustomObjectPermission
 
 class CustomItemPermissionProvider
 {
-    /**
-     * @var CorePermissions
-     */
-    private $corePermissions;
-
-    public function __construct(CorePermissions $corePermissions)
+    public function __construct(private CorePermissions $corePermissions)
     {
-        $this->corePermissions = $corePermissions;
     }
 
     /**

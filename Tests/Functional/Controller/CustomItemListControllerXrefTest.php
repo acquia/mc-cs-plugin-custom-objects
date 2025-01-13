@@ -67,7 +67,7 @@ class CustomItemListControllerXrefTest extends MauticMysqlTestCase
         $uri     = sprintf('/s/custom/object/%s/item?filterEntityId=%s&filterEntityType=%s&lookup=%d', $customObject->getId(), $filterEntityId, $entityType, $lookup);
         $crawler = $this->client->request(Request::METHOD_GET, $uri);
 
-        $tableCrawler = $crawler->filter('table');
+        $tableCrawler = $crawler->filter('div[id*="custom-item-"] table');
         Assert::assertSame(1, $tableCrawler->count());
 
         $rowCrawler = $tableCrawler->filterXPath('.//tbody/tr');

@@ -10,6 +10,7 @@ use Mautic\LeadBundle\Event\ImportMappingEvent;
 use Mautic\LeadBundle\Event\ImportProcessEvent;
 use Mautic\LeadBundle\Event\ImportValidateEvent;
 use Mautic\LeadBundle\LeadEvents;
+use MauticPlugin\CustomObjectsBundle\DTO\ImportLogDTO;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
@@ -20,56 +21,20 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormError;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ImportSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    /**
-     * @var CustomItemImportModel
-     */
-    private $customItemImportModel;
-
-    /**
-     * @var ConfigProvider
-     */
-    private $configProvider;
-
-    /**
-     * @var CustomItemPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var CustomFieldRepository
-     */
-    private $customFieldRepository;
-
     public function __construct(
-        CustomObjectModel $customObjectModel,
-        CustomItemImportModel $customItemImportModel,
-        ConfigProvider $configProvider,
-        CustomItemPermissionProvider $permissionProvider,
-        CustomFieldRepository $customFieldRepository,
-        TranslatorInterface $translator
+        private CustomObjectModel $customObjectModel,
+        private CustomItemImportModel $customItemImportModel,
+        private ConfigProvider $configProvider,
+        private CustomItemPermissionProvider $permissionProvider,
+        private CustomFieldRepository $customFieldRepository,
+        private TranslatorInterface $translator
     ) {
-        $this->customObjectModel     = $customObjectModel;
-        $this->customItemImportModel = $customItemImportModel;
-        $this->configProvider        = $configProvider;
-        $this->permissionProvider    = $permissionProvider;
-        $this->customFieldRepository = $customFieldRepository;
-        $this->translator            = $translator;
     }
 
     /**
@@ -101,7 +66,7 @@ class ImportSubscriber implements EventSubscriberInterface
             $event->activeLink      = "#mautic_custom_object_$customObjectId";
             $event->setIndexRoute(CustomItemRouteProvider::ROUTE_LIST, ['objectId' => $customObjectId]);
             $event->stopPropagation();
-        } catch (NotFoundException|ForbiddenException $e) {
+        } catch (NotFoundException|ForbiddenException) {
         }
     }
 
@@ -133,7 +98,7 @@ class ImportSubscriber implements EventSubscriberInterface
                 $customObject->getNamePlural() => $fieldList,
                 'mautic.lead.special_fields'   => $specialFields,
             ];
-        } catch (NotFoundException|ForbiddenException $e) {
+        } catch (NotFoundException|ForbiddenException) {
         }
     }
 
@@ -145,7 +110,7 @@ class ImportSubscriber implements EventSubscriberInterface
 
         try {
             $customObjectId = $this->getCustomObjectId($event->getRouteObjectName());
-        } catch (NotFoundException $e) {
+        } catch (NotFoundException) {
             // This is not a Custom Object import. Abort.
             return;
         }
@@ -162,7 +127,7 @@ class ImportSubscriber implements EventSubscriberInterface
         if (empty($matchedFields)) {
             $form->addError(
                 new FormError(
-                    $this->translator->trans('mautic.lead.import.matchfields', [], 'validators')
+                    $this->translator->trans('mautic.lead.import.matchfields', [], 'validators') ?? ''
                 )
             );
 
@@ -187,9 +152,14 @@ class ImportSubscriber implements EventSubscriberInterface
             $customObjectId = $this->getCustomObjectId($event->import->getObject());
             $this->permissionProvider->canCreate($customObjectId);
             $customObject = $this->customObjectModel->fetchEntity($customObjectId);
-            $merged       = $this->customItemImportModel->import($event->import, $event->rowData, $customObject);
+            $importLogDto = new ImportLogDTO();
+            $merged       = $this->customItemImportModel->import($event->import, $event->rowData, $customObject, $importLogDto);
             $event->setWasMerged($merged);
-        } catch (NotFoundException $e) {
+
+            if ($importLogDto->hasWarning()) {
+                $event->addWarning($importLogDto->getWarningsAsString());
+            }
+        } catch (NotFoundException) {
             // Not a Custom Object import or the custom object doesn't exist anymore. Move on.
         }
     }
@@ -223,13 +193,13 @@ class ImportSubscriber implements EventSubscriberInterface
      *
      * @param mixed[] $matchedFields
      */
-    private function handleValidateRequired(Form $form, int $customObjectId, array $matchedFields): void
+    private function handleValidateRequired(FormInterface $form, int $customObjectId, array $matchedFields): void
     {
         $requiredFields = $this->customFieldRepository->getRequiredCustomFieldsForCustomObject($customObjectId);
 
-        $missingRequiredFields = $requiredFields->filter(function (CustomField $customField) use ($matchedFields) {
+        $missingRequiredFields = $requiredFields->filter(function (CustomField $customField) use ($matchedFields): bool {
             return !array_key_exists($customField->getAlias(), $matchedFields);
-        })->map(function (CustomField $customField) {
+        })->map(function (CustomField $customField): string {
             return "{$customField->getLabel()} ({$customField->getAlias()})";
         });
 

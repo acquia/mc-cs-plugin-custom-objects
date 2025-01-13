@@ -7,6 +7,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Statement;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
@@ -18,9 +19,9 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldValueModel;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomFieldValueModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -40,8 +41,6 @@ class CustomFieldValueModelTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', '');
 
         $this->customObject           = $this->createMock(CustomObject::class);
         $this->customItem             = $this->createMock(CustomItem::class);
@@ -66,7 +65,7 @@ class CustomFieldValueModelTest extends \PHPUnit\Framework\TestCase
     {
         $customFields = new ArrayCollection([$this->customField]);
 
-        $this->customItem->expects($this->once())
+        $this->customItem->expects($this->any())
             ->method('getCustomObject')
             ->willReturn($this->customObject);
 
@@ -177,11 +176,14 @@ class CustomFieldValueModelTest extends \PHPUnit\Framework\TestCase
             ->with('THE TEXT FIELD SQL QUERY UNION ALL THE NUMBER FIELD SQL QUERY')
             ->willReturn($this->statement);
 
-        $this->statement->expects($this->once())
-            ->method('execute');
+        $result = $this->createMock(Result::class);
 
         $this->statement->expects($this->once())
-            ->method('fetchAll')
+            ->method('executeQuery')
+            ->willReturn($result);
+
+        $result->expects($this->once())
+            ->method('fetchAllAssociative')
             ->willReturn([[
                 'custom_field_id' => 44,
                 'custom_item_id'  => 33,
@@ -248,7 +250,7 @@ class CustomFieldValueModelTest extends \PHPUnit\Framework\TestCase
 
         $this->customItem->expects($this->exactly(2))
             ->method('getId')
-            ->willReturn(null);
+            ->willReturn(0);
 
         $this->entityManager->expects($this->once())
             ->method('persist')

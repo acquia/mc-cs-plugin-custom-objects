@@ -9,7 +9,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class CustomFieldOptionFunctionalTest extends AbstractApiPlatformFunctionalTest
 {
@@ -126,41 +126,41 @@ final class CustomFieldOptionFunctionalTest extends AbstractApiPlatformFunctiona
     {
         return [
             'all_ok' => [
-                    ['viewown', 'viewother', 'editown', 'editother', 'create', 'deleteown', 'deleteother', 'publishown', 'publishother'],
-                    Response::HTTP_CREATED,
-                    Response::HTTP_OK,
-                    'New Custom Field Option',
-                    Response::HTTP_OK,
-                    'Edited Custom Field Option',
-                    Response::HTTP_NO_CONTENT,
-                ],
+                ['viewown', 'viewother', 'editown', 'editother', 'create', 'deleteown', 'deleteother', 'publishown', 'publishother'],
+                Response::HTTP_CREATED,
+                Response::HTTP_OK,
+                'New Custom Field Option',
+                Response::HTTP_OK,
+                'Edited Custom Field Option',
+                Response::HTTP_NO_CONTENT,
+            ],
             'no_delete' => [
-                    ['viewown', 'viewother', 'editown', 'editother', 'create', 'publishown', 'publishother'],
-                    Response::HTTP_CREATED,
-                    Response::HTTP_OK,
-                    'New Custom Field Option',
-                    Response::HTTP_OK,
-                    'Edited Custom Field Option',
-                    Response::HTTP_FORBIDDEN,
-                ],
+                ['viewown', 'viewother', 'editown', 'editother', 'create', 'publishown', 'publishother'],
+                Response::HTTP_CREATED,
+                Response::HTTP_OK,
+                'New Custom Field Option',
+                Response::HTTP_OK,
+                'Edited Custom Field Option',
+                Response::HTTP_FORBIDDEN,
+            ],
             'no_update' => [
-                    ['viewown', 'viewother', 'create', 'deleteown', 'deleteother', 'publishown', 'publishother'],
-                    Response::HTTP_CREATED,
-                    Response::HTTP_OK,
-                    'New Custom Field Option',
-                    Response::HTTP_FORBIDDEN,
-                    null,
-                    Response::HTTP_NO_CONTENT,
-                ],
+                ['viewown', 'viewother', 'create', 'deleteown', 'deleteother', 'publishown', 'publishother'],
+                Response::HTTP_CREATED,
+                Response::HTTP_OK,
+                'New Custom Field Option',
+                Response::HTTP_FORBIDDEN,
+                null,
+                Response::HTTP_NO_CONTENT,
+            ],
             'no_create' => [
-                    ['viewown', 'viewother', 'editown', 'editother', 'deleteown', 'deleteother', 'publishown', 'publishother'],
-                    Response::HTTP_FORBIDDEN,
-                    '',
-                    null,
-                    '',
-                    null,
-                    '',
-                ],
+                ['viewown', 'viewother', 'editown', 'editother', 'deleteown', 'deleteother', 'publishown', 'publishother'],
+                Response::HTTP_FORBIDDEN,
+                '',
+                null,
+                '',
+                null,
+                '',
+            ],
         ];
     }
 }

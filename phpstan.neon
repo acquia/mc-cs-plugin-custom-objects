@@ -1,0 +1,28 @@
+includes:
+	- phpstan-baseline-php-versions.neon.php
+	- phpstan-baseline.neon
+	- ../../vendor/phpstan/phpstan/conf/bleedingEdge.neon
+
+parameters:
+	level: 6
+	reportUnmatchedIgnoredErrors: false
+	checkGenericClassInNonGenericObjectType: false
+	parallel:
+		maximumNumberOfProcesses: 4
+		processTimeout: 1000.0
+	scanDirectories:
+		- ../../app
+	paths:
+		- .
+	excludePaths:
+		- CustomFieldType/*Type.php # This should be refactored
+		- *.html.php # this can be removed in Mautic 5
+		- Extension/CustomItemListeningExtension.php # PHPSTAN is confused because it exists only if API Platform does.
+		- Serializer/ApiNormalizer.php # PHPSTAN is confused because it exists only if API Platform does.
+		- Tests/Unit/Serializer/ApiNormalizerTest.php # PHPSTAN is confused because it exists only if API Platform does.
+		- DataPersister/CustomItemDataPersister.php # PHPSTAN is confused because it exists only if API Platform does.
+		- Tests/Unit/EventListener/SegmentFiltersChoicesGenerateSubscriberTest.php
+	dynamicConstantNames:
+		- MAUTIC_ENV
+		- MAUTIC_TABLE_PREFIX
+		- MAUTIC_VERSION

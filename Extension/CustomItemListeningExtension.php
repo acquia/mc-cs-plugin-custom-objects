@@ -14,20 +14,8 @@ use MauticPlugin\CustomObjectsBundle\Security\Permissions\CustomObjectPermission
 
 class CustomItemListeningExtension implements QueryCollectionExtensionInterface
 {
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
-
-    /**
-     * @var CorePermissions
-     */
-    private $security;
-
-    public function __construct(UserHelper $userHelper, CorePermissions $security)
+    public function __construct(private UserHelper $userHelper, private CorePermissions $security)
     {
-        $this->userHelper = $userHelper;
-        $this->security   = $security;
     }
 
     /**
@@ -38,7 +26,7 @@ class CustomItemListeningExtension implements QueryCollectionExtensionInterface
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
         string $operationName = null
-    ) {
+    ): void {
         if (CustomItem::class !== $resourceClass) {
             return;
         }

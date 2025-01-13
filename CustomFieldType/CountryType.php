@@ -23,7 +23,7 @@ class CountryType extends SelectType implements StaticChoiceTypeInterface
     /**
      * @var string[]
      */
-    private $countryList;
+    private ?array $countryList = null;
 
     /**
      * {@inheritdoc}

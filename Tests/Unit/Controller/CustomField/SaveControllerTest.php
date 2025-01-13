@@ -20,12 +20,10 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class SaveControllerTest extends AbstractFieldControllerTest
 {
     private $formFactory;
-    private $translator;
     private $customFieldModel;
     private $customFieldFactory;
     private $permissionProvider;
@@ -39,36 +37,29 @@ class SaveControllerTest extends AbstractFieldControllerTest
         parent::setUp();
 
         $this->formFactory        = $this->createMock(FormFactory::class);
-        $this->translator         = $this->createMock(TranslatorInterface::class);
         $this->customFieldModel   = $this->createMock(CustomFieldModel::class);
         $this->customFieldFactory = $this->createMock(CustomFieldFactory::class);
         $this->permissionProvider = $this->createMock(CustomFieldPermissionProvider::class);
         $this->fieldRouteProvider = $this->createMock(CustomFieldRouteProvider::class);
         $this->customObjectModel  = $this->createMock(CustomObjectModel::class);
         $this->form               = $this->createMock(FormInterface::class);
-
-        $this->saveController = new SaveController(
-            $this->formFactory,
-            $this->translator,
-            $this->customFieldModel,
-            $this->customFieldFactory,
-            $this->permissionProvider,
-            $this->fieldRouteProvider,
-            $this->customObjectModel
-        );
-
-        $this->addSymfonyDependencies($this->saveController);
     }
 
     public function testRenderFormIfCustomFieldNotFound(): void
     {
-        $objectId   = 1;
-        $fieldId    = 2;
-        $fieldType  = 'text';
-        $panelId    = null;
-        $panelCount = null;
+        $objectId     = 1;
+        $fieldId      = 2;
+        $fieldType    = 'text';
+        $panelId      = null;
+        $panelCount   = null;
 
-        $request = $this->createRequestMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
+        $this->createSaveController(
+            $objectId,
+            $fieldId,
+            $fieldType,
+            $panelId,
+            $panelCount
+        );
 
         $this->customFieldModel->expects($this->once())
             ->method('fetchEntity')
@@ -77,7 +68,14 @@ class SaveControllerTest extends AbstractFieldControllerTest
         $this->permissionProvider->expects($this->never())
             ->method('canEdit');
 
-        $this->saveController->saveAction($request);
+        $this->saveController->saveAction(
+            $this->formFactory,
+            $this->customFieldModel,
+            $this->customFieldFactory,
+            $this->permissionProvider,
+            $this->fieldRouteProvider,
+            $this->customObjectModel
+        );
     }
 
     public function testRenderFormIfCustomFieldAccessDenied(): void
@@ -88,7 +86,13 @@ class SaveControllerTest extends AbstractFieldControllerTest
         $panelId    = null;
         $panelCount = null;
 
-        $request = $this->createRequestMock($objectId, $fieldId, $fieldType, $panelId, $panelCount);
+        $this->createSaveController(
+            $objectId,
+            $fieldId,
+            $fieldType,
+            $panelId,
+            $panelCount
+        );
 
         $this->customFieldModel->expects($this->once())
             ->method('fetchEntity')
@@ -101,7 +105,14 @@ class SaveControllerTest extends AbstractFieldControllerTest
 
         $this->expectException(AccessDeniedHttpException::class);
 
-        $this->saveController->saveAction($request);
+        $this->saveController->saveAction(
+            $this->formFactory,
+            $this->customFieldModel,
+            $this->customFieldFactory,
+            $this->permissionProvider,
+            $this->fieldRouteProvider,
+            $this->customObjectModel
+        );
     }
 
     public function testSaveActionEdit(): void
@@ -111,6 +122,14 @@ class SaveControllerTest extends AbstractFieldControllerTest
         $fieldType  = 'text';
         $panelId    = null;
         $panelCount = null;
+
+        $this->createSaveController(
+            $objectId,
+            $fieldId,
+            $fieldType,
+            $panelId,
+            $panelCount
+        );
 
         $customObject = $this->createMock(CustomObject::class);
         $customObject->expects($this->once())
@@ -124,7 +143,15 @@ class SaveControllerTest extends AbstractFieldControllerTest
             ['custom_field', null, []],
             ['panelId', null, $panelCount],
         ];
-        $request = $this->createRequestMock($objectId, $fieldId, $fieldType, $panelId, $panelCount, $mapExtras);
+
+        $this->createSaveController(
+            $objectId,
+            $fieldId,
+            $fieldType,
+            $panelId,
+            $panelCount,
+            $mapExtras
+        );
 
         $this->customObjectModel->expects($this->once())
             ->method('fetchEntity')
@@ -157,7 +184,7 @@ class SaveControllerTest extends AbstractFieldControllerTest
 
         $this->form->expects($this->once())
             ->method('handleRequest')
-            ->with($request);
+            ->with($this->requestStack->getCurrentRequest());
 
         $this->form->expects($this->once())
             ->method('isValid')
@@ -181,7 +208,14 @@ class SaveControllerTest extends AbstractFieldControllerTest
         $customObject->expects($this->once())
             ->method('setCustomFields');
 
-        $this->saveController->saveAction($request);
+        $this->saveController->saveAction(
+            $this->formFactory,
+            $this->customFieldModel,
+            $this->customFieldFactory,
+            $this->permissionProvider,
+            $this->fieldRouteProvider,
+            $this->customObjectModel
+        );
     }
 
     public function testSaveActionCreate(): void
@@ -191,6 +225,14 @@ class SaveControllerTest extends AbstractFieldControllerTest
         $fieldType  = 'text';
         $panelId    = null;
         $panelCount = null;
+
+        $this->createSaveController(
+            $objectId,
+            $fieldId,
+            $fieldType,
+            $panelId,
+            $panelCount
+        );
 
         $customObject = $this->createMock(CustomObject::class);
         $customObject->expects($this->once())
@@ -206,7 +248,15 @@ class SaveControllerTest extends AbstractFieldControllerTest
             ['panelCount', null, $panelCount],
             ['custom_field', null, []],
         ];
-        $request = $this->createRequestMock($objectId, $fieldId, $fieldType, $panelId, $panelCount, $mapExtras);
+
+        $this->createSaveController(
+            $objectId,
+            $fieldId,
+            $fieldType,
+            $panelId,
+            $panelCount,
+            $mapExtras
+        );
 
         $this->customObjectModel->expects($this->once())
             ->method('fetchEntity')
@@ -239,7 +289,7 @@ class SaveControllerTest extends AbstractFieldControllerTest
 
         $this->form->expects($this->once())
             ->method('handleRequest')
-            ->with($request);
+            ->with($this->requestStack->getCurrentRequest());
 
         $this->form->expects($this->once())
             ->method('isValid')
@@ -260,7 +310,14 @@ class SaveControllerTest extends AbstractFieldControllerTest
         $customObject->expects($this->once())
             ->method('setCustomFields');
 
-        $this->saveController->saveAction($request);
+        $this->saveController->saveAction(
+            $this->formFactory,
+            $this->customFieldModel,
+            $this->customFieldFactory,
+            $this->permissionProvider,
+            $this->fieldRouteProvider,
+            $this->customObjectModel
+        );
     }
 
     public function testInvalidPost(): void
@@ -282,7 +339,15 @@ class SaveControllerTest extends AbstractFieldControllerTest
             ['custom_field', null, []],
             ['custom_field', null, []],
         ];
-        $request = $this->createRequestMock($objectId, $fieldId, $fieldType, $panelId, $panelCount, $mapExtras);
+
+        $this->createSaveController(
+            $objectId,
+            $fieldId,
+            $fieldType,
+            $panelId,
+            $panelCount,
+            $mapExtras
+        );
 
         $this->customObjectModel->expects($this->once())
             ->method('fetchEntity')
@@ -311,12 +376,52 @@ class SaveControllerTest extends AbstractFieldControllerTest
 
         $this->form->expects($this->once())
             ->method('handleRequest')
-            ->with($request);
+            ->with($this->requestStack->getCurrentRequest());
 
         $this->form->expects($this->once())
             ->method('isValid')
             ->willReturn(false);
 
-        $this->saveController->saveAction($request);
+        $this->saveController->saveAction(
+            $this->formFactory,
+            $this->customFieldModel,
+            $this->customFieldFactory,
+            $this->permissionProvider,
+            $this->fieldRouteProvider,
+            $this->customObjectModel
+        );
+    }
+
+    private function createSaveController(
+        ?int $objectId,
+        ?int $fieldId,
+        string $fieldType,
+        ?int $panelId = null,
+        ?int $panelCount = null,
+        array $mapExtras = []
+    ): void {
+        $this->requestStack  = $this->createRequestStackMock(
+            $objectId,
+            $fieldId,
+            $fieldType,
+            $panelId,
+            $panelCount,
+            $mapExtras
+        );
+
+        $this->saveController     = new SaveController(
+            $this->managerRegistry,
+            $this->mauticFactory,
+            $this->modelFactory,
+            $this->userHelper,
+            $this->coreParametersHelper,
+            $this->dispatcher,
+            $this->translator,
+            $this->flashBag,
+            $this->requestStack,
+            $this->security
+        );
+
+        $this->addSymfonyDependencies($this->saveController);
     }
 }

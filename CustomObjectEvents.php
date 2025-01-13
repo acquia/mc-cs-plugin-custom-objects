@@ -14,7 +14,7 @@ final class CustomObjectEvents
      *
      * The event listener receives a
      *
-     * @see \MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent
+     * @see Event\CustomObjectEvent
      *
      * @var string
      */
@@ -25,7 +25,7 @@ final class CustomObjectEvents
      *
      * The event listener receives a
      *
-     * @see \MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent
+     * @see Event\CustomObjectEvent
      *
      * @var string
      */
@@ -36,7 +36,7 @@ final class CustomObjectEvents
      *
      * The event listener receives a
      *
-     * @see \MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent
+     * @see Event\CustomObjectEvent
      *
      * @var string
      */
@@ -47,7 +47,7 @@ final class CustomObjectEvents
      *
      * The event listener receives a
      *
-     * @see \MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent
+     * @see Event\CustomObjectEvent
      *
      * @var string
      */
@@ -58,7 +58,7 @@ final class CustomObjectEvents
      *
      * The event listener receives a
      *
-     * @see \MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent
+     * @see Event\CustomObjectEvent
      *
      * @var string
      */
@@ -69,7 +69,7 @@ final class CustomObjectEvents
      *
      * The event listener receives a
      *
-     * @see \MauticPlugin\CustomObjectsBundle\Event\CustomObjectListFormatEvent
+     * @see Event\CustomObjectListFormatEvent
      *
      * @var string
      */

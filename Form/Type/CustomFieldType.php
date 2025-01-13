@@ -26,48 +26,15 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CustomFieldType extends AbstractType
 {
-    /**
-     * @var CustomObjectRepository
-     */
-    private $customObjectRepository;
-
-    /**
-     * @var CustomFieldTypeProvider
-     */
-    private $customFieldTypeProvider;
-
-    /**
-     * @var ParamsToStringTransformer
-     */
-    private $paramsToStringTransformer;
-
-    /**
-     * @var OptionsToStringTransformer
-     */
-    private $optionsToStringTransformer;
-
-    /**
-     * @var CustomFieldFactory
-     */
-    private $customFieldFactory;
-
-    /**
-     * @var bool
-     */
-    private $isCustomObjectForm;
+    private bool $isCustomObjectForm;
 
     public function __construct(
-        CustomObjectRepository $customObjectRepository,
-        CustomFieldTypeProvider $customFieldTypeProvider,
-        ParamsToStringTransformer $paramsToStringTransformer,
-        OptionsToStringTransformer $optionsToStringTransformer,
-        CustomFieldFactory $customFieldFactory
+        private CustomObjectRepository $customObjectRepository,
+        private CustomFieldTypeProvider $customFieldTypeProvider,
+        private ParamsToStringTransformer $paramsToStringTransformer,
+        private OptionsToStringTransformer $optionsToStringTransformer,
+        private CustomFieldFactory $customFieldFactory
     ) {
-        $this->customObjectRepository     = $customObjectRepository;
-        $this->customFieldTypeProvider    = $customFieldTypeProvider;
-        $this->paramsToStringTransformer  = $paramsToStringTransformer;
-        $this->optionsToStringTransformer = $optionsToStringTransformer;
-        $this->customFieldFactory         = $customFieldFactory;
     }
 
     /**
@@ -128,8 +95,8 @@ class CustomFieldType extends AbstractType
         $resolver->setDefaults(
             [
                 'data_class'         => CustomField::class,
-                'empty_data'         => function (FormInterface $form) {
-                    $type = $form->get('type')->getData();
+                'empty_data'         => function (FormInterface $form): CustomField {
+                    $type         = $form->get('type')->getData();
                     $customObject = $form->get('customObject')->getData();
 
                     return $this->customFieldFactory->create($type, $customObject);
@@ -199,8 +166,8 @@ class CustomFieldType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
             /** @var CustomField $customField */
             $customField = $event->getData();
-            $form = $event->getForm();
-            $hasChoices = $customField->getTypeObject()->hasChoices();
+            $form        = $event->getForm();
+            $hasChoices  = $customField->getTypeObject()->hasChoices();
 
             $this->createDefaultValueInput($form, $customField);
 
@@ -260,7 +227,7 @@ class CustomFieldType extends AbstractType
             ]
         );
 
-        $builder->setAction($options['action']);
+        $builder->setAction($options['action'] ?? '');
     }
 
     /**
@@ -270,9 +237,9 @@ class CustomFieldType extends AbstractType
     private function buildPanelFormFields(FormBuilderInterface $builder): void
     {
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
-            /** @var CustomField $customField */
+            /** @var ?CustomField $customField */
             $customField = $event->getData();
-            $form = $event->getForm();
+            $form        = $event->getForm();
 
             if (!$customField) {
                 // Custom field is new without data fetched from DB
@@ -368,7 +335,7 @@ class CustomFieldType extends AbstractType
             // Set proper type object when creating new custom field
             /** @var CustomField $customField */
             $customField = $event->getData();
-            $form = $event->getForm();
+            $form        = $event->getForm();
 
             if (!$customField->getTypeObject() && $customField->getType()) {
                 $customField->setTypeObject($this->customFieldTypeProvider->getType($customField->getType()));

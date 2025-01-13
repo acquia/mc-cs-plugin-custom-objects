@@ -7,8 +7,14 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Criteria;
 use Mautic\LeadBundle\Event\LeadListFiltersChoicesEvent;
+use Mautic\LeadBundle\Event\OverrideOperatorLabelEvent;
+use Mautic\LeadBundle\Event\TypeOperatorsEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
+use Mautic\LeadBundle\Provider\TypeOperatorProvider;
+use Mautic\LeadBundle\Provider\TypeOperatorProviderInterface;
+use Mautic\LeadBundle\Segment\OperatorOptions;
+use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\IntType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
@@ -16,12 +22,16 @@ use MauticPlugin\CustomObjectsBundle\EventListener\SegmentFiltersChoicesGenerate
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
+use MauticPlugin\CustomObjectsBundle\Tests\ProjectVersionTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SegmentFiltersChoicesGenerateSubscriberTest extends TestCase
 {
+    use ProjectVersionTrait;
+
     /**
      * @var CustomObjectRepository|MockObject
      */
@@ -52,6 +62,16 @@ class SegmentFiltersChoicesGenerateSubscriberTest extends TestCase
      */
     private $filterOperatorProvider;
 
+    /**
+     * @var TypeOperatorProviderInterface|MockObject
+     */
+    private $typeOperatorProvider;
+
+    /**
+     * @var EventDispatcherInterface|MockObject
+     */
+    private $dispatcher;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -61,17 +81,27 @@ class SegmentFiltersChoicesGenerateSubscriberTest extends TestCase
         $this->configProvider         = $this->createMock(ConfigProvider::class);
         $this->fieldTypeProvider      = $this->createMock(CustomFieldTypeProvider::class);
         $this->filterOperatorProvider = $this->createMock(FilterOperatorProviderInterface::class);
+        $this->dispatcher             = $this->createMock(EventDispatcherInterface::class);
+        $this->typeOperatorProvider   = new TypeOperatorProvider(
+            $this->dispatcher,
+            $this->filterOperatorProvider
+        );
 
         $this->subscriber = new SegmentFiltersChoicesGenerateSubscriber(
             $this->customObjectRepository,
             $this->translator,
             $this->configProvider,
-            $this->fieldTypeProvider
+            $this->fieldTypeProvider,
+            $this->typeOperatorProvider
         );
     }
 
     public function testOnGenerateSegmentFilters(): void
     {
+        if (!$this->isCloudProject()) {
+            $this->markTestSkipped('Undefined index: default on TypeOperatorProvider.php:61 in 4.4');
+        }
+
         $customObject = new CustomObject();
         $customObject->setId(1);
         $customObject->setNameSingular('Product');
@@ -98,116 +128,119 @@ class SegmentFiltersChoicesGenerateSubscriberTest extends TestCase
 
         $allOperators = [
             '=' => [
-                    'label'       => 'equals',
-                    'expr'        => 'eq',
-                    'negate_expr' => 'neq',
-                ],
+                'label'       => 'equals',
+                'expr'        => 'eq',
+                'negate_expr' => 'neq',
+            ],
             '!=' => [
-                    'label'       => 'not equal',
-                    'expr'        => 'neq',
-                    'negate_expr' => 'eq',
-                ],
+                'label'       => 'not equal',
+                'expr'        => 'neq',
+                'negate_expr' => 'eq',
+            ],
             'gt' => [
-                    'label'       => 'greater than',
-                    'expr'        => 'gt',
-                    'negate_expr' => 'lt',
-                ],
+                'label'       => 'greater than',
+                'expr'        => 'gt',
+                'negate_expr' => 'lt',
+            ],
             'gte' => [
-                    'label'       => 'greater than or equal',
-                    'expr'        => 'gte',
-                    'negate_expr' => 'lt',
-                ],
+                'label'       => 'greater than or equal',
+                'expr'        => 'gte',
+                'negate_expr' => 'lt',
+            ],
             'lt' => [
-                    'label'       => 'less than',
-                    'expr'        => 'lt',
-                    'negate_expr' => 'gt',
-                ],
+                'label'       => 'less than',
+                'expr'        => 'lt',
+                'negate_expr' => 'gt',
+            ],
             'lte' => [
-                    'label'       => 'less than or equal',
-                    'expr'        => 'lte',
-                    'negate_expr' => 'gt',
-                ],
+                'label'       => 'less than or equal',
+                'expr'        => 'lte',
+                'negate_expr' => 'gt',
+            ],
             'empty' => [
-                    'label'       => 'empty',
-                    'expr'        => 'empty',
-                    'negate_expr' => 'notEmpty',
-                ],
+                'label'       => 'empty',
+                'expr'        => 'empty',
+                'negate_expr' => 'notEmpty',
+            ],
             '!empty' => [
-                    'label'       => 'not empty',
-                    'expr'        => 'notEmpty',
-                    'negate_expr' => 'empty',
-                ],
+                'label'       => 'not empty',
+                'expr'        => 'notEmpty',
+                'negate_expr' => 'empty',
+            ],
             'like' => [
-                    'label'       => 'like',
-                    'expr'        => 'like',
-                    'negate_expr' => 'notLike',
-                ],
+                'label'       => 'like',
+                'expr'        => 'like',
+                'negate_expr' => 'notLike',
+            ],
             '!like' => [
-                    'label'       => 'not like',
-                    'expr'        => 'notLike',
-                    'negate_expr' => 'like',
-                ],
+                'label'       => 'not like',
+                'expr'        => 'notLike',
+                'negate_expr' => 'like',
+            ],
             'between' => [
-                    'label'       => 'between',
-                    'expr'        => 'between',
-                    'negate_expr' => 'notBetween',
-                    'hide'        => true,
-                ],
+                'label'       => 'between',
+                'expr'        => 'between',
+                'negate_expr' => 'notBetween',
+            ],
             '!between' => [
-                    'label'       => 'not between',
-                    'expr'        => 'notBetween',
-                    'negate_expr' => 'between',
-                    'hide'        => true,
-                ],
+                'label'       => 'not between',
+                'expr'        => 'notBetween',
+                'negate_expr' => 'between',
+            ],
             'in' => [
-                    'label'       => 'including',
-                    'expr'        => 'in',
-                    'negate_expr' => 'notIn',
-                ],
+                'label'       => 'including',
+                'expr'        => 'in',
+                'negate_expr' => 'notIn',
+            ],
             '!in' => [
-                    'label'       => 'excluding',
-                    'expr'        => 'notIn',
-                    'negate_expr' => 'in',
-                ],
+                'label'       => 'excluding',
+                'expr'        => 'notIn',
+                'negate_expr' => 'in',
+            ],
             'regexp' => [
-                    'label'       => 'regexp',
-                    'expr'        => 'regexp',
-                    'negate_expr' => 'notRegexp',
-                ],
+                'label'       => 'regexp',
+                'expr'        => 'regexp',
+                'negate_expr' => 'notRegexp',
+            ],
             '!regexp' => [
-                    'label'       => 'not regexp',
-                    'expr'        => 'notRegexp',
-                    'negate_expr' => 'regexp',
-                ],
+                'label'       => 'not regexp',
+                'expr'        => 'notRegexp',
+                'negate_expr' => 'regexp',
+            ],
             'date' => [
-                    'label'       => 'date',
-                    'expr'        => 'date',
-                    'negate_expr' => 'date',
-                    'hide'        => true,
-                ],
+                'label'       => 'date',
+                'expr'        => 'date',
+                'negate_expr' => 'date',
+                'hide'        => true,
+            ],
             'startsWith' => [
-                    'label'       => 'starts with',
-                    'expr'        => 'startsWith',
-                    'negate_expr' => 'startsWith',
-                ],
+                'label'       => 'starts with',
+                'expr'        => 'startsWith',
+                'negate_expr' => 'startsWith',
+            ],
             'endsWith' => [
-                    'label'       => 'ends with',
-                    'expr'        => 'endsWith',
-                    'negate_expr' => 'endsWith',
-                ],
+                'label'       => 'ends with',
+                'expr'        => 'endsWith',
+                'negate_expr' => 'endsWith',
+            ],
             'contains' => [
-                    'label'       => 'contains',
-                    'expr'        => 'contains',
-                    'negate_expr' => 'contains',
-                ],
+                'label'       => 'contains',
+                'expr'        => 'contains',
+                'negate_expr' => 'contains',
+            ],
             'withinCustomObjects' => [
-                    'label'       => 'within custom objects',
-                    'expr'        => 'withinCustomObjects',
-                    'negate_expr' => 'notWithinCustomObjects',
-                ],
+                'label'       => 'within custom objects',
+                'expr'        => 'withinCustomObjects',
+                'negate_expr' => 'notWithinCustomObjects',
+            ],
         ];
 
-        $fieldOperators = [
+        $betweenOperators = [
+            'between'               => 'between',
+            'not between'           => '!between',
+        ];
+
+        $fieldOperators = array_merge([
             'equals'                => '=',
             'not equal'             => '!=',
             'greater than'          => 'gt',
@@ -216,6 +249,136 @@ class SegmentFiltersChoicesGenerateSubscriberTest extends TestCase
             'less than or equal'    => 'lte',
             'empty'                 => 'empty',
             'not empty'             => '!empty',
+        ], $betweenOperators);
+
+        $event = new LeadListFiltersChoicesEvent([], [], $this->translator);
+
+        $this->configProvider->expects($this->once())
+            ->method('pluginIsEnabled')
+            ->willReturn(true);
+
+        $this->fieldTypeProvider->expects($this->once())
+            ->method('getKeyTypeMapping')
+            ->willReturn($keyTypeMapping);
+
+        $this->customObjectRepository->expects($this->once())
+            ->method('matching')
+            ->with($criteria)
+            ->willReturn(new ArrayCollection([$customObject]));
+
+        $translationsKeys = [
+            ['custom.item.name.label'],
+            ['mautic.lead.list.form.operator.equals'],
+            ['mautic.lead.list.form.operator.notequals'],
+            ['mautic.lead.list.form.operator.isempty'],
+            ['mautic.lead.list.form.operator.isnotempty'],
+            ['mautic.lead.list.form.operator.islike'],
+            ['mautic.lead.list.form.operator.isnotlike'],
+            ['mautic.lead.list.form.operator.regexp'],
+            ['mautic.lead.list.form.operator.notregexp'],
+            ['mautic.core.operator.starts.with'],
+            ['mautic.core.operator.ends.with'],
+            ['mautic.core.operator.contains'],
+            ['mautic.lead.list.form.operator.equals'],
+            ['mautic.lead.list.form.operator.notequals'],
+            ['mautic.lead.list.form.operator.greaterthan'],
+            ['mautic.lead.list.form.operator.greaterthanequals'],
+            ['mautic.lead.list.form.operator.lessthan'],
+            ['mautic.lead.list.form.operator.lessthanequals'],
+            ['mautic.lead.list.form.operator.isempty'],
+            ['mautic.lead.list.form.operator.isnotempty'],
+            ['mautic.lead.list.form.operator.islike'],
+            ['mautic.lead.list.form.operator.isnotlike'],
+            ['mautic.lead.list.form.operator.between'],
+            ['mautic.lead.list.form.operator.notbetween'],
+            ['mautic.lead.list.form.operator.regexp'],
+            ['mautic.lead.list.form.operator.notregexp'],
+            ['mautic.core.operator.starts.with'],
+            ['mautic.core.operator.ends.with'],
+            ['mautic.core.operator.contains'],
+        ];
+
+        $translations = [
+            'Mobile',
+            'equals',
+            'not equal',
+            'empty',
+            'not empty',
+            'like',
+            'not like',
+            'regexp',
+            'not regexp',
+            'starts with',
+            'ends with',
+            'contains',
+            'equals',
+            'not equal',
+            'greater than',
+            'greater than or equal',
+            'less than',
+            'less than or equal',
+            'empty',
+            'not empty',
+            'like',
+            'not like',
+            'between',
+            'not between',
+            'regexp',
+            'not regexp',
+            'starts with',
+            'ends with',
+            'contains',
+        ];
+
+        $this->translator
+            ->method('trans')
+            ->withConsecutive(...$translationsKeys)
+            ->willReturn(...$translations);
+
+        $this->filterOperatorProvider->expects($this->any())
+            ->method('getAllOperators')
+            ->willReturn($allOperators);
+
+        $this->subscriber->onGenerateSegmentFilters($event);
+
+        $choices = $event->getChoices();
+        $this->assertIsArray($choices);
+        $this->assertArrayHasKey('custom_object', $choices);
+        $this->assertArrayHasKey('cmo_1', $choices['custom_object']);
+        $this->assertArrayHasKey('cmf_1', $choices['custom_object']);
+        $this->assertSame('Products Mobile', $choices['custom_object']['cmo_1']['label']);
+        $this->assertSame('Products : Price', $choices['custom_object']['cmf_1']['label']);
+        $this->assertSame($fieldOperators, $choices['custom_object']['cmf_1']['operators']);
+    }
+
+    public function testOnGenerateSegmentFiltersForDate(): void
+    {
+        if (!$this->isCloudProject()) {
+            $this->markTestSkipped('OVERRIDE_OPERATOR_LABEL_FOR_FIELD_TYPE event is not present in 4.4');
+        }
+
+        $customObject = new CustomObject();
+        $customObject->setId(1);
+        $customObject->setNameSingular('Product');
+        $customObject->setNamePlural('Products');
+        $customObject->setIsPublished(true);
+
+        $dateType        = new DateType($this->translator, $this->filterOperatorProvider);
+        $dateCustomField = new CustomField();
+        $dateCustomField->setId(2);
+        $dateCustomField->setType('date');
+        $dateCustomField->setTypeObject($dateType);
+        $dateCustomField->setLabel('Purchase Date');
+        $dateCustomField->setAlias('purchase_date');
+
+        $customObject->addCustomField($dateCustomField);
+
+        $criteria = new Criteria(Criteria::expr()->eq('isPublished', 1));
+
+        $keyTypeMapping = [
+            'custom.field.type.text'   => 'text',
+            'custom.field.type.date'   => 'date',
+            'custom.field.type.hidden' => 'hidden',
         ];
 
         $event = new LeadListFiltersChoicesEvent([], [], $this->translator);
@@ -237,66 +400,94 @@ class SegmentFiltersChoicesGenerateSubscriberTest extends TestCase
             ->method('trans')
             ->withConsecutive(
                 ['custom.item.name.label'],
-                ['mautic.lead.list.form.operator.equals'],
-                ['mautic.lead.list.form.operator.notequals'],
-                ['mautic.lead.list.form.operator.isempty'],
-                ['mautic.lead.list.form.operator.isnotempty'],
-                ['mautic.lead.list.form.operator.islike'],
-                ['mautic.lead.list.form.operator.isnotlike'],
-                ['mautic.lead.list.form.operator.regexp'],
-                ['mautic.lead.list.form.operator.notregexp'],
-                ['mautic.core.operator.starts.with'],
-                ['mautic.core.operator.ends.with'],
-                ['mautic.core.operator.contains'],
-                ['mautic.lead.list.form.operator.equals'],
-                ['mautic.lead.list.form.operator.notequals'],
-                ['mautic.lead.list.form.operator.greaterthan'],
-                ['mautic.lead.list.form.operator.greaterthanequals'],
-                ['mautic.lead.list.form.operator.lessthan'],
-                ['mautic.lead.list.form.operator.lessthanequals'],
-                ['mautic.lead.list.form.operator.isempty'],
-                ['mautic.lead.list.form.operator.isnotempty'],
-                ['mautic.lead.list.form.operator.islike'],
-                ['mautic.lead.list.form.operator.isnotlike'],
-                ['mautic.lead.list.form.operator.regexp'],
-                ['mautic.lead.list.form.operator.notregexp'],
-                ['mautic.core.operator.starts.with'],
-                ['mautic.core.operator.ends.with'],
-                ['mautic.core.operator.contains']
             )
             ->willReturn(
-                'Mobile',
-                'equals',
-                'not equal',
-                'empty',
-                'not empty',
-                'like',
-                'not like',
-                'regexp',
-                'not regexp',
-                'starts with',
-                'ends with',
-                'contains',
-                'equals',
-                'not equal',
-                'greater than',
-                'greater than or equal',
-                'less than',
-                'less than or equal',
-                'empty',
-                'not empty',
-                'like',
-                'not like',
-                'regexp',
-                'not regexp',
-                'starts with',
-                'ends with',
-                'contains'
+                'Mobile'
             );
 
         $this->filterOperatorProvider->expects($this->once())
             ->method('getAllOperators')
-            ->willReturn($allOperators);
+            ->willReturn([
+                OperatorOptions::GREATER_THAN => [
+                    'label'       => 'grater than',
+                    'expr'        => 'gt',
+                    'negate_expr' => 'lt',
+                ],
+                OperatorOptions::GREATER_THAN_OR_EQUAL => [
+                    'label'       => 'grater than or equal',
+                    'expr'        => 'gte',
+                    'negate_expr' => 'lt',
+                ],
+                OperatorOptions::LESS_THAN => [
+                    'label'        => 'less than',
+                    'expr'         => 'lt',
+                    'negagte_expr' => 'gt',
+                ],
+                OperatorOptions::LESS_THAN_OR_EQUAL => [
+                    'label'       => 'less than or equal',
+                    'expr'        => 'lte',
+                    'negate_expr' => 'gt',
+                ],
+            ]);
+
+        $this->dispatcher->expects($this->exactly(3))
+            ->method('dispatch')
+            ->withConsecutive(
+                [
+                    LeadEvents::COLLECT_OPERATORS_FOR_FIELD_TYPE,
+                    $this->callback(function (TypeOperatorsEvent $event) {
+                        // Emulate a subscriber.
+                        $event->setOperatorsForFieldType('date', [
+                            'include' => [
+                                OperatorOptions::GREATER_THAN,
+                                OperatorOptions::GREATER_THAN_OR_EQUAL,
+                                OperatorOptions::LESS_THAN,
+                                OperatorOptions::LESS_THAN_OR_EQUAL,
+                            ],
+                        ]);
+
+                        $event->setOperatorsForFieldType('text', [
+                            'include' => [
+                                OperatorOptions::GREATER_THAN,
+                                OperatorOptions::GREATER_THAN_OR_EQUAL,
+                                OperatorOptions::LESS_THAN,
+                                OperatorOptions::LESS_THAN_OR_EQUAL,
+                            ],
+                        ]);
+
+                        return true;
+                    }),
+                ],
+                [
+                    LeadEvents::OVERRIDE_OPERATOR_LABEL_FOR_FIELD_TYPE,
+                    $this->callback(function (OverrideOperatorLabelEvent $event) {
+                        // Emulate a subscriber.
+                        $event->setTypeOperatorsChoices(
+                            [
+                                'Greater Than' => OperatorOptions::GREATER_THAN,
+                            ]
+                        );
+
+                        return true;
+                    }),
+                ],
+                [
+                    LeadEvents::OVERRIDE_OPERATOR_LABEL_FOR_FIELD_TYPE,
+                    $this->callback(function (OverrideOperatorLabelEvent $event) {
+                        // Emulate a subscriber.
+                        $event->setTypeOperatorsChoices(
+                            [
+                                'After'                  => OperatorOptions::GREATER_THAN,
+                                'After (Including day)'  => OperatorOptions::GREATER_THAN_OR_EQUAL,
+                                'Before'                 => OperatorOptions::LESS_THAN,
+                                'Before (Including day)' => OperatorOptions::LESS_THAN_OR_EQUAL,
+                            ]
+                        );
+
+                        return true;
+                    }),
+                ],
+            );
 
         $this->subscriber->onGenerateSegmentFilters($event);
 
@@ -304,10 +495,18 @@ class SegmentFiltersChoicesGenerateSubscriberTest extends TestCase
         $this->assertIsArray($choices);
         $this->assertArrayHasKey('custom_object', $choices);
         $this->assertArrayHasKey('cmo_1', $choices['custom_object']);
-        $this->assertArrayHasKey('cmf_1', $choices['custom_object']);
+        $this->assertArrayHasKey('cmf_2', $choices['custom_object']);
         $this->assertSame('Products Mobile', $choices['custom_object']['cmo_1']['label']);
-        $this->assertSame('Products : Price', $choices['custom_object']['cmf_1']['label']);
-        $this->assertSame($fieldOperators, $choices['custom_object']['cmf_1']['operators']);
+        $this->assertSame('Products : Purchase Date', $choices['custom_object']['cmf_2']['label']);
+        $this->assertSame(
+            [
+                'After'                  => OperatorOptions::GREATER_THAN,
+                'After (Including day)'  => OperatorOptions::GREATER_THAN_OR_EQUAL,
+                'Before'                 => OperatorOptions::LESS_THAN,
+                'Before (Including day)' => OperatorOptions::LESS_THAN_OR_EQUAL,
+            ],
+            $choices['custom_object']['cmf_2']['operators']
+        );
     }
 
     public function testGetSubscribedEvents(): void

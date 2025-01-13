@@ -14,20 +14,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class CustomItemPostSaveSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    public function __construct(CustomItemModel $customItemModel, RequestStack $requestStack)
-    {
-        $this->customItemModel = $customItemModel;
-        $this->requestStack    = $requestStack;
+    public function __construct(
+        private CustomItemModel $customItemModel,
+        private RequestStack $requestStack
+    ) {
     }
 
     public static function getSubscribedEvents()

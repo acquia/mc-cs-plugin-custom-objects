@@ -52,8 +52,6 @@ class QueryFilterFactoryTest extends TestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', '');
-
         $this->contactSegmentFilterFactory = $this->createMock(ContactSegmentFilterFactory::class);
         $this->queryFilterHelper           = $this->createMock(QueryFilterHelper::class);
         $this->contactSegmentFilter        = $this->createMock(ContactSegmentFilter::class);

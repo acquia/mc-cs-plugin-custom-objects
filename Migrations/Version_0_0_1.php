@@ -10,10 +10,7 @@ use Mautic\IntegrationsBundle\Migration\AbstractMigration;
 
 class Version_0_0_1 extends AbstractMigration
 {
-    /**
-     * @var string
-     */
-    private $table = 'custom_object';
+    private string $table = 'custom_object';
 
     /**
      * {@inheritdoc}
@@ -22,7 +19,7 @@ class Version_0_0_1 extends AbstractMigration
     {
         try {
             return !$schema->getTable($this->concatPrefix($this->table))->hasColumn('description');
-        } catch (SchemaException $e) {
+        } catch (SchemaException) {
             return false;
         }
     }

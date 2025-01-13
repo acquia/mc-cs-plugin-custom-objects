@@ -72,8 +72,6 @@ class CustomItemXrefContactSubscriberTest extends TestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', '');
-
         $this->entityManager        = $this->createMock(EntityManager::class);
         $this->queryBuilder         = $this->createMock(QueryBuilder::class);
         $this->queryBuilderDbal     = $this->createMock(DbalQueryBuilder::class);

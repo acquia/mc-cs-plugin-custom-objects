@@ -18,7 +18,7 @@ class Version_0_0_21 extends AbstractMigration
 
         try {
             return !$schema->getTable($tableCustomObject)->hasColumn('is_unique_identifier');
-        } catch (SchemaException $e) {
+        } catch (SchemaException) {
             return false;
         }
     }

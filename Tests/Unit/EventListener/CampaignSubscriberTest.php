@@ -7,6 +7,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Statement;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
 use Mautic\CampaignBundle\Event\CampaignExecutionEvent;
@@ -26,7 +27,7 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSubscriberTest extends TestCase
 {
@@ -52,6 +53,7 @@ class CampaignSubscriberTest extends TestCase
     private $queryBuilder;
     private $segmentQueryBuilder;
     private $statement;
+    private $result;
 
     /**
      * @var CampaignSubscriber
@@ -61,9 +63,6 @@ class CampaignSubscriberTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', '');
-
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', '');
 
         $this->customFieldModel       = $this->createMock(CustomFieldModel::class);
         $this->customObjectModel      = $this->createMock(CustomObjectModel::class);
@@ -81,6 +80,7 @@ class CampaignSubscriberTest extends TestCase
         $this->queryBuilder           = $this->createMock(QueryBuilder::class);
         $this->segmentQueryBuilder    = $this->createMock(SegmentQueryBuilder::class);
         $this->statement              = $this->createMock(Statement::class);
+        $this->result                 = $this->createMock(Result::class);
         $this->campaignSubscriber     = new CampaignSubscriber(
             $this->customFieldModel,
             $this->customObjectModel,
@@ -380,7 +380,7 @@ class CampaignSubscriberTest extends TestCase
 
         $this->queryBuilder->expects($this->once())
             ->method('execute')
-            ->willReturn($this->statement);
+            ->willReturn($this->result);
 
         $this->queryFilterFactory->expects($this->once())
             ->method('configureQueryBuilderFromSegmentFilter')
@@ -413,8 +413,8 @@ class CampaignSubscriberTest extends TestCase
             ->method('fetchEntity')
             ->willReturn($this->customField);
 
-        $this->statement->expects($this->once())
-            ->method('fetchColumn')
+        $this->result->expects($this->once())
+            ->method('fetchOne')
             ->willReturn(false);
 
         $this->campaignExecutionEvent->expects($this->once())
@@ -436,7 +436,7 @@ class CampaignSubscriberTest extends TestCase
 
         $this->queryBuilder->expects($this->once())
             ->method('execute')
-            ->willReturn($this->statement);
+            ->willReturn($this->result);
 
         $this->queryFilterFactory->expects($this->once())
             ->method('configureQueryBuilderFromSegmentFilter')
@@ -473,8 +473,8 @@ class CampaignSubscriberTest extends TestCase
             ->method('setChannel')
             ->with('customItem', 4344);
 
-        $this->statement->expects($this->once())
-            ->method('fetchColumn')
+        $this->result->expects($this->once())
+            ->method('fetchOne')
             ->willReturn('4344');
 
         $this->campaignExecutionEvent->expects($this->once())

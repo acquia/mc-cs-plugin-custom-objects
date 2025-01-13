@@ -11,11 +11,8 @@ use Symfony\Component\Validator\ConstraintValidator;
 
 class AllowUniqueIdentifierValidator extends ConstraintValidator
 {
-    private CustomItemModel $customItemModel;
-
-    public function __construct(CustomItemModel $customItemModel)
+    public function __construct(private CustomItemModel $customItemModel)
     {
-        $this->customItemModel  = $customItemModel;
     }
 
     /**

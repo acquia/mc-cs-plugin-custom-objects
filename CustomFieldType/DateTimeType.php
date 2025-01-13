@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType;
 
-use DateTimeInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\DateTimeAtomTransformer;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\DateTimeTransformer;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\ViewDateTransformer;
@@ -17,6 +16,8 @@ use Symfony\Component\Form\DataTransformerInterface;
 
 class DateTimeType extends AbstractCustomFieldType
 {
+    use DateOperatorTrait;
+
     /**
      * @var string
      */
@@ -71,17 +72,6 @@ class DateTimeType extends AbstractCustomFieldType
     }
 
     /**
-     * @return mixed[]
-     */
-    public function getOperators(): array
-    {
-        $allOperators     = parent::getOperators();
-        $allowedOperators = array_flip(['=', '!=', 'gt', 'gte', 'lt', 'lte', 'empty', '!empty']);
-
-        return array_intersect_key($allOperators, $allowedOperators);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function createDefaultValueTransformer(): DataTransformerInterface
@@ -112,7 +102,7 @@ class DateTimeType extends AbstractCustomFieldType
     {
         $value = $fieldValue->getValue();
 
-        if ($value instanceof DateTimeInterface) {
+        if ($value instanceof \DateTimeInterface) {
             return $value->format('Y-m-d H:i:s');
         }
 

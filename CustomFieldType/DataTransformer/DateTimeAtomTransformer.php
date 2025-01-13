@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer;
 
-use DateTimeImmutable;
 use Symfony\Component\Form\DataTransformerInterface;
 
 class DateTimeAtomTransformer implements DataTransformerInterface
@@ -15,7 +14,7 @@ class DateTimeAtomTransformer implements DataTransformerInterface
     public function transform($value)
     {
         if ($value) {
-            return new DateTimeImmutable($value);
+            return new \DateTimeImmutable($value);
         }
 
         return null;

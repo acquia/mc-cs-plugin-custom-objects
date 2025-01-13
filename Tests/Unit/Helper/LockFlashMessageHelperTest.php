@@ -10,7 +10,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LockFlashMessageHelperTest extends TestCase
 {
@@ -76,7 +76,7 @@ class LockFlashMessageHelperTest extends TestCase
         $checkedOut
             ->method('format')
             ->withConsecutive([$dateFormat1], [$dateFormat2], [$dateFormat3])
-            ->willReturnOnConsecutiveCalls(1, 2, 3);
+            ->willReturnOnConsecutiveCalls('1', '2', '3');
 
         $flashBag->expects($this->once())
             ->method('add')

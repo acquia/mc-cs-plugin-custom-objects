@@ -32,6 +32,8 @@ trait FixtureObjectsTrait
      */
     public function setFixtureObjects(array $objects): void
     {
+        $this->skipIfMissingDependency();
+
         foreach ($objects as $key => $object) {
             $this->objects[get_class($object)][$key] = $object;
             $this->entityMap[$key]                   = get_class($object);
@@ -45,6 +47,8 @@ trait FixtureObjectsTrait
      */
     public function getFixturesByEntityClassName(string $type): array
     {
+        $this->skipIfMissingDependency();
+
         if (!isset($this->objects[$type])) {
             throw new FixtureNotFoundException('No fixtures of type '.$type.' defined');
         }
@@ -57,6 +61,8 @@ trait FixtureObjectsTrait
      */
     public function getFixtureByEntityClassNameAndIndex(string $type, int $index): CommonEntity
     {
+        $this->skipIfMissingDependency();
+
         $fixtures = $this->getFixturesByEntityClassName($type);
 
         $fixtures = array_values($fixtures);
@@ -75,6 +81,8 @@ trait FixtureObjectsTrait
      */
     public function getFixtureById(string $id): UniqueEntityInterface
     {
+        $this->skipIfMissingDependency();
+
         if (!isset($this->entityMap[$id])) {
             throw new FixtureNotFoundException('No fixture with id "'.$id.'"" defined');
         }
@@ -87,10 +95,12 @@ trait FixtureObjectsTrait
      */
     public function getFixturesInUnloadableOrder(): array
     {
+        $this->skipIfMissingDependency();
+
         $entities = [];
 
         $orderedKeys = $this->entityMap;
-        array_reverse($orderedKeys, true);
+        $orderedKeys = array_reverse($orderedKeys, true);
         foreach ($orderedKeys as $key => $type) {
             $entities[$key] = $this->objects[$type][$key];
         }
@@ -100,6 +110,8 @@ trait FixtureObjectsTrait
 
     private function getFixturesDirectory(): string
     {
+        $this->skipIfMissingDependency();
+
         /** @var KernelInterface $kernel */
         $kernel          = $this->getContainer()->get('kernel');
         $pluginDirectory = $kernel->locateResource('@CustomObjectsBundle');
@@ -109,5 +121,12 @@ trait FixtureObjectsTrait
         }
 
         return $pluginDirectory.'/Tests/Functional/DataFixtures/ORM/Data';
+    }
+
+    private function skipIfMissingDependency(): void
+    {
+        if (!self::$container->has('fidry_alice_data_fixtures.loader.doctrine')) {
+            $this->markTestSkipped('This test requires the theofidry/alice-data-fixtures package');
+        }
     }
 }

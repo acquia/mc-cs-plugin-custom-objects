@@ -59,7 +59,8 @@ class CustomItemNameFilterQueryBuilderTest extends MauticMysqlTestCase
                 $customFieldRepository,
                 new QueryFilterFactory\Calculator(),
                 1
-            )
+            ),
+            new RandomParameterName()
         );
         $queryBuilderService = new CustomItemNameFilterQueryBuilder(
             new RandomParameterName(),
@@ -94,6 +95,7 @@ class CustomItemNameFilterQueryBuilderTest extends MauticMysqlTestCase
         $filterMock->method('getField')->willReturn((string) $this->getFixtureById($fixtureField)->getId());
         $filterMock->method('getParameterValue')->willReturn($value);
         $filterMock->method('getParameterHolder')->willReturn((string) ':needle');
+        $filterMock->method('getGlue')->willReturn($operator);
 
         return $filterMock;
     }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Controller;
 
-use DateTime;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
@@ -886,12 +885,12 @@ class CustomObjectFormTest extends MauticMysqlTestCase
             $defaultValue = $customField->getDefaultValue();
             switch ($customField->getType()) {
                 case 'date':
-                    $this->assertInstanceOf(DateTime::class, $defaultValue);
+                    $this->assertInstanceOf(\DateTime::class, $defaultValue);
                     $this->assertSame($expectedCf['defaultValue'], $defaultValue->format('Y-m-d'));
 
                     break;
                 case 'datetime':
-                    $this->assertInstanceOf(DateTime::class, $defaultValue);
+                    $this->assertInstanceOf(\DateTime::class, $defaultValue);
                     $this->assertSame($expectedCf['defaultValue'], $defaultValue->format('Y-m-d H:i'));
 
                     break;

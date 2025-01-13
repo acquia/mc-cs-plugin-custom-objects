@@ -18,9 +18,9 @@ use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
+#[\AllowDynamicProperties]
 class ListControllerTest extends ControllerTestCase
 {
     private const OBJECT_ID = 33;
@@ -32,6 +32,7 @@ class ListControllerTest extends ControllerTestCase
     private $sessionProvider;
     private $permissionProvider;
     private $routeProvider;
+    private $sessionProviderFactory;
 
     /**
      * @var ListController
@@ -42,27 +43,31 @@ class ListControllerTest extends ControllerTestCase
     {
         parent::setUp();
 
-        $sessionProviderFactory   = $this->createMock(SessionProviderFactory::class);
-        $this->requestStack       = $this->createMock(RequestStack::class);
-        $this->customItemModel    = $this->createMock(CustomItemModel::class);
-        $this->customObjectModel  = $this->createMock(CustomObjectModel::class);
-        $this->sessionProvider    = $this->createMock(SessionProvider::class);
-        $this->permissionProvider = $this->createMock(CustomItemPermissionProvider::class);
-        $this->routeProvider      = $this->createMock(CustomItemRouteProvider::class);
-        $this->request            = $this->createMock(Request::class);
-        $this->listController     = new ListController(
+        $this->sessionProviderFactory = $this->createMock(SessionProviderFactory::class);
+        $this->customItemModel        = $this->createMock(CustomItemModel::class);
+        $this->customObjectModel      = $this->createMock(CustomObjectModel::class);
+        $this->sessionProvider        = $this->createMock(SessionProvider::class);
+        $this->permissionProvider     = $this->createMock(CustomItemPermissionProvider::class);
+        $this->routeProvider          = $this->createMock(CustomItemRouteProvider::class);
+        $this->request                = $this->createMock(Request::class);
+
+        $this->listController         = new ListController(
+            $this->managerRegistry,
+            $this->mauticFactory,
+            $this->modelFactory,
+            $this->userHelper,
+            $this->coreParametersHelper,
+            $this->dispatcher,
+            $this->translator,
+            $this->flashBag,
             $this->requestStack,
-            $sessionProviderFactory,
-            $this->customItemModel,
-            $this->customObjectModel,
-            $this->permissionProvider,
-            $this->routeProvider
+            $this->security
         );
 
         $this->addSymfonyDependencies($this->listController);
 
         $this->requestStack->method('getCurrentRequest')->willReturn($this->request);
-        $sessionProviderFactory->method('createItemProvider')->willReturn($this->sessionProvider);
+        $this->sessionProviderFactory->method('createItemProvider')->willReturn($this->sessionProvider);
     }
 
     public function testListActionIfCustomObjectNotFound(): void
@@ -74,7 +79,21 @@ class ListControllerTest extends ControllerTestCase
         $this->customItemModel->expects($this->never())
             ->method('getTableData');
 
-        $this->listController->listAction(self::OBJECT_ID, self::PAGE);
+        $post                   = $this->createMock(ParameterBag::class);
+        $this->request->request = $post;
+        $post->expects($this->once())
+            ->method('all')
+            ->willReturn([]);
+
+        $this->listController->listAction(
+            $this->sessionProviderFactory,
+            $this->customItemModel,
+            $this->customObjectModel,
+            $this->permissionProvider,
+            $this->routeProvider,
+            self::OBJECT_ID,
+            self::PAGE
+        );
     }
 
     public function testListActionIfForbidden(): void
@@ -86,9 +105,21 @@ class ListControllerTest extends ControllerTestCase
         $this->customObjectModel->expects($this->never())
             ->method('fetchEntity');
 
+        $this->security->expects($this->once())
+            ->method('isAnonymous')
+            ->willReturn(true);
+
         $this->expectException(AccessDeniedHttpException::class);
 
-        $this->listController->listAction(self::OBJECT_ID, self::PAGE);
+        $this->listController->listAction(
+            $this->sessionProviderFactory,
+            $this->customItemModel,
+            $this->customObjectModel,
+            $this->permissionProvider,
+            $this->routeProvider,
+            self::OBJECT_ID,
+            self::PAGE
+        );
     }
 
     public function testListAction(): void
@@ -148,7 +179,15 @@ class ListControllerTest extends ControllerTestCase
             ->method('setPageLimit')
             ->with($pageLimit);
 
-        $this->listController->listAction(self::OBJECT_ID, self::PAGE);
+        $this->listController->listAction(
+            $this->sessionProviderFactory,
+            $this->customItemModel,
+            $this->customObjectModel,
+            $this->permissionProvider,
+            $this->routeProvider,
+            self::OBJECT_ID,
+            self::PAGE
+        );
     }
 
     public function testListActionWithQueryParamAndAjax(): void
@@ -225,6 +264,14 @@ class ListControllerTest extends ControllerTestCase
             ->method('setPageLimit')
             ->with($pageLimit);
 
-        $this->listController->listAction(self::OBJECT_ID, self::PAGE);
+        $this->listController->listAction(
+            $this->sessionProviderFactory,
+            $this->customItemModel,
+            $this->customObjectModel,
+            $this->permissionProvider,
+            $this->routeProvider,
+            self::OBJECT_ID,
+            self::PAGE
+        );
     }
 }

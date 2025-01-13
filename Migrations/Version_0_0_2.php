@@ -9,10 +9,7 @@ use Mautic\IntegrationsBundle\Migration\AbstractMigration;
 
 class Version_0_0_2 extends AbstractMigration
 {
-    /**
-     * @var string
-     */
-    private $table = 'custom_item_xref_custom_item';
+    private string $table = 'custom_item_xref_custom_item';
 
     /**
      * {@inheritdoc}

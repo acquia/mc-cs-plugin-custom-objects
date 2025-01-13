@@ -7,7 +7,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\CustomFieldType;
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\PhoneType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PhoneTypeTest extends \PHPUnit\Framework\TestCase
 {

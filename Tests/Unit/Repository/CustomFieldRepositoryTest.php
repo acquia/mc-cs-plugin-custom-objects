@@ -5,20 +5,31 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Repository;
 
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class CustomFieldRepositoryTest extends \PHPUnit\Framework\TestCase
 {
     private $entityManager;
-    private $classMetadata;
     private $queryBuilder;
     private $query;
     private $expression;
+
+    /**
+     * @var MockObject|ClassMetadata
+     */
+    private $classMetadata;
+
+    /**
+     * @var MockObject|ManagerRegistry
+     */
+    private $registry;
 
     /**
      * @var CustomFieldRepository
@@ -29,16 +40,18 @@ class CustomFieldRepositoryTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->registry      = $this->createMock(ManagerRegistry::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->classMetadata = $this->createMock(ClassMetadata::class);
         $this->queryBuilder  = $this->createMock(QueryBuilder::class);
         $this->query         = $this->createMock(AbstractQuery::class);
         $this->expression    = $this->createMock(Expr::class);
         $this->repository    = new CustomFieldRepository(
-            $this->entityManager,
-            $this->classMetadata
+            $this->registry,
         );
 
+        $this->registry->method('getManagerForClass')->willReturn($this->entityManager);
+        $this->entityManager->method('getClassMetadata')->willReturn($this->classMetadata);
         $this->entityManager->method('createQueryBuilder')->willReturn($this->queryBuilder);
         $this->queryBuilder->method('getQuery')->willReturn($this->query);
         $this->queryBuilder->method('expr')->willReturn($this->expression);

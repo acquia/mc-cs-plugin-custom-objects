@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
-use Mautic\CoreBundle\Exception\SchemaException;
+use Doctrine\DBAL\Schema\SchemaException;
 use Mautic\IntegrationsBundle\Migration\AbstractMigration;
 
 class Version_0_0_16 extends AbstractMigration
@@ -16,9 +16,9 @@ class Version_0_0_16 extends AbstractMigration
         $table     = $schema->getTable($tableName);
 
         try {
-            return $table->hasColumn('required') &&
-                null === $table->getColumn('required')->getDefault();
-        } catch (SchemaException $e) {
+            return $table->hasColumn('required')
+                && null === $table->getColumn('required')->getDefault();
+        } catch (SchemaException) {
             return false;
         }
     }

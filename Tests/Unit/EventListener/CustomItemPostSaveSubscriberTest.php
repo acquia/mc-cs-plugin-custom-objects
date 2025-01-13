@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
-use Exception;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
@@ -33,7 +32,7 @@ class CustomItemPostSaveSubscriberTest extends TestCase
 
             public function fetchEntity(int $id): CustomItem
             {
-                throw new Exception('This should not have been called.');
+                throw new \Exception('This should not have been called.');
             }
         };
 
@@ -60,7 +59,7 @@ class CustomItemPostSaveSubscriberTest extends TestCase
 
         $subscriber->postSave($event);
 
-        // No actual assertions made, we're just ensuring an exception is not thrown.
+        // No actual assertions made, we're just ensuring an \Exception is not thrown.
         $this->addToAssertionCount(1);
     }
 
@@ -74,7 +73,7 @@ class CustomItemPostSaveSubscriberTest extends TestCase
 
             public function fetchEntity(int $id): CustomItem
             {
-                throw new Exception('This should not have been called.');
+                throw new \Exception('This should not have been called.');
             }
         };
 
@@ -101,7 +100,7 @@ class CustomItemPostSaveSubscriberTest extends TestCase
 
         $subscriber->postSave($event);
 
-        // No actual assertions made, we're just ensuring an exception is not thrown.
+        // No actual assertions made, we're just ensuring an \Exception is not thrown.
         $this->addToAssertionCount(1);
     }
 }

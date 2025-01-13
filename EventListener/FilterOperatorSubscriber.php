@@ -21,14 +21,8 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
 
     public const NOT_IN_CUSTOM_OBJECTS = 'notInCustomObjects';
 
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    public function __construct(CustomObjectModel $customObjectModel)
+    public function __construct(private CustomObjectModel $customObjectModel)
     {
-        $this->customObjectModel = $customObjectModel;
     }
 
     /**
@@ -45,7 +39,7 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onOperatorsGenerate(LeadListFiltersOperatorsEvent $event)
+    public function onOperatorsGenerate(LeadListFiltersOperatorsEvent $event): void
     {
         $event->addOperator(self::WITHIN_CUSTOM_OBJECTS, [
             'label'       => 'custom.within.custom.objects.label',
@@ -121,9 +115,9 @@ class FilterOperatorSubscriber implements EventSubscriberInterface
             );
         } elseif ($event->operatorIsOneOf(self::NOT_IN_CUSTOM_OBJECTS)) {
             $queryBuilder           = $event->getQueryBuilder();
-            $subQueryBuilder        = $queryBuilder->getConnection()->createQueryBuilder();
-            $expr                   = $subQueryBuilder->expr();
-            $customItemQueryBuilder = $subQueryBuilder->select('ci.name')
+            // $subQueryBuilder        = $queryBuilder->getConnection()->createQueryBuilder();
+            $expr                   = $queryBuilder->expr();
+            $customItemQueryBuilder = $queryBuilder->select('ci.name')
                 ->from(MAUTIC_TABLE_PREFIX.'custom_item', 'ci')
                 ->andWhere($expr->eq('ci.custom_object_id', $customObjectId))
                 ->andWhere($expr->eq('ci.is_published', 1));

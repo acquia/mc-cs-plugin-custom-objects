@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Controller;
 
-use DateTime;
-use InvalidArgumentException;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Entity\AbstractCustomFieldValue;
@@ -78,7 +76,7 @@ class CustomItemListControllerShownFieldTest extends MauticMysqlTestCase
                 $showInContactDetailList      = false;
                 break;
             default:
-                throw new InvalidArgumentException();
+                throw new \InvalidArgumentException();
                 break;
         }
 
@@ -97,8 +95,8 @@ class CustomItemListControllerShownFieldTest extends MauticMysqlTestCase
 
         $fieldValueBasset      = $this->addCustomFieldValue($customItemAnimal, new CustomFieldValueText($customFieldBreed, $customItemAnimal, 'Basset'));
         $fieldValueAge         = $this->addCustomFieldValue($customItemAnimal, new CustomFieldValueInt($customFieldAge, $customItemAnimal, 5));
-        $fieldValueBirthDate   = $this->addCustomFieldValue($customItemAnimal, new CustomFieldValueDate($customFieldBirthDate, $customItemAnimal, new DateTime('2015-02-15')));
-        $fieldValueInoculation = $this->addCustomFieldValue($customItemAnimal, new CustomFieldValueDateTime($customFieldInoculation, $customItemAnimal, new DateTime('2020-09-15')));
+        $fieldValueBirthDate   = $this->addCustomFieldValue($customItemAnimal, new CustomFieldValueDate($customFieldBirthDate, $customItemAnimal, new \DateTime('2015-02-15')));
+        $fieldValueInoculation = $this->addCustomFieldValue($customItemAnimal, new CustomFieldValueDateTime($customFieldInoculation, $customItemAnimal, new \DateTime('2020-09-15')));
         $this->addCustomFieldValue($customItemAnimal, new CustomFieldValueOption($customFieldDiseases, $customItemAnimal, 'fever'));
 
         $createXref($customItemAnimal);
@@ -108,7 +106,7 @@ class CustomItemListControllerShownFieldTest extends MauticMysqlTestCase
         $this->em->flush();
 
         $crawler      = $this->client->request(Request::METHOD_GET, sprintf('/s/custom/object/%s/item?filterEntityId=%s&filterEntityType=%s', $customObjectAnimal->getId(), $relatedObject->getId(), $type));
-        $tableCrawler = $crawler->filterXPath(sprintf('//h3[contains(text(), "%s")]/following::table[1]', $customObjectAnimal->getNameSingular()));
+        $tableCrawler = $crawler->filterXPath(sprintf('//h1[contains(text(), "%s")]/following::table[1]', $customObjectAnimal->getNameSingular()));
         Assert::assertSame(1, $tableCrawler->count());
 
         $headRowCrawler = $tableCrawler->filterXPath('.//thead/tr');

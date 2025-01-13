@@ -14,7 +14,6 @@ use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
-use PDOException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -23,36 +22,12 @@ class DynamicContentSubscriber implements EventSubscriberInterface
     use MatchFilterForLeadTrait;
     use DbalQueryTrait;
 
-    /**
-     * @var QueryFilterFactory
-     */
-    private $queryFilterFactory;
-
-    /**
-     * @var QueryFilterHelper
-     */
-    private $queryFilterHelper;
-
-    /**
-     * @var ConfigProvider
-     */
-    private $configProvider;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
     public function __construct(
-        QueryFilterFactory $queryFilterFactory,
-        QueryFilterHelper $queryFilterHelper,
-        ConfigProvider $configProvider,
-        LoggerInterface $logger
+        private QueryFilterFactory $queryFilterFactory,
+        private QueryFilterHelper $queryFilterHelper,
+        private ConfigProvider $configProvider,
+        private LoggerInterface $logger
     ) {
-        $this->queryFilterFactory = $queryFilterFactory;
-        $this->queryFilterHelper  = $queryFilterHelper;
-        $this->configProvider     = $configProvider;
-        $this->logger             = $logger;
     }
 
     /**
@@ -99,8 +74,8 @@ class DynamicContentSubscriber implements EventSubscriberInterface
                 } else {
                     $event->setIsEvaluated(true);
                 }
-            } catch (PDOException $e) {
-                $this->logger->addError('Failed to evaluate dynamic content for custom object '.$e->getMessage());
+            } catch (\PDOException $e) {
+                $this->logger->error('Failed to evaluate dynamic content for custom object '.$e->getMessage());
 
                 throw $e;
             }

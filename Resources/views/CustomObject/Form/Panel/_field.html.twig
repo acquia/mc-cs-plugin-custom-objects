@@ -1,0 +1,47 @@
+{% set customFieldEntity = customField.vars.data %}
+{#{% set customField.vars.index = customField.vars.name %}#}
+{% set order = customField.vars.value.getOrder() %}
+{#{{ dump(app.request.) }}#}
+{# TODO !!!!!!!!!!!! Handle deleted objects#}
+{#{% set requestCustomObject = app.request.post('custom_object') %}#}
+{#{% set displayStyle = requestCustomObject['customFields'][order]['deleted'] is empty ? '' : 'style="display:none;"' %}#}
+{% set displayStyle = '' %}
+{% set panelId = panelId is empty ? customField.vars.value.getOrder()|number_format : panelId %}
+{% set routeForm = constant('MauticPlugin\\CustomObjectsBundle\\Provider\\CustomFieldRouteProvider::ROUTE_FORM') %}
+
+<div class="panel form-field-wrapper ui-sortable-handle" id="customField_{{ panelId }}" {{ displayStyle }}>
+    <div class="form-buttons btn-group" role="group" aria-label="Field options" style="width: 77px;">
+        <button type="button"
+                data-toggle="ajaxmodal"
+                data-target="#objectFieldModal"
+                href="{{ path(routeForm, {
+                    'fieldId': customFieldEntity.getId(),
+                    'objectId': customObject.getId(),
+                    'fieldType': customFieldEntity.getTypeObject().getKey()
+                }) }}"
+                class="btn btn-default btn-edit">
+            <i class="fa fa-pencil-square-o text-primary"></i>
+        </button>
+
+        <a type="button" data-hide-panel="true" class="btn btn-default">
+            <i class="fa fa-trash-o text-danger"></i>
+        </a>
+    </div>
+
+    <div class="row ml-0 mr-0">
+        <div class="mauticform-row">
+            <div class="col-xs-10">
+                {{ form_row(customField.defaultValue) }}
+            </div>
+        </div>
+    </div>
+    <div class="hidden-fields">
+        {{ form_rest(customField) }}
+    </div>
+    <div class="panel-footer">
+        <i class="fa fa-cog" aria-hidden="true"></i>
+        <span class="inline-spacer">
+        {{ customFieldEntity.getTypeObject().getName() }}
+    </span>
+    </div>
+</div>

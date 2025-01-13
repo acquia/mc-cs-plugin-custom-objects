@@ -13,7 +13,7 @@ class CustomObjectTypeValuesValidator extends ConstraintValidator
     /**
      * @param CustomObject $customObject
      */
-    public function validate($customObject, Constraint $constraint)
+    public function validate($customObject, Constraint $constraint): void
     {
         if (CustomObject::TYPE_RELATIONSHIP === $customObject->getType()) {
             if (null === $customObject->getMasterObject()) {

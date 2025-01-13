@@ -6,24 +6,12 @@ namespace MauticPlugin\CustomObjectsBundle\Event;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class CustomItemListDbalQueryEvent extends Event
 {
-    /**
-     * @var QueryBuilder
-     */
-    private $queryBuilder;
-
-    /**
-     * @var TableConfig
-     */
-    private $tableConfig;
-
-    public function __construct(QueryBuilder $queryBuilder, TableConfig $tableConfig)
+    public function __construct(private QueryBuilder $queryBuilder, private TableConfig $tableConfig)
     {
-        $this->queryBuilder = $queryBuilder;
-        $this->tableConfig  = $tableConfig;
     }
 
     public function getQueryBuilder(): QueryBuilder

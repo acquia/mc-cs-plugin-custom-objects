@@ -113,7 +113,7 @@ class CustomItemListControllerSearchTest extends MauticMysqlTestCase
     private function assertFound(CustomObject $customObject, CustomItem $customItem, string $search): void
     {
         $crawler      = $this->client->request(Request::METHOD_GET, sprintf('/s/custom/object/%s/item?search=%s', $customObject->getId(), $search));
-        $tableCrawler = $crawler->filterXPath('//h3[contains(text(), "Devices")]/following::table[1]');
+        $tableCrawler = $crawler->filterXPath('//h1[contains(text(), "Devices")]/following::table[1]');
         Assert::assertSame(1, $tableCrawler->count());
 
         $rowCrawler = $tableCrawler->filterXPath('.//tbody/tr');

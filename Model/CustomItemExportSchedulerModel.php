@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
-use DateTimeImmutable;
-use DateTimeZone;
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\ExportHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\EmailBundle\Helper\MailHelper;
-use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemExportScheduler;
@@ -18,9 +20,11 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemExportSchedulerRepository;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CustomItemExportSchedulerModel extends AbstractCommonModel
 {
@@ -28,38 +32,25 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
     private const CUSTOM_ITEM_LIMIT            = 200;
     private const CONTACT_LIMIT                = 5000;
 
-    private ExportHelper $exportHelper;
-
-    private MailHelper $mailHelper;
-
-    private CustomItemRouteProvider $customItemRouteProvider;
-
-    private CustomFieldValueModel $customFieldValueModel;
-
-    private CustomItemXrefContactRepository $customItemXrefContactRepository;
-
-    private CustomItemRepository $customItemRepository;
-
-    private EventDispatcherInterface $eventDispatcher;
-
     private string $filePath;
 
     public function __construct(
-        ExportHelper $exportHelper,
-        MailHelper $mailHelper,
-        CustomFieldValueModel $customFieldValueModel,
-        CustomItemRouteProvider $customItemRouteProvider,
-        CustomItemXrefContactRepository $customItemXrefContactRepository,
-        CustomItemRepository $customItemRepository,
-        EventDispatcherInterface $eventDispatcher
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $logger,
+        CoreParametersHelper $coreParametersHelper,
+        private ExportHelper $exportHelper,
+        private MailHelper $mailHelper,
+        private CustomFieldValueModel $customFieldValueModel,
+        private CustomItemRouteProvider $customItemRouteProvider,
+        private CustomItemXrefContactRepository $customItemXrefContactRepository,
+        private CustomItemRepository $customItemRepository,
     ) {
-        $this->exportHelper                    = $exportHelper;
-        $this->mailHelper                      = $mailHelper;
-        $this->customFieldValueModel           = $customFieldValueModel;
-        $this->customItemRouteProvider         = $customItemRouteProvider;
-        $this->customItemXrefContactRepository = $customItemXrefContactRepository;
-        $this->customItemRepository            = $customItemRepository;
-        $this->eventDispatcher                 = $eventDispatcher;
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }
 
     public function getRepository(): CustomItemExportSchedulerRepository
@@ -79,7 +70,7 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
         $customItemExportScheduler = new CustomItemExportScheduler();
         $customItemExportScheduler
             ->setUser($this->userHelper->getUser())
-            ->setScheduledDateTime(new DateTimeImmutable('now', new DateTimeZone('UTC')))
+            ->setScheduledDateTime(new \DateTimeImmutable('now', new \DateTimeZone('UTC')))
             ->setCustomObjectId($customObjectId);
 
         $this->em->persist($customItemExportScheduler);
@@ -93,7 +84,7 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
         $scheduledDateTime = $customItemExportScheduler->getScheduledDateTime();
         $fileName          = 'custom_items_export_'.$scheduledDateTime->format(self::EXPORT_FILE_NAME_DATE_FORMAT).'.csv';
 
-        $filePath = $this->exportHelper->getValidExportFileName($fileName, 'custom_item_export_dir');
+        $filePath    = $this->coreParametersHelper->get('custom_item_export_dir').'/'.$fileName;
 
         $this->filePath = $filePath;
 
@@ -167,20 +158,12 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
                 foreach ($customFields as $customField) {
                     $fieldValue = $listData->getFields($customItem->getId())[$customField->getId()]->getValue();
 
-                    switch ($customField->getType()) {
-                        case 'date':
-                            $value = $fieldValue instanceof \DateTimeInterface ? $fieldValue->format('Y-m-d') : $fieldValue;
-                            break;
-
-                        case 'datetime':
-                            $value = $fieldValue instanceof \DateTimeInterface ? $fieldValue->format('Y-m-d H:i:s') : $fieldValue;
-                            break;
-
-                        case 'multiselect': $value = is_array($fieldValue) ? implode(',', $fieldValue) : $fieldValue;
-                            break;
-
-                            default: $value = $fieldValue;
-                    }
+                    $value = match ($customField->getType()) {
+                        'date'        => $fieldValue instanceof \DateTimeInterface ? $fieldValue->format('Y-m-d') : $fieldValue,
+                        'datetime'    => $fieldValue instanceof \DateTimeInterface ? $fieldValue->format('Y-m-d H:i:s') : $fieldValue,
+                        'multiselect' => is_array($fieldValue) ? implode(',', $fieldValue) : $fieldValue,
+                        default       => $fieldValue,
+                    };
 
                     $rowData[] = $value;
                 }
@@ -205,10 +188,6 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
 
                     $rowData   = $savedRow;
                     $rowData[] = implode(',', $results);
-
-                    if ($this->eventDispatcher->hasListeners(CustomItemEvents::ON_PROCESSING_FILE)) {
-                        $this->eventDispatcher->dispatch(CustomItemEvents::ON_PROCESSING_FILE);
-                    }
 
                     fputcsv($handler, $rowData);
                     $customItemAdded = true;

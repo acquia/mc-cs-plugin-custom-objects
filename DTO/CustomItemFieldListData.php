@@ -8,20 +8,8 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 
 class CustomItemFieldListData
 {
-    /**
-     * @var array
-     */
-    private $columns;
-
-    /**
-     * @var array
-     */
-    private $data;
-
-    public function __construct(array $columns, array $data)
+    public function __construct(private array $columns, private array $data)
     {
-        $this->columns = $columns;
-        $this->data    = $data;
     }
 
     public function getColumnLabels(): array

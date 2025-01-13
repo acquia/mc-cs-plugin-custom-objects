@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
@@ -16,6 +17,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class CustomItemRepositoryTest extends TestCase
@@ -32,11 +34,14 @@ class CustomItemRepositoryTest extends TestCase
      */
     private $customItemRepository;
 
+    /**
+     * @var MockObject|ManagerRegistry
+     */
+    private $registry;
+
     protected function setUp(): void
     {
         parent::setUp();
-
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', '');
 
         $this->entityManager        = $this->createMock(EntityManager::class);
         $classMetadata              = $this->createMock(ClassMetadata::class);
@@ -45,10 +50,13 @@ class CustomItemRepositoryTest extends TestCase
         $this->queryBuilder         = $this->createMock(QueryBuilder::class);
         $this->expr                 = $this->createMock(Expr::class);
         $this->query                = $this->createMock(AbstractQuery::class);
+        $this->registry             = $this->createMock(ManagerRegistry::class);
         $this->customItemRepository = new CustomItemRepository(
-            $this->entityManager,
-            $classMetadata
+            $this->registry,
         );
+
+        $this->registry->method('getManagerForClass')->willReturn($this->entityManager);
+        $this->entityManager->method('getClassMetadata')->willReturn($classMetadata);
     }
 
     public function testCountItemsLinkedToContact(): void

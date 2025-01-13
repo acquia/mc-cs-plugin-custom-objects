@@ -10,14 +10,8 @@ use Symfony\Component\Form\DataTransformerInterface;
 
 class ParamsToStringTransformer implements DataTransformerInterface
 {
-    /**
-     * @var SerializerInterface
-     */
-    private $serializer;
-
-    public function __construct(SerializerInterface $serializer)
+    public function __construct(private SerializerInterface $serializer)
     {
-        $this->serializer = $serializer;
     }
 
     /**

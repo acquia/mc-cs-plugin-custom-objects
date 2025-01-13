@@ -5,7 +5,7 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomField:
     date_added: '<date_create()>'
     label: '<word()> Text'
     alias: 'text_1'
-    type: 'tect'
+    type: 'text'
   custom_field2:
     custom_object: '@custom_object1'
     is_published: true

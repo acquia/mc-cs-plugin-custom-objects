@@ -10,14 +10,8 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 
 class CustomFieldFactory
 {
-    /**
-     * @var CustomFieldTypeProvider
-     */
-    private $customFieldTypeProvider;
-
-    public function __construct(CustomFieldTypeProvider $customFieldTypeProvider)
+    public function __construct(private CustomFieldTypeProvider $customFieldTypeProvider)
     {
-        $this->customFieldTypeProvider = $customFieldTypeProvider;
     }
 
     /**

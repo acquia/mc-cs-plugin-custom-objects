@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
+use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Statement;
 use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\LeadBundle\Entity\Lead;
@@ -86,8 +87,6 @@ class DynamicContentSubscriberTest extends TestCase
 
     public function testFiltersInsertedIntoEvent(): void
     {
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', '');
-
         $this->configProviderMock->expects($this->once())->method('pluginIsEnabled')->willReturn(true);
 
         $this->queryFilterFactory->expects($this->exactly(2))
@@ -120,11 +119,15 @@ class DynamicContentSubscriberTest extends TestCase
         $event = $this->buildEventWithFilters();
         $event->setIsEvaluated(false);
 
-        $this->queryBuilderMock->expects($this->once())->method('execute')->willReturn($this->statementMock);
+        $result = $this->createMock(Result::class);
+
+        $this->queryBuilderMock->expects($this->once())
+            ->method('execute')
+            ->willReturn($result);
 
         $this->loggerMock
             ->expects($this->never())
-            ->method('addError');
+            ->method('error');
 
         $this->dynamicContentSubscriber->evaluateFilters($event);
     }

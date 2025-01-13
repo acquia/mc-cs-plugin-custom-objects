@@ -14,14 +14,9 @@ class ReportColumnsBuilder
     public const DEFAULT_COLUMN_TYPE = 'string';
 
     /**
-     * @var CustomObject
+     * @var mixed[]
      */
-    private $customObject;
-
-    /**
-     * @var array
-     */
-    private $columns = [];
+    private array $columns = [];
 
     /**
      * @var callable
@@ -37,9 +32,8 @@ class ReportColumnsBuilder
         'datetime' => 'datetime',
     ];
 
-    public function __construct(CustomObject $customObject)
+    public function __construct(private CustomObject $customObject)
     {
-        $this->customObject = $customObject;
     }
 
     private function buildColumns(): void

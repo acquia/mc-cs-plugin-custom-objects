@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit;
 
-use DateTimeImmutable;
-use DateTimeZone;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
@@ -62,7 +60,7 @@ class CustomObjectTestCase extends MauticMysqlTestCase
     protected function createCustomItemExportScheduleEntity(CustomObject $customObject): CustomItemExportScheduler
     {
         $customItemExportScheduler = new CustomItemExportScheduler();
-        $customItemExportScheduler->setScheduledDateTime(new DateTimeImmutable('now', new DateTimeZone('UTC')));
+        $customItemExportScheduler->setScheduledDateTime(new \DateTimeImmutable('now', new \DateTimeZone('UTC')));
         $customItemExportScheduler->setUser($this->em->getRepository(User::class)->find(1));
         $customItemExportScheduler->setCustomObjectId((int) $customObject->getId());
 

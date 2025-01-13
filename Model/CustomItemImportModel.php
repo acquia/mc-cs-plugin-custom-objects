@@ -4,40 +4,39 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\LeadBundle\Entity\Import;
+use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
+use MauticPlugin\CustomObjectsBundle\DTO\ImportLogDTO;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CustomItemImportModel extends FormModel
 {
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
-     * @var FormatterHelper
-     */
-    private $formatterHelper;
-
     public function __construct(
-        EntityManager $entityManager,
-        CustomItemModel $customItemModel,
-        FormatterHelper $formatterHelper
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $logger,
+        CoreParametersHelper $coreParametersHelper,
+        private CustomItemModel $customItemModel,
+        private FormatterHelper $formatterHelper,
     ) {
-        $this->entityManager   = $entityManager;
-        $this->customItemModel = $customItemModel;
-        $this->formatterHelper = $formatterHelper;
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }
 
     /**
@@ -45,7 +44,7 @@ class CustomItemImportModel extends FormModel
      *
      * @return bool updated = true, inserted = false
      */
-    public function import(Import $import, array $rowData, CustomObject $customObject): bool
+    public function import(Import $import, array $rowData, CustomObject $customObject, ImportLogDTO $importLogDto = null): bool
     {
         $matchedFields = $import->getMatchedFields();
         $customItem    = $this->getCustomItem($import, $customObject, $rowData);
@@ -80,7 +79,7 @@ class CustomItemImportModel extends FormModel
 
             try {
                 $customFieldValue = $customItem->findCustomFieldValueForFieldId((int) $customFieldId);
-            } catch (NotFoundException $e) {
+            } catch (NotFoundException) {
                 $customFieldValue = $customItem->createNewCustomFieldValueByFieldId((int) $customFieldId, $csvValue);
             }
 
@@ -94,7 +93,7 @@ class CustomItemImportModel extends FormModel
             $merged = true;
         }
 
-        $this->linkContacts($customItem, $contactIds);
+        $this->linkContacts($customItem, $contactIds, $importLogDto);
 
         return $merged;
     }
@@ -102,14 +101,25 @@ class CustomItemImportModel extends FormModel
     /**
      * @param int[] $contactIds
      */
-    private function linkContacts(CustomItem $customItem, array $contactIds): CustomItem
+    private function linkContacts(CustomItem $customItem, array $contactIds, ?ImportLogDTO $importLogDto): void
     {
         foreach ($contactIds as $contactId) {
-            $xref = $this->customItemModel->linkEntity($customItem, 'contact', $contactId);
+            $leadRepository = $this->em->getRepository(Lead::class);
+            if (method_exists($leadRepository, 'exists') && !$leadRepository->exists((string) $contactId)) {
+                if ($importLogDto) {
+                    $importLogDto->addWarning(
+                        $this->translator->trans('custom.item.import.invalid.contactid.for.link', [
+                            '%contactId%'    => $contactId,
+                            '%customItemId%' => $customItem->getId(),
+                        ])
+                    );
+                }
+                continue;
+            }
+
+            $xref = $this->customItemModel->linkEntity($customItem, 'contact', (int) $contactId);
             $customItem->addContactReference($xref);
         }
-
-        return $customItem;
     }
 
     private function setOwner(Import $import, CustomItem $customItem): CustomItem
@@ -118,7 +128,7 @@ class CustomItemImportModel extends FormModel
 
         if ($owner) {
             /** @var User $user */
-            $user = $this->entityManager->find(User::class, $owner);
+            $user = $this->em->find(User::class, $owner);
 
             $customItem->setCreatedBy($user);
         }
@@ -143,7 +153,7 @@ class CustomItemImportModel extends FormModel
             try {
                 $customItem = $this->customItemModel->fetchEntity((int) $rowData[$idKey]);
                 $customItem = $this->customItemModel->populateCustomFields($customItem);
-            } catch (NotFoundException $e) {
+            } catch (NotFoundException) {
             }
         }
 

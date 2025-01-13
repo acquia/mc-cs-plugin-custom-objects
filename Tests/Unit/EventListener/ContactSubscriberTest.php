@@ -16,7 +16,9 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use Symfony\Component\Translation\TranslatorInterface;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ContactSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -27,6 +29,11 @@ class ContactSubscriberTest extends \PHPUnit\Framework\TestCase
     private $configProvider;
     private $leadTimelineEvent;
     private $leadEventLogRepo;
+
+    /**
+     * @var MockObject&CustomItemXrefContactRepository
+     */
+    private MockObject $ciXcontactRepo;
 
     /**
      * @var ContactSubscriber
@@ -44,12 +51,14 @@ class ContactSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->configProvider    = $this->createMock(ConfigProvider::class);
         $this->leadTimelineEvent = $this->createMock(LeadTimelineEvent::class);
         $this->leadEventLogRepo  = $this->createMock(LeadEventLogRepository::class);
+        $this->ciXcontactRepo    = $this->createMock(CustomItemXrefContactRepository::class);
         $this->subscriber        = new ContactSubscriber(
             $this->entityManager,
             $this->translator,
             $this->routeProvider,
             $this->customItemModel,
-            $this->configProvider
+            $this->configProvider,
+            $this->ciXcontactRepo
         );
     }
 
@@ -176,7 +185,7 @@ class ContactSubscriberTest extends \PHPUnit\Framework\TestCase
                     'id'         => 444,
                 ],
                 'contactId'       => 333,
-                'contentTemplate' => 'CustomObjectsBundle:SubscribedEvents\Timeline:link.html.php',
+                'contentTemplate' => '@CustomObjects/SubscribedEvents/Timeline/link.html.twig',
             ]);
 
         $this->subscriber->onTimelineGenerate($this->leadTimelineEvent);
@@ -273,7 +282,7 @@ class ContactSubscriberTest extends \PHPUnit\Framework\TestCase
                     'id'         => 444,
                 ],
                 'contactId'       => 333,
-                'contentTemplate' => 'CustomObjectsBundle:SubscribedEvents\Timeline:link.html.php',
+                'contentTemplate' => '@CustomObjects/SubscribedEvents/Timeline/link.html.twig',
             ]);
 
         $this->subscriber->onTimelineGenerate($this->leadTimelineEvent);

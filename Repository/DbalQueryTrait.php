@@ -6,6 +6,7 @@ namespace MauticPlugin\CustomObjectsBundle\Repository;
 
 use Doctrine\DBAL\Driver\Statement;
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\DBAL\Result;
 
 trait DbalQueryTrait
 {
@@ -14,11 +15,11 @@ trait DbalQueryTrait
      *
      * @throws \UnexpectedValueException
      */
-    private function executeSelect(QueryBuilder $queryBuilder): Statement
+    private function executeSelect(QueryBuilder $queryBuilder): Result|Statement
     {
         $statement = $queryBuilder->execute();
 
-        if ($statement instanceof Statement) {
+        if ($statement instanceof Result || $statement instanceof Statement) {
             return $statement;
         }
 

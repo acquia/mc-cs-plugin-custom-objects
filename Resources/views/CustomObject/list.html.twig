@@ -1,0 +1,27 @@
+{% set isIndex = tmpl == 'index' ? true : false %}
+{% set tmpl = 'list' %}
+
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block mauticContent %}customObject{% endblock %}
+
+{% block headerTitle %}
+    {{ 'custom.object.title'|trans }}
+{% endblock %}
+
+{% block actions %}
+    {{ include('@MauticCore/Helper/page_actions.html.twig') }}
+{% endblock %}
+
+{% block content %}
+    {% if isIndex %}
+        <div class="panel panel-default bdr-t-wdh-0 mb-0">
+            {{ include('@MauticCore/Helper/list_toolbar.html.twig') }}
+            <div class="page-list">!
+                {{ include('@CustomObjects/CustomObject/_list.html.twig') }}
+            </div>
+        </div>
+    {% else %}
+        {{ include('@CustomObjects/CustomObject/_list.html.twig') }}
+    {% endif %}
+{% endblock %}

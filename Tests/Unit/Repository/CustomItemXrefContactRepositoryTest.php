@@ -13,12 +13,14 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class CustomItemXrefContactRepositoryTest extends \PHPUnit\Framework\TestCase
 {
@@ -38,11 +40,14 @@ class CustomItemXrefContactRepositoryTest extends \PHPUnit\Framework\TestCase
      */
     private $repository;
 
+    /**
+     * @var MockObject|ManagerRegistry
+     */
+    private $registry;
+
     protected function setUp(): void
     {
         parent::setUp();
-
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', '');
 
         $this->entityManager        = $this->createMock(EntityManager::class);
         $this->classMetadata        = $this->createMock(ClassMetadata::class);
@@ -54,11 +59,13 @@ class CustomItemXrefContactRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->expr                 = $this->createMock(Expr::class);
         $this->expressionBuilder    = $this->createMock(ExpressionBuilder::class);
         $this->query                = $this->createMock(AbstractQuery::class);
+        $this->registry             = $this->createMock(ManagerRegistry::class);
         $this->repository           = new CustomItemXrefContactRepository(
-            $this->entityManager,
-            $this->classMetadata
+            $this->registry,
         );
 
+        $this->registry->method('getManagerForClass')->willReturn($this->entityManager);
+        $this->entityManager->method('getClassMetadata')->willReturn($this->classMetadata);
         $this->entityManager->method('createQueryBuilder')->willReturn($this->queryBuilder);
         $this->entityManager->method('getConnection')->willReturn($this->connection);
         $this->connection->method('createQueryBuilder')->willReturn($this->queryBuilderDbal);

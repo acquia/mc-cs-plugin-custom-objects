@@ -11,61 +11,41 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use UnexpectedValueException;
 
 class UnlinkController extends JsonController
 {
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
-     * @var CustomItemPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var FlashBag
-     */
-    private $flashBag;
-
-    public function __construct(
+    public function saveAction(
         CustomItemModel $customItemModel,
         CustomItemPermissionProvider $permissionProvider,
-        FlashBag $flashBag
-    ) {
-        $this->customItemModel    = $customItemModel;
-        $this->permissionProvider = $permissionProvider;
-        $this->flashBag           = $flashBag;
-    }
-
-    public function saveAction(int $itemId, string $entityType, int $entityId): JsonResponse
-    {
+        FlashBag $flashBag,
+        int $itemId,
+        string $entityType,
+        int $entityId
+    ): JsonResponse {
         try {
-            $customItem = $this->customItemModel->fetchEntity($itemId);
+            $customItem = $customItemModel->fetchEntity($itemId);
 
-            $this->permissionProvider->canEdit($customItem);
+            $permissionProvider->canEdit($customItem);
 
             if ($customItem->getCustomObject()->getRelationshipObject()) {
                 try {
                     $childCustomItem = $customItem->findChildCustomItem();
-                } catch (NotFoundException $e) {
+                } catch (NotFoundException) {
                 }
 
                 if (isset($childCustomItem)) {
-                    $this->customItemModel->delete($childCustomItem);
+                    $customItemModel->delete($childCustomItem);
                 }
             }
 
-            $this->customItemModel->unlinkEntity($customItem, $entityType, $entityId);
+            $customItemModel->unlinkEntity($customItem, $entityType, $entityId);
 
-            $this->flashBag->add(
+            $flashBag->add(
                 'custom.item.unlinked',
                 ['%itemId%' => $customItem->getId(), '%itemName%' => $customItem->getName(), '%entityType%' => $entityType, '%entityId%' => $entityId]
             );
-        } catch (ForbiddenException|NotFoundException|UnexpectedValueException $e) {
-            $this->flashBag->add($e->getMessage(), [], FlashBag::LEVEL_ERROR);
+        } catch (ForbiddenException|NotFoundException|\UnexpectedValueException $e) {
+            $flashBag->add($e->getMessage(), [], FlashBag::LEVEL_ERROR);
         }
 
         return $this->renderJson();

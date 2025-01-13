@@ -13,7 +13,7 @@ class CustomFieldTypeProvider
     /**
      * @var CustomFieldTypeInterface[]
      */
-    private $customFieldTypes = [];
+    private array $customFieldTypes = [];
 
     /**
      * Builds the list of custom field type objects.

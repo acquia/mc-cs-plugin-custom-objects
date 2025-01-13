@@ -1,0 +1,23 @@
+<!-- right section -->
+<div class="col-md-3 bg-white bdr-l height-auto">
+    <!-- preview URL -->
+    <div class="panel bg-transparent shd-none bdr-rds-0 bdr-w-0 mt-sm mb-0">
+        <div class="panel-heading">
+            <div class="panel-title">
+                {{ 'mautic.webhook.webhook_url'|trans }}
+            </div>
+            <div class="panel-body pt-xs">
+                <div class="input-group">
+                </div>
+            </div>
+
+            <hr class="hr-w-2" style="width:50%">
+
+            <!-- recent activity -->
+            {{ include('@MauticCore/Helper/recentactivity.html.twig', {
+                logs: logs
+            }) }}
+        </div>
+    </div>
+    <!--/ right section -->
+</div>

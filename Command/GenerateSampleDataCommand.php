@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Command;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManager;
 use MauticPlugin\CustomObjectsBundle\Helper\RandomHelper;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,32 +16,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class GenerateSampleDataCommand extends ContainerAwareCommand
+class GenerateSampleDataCommand extends Command
 {
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @var RandomHelper
-     */
-    private $randomHelper;
-
-    /**
-     * @var Connection
-     */
-    private $connection;
+    private Connection $connection;
 
     public function __construct(
-        EntityManager $entityManager,
-        RandomHelper $randomHelper
+        private EntityManager $entityManager,
+        private RandomHelper $randomHelper
     ) {
         parent::__construct();
 
-        $this->entityManager     = $entityManager;
-        $this->randomHelper      = $randomHelper;
-        $this->connection        = $entityManager->getConnection();
+        $this->connection = $entityManager->getConnection();
     }
 
     /**
@@ -111,8 +96,6 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
 
     /**
      * @return int[]
-     *
-     * @throws DBALException
      */
     private function createCustomObjectsWithItems(): array
     {
@@ -150,13 +133,16 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         return [$coProductId, $cfPriceId, $coOrderId];
     }
 
+    /**
+     * @throws Exception
+     */
     private function cleanupDB(): void
     {
         $query = 'delete from '.MAUTIC_TABLE_PREFIX.'leads where 1';
-        $this->connection->query($query);
+        $this->connection->executeQuery($query);
 
         $query = 'delete from '.MAUTIC_TABLE_PREFIX.'custom_object where 1';
-        $this->connection->query($query);
+        $this->connection->executeQuery($query);
     }
 
     private function generateContact(int $coProductId, int $cfPriceId, int $coOrderId, int $priceLimit): void
@@ -220,9 +206,11 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
     }
 
     /**
+     * @param array<int|string, mixed> $row
+     *
      * @return int Last inserted row ID
      *
-     * @throws DBALException
+     * @throws Exception
      */
     private function insertInto(string $table, array $row): int
     {
@@ -235,13 +223,10 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
                     switch (gettype($value)) {
                         case 'string':
                             return "'$value'";
-                            break;
                         case 'integer':
                             return (string) $value;
-                            break;
                         case 'boolean':
                             return (bool) $value;
-                            break;
                         default:
                             $type = gettype($value);
                             throw new \InvalidArgumentException("Unsupported type '$type' for insert query");
@@ -256,7 +241,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
             VALUES ($values)
         ";
 
-        $this->connection->query($query);
+        $this->connection->executeQuery($query);
 
         return (int) $this->connection->lastInsertId();
     }
