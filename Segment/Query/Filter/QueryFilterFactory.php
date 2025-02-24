@@ -48,7 +48,10 @@ class QueryFilterFactory
 
         $type = $segmentFilter->getQueryType();
 
-        if (CustomFieldFilterQueryBuilder::getServiceId() === $type) {
+        if (in_array($type, [
+            CustomFieldFilterQueryBuilder::getServiceId(),
+            CustomObjectMergedFilterQueryBuilder::getServiceId()
+        ])) {
             $queryBuilder = $this->queryFilterHelper->createValueQuery(
                 $queryAlias,
                 $segmentFilter
