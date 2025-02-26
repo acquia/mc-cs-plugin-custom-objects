@@ -50,7 +50,7 @@ class QueryFilterFactory
 
         if (in_array($type, [
             CustomFieldFilterQueryBuilder::getServiceId(),
-            CustomObjectMergedFilterQueryBuilder::getServiceId()
+            CustomObjectMergedFilterQueryBuilder::getServiceId(),
         ])) {
             $queryBuilder = $this->queryFilterHelper->createValueQuery(
                 $queryAlias,
