@@ -53,6 +53,7 @@ class ConfigProvider
             $customObjectsTableExists = $this->connection
                 ->executeQuery('SHOW TABLES LIKE :tableName', ['tableName' => CustomObject::TABLE_NAME])
                 ->rowCount();
+
             return $pluginWasInstalledBefore && $customObjectsTableExists;
         } catch (Exception $e) {
             return false;
