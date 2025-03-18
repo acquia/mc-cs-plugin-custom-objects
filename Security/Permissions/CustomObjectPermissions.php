@@ -56,10 +56,6 @@ class CustomObjectPermissions extends AbstractPermissions
      */
     public function definePermissions(): void
     {
-        if (!$this->isEnabled()) {
-            return;
-        }
-
         $this->addExtendedPermissions(['custom_fields', self::NAME]);
 
         $customObjects = $this->getCustomObjects();
