@@ -139,7 +139,11 @@ jobs:
     #     verbose: true
 
     - name: Upload logs as artifacts
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: mautic-logs
+        name: mautic-logs-${{ matrix.php-versions }}-${{ github.run_id }}
         path: var/logs/
+        if-no-files-found: warn
+        compression-level: 6
+        overwrite: false
+        include-hidden-files: false
