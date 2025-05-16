@@ -101,7 +101,7 @@ class TokenSubscriber implements EventSubscriberInterface
         EventModel $eventModel,
         EventDispatcherInterface $eventDispatcher,
         TokenFormatter $tokenFormatter,
-        ContactFilterMatcher $contactFilterMatcher,
+        ContactFilterMatcher $contactFilterMatcher
     ) {
         $this->configProvider       = $configProvider;
         $this->queryFilterHelper    = $queryFilterHelper;

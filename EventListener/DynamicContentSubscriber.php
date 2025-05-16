@@ -26,7 +26,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         QueryFilterFactory $queryFilterFactory,
         ConfigProvider $configProvider,
         PrimaryCompanyHelper $primaryCompanyHelper,
-        ContactFilterMatcher $contactFilterMatcher,
+        ContactFilterMatcher $contactFilterMatcher
     ) {
         $this->queryFilterFactory   = $queryFilterFactory;
         $this->configProvider       = $configProvider;
