@@ -68,7 +68,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
                 $this->queryFilterFactory->configureQueryBuilderFromSegmentFilter($filter, 'filter');
 
                 return true;
-            } catch (InvalidSegmentFilterException) {
+            } catch (InvalidSegmentFilterException $e) {
             }
         }
 
