@@ -4,43 +4,38 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
-use Doctrine\DBAL\Statement;
 use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\EventListener\DynamicContentSubscriber;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
-use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
+use MauticPlugin\CustomObjectsBundle\Helper\ContactFilterMatcher;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomItemNameFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
-use Monolog\Logger;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class DynamicContentSubscriberTest extends TestCase
 {
-    /** @var ConfigProvider|MockObject */
+    /** @var ConfigProvider&MockObject */
     private $configProviderMock;
 
-    /** @var QueryFilterHelper|MockObject */
-    private $queryFilterHelperMock;
+    /** @var PrimaryCompanyHelper&MockObject */
+    private $primaryCompanyHelper;
 
-    /** @var QueryFilterFactory|MockObject */
+    /** @var QueryFilterFactory&MockObject */
     private $queryFilterFactory;
 
-    /** @var Logger|MockObject */
-    private $loggerMock;
+    /** @var ContactFilterMatcher&MockObject */
+    private $contactFilterMatcher;
 
-    /** @var QueryBuilder|MockObject */
+    /** @var QueryBuilder&MockObject */
     private $queryBuilderMock;
 
-    /** @var DynamicContentSubscriber */
-    private $dynamicContentSubscriber;
-
-    /** @var Statement|MockObject */
-    private $statementMock;
+    private DynamicContentSubscriber $dynamicContentSubscriber;
 
     protected function setUp(): void
     {
@@ -48,16 +43,15 @@ class DynamicContentSubscriberTest extends TestCase
 
         $this->configProviderMock    = $this->createMock(ConfigProvider::class);
         $this->queryFilterFactory    = $this->createMock(QueryFilterFactory::class);
-        $this->queryFilterHelperMock = $this->createMock(QueryFilterHelper::class);
-        $this->loggerMock            = $this->createMock(Logger::class);
+        $this->primaryCompanyHelper  = $this->createMock(PrimaryCompanyHelper::class);
         $this->queryBuilderMock      = $this->createMock(QueryBuilder::class);
-        $this->statementMock         = $this->createMock(Statement::class);
+        $this->contactFilterMatcher  = $this->createMock(ContactFilterMatcher::class);
 
         $this->dynamicContentSubscriber = new DynamicContentSubscriber(
             $this->queryFilterFactory,
-            $this->queryFilterHelperMock,
             $this->configProviderMock,
-            $this->loggerMock
+            $this->primaryCompanyHelper,
+            $this->contactFilterMatcher
         );
     }
 
@@ -74,7 +68,7 @@ class DynamicContentSubscriberTest extends TestCase
 
     public function testFiltersNotEvaluatedIfEventMarkedEvaluated(): void
     {
-        $this->configProviderMock->expects($this->once())->method('pluginIsEnabled')->willReturn(true);
+        $this->configProviderMock->expects($this->never())->method('pluginIsEnabled');
 
         $event = $this->buildEventWithFilters();
         $event->setIsEvaluated(true);
@@ -89,6 +83,7 @@ class DynamicContentSubscriberTest extends TestCase
         defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', '');
 
         $this->configProviderMock->expects($this->once())->method('pluginIsEnabled')->willReturn(true);
+        $this->primaryCompanyHelper->method('getProfileFieldsWithPrimaryCompany')->willReturn([]);
 
         $this->queryFilterFactory->expects($this->exactly(2))
             ->method('configureQueryBuilderFromSegmentFilter')
@@ -100,7 +95,7 @@ class DynamicContentSubscriberTest extends TestCase
                         'field'         => 'cfwq_1',
                         'foreign_table' => 'custom_objects',
                     ],
-                    'filter_custom_field_1',
+                    'filter',
                 ],
                 [
                     [
@@ -109,22 +104,20 @@ class DynamicContentSubscriberTest extends TestCase
                         'field'         => 'cowq_2',
                         'foreign_table' => 'custom_objects',
                     ],
-                    'filter_custom_item_1',
+                    'filter',
                 ]
             )
             ->will($this->onConsecutiveCalls(
-                $this->queryBuilderMock,
-                $this->throwException(new InvalidSegmentFilterException('Testing invalid segment handling here.'))
+                $this->throwException(new InvalidSegmentFilterException('Testing invalid segment handling here.')),
+                $this->queryBuilderMock
             ));
 
         $event = $this->buildEventWithFilters();
         $event->setIsEvaluated(false);
 
-        $this->queryBuilderMock->expects($this->once())->method('execute')->willReturn($this->statementMock);
-
-        $this->loggerMock
-            ->expects($this->never())
-            ->method('addError');
+        $this->contactFilterMatcher
+            ->expects($this->once())
+            ->method('match');
 
         $this->dynamicContentSubscriber->evaluateFilters($event);
     }
