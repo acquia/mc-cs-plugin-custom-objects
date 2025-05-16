@@ -55,7 +55,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 
         $event->setIsEvaluated(true);
         $event->stopPropagation();
-        $event->setIsMatched($this->doesFiltersMatch($event->getFilters(), $event->getContact()));
+        $event->setIsMatched($this->doFiltersMatch($event->getFilters(), $event->getContact()));
     }
 
     /**
@@ -78,10 +78,25 @@ class DynamicContentSubscriber implements EventSubscriberInterface
     /**
      * @param mixed[] $filters
      */
-    private function doesFiltersMatch(array $filters, Lead $contact): bool
+    private function doFiltersMatch(array $filters, Lead $contact): bool
     {
         $lead = $this->primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($contact);
-        $lead = array_merge($lead, [
+
+        if ($this->doFiltersContainTagsFilter($filters)) {
+            $lead = $this->mergeInTags($contact, $lead);
+        }
+
+        return $this->contactFilterMatcher->match($filters, $lead);
+    }
+
+    /**
+     * @param mixed[] $lead
+     *
+     * @return mixed[]
+     */
+    private function mergeInTags(Lead $contact, array $lead): array
+    {
+        return array_merge($lead, [
             'tags' => array_map(
                 function (Tag $v) {
                     return $v->getId();
@@ -89,7 +104,19 @@ class DynamicContentSubscriber implements EventSubscriberInterface
                 $contact->getTags()->toArray()
             ),
         ]);
+    }
 
-        return $this->contactFilterMatcher->match($filters, $lead);
+    /**
+     * @param mixed[] $filters
+     */
+    private function doFiltersContainTagsFilter(array $filters): bool
+    {
+        foreach ($filters as $filter) {
+            if ('tags' === ($filter['type'] ?? null)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
