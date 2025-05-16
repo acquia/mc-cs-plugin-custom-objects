@@ -345,8 +345,7 @@ class TokenSubscriber implements EventSubscriberInterface
             $isCustomObject = false;
 
             foreach ($data['filters'] as $filter) {
-                if ($this->contactFilterMatcher->match($filter['filters'], $lead)) {
-                    $isCustomObject = true;
+                if ($this->contactFilterMatcher->match($filter['filters'], $lead, $isCustomObject)) {
                     $filterContent  = $filter['content'];
                     break;
                 }

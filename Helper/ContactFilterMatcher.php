@@ -41,7 +41,7 @@ class ContactFilterMatcher
      * @param mixed[] $filters
      * @param mixed[] $lead
      */
-    public function match(array $filters, array $lead): bool
+    public function match(array $filters, array $lead, bool &$hasCustomFields = false): bool
     {
         $customFieldValues = $this->getCustomFieldDataForLead($filters, (string) $lead['id']);
 
@@ -49,7 +49,8 @@ class ContactFilterMatcher
             return false;
         }
 
-        $lead = array_merge($lead, $customFieldValues);
+        $hasCustomFields = true;
+        $lead            = array_merge($lead, $customFieldValues);
 
         return $this->matchFilterForLeadInCustomObject($filters, $lead);
     }
