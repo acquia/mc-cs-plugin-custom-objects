@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Helper;
 
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
+use Mautic\LeadBundle\Entity\LeadListRepository;
 use Mautic\LeadBundle\Exception\OperatorsNotFoundException;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
@@ -29,11 +30,13 @@ class ContactFilterMatcher
         CustomFieldModel $customFieldModel,
         CustomObjectModel $customObjectModel,
         CustomItemModel $customItemModel,
+        LeadListRepository $segmentRepository,
         int $leadCustomItemFetchLimit
     ) {
         $this->customFieldModel         = $customFieldModel;
         $this->customObjectModel        = $customObjectModel;
         $this->customItemModel          = $customItemModel;
+        $this->segmentRepository        = $segmentRepository;
         $this->leadCustomItemFetchLimit = $leadCustomItemFetchLimit;
     }
 
@@ -180,10 +183,6 @@ class ContactFilterMatcher
         $groupNum = 0;
 
         foreach ($filter as $data) {
-            if (!array_key_exists($data['field'], $lead)) {
-                continue;
-            }
-
             /*
              * Split the filters into groups based on the glue.
              * The first filter and any filters whose glue is
@@ -209,6 +208,16 @@ class ContactFilterMatcher
              */
             if (null === $groups[$groupNum]) {
                 $groups[$groupNum] = false;
+            }
+
+            if ('leadlist' === $data['type']) {
+                $groups[$groupNum] = $this->isContactSegmentRelationshipValid(
+                    (int) $lead['id'], $data['operator'], $data['filter']
+                );
+            }
+
+            if (!array_key_exists($data['field'], $lead)) {
+                continue;
             }
 
             $leadValues   = $lead[$data['field']];

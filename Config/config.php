@@ -1182,6 +1182,7 @@ $coParams = [
                     'mautic.custom.model.field',
                     'mautic.custom.model.object',
                     'mautic.custom.model.item',
+                    'mautic.lead.repository.lead_list',
                     '%mautic.custom_item_fetch_limit_per_lead%',
                 ],
             ],
