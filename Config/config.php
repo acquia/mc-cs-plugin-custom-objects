@@ -838,7 +838,7 @@ $coParams = [
                 'arguments' => [
                     'custom_object.query.filter.factory',
                     'custom_object.config.provider',
-                    'mautic.lead.helper.primary_company',
+                    'mautic.lead.repository.company',
                     'custom_object.helper.contact_filter_matcher',
                 ],
             ],

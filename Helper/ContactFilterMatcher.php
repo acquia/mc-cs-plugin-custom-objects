@@ -183,6 +183,9 @@ class ContactFilterMatcher
         $groupNum = 0;
 
         foreach ($filter as $data) {
+            $isCompanyField = (0 === strpos($data['field'], 'company') && 'company' !== $data['field']);
+            $primaryCompany = ($isCompanyField && !empty($lead['companies'])) ? $lead['companies'][0] : null;
+
             /*
              * Split the filters into groups based on the glue.
              * The first filter and any filters whose glue is
@@ -216,12 +219,17 @@ class ContactFilterMatcher
                 );
             }
 
-            if (!array_key_exists($data['field'], $lead)) {
-                continue;
+            if ($isCompanyField) {
+                if (empty($primaryCompany)) {
+                    continue;
+                }
+            } else {
+                if (!array_key_exists($data['field'], $lead)) {
+                    continue;
+                }
             }
 
-            $leadValues   = $lead[$data['field']];
-            $leadValues   = 'custom_object' === $data['object'] ? $leadValues : [$leadValues];
+            $leadValues   = 'custom_object' === $data['object'] ? $lead[$data['field']] : [$isCompanyField ? $primaryCompany[$data['field']] : $lead[$data['field']]];
             $filterVal    = $data['filter'];
             $subgroup     = null;
 

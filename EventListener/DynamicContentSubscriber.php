@@ -6,9 +6,9 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\Tag;
-use Mautic\LeadBundle\Helper\PrimaryCompanyHelper;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
 use MauticPlugin\CustomObjectsBundle\Helper\ContactFilterMatcher;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
@@ -19,18 +19,18 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 {
     private QueryFilterFactory $queryFilterFactory;
     private ConfigProvider $configProvider;
-    private PrimaryCompanyHelper $primaryCompanyHelper;
+    private CompanyRepository $companyRepository;
     private ContactFilterMatcher $contactFilterMatcher;
 
     public function __construct(
         QueryFilterFactory $queryFilterFactory,
         ConfigProvider $configProvider,
-        PrimaryCompanyHelper $primaryCompanyHelper,
+        CompanyRepository $companyRepository,
         ContactFilterMatcher $contactFilterMatcher
     ) {
         $this->queryFilterFactory   = $queryFilterFactory;
         $this->configProvider       = $configProvider;
-        $this->primaryCompanyHelper = $primaryCompanyHelper;
+        $this->companyRepository    = $companyRepository;
         $this->contactFilterMatcher = $contactFilterMatcher;
     }
 
@@ -80,7 +80,11 @@ class DynamicContentSubscriber implements EventSubscriberInterface
      */
     private function doFiltersMatch(array $filters, Lead $contact): bool
     {
-        $lead = $this->primaryCompanyHelper->getProfileFieldsWithPrimaryCompany($contact);
+        $lead = $contact->getProfileFields();
+
+        if ($this->doFiltersContainCompanyFilter($filters)) {
+            $lead['companies'] = $this->companyRepository->getCompaniesByLeadId($contact->getId());
+        }
 
         if ($this->doFiltersContainTagsFilter($filters)) {
             $lead = $this->mergeInTags($contact, $lead);
@@ -104,6 +108,20 @@ class DynamicContentSubscriber implements EventSubscriberInterface
                 $contact->getTags()->toArray()
             ),
         ]);
+    }
+
+    /**
+     * @param mixed[] $filters
+     */
+    private function doFiltersContainCompanyFilter(array $filters): bool
+    {
+        foreach ($filters as $filter) {
+            if ((0 === strpos($filter['field'], 'company') && 'company' !== $filter['field'])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
