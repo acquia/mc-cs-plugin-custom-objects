@@ -13,6 +13,8 @@ parameters:
 		- ../../app
 	paths:
 		- .
+	bootstrapFiles:
+		- phpstan-class-aliases.php
 	excludePaths:
 		- CustomFieldType/*Type.php # This should be refactored
 		- *.html.php # this can be removed in Mautic 5
@@ -25,3 +27,7 @@ parameters:
 		- MAUTIC_ENV
 		- MAUTIC_TABLE_PREFIX
 		- MAUTIC_VERSION
+	ignoreErrors:
+		-
+			message: '#^Call to an undefined method MauticPlugin\\CustomObjectsBundle\\Helper\\ContactFilterMatcher::transformFilterDataForLeadAlias\(\).$#'
+			path: Helper/ContactFilterMatcher.php
