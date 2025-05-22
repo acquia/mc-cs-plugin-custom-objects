@@ -202,6 +202,12 @@ trait MatchFilterForLeadTrait
     private function doFiltersContainCompanyFilter(array $filters): bool
     {
         foreach ($filters as $filter) {
+            $object = $filter['object'] ?? '';
+
+            if ('company' === $object) {
+                return true;
+            }
+
             if ((0 === strpos($filter['field'], 'company') && 'company' !== $filter['field'])) {
                 return true;
             }
