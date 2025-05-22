@@ -3019,4 +3019,7 @@ parameters:
 			message: "#^Parameter \\#3 \\$type of method Mautic\\\\LeadBundle\\\\Segment\\\\Query\\\\QueryBuilder\\:\\:setParameter\\(\\) expects string\\|null, int given\\.$#"
 			count: 1
 			path: ../../plugins/CustomObjectsBundle/Tests/Unit/Segment/Query/UnionQueryContainerTest.php
-
+		-
+			message: "#^Constant MAUTIC_TABLE_PREFIX not found\\.$#"
+			count: 1
+			path: ../../plugins/CustomObjectsBundle/Helper/ContactFilterMatcher.php
