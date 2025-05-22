@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Helper;
 
+use Doctrine\DBAL\Connection;
 use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
+use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
@@ -31,6 +33,8 @@ class ContactFilterMatcher
     private CustomFieldModel $customFieldModel;
     private CustomObjectModel $customObjectModel;
     private CustomItemModel $customItemModel;
+    private CompanyRepository $companyRepository;
+    private Connection $connection;
     private int $leadCustomItemFetchLimit;
 
     public function __construct(
@@ -38,12 +42,16 @@ class ContactFilterMatcher
         CustomObjectModel $customObjectModel,
         CustomItemModel $customItemModel,
         LeadListRepository $segmentRepository,
+        CompanyRepository $companyRepository,
+        Connection $connection,
         int $leadCustomItemFetchLimit
     ) {
         $this->customFieldModel         = $customFieldModel;
         $this->customObjectModel        = $customObjectModel;
         $this->customItemModel          = $customItemModel;
         $this->segmentRepository        = $segmentRepository;
+        $this->companyRepository        = $companyRepository;
+        $this->connection               = $connection;
         $this->leadCustomItemFetchLimit = $leadCustomItemFetchLimit;
     }
 
@@ -53,7 +61,8 @@ class ContactFilterMatcher
      */
     public function match(array $filters, array $lead, bool &$hasCustomFields = false): bool
     {
-        $customFieldValues = $this->getCustomFieldDataForLead($filters, (string) $lead['id']);
+        $leadId            = (string) $lead['id'];
+        $customFieldValues = $this->getCustomFieldDataForLead($filters, $leadId);
 
         if (!$customFieldValues) {
             return false;
@@ -61,6 +70,14 @@ class ContactFilterMatcher
 
         $hasCustomFields = true;
         $lead            = array_merge($lead, $customFieldValues);
+
+        if (!isset($lead['companies']) && $this->doFiltersContainCompanyFilter($filters)) {
+            $lead['companies'] = $this->companyRepository->getCompaniesByLeadId($leadId);
+        }
+
+        if (!isset($lead['tags']) && $this->doFiltersContainTagsFilter($filters)) {
+            $lead['tags'] = $this->getTagIdsByLeadId($leadId);
+        }
 
         return $this->matchFilterForLead($filters, $lead);
     }
@@ -185,5 +202,19 @@ class ContactFilterMatcher
         }
 
         return $this->transformFilterDataForLeadAlias($data, $lead);
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getTagIdsByLeadId(string $leadId): array
+    {
+        return $this->connection->createQueryBuilder()
+            ->select('tag_id')
+            ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x')
+            ->where('x.lead_id = :leadId')
+            ->setParameter('leadId', $leadId)
+            ->execute()
+            ->fetchFirstColumn();
     }
 }

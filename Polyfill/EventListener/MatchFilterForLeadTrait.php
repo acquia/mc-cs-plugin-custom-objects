@@ -195,4 +195,32 @@ trait MatchFilterForLeadTrait
     {
         return null;
     }
+
+    /**
+     * @param mixed[] $filters
+     */
+    private function doFiltersContainCompanyFilter(array $filters): bool
+    {
+        foreach ($filters as $filter) {
+            if ((0 === strpos($filter['field'], 'company') && 'company' !== $filter['field'])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param mixed[] $filters
+     */
+    private function doFiltersContainTagsFilter(array $filters): bool
+    {
+        foreach ($filters as $filter) {
+            if ('tags' === ($filter['type'] ?? null)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

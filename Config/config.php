@@ -838,7 +838,6 @@ $coParams = [
                 'arguments' => [
                     'custom_object.query.filter.factory',
                     'custom_object.config.provider',
-                    'mautic.lead.repository.company',
                     'custom_object.helper.contact_filter_matcher',
                 ],
             ],
@@ -1183,6 +1182,8 @@ $coParams = [
                     'mautic.custom.model.object',
                     'mautic.custom.model.item',
                     'mautic.lead.repository.lead_list',
+                    'mautic.lead.repository.company',
+                    'doctrine.dbal.default_connection',
                     '%mautic.custom_item_fetch_limit_per_lead%',
                 ],
             ],

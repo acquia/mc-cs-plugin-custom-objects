@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
 use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
-use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\EventListener\DynamicContentSubscriber;
@@ -22,9 +21,6 @@ class DynamicContentSubscriberTest extends TestCase
 {
     /** @var ConfigProvider&MockObject */
     private $configProviderMock;
-
-    /** @var CompanyRepository&MockObject */
-    private $companyRepository;
 
     /** @var QueryFilterFactory&MockObject */
     private $queryFilterFactory;
@@ -43,14 +39,12 @@ class DynamicContentSubscriberTest extends TestCase
 
         $this->configProviderMock   = $this->createMock(ConfigProvider::class);
         $this->queryFilterFactory   = $this->createMock(QueryFilterFactory::class);
-        $this->companyRepository    = $this->createMock(CompanyRepository::class);
         $this->queryBuilderMock     = $this->createMock(QueryBuilder::class);
         $this->contactFilterMatcher = $this->createMock(ContactFilterMatcher::class);
 
         $this->dynamicContentSubscriber = new DynamicContentSubscriber(
             $this->queryFilterFactory,
             $this->configProviderMock,
-            $this->companyRepository,
             $this->contactFilterMatcher
         );
     }
@@ -83,7 +77,6 @@ class DynamicContentSubscriberTest extends TestCase
         defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', '');
 
         $this->configProviderMock->expects($this->once())->method('pluginIsEnabled')->willReturn(true);
-        $this->companyRepository->method('getCompaniesByLeadId')->willReturn([]);
 
         $this->queryFilterFactory->expects($this->exactly(2))
             ->method('configureQueryBuilderFromSegmentFilter')

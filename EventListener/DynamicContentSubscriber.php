@@ -6,9 +6,6 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
-use Mautic\LeadBundle\Entity\CompanyRepository;
-use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\Tag;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
 use MauticPlugin\CustomObjectsBundle\Helper\ContactFilterMatcher;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
@@ -19,18 +16,15 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 {
     private QueryFilterFactory $queryFilterFactory;
     private ConfigProvider $configProvider;
-    private CompanyRepository $companyRepository;
     private ContactFilterMatcher $contactFilterMatcher;
 
     public function __construct(
         QueryFilterFactory $queryFilterFactory,
         ConfigProvider $configProvider,
-        CompanyRepository $companyRepository,
         ContactFilterMatcher $contactFilterMatcher
     ) {
         $this->queryFilterFactory   = $queryFilterFactory;
         $this->configProvider       = $configProvider;
-        $this->companyRepository    = $companyRepository;
         $this->contactFilterMatcher = $contactFilterMatcher;
     }
 
@@ -55,7 +49,10 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 
         $event->setIsEvaluated(true);
         $event->stopPropagation();
-        $event->setIsMatched($this->doFiltersMatch($event->getFilters(), $event->getContact()));
+        $event->setIsMatched($this->contactFilterMatcher->match(
+            $event->getFilters(),
+            $event->getContact()->getProfileFields()
+        ));
     }
 
     /**
@@ -69,69 +66,6 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 
                 return true;
             } catch (InvalidSegmentFilterException $e) {
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @param mixed[] $filters
-     */
-    private function doFiltersMatch(array $filters, Lead $contact): bool
-    {
-        $lead = $contact->getProfileFields();
-
-        if ($this->doFiltersContainCompanyFilter($filters)) {
-            $lead['companies'] = $this->companyRepository->getCompaniesByLeadId($contact->getId());
-        }
-
-        if ($this->doFiltersContainTagsFilter($filters)) {
-            $lead = $this->mergeInTags($contact, $lead);
-        }
-
-        return $this->contactFilterMatcher->match($filters, $lead);
-    }
-
-    /**
-     * @param mixed[] $lead
-     *
-     * @return mixed[]
-     */
-    private function mergeInTags(Lead $contact, array $lead): array
-    {
-        return array_merge($lead, [
-            'tags' => array_map(
-                function (Tag $v) {
-                    return $v->getId();
-                },
-                $contact->getTags()->toArray()
-            ),
-        ]);
-    }
-
-    /**
-     * @param mixed[] $filters
-     */
-    private function doFiltersContainCompanyFilter(array $filters): bool
-    {
-        foreach ($filters as $filter) {
-            if ((0 === strpos($filter['field'], 'company') && 'company' !== $filter['field'])) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @param mixed[] $filters
-     */
-    private function doFiltersContainTagsFilter(array $filters): bool
-    {
-        foreach ($filters as $filter) {
-            if ('tags' === ($filter['type'] ?? null)) {
-                return true;
             }
         }
 
