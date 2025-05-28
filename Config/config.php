@@ -837,9 +837,8 @@ $coParams = [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\DynamicContentSubscriber::class,
                 'arguments' => [
                     'custom_object.query.filter.factory',
-                    'custom_object.query.filter.helper',
                     'custom_object.config.provider',
-                    'monolog.logger.mautic',
+                    'custom_object.helper.contact_filter_matcher',
                 ],
             ],
             'custom_object.serializer.subscriber' => [
@@ -863,12 +862,11 @@ $coParams = [
                     'custom_object.query.filter.factory',
                     'mautic.custom.model.object',
                     'mautic.custom.model.item',
-                    'mautic.custom.model.field',
                     'custom_object.token.parser',
                     'mautic.campaign.model.event',
                     'event_dispatcher',
                     'custom_object.helper.token_formatter',
-                    '%mautic.custom_item_fetch_limit_per_lead%',
+                    'custom_object.helper.contact_filter_matcher',
                 ],
             ],
             'custom_object.segments.decorator_delegate.subscriber'   => [
@@ -1175,6 +1173,18 @@ $coParams = [
                 'tag'       => 'api_platform.data_persister',
                 'arguments' => [
                     'mautic.custom.model.item',
+                ],
+            ],
+            'custom_object.helper.contact_filter_matcher' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Helper\ContactFilterMatcher::class,
+                'arguments' => [
+                    'mautic.custom.model.field',
+                    'mautic.custom.model.object',
+                    'mautic.custom.model.item',
+                    'mautic.lead.repository.lead_list',
+                    'mautic.lead.repository.company',
+                    'doctrine.dbal.default_connection',
+                    '%mautic.custom_item_fetch_limit_per_lead%',
                 ],
             ],
         ],
