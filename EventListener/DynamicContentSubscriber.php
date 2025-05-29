@@ -6,57 +6,30 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
-use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
-use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
+use MauticPlugin\CustomObjectsBundle\Helper\ContactFilterMatcher;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
-use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
-use PDOException;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class DynamicContentSubscriber implements EventSubscriberInterface
 {
-    use MatchFilterForLeadTrait;
-    use DbalQueryTrait;
-
-    /**
-     * @var QueryFilterFactory
-     */
-    private $queryFilterFactory;
-
-    /**
-     * @var QueryFilterHelper
-     */
-    private $queryFilterHelper;
-
-    /**
-     * @var ConfigProvider
-     */
-    private $configProvider;
-
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
+    private QueryFilterFactory $queryFilterFactory;
+    private ConfigProvider $configProvider;
+    private ContactFilterMatcher $contactFilterMatcher;
 
     public function __construct(
         QueryFilterFactory $queryFilterFactory,
-        QueryFilterHelper $queryFilterHelper,
         ConfigProvider $configProvider,
-        LoggerInterface $logger
+        ContactFilterMatcher $contactFilterMatcher
     ) {
-        $this->queryFilterFactory = $queryFilterFactory;
-        $this->queryFilterHelper  = $queryFilterHelper;
-        $this->configProvider     = $configProvider;
-        $this->logger             = $logger;
+        $this->queryFilterFactory   = $queryFilterFactory;
+        $this->configProvider       = $configProvider;
+        $this->contactFilterMatcher = $contactFilterMatcher;
     }
 
     /**
-     * @return mixed[]
+     * @return array<string,array{string,int}>
      */
     public static function getSubscribedEvents(): array
     {
@@ -65,47 +38,37 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         ];
     }
 
-    /**
-     * @throws InvalidArgumentException
-     * @throws NotFoundException
-     */
     public function evaluateFilters(ContactFiltersEvaluateEvent $event): void
     {
-        if (!$this->configProvider->pluginIsEnabled()) {
+        if ($event->isEvaluated()
+            || !$this->configProvider->pluginIsEnabled()
+            || !$this->hasCustomObjectFilters($event->getFilters())
+        ) {
             return;
         }
 
-        $eventFilters = $event->getFilters();
+        $event->setIsEvaluated(true);
+        $event->stopPropagation();
+        $event->setIsMatched($this->contactFilterMatcher->match(
+            $event->getFilters(),
+            $event->getContact()->getProfileFields()
+        ));
+    }
 
-        if ($event->isEvaluated()) {
-            return;
-        }
-
-        foreach ($eventFilters as $key => $eventFilter) {
-            $queryAlias = "filter_{$key}";
-
+    /**
+     * @param mixed[] $filters
+     */
+    private function hasCustomObjectFilters(array $filters): bool
+    {
+        foreach ($filters as $filter) {
             try {
-                $filterQueryBuilder = $this->queryFilterFactory->configureQueryBuilderFromSegmentFilter($eventFilter, $queryAlias);
+                $this->queryFilterFactory->configureQueryBuilderFromSegmentFilter($filter, 'filter');
+
+                return true;
             } catch (InvalidSegmentFilterException $e) {
-                continue;
             }
-
-            $this->queryFilterHelper->addContactIdRestriction($filterQueryBuilder, $queryAlias, (int) $event->getContact()->getId());
-
-            try {
-                if ($this->executeSelect($filterQueryBuilder)->rowCount()) {
-                    $event->setIsEvaluated(true);
-                    $event->setIsMatched(true);
-                } else {
-                    $event->setIsEvaluated(true);
-                }
-            } catch (PDOException $e) {
-                $this->logger->addError('Failed to evaluate dynamic content for custom object '.$e->getMessage());
-
-                throw $e;
-            }
-
-            $event->stopPropagation();  // The filter is ours, we won't allow no more processing
         }
+
+        return false;
     }
 }
