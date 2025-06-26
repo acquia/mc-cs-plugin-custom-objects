@@ -13,6 +13,8 @@ parameters:
 		- ../../app
 	paths:
 		- .
+	bootstrapFiles:
+		- phpstan-class-aliases.php
 	excludePaths:
 		- CustomFieldType/*Type.php # This should be refactored
 		- *.html.php # this can be removed in Mautic 5
@@ -21,7 +23,13 @@ parameters:
 		- Tests/Unit/Serializer/ApiNormalizerTest.php # PHPSTAN is confused because it exists only if API Platform does.
 		- DataPersister/CustomItemDataPersister.php # PHPSTAN is confused because it exists only if API Platform does.
 		- Tests/Unit/EventListener/SegmentFiltersChoicesGenerateSubscriberTest.php
+		- Polyfill/EventListener/MatchFilterForLeadTrait.php
+		- Tests/Functional/EventListener/DynamicContentSubscriberTest.php
 	dynamicConstantNames:
 		- MAUTIC_ENV
 		- MAUTIC_TABLE_PREFIX
 		- MAUTIC_VERSION
+	ignoreErrors:
+		-
+			message: '#^Call to an undefined method MauticPlugin\\CustomObjectsBundle\\Helper\\ContactFilterMatcher::transformFilterDataForLeadAlias\(\).$#'
+			path: Helper/ContactFilterMatcher.php
