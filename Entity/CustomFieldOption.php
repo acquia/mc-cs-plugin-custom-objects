@@ -172,7 +172,7 @@ class CustomFieldOption implements \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         return $this->offsetExists($offset) ? $this->{$offset} : null;
     }
