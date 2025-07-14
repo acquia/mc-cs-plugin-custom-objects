@@ -1,28 +1,35 @@
 version: 2
 updates:
-  - package-ecosystem: "composer"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    pull-request-branch-name:
-      separator: "-"
-    groups:
-      composer-dependencies:
-        patterns:
-          - "*"
-    registries:
-      - jfrog
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    pull-request-branch-name:
-      separator: "-"
-    groups:
-      github-actions-dependencies:
-        patterns:
-          - "*"
-
+- package-ecosystem: composer
+  directory: /
+  schedule:
+    interval: weekly
+  pull-request-branch-name:
+    separator: "-"
+  groups:
+    composer-dependencies:
+      patterns:
+      - "*"
+  registries:
+  - jfrog
+  ignore:
+  - update-types:
+    - version-update:semver-major
+  - dependency-name: "*"
+- package-ecosystem: github-actions
+  directory: /
+  schedule:
+    interval: weekly
+  pull-request-branch-name:
+    separator: "-"
+  groups:
+    github-actions-dependencies:
+      patterns:
+      - "*"
+  ignore:
+  - update-types:
+    - version-update:semver-major
+  - dependency-name: "*"
 registries:
   jfrog:
     type: composer-repository
