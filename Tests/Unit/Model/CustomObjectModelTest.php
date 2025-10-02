@@ -6,14 +6,17 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Query\QueryBuilder as QueryBuilderDbal;
 use Doctrine\DBAL\Statement;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Model\ListModel;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
@@ -27,9 +30,11 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CustomObjectModelTest extends TestCase
 {
@@ -37,6 +42,41 @@ class CustomObjectModelTest extends TestCase
     private $customField;
     private $user;
     private $entityManager;
+
+    /**
+     * @var MockObject|CorePermissions
+     */
+    private $security;
+
+    /**
+     * @var MockObject|EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    /**
+     * @var MockObject|UrlGeneratorInterface
+     */
+    private $router;
+
+    /**
+     * @var MockObject|Translator
+     */
+    private $translator;
+
+    /**
+     * @var MockObject|UserHelper
+     */
+    private $userHelper;
+
+    /**
+     * @var MockObject|LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var MockObject|CoreParametersHelper
+     */
+    private $coreParametersHelper;
     private $queryBuilder;
     private $queryBuilderDbal;
     private $query;
@@ -45,10 +85,7 @@ class CustomObjectModelTest extends TestCase
     private $databasePlatform;
     private $customObjectRepository;
     private $customObjectPermissionProvider;
-    private $userHelper;
     private $customFieldModel;
-    private $dispatcher;
-    private $translator;
 
     /**
      * @var ListModel
@@ -64,37 +101,41 @@ class CustomObjectModelTest extends TestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', '');
-
         $this->customObject                   = $this->createMock(CustomObject::class);
         $this->customField                    = $this->createMock(CustomField::class);
         $this->user                           = $this->createMock(User::class);
         $this->entityManager                  = $this->createMock(EntityManager::class);
+        $this->translator                     = $this->createMock(Translator::class);
+        $this->security                       = $this->createMock(CorePermissions::class);
+        $this->dispatcher                     = $this->createMock(EventDispatcherInterface::class);
+        $this->router                         = $this->createMock(UrlGeneratorInterface::class);
+        $this->userHelper                     = $this->createMock(UserHelper::class);
+        $this->logger                         = $this->createMock(LoggerInterface::class);
+        $this->coreParametersHelper           = $this->createMock(CoreParametersHelper::class);
         $this->queryBuilder                   = $this->createMock(QueryBuilder::class);
         $this->queryBuilderDbal               = $this->createMock(QueryBuilderDbal::class);
         $this->statement                      = $this->createMock(Statement::class);
         $this->query                          = $this->createMock(AbstractQuery::class);
         $this->connection                     = $this->createMock(Connection::class);
-        $this->databasePlatform               = $this->createMock(MySqlPlatform::class);
+        $this->databasePlatform               = $this->createMock(AbstractMySQLPlatform::class);
         $this->customObjectRepository         = $this->createMock(CustomObjectRepository::class);
         $this->customObjectPermissionProvider = $this->createMock(CustomObjectPermissionProvider::class);
-        $this->userHelper                     = $this->createMock(UserHelper::class);
         $this->customFieldModel               = $this->createMock(CustomFieldModel::class);
-        $this->dispatcher                     = $this->createMock(EventDispatcherInterface::class);
-        $this->translator                     = $this->createMock(TranslatorInterface::class);
         $this->listModel                      = $this->createMock(ListModel::class);
         $this->customObjectModel              = new CustomObjectModel(
             $this->entityManager,
+            $this->security,
+            $this->dispatcher,
+            $this->router,
+            $this->translator,
+            $this->userHelper,
+            $this->logger,
+            $this->coreParametersHelper,
             $this->customObjectRepository,
             $this->customObjectPermissionProvider,
-            $this->userHelper,
             $this->customFieldModel,
-            $this->dispatcher,
-            $this->listModel
         );
 
-        $this->customObjectModel->setEntityManager($this->entityManager);
-        $this->customObjectModel->setTranslator($this->translator);
         $this->entityManager->method('createQueryBuilder')->willReturn($this->queryBuilder);
         $this->entityManager->method('getConnection')->willReturn($this->connection);
         $this->connection->method('getDatabasePlatform')->willReturn($this->databasePlatform);
@@ -161,8 +202,8 @@ class CustomObjectModelTest extends TestCase
 
         $this->dispatcher->method('dispatch')
             ->withConsecutive(
-                [CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_SAVE, $this->isInstanceOf(CustomObjectEvent::class)],
-                [CustomObjectEvents::ON_CUSTOM_OBJECT_POST_SAVE, $this->isInstanceOf(CustomObjectEvent::class)]
+                [$this->isInstanceOf(CustomObjectEvent::class), CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_SAVE],
+                [$this->isInstanceOf(CustomObjectEvent::class), CustomObjectEvents::ON_CUSTOM_OBJECT_POST_SAVE]
             );
         $this->entityManager->expects($this->once())->method('persist')->with($this->customObject);
         $this->entityManager->expects($this->once())->method('flush');
@@ -241,8 +282,8 @@ class CustomObjectModelTest extends TestCase
 
         $this->dispatcher->method('dispatch')
             ->withConsecutive(
-                [CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_SAVE, $this->isInstanceOf(CustomObjectEvent::class)],
-                [CustomObjectEvents::ON_CUSTOM_OBJECT_POST_SAVE, $this->isInstanceOf(CustomObjectEvent::class)]
+                [$this->isInstanceOf(CustomObjectEvent::class), CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_SAVE],
+                [$this->isInstanceOf(CustomObjectEvent::class), CustomObjectEvents::ON_CUSTOM_OBJECT_POST_SAVE]
             );
         $this->entityManager->expects($this->once())->method('persist')->with($this->customObject);
         $this->entityManager->expects($this->once())->method('flush');
@@ -294,8 +335,8 @@ class CustomObjectModelTest extends TestCase
 
         $this->dispatcher->method('dispatch')
             ->withConsecutive(
-                [CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_SAVE, $this->isInstanceOf(CustomObjectEvent::class)],
-                [CustomObjectEvents::ON_CUSTOM_OBJECT_POST_SAVE, $this->isInstanceOf(CustomObjectEvent::class)]
+                [$this->isInstanceOf(CustomObjectEvent::class), CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_SAVE],
+                [$this->isInstanceOf(CustomObjectEvent::class), CustomObjectEvents::ON_CUSTOM_OBJECT_POST_SAVE]
             );
         $this->entityManager->expects($this->once())->method('persist')->with($this->customObject);
         $this->entityManager->expects($this->once())->method('flush');
@@ -311,7 +352,7 @@ class CustomObjectModelTest extends TestCase
 
         $this->dispatcher->method('dispatch')
             ->withConsecutive(
-                [CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_DELETE, $this->isInstanceOf(CustomObjectEvent::class)]
+                [$this->isInstanceOf(CustomObjectEvent::class), CustomObjectEvents::ON_CUSTOM_OBJECT_PRE_DELETE]
             );
 
         $this->entityManager->expects($this->once())
@@ -576,10 +617,6 @@ class CustomObjectModelTest extends TestCase
             ->method('trans')
             ->with('custom.object.created.items')
             ->willReturn('Items Created');
-
-        $this->statement->expects($this->once())
-            ->method('fetchAll')
-            ->willReturn([]);
 
         $chartData = $this->customObjectModel->getItemsLineChartData(
             $from,

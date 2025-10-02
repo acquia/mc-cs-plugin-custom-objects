@@ -14,48 +14,15 @@ use MauticPlugin\CustomObjectsBundle\Segment\Query\UnionQueryContainer;
 
 class QueryFilterFactory
 {
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @var CustomFieldTypeProvider
-     */
-    private $fieldTypeProvider;
-
-    /**
-     * @var UnionQueryContainer|null
-     */
-    private $unionQueryContainer;
-
-    /**
-     * @var CustomFieldRepository
-     */
-    private $customFieldRepository;
-
-    /**
-     * @var Calculator
-     */
-    private $calculator;
-
-    /**
-     * @var int
-     */
-    private $itemRelationLevelLimit;
+    private ?UnionQueryContainer $unionQueryContainer = null;
 
     public function __construct(
-        EntityManager $entityManager,
-        CustomFieldTypeProvider $fieldTypeProvider,
-        CustomFieldRepository $customFieldRepository,
-        Calculator $calculator,
-        int $itemRelationLevelLimit
+        private EntityManager $entityManager,
+        private CustomFieldTypeProvider $fieldTypeProvider,
+        private CustomFieldRepository $customFieldRepository,
+        private Calculator $calculator,
+        private int $itemRelationLevelLimit
     ) {
-        $this->entityManager          = $entityManager;
-        $this->fieldTypeProvider      = $fieldTypeProvider;
-        $this->customFieldRepository  = $customFieldRepository;
-        $this->calculator             = $calculator;
-        $this->itemRelationLevelLimit = $itemRelationLevelLimit;
     }
 
     public function createQuery(

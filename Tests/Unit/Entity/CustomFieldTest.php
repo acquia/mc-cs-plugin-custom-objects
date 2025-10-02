@@ -19,13 +19,13 @@ use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
 use MauticPlugin\CustomObjectsBundle\Form\Validator\Constraints\AllowUniqueIdentifier;
 use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomFieldTest extends \PHPUnit\Framework\TestCase
 {
@@ -282,8 +282,8 @@ class CustomFieldTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->assertSame([
-             'Option A label' => 'option_a_value',
-             'Option B label' => 'option_b_value',
+            'Option A label' => 'option_a_value',
+            'Option B label' => 'option_b_value',
         ], $customField->getChoices());
     }
 

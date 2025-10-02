@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
-use DateTimeInterface;
-
 interface CustomItemXrefInterface
 {
     /**
@@ -19,7 +17,7 @@ interface CustomItemXrefInterface
     public function getLinkedEntity();
 
     /**
-     * @return DateTimeInterface
+     * @return \DateTimeInterface
      */
     public function getDateAdded();
 }

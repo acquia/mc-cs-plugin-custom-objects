@@ -53,7 +53,7 @@ class SelectType extends AbstractTextType
 
         try {
             return $fieldValue->getCustomField()->valueToLabel((string) $value);
-        } catch (NotFoundException $e) {
+        } catch (NotFoundException) {
             // When the value does not exist anymore, use the value instead.
             return $value;
         }

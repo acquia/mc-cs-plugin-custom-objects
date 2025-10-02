@@ -18,7 +18,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ContactSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -185,7 +185,7 @@ class ContactSubscriberTest extends \PHPUnit\Framework\TestCase
                     'id'         => 444,
                 ],
                 'contactId'       => 333,
-                'contentTemplate' => 'CustomObjectsBundle:SubscribedEvents\Timeline:link.html.php',
+                'contentTemplate' => '@CustomObjects/SubscribedEvents/Timeline/link.html.twig',
             ]);
 
         $this->subscriber->onTimelineGenerate($this->leadTimelineEvent);
@@ -282,7 +282,7 @@ class ContactSubscriberTest extends \PHPUnit\Framework\TestCase
                     'id'         => 444,
                 ],
                 'contactId'       => 333,
-                'contentTemplate' => 'CustomObjectsBundle:SubscribedEvents\Timeline:link.html.php',
+                'contentTemplate' => '@CustomObjects/SubscribedEvents/Timeline/link.html.twig',
             ]);
 
         $this->subscriber->onTimelineGenerate($this->leadTimelineEvent);

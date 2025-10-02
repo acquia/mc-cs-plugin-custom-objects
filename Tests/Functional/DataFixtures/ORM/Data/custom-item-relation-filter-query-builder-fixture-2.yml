@@ -216,6 +216,7 @@ Mautic\LeadBundle\Entity\LeadList:
     is_published: true
     name: 'Price = 1000'
     alias: 'price-eq-1000'
+    public_name: 'price-eq-1000'
     filters:
       0:
         glue : 'and'
@@ -233,6 +234,7 @@ Mautic\LeadBundle\Entity\LeadList:
     is_published: true
     name: 'Order name = Ordered plug'
     alias: 'order-plug-name-eq'
+    public_name: 'order-plug-name-eq'
     filters: # a:1:{i:0;a:6:{s:4:"glue";s:3:"and";s:5:"field";s:5:"cmo_2";s:6:"object";s:13:"custom_object";s:4:"type";s:4:"text";s:8:"operator";s:1:"=";s:10:"properties";a:1:{s:6:"filter";s:12:"Ordered plug";}}}
       0:
         glue : 'and'
@@ -249,6 +251,7 @@ Mautic\LeadBundle\Entity\LeadList:
     is_published: true
     name: 'Date < 1990'
     alias: 'date-lt-1990'
+    public_name: 'date-lt-1990'
     filters: # a:1:{i:0;a:6:{s:4:"glue";s:3:"and";s:5:"field";s:5:"cmf_2";s:6:"object";s:13:"custom_object";s:4:"type";s:4:"date";s:8:"operator";s:2:"lt";s:10:"properties";a:1:{s:6:"filter";s:4:"1990";}}}
       0:
         glue : 'and'
@@ -265,6 +268,7 @@ Mautic\LeadBundle\Entity\LeadList:
     is_published: true
     name: 'DateTime > 1990'
     alias: 'datetime-gt-1990'
+    public_name: 'datetime-gt-1990'
     filters:
       0:
         glue : 'and'
@@ -281,6 +285,7 @@ Mautic\LeadBundle\Entity\LeadList:
     is_published: true
     name: 'Price > 500'
     alias: 'price-greater-500'
+    public_name: 'price-greater-500'
     filters: # a:1:{i:0;a:6:{s:4:"glue";s:3:"and";s:5:"field";s:5:"cmf_1";s:6:"object";s:13:"custom_object";s:4:"type";s:3:"int";s:8:"operator";s:2:"gt";s:10:"properties";a:1:{s:6:"filter";s:3:"500";}}}
       0:
         glue : 'and'
@@ -297,6 +302,7 @@ Mautic\LeadBundle\Entity\LeadList:
     is_published: true
     name: 'Price = 500'
     alias: 'price-eq-500'
+    public_name: 'price-eq-500'
     filters:
       0:
         glue : 'and'
@@ -313,6 +319,7 @@ Mautic\LeadBundle\Entity\LeadList:
     is_published: true
     name: 'Price > 1000'
     alias: 'price-greater-1000'
+    public_name: 'price-greater-1000'
     filters:
       0:
         glue : 'and'
@@ -329,6 +336,7 @@ Mautic\LeadBundle\Entity\LeadList:
     is_published: true
     name: 'Price <= 1000'
     alias: 'price-lte-1000'
+    public_name: 'price-lte-1000'
     filters:
       0:
         glue : 'and'
@@ -345,6 +353,7 @@ Mautic\LeadBundle\Entity\LeadList:
     is_published: true
     name: 'Price < 500'
     alias: 'price-lt-500'
+    public_name: 'price-lt-500'
     filters:
       0:
         glue : 'and'
@@ -361,6 +370,7 @@ Mautic\LeadBundle\Entity\LeadList:
     is_published: true
     name: 'Multiselect = 1'
     alias: 'option-in-1'
+    public_name: 'option-in-1'
     filters: # a:1:{i:0;a:8:{s:6:"object";s:13:"custom_object";s:4:"glue";s:3:"and";s:5:"field";s:5:"cmf_1";s:4:"type";s:11:"multiselect";s:8:"operator";s:2:"in";s:10:"properties";a:1:{s:6:"filter";a:1:{i:0;s:1:"1";}}s:6:"filter";a:1:{i:0;s:1:"1";}s:7:"display";N;}}
       0:
         glue : 'and'
@@ -381,6 +391,7 @@ Mautic\LeadBundle\Entity\LeadList:
     is_published: true
     name: 'Text = text'
     alias: 'text-eq-text'
+    public_name: 'text-eq-tex'
     filters:
       0:
         glue : 'and'
@@ -398,6 +409,7 @@ Mautic\LeadBundle\Entity\LeadList:
     is_published: true
     name: 'Combined Price = 1000 and Date = 2020-08-13'
     alias: 'combined'
+    public_name: 'combined'
     filters:
       0:
         glue : 'and'

@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\FormModel;
-use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
@@ -14,32 +18,25 @@ use MauticPlugin\CustomObjectsBundle\DTO\ImportLogDTO;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CustomItemImportModel extends FormModel
 {
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
-     * @var FormatterHelper
-     */
-    private $formatterHelper;
-
     public function __construct(
-        EntityManager $entityManager,
-        CustomItemModel $customItemModel,
-        FormatterHelper $formatterHelper
+        EntityManagerInterface $em,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $logger,
+        CoreParametersHelper $coreParametersHelper,
+        private CustomItemModel $customItemModel,
+        private FormatterHelper $formatterHelper,
     ) {
-        $this->entityManager   = $entityManager;
-        $this->customItemModel = $customItemModel;
-        $this->formatterHelper = $formatterHelper;
+        parent::__construct($em, $security, $dispatcher, $router, $translator, $userHelper, $logger, $coreParametersHelper);
     }
 
     /**
@@ -82,7 +79,7 @@ class CustomItemImportModel extends FormModel
 
             try {
                 $customFieldValue = $customItem->findCustomFieldValueForFieldId((int) $customFieldId);
-            } catch (NotFoundException $e) {
+            } catch (NotFoundException) {
                 $customFieldValue = $customItem->createNewCustomFieldValueByFieldId((int) $customFieldId, $csvValue);
             }
 
@@ -107,7 +104,7 @@ class CustomItemImportModel extends FormModel
     private function linkContacts(CustomItem $customItem, array $contactIds, ?ImportLogDTO $importLogDto): void
     {
         foreach ($contactIds as $contactId) {
-            $leadRepository = $this->entityManager->getRepository(Lead::class);
+            $leadRepository = $this->em->getRepository(Lead::class);
             if (method_exists($leadRepository, 'exists') && !$leadRepository->exists((string) $contactId)) {
                 if ($importLogDto) {
                     $importLogDto->addWarning(
@@ -120,7 +117,7 @@ class CustomItemImportModel extends FormModel
                 continue;
             }
 
-            $xref = $this->customItemModel->linkEntity($customItem, 'contact', $contactId);
+            $xref = $this->customItemModel->linkEntity($customItem, 'contact', (int) $contactId);
             $customItem->addContactReference($xref);
         }
     }
@@ -131,7 +128,7 @@ class CustomItemImportModel extends FormModel
 
         if ($owner) {
             /** @var User $user */
-            $user = $this->entityManager->find(User::class, $owner);
+            $user = $this->em->find(User::class, $owner);
 
             $customItem->setCreatedBy($user);
         }
@@ -156,7 +153,7 @@ class CustomItemImportModel extends FormModel
             try {
                 $customItem = $this->customItemModel->fetchEntity((int) $rowData[$idKey]);
                 $customItem = $this->customItemModel->populateCustomFields($customItem);
-            } catch (NotFoundException $e) {
+            } catch (NotFoundException) {
             }
         }
 

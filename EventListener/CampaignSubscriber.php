@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CampaignBundle\CampaignEvents;
 use Mautic\CampaignBundle\Event\CampaignBuilderEvent;
@@ -16,7 +16,6 @@ use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Form\Type\CampaignActionLinkType;
@@ -31,71 +30,23 @@ use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\UnionQueryContainer;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CampaignSubscriber implements EventSubscriberInterface
 {
     use DbalQueryTrait;
     use QueryBuilderManipulatorTrait;
 
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var CustomFieldModel
-     */
-    private $customFieldModel;
-
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
-     * @var ConfigProvider
-     */
-    private $configProvider;
-
-    /**
-     * @var QueryFilterHelper
-     */
-    private $queryFilterHelper;
-
-    /**
-     * @var QueryFilterFactory
-     */
-    private $queryFilterFactory;
-
-    /**
-     * @var Connection
-     */
-    private $connection;
-
     public function __construct(
-        CustomFieldModel $customFieldModel,
-        CustomObjectModel $customObjectModel,
-        CustomItemModel $customItemModel,
-        TranslatorInterface $translator,
-        ConfigProvider $configProvider,
-        QueryFilterHelper $queryFilterHelper,
-        QueryFilterFactory $queryFilterFactory,
-        Connection $connection
+        private CustomFieldModel $customFieldModel,
+        private CustomObjectModel $customObjectModel,
+        private CustomItemModel $customItemModel,
+        private TranslatorInterface $translator,
+        private ConfigProvider $configProvider,
+        private QueryFilterHelper $queryFilterHelper,
+        private QueryFilterFactory $queryFilterFactory,
+        private Connection $connection
     ) {
-        $this->customFieldModel   = $customFieldModel;
-        $this->customObjectModel  = $customObjectModel;
-        $this->customItemModel    = $customItemModel;
-        $this->translator         = $translator;
-        $this->configProvider     = $configProvider;
-        $this->queryFilterHelper  = $queryFilterHelper;
-        $this->queryFilterFactory = $queryFilterFactory;
-        $this->connection         = $connection;
     }
 
     /**
@@ -140,8 +91,8 @@ class CampaignSubscriber implements EventSubscriberInterface
                 'description'     => $this->translator->trans('custom.item.events.field.value_descr', ['%customObject%' => $customObject->getNameSingular()]),
                 'eventName'       => CustomItemEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
                 'formType'        => CampaignConditionFieldValueType::class,
-                'formTheme'       => 'CustomObjectsBundle:FormTheme\FieldValueCondition',
-                'formTypeOptions' => ['customObject' => $customObject],
+                'formTheme'       => '@MauticForm/FormTheme/FieldValueCondition/_campaignevent_form_field_value_widget.html.twig',
+                'formTypeOptions' => ['customObjectId' => $customObject->getId()],
             ]);
         }
     }
@@ -165,7 +116,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             try {
                 $customItem = $this->customItemModel->fetchEntity($linkCustomItemId);
                 $this->customItemModel->linkEntity($customItem, 'contact', $contactId);
-            } catch (NotFoundException $e) {
+            } catch (NotFoundException) {
                 // Do nothing if the custom item doesn't exist anymore.
             }
         }
@@ -174,7 +125,7 @@ class CampaignSubscriber implements EventSubscriberInterface
             try {
                 $customItem = $this->customItemModel->fetchEntity($unlinkCustomItemId);
                 $this->customItemModel->unlinkEntity($customItem, 'contact', $contactId);
-            } catch (NotFoundException $e) {
+            } catch (NotFoundException) {
                 // Do nothing if the custom item doesn't exist anymore.
             }
         }
@@ -182,9 +133,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
     /**
      * @throws NotFoundException
-     * @throws DBALException
-     * @throws InvalidArgumentException
-     * @throws InvalidSegmentFilterException
+     * @throws InvalidSegmentFilterException|Exception
      */
     public function onCampaignTriggerCondition(CampaignExecutionEvent $event): void
     {
@@ -206,7 +155,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         try {
             $customField = $this->customFieldModel->fetchEntity((int) $event->getConfig()['field']);
-        } catch (NotFoundException $e) {
+        } catch (NotFoundException) {
             $event->setResult(false);
 
             return;
@@ -228,7 +177,7 @@ class CampaignSubscriber implements EventSubscriberInterface
 
         $queryBuilder = $this->buildOuterQuery($innerQueryBuilder, $queryAlias);
 
-        $customItemId = $this->executeSelect($queryBuilder)->fetchColumn();
+        $customItemId = $this->executeSelect($queryBuilder)->fetchOne();
 
         if ($customItemId) {
             $event->setChannel('customItem', $customItemId);

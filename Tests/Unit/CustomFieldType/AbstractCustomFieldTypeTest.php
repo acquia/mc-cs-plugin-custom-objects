@@ -9,7 +9,7 @@ use MauticPlugin\CustomObjectsBundle\CustomFieldType\AbstractCustomFieldType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\EmailType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AbstractCustomFieldTypeTest extends \PHPUnit\Framework\TestCase
 {
@@ -25,8 +25,6 @@ class AbstractCustomFieldTypeTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', '');
 
         $this->translator             = $this->createMock(TranslatorInterface::class);
         $this->customField            = $this->createMock(CustomField::class);

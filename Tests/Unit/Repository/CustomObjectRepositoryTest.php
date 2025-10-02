@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
@@ -48,6 +49,11 @@ class CustomObjectRepositoryTest extends TestCase
      */
     private $repository;
 
+    /**
+     * @var MockObject|ManagerRegistry
+     */
+    private $registry;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -57,11 +63,13 @@ class CustomObjectRepositoryTest extends TestCase
         $this->queryBuilder  = $this->createMock(QueryBuilder::class);
         $this->query         = $this->createMock(AbstractQuery::class);
         $this->expression    = $this->createMock(Expr::class);
+        $this->registry      = $this->createMock(ManagerRegistry::class);
         $this->repository    = new CustomObjectRepository(
-            $this->entityManager,
-            $this->classMetadata
+            $this->registry,
         );
 
+        $this->registry->method('getManagerForClass')->willReturn($this->entityManager);
+        $this->entityManager->method('getClassMetadata')->willReturn($this->classMetadata);
         $this->entityManager->method('createQueryBuilder')->willReturn($this->queryBuilder);
         $this->queryBuilder->method('getQuery')->willReturn($this->query);
         $this->queryBuilder->method('expr')->willReturn($this->expression);

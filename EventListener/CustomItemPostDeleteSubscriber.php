@@ -12,22 +12,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class CustomItemPostDeleteSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CustomItemXrefCustomItemRepository
-     */
-    private $customItemXrefCustomItemRepository;
-
-    /**
-     * @var CustomItemXrefContactRepository
-     */
-    private $customItemXrefContactRepository;
-
     public function __construct(
-        CustomItemXrefCustomItemRepository $customItemXrefCustomItemRepository,
-        CustomItemXrefContactRepository $customItemXrefContactRepository
+        private CustomItemXrefCustomItemRepository $customItemXrefCustomItemRepository,
+        private CustomItemXrefContactRepository $customItemXrefContactRepository
     ) {
-        $this->customItemXrefCustomItemRepository = $customItemXrefCustomItemRepository;
-        $this->customItemXrefContactRepository    = $customItemXrefContactRepository;
     }
 
     public static function getSubscribedEvents()

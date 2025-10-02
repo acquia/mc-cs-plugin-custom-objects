@@ -50,7 +50,6 @@ class CustomItemNameFilterQueryBuilderTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', '');
 
         $randomParameter = new RandomParameterName();
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
@@ -91,8 +90,6 @@ class CustomItemNameFilterQueryBuilderTest extends TestCase
 
     /**
      * @dataProvider parameterValueProvider
-     *
-     * @param $parameterValue
      */
     public function testApplyQuery($parameterValue): void
     {

@@ -347,7 +347,7 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $this->assertSame([], $customItemFromResponse['attributes']['multiselect-test-field']);
         $this->assertSame('', $customItemFromResponse['attributes']['select-test-field']);
         $this->assertSame('', $customItemFromResponse['attributes']['phone-number-test-field']);
-        $this->assertSame(null, $customItemFromResponse['attributes']['number-test-field']);
+        $this->assertSame(0, $customItemFromResponse['attributes']['number-test-field']);
         $this->assertSame('', $customItemFromResponse['attributes']['hidden-test-field']);
         $this->assertSame('', $customItemFromResponse['attributes']['email-test-field']);
         $this->assertSame(null, $customItemFromResponse['attributes']['date-test-field']);

@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\LeadBundle\Event\SegmentDictionaryGenerationEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
@@ -20,20 +21,10 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
 {
     use DbalQueryTrait;
 
-    /**
-     * @var Registry
-     */
-    private $doctrineRegistry;
-
-    /**
-     * @var ConfigProvider
-     */
-    private $configProvider;
-
-    public function __construct(Registry $registry, ConfigProvider $configProvider)
-    {
-        $this->doctrineRegistry = $registry;
-        $this->configProvider   = $configProvider;
+    public function __construct(
+        private ManagerRegistry $doctrineRegistry,
+        private ConfigProvider $configProvider
+    ) {
     }
 
     /**
@@ -47,7 +38,7 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws Exception
      */
     public function onGenerateSegmentDictionary(SegmentDictionaryGenerationEvent $event): void
     {
@@ -66,7 +57,7 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
             ->leftJoin('o', MAUTIC_TABLE_PREFIX.'custom_field', 'f', 'f.custom_object_id = o.id');
 
         $registeredObjects                = [];
-        $fields                           = $this->executeSelect($queryBuilder)->fetchAll();
+        $fields                           = $this->executeSelect($queryBuilder)->fetchAllAssociative();
         $isCustomObjectMergeFilterEnabled = $this->configProvider->isCustomObjectMergeFilterEnabled();
         $cmoType                          = CustomItemNameFilterQueryBuilder::getServiceId();
         $cmfType                          = CustomFieldFilterQueryBuilder::getServiceId();

@@ -25,7 +25,8 @@ use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportSubscriberTest extends TestCase
 {
@@ -85,18 +86,22 @@ class ReportSubscriberTest extends TestCase
     private $connection;
 
     /**
+     * @var MockObject|EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    /**
      * @var ReportHelper
      */
     private $reportHelper;
 
     protected function setUp(): void
     {
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
-
         $this->customObjectRepository          = $this->createMock(CustomObjectRepository::class);
         $this->fieldsBuilder                   = $this->createMock(FieldsBuilder::class);
         $this->companyReportData               = $this->createMock(CompanyReportData::class);
-        $this->reportHelper                    = new ReportHelper();
+        $this->dispatcher                      = $this->createMock(EventDispatcherInterface::class);
+        $this->reportHelper                    = new ReportHelper($this->dispatcher);
         $this->translatorInterface             = $this->createMock(TranslatorInterface::class);
         $this->reportSubscriber                = new ReportSubscriber($this->customObjectRepository, $this->fieldsBuilder, $this->companyReportData, $this->reportHelper, $this->translatorInterface);
         $this->reportBuilderEvent              = $this->createMock(ReportBuilderEvent::class);

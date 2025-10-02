@@ -9,10 +9,7 @@ use Symfony\Component\Form\DataTransformerInterface;
 
 class CsvTransformer implements DataTransformerInterface
 {
-    /**
-     * @var CsvHelper
-     */
-    private $csvHelper;
+    private CsvHelper $csvHelper;
 
     public function __construct()
     {

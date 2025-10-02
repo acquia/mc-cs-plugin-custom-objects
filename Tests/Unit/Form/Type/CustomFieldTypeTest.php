@@ -65,6 +65,7 @@ class CustomFieldTypeTest extends \PHPUnit\Framework\TestCase
     {
         $options['data']               = $this->customField;
         $options['custom_object_form'] = '';
+        $options['action']             = '';
 
         $this->formBuilder->expects($this->once())
             ->method('addModelTransFormer')

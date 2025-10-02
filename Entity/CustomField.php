@@ -11,7 +11,6 @@ use ApiPlatform\Core\Annotation\ApiSubresource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
@@ -51,6 +50,7 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  *     normalizationContext={"groups"={"custom_field:read"}, "swagger_definition_name"="Read"},
  *     denormalizationContext={"groups"={"custom_field:write"}, "swagger_definition_name"="Write"}
  * )
+ *
  * @ApiFilter(SearchFilter::class, properties={"alias": "partial"})
  */
 class CustomField extends FormEntity implements UniqueEntityInterface, UuidInterface
@@ -62,7 +62,9 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
 
     /**
      * @var int|null
+     *
      * @Groups({"custom_field:read", "custom_object:read"})
+     *
      * @ApiProperty(
      *     attributes={
      *         "openapi_context"={
@@ -77,7 +79,9 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
 
     /**
      * @var string|null
+     *
      * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
+     *
      * @ApiProperty(
      *     attributes={
      *         "openapi_context"={
@@ -93,7 +97,9 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
 
     /**
      * @var string|null
+     *
      * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
+     *
      * @ApiProperty(
      *     attributes={
      *         "openapi_context"={
@@ -109,7 +115,9 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
 
     /**
      * @var string|null
+     *
      * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
+     *
      * @ApiProperty(
      *     attributes={
      *         "openapi_context"={
@@ -143,7 +151,9 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
 
     /**
      * @ManyToOne(targetEntity="CustomObject", inversedBy="customFields")
+     *
      * @JoinColumn(name="custom_object_id", referencedColumnName="id")
+     *
      * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
      *
      * @var CustomObject|null
@@ -152,6 +162,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
 
     /**
      * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
+     *
      * @ApiProperty(
      *     attributes={
      *         "openapi_context"={
@@ -168,26 +179,32 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
 
     /**
      * @var bool
+     *
      * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
      */
     private $required = false;
 
     /**
      * @var mixed
+     *
      * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
      */
     private $defaultValue;
 
     /**
      * @var Collection|CustomFieldOption[]
+     *
      * @OneToMany(targetEntity="CustomFieldOption", mappedBy="customField")
+     *
      * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
+     *
      * @ApiSubresource()
      */
     private $options;
 
     /**
      * @var Params|string[]
+     *
      * @Groups({"custom_field:read", "custom_field:write", "custom_object:read", "custom_object:write"})
      */
     private $params;
@@ -220,9 +237,9 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
         $this->alias = null;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
-        return $this->getLabel();
+        return (string) $this->getLabel();
     }
 
     /**
@@ -255,20 +272,20 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
             ->build();
 
         $builder->addId();
-        $builder->addField('label', Type::STRING);
-        $builder->addField('alias', Type::STRING);
-        $builder->addField('type', Type::STRING);
+        $builder->addField('label', Types::STRING);
+        $builder->addField('alias', Types::STRING);
+        $builder->addField('type', Types::STRING);
         $builder->createField('order', 'integer')
             ->columnName('field_order')
             ->nullable()
             ->build();
 
-        $builder->createField('required', Type::BOOLEAN)
+        $builder->createField('required', Types::BOOLEAN)
             ->columnName('required')
             ->option('default', false)
             ->build();
 
-        $builder->createField('defaultValue', Type::STRING)
+        $builder->createField('defaultValue', Types::STRING)
             ->columnName('default_value')
             ->nullable()
             ->build();
@@ -280,17 +297,17 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createField('params', Type::JSON_ARRAY)
+        $builder->createField('params', Types::JSON)
             ->columnName('params')
             ->nullable()
             ->build();
 
-        $builder->createField('showInCustomObjectDetailList', Type::BOOLEAN)
+        $builder->createField('showInCustomObjectDetailList', Types::BOOLEAN)
             ->columnName('show_in_custom_object_detail_list')
             ->option('default', true)
             ->build();
 
-        $builder->createField('showInContactDetailList', Type::BOOLEAN)
+        $builder->createField('showInContactDetailList', Types::BOOLEAN)
             ->columnName('show_in_contact_detail_list')
             ->option('default', true)
             ->build();
@@ -365,7 +382,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
     /**
      * @param string|null $alias
      */
-    public function setAlias($alias)
+    public function setAlias($alias): void
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -417,6 +434,15 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
             'attr'       => ['class' => 'form-control'],
         ];
 
+        if ('datetime' === $this->getType()) {
+            $fieldOptions = array_merge(
+                $fieldOptions,
+                [
+                    'html5'  => false,
+                ]
+            );
+        }
+
         if ($placeholder) {
             $fieldOptions['attr']['data-placeholder'] = $placeholder;
         }
@@ -433,9 +459,6 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
         return $this->customObject;
     }
 
-    /**
-     * @param CustomObject $customObject
-     */
     public function setCustomObject(?CustomObject $customObject = null): void
     {
         $this->customObject = $customObject;
@@ -459,9 +482,6 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
         return $this->required;
     }
 
-    /**
-     * @param bool $required
-     */
     public function setRequired(?bool $required): void
     {
         $this->required = $this->isUniqueIdentifier ?: (bool) $required;
@@ -474,7 +494,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
     {
         try {
             return $this->getTypeObject()->createDefaultValueTransformer()->transform($this->defaultValue);
-        } catch (UndefinedTransformerException $e) {
+        } catch (UndefinedTransformerException) {
             // Nothing to transform, return string below
         }
 
@@ -490,7 +510,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
             $this->defaultValue = $this->getTypeObject()->createDefaultValueTransformer()->reverseTransform($defaultValue);
 
             return;
-        } catch (UndefinedTransformerException $e) {
+        } catch (UndefinedTransformerException) {
             // Nothing to transform, use string below
         }
 
@@ -628,8 +648,8 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
 
     public function isChoiceType(): bool
     {
-        return ChoiceType::class === $this->getTypeObject()->getSymfonyFormFieldType() ||
-            is_subclass_of($this->getTypeObject()->getSymfonyFormFieldType(), ChoiceType::class);
+        return ChoiceType::class === $this->getTypeObject()->getSymfonyFormFieldType()
+            || is_subclass_of($this->getTypeObject()->getSymfonyFormFieldType(), ChoiceType::class);
     }
 
     public function canHaveMultipleValues(): bool
@@ -667,7 +687,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
     /**
      * @Groups({"custom_field:read", "custom_object:read"})
      *
-     * @return \DateTime
+     * @return \DateTimeInterface|null
      */
     public function getDateAdded()
     {
@@ -677,7 +697,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
     /**
      * @Groups({"custom_field:read", "custom_object:read"})
      *
-     * @return \DateTime
+     * @return \DateTimeInterface|null
      */
     public function getDateModified()
     {

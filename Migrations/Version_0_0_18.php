@@ -10,15 +10,14 @@ use Mautic\IntegrationsBundle\Migration\AbstractMigration;
 
 class Version_0_0_18 extends AbstractMigration
 {
-    /** @var Schema */
-    private $schema;
+    private ?Schema $schema = null;
 
     protected function isApplicable(Schema $schema): bool
     {
         $this->schema = $schema;
         try {
             return !$this->schema->getTable($this->concatPrefix('custom_object'))->hasForeignKey('FK_CO_MASTER_OBJECT');
-        } catch (SchemaException $e) {
+        } catch (SchemaException) {
             return false;
         }
     }

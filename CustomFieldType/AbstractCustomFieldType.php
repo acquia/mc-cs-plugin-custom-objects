@@ -10,9 +10,9 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
+abstract class AbstractCustomFieldType implements CustomFieldTypeInterface, \Stringable
 {
     /**
      * @var string
@@ -24,22 +24,10 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
      */
     protected $formTypeOptions = [];
 
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
-
-    /**
-     * @var FilterOperatorProviderInterface
-     */
-    protected $filterOperatorProvider;
-
     public function __construct(
-        TranslatorInterface $translator,
-        FilterOperatorProviderInterface $filterOperatorProvider
+        protected TranslatorInterface $translator,
+        protected FilterOperatorProviderInterface $filterOperatorProvider
     ) {
-        $this->translator             = $translator;
-        $this->filterOperatorProvider = $filterOperatorProvider;
     }
 
     public function __toString(): string
@@ -110,8 +98,8 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     {
         $type = $this->getSymfonyFormFieldType();
 
-        return ChoiceType::class === $type ||
-            is_subclass_of($this->getSymfonyFormFieldType(), ChoiceType::class);
+        return ChoiceType::class === $type
+            || is_subclass_of($this->getSymfonyFormFieldType(), ChoiceType::class);
     }
 
     /**

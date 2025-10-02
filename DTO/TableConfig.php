@@ -11,36 +11,16 @@ use Mautic\CoreBundle\Helper\ArrayHelper;
 class TableConfig
 {
     /**
-     * @var int
-     */
-    private $limit;
-
-    /**
-     * @var int
-     */
-    private $page;
-
-    /**
-     * @var string
-     */
-    private $orderBy;
-
-    /**
-     * @var string
-     */
-    private $orderDirection;
-
-    /**
      * @var mixed[]
      */
-    private $parameters = [];
+    private array $parameters = [];
 
-    public function __construct(int $limit, int $page, string $orderBy, string $orderDirection = 'ASC')
-    {
-        $this->limit          = $limit;
-        $this->page           = $page;
-        $this->orderBy        = $orderBy;
-        $this->orderDirection = $orderDirection;
+    public function __construct(
+        private int $limit,
+        private int $page,
+        private string $orderBy,
+        private string $orderDirection = 'ASC'
+    ) {
     }
 
     public function getOrderBy(): string

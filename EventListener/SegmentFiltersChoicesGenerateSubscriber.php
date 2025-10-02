@@ -16,46 +16,25 @@ use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterface
 {
     use OperatorListTrait;
 
     /**
-     * @var CustomObjectRepository
-     */
-    private $customObjectRepository;
-
-    /**
      * @var TranslatorInterface
      */
     private $translator;
 
-    /**
-     * @var ConfigProvider
-     */
-    private $configProvider;
-
-    /**
-     * @var CustomFieldTypeProvider
-     */
-    private $fieldTypeProvider;
-
-    private TypeOperatorProviderInterface $typeOperatorProvider;
-
     public function __construct(
-        CustomObjectRepository $customObjectRepository,
+        private CustomObjectRepository $customObjectRepository,
         TranslatorInterface $translator,
-        ConfigProvider $configProvider,
-        CustomFieldTypeProvider $fieldTypeProvider,
-        TypeOperatorProviderInterface $typeOperatorProvider
+        private ConfigProvider $configProvider,
+        private CustomFieldTypeProvider $fieldTypeProvider,
+        private TypeOperatorProviderInterface $typeOperatorProvider
     ) {
-        $this->customObjectRepository  = $customObjectRepository;
-        $this->translator              = $translator;
-        $this->configProvider          = $configProvider;
-        $this->fieldTypeProvider       = $fieldTypeProvider;
-        $this->typeOperatorProvider    = $typeOperatorProvider;
+        $this->translator = $translator;
     }
 
     /**
@@ -96,19 +75,19 @@ class SegmentFiltersChoicesGenerateSubscriber implements EventSubscriberInterfac
                         continue;
                     }
 
-                    if (method_exists($this->typeOperatorProvider, 'getContext') &&
-                        'segment' === $this->typeOperatorProvider->getContext() &&
-                        method_exists($customField->getTypeObject(), 'getOperatorsForSegment')
+                    if (method_exists($this->typeOperatorProvider, 'getContext')
+                        && 'segment' === $this->typeOperatorProvider->getContext()
+                        && method_exists($customField->getTypeObject(), 'getOperatorsForSegment')
                     ) {
                         $allowedOperators = $customField->getTypeObject()->getOperatorsForSegment();
                     } else {
                         $allowedOperators = $customField->getTypeObject()->getOperators();
                     }
 
-                    $typeOperators = $this->typeOperatorProvider->getOperatorsForFieldType($customField->getType());
+                    $typeOperators      = $this->typeOperatorProvider->getOperatorsForFieldType($customField->getType());
                     $availableOperators = array_flip($typeOperators);
-                    $operators = array_intersect_key($availableOperators, $allowedOperators);
-                    $operators = array_flip($operators);
+                    $operators          = array_intersect_key($availableOperators, $allowedOperators);
+                    $operators          = array_flip($operators);
 
                     $event->addChoice(
                         'custom_object',

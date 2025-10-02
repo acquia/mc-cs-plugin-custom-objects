@@ -9,20 +9,8 @@ use Symfony\Component\HttpFoundation\Session\Session;
 
 class SessionProviderFactory
 {
-    /**
-     * @var Session
-     */
-    private $session;
-
-    /**
-     * @var CoreParametersHelper
-     */
-    private $coreParametersHelper;
-
-    public function __construct(Session $session, CoreParametersHelper $coreParametersHelper)
+    public function __construct(private Session $session, private CoreParametersHelper $coreParametersHelper)
     {
-        $this->session              = $session;
-        $this->coreParametersHelper = $coreParametersHelper;
     }
 
     public function createObjectProvider(): SessionProvider

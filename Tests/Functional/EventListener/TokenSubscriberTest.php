@@ -17,6 +17,7 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomFieldValueModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\CustomObjectsTrait;
 
+#[\AllowDynamicProperties]
 class TokenSubscriberTest extends MauticMysqlTestCase
 {
     use CustomObjectsTrait;

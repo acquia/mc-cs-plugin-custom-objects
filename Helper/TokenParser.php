@@ -27,7 +27,7 @@ class TokenParser
 
             try {
                 $this->extractAliases($parts[0], $token);
-            } catch (\LengthException $e) {
+            } catch (\LengthException) {
                 // Invalid token, pretend like we did not see it.
                 continue;
             }
@@ -109,7 +109,7 @@ class TokenParser
     private function trimArrayElements(array $array): array
     {
         return array_map(
-            function ($part) {
+            function ($part): string {
                 return trim($part);
             },
             $array

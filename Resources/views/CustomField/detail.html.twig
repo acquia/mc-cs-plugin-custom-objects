@@ -1,0 +1,19 @@
+{% extends '@MauticCore/Default/content.html.twig.html.twig' %}
+
+{% block mauticContent %}customField{% endblock %}
+
+{% block headerTitle %}
+    {{ item.getName() }}
+{% endblock %}
+
+{% block actions %}
+    {{ include('@MauticCore/Helper/page_actions.html.twig', { 'item': item }) }}
+{% endblock %}
+
+{% block content %}
+    <!-- start: box layout -->
+    <div class="box-layout">
+        {{ include('@CustomObjects/CustomField/_detail_left_section.html.twig') }}
+        {{ include('@CustomObjects/CustomField/_detail_right_section.html.twig', {'logs': logs}) }}
+    </div>
+{% endblock %}

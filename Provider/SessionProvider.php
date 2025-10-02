@@ -33,26 +33,8 @@ class SessionProvider
      */
     private const KEY_FILTER = 'filter';
 
-    /**
-     * @var Session
-     */
-    private $session;
-
-    /**
-     * @var int
-     */
-    private $defaultPageLimit;
-
-    /**
-     * @var string
-     */
-    private $namespace;
-
-    public function __construct(Session $session, string $namespace, int $defaultPageLimit)
+    public function __construct(private Session $session, private string $namespace, private int $defaultPageLimit)
     {
-        $this->session          = $session;
-        $this->namespace        = $namespace;
-        $this->defaultPageLimit = $defaultPageLimit;
     }
 
     public function getNamespace(): string

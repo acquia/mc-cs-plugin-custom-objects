@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
-use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
@@ -19,7 +18,7 @@ class CustomItemExportScheduler
 
     private User $user; // Created by
 
-    private DateTimeImmutable $scheduledDateTime;
+    private \DateTimeImmutable $scheduledDateTime;
 
     private int $customObjectId;
 
@@ -78,12 +77,12 @@ class CustomItemExportScheduler
         return $this;
     }
 
-    public function getScheduledDateTime(): ?DateTimeImmutable
+    public function getScheduledDateTime(): ?\DateTimeImmutable
     {
         return $this->scheduledDateTime;
     }
 
-    public function setScheduledDateTime(DateTimeImmutable $scheduledDateTime): self
+    public function setScheduledDateTime(\DateTimeImmutable $scheduledDateTime): self
     {
         $this->scheduledDateTime = $scheduledDateTime;
         $this->addChange('scheduledDateTime', $scheduledDateTime);

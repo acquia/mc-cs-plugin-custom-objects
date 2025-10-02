@@ -12,16 +12,6 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 abstract class AbstractCustomFieldValue implements CustomFieldValueInterface
 {
-    /**
-     * @var CustomField
-     */
-    protected $customField;
-
-    /**
-     * @var CustomItem
-     */
-    protected $customItem;
-
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
     {
         $builder = new ClassMetadataBuilder($metadata);
@@ -29,10 +19,8 @@ abstract class AbstractCustomFieldValue implements CustomFieldValueInterface
         $builder->setMappedSuperClass();
     }
 
-    public function __construct(CustomField $customField, CustomItem $customItem)
+    public function __construct(protected CustomField $customField, protected CustomItem $customItem)
     {
-        $this->customField = $customField;
-        $this->customItem  = $customItem;
     }
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
@@ -81,7 +69,7 @@ abstract class AbstractCustomFieldValue implements CustomFieldValueInterface
     /**
      * @param mixed $value
      */
-    public function addValue($value = null)
+    public function addValue($value = null): void
     {
         throw new \Exception('addValue is not implemented for '.self::class);
     }

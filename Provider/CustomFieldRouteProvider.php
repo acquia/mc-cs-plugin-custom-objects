@@ -12,14 +12,8 @@ class CustomFieldRouteProvider
 
     public const ROUTE_SAVE   = 'mautic_custom_field_save';
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    public function __construct(RouterInterface $router)
+    public function __construct(private RouterInterface $router)
     {
-        $this->router = $router;
     }
 
     public function buildSaveRoute(string $fieldType, ?int $id = null, ?int $objectId = null, ?int $panelCount = null, ?int $panelId = null): string

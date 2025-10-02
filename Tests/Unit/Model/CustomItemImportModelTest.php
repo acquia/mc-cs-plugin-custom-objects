@@ -6,7 +6,12 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\CoreBundle\Twig\Helper\DateHelper;
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -23,7 +28,9 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemImportModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Translation\TranslatorInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class CustomItemImportModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -57,14 +64,48 @@ class CustomItemImportModelTest extends \PHPUnit\Framework\TestCase
     private $entityManager;
 
     /**
+     * @var MockObject|CorePermissions
+     */
+    private $security;
+
+    /**
+     * @var MockObject|EventDispatcherInterface
+     */
+    private $dispatcher;
+
+    /**
+     * @var MockObject|UrlGeneratorInterface
+     */
+    private $router;
+
+    /**
+     * @var MockObject|Translator
+     */
+    private $translator;
+
+    /**
+     * @var MockObject|UserHelper
+     */
+    private $userHelper;
+
+    /**
+     * @var MockObject|LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var MockObject|CoreParametersHelper
+     */
+    private $coreParametersHelper;
+
+    private DateHelper $dateHelper;
+
+    /**
      * @var MockObject|CustomItemModel
      */
     private $customItemModel;
 
-    /**
-     * @var MockObject|FormatterHelper
-     */
-    private $formatterHelper;
+    private FormatterHelper $formatterHelper;
 
     /**
      * @var MockObject|CustomField
@@ -96,19 +137,43 @@ class CustomItemImportModelTest extends \PHPUnit\Framework\TestCase
         $this->import                 = $this->createMock(Import::class);
         $this->customItemModel        = $this->createMock(CustomItemModel::class);
         $this->entityManager          = $this->createMock(EntityManager::class);
-        $this->formatterHelper        = $this->createMock(FormatterHelper::class);
+        $this->security               = $this->createMock(CorePermissions::class);
+        $this->dispatcher             = $this->createMock(EventDispatcherInterface::class);
+        $this->router                 = $this->createMock(UrlGeneratorInterface::class);
+        $this->translator             = $this->createMock(Translator::class);
+        $this->userHelper             = $this->createMock(UserHelper::class);
+        $this->logger                 = $this->createMock(LoggerInterface::class);
+        $this->coreParametersHelper   = $this->createMock(CoreParametersHelper::class);
+
+        $this->dateHelper             = new DateHelper(
+            'F j, Y g:i a T',
+            'D, M d',
+            'F j, Y',
+            'g:i a',
+            $this->translator,
+            $this->coreParametersHelper,
+        );
+
+        $this->formatterHelper        = new FormatterHelper(
+            $this->dateHelper,
+            $this->translator,
+        );
         $this->filterOperatorProvider = $this->createMock(FilterOperatorProviderInterface::class);
         $this->customItemImportModel  = new CustomItemImportModel(
             $this->entityManager,
+            $this->security,
+            $this->dispatcher,
+            $this->router,
+            $this->translator,
+            $this->userHelper,
+            $this->logger,
+            $this->coreParametersHelper,
             $this->customItemModel,
             $this->formatterHelper
         );
 
-        /** @var TranslatorInterface $translator */
-        $translator = $this->createMock(TranslatorInterface::class);
-
-        $textareaType = new TextareaType($translator, $this->filterOperatorProvider);
-        $dateTimeType = new DateTimeType($translator, $this->filterOperatorProvider);
+        $textareaType = new TextareaType($this->translator, $this->filterOperatorProvider);
+        $dateTimeType = new DateTimeType($this->translator, $this->filterOperatorProvider);
         $this->descriptionField->method('getId')->willReturn(33);
         $this->descriptionField->method('getTypeObject')->willReturn($textareaType);
         $this->dateField->method('getId')->willReturn(34);
@@ -127,11 +192,6 @@ class CustomItemImportModelTest extends \PHPUnit\Framework\TestCase
 
         $this->customItemModel->expects($this->never())
             ->method('fetchEntity');
-
-        $this->formatterHelper->expects($this->once())
-            ->method('simpleCsvToArray')
-            ->with('3262739,3262738,3262737')
-            ->willReturn([3262739, 3262738, 3262737]);
 
         $this->customObject->expects($this->exactly(3))
             ->method('getCustomFields')
@@ -173,11 +233,6 @@ class CustomItemImportModelTest extends \PHPUnit\Framework\TestCase
         $this->import->expects($this->exactly(2))
             ->method('getMatchedFields')
             ->willReturn(self::MAPPED_FIELDS);
-
-        $this->formatterHelper->expects($this->once())
-            ->method('simpleCsvToArray')
-            ->with('3262739,3262738,3262737')
-            ->willReturn([3262739, 3262738, 3262737]);
 
         $this->customObject->expects($this->exactly(1))
             ->method('getCustomFields')
@@ -231,11 +286,6 @@ class CustomItemImportModelTest extends \PHPUnit\Framework\TestCase
             ->with(User::class, 222)
             ->willReturn(222);
 
-        $this->formatterHelper->expects($this->once())
-            ->method('simpleCsvToArray')
-            ->with('3262739,3262738,3262737')
-            ->willReturn([3262739, 3262738, 3262737]);
-
         $this->customItemModel->expects($this->exactly(3))
             ->method('linkEntity')
             ->withConsecutive(
@@ -282,11 +332,6 @@ class CustomItemImportModelTest extends \PHPUnit\Framework\TestCase
             ->method('fetchEntity')
             ->with(555)
             ->will($this->throwException(new NotFoundException()));
-
-        $this->formatterHelper->expects($this->once())
-            ->method('simpleCsvToArray')
-            ->with('3262739,3262738,3262737')
-            ->willReturn([3262739, 3262738, 3262737]);
 
         $this->customItemModel->expects($this->exactly(3))
             ->method('linkEntity')

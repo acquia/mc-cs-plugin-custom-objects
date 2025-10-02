@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\CustomFieldType\DataTransformer;
 
-use DateTime;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DataTransformer\DateTimeAtomTransformer;
 
 class DateTimeAtomTransformerTest extends \PHPUnit\Framework\TestCase
@@ -12,7 +11,7 @@ class DateTimeAtomTransformerTest extends \PHPUnit\Framework\TestCase
     public function test(): void
     {
         $date     = '2019-05-30T13:45:04+00:00';
-        $datetime = new DateTime($date);
+        $datetime = new \DateTime($date);
         $format   = DATE_ATOM;
 
         $transformer = new DateTimeAtomTransformer();

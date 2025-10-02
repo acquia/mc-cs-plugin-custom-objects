@@ -6,39 +6,21 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
-use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
+use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomItemButtonSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var CustomItemPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var CustomItemRouteProvider
-     */
-    private $routeProvider;
-
     public function __construct(
-        CustomItemPermissionProvider $permissionProvider,
-        CustomItemRouteProvider $routeProvider,
-        TranslatorInterface $translator
+        private CustomItemPermissionProvider $permissionProvider,
+        private CustomItemRouteProvider $routeProvider,
+        private TranslatorInterface $translator
     ) {
-        $this->permissionProvider = $permissionProvider;
-        $this->routeProvider      = $routeProvider;
-        $this->translator         = $translator;
     }
 
     /**
@@ -57,8 +39,8 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
             case CustomItemRouteProvider::ROUTE_LIST:
                 try {
                     $customObjectId   = $this->getCustomObjectIdFromEvent($event);
-                    $filterEntityId   = $event->getRequest()->query->get('filterEntityId', false);
-                    $filterEntityType = $event->getRequest()->query->get('filterEntityType', false);
+                    $filterEntityId   = $event->getRequest()->query->get('filterEntityId');
+                    $filterEntityType = $event->getRequest()->query->get('filterEntityType');
                     $loadedInTab      = (bool) $filterEntityId;
                     if ($loadedInTab && in_array($filterEntityType, ['contact', 'customItem'], true)) {
                         $customItem = $event->getItem();
@@ -112,7 +94,7 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
                             $event->getRoute()
                         );
                     }
-                } catch (ForbiddenException $e) {
+                } catch (ForbiddenException) {
                 }
 
                 break;
@@ -136,17 +118,17 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
         if ($customItem && $customItem instanceof CustomItem) {
             try {
                 $event->addButton($this->defineDeleteButton($customObjectId, $customItem), $location, $event->getRoute());
-            } catch (ForbiddenException $e) {
+            } catch (ForbiddenException) {
             }
 
             try {
                 $event->addButton($this->defineCloneButton($customObjectId, $customItem), $location, $event->getRoute());
-            } catch (ForbiddenException $e) {
+            } catch (ForbiddenException) {
             }
 
             try {
                 $event->addButton($this->defineEditButton($customObjectId, $customItem), $location, $event->getRoute());
-            } catch (ForbiddenException $e) {
+            } catch (ForbiddenException) {
             }
         }
     }
@@ -295,7 +277,7 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
         return [
             'attr' => [
                 'href'        => '#',
-                'onclick'     => "CustomObjects.linkCustomItemWithEntity(this, event, ${customObjectId}, '${entityType}', ${entityId}, 'custom-object-${customObjectId}', ".($relationshipObjectId ?: 'null').');',
+                'onclick'     => "CustomObjects.linkCustomItemWithEntity(this, event, {$customObjectId}, '{$entityType}', {$entityId}, 'custom-object-{$customObjectId}', ".($relationshipObjectId ?: 'null').');',
                 'data-action' => $action,
                 'data-toggle' => '',
             ],
@@ -317,7 +299,7 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
         return [
             'attr' => [
                 'href'        => '#',
-                'onclick'     => "CustomObjects.unlinkCustomItemFromEntity(this, event, ${customObjectId}, '${entityType}', ${entityId}, 'custom-object-${customObjectId}');",
+                'onclick'     => "CustomObjects.unlinkCustomItemFromEntity(this, event, {$customObjectId}, '{$entityType}', {$entityId}, 'custom-object-{$customObjectId}');",
                 'data-action' => $this->routeProvider->buildUnlinkRoute($customItemId, $entityType, $entityId),
                 'data-toggle' => '',
             ],

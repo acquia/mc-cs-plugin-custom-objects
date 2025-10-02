@@ -13,15 +13,12 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CustomObjectMergedFilterQueryBuilder extends BaseFilterQueryBuilder
 {
-    private QueryFilterHelper $queryFilterHelper;
-
     public function __construct(
         RandomParameterName $randomParameterNameService,
         EventDispatcherInterface $dispatcher,
-        QueryFilterHelper $queryFilterHelper
+        private QueryFilterHelper $queryFilterHelper
     ) {
         parent::__construct($randomParameterNameService, $dispatcher);
-        $this->queryFilterHelper = $queryFilterHelper;
     }
 
     public static function getServiceId(): string

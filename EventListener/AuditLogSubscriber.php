@@ -15,20 +15,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class AuditLogSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
-    /**
-     * @var IpLookupHelper
-     */
-    private $ipLookupHelper;
-
-    public function __construct(AuditLogModel $auditLogModel, IpLookupHelper $ipLookupHelper)
-    {
-        $this->auditLogModel  = $auditLogModel;
-        $this->ipLookupHelper = $ipLookupHelper;
+    public function __construct(
+        private AuditLogModel $auditLogModel,
+        private IpLookupHelper $ipLookupHelper
+    ) {
     }
 
     /**

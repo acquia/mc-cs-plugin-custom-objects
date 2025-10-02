@@ -11,11 +11,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CustomItemScheduledExportSubscriber implements EventSubscriberInterface
 {
-    private CustomItemExportSchedulerModel $customItemExportSchedulerModel;
-
-    public function __construct(CustomItemExportSchedulerModel $customItemExportSchedulerModel)
+    public function __construct(private CustomItemExportSchedulerModel $customItemExportSchedulerModel)
     {
-        $this->customItemExportSchedulerModel = $customItemExportSchedulerModel;
     }
 
     /**

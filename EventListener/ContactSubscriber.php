@@ -17,54 +17,18 @@ use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ContactSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @var CustomItemRouteProvider
-     */
-    private $routeProvider;
-
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
-     * @var ConfigProvider
-     */
-    private $configProvider;
-
-    /**
-     * @var CustomItemXrefContactRepository
-     */
-    private $customItemXrefContactRepository;
-
     public function __construct(
-        EntityManager $entityManager,
-        TranslatorInterface $translator,
-        CustomItemRouteProvider $routeProvider,
-        CustomItemModel $customItemModel,
-        ConfigProvider $configProvider,
-        CustomItemXrefContactRepository $customItemXrefContactRepository
+        private EntityManager $entityManager,
+        private TranslatorInterface $translator,
+        private CustomItemRouteProvider $routeProvider,
+        private CustomItemModel $customItemModel,
+        private ConfigProvider $configProvider,
+        private CustomItemXrefContactRepository $customItemXrefContactRepository
     ) {
-        $this->entityManager                   = $entityManager;
-        $this->translator                      = $translator;
-        $this->routeProvider                   = $routeProvider;
-        $this->customItemModel                 = $customItemModel;
-        $this->configProvider                  = $configProvider;
-        $this->customItemXrefContactRepository = $customItemXrefContactRepository;
     }
 
     /**
@@ -178,7 +142,7 @@ class ContactSubscriber implements EventSubscriberInterface
                         'label' => $this->translator->trans("custom.item.{$action}.event", ['%customItemName%' => $customItem->getName()]),
                         'href'  => $this->routeProvider->buildViewRoute($customItem->getCustomObject()->getId(), $customItem->getId()),
                     ];
-                } catch (NotFoundException $e) {
+                } catch (NotFoundException) {
                     $eventLabel = $this->translator->trans("custom.item.{$action}.event.not.found", ['%customItemId%' => $link['object_id']]);
                 }
                 $event->addEvent([
@@ -190,7 +154,7 @@ class ContactSubscriber implements EventSubscriberInterface
                     'icon'            => "fa-{$action}",
                     'extra'           => $link,
                     'contactId'       => $link['lead_id'],
-                    'contentTemplate' => 'CustomObjectsBundle:SubscribedEvents\Timeline:link.html.php',
+                    'contentTemplate' => '@CustomObjects/SubscribedEvents/Timeline/link.html.twig',
                 ]);
             }
         }

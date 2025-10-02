@@ -26,26 +26,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CustomObjectType extends AbstractType
 {
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @var CustomFieldTypeProvider
-     */
-    private $customFieldTypeProvider;
-
-    /**
-     * @var CustomObjectRepository
-     */
-    private $customObjectRepository;
-
-    public function __construct(EntityManager $entityManager, CustomFieldTypeProvider $customFieldTypeProvider, CustomObjectRepository $customObjectRepository)
-    {
-        $this->entityManager           = $entityManager;
-        $this->customFieldTypeProvider = $customFieldTypeProvider;
-        $this->customObjectRepository  = $customObjectRepository;
+    public function __construct(
+        private EntityManager $entityManager,
+        private CustomFieldTypeProvider $customFieldTypeProvider,
+        private CustomObjectRepository $customObjectRepository
+    ) {
     }
 
     /**
@@ -204,10 +189,6 @@ class CustomObjectType extends AbstractType
                 /** @var CustomObject $customObject */
                 $customObject = $event->getData();
                 $customFields = $customObject->getCustomFields();
-
-                if (empty($customFields)) {
-                    return;
-                }
 
                 /** @var CustomField $customField */
                 foreach ($customFields as $customField) {

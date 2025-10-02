@@ -24,8 +24,6 @@ class CustomFieldOptionModelTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', '');
-
         $this->entityManager          = $this->createMock(EntityManager::class);
         $this->connection             = $this->createMock(Connection::class);
         $this->queryBuilder           = $this->createMock(QueryBuilder::class);

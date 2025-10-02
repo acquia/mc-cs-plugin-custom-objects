@@ -6,34 +6,16 @@ namespace MauticPlugin\CustomObjectsBundle\Event;
 
 use Mautic\CoreBundle\Service\FlashBag;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class CustomObjectEvent extends Event
 {
-    /**
-     * @var CustomObject
-     */
-    private $customObject;
+    private string $message;
 
-    /**
-     * @var bool
-     */
-    private $isNew;
+    private FlashBag $flashBag;
 
-    /**
-     * @var string
-     */
-    private $message;
-
-    /**
-     * @var FlashBag
-     */
-    private $flashBag;
-
-    public function __construct(CustomObject $customObject, bool $isNew = false)
+    public function __construct(private CustomObject $customObject, private bool $isNew = false)
     {
-        $this->customObject = $customObject;
-        $this->isNew        = $isNew;
     }
 
     public function getCustomObject(): CustomObject

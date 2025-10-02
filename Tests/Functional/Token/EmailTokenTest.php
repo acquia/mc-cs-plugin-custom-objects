@@ -16,6 +16,7 @@ use PHPUnit\Framework\Assert;
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Request;
 
+#[\AllowDynamicProperties]
 class EmailTokenTest extends MauticMysqlTestCase
 {
     use CustomObjectsTrait;

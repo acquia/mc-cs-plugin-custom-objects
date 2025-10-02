@@ -15,7 +15,6 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
-use UnexpectedValueException;
 
 class UnlinkControllerTest extends ControllerTestCase
 {
@@ -29,11 +28,6 @@ class UnlinkControllerTest extends ControllerTestCase
      * @var MockObject|CustomItemModel
      */
     private $customItemModel;
-
-    /**
-     * @var MockObject|FlashBag
-     */
-    private $flashBag;
 
     /**
      * @var MockObject|CustomItemPermissionProvider
@@ -50,13 +44,8 @@ class UnlinkControllerTest extends ControllerTestCase
         parent::setUp();
 
         $this->customItemModel            = $this->createMock(CustomItemModel::class);
-        $this->flashBag                   = $this->createMock(FlashBag::class);
         $this->permissionProvider         = $this->createMock(CustomItemPermissionProvider::class);
-        $this->unlinkController           = new UnlinkController(
-            $this->customItemModel,
-            $this->permissionProvider,
-            $this->flashBag
-        );
+        $this->unlinkController           = new UnlinkController();
 
         $this->addSymfonyDependencies($this->unlinkController);
     }
@@ -77,7 +66,14 @@ class UnlinkControllerTest extends ControllerTestCase
         $this->customItemModel->expects($this->never())
             ->method('unlinkEntity');
 
-        $this->unlinkController->saveAction(self::ITEM_ID, self::ENTITY_TYPE, self::ENTITY_ID);
+        $this->unlinkController->saveAction(
+            $this->customItemModel,
+            $this->permissionProvider,
+            $this->flashBag,
+            self::ITEM_ID,
+            self::ENTITY_TYPE,
+            self::ENTITY_ID
+        );
     }
 
     public function testSaveActionIfForbidden(): void
@@ -100,7 +96,14 @@ class UnlinkControllerTest extends ControllerTestCase
         $this->customItemModel->expects($this->never())
             ->method('unlinkEntity');
 
-        $this->unlinkController->saveAction(self::ITEM_ID, self::ENTITY_TYPE, self::ENTITY_ID);
+        $this->unlinkController->saveAction(
+            $this->customItemModel,
+            $this->permissionProvider,
+            $this->flashBag,
+            self::ITEM_ID,
+            self::ENTITY_TYPE,
+            self::ENTITY_ID
+        );
     }
 
     public function testSaveActionIfEntityTypeNotFound(): void
@@ -111,19 +114,26 @@ class UnlinkControllerTest extends ControllerTestCase
 
         $this->customItemModel->expects($this->once())
             ->method('unlinkEntity')
-            ->will($this->throwException(new UnexpectedValueException('Entity unicorn cannot be linked to a custom item')));
+            ->will($this->throwException(new \UnexpectedValueException('Entity unicorn cannot be linked to a custom item')));
 
         $this->flashBag->expects($this->once())
             ->method('add')
             ->with('Entity unicorn cannot be linked to a custom item', [], FlashBag::LEVEL_ERROR);
 
-        $this->unlinkController->saveAction(self::ITEM_ID, 'unicorn', self::ENTITY_ID);
+        $this->unlinkController->saveAction(
+            $this->customItemModel,
+            $this->permissionProvider,
+            $this->flashBag,
+            self::ITEM_ID,
+            'unicorn',
+            self::ENTITY_ID
+        );
     }
 
     public function testSaveAction(): void
     {
         $customItem = new class(new CustomObject()) extends CustomItem {
-            public function getId()
+            public function getId(): int
             {
                 return UnlinkControllerTest::ITEM_ID;
             }
@@ -143,7 +153,14 @@ class UnlinkControllerTest extends ControllerTestCase
         $this->customItemModel->expects($this->never())
             ->method('delete');
 
-        $this->unlinkController->saveAction(self::ITEM_ID, self::ENTITY_TYPE, self::ENTITY_ID);
+        $this->unlinkController->saveAction(
+            $this->customItemModel,
+            $this->permissionProvider,
+            $this->flashBag,
+            self::ITEM_ID,
+            self::ENTITY_TYPE,
+            self::ENTITY_ID
+        );
     }
 
     public function testSaveActionWithChildItem(): void
@@ -157,7 +174,7 @@ class UnlinkControllerTest extends ControllerTestCase
         $customObject->setRelationshipObject($childCustomObject);
 
         $customItem = new class($customObject) extends CustomItem {
-            public function getId()
+            public function getId(): int
             {
                 return UnlinkControllerTest::ITEM_ID;
             }
@@ -190,6 +207,13 @@ class UnlinkControllerTest extends ControllerTestCase
                 }
             ));
 
-        $this->unlinkController->saveAction(self::ITEM_ID, self::ENTITY_TYPE, self::ENTITY_ID);
+        $this->unlinkController->saveAction(
+            $this->customItemModel,
+            $this->permissionProvider,
+            $this->flashBag,
+            self::ITEM_ID,
+            self::ENTITY_TYPE,
+            self::ENTITY_ID
+        );
     }
 }

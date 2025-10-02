@@ -1,0 +1,97 @@
+{% set title = customField.id ? customField.label : customField.typeObject.name %}
+{% set showProperties = form.options is defined or customField.typeObject.usePlaceholder() %}
+
+{% block content %}
+    <div class="bundle-form">
+        <div class="bundle-form-header">
+            <h3 class="mb-lg">{{ title }}</h3>
+        </div>
+
+        {{ form_start(form) }}
+        <div role="tabpanel">
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active">
+                    <a href="#general" aria-controls="general" role="tab" data-toggle="tab">
+                        General
+                    </a>
+                </li>
+                <li role="presentation">
+                    <a href="#validation" aria-controls="validation" role="tab" data-toggle="tab">
+                        Validation
+                    </a>
+                </li>
+                {% if showProperties %}
+                    <li role="presentation">
+                        <a href="#properties" aria-controls="properties" role="tab" data-toggle="tab">
+                            Properties
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+
+            <div class="tab-content pa-lg">
+                <div role="tabpanel" class="tab-pane active" id="general">
+
+                    <div class="row">
+                        <div class="col-md-6" >
+                            {{ form_row(form.label) }}
+                        </div>
+                        <div class="col-md-6 chosen-showInCustomObjectDetailList">
+                            {{ form_row(form.showInCustomObjectDetailList) }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ form_row(form.alias) }}
+                        </div>
+                        <div class="col-md-6 chosen-showInContactDetailList">
+                            {{ form_row(form.showInContactDetailList) }}
+                        </div>
+                    </div>
+
+                    <div class="row default-value">
+                        <div class="col-md-6">
+                            {{ form_row(form.defaultValue) }}
+                        </div>
+                        <div class="col-md-6 chosen-isUniqueIdentifier">
+                            {{ form_row(form.isUniqueIdentifier) }}
+                        </div>
+                    </div>
+
+                </div>
+
+                <div role="tabpanel" class="tab-pane" id="validation">
+                    <div class="row">
+                        <div class="col-md-12 chosen-required">
+                            {{ form_row(form.required) }}
+                        </div>
+                    </div>
+                </div>
+
+                {% if showProperties %}
+                    <div role="tabpanel" class="tab-pane" id="properties">
+                        <div class="row">
+                            {% if form.options is defined %}
+                                <div class="col-md-12">
+                                    {{ form_row(form.options) }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="row">
+                            {% if customField.typeObject.usePlaceholder %}
+                                <div class="col-md-6">
+                                    {{ form_row(form.params.placeholder) }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {{ form_rest(form) }}
+        {{ form_end(form) }}
+
+    </div>
+{% endblock %}

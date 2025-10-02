@@ -25,29 +25,11 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CustomItemXrefContactSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @var UserHelper
-     */
-    private $userHelper;
-
-    /**
-     * @var CustomItemRepository
-     */
-    private $customItemRepository;
-
     public function __construct(
-        EntityManager $entityManager,
-        UserHelper $userHelper,
-        CustomItemRepository $customItemRepository
+        private EntityManager $entityManager,
+        private UserHelper $userHelper,
+        private CustomItemRepository $customItemRepository
     ) {
-        $this->entityManager        = $entityManager;
-        $this->userHelper           = $userHelper;
-        $this->customItemRepository = $customItemRepository;
     }
 
     /**
@@ -118,7 +100,7 @@ class CustomItemXrefContactSubscriber implements EventSubscriberInterface
         if ('contact' === $event->getEntityType()) {
             try {
                 $xRef = $this->getContactXrefEntity($event->getCustomItem()->getId(), $event->getEntityId());
-            } catch (NoResultException $e) {
+            } catch (NoResultException) {
                 /** @var Lead $contact */
                 $contact = $this->entityManager->getReference(Lead::class, $event->getEntityId());
                 $xRef    = new CustomItemXrefContact($event->getCustomItem(), $contact);

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Segment\Query\Filter;
 
-use InvalidArgumentException;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\LeadList;
@@ -162,7 +161,7 @@ class CustomItemRelationQueryBuilderTest extends MauticMysqlTestCase
         $segment = $this->segmentRepository->findOneBy(['alias' => $segmentAlias]);
 
         if (!$segment) {
-            throw new InvalidArgumentException("No segment with alias '{$segmentAlias}' found");
+            throw new \InvalidArgumentException("No segment with alias '{$segmentAlias}' found");
         }
 
         $count = $this->segmentRepository->getLeadCount($segment->getId());

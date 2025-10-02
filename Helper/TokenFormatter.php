@@ -117,16 +117,15 @@ class TokenFormatter
         foreach ($values as $item) {
             $list .= '<li>'.$item.'</li>';
         }
-        $list .= "</$tag>";
 
-        return $list;
+        return $list."</$tag>";
     }
 
     private function removeEmptyValues(array $values): array
     {
         return array_filter(
             $values,
-            function ($value) {
+            function ($value): bool {
                 return '' !== trim($value);
             }
         );

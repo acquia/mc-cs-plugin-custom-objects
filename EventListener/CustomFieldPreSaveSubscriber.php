@@ -17,16 +17,10 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class CustomFieldPreSaveSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var CustomFieldOptionModel
-     */
-    private $customFieldOptionModel;
-
-    /**
      * CustomFieldPreSaveSubscriber constructor.
      */
-    public function __construct(CustomFieldOptionModel $customFieldOptionModel)
+    public function __construct(private CustomFieldOptionModel $customFieldOptionModel)
     {
-        $this->customFieldOptionModel = $customFieldOptionModel;
     }
 
     /**

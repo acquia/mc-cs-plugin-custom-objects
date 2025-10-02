@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\EventListener;
 
+use Mautic\CoreBundle\Helper\CommandHelper;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadField;
@@ -20,6 +21,17 @@ use Symfony\Component\HttpFoundation\Request;
 class FilterOperatorSubscriberTest extends MauticMysqlTestCase
 {
     use ProjectVersionTrait;
+
+    /**
+     * @var CommandHelper
+     */
+    private $commandHelper;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->commandHelper = static::getContainer()->get('mautic.helper.command');
+    }
 
     public function testIfNewOperatorNotInCustomObjectsAddedinSegmentFilter()
     {
@@ -40,7 +52,13 @@ class FilterOperatorSubscriberTest extends MauticMysqlTestCase
         $this->em->persist($contact2);
 
         // 2) create custom object "Email List" with "testcontact1@acquia.com" and "testcontact2@mautic.com" as items
-        $customObject  = $this->createCustomObject('emails');
+        $customObject = new CustomObject();
+        $customObject->setNameSingular('Email List');
+        $customObject->setNamePlural('Emai List');
+        $customObject->setAlias('emails');
+        $customObject->setType(CustomObject::TYPE_MASTER);
+        $this->em->persist($customObject);
+
         $customItem1   = new CustomItem($customObject);
         $customItem1->setName('testcontact1@acquia.com');
         $this->em->persist($customItem1);
@@ -52,17 +70,17 @@ class FilterOperatorSubscriberTest extends MauticMysqlTestCase
 
         // 3) create a segment with filter : email > not in custom objects > select custom object
         $filters = [[
-                'object'     => 'lead',
-                'glue'       => 'and',
-                'field'      => 'email',
-                'type'       => 'text',
-                'operator'   => 'notInCustomObjects',
-                'properties' => [
-                    'filter' => 'custom-object:'.$customObject->getId().':name',
-                ],
-                'filter'     => 'custom-object:'.$customObject->getId().':name',
-                'display'    => null,
-            ]];
+            'object'     => 'lead',
+            'glue'       => 'and',
+            'field'      => 'email',
+            'type'       => 'text',
+            'operator'   => 'notInCustomObjects',
+            'properties' => [
+                'filter' => 'custom-object:'.$customObject->getId().':name',
+            ],
+            'filter'     => 'custom-object:'.$customObject->getId().':name',
+            'display'    => null,
+        ]];
         $segment = new LeadList();
         $segment->setName('Test Segment A');
         $segment->setPublicName('Test Segment A');
@@ -72,7 +90,7 @@ class FilterOperatorSubscriberTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // 4) run update segment command
-        $this->runCommand('mautic:segments:update', ['-i' => $segment->getId()]);
+        $this->commandHelper->runCommand('mautic:segments:update', ['-i' => $segment->getId()]);
 
         // 5) fetch segment added contacts
         $leads = $this->em->getRepository(ListLead::class)->findBy(['list' => $segment->getId()], ['lead' => 'DESC']);

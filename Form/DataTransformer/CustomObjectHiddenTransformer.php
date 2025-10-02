@@ -11,14 +11,8 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 
 class CustomObjectHiddenTransformer implements DataTransformerInterface
 {
-    /**
-     * @var CustomObjectRepository
-     */
-    private $customObjectRepository;
-
-    public function __construct(CustomObjectRepository $customObjectRepository)
+    public function __construct(private CustomObjectRepository $customObjectRepository)
     {
-        $this->customObjectRepository = $customObjectRepository;
     }
 
     /**

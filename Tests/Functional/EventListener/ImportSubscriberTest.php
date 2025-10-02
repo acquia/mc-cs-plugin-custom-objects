@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\EventListener;
 
-use DateTimeImmutable;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\Lead;
@@ -24,7 +23,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\CustomObjectsTrait;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ImportSubscriberTest extends MauticMysqlTestCase
 {
@@ -62,8 +61,8 @@ class ImportSubscriberTest extends MauticMysqlTestCase
         ];
 
         $expectedValues                   = $csvRow;
-        $expectedValues['datetime']       = new DateTimeImmutable('2019-03-04 12:35:09');
-        $expectedValues['date']           = new DateTimeImmutable('2019-03-04 00:00:00');
+        $expectedValues['datetime']       = new \DateTimeImmutable('2019-03-04 12:35:09');
+        $expectedValues['date']           = new \DateTimeImmutable('2019-03-04 00:00:00');
         $expectedValues['multiselect']    = ['option_b', 'option_a'];
 
         // Import the custom item
@@ -100,8 +99,8 @@ class ImportSubscriberTest extends MauticMysqlTestCase
         $updateStatus = $this->importCsvRow($customObject, $editCsvRow);
 
         $expectedUpdatedValues                   = $editCsvRow;
-        $expectedUpdatedValues['datetime']       = new DateTimeImmutable('2019-03-04 12:35:09');
-        $expectedUpdatedValues['date']           = new DateTimeImmutable('2019-05-24 00:00:00');
+        $expectedUpdatedValues['datetime']       = new \DateTimeImmutable('2019-03-04 12:35:09');
+        $expectedUpdatedValues['date']           = new \DateTimeImmutable('2019-05-24 00:00:00');
         $expectedUpdatedValues['multiselect']    = ['option_b', 'option_a'];
 
         $this->assertTrue($updateStatus);
@@ -167,8 +166,8 @@ class ImportSubscriberTest extends MauticMysqlTestCase
         ];
 
         $expectedValues                   = $csvRow;
-        $expectedValues['datetime']       = new DateTimeImmutable('2019-03-04 12:35:09');
-        $expectedValues['date']           = new DateTimeImmutable('2019-06-21 00:00:00');
+        $expectedValues['datetime']       = new \DateTimeImmutable('2019-03-04 12:35:09');
+        $expectedValues['date']           = new \DateTimeImmutable('2019-06-21 00:00:00');
         $expectedValues['multiselect']    = ['option_b'];
         $expectedValues['text']           = 'A default value';
 

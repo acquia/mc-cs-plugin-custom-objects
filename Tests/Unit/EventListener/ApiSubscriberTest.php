@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
-use InvalidArgumentException;
 use Mautic\ApiBundle\Event\ApiEntityEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
@@ -21,7 +20,7 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ApiSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -254,7 +253,7 @@ class ApiSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getEntity')
             ->willReturn(new Lead());
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionCode(Response::HTTP_BAD_REQUEST);
         $this->apiSubscriber->validateCustomObjectsInContactRequest($this->apiEntityEvent);
     }
@@ -455,7 +454,7 @@ class ApiSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('save')
             ->with($this->callback(function (CustomItem $customItem) {
                 $this->assertSame('Test Item', $customItem->getName());
-                $skuValue = $customItem->findCustomFieldValueForFieldAlias('sku');
+                $skuValue   = $customItem->findCustomFieldValueForFieldAlias('sku');
                 $priceValue = $customItem->findCustomFieldValueForFieldAlias('price');
                 $this->assertSame('d2345f', $skuValue->getValue());
                 $this->assertSame(237, $priceValue->getValue());

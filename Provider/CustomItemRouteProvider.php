@@ -51,14 +51,8 @@ class CustomItemRouteProvider
 
     public const ROUTE_CONTACT_LIST  = 'mautic_custom_item_contacts';
 
-    /**
-     * @var RouterInterface
-     */
-    private $router;
-
-    public function __construct(RouterInterface $router)
+    public function __construct(private RouterInterface $router)
     {
-        $this->router = $router;
     }
 
     public function buildListRoute(int $objectId, int $page = 1, string $filterEntityType = null, int $filterEntityId = null, array $parameters = []): string

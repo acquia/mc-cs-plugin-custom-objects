@@ -17,7 +17,7 @@ class Version_0_0_14 extends AbstractMigration
     {
         try {
             return !$schema->getTable($this->concatPrefix('custom_field'))->hasColumn('show_in_custom_object_detail_list');
-        } catch (SchemaException $e) {
+        } catch (SchemaException) {
             return false;
         }
     }

@@ -18,9 +18,9 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['7.4', '8.0'] # The supported PHP versions
+        php-versions: ['8.0'] # The supported PHP versions
         db-types: ['mysql'] # can be: ['mysql', 'mariadb'] but not necessary for this plugin that does not add any DB schema
-        mautic-versions: ['4.4'] # The supported Mautic versions
+        mautic-versions: ['5.1'] # The supported Mautic versions
 
     name: Tests on PHP ${{ matrix.php-versions }}, ${{ matrix.db-types }}, Mautic ${{ matrix.mautic-versions }}
 
@@ -119,6 +119,9 @@ jobs:
 
     - name: Twig Lint
       run: bin/console lint:twig ${{ env.PLUGIN_DIR }}
+
+    - name: Create writable directory
+      run: mkdir -p ./media/files/temp && chmod -R 777 ./media/files/temp
 
     - name: Run PHPUNIT tests
       env:

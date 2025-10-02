@@ -44,75 +44,19 @@ class TokenSubscriber implements EventSubscriberInterface
 {
     use QueryBuilderManipulatorTrait;
 
-    /**
-     * @var ConfigProvider
-     */
-    private $configProvider;
-
-    /**
-     * @var QueryFilterHelper
-     */
-    private $queryFilterHelper;
-
-    /**
-     * @var QueryFilterFactory
-     */
-    private $queryFilterFactory;
-
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
-     * @var TokenParser
-     */
-    private $tokenParser;
-
-    /**
-     * @var EventModel
-     */
-    private $eventModel;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
-    /**
-     * @var TokenFormatter
-     */
-    private $tokenFormatter;
-
-    private ContactFilterMatcher $contactFilterMatcher;
-
     public function __construct(
-        ConfigProvider $configProvider,
-        QueryFilterHelper $queryFilterHelper,
-        QueryFilterFactory $queryFilterFactory,
-        CustomObjectModel $customObjectModel,
-        CustomItemModel $customItemModel,
-        TokenParser $tokenParser,
-        EventModel $eventModel,
-        EventDispatcherInterface $eventDispatcher,
-        TokenFormatter $tokenFormatter,
-        ContactFilterMatcher $contactFilterMatcher
+        private ConfigProvider $configProvider,
+        private QueryFilterHelper $queryFilterHelper,
+        private QueryFilterFactory $queryFilterFactory,
+        private CustomObjectModel $customObjectModel,
+        private CustomItemModel $customItemModel,
+        private CustomFieldModel $customFieldModel,
+        private TokenParser $tokenParser,
+        private EventModel $eventModel,
+        private EventDispatcherInterface $eventDispatcher,
+        private TokenFormatter $tokenFormatter,
+        private int $leadCustomItemFetchLimit
     ) {
-        $this->configProvider       = $configProvider;
-        $this->queryFilterHelper    = $queryFilterHelper;
-        $this->queryFilterFactory   = $queryFilterFactory;
-        $this->customObjectModel    = $customObjectModel;
-        $this->customItemModel      = $customItemModel;
-        $this->tokenParser          = $tokenParser;
-        $this->eventModel           = $eventModel;
-        $this->eventDispatcher      = $eventDispatcher;
-        $this->tokenFormatter       = $tokenFormatter;
-        $this->contactFilterMatcher = $contactFilterMatcher;
     }
 
     /**
@@ -172,8 +116,8 @@ class TokenSubscriber implements EventSubscriberInterface
         $tokens->map(function (Token $token) use ($event): void {
             try {
                 $customObject = $this->customObjectModel->fetchEntityByAlias($token->getCustomObjectAlias());
-                $fieldValues = $this->getCustomFieldValues($customObject, $token, $event);
-            } catch (NotFoundException $e) {
+                $fieldValues  = $this->getCustomFieldValues($customObject, $token, $event);
+            } catch (NotFoundException) {
                 $fieldValues = null;
             }
 
@@ -185,14 +129,14 @@ class TokenSubscriber implements EventSubscriberInterface
                         $formatEvent = new CustomObjectListFormatEvent($fieldValues, $token->getFormat());
 
                         $this->eventDispatcher->dispatch(
-                            CustomObjectEvents::ON_CUSTOM_OBJECT_LIST_FORMAT,
-                            $formatEvent
+                            $formatEvent,
+                            CustomObjectEvents::ON_CUSTOM_OBJECT_LIST_FORMAT
                         );
 
                         $result = $formatEvent->hasBeenFormatted() ?
                             $formatEvent->getFormattedString() :
                             $this->tokenFormatter->format($fieldValues, TokenFormatter::DEFAULT_FORMAT);
-                    } catch (InvalidCustomObjectFormatListException $e) {
+                    } catch (InvalidCustomObjectFormatListException) {
                         $result = $this->tokenFormatter->format($fieldValues, TokenFormatter::DEFAULT_FORMAT);
                     }
                 } else {
@@ -232,7 +176,7 @@ class TokenSubscriber implements EventSubscriberInterface
             } elseif ('template' && isset($source[0]) && 'campaign.event' === $source[0] && !empty($source[1])) {
                 $campaignEventId = (int) $source[1];
 
-                /** @var Event $campaignEvent */
+                /** @var ?Event $campaignEvent */
                 $campaignEvent = $this->eventModel->getEntity($campaignEventId);
 
                 if (!$campaignEvent) {
@@ -253,7 +197,7 @@ class TokenSubscriber implements EventSubscriberInterface
                 try {
                     $queryAlias        = 'filter_'.$id;
                     $innerQueryBuilder = $this->queryFilterFactory->configureQueryBuilderFromSegmentFilter($filter, $queryAlias);
-                } catch (InvalidSegmentFilterException $e) {
+                } catch (InvalidSegmentFilterException) {
                     continue;
                 }
 
@@ -321,7 +265,7 @@ class TokenSubscriber implements EventSubscriberInterface
                     $fieldValue->setValue($fieldValue->getCustomField()->getDefaultValue());
                 }
                 $fieldValues[] = $fieldValue->getCustomField()->getTypeObject()->valueToString($fieldValue);
-            } catch (NotFoundException $e) {
+            } catch (NotFoundException) {
                 // Custom field not found.
             }
         }
@@ -355,5 +299,287 @@ class TokenSubscriber implements EventSubscriberInterface
                 $event->addToken('{dynamiccontent="'.$data['tokenName'].'"}', $filterContent);
             }
         }
+    }
+
+    /**
+     * @param array<mixed> $filters
+     *
+     * @return array<mixed>
+     */
+    private function getCustomFieldDataForLead(array $filters, string $leadId): array
+    {
+        $customFieldValues = $cachedCustomItems = [];
+
+        foreach ($filters as $condition) {
+            try {
+                if ('custom_object' !== $condition['object']) {
+                    continue;
+                }
+
+                if (str_starts_with($condition['field'], 'cmf_')) {
+                    $customField  = $this->customFieldModel->fetchEntity(
+                        (int) explode('cmf_', $condition['field'])[1]
+                    );
+                    $customObject = $customField->getCustomObject();
+                    $fieldAlias   = $customField->getAlias();
+                } elseif (str_starts_with($condition['field'], 'cmo_')) {
+                    $customObject = $this->customObjectModel->fetchEntity(
+                        (int) explode('cmo_', $condition['field'])[1]
+                    );
+                    $fieldAlias   = 'name';
+                } else {
+                    continue;
+                }
+
+                $key = $customObject->getId().'-'.$leadId;
+                if (!isset($cachedCustomItems[$key])) {
+                    $cachedCustomItems[$key] = $this->getCustomItems($customObject, $leadId);
+                }
+
+                $result = $this->getCustomFieldValue($customObject, $fieldAlias, $cachedCustomItems[$key]);
+
+                $customFieldValues[$condition['field']] = $result;
+            } catch (NotFoundException|InvalidCustomObjectFormatListException) {
+                continue;
+            }
+        }
+
+        return $customFieldValues;
+    }
+
+    /**
+     * @param array<mixed> $customItems
+     *
+     * @return array<mixed>
+     */
+    private function getCustomFieldValue(
+        CustomObject $customObject,
+        string $customFieldAlias,
+        array $customItems
+    ): array {
+        $fieldValues = [];
+
+        foreach ($customItems as $customItemData) {
+            // Name is known from the CI data array.
+            if ('name' === $customFieldAlias) {
+                $fieldValues[] = $customItemData['name'];
+
+                continue;
+            }
+
+            // Custom Field values are handled like this.
+            $customItem = new CustomItem($customObject);
+            $customItem->populateFromArray($customItemData);
+            $customItem = $this->customItemModel->populateCustomFields($customItem);
+
+            try {
+                $fieldValue = $customItem->findCustomFieldValueForFieldAlias($customFieldAlias);
+                // If the CO item doesn't have a value, get the default value
+                if (empty($fieldValue->getValue())) {
+                    $fieldValue->setValue($fieldValue->getCustomField()->getDefaultValue());
+                }
+
+                if (in_array($fieldValue->getCustomField()->getType(), ['multiselect', 'select'])) {
+                    $fieldValues[] = $fieldValue->getValue();
+                } else {
+                    $fieldValues[] = $fieldValue->getCustomField()->getTypeObject()->valueToString($fieldValue);
+                }
+            } catch (NotFoundException) {
+                // Custom field not found.
+            }
+        }
+
+        return $fieldValues;
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    private function getCustomItems(CustomObject $customObject, string $leadId): array
+    {
+        $orderBy  = CustomItem::TABLE_ALIAS.'.id';
+        $orderDir = 'DESC';
+
+        $tableConfig = new TableConfig($this->leadCustomItemFetchLimit, 1, $orderBy, $orderDir);
+        $tableConfig->addParameter('customObjectId', $customObject->getId());
+        $tableConfig->addParameter('filterEntityType', 'contact');
+        $tableConfig->addParameter('filterEntityId', $leadId);
+
+        return $this->customItemModel->getArrayTableData($tableConfig);
+    }
+
+    // We have a similar function in MatchFilterForLeadTrait since we are unable to alter anything in Mautic 4.4,
+    // hence there is some duplication of code.
+
+    /**
+     * @param array<mixed> $filter
+     * @param array<mixed> $lead
+     *
+     * @throws OperatorsNotFoundException
+     */
+    protected function matchFilterForLeadInCustomObject(array $filter, array $lead): bool
+    {
+        if (empty($lead['id'])) {
+            // Lead in generated for preview with faked data
+            return false;
+        }
+
+        $groups   = [];
+        $groupNum = 0;
+
+        foreach ($filter as $data) {
+            if (!array_key_exists($data['field'], $lead)) {
+                continue;
+            }
+
+            /*
+             * Split the filters into groups based on the glue.
+             * The first filter and any filters whose glue is
+             * "or" will start a new group.
+             */
+            if (0 === $groupNum || 'or' === $data['glue']) {
+                ++$groupNum;
+                $groups[$groupNum] = null;
+            }
+
+            /*
+             * If the group has been marked as false, there
+             * is no need to continue checking the others
+             * in the group.
+             */
+            if (false === $groups[$groupNum]) {
+                continue;
+            }
+
+            /*
+             * If we are checking the first filter in a group
+             * assume that the group will not match.
+             */
+            if (null === $groups[$groupNum]) {
+                $groups[$groupNum] = false;
+            }
+
+            $leadValues   = $lead[$data['field']];
+            $leadValues   = 'custom_object' === $data['object'] ? $leadValues : [$leadValues];
+            $filterVal    = $data['filter'];
+            $subgroup     = null;
+
+            if (is_array($leadValues)) {
+                foreach ($leadValues as $leadVal) {
+                    if ($subgroup) {
+                        break;
+                    }
+
+                    switch ($data['type']) {
+                        case 'boolean':
+                            if (null !== $leadVal) {
+                                $leadVal = (bool) $leadVal;
+                            }
+
+                            if (null !== $filterVal) {
+                                $filterVal = (bool) $filterVal;
+                            }
+                            break;
+                        case 'datetime':
+                        case 'time':
+                            if (!is_null($leadVal) && !is_null($filterVal)) {
+                                $leadValCount   = substr_count($leadVal, ':');
+                                $filterValCount = substr_count($filterVal, ':');
+
+                                if (2 === $leadValCount && 1 === $filterValCount) {
+                                    $filterVal .= ':00';
+                                }
+                            }
+                            break;
+                        case 'tags':
+                        case 'select':
+                        case 'multiselect':
+                            if (!is_array($leadVal) && !empty($leadVal)) {
+                                $leadVal = explode('|', $leadVal);
+                            }
+                            if (!is_null($filterVal) && !is_array($filterVal)) {
+                                $filterVal = explode('|', $filterVal);
+                            }
+                            break;
+                        case 'number':
+                            $leadVal   = (int) $leadVal;
+                            $filterVal = (int) $filterVal;
+                            break;
+                    }
+
+                    switch ($data['operator']) {
+                        case '=':
+                            if ('boolean' === $data['type']) {
+                                $groups[$groupNum] = $leadVal === $filterVal;
+                            } else {
+                                $groups[$groupNum] = $leadVal == $filterVal;
+                            }
+                            break;
+                        case '!=':
+                            if ('boolean' === $data['type']) {
+                                $groups[$groupNum] = $leadVal !== $filterVal;
+                            } else {
+                                $groups[$groupNum] = $leadVal != $filterVal;
+                            }
+                            break;
+                        case 'gt':
+                            $groups[$groupNum] = $leadVal > $filterVal;
+                            break;
+                        case 'gte':
+                            $groups[$groupNum] = $leadVal >= $filterVal;
+                            break;
+                        case 'lt':
+                            $groups[$groupNum] = $leadVal < $filterVal;
+                            break;
+                        case 'lte':
+                            $groups[$groupNum] = $leadVal <= $filterVal;
+                            break;
+                        case 'empty':
+                            $groups[$groupNum] = empty($leadVal);
+                            break;
+                        case '!empty':
+                            $groups[$groupNum] = !empty($leadVal);
+                            break;
+                        case 'like':
+                            $matchVal          = str_replace(['.', '*', '%'], ['\.', '\*', '.*'], $filterVal);
+                            $groups[$groupNum] = 1 === preg_match('/'.$matchVal.'/', $leadVal);
+                            break;
+                        case '!like':
+                            $matchVal          = str_replace(['.', '*'], ['\.', '\*'], $filterVal);
+                            $matchVal          = str_replace('%', '.*', $matchVal);
+                            $groups[$groupNum] = 1 !== preg_match('/'.$matchVal.'/', $leadVal);
+                            break;
+                        case OperatorOptions::IN:
+                            $groups[$groupNum] = $this->checkLeadValueIsInFilter($leadVal, $filterVal, false);
+                            break;
+                        case OperatorOptions::NOT_IN:
+                            $groups[$groupNum] = $this->checkLeadValueIsInFilter($leadVal, $filterVal, true);
+                            break;
+                        case 'regexp':
+                            $groups[$groupNum] = 1 === preg_match('/'.$filterVal.'/i', $leadVal);
+                            break;
+                        case '!regexp':
+                            $groups[$groupNum] = 1 !== preg_match('/'.$filterVal.'/i', $leadVal);
+                            break;
+                        case 'startsWith':
+                            $groups[$groupNum] = str_starts_with($leadVal, $filterVal);
+                            break;
+                        case 'endsWith':
+                            $endOfString       = substr($leadVal, strlen($leadVal) - strlen($filterVal));
+                            $groups[$groupNum] = 0 === strcmp($endOfString, $filterVal);
+                            break;
+                        case 'contains':
+                            $groups[$groupNum] = str_contains((string) $leadVal, (string) $filterVal);
+                            break;
+                        default:
+                            throw new OperatorsNotFoundException('Operator is not defined or invalid operator found.');
+                    }
+
+                    $subgroup = $groups[$groupNum];
+                }
+            }
+        }
+
+        return in_array(true, $groups);
     }
 }

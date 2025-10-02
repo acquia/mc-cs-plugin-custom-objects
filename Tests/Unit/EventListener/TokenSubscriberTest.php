@@ -7,6 +7,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CampaignBundle\Entity\Event;
 use Mautic\CampaignBundle\Event\CampaignEvent;
 use Mautic\CampaignBundle\Model\EventModel;
 use Mautic\CoreBundle\Event\BuilderEvent;
@@ -37,7 +38,7 @@ use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TokenSubscriberTest extends TestCase
 {
@@ -795,7 +796,7 @@ class TokenSubscriberTest extends TestCase
         $this->constructWithDependencies();
 
         $queryBuilder  = $this->createMock(QueryBuilder::class);
-        $campaignEvent = $this->createMock(CampaignEvent::class);
+        $campaignEvent = $this->createMock(Event::class);
         $token         = $this->tokenParser->findTokens('{custom-object=product:sku | where=segment-filter |order=latest|limit=1 | default=No thing}')->current();
         $campaign      = $this->createMock(Campaign::class);
 

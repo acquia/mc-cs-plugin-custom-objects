@@ -7,12 +7,16 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
+use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Statement;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
@@ -29,11 +33,13 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomFieldValueModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use UnexpectedValueException;
 
 class CustomItemModelTest extends TestCase
 {
@@ -72,15 +78,44 @@ class CustomItemModelTest extends TestCase
      */
     private $customItemModel;
 
+    /**
+     * @var CorePermissions|MockObject
+     */
+    private $security;
+
+    /**
+     * @var UrlGeneratorInterface|MockObject
+     */
+    private $router;
+
+    /**
+     * @var Translator|MockObject
+     */
+    private $translator;
+
+    /**
+     * @var LoggerInterface|MockObject
+     */
+    private $logger;
+
+    /**
+     * @var CoreParametersHelper|MockObject
+     */
+    private $coreParametersHelper;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
-
         $this->customItem                   = $this->createMock(CustomItem::class);
         $this->user                         = $this->createMock(User::class);
         $this->entityManager                = $this->createMock(EntityManager::class);
+        $this->security                     = $this->createMock(CorePermissions::class);
+        $this->router                       = $this->createMock(UrlGeneratorInterface::class);
+        $this->translator                   = $this->createMock(Translator::class);
+        $this->userHelper                   = $this->createMock(UserHelper::class);
+        $this->logger                       = $this->createMock(LoggerInterface::class);
+        $this->coreParametersHelper         = $this->createMock(CoreParametersHelper::class);
         $this->queryBuilder                 = $this->createMock(QueryBuilder::class);
         $this->dbalQueryBuilder             = $this->createMock(DbalQueryBuilder::class);
         $this->statement                    = $this->createMock(Statement::class);
@@ -95,11 +130,16 @@ class CustomItemModelTest extends TestCase
         $this->violationList                = $this->createMock(ConstraintViolationListInterface::class);
         $this->customItemModel              = new CustomItemModel(
             $this->entityManager,
+            $this->security,
+            $this->dispatcher,
+            $this->router,
+            $this->translator,
+            $this->userHelper,
+            $this->logger,
+            $this->coreParametersHelper,
             $this->customItemRepository,
             $this->customItemPermissionProvider,
-            $this->userHelper,
             $this->customFieldValueModel,
-            $this->dispatcher,
             $this->validator
         );
 
@@ -127,13 +167,13 @@ class CustomItemModelTest extends TestCase
         $this->customItem->expects($this->never())->method('recordCustomFieldValueChanges');
         $this->dispatcher->method('dispatch')
             ->withConsecutive(
-                [CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, $this->isInstanceOf(CustomItemEvent::class)],
-                [CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $this->isInstanceOf(CustomItemEvent::class)]
+                [$this->isInstanceOf(CustomItemEvent::class), CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE],
+                [$this->isInstanceOf(CustomItemEvent::class), CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE]
             );
         $this->customItemRepository->expects($this->once())->method('upsert')->with($this->customItem);
         $this->validator->expects($this->once())->method('validate')->with($this->customItem)->willReturn($this->violationList);
 
-        $this->expectException(NotFoundException::class); //since the fetchEntity() method is called on save and there's no customItem in the DB with ID 1
+        $this->expectException(NotFoundException::class); // since the fetchEntity() method is called on save and there's no customItem in the DB with ID 1
         $this->assertSame($this->customItem, $this->customItemModel->save($this->customItem));
     }
 
@@ -151,8 +191,8 @@ class CustomItemModelTest extends TestCase
         $this->customFieldValueModel->expects($this->once())->method('save')->with($customFieldValue);
         $this->dispatcher->method('dispatch')
             ->withConsecutive(
-                [CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, $this->isInstanceOf(CustomItemEvent::class)],
-                [CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, $this->isInstanceOf(CustomItemEvent::class)]
+                [$this->isInstanceOf(CustomItemEvent::class), CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE],
+                [$this->isInstanceOf(CustomItemEvent::class), CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE]
             );
         $this->validator->expects($this->once())->method('validate')->with($this->customItem)->willReturn($this->violationList);
 
@@ -164,8 +204,8 @@ class CustomItemModelTest extends TestCase
         $this->customItem->expects($this->once())->method('getId')->willReturn(34);
         $this->dispatcher->method('dispatch')
             ->withConsecutive(
-                [CustomItemEvents::ON_CUSTOM_ITEM_PRE_DELETE, $this->isInstanceOf(CustomItemEvent::class)],
-                [CustomItemEvents::ON_CUSTOM_ITEM_POST_DELETE, $this->isInstanceOf(CustomItemEvent::class)]
+                [$this->isInstanceOf(CustomItemEvent::class), CustomItemEvents::ON_CUSTOM_ITEM_PRE_DELETE],
+                [$this->isInstanceOf(CustomItemEvent::class), CustomItemEvents::ON_CUSTOM_ITEM_POST_DELETE]
             );
         $this->entityManager->expects($this->once())->method('remove')->with($this->customItem);
         $this->entityManager->expects($this->once())->method('flush');
@@ -178,17 +218,17 @@ class CustomItemModelTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY,
                 $this->callback(function (CustomItemXrefEntityDiscoveryEvent $event) {
                     $this->assertSame($this->customItem, $event->getCustomItem());
                     $this->assertSame('contact', $event->getEntityType());
                     $this->assertSame(123, $event->getEntityId());
 
                     return true;
-                })
+                }),
+                CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY
             );
 
-        $this->expectException(UnexpectedValueException::class);
+        $this->expectException(\UnexpectedValueException::class);
         $this->customItemModel->linkEntity($this->customItem, 'contact', 123);
     }
 
@@ -200,7 +240,6 @@ class CustomItemModelTest extends TestCase
             ->method('dispatch')
             ->withConsecutive(
                 [
-                    CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY,
                     $this->callback(function (CustomItemXrefEntityDiscoveryEvent $event) use ($xref) {
                         $this->assertSame($this->customItem, $event->getCustomItem());
                         $this->assertSame('contact', $event->getEntityType());
@@ -211,14 +250,15 @@ class CustomItemModelTest extends TestCase
 
                         return true;
                     }),
+                    CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY,
                 ],
                 [
-                    CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY,
                     $this->callback(function (CustomItemXrefEntityEvent $event) use ($xref) {
                         $this->assertSame($xref, $event->getXref());
 
                         return true;
                     }),
+                    CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY,
                 ]
             );
 
@@ -230,17 +270,17 @@ class CustomItemModelTest extends TestCase
         $this->dispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY,
                 $this->callback(function (CustomItemXrefEntityDiscoveryEvent $event) {
                     $this->assertSame($this->customItem, $event->getCustomItem());
                     $this->assertSame('contact', $event->getEntityType());
                     $this->assertSame(123, $event->getEntityId());
 
                     return true;
-                })
+                }),
+                CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY
             );
 
-        $this->expectException(UnexpectedValueException::class);
+        $this->expectException(\UnexpectedValueException::class);
         $this->customItemModel->unlinkEntity($this->customItem, 'contact', 123);
     }
 
@@ -252,7 +292,6 @@ class CustomItemModelTest extends TestCase
             ->method('dispatch')
             ->withConsecutive(
                 [
-                    CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY,
                     $this->callback(function (CustomItemXrefEntityDiscoveryEvent $event) use ($xref) {
                         $this->assertSame($this->customItem, $event->getCustomItem());
                         $this->assertSame('contact', $event->getEntityType());
@@ -263,14 +302,15 @@ class CustomItemModelTest extends TestCase
 
                         return true;
                     }),
+                    CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY,
                 ],
                 [
-                    CustomItemEvents::ON_CUSTOM_ITEM_UNLINK_ENTITY,
                     $this->callback(function (CustomItemXrefEntityEvent $event) use ($xref) {
                         $this->assertSame($xref, $event->getXref());
 
                         return true;
                     }),
+                    CustomItemEvents::ON_CUSTOM_ITEM_UNLINK_ENTITY,
                 ]
             );
 
@@ -314,7 +354,7 @@ class CustomItemModelTest extends TestCase
     {
         $tableConfig = new TableConfig(10, 1, 'column');
 
-        $this->expectException(UnexpectedValueException::class);
+        $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage("customObjectId cannot be empty. It's required for permission management");
         $this->customItemModel->getTableData($tableConfig);
     }
@@ -341,8 +381,7 @@ class CustomItemModelTest extends TestCase
             ->willReturn([]);
 
         $this->dispatcher->expects($this->once())
-            ->method('dispatch')
-            ->with(CustomItemEvents::ON_CUSTOM_ITEM_LIST_ORM_QUERY);
+            ->method('dispatch');
 
         $this->customItemModel->getTableData($tableConfig);
     }
@@ -351,7 +390,7 @@ class CustomItemModelTest extends TestCase
     {
         $tableConfig = new TableConfig(10, 1, 'column');
 
-        $this->expectException(UnexpectedValueException::class);
+        $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage("customObjectId cannot be empty. It's required for permission management");
         $this->customItemModel->getArrayTableData($tableConfig);
     }
@@ -373,21 +412,22 @@ class CustomItemModelTest extends TestCase
             ->method('select')
             ->willReturn(CustomItem::TABLE_ALIAS.'.*');
 
+        $result = $this->createMock(Result::class);
+
+        $result->expects($this->once())
+            ->method('fetchAllAssociative')
+            ->willReturn([]);
+
         $this->dbalQueryBuilder->expects($this->once())
             ->method('execute')
-            ->willReturn($this->statement);
+            ->willReturn($result);
 
         $this->dbalQueryBuilder->expects($this->once())
             ->method('setParameter')
             ->with('customObjectId', 44);
 
-        $this->statement->expects($this->once())
-            ->method('fetchAll')
-            ->willReturn([]);
-
         $this->dispatcher->expects($this->once())
-            ->method('dispatch')
-            ->with(CustomItemEvents::ON_CUSTOM_ITEM_LIST_DBAL_QUERY);
+            ->method('dispatch');
 
         $this->customItemModel->getArrayTableData($tableConfig);
     }

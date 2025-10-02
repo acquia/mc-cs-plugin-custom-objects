@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomObject;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\LeadBundle\Entity\LeadList;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomObject\DeleteController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
@@ -17,10 +16,9 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class DeleteControllerTest extends ControllerTestCase
 {
@@ -28,13 +26,8 @@ class DeleteControllerTest extends ControllerTestCase
 
     private $customObjectModel;
     private $sessionProvider;
-    private $flashBag;
-    private $permissionProvider;
 
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
+    private $permissionProvider;
 
     /**
      * @var DeleteController
@@ -42,42 +35,43 @@ class DeleteControllerTest extends ControllerTestCase
     private $deleteController;
 
     /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
      * @var int
      */
     private $leadListIndex;
+    private $sessionProviderFactory;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $sessionProviderFactory   = $this->createMock(SessionProviderFactory::class);
-        $this->customObjectModel  = $this->createMock(CustomObjectModel::class);
-        $this->sessionProvider    = $this->createMock(SessionProvider::class);
-        $this->flashBag           = $this->createMock(FlashBag::class);
-        $this->permissionProvider = $this->createMock(CustomObjectPermissionProvider::class);
-        $this->request            = $this->createMock(Request::class);
-        $this->eventDispatcher    = $this->createMock(EventDispatcherInterface::class);
+        $this->sessionProviderFactory = $this->createMock(SessionProviderFactory::class);
+        $this->customObjectModel      = $this->createMock(CustomObjectModel::class);
+        $this->sessionProvider        = $this->createMock(SessionProvider::class);
+        $this->permissionProvider     = $this->createMock(CustomObjectPermissionProvider::class);
+        $this->request                = $this->createMock(Request::class);
+
+        $this->requestStack->expects($this->any())
+            ->method('getCurrentRequest')
+            ->willReturn($this->request);
+
         $this->deleteController   = new DeleteController(
-            $this->customObjectModel,
-            $sessionProviderFactory,
+            $this->managerRegistry,
+            $this->mauticFactory,
+            $this->modelFactory,
+            $this->userHelper,
+            $this->coreParametersHelper,
+            $this->dispatcher,
+            $this->translator,
             $this->flashBag,
-            $this->permissionProvider,
-            $this->eventDispatcher
+            $this->requestStack,
+            $this->security
         );
 
         $this->addSymfonyDependencies($this->deleteController);
 
         $this->request->method('isXmlHttpRequest')->willReturn(true);
         $this->request->method('getRequestUri')->willReturn('https://a.b');
-        $sessionProviderFactory->method('createObjectProvider')->willReturn($this->sessionProvider);
-
-        $this->translator = $this->createMock(TranslatorInterface::class);
-        $this->deleteController->setTranslator($this->translator);
+        $this->sessionProviderFactory->method('createObjectProvider')->willReturn($this->sessionProvider);
 
         $this->leadListIndex = 1;
     }
@@ -94,7 +88,20 @@ class DeleteControllerTest extends ControllerTestCase
         $this->flashBag->expects($this->never())
             ->method('add');
 
-        $this->deleteController->deleteAction(self::OBJECT_ID);
+        $post                   = $this->createMock(ParameterBag::class);
+        $this->request->request = $post;
+        $post->expects($this->once())
+            ->method('all')
+            ->willReturn([]);
+
+        $this->deleteController->deleteAction(
+            $this->sessionProviderFactory,
+            $this->customObjectModel,
+            $this->flashBag,
+            $this->permissionProvider,
+            $this->dispatcher,
+            self::OBJECT_ID
+        );
     }
 
     public function testDeleteActionIfCustomObjectForbidden(): void
@@ -113,9 +120,20 @@ class DeleteControllerTest extends ControllerTestCase
         $this->flashBag->expects($this->never())
             ->method('add');
 
+        $this->security->expects($this->once())
+            ->method('isAnonymous')
+            ->willReturn(true);
+
         $this->expectException(AccessDeniedHttpException::class);
 
-        $this->deleteController->deleteAction(self::OBJECT_ID);
+        $this->deleteController->deleteAction(
+            $this->sessionProviderFactory,
+            $this->customObjectModel,
+            $this->flashBag,
+            $this->permissionProvider,
+            $this->dispatcher,
+            self::OBJECT_ID
+        );
     }
 
     public function testDeleteAction(): void
@@ -129,14 +147,21 @@ class DeleteControllerTest extends ControllerTestCase
             ->with(self::OBJECT_ID)
             ->willReturn($customObject);
 
-        $this->eventDispatcher->expects($this->once())
+        $this->dispatcher->expects($this->once())
             ->method('dispatch');
 
         $this->sessionProvider->expects($this->once())
             ->method('getPage')
             ->willReturn(3);
 
-        $this->deleteController->deleteAction(self::OBJECT_ID);
+        $this->deleteController->deleteAction(
+            $this->sessionProviderFactory,
+            $this->customObjectModel,
+            $this->flashBag,
+            $this->permissionProvider,
+            $this->dispatcher,
+            self::OBJECT_ID
+        );
     }
 
     public function testThatItDisplaysErrorMessageIfThereAreRelatedSegments(): void
@@ -150,7 +175,7 @@ class DeleteControllerTest extends ControllerTestCase
             ->with(self::OBJECT_ID)
             ->willReturn($customObject);
 
-        $this->eventDispatcher->expects($this->never())
+        $this->dispatcher->expects($this->never())
             ->method('dispatch');
 
         $this->flashBag->expects($this->once())
@@ -168,7 +193,14 @@ class DeleteControllerTest extends ControllerTestCase
             ->method('checkIfTheCustomObjectIsUsedInSegmentFilters')
             ->willThrowException($inUseException);
 
-        $this->deleteController->deleteAction(self::OBJECT_ID);
+        $this->deleteController->deleteAction(
+            $this->sessionProviderFactory,
+            $this->customObjectModel,
+            $this->flashBag,
+            $this->permissionProvider,
+            $this->dispatcher,
+            self::OBJECT_ID
+        );
     }
 
     private function createSegments(int $quantity): ArrayCollection

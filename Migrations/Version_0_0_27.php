@@ -18,7 +18,7 @@ class Version_0_0_27 extends AbstractMigration
 
         try {
             return !$schema->getTable($tableCustomItem)->hasColumn('unique_hash');
-        } catch (SchemaException $e) {
+        } catch (SchemaException) {
             return false;
         }
     }

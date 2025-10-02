@@ -8,11 +8,8 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 
 final class CustomItemDataPersister implements DataPersisterInterface
 {
-    private CustomItemModel $customItemModel;
-
-    public function __construct(CustomItemModel $customItemModel)
+    public function __construct(private CustomItemModel $customItemModel)
     {
-        $this->customItemModel = $customItemModel;
     }
 
     /**

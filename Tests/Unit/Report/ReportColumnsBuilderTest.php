@@ -17,7 +17,7 @@ use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 use MauticPlugin\CustomObjectsBundle\Report\ReportColumnsBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ReportColumnsBuilderTest extends TestCase
 {
@@ -58,8 +58,6 @@ class ReportColumnsBuilderTest extends TestCase
 
     protected function setUp(): void
     {
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
-
         $this->customObject                    = $this->createMock(CustomObject::class);
         $this->reportColumnsBuilder            = new ReportColumnsBuilder($this->customObject);
         $this->connection                      = $this->createMock(Connection::class);

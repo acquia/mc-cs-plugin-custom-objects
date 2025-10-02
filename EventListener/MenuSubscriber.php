@@ -14,20 +14,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class MenuSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    /**
-     * @var ConfigProvider
-     */
-    private $configProvider;
-
-    public function __construct(CustomObjectModel $customObjectModel, ConfigProvider $configProvider)
+    public function __construct(private CustomObjectModel $customObjectModel, private ConfigProvider $configProvider)
     {
-        $this->customObjectModel = $customObjectModel;
-        $this->configProvider    = $configProvider;
     }
 
     /**

@@ -11,49 +11,22 @@ namespace MauticPlugin\CustomObjectsBundle\DTO;
  */
 class Token
 {
-    /**
-     * @var string
-     */
-    private $token;
+    private int $limit = 1;
 
-    /**
-     * @var int
-     */
-    private $limit = 1;
+    private string $where = '';
 
-    /**
-     * @var string
-     */
-    private $where = '';
+    private string $order = 'latest';
 
-    /**
-     * @var string
-     */
-    private $order = 'latest';
+    private string $defaultValue = '';
 
-    /**
-     * @var string
-     */
-    private $defaultValue = '';
+    private string $format = '';
 
-    /**
-     * @var string
-     */
-    private $format = '';
+    private string $customFieldAlias = '';
 
-    /**
-     * @var string
-     */
-    private $customFieldAlias = '';
+    private string $customObjectAlias = '';
 
-    /**
-     * @var string
-     */
-    private $customObjectAlias = '';
-
-    public function __construct(string $token)
+    public function __construct(private string $token)
     {
-        $this->token = $token;
     }
 
     public function setDefaultValue(string $defaultValue): void

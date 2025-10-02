@@ -13,52 +13,22 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CustomItemTabSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var TranslatorInterface
-     */
-    private $translator;
-
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    /**
-     * @var CustomItemRepository
-     */
-    private $customItemRepository;
-
-    /**
-     * @var CustomItemRouteProvider
-     */
-    private $customItemRouteProvider;
-
-    /**
      * @var CustomObject[]
      */
-    private $customObjects = [];
-
-    /**
-     * @var SessionProviderFactory
-     */
-    private $sessionProviderFactory;
+    private array $customObjects = [];
 
     public function __construct(
-        CustomObjectModel $customObjectModel,
-        CustomItemRepository $customItemRepository,
-        TranslatorInterface $translator,
-        CustomItemRouteProvider $customItemRouteProvider,
-        SessionProviderFactory $sessionProviderFactory
+        private CustomObjectModel $customObjectModel,
+        private CustomItemRepository $customItemRepository,
+        private TranslatorInterface $translator,
+        private CustomItemRouteProvider $customItemRouteProvider,
+        private SessionProviderFactory $sessionProviderFactory
     ) {
-        $this->customObjectModel       = $customObjectModel;
-        $this->customItemRepository    = $customItemRepository;
-        $this->translator              = $translator;
-        $this->customItemRouteProvider = $customItemRouteProvider;
-        $this->sessionProviderFactory  = $sessionProviderFactory;
     }
 
     /**
@@ -73,7 +43,7 @@ class CustomItemTabSubscriber implements EventSubscriberInterface
 
     public function injectTabs(CustomContentEvent $event): void
     {
-        if ($event->checkContext('CustomObjectsBundle:CustomItem:detail.html.php', 'tabs')) {
+        if ($event->checkContext('@CustomObjects/CustomItem/detail.html.twig', 'tabs')) {
             $vars    = $event->getVars();
             $objects = $this->customObjectModel->getMasterCustomObjects();
 
@@ -92,13 +62,13 @@ class CustomItemTabSubscriber implements EventSubscriberInterface
                     'tabId' => "custom-object-{$object->getId()}",
                 ];
 
-                $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:link.html.php', $data);
+                $event->addTemplate('@CustomObjects/SubscribedEvents/Tab/link.html.twig', $data);
             }
 
-            $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:modal.html.php');
+            $event->addTemplate('@CustomObjects/SubscribedEvents/Tab/modal.html.twig');
         }
 
-        if ($event->checkContext('CustomObjectsBundle:CustomItem:detail.html.php', 'tabs.content')) {
+        if ($event->checkContext('@CustomObjects/CustomItem/detail.html.twig', 'tabs.content')) {
             $vars    = $event->getVars();
             $objects = $this->getCustomObjects();
 
@@ -129,7 +99,7 @@ class CustomItemTabSubscriber implements EventSubscriberInterface
                     'namespace'         => $sessionProvider->getNamespace(),
                 ];
 
-                $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:content.html.php', $data);
+                $event->addTemplate('@CustomObjects/SubscribedEvents/Tab/content.html.twig', $data);
             }
         }
     }

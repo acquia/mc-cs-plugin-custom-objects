@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use InvalidArgumentException;
 use Mautic\ApiBundle\ApiEvents;
 use Mautic\ApiBundle\Event\ApiEntityEvent;
 use Mautic\LeadBundle\Controller\Api\LeadApiController;
@@ -22,29 +21,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ApiSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var ConfigProvider
-     */
-    private $configProvider;
-
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
     public function __construct(
-        ConfigProvider $configProvider,
-        CustomObjectModel $customObjectModel,
-        CustomItemModel $customItemModel
+        private ConfigProvider $configProvider,
+        private CustomObjectModel $customObjectModel,
+        private CustomItemModel $customItemModel
     ) {
-        $this->configProvider    = $configProvider;
-        $this->customObjectModel = $customObjectModel;
-        $this->customItemModel   = $customItemModel;
     }
 
     /**
@@ -79,7 +60,7 @@ class ApiSubscriber implements EventSubscriberInterface
                 $event->getEntityRequestParameters(),
                 $event->getRequest()
             );
-        } catch (InvalidArgumentException $e) {
+        } catch (\InvalidArgumentException) {
             return;
         }
 
@@ -112,20 +93,20 @@ class ApiSubscriber implements EventSubscriberInterface
      *
      * @return mixed[]
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     private function getCustomObjectsFromContactCreateRequest(array $entityRequestParameters, Request $request): array
     {
         if (!$this->configProvider->pluginIsEnabled()) {
-            throw new InvalidArgumentException('Custom Object Plugin is disabled');
+            throw new \InvalidArgumentException('Custom Object Plugin is disabled');
         }
 
-        if (1 !== preg_match('~^'.preg_quote(LeadApiController::class, '~').'::(new|edit)(Entity|Entities)Action$~i', $request->attributes->get('_controller'))) {
-            throw new InvalidArgumentException('Not a API request we care about');
+        if (1 !== preg_match('~^'.preg_quote(LeadApiController::class, '~').'(::|:)(new|edit)(Entity|Entities)Action$~i', $request->attributes->get('_controller'))) {
+            throw new \InvalidArgumentException('Not a API request we care about');
         }
 
         if (empty($entityRequestParameters['customObjects']['data']) || !is_array($entityRequestParameters['customObjects']['data'])) {
-            throw new InvalidArgumentException('The request payload does not contain any custom items in the customObjects attribute.');
+            throw new \InvalidArgumentException('The request payload does not contain any custom items in the customObjects attribute.');
         }
 
         return $entityRequestParameters['customObjects'];
@@ -134,7 +115,7 @@ class ApiSubscriber implements EventSubscriberInterface
     /**
      * @param mixed[] $customObjectData
      *
-     * @throws NotFoundException|InvalidArgumentException
+     * @throws NotFoundException|\InvalidArgumentException
      */
     private function getCustomObject(array $customObjectData): CustomObject
     {
@@ -145,7 +126,7 @@ class ApiSubscriber implements EventSubscriberInterface
                 return $this->customObjectModel->fetchEntityByAlias($customObjectData['alias']);
             }
 
-            throw new InvalidArgumentException('customObject[data][][id] or customObject[data][][alias] must exist in the request to identify a Custom Object.', Response::HTTP_BAD_REQUEST);
+            throw new \InvalidArgumentException('customObject[data][][id] or customObject[data][][alias] must exist in the request to identify a Custom Object.', Response::HTTP_BAD_REQUEST);
         } catch (NotFoundException $e) {
             throw new NotFoundException($e->getMessage(), Response::HTTP_BAD_REQUEST, $e);
         }

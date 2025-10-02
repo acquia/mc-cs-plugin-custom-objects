@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
-use Exception;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Event\CustomObjectEvent;
 use MauticPlugin\CustomObjectsBundle\EventListener\CustomObjectPostSaveSubscriber;
@@ -53,7 +52,7 @@ class CustomObjectPostSaveSubscriberTest extends TestCase
 
             public function saveEntity($entity, $unlock = true): void
             {
-                throw new Exception('Should not have been called.');
+                throw new \Exception('Should not have been called.');
             }
         };
 
@@ -65,7 +64,7 @@ class CustomObjectPostSaveSubscriberTest extends TestCase
 
         $subscriber->postSave($event);
 
-        // Asserting that the exception is not thrown
+        // Asserting that the \Exception is not thrown
         $this->addToAssertionCount(1);
     }
 }

@@ -1,0 +1,701 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Call to an undefined method Symfony\\\\Component\\\\Console\\\\Helper\\\\HelperInterface\\:\\:ask\\(\\)\\.$#"
+			count: 1
+			path: Command/GenerateSampleDataCommand.php
+
+		-
+			message: "#^Trait MauticPlugin\\\\CustomObjectsBundle\\\\CustomFieldType\\\\DateOperatorTrait is used zero times and is not analysed\\.$#"
+			count: 1
+			path: CustomFieldType/DateOperatorTrait.php
+
+		-
+			message: """
+				#^Parameter \\$factory of method MauticPlugin\\\\CustomObjectsBundle\\\\CustomObjectsBundle\\:\\:installAllTablesIfMissing\\(\\) has typehint with deprecated class Mautic\\\\CoreBundle\\\\Factory\\\\MauticFactory\\:
+				2\\.0 to be removed in 3\\.0$#
+			"""
+			count: 1
+			path: CustomObjectsBundle.php
+
+		-
+			message: """
+				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
+				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
+			"""
+			count: 1
+			path: EventListener/CampaignSubscriber.php
+
+		-
+			message: "#^Instanceof between int\\|string and Doctrine\\\\DBAL\\\\Driver\\\\Statement will always evaluate to false\\.$#"
+			count: 1
+			path: EventListener/CampaignSubscriber.php
+
+		-
+			message: """
+				#^Parameter \\$event of method MauticPlugin\\\\CustomObjectsBundle\\\\EventListener\\\\CampaignSubscriber\\:\\:onCampaignTriggerAction\\(\\) has typehint with deprecated class Mautic\\\\CampaignBundle\\\\Event\\\\CampaignExecutionEvent\\:
+				2\\.13\\.0; to be removed in 3\\.0$#
+			"""
+			count: 1
+			path: EventListener/CampaignSubscriber.php
+
+		-
+			message: """
+				#^Parameter \\$event of method MauticPlugin\\\\CustomObjectsBundle\\\\EventListener\\\\CampaignSubscriber\\:\\:onCampaignTriggerCondition\\(\\) has typehint with deprecated class Mautic\\\\CampaignBundle\\\\Event\\\\CampaignExecutionEvent\\:
+				2\\.13\\.0; to be removed in 3\\.0$#
+			"""
+			count: 1
+			path: EventListener/CampaignSubscriber.php
+
+		-
+			message: """
+				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
+				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
+			"""
+			count: 1
+			path: EventListener/DynamicContentSubscriber.php
+
+		-
+			message: "#^Instanceof between int\\|string and Doctrine\\\\DBAL\\\\Driver\\\\Statement will always evaluate to false\\.$#"
+			count: 1
+			path: EventListener/DynamicContentSubscriber.php
+
+		-
+			message: "#^Expression on left side of \\?\\? is not nullable\\.$#"
+			count: 1
+			path: EventListener/ImportSubscriber.php
+
+		-
+			message: "#^Instanceof between Doctrine\\\\Common\\\\Collections\\\\ArrayCollection and Doctrine\\\\Common\\\\Collections\\\\ArrayCollection will always evaluate to true\\.$#"
+			count: 1
+			path: EventListener/ReportSubscriber.php
+
+		-
+			message: "#^Instanceof between MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomObject and MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomObject will always evaluate to true\\.$#"
+			count: 1
+			path: EventListener/ReportSubscriber.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\EventListener\\\\ReportSubscriber\\:\\:sortCustomObjects\\(\\) is unused\\.$#"
+			count: 1
+			path: EventListener/ReportSubscriber.php
+
+		-
+			message: """
+				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
+				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
+			"""
+			count: 1
+			path: EventListener/SegmentFiltersDictionarySubscriber.php
+
+		-
+			message: "#^Instanceof between int\\|string and Doctrine\\\\DBAL\\\\Driver\\\\Statement will always evaluate to false\\.$#"
+			count: 1
+			path: EventListener/SegmentFiltersDictionarySubscriber.php
+
+		-
+			message: "#^Instanceof between Mautic\\\\LeadBundle\\\\Entity\\\\Lead and Mautic\\\\LeadBundle\\\\Entity\\\\Lead will always evaluate to true\\.$#"
+			count: 1
+			path: EventListener/SerializerSubscriber.php
+
+		-
+			message: "#^Instanceof between MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomField\\\\Params and MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomField\\\\Params will always evaluate to true\\.$#"
+			count: 1
+			path: Form/DataTransformer/ParamsToStringTransformer.php
+
+		-
+			message: """
+				#^Call to deprecated method add\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\Expression\\\\CompositeExpression\\:
+				This class will be made immutable\\. Use with\\(\\) instead\\.$#
+			"""
+			count: 2
+			path: Helper/QueryFilterHelper.php
+
+		-
+			message: """
+				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
+				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
+			"""
+			count: 1
+			path: Helper/QueryFilterHelper.php
+
+		-
+			message: """
+				#^Call to deprecated method orX\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\Expression\\\\ExpressionBuilder\\:
+				Use `or\\(\\)` instead\\.$#
+			"""
+			count: 2
+			path: Helper/QueryFilterHelper.php
+
+		-
+			message: "#^Instanceof between int\\|string and Doctrine\\\\DBAL\\\\Driver\\\\Statement will always evaluate to false\\.$#"
+			count: 1
+			path: Helper/QueryFilterHelper.php
+
+		-
+			message: """
+				#^Call to deprecated method hasPrimaryKey\\(\\) of class Doctrine\\\\DBAL\\\\Schema\\\\Table\\:
+				Use \\{@see getPrimaryKey\\(\\)\\} instead\\.$#
+			"""
+			count: 1
+			path: Migrations/Version_0_0_12.php
+
+		-
+			message: """
+				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
+				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
+			"""
+			count: 1
+			path: Model/CustomFieldOptionModel.php
+
+		-
+			message: """
+				#^Call to deprecated method merge\\(\\) of class Doctrine\\\\ORM\\\\EntityManager\\:
+				2\\.7 This method is being removed from the ORM and won't have any replacement$#
+			"""
+			count: 1
+			path: Model/CustomFieldValueModel.php
+
+		-
+			message: """
+				#^Fetching deprecated class constant PARAM_INT_ARRAY of class Doctrine\\\\DBAL\\\\Connection\\:
+				Use \\{@see ArrayParameterType\\:\\:INTEGER\\} instead\\.$#
+			"""
+			count: 2
+			path: Model/CustomFieldValueModel.php
+
+		-
+			message: "#^Parameter \\#2 \\$contactIds of method MauticPlugin\\\\CustomObjectsBundle\\\\Model\\\\CustomItemImportModel\\:\\:linkContacts\\(\\) expects array\\<int\\>, array\\<int\\|string, string\\> given\\.$#"
+			count: 1
+			path: Model/CustomItemImportModel.php
+
+		-
+			message: """
+				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
+				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
+			"""
+			count: 1
+			path: Model/CustomItemModel.php
+
+		-
+			message: """
+				#^Call to deprecated method getConnection\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
+				Use the connection used to instantiate the builder instead\\.$#
+			"""
+			count: 1
+			path: Report/ReportColumnsBuilder.php
+
+		-
+			message: "#^Call to function is_callable\\(\\) with callable\\(\\)\\: mixed will always evaluate to true\\.$#"
+			count: 1
+			path: Report/ReportColumnsBuilder.php
+
+		-
+			message: """
+				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
+				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
+			"""
+			count: 1
+			path: Repository/CustomItemRepository.php
+
+		-
+			message: "#^Instanceof between int\\|string and Doctrine\\\\DBAL\\\\Driver\\\\Statement will always evaluate to false\\.$#"
+			count: 1
+			path: Repository/CustomItemRepository.php
+
+		-
+			message: "#^PHPDoc tag @throws with type Doctrine\\\\DBAL\\\\DBALException is not subtype of Throwable$#"
+			count: 1
+			path: Segment/Query/Filter/CustomFieldFilterQueryBuilder.php
+
+		-
+			message: "#^PHPDoc tag @throws with type Doctrine\\\\DBAL\\\\DBALException is not subtype of Throwable$#"
+			count: 1
+			path: Segment/Query/Filter/CustomItemNameFilterQueryBuilder.php
+
+		-
+			message: "#^PHPDoc tag @throws with type Doctrine\\\\DBAL\\\\DBALException is not subtype of Throwable$#"
+			count: 1
+			path: Segment/Query/UnionQueryContainer.php
+
+		-
+			message: "#^You should use assertCount\\(\\$expectedCount, \\$variable\\) instead of assertSame\\(\\$expectedCount, \\$variable\\-\\>count\\(\\)\\)\\.$#"
+			count: 2
+			path: Tests/Functional/Controller/CustomItemListControllerSearchTest.php
+
+		-
+			message: "#^You should use assertCount\\(\\$expectedCount, \\$variable\\) instead of assertSame\\(\\$expectedCount, \\$variable\\-\\>count\\(\\)\\)\\.$#"
+			count: 3
+			path: Tests/Functional/Controller/CustomItemListControllerShownFieldTest.php
+
+		-
+			message: "#^You should use assertCount\\(\\$expectedCount, \\$variable\\) instead of assertSame\\(\\$expectedCount, \\$variable\\-\\>count\\(\\)\\)\\.$#"
+			count: 2
+			path: Tests/Functional/Controller/CustomItemListControllerXrefTest.php
+
+		-
+			message: "#^Call to static method PHPUnit\\\\Framework\\\\Assert\\:\\:assertIsArray\\(\\) with array will always evaluate to true\\.$#"
+			count: 1
+			path: Tests/Functional/Controller/CustomItemLookupControllerTest.php
+
+		-
+			message: "#^You should use assertNull\\(\\) instead of assertSame\\(null, \\$actual\\)\\.$#"
+			count: 3
+			path: Tests/Functional/EventListener/ApiSubscriberTest.php
+
+		-
+			message: """
+				#^Instantiation of deprecated class Mautic\\\\CampaignBundle\\\\Event\\\\CampaignExecutionEvent\\:
+				2\\.13\\.0; to be removed in 3\\.0$#
+			"""
+			count: 1
+			path: Tests/Functional/EventListener/CampaignSubscriberTest.php
+
+		-
+			message: """
+				#^Return type of method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\EventListener\\\\CampaignSubscriberTest\\:\\:createCampaignExecutionEvent\\(\\) has typehint with deprecated class Mautic\\\\CampaignBundle\\\\Event\\\\CampaignExecutionEvent\\:
+				2\\.13\\.0; to be removed in 3\\.0$#
+			"""
+			count: 1
+			path: Tests/Functional/EventListener/CampaignSubscriberTest.php
+
+		-
+			message: "#^You should use assertCount\\(\\$expectedCount, \\$variable\\) instead of assertSame\\(\\$expectedCount, \\$variable\\-\\>count\\(\\)\\)\\.$#"
+			count: 4
+			path: Tests/Functional/EventListener/ImportSubscriberTest.php
+
+		-
+			message: "#^Call to function is_string\\(\\) with string will always evaluate to true\\.$#"
+			count: 1
+			path: Tests/Functional/EventListener/SegmentFiltersDictionarySubscriberTest.php
+
+		-
+			message: "#^Call to function is_string\\(\\) with string will always evaluate to true\\.$#"
+			count: 1
+			path: Tests/Functional/Helper/QueryFilterHelperTest.php
+
+		-
+			message: """
+				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
+				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
+			"""
+			count: 1
+			path: Tests/Functional/Segment/Query/Filter/CustomFieldFilterQueryBuilderTest.php
+
+		-
+			message: "#^Call to function is_string\\(\\) with string will always evaluate to true\\.$#"
+			count: 1
+			path: Tests/Functional/Segment/Query/Filter/CustomFieldFilterQueryBuilderTest.php
+
+		-
+			message: "#^Instanceof between int\\|string and Doctrine\\\\DBAL\\\\Driver\\\\Statement will always evaluate to false\\.$#"
+			count: 1
+			path: Tests/Functional/Segment/Query/Filter/CustomFieldFilterQueryBuilderTest.php
+
+		-
+			message: "#^PHPDoc tag @var with type Mautic\\\\LeadBundle\\\\Segment\\\\ContactSegmentFilter is not subtype of native type PHPUnit\\\\Framework\\\\MockObject\\\\MockObject\\.$#"
+			count: 2
+			path: Tests/Functional/Segment/Query/Filter/CustomFieldFilterQueryBuilderTest.php
+
+		-
+			message: """
+				#^Call to deprecated method execute\\(\\) of class Doctrine\\\\DBAL\\\\Query\\\\QueryBuilder\\:
+				Use \\{@see executeQuery\\(\\)\\} or \\{@see executeStatement\\(\\)\\} instead\\.$#
+			"""
+			count: 1
+			path: Tests/Functional/Segment/Query/Filter/CustomItemNameFilterQueryBuilderTest.php
+
+		-
+			message: "#^Call to function is_string\\(\\) with string will always evaluate to true\\.$#"
+			count: 1
+			path: Tests/Functional/Segment/Query/Filter/CustomItemNameFilterQueryBuilderTest.php
+
+		-
+			message: "#^Instanceof between int\\|string and Doctrine\\\\DBAL\\\\Driver\\\\Statement will always evaluate to false\\.$#"
+			count: 1
+			path: Tests/Functional/Segment/Query/Filter/CustomItemNameFilterQueryBuilderTest.php
+
+		-
+			message: "#^Call to an undefined method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Functional\\\\Segment\\\\Query\\\\Filter\\\\CustomItemRelationQueryBuilderTest\\:\\:runCommand\\(\\)\\.$#"
+			count: 3
+			path: Tests/Functional/Segment/Query/Filter/CustomItemRelationQueryBuilderTest.php
+
+		-
+			message: "#^Call to function is_string\\(\\) with string will always evaluate to true\\.$#"
+			count: 1
+			path: Tests/Functional/Segment/Query/Filter/CustomItemRelationQueryBuilderTest.php
+
+		-
+			message: "#^Call to function is_string\\(\\) with string will always evaluate to true\\.$#"
+			count: 1
+			path: Tests/Functional/Segment/Query/Filter/CustomObjectMergedFilterQueryBuilderTest.php
+
+		-
+			message: "#^Call to function method_exists\\(\\) with 'Mautic\\\\\\\\LeadBundle\\\\\\\\Segment\\\\\\\\ContactSegmentFilterCrate' and 'getMergedProperty' will always evaluate to true\\.$#"
+			count: 1
+			path: Tests/Functional/Segment/Query/Filter/NegativeOperatorFilterQueryBuilderTest.php
+
+		-
+			message: "#^Call to an undefined method Symfony\\\\Component\\\\DependencyInjection\\\\ContainerInterface\\:\\:method\\(\\)\\.$#"
+			count: 2
+			path: Tests/Unit/Controller/ControllerTestCase.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CoreBundle\\\\Factory\\\\MauticFactory\\:
+				2\\.0 to be removed in 3\\.0$#
+			"""
+			count: 1
+			path: Tests/Unit/Controller/ControllerTestCase.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\ControllerTestCase\\:\\:\\$modelFactory \\(Mautic\\\\CoreBundle\\\\Factory\\\\ModelFactory&PHPUnit\\\\Framework\\\\MockObject\\\\MockObject\\) in empty\\(\\) is not falsy\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/ControllerTestCase.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\ControllerTestCase\\:\\:\\$requestStack \\(PHPUnit\\\\Framework\\\\MockObject\\\\MockObject&Symfony\\\\Component\\\\HttpFoundation\\\\RequestStack\\) in empty\\(\\) is not falsy\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/ControllerTestCase.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\AbstractFieldControllerTest\\:\\:createRequestStackMock\\(\\) has parameter \\$fieldId with no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/AbstractFieldControllerTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\AbstractFieldControllerTest\\:\\:createRequestStackMock\\(\\) has parameter \\$fieldType with no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/AbstractFieldControllerTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\AbstractFieldControllerTest\\:\\:createRequestStackMock\\(\\) has parameter \\$mapExtras with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/AbstractFieldControllerTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\AbstractFieldControllerTest\\:\\:createRequestStackMock\\(\\) has parameter \\$objectId with no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/AbstractFieldControllerTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\AbstractFieldControllerTest\\:\\:createRequestStackMock\\(\\) has parameter \\$panelCount with no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/AbstractFieldControllerTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\AbstractFieldControllerTest\\:\\:createRequestStackMock\\(\\) has parameter \\$panelId with no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/AbstractFieldControllerTest.php
+
+		-
+			message: "#^Property Symfony\\\\Component\\\\HttpFoundation\\\\Request\\:\\:\\$query \\(Symfony\\\\Component\\\\HttpFoundation\\\\InputBag\\<string\\>\\) does not accept PHPUnit\\\\Framework\\\\MockObject\\\\MockObject&Symfony\\\\Component\\\\HttpFoundation\\\\ParameterBag\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/AbstractFieldControllerTest.php
+
+		-
+			message: "#^Property Symfony\\\\Component\\\\HttpFoundation\\\\Request\\:\\:\\$request \\(Symfony\\\\Component\\\\HttpFoundation\\\\InputBag\\<bool\\|float\\|int\\|string\\>\\) does not accept PHPUnit\\\\Framework\\\\MockObject\\\\MockObject&Symfony\\\\Component\\\\HttpFoundation\\\\ParameterBag\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/AbstractFieldControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\FormControllerTest\\:\\:\\$formController \\(MauticPlugin\\\\CustomObjectsBundle\\\\Controller\\\\CustomField\\\\FormController&PHPUnit\\\\Framework\\\\MockObject\\\\MockObject\\) does not accept MauticPlugin\\\\CustomObjectsBundle\\\\Controller\\\\CustomField\\\\FormController\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/FormControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\FormControllerTest\\:\\:\\$requestStack \\(PHPUnit\\\\Framework\\\\MockObject\\\\MockObject&Symfony\\\\Component\\\\HttpFoundation\\\\RequestStack\\) does not accept Symfony\\\\Component\\\\HttpFoundation\\\\RequestStack\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/FormControllerTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomField\\\\SaveControllerTest\\:\\:createSaveController\\(\\) has parameter \\$mapExtras with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/SaveControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\ControllerTestCase\\:\\:\\$requestStack \\(PHPUnit\\\\Framework\\\\MockObject\\\\MockObject&Symfony\\\\Component\\\\HttpFoundation\\\\RequestStack\\) does not accept Symfony\\\\Component\\\\HttpFoundation\\\\RequestStack\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomField/SaveControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\BatchDeleteControllerTest\\:\\:\\$model has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/BatchDeleteControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\BatchDeleteControllerTest\\:\\:\\$sessionProviderFactory has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/BatchDeleteControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\CancelControllerTest\\:\\:\\$sessionProviderFactory has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/CancelControllerTest.php
+
+		-
+			message: "#^Access to an undefined property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\DeleteControllerTest\\:\\:\\$model\\.$#"
+			count: 2
+			path: Tests/Unit/Controller/CustomItem/DeleteControllerTest.php
+
+		-
+			message: "#^Access to an undefined property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\DeleteControllerTest\\:\\:\\$sessionProviderFactory\\.$#"
+			count: 5
+			path: Tests/Unit/Controller/CustomItem/DeleteControllerTest.php
+
+		-
+			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertNotNull\\(\\) with list\\<MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomItemExportScheduler\\> and 'Custom Item Export…' will always evaluate to true\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/ExportControllerTest.php
+
+		-
+			message: "#^Access to an undefined property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\FormControllerTest\\:\\:\\$model\\.$#"
+			count: 9
+			path: Tests/Unit/Controller/CustomItem/FormControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomItem\\\\ListControllerTest\\:\\:\\$sessionProviderFactory has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomItem/ListControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\CancelControllerTest\\:\\:\\$sessionProviderFactory has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/CancelControllerTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\DeleteControllerTest\\:\\:\\$sessionProviderFactory has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/Controller/CustomObject/DeleteControllerTest.php
+
+		-
+			message: "#^Access to an undefined property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\FormControllerTest\\:\\:\\$model\\.$#"
+			count: 7
+			path: Tests/Unit/Controller/CustomObject/FormControllerTest.php
+
+		-
+			message: "#^Access to an undefined property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Controller\\\\CustomObject\\\\ListControllerTest\\:\\:\\$sessionProviderFactory\\.$#"
+			count: 5
+			path: Tests/Unit/Controller/CustomObject/ListControllerTest.php
+
+		-
+			message: "#^You should use assertNull\\(\\) instead of assertSame\\(null, \\$actual\\)\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/DateTimeTypeTest.php
+
+		-
+			message: "#^You should use assertNull\\(\\) instead of assertSame\\(null, \\$actual\\)\\.$#"
+			count: 1
+			path: Tests/Unit/CustomFieldType/DateTypeTest.php
+
+		-
+			message: "#^Unable to resolve the template type T in call to method PHPUnit\\\\Framework\\\\TestCase\\:\\:createMock\\(\\)$#"
+			count: 1
+			path: Tests/Unit/Entity/CustomFieldFactoryTest.php
+
+		-
+			message: "#^Parameter \\#1 \\$expected of method PHPUnit\\\\Framework\\\\Assert\\:\\:assertSame\\(\\) contains unresolvable type\\.$#"
+			count: 1
+			path: Tests/Unit/Entity/CustomFieldValueOptionTest.php
+
+		-
+			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertSame\\(\\) with Doctrine\\\\Common\\\\Collections\\\\ArrayCollection\\<\\*NEVER\\*, \\*NEVER\\*\\> and Doctrine\\\\Common\\\\Collections\\\\Collection&iterable\\<MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomField\\> will always evaluate to false\\.$#"
+			count: 1
+			path: Tests/Unit/Entity/CustomObjectTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\AssetsSubscriberTest\\:\\:\\$coreParametersHelper has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/AssetsSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\AssetsSubscriberTest\\:\\:\\$packages has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/AssetsSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\AssetsSubscriberTest\\:\\:\\$requestEvent has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/AssetsSubscriberTest.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Mautic\\\\CampaignBundle\\\\Event\\\\CampaignExecutionEvent\\:
+				2\\.13\\.0; to be removed in 3\\.0$#
+			"""
+			count: 1
+			path: Tests/Unit/EventListener/CampaignSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CampaignSubscriberTest\\:\\:\\$result has no type specified\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CampaignSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CampaignSubscriberTest\\:\\:\\$statement is never read, only written\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CampaignSubscriberTest.php
+
+		-
+			message: """
+				#^Fetching class constant class of deprecated class Doctrine\\\\ORM\\\\Event\\\\LifecycleEventArgs\\:
+				This class will be removed in ORM 3\\.0\\. Use one of the dedicated classes instead\\.$#
+			"""
+			count: 1
+			path: Tests/Unit/EventListener/CustomFieldPostLoadSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomItemXrefContactSubscriberTest\\:\\:\\$xrefSubscriber \\(MauticPlugin\\\\CustomObjectsBundle\\\\EventListener\\\\CustomItemXrefContactSubscriber&PHPUnit\\\\Framework\\\\MockObject\\\\MockObject\\) does not accept MauticPlugin\\\\CustomObjectsBundle\\\\EventListener\\\\CustomItemXrefContactSubscriber\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomItemXrefContactSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\CustomItemXrefCustomItemSubscriberTest\\:\\:\\$xrefSubscriber \\(MauticPlugin\\\\CustomObjectsBundle\\\\EventListener\\\\CustomItemXrefCustomItemSubscriber&PHPUnit\\\\Framework\\\\MockObject\\\\MockObject\\) does not accept MauticPlugin\\\\CustomObjectsBundle\\\\EventListener\\\\CustomItemXrefCustomItemSubscriber\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/CustomItemXrefCustomItemSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\DynamicContentSubscriberTest\\:\\:\\$statementMock is never read, only written\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/DynamicContentSubscriberTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\EventListener\\\\TokenSubscriberTest\\:\\:\\$tokenParser \\(MauticPlugin\\\\CustomObjectsBundle\\\\Helper\\\\TokenParser&PHPUnit\\\\Framework\\\\MockObject\\\\MockObject\\) does not accept MauticPlugin\\\\CustomObjectsBundle\\\\Helper\\\\TokenParser\\.$#"
+			count: 1
+			path: Tests/Unit/EventListener/TokenSubscriberTest.php
+
+		-
+			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\) with 'Doctrine\\\\\\\\Common\\\\\\\\Collections\\\\\\\\ArrayCollection' and Doctrine\\\\Common\\\\Collections\\\\ArrayCollection&iterable\\<MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomFieldOption\\> will always evaluate to true\\.$#"
+			count: 3
+			path: Tests/Unit/Form/DataTransformer/OptionsToStringTransformerTest.php
+
+		-
+			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\) with 'Doctrine\\\\\\\\Common\\\\\\\\Collections\\\\\\\\ArrayCollection' and Doctrine\\\\Common\\\\Collections\\\\ArrayCollection will always evaluate to true\\.$#"
+			count: 4
+			path: Tests/Unit/Form/DataTransformer/OptionsTransformerTest.php
+
+		-
+			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertSame\\(\\) with array\\{list\\: array\\{11, 221\\}\\} and array\\<string\\> will always evaluate to false\\.$#"
+			count: 1
+			path: Tests/Unit/Form/DataTransformer/OptionsTransformerTest.php
+
+		-
+			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertSame\\(\\) with array\\{list\\: array\\{\\}\\} and array\\<string\\> will always evaluate to false\\.$#"
+			count: 2
+			path: Tests/Unit/Form/DataTransformer/OptionsTransformerTest.php
+
+		-
+			message: "#^You should use assertCount\\(\\$expectedCount, \\$variable\\) instead of assertSame\\(\\$expectedCount, \\$variable\\-\\>count\\(\\)\\)\\.$#"
+			count: 3
+			path: Tests/Unit/Form/DataTransformer/OptionsTransformerTest.php
+
+		-
+			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\) with 'MauticPlugin\\\\\\\\CustomObjectsBundle\\\\\\\\Entity\\\\\\\\CustomField\\\\\\\\Params' and MauticPlugin\\\\CustomObjectsBundle\\\\Entity\\\\CustomField\\\\Params will always evaluate to true\\.$#"
+			count: 1
+			path: Tests/Unit/Form/DataTransformer/ParamsToStringTransformerTest.php
+
+		-
+			message: "#^Access to an undefined property PHPUnit\\\\Framework\\\\MockObject\\\\MockObject&Symfony\\\\Component\\\\Validator\\\\Constraint\\:\\:\\$message\\.$#"
+			count: 1
+			path: Tests/Unit/Form/Validator/AllowUniqueIdentifierValidatorTest.php
+
+		-
+			message: "#^Access to an undefined property PHPUnit\\\\Framework\\\\MockObject\\\\MockObject&Symfony\\\\Component\\\\Validator\\\\Constraint\\:\\:\\$missingMasterObject\\.$#"
+			count: 1
+			path: Tests/Unit/Form/Validator/CustomObjectTypeValuesValidatorTest.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Helper\\\\CustomFieldQueryBuilder\\\\CalculatorTest\\:\\:getSuffix\\(\\) is unused\\.$#"
+			count: 1
+			path: Tests/Unit/Helper/CustomFieldQueryBuilder/CalculatorTest.php
+
+		-
+			message: "#^Constant MAUTIC_TABLE_PREFIX not found\\.$#"
+			count: 1
+			path: Tests/Unit/Helper/QueryFilterFactoryTest.php
+
+		-
+			message: """
+				#^Call to deprecated method setMethods\\(\\) of class PHPUnit\\\\Framework\\\\MockObject\\\\MockBuilder\\:
+				https\\://github\\.com/sebastianbergmann/phpunit/pull/3687$#
+			"""
+			count: 1
+			path: Tests/Unit/Model/CustomFieldValueModelTest.php
+
+		-
+			message: "#^You should use assertCount\\(\\$expectedCount, \\$variable\\) instead of assertSame\\(\\$expectedCount, \\$variable\\-\\>count\\(\\)\\)\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomFieldValueModelTest.php
+
+		-
+			message: "#^Call to an undefined method MauticPlugin\\\\CustomObjectsBundle\\\\Model\\\\CustomItemImportModel\\:\\:setTranslator\\(\\)\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomItemImportModelTest.php
+
+		-
+			message: "#^Call to an undefined method Mautic\\\\CoreBundle\\\\Twig\\\\Helper\\\\FormatterHelper\\:\\:expects\\(\\)\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomItemImportModelTest.php
+
+		-
+			message: "#^Call to method expects\\(\\) on an unknown class MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\TranslatorInterface\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomItemImportModelTest.php
+
+		-
+			message: "#^Class MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\TranslatorInterface not found\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomItemImportModelTest.php
+
+		-
+			message: "#^Trying to mock an undefined method exists\\(\\) on class Mautic\\\\LeadBundle\\\\Entity\\\\LeadRepository\\.$#"
+			count: 3
+			path: Tests/Unit/Model/CustomItemImportModelTest.php
+
+		-
+			message: "#^Trying to mock an undefined method trans\\(\\) on class MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\TranslatorInterface\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomItemImportModelTest.php
+
+		-
+			message: "#^You should use assertFalse\\(\\) instead of assertSame\\(\\) when expecting \"false\"$#"
+			count: 1
+			path: Tests/Unit/Model/CustomItemImportModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomItemModelTest\\:\\:\\$statement is never read, only written\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomItemModelTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Model\\\\CustomObjectModelTest\\:\\:\\$listModel is never read, only written\\.$#"
+			count: 1
+			path: Tests/Unit/Model/CustomObjectModelTest.php
+
+		-
+			message: "#^You should use assertCount\\(\\$expectedCount, \\$variable\\) instead of assertSame\\(\\$expectedCount, count\\(\\$variable\\)\\)\\.$#"
+			count: 1
+			path: Tests/Unit/Provider/CustomFieldTypeProviderTest.php
+
+		-
+			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertSame\\(\\) with array\\{'some items here'\\} and array\\<int\\> will always evaluate to false\\.$#"
+			count: 1
+			path: Tests/Unit/Repository/CustomItemXrefContactRepositoryTest.php
+
+		-
+			message: "#^Property MauticPlugin\\\\CustomObjectsBundle\\\\Tests\\\\Unit\\\\Security\\\\Permissions\\\\CustomObjectPermissionsTest\\:\\:\\$permissions \\(MauticPlugin\\\\CustomObjectsBundle\\\\Security\\\\Permissions\\\\CustomObjectPermissions&PHPUnit\\\\Framework\\\\MockObject\\\\MockObject\\) does not accept MauticPlugin\\\\CustomObjectsBundle\\\\Security\\\\Permissions\\\\CustomObjectPermissions\\.$#"
+			count: 1
+			path: Tests/Unit/Security/Permissions/CustomObjectPermissionsTest.php
+
+		-
+			message: "#^Call to method PHPUnit\\\\Framework\\\\Assert\\:\\:assertInstanceOf\\(\\) with 'Mautic\\\\\\\\LeadBundle\\\\\\\\Segment\\\\\\\\Query\\\\\\\\QueryBuilder' and Mautic\\\\LeadBundle\\\\Segment\\\\Query\\\\QueryBuilder will always evaluate to true\\.$#"
+			count: 1
+			path: Tests/Unit/Segment/Query/UnionQueryContainerTest.php
+
+		-
+			message: """
+				#^Fetching deprecated class constant PARAM_INT_ARRAY of class Doctrine\\\\DBAL\\\\Connection\\:
+				Use \\{@see ArrayParameterType\\:\\:INTEGER\\} instead\\.$#
+			"""
+			count: 2
+			path: Tests/Unit/Segment/Query/UnionQueryContainerTest.php

@@ -13,53 +13,25 @@ use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Request;
 
 class LookupController extends JsonController
 {
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
-     * @var CustomItemPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var FlashBag
-     */
-    private $flashBag;
-
-    public function __construct(
-        RequestStack $requestStack,
+    public function listAction(
+        Request $request,
         CustomItemModel $customItemModel,
         CustomItemPermissionProvider $permissionProvider,
-        FlashBag $flashBag
-    ) {
-        $this->requestStack       = $requestStack;
-        $this->customItemModel    = $customItemModel;
-        $this->permissionProvider = $permissionProvider;
-        $this->flashBag           = $flashBag;
-    }
-
-    public function listAction(int $objectId): JsonResponse
-    {
+        FlashBag $flashBag,
+        int $objectId
+    ): JsonResponse {
         try {
-            $this->permissionProvider->canViewAtAll($objectId);
+            $permissionProvider->canViewAtAll($objectId);
         } catch (ForbiddenException $e) {
-            $this->flashBag->add($e->getMessage(), [], FlashBag::LEVEL_ERROR);
+            $flashBag->add($e->getMessage(), [], FlashBag::LEVEL_ERROR);
 
             return $this->renderJson();
         }
 
-        $request          = $this->requestStack->getCurrentRequest();
         $search           = InputHelper::clean($request->get('filter'));
         $filterEntityId   = (int) $request->get('filterEntityId');
         $filterEntityType = InputHelper::clean($request->get('filterEntityType'));
@@ -69,6 +41,6 @@ class LookupController extends JsonController
         $tableConfig->addParameter('filterEntityType', $filterEntityType);
         $tableConfig->addParameter('filterEntityId', $filterEntityId);
 
-        return $this->renderJson(['items' => $this->customItemModel->getLookupData($tableConfig)]);
+        return $this->renderJson(['items' => $customItemModel->getLookupData($tableConfig)]);
     }
 }

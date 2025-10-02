@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Helper;
 
+use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\UnionQueryContainer;
 
@@ -18,7 +20,7 @@ trait QueryBuilderManipulatorTrait
     private function copyParams($fromQueryBuilder, QueryBuilder $toQueryBuilder): void
     {
         foreach ($fromQueryBuilder->getParameters() as $key => $value) {
-            $paramType = is_array($value) ? $toQueryBuilder->getConnection()::PARAM_STR_ARRAY : null;
+            $paramType = is_array($value) ? ArrayParameterType::STRING : ParameterType::STRING;
             $toQueryBuilder->setParameter($key, $value, $paramType);
         }
     }

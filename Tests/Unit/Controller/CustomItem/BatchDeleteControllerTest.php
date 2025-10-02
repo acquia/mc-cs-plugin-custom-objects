@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomItem;
 
+use Mautic\CoreBundle\Model\NotificationModel;
 use Mautic\CoreBundle\Service\FlashBag;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\BatchDeleteController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
@@ -16,15 +17,16 @@ use MauticPlugin\CustomObjectsBundle\Provider\SessionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
 
+#[\AllowDynamicProperties]
 class BatchDeleteControllerTest extends ControllerTestCase
 {
     private $customItemModel;
     private $sessionProvider;
-    private $flashBag;
+    private $sessionProviderFactory;
     private $permissionProvider;
     private $routeProvider;
+    private $model;
 
     /**
      * @var BatchDeleteController
@@ -35,27 +37,43 @@ class BatchDeleteControllerTest extends ControllerTestCase
     {
         parent::setUp();
 
-        $sessionProviderFactory      = $this->createMock(SessionProviderFactory::class);
-        $this->requestStack          = $this->createMock(RequestStack::class);
-        $this->customItemModel       = $this->createMock(CustomItemModel::class);
-        $this->sessionProvider       = $this->createMock(SessionProvider::class);
-        $this->flashBag              = $this->createMock(FlashBag::class);
-        $this->permissionProvider    = $this->createMock(CustomItemPermissionProvider::class);
-        $this->routeProvider         = $this->createMock(CustomItemRouteProvider::class);
-        $this->request               = $this->createMock(Request::class);
-        $this->batchDeleteController = new BatchDeleteController(
+        $this->customItemModel        = $this->createMock(CustomItemModel::class);
+        $this->sessionProvider        = $this->createMock(SessionProvider::class);
+        $this->sessionProviderFactory = $this->createMock(SessionProviderFactory::class);
+        $this->permissionProvider     = $this->createMock(CustomItemPermissionProvider::class);
+        $this->routeProvider          = $this->createMock(CustomItemRouteProvider::class);
+        $this->request                = $this->createMock(Request::class);
+
+        $this->requestStack->expects($this->any())
+            ->method('getCurrentRequest')
+            ->willReturn($this->request);
+
+        $this->model                  = $this->createMock(NotificationModel::class);
+        $this->modelFactory->expects($this->once())
+            ->method('getModel')
+            ->willReturn($this->model);
+
+        $this->batchDeleteController  = new BatchDeleteController(
+            $this->managerRegistry,
+            $this->mauticFactory,
+            $this->modelFactory,
+            $this->userHelper,
+            $this->coreParametersHelper,
+            $this->dispatcher,
+            $this->translator,
+            $this->flashBag,
             $this->requestStack,
-            $this->customItemModel,
-            $sessionProviderFactory,
-            $this->permissionProvider,
-            $this->routeProvider,
-            $this->flashBag
+            $this->security
         );
 
         $this->addSymfonyDependencies($this->batchDeleteController);
 
         $this->request->method('isXmlHttpRequest')->willReturn(true);
-        $sessionProviderFactory->method('createItemProvider')->willReturn($this->sessionProvider);
+        $this->sessionProviderFactory->method('createItemProvider')->willReturn($this->sessionProvider);
+
+        $this->model->expects($this->once())
+            ->method('getNotificationContent')
+            ->willReturn([[], 'test', 'test']);
     }
 
     public function testDeleteActionIfCustomItemNotFound(): void
@@ -79,7 +97,14 @@ class BatchDeleteControllerTest extends ControllerTestCase
             ->method('add')
             ->with('custom.item.error.items.not.found', ['%ids%' => '13,14'], FlashBag::LEVEL_ERROR);
 
-        $this->batchDeleteController->deleteAction(33);
+        $this->batchDeleteController->deleteAction(
+            $this->customItemModel,
+            $this->sessionProviderFactory,
+            $this->permissionProvider,
+            $this->routeProvider,
+            $this->flashBag,
+            33
+        );
     }
 
     public function testDeleteActionIfCustomItemForbidden(): void
@@ -107,7 +132,14 @@ class BatchDeleteControllerTest extends ControllerTestCase
             ->method('add')
             ->with('custom.item.error.items.denied', ['%ids%' => '13,14'], FlashBag::LEVEL_ERROR);
 
-        $this->batchDeleteController->deleteAction(33);
+        $this->batchDeleteController->deleteAction(
+            $this->customItemModel,
+            $this->sessionProviderFactory,
+            $this->permissionProvider,
+            $this->routeProvider,
+            $this->flashBag,
+            33
+        );
     }
 
     public function testDeleteAction(): void
@@ -144,6 +176,13 @@ class BatchDeleteControllerTest extends ControllerTestCase
             ->method('buildListRoute')
             ->with(33, 3);
 
-        $this->batchDeleteController->deleteAction(33);
+        $this->batchDeleteController->deleteAction(
+            $this->customItemModel,
+            $this->sessionProviderFactory,
+            $this->permissionProvider,
+            $this->routeProvider,
+            $this->flashBag,
+            33
+        );
     }
 }

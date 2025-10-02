@@ -13,7 +13,7 @@ use MauticPlugin\CustomObjectsBundle\EventListener\FilterOperatorSubscriber;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -29,7 +29,6 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
 
     protected function setUp(): void
     {
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', getenv('MAUTIC_DB_PREFIX') ?: '');
         $this->customObjectModelMock    = $this->createMock(CustomObjectModel::class);
         $this->filterOperatorSubscriber = new FilterOperatorSubscriber($this->customObjectModelMock);
     }

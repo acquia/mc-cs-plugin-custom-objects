@@ -10,10 +10,7 @@ use Mautic\IntegrationsBundle\Migration\AbstractMigration;
 
 class Version_0_0_7 extends AbstractMigration
 {
-    /**
-     * @var string
-     */
-    private $table = 'custom_field_option';
+    private string $table = 'custom_field_option';
 
     /**
      * {@inheritdoc}
@@ -22,7 +19,7 @@ class Version_0_0_7 extends AbstractMigration
     {
         try {
             return !$schema->getTable($this->concatPrefix($this->table))->hasColumn('option_order');
-        } catch (SchemaException $e) {
+        } catch (SchemaException) {
             return false;
         }
     }

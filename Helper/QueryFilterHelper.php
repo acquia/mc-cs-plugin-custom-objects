@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Helper;
 
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\EntityManager;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
-use Mautic\LeadBundle\Segment\Query\Expression\CompositeExpression;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder as SegmentQueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
@@ -18,26 +18,11 @@ class QueryFilterHelper
 {
     use DbalQueryTrait;
 
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @var QueryFilterFactory
-     */
-    private $queryFilterFactory;
-
-    private RandomParameterName $randomParameterNameService;
-
     public function __construct(
-        EntityManager $entityManager,
-        QueryFilterFactory $queryFilterFactory,
-        RandomParameterName $randomParameterNameService
+        private EntityManager $entityManager,
+        private QueryFilterFactory $queryFilterFactory,
+        private RandomParameterName $randomParameterNameService
     ) {
-        $this->entityManager              = $entityManager;
-        $this->queryFilterFactory         = $queryFilterFactory;
-        $this->randomParameterNameService = $randomParameterNameService;
     }
 
     public function createValueQuery(
@@ -140,7 +125,7 @@ class QueryFilterHelper
             case 'notIn':
             case 'multiselect':
             case 'in':
-                $valueType      = Connection::PARAM_STR_ARRAY;
+                $valueType      = ArrayParameterType::STRING;
                 $segmentQueryBuilder->setParameter($valueParameter, $value, $valueType);
                 break;
             default:
@@ -199,7 +184,7 @@ class QueryFilterHelper
                 }
                 break;
             case 'notEmpty':
-                $expression = $customQuery->expr()->andX(
+                $expression = $customQuery->expr()->and(
                     $customQuery->expr()->isNotNull($tableAlias.'_value.value'),
                 );
                 if ($filter->doesColumnSupportEmptyValue()) {
@@ -215,13 +200,13 @@ class QueryFilterHelper
             case 'multiselect':
                 $expression     = $customQuery->expr()->in(
                     $tableAlias.'_value.value',
-                    ":${valueParameter}"
+                    ":{$valueParameter}"
                 );
 
                 break;
             case 'neq':
-                $expression     = $customQuery->expr()->orX(
-                    $customQuery->expr()->neq($tableAlias.'_value.value', ":${valueParameter}"),
+                $expression     = $customQuery->expr()->or(
+                    $customQuery->expr()->neq($tableAlias.'_value.value', ":{$valueParameter}"),
                     $customQuery->expr()->isNull($tableAlias.'_value.value')
                 );
 
@@ -231,9 +216,9 @@ class QueryFilterHelper
 
                 break;
             case 'notLike':
-                $expression = $customQuery->expr()->orX(
+                $expression = $customQuery->expr()->or(
                     $customQuery->expr()->isNull($tableAlias.'_value.value'),
-                    $customQuery->expr()->like($tableAlias.'_value.value', ":${valueParameter}")
+                    $customQuery->expr()->like($tableAlias.'_value.value', ":{$valueParameter}")
                 );
 
                 break;
@@ -253,7 +238,7 @@ class QueryFilterHelper
             default:
                 $expression     = $customQuery->expr()->{$operator}(
                     $tableAlias.'_value.value',
-                    ":${valueParameter}"
+                    ":{$valueParameter}"
                 );
         }
 
@@ -271,51 +256,32 @@ class QueryFilterHelper
         string $operator,
         string $valueParameter
     ) {
-        switch ($operator) {
-            case 'empty':
-                $expression = $customQuery->expr()->orX(
-                    $customQuery->expr()->isNull($tableAlias.'_item.name'),
-                    $customQuery->expr()->eq($tableAlias.'_item.name', $customQuery->expr()->literal(''))
-                );
-
-                break;
-            case 'notEmpty':
-                $expression = $customQuery->expr()->andX(
-                    $customQuery->expr()->isNotNull($tableAlias.'_item.name'),
-                    $customQuery->expr()->neq($tableAlias.'_item.name', $customQuery->expr()->literal(''))
-                );
-
-                break;
-            case 'notIn':
-            case 'in':
-                $expression     = $customQuery->expr()->in(
-                    $tableAlias.'_item.name',
-                    ":${valueParameter}"
-                );
-
-                break;
-            case 'neq':
-                $expression     = $customQuery->expr()->orX(
-                    $customQuery->expr()->eq($tableAlias.'_item.name', ":${valueParameter}"),
-                    $customQuery->expr()->isNull($tableAlias.'_item.name')
-                );
-
-                break;
-            case 'notLike':
-                $expression = $customQuery->expr()->orX(
-                    $customQuery->expr()->isNull($tableAlias.'_item.name'),
-                    $customQuery->expr()->like($tableAlias.'_item.name', ":${valueParameter}")
-                );
-
-                break;
-            default:
-                $expression     = $customQuery->expr()->{$operator}(
-                    $tableAlias.'_item.name',
-                    ":${valueParameter}"
-                );
-        }
-
-        return $expression;
+        return match ($operator) {
+            'empty' => $customQuery->expr()->or(
+                $customQuery->expr()->isNull($tableAlias.'_item.name'),
+                $customQuery->expr()->eq($tableAlias.'_item.name', $customQuery->expr()->literal(''))
+            ),
+            'notEmpty' => $customQuery->expr()->and(
+                $customQuery->expr()->isNotNull($tableAlias.'_item.name'),
+                $customQuery->expr()->neq($tableAlias.'_item.name', $customQuery->expr()->literal(''))
+            ),
+            'notIn', 'in' => $customQuery->expr()->in(
+                $tableAlias.'_item.name',
+                ":{$valueParameter}"
+            ),
+            'neq' => $customQuery->expr()->orX(
+                $customQuery->expr()->eq($tableAlias.'_item.name', ':'.$valueParameter),
+                $customQuery->expr()->isNull($tableAlias.'_item.name')
+            ),
+            'notLike' => $customQuery->expr()->or(
+                $customQuery->expr()->isNull($tableAlias.'_item.name'),
+                $customQuery->expr()->like($tableAlias.'_item.name', ":{$valueParameter}")
+            ),
+            default => $customQuery->expr()->{$operator}(
+                $tableAlias.'_item.name',
+                ":{$valueParameter}"
+            ),
+        };
     }
 
     /**
@@ -367,7 +333,7 @@ class QueryFilterHelper
             $segmentFilterFieldType     = $filter['type'] ?: $this->queryFilterFactory
                 ->getCustomFieldTypeById($segmentFilterFieldId);
             $dataTable                  = $this->queryFilterFactory->getTableNameFromType($segmentFilterFieldType);
-            $segmentMergedFilter        = $filter['filter'];
+            $segmentMergedFilter        = $segmentFilter;
             $segmentFilterFieldOperator = (string) $filter['operator'];
 
             $alias                      = $customItemXrefContactAlias.'_'.$segmentFilterFieldId.'_'.$filter['type'];

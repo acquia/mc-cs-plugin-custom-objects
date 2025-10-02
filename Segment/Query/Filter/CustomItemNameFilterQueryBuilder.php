@@ -17,18 +17,12 @@ class CustomItemNameFilterQueryBuilder extends BaseFilterQueryBuilder
 {
     use QueryBuilderManipulatorTrait;
 
-    /**
-     * @var QueryFilterHelper
-     */
-    private $filterHelper;
-
     public function __construct(
         RandomParameterName $randomParameterNameService,
-        QueryFilterHelper $filterHelper,
+        private QueryFilterHelper $filterHelper,
         EventDispatcherInterface $dispatcher
     ) {
         parent::__construct($randomParameterNameService, $dispatcher);
-        $this->filterHelper = $filterHelper;
     }
 
     public static function getServiceId(): string
@@ -64,16 +58,10 @@ class CustomItemNameFilterQueryBuilder extends BaseFilterQueryBuilder
         $filterQueryBuilder->select($tableAlias.'_contact.contact_id as lead_id');
         $filterQueryBuilder->andWhere($leadsTableAlias.'.id = '.$tableAlias.'_contact.contact_id');
 
-        switch ($filter->getOperator()) {
-            case 'empty':
-            case 'neq':
-            case 'notLike':
-                $queryBuilder->addLogic($queryBuilder->expr()->notExists($filterQueryBuilder->getSQL()), $filter->getGlue());
-
-                break;
-            default:
-                $queryBuilder->addLogic($queryBuilder->expr()->exists($filterQueryBuilder->getSQL()), $filter->getGlue());
-        }
+        match ($filter->getOperator()) {
+            'empty', 'neq', 'notLike' => $queryBuilder->addLogic($queryBuilder->expr()->notExists($filterQueryBuilder->getSQL()), $filter->getGlue()),
+            default                   => $queryBuilder->addLogic($queryBuilder->expr()->exists($filterQueryBuilder->getSQL()), $filter->getGlue()),
+        };
 
         $this->copyParams($filterQueryBuilder, $queryBuilder);
 

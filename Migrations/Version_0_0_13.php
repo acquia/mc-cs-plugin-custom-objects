@@ -17,7 +17,7 @@ class Version_0_0_13 extends AbstractMigration
     {
         try {
             return !$schema->getTable($this->concatPrefix('custom_object'))->hasColumn('relationship_object');
-        } catch (SchemaException $e) {
+        } catch (SchemaException) {
             return false;
         }
     }

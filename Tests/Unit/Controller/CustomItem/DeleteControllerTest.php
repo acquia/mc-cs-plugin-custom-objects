@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomItem;
 
-use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Model\NotificationModel;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\DeleteController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
@@ -15,9 +15,11 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
+use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
+#[\AllowDynamicProperties]
 class DeleteControllerTest extends ControllerTestCase
 {
     private const OBJECT_ID = 33;
@@ -26,7 +28,6 @@ class DeleteControllerTest extends ControllerTestCase
 
     private $customItemModel;
     private $sessionProvider;
-    private $flashBag;
     private $permissionProvider;
     private $routeProvider;
 
@@ -39,26 +40,37 @@ class DeleteControllerTest extends ControllerTestCase
     {
         parent::setUp();
 
-        $sessionProviderFactory   = $this->createMock(SessionProviderFactory::class);
-        $this->customItemModel    = $this->createMock(CustomItemModel::class);
-        $this->sessionProvider    = $this->createMock(SessionProvider::class);
-        $this->flashBag           = $this->createMock(FlashBag::class);
-        $this->permissionProvider = $this->createMock(CustomItemPermissionProvider::class);
-        $this->routeProvider      = $this->createMock(CustomItemRouteProvider::class);
-        $this->request            = $this->createMock(Request::class);
-        $this->deleteController   = new DeleteController(
-            $this->customItemModel,
-            $sessionProviderFactory,
+        $this->sessionProviderFactory = $this->createMock(SessionProviderFactory::class);
+        $this->customItemModel        = $this->createMock(CustomItemModel::class);
+        $this->sessionProvider        = $this->createMock(SessionProvider::class);
+        $this->permissionProvider     = $this->createMock(CustomItemPermissionProvider::class);
+        $this->routeProvider          = $this->createMock(CustomItemRouteProvider::class);
+        $this->request                = $this->createMock(Request::class);
+
+        $this->requestStack->expects($this->any())
+            ->method('getCurrentRequest')
+            ->willReturn($this->request);
+
+        $this->model                  = $this->createMock(NotificationModel::class);
+
+        $this->deleteController       = new DeleteController(
+            $this->managerRegistry,
+            $this->mauticFactory,
+            $this->modelFactory,
+            $this->userHelper,
+            $this->coreParametersHelper,
+            $this->dispatcher,
+            $this->translator,
             $this->flashBag,
-            $this->permissionProvider,
-            $this->routeProvider
+            $this->requestStack,
+            $this->security
         );
 
         $this->addSymfonyDependencies($this->deleteController);
 
         $this->request->method('isXmlHttpRequest')->willReturn(true);
         $this->request->method('getRequestUri')->willReturn('https://a.b');
-        $sessionProviderFactory->method('createItemProvider')->willReturn($this->sessionProvider);
+        $this->sessionProviderFactory->method('createItemProvider')->willReturn($this->sessionProvider);
     }
 
     public function testDeleteActionIfCustomItemNotFound(): void
@@ -73,7 +85,25 @@ class DeleteControllerTest extends ControllerTestCase
         $this->flashBag->expects($this->never())
             ->method('add');
 
-        $this->deleteController->deleteAction(self::OBJECT_ID, self::ITEM_ID);
+        $this->translator->expects($this->once())
+            ->method('trans')
+            ->willReturn('Item not found message');
+
+        $post                   = $this->createMock(ParameterBag::class);
+        $this->request->request = $post;
+        $post->expects($this->once())
+            ->method('all')
+            ->willReturn([]);
+
+        $this->deleteController->deleteAction(
+            $this->customItemModel,
+            $this->sessionProviderFactory,
+            $this->flashBag,
+            $this->permissionProvider,
+            $this->routeProvider,
+            self::OBJECT_ID,
+            self::ITEM_ID
+        );
     }
 
     public function testDeleteActionIfCustomItemForbidden(): void
@@ -92,9 +122,21 @@ class DeleteControllerTest extends ControllerTestCase
         $this->flashBag->expects($this->never())
             ->method('add');
 
+        $this->security->expects($this->once())
+            ->method('isAnonymous')
+            ->willReturn(true);
+
         $this->expectException(AccessDeniedHttpException::class);
 
-        $this->deleteController->deleteAction(self::OBJECT_ID, self::ITEM_ID);
+        $this->deleteController->deleteAction(
+            $this->customItemModel,
+            $this->sessionProviderFactory,
+            $this->flashBag,
+            $this->permissionProvider,
+            $this->routeProvider,
+            self::OBJECT_ID,
+            self::ITEM_ID
+        );
     }
 
     public function testDeleteAction(): void
@@ -124,6 +166,18 @@ class DeleteControllerTest extends ControllerTestCase
             ->method('buildListRoute')
             ->with(self::OBJECT_ID, 3);
 
-        $this->deleteController->deleteAction(self::OBJECT_ID, self::ITEM_ID);
+        $this->modelFactory->expects($this->once())
+            ->method('getModel')
+            ->willReturn($this->model);
+
+        $this->deleteController->deleteAction(
+            $this->customItemModel,
+            $this->sessionProviderFactory,
+            $this->flashBag,
+            $this->permissionProvider,
+            $this->routeProvider,
+            self::OBJECT_ID,
+            self::ITEM_ID
+        );
     }
 }

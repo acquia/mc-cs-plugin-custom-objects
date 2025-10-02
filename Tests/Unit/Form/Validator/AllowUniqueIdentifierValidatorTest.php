@@ -103,6 +103,10 @@ class AllowUniqueIdentifierValidatorTest extends TestCase
             ->method('addViolation');
 
         /** @phpstan-ignore-next-line */
+        $this->constraint->method('__get')
+            ->with('message')
+            ->willReturn('custom.field.allow.unique_identifier.invalid');
+
         $message = $this->constraint->message;
         $this->context->expects($this->once())
             ->method('buildViolation')

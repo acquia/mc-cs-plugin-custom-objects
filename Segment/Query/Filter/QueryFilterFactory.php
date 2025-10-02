@@ -13,22 +13,10 @@ use MauticPlugin\CustomObjectsBundle\Segment\Query\UnionQueryContainer;
 
 class QueryFilterFactory
 {
-    /**
-     * @var ContactSegmentFilterFactory
-     */
-    private $contactSegmentFilterFactory;
-
-    /**
-     * @var QueryFilterHelper
-     */
-    private $queryFilterHelper;
-
     public function __construct(
-        ContactSegmentFilterFactory $filterFactory,
-        QueryFilterHelper $queryFilterHelper
+        private ContactSegmentFilterFactory $contactSegmentFilterFactory,
+        private QueryFilterHelper $queryFilterHelper
     ) {
-        $this->contactSegmentFilterFactory = $filterFactory;
-        $this->queryFilterHelper           = $queryFilterHelper;
     }
 
     /**

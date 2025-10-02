@@ -12,14 +12,8 @@ abstract class AbstractPermissionProvider
 {
     public const BASE = 'undefined';
 
-    /**
-     * @var CorePermissions
-     */
-    private $corePermissions;
-
-    public function __construct(CorePermissions $corePermissions)
+    public function __construct(private CorePermissions $corePermissions)
     {
-        $this->corePermissions = $corePermissions;
     }
 
     /**
@@ -40,7 +34,7 @@ abstract class AbstractPermissionProvider
         if (!$this->corePermissions->hasEntityAccess(static::BASE.$permission.'own', static::BASE.$permission.'other', $entity->getCreatedBy())) {
             $entityId = method_exists($entity, 'getId') ? $entity->getId() : null;
 
-            throw new ForbiddenException($permission, get_class($entity), $entityId);
+            throw new ForbiddenException($permission, $entity::class, $entityId);
         }
     }
 

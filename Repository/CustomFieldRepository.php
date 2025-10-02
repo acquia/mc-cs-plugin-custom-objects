@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Repository;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Mautic\CoreBundle\Entity\CommonRepository;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 
-class CustomFieldRepository extends CommonRepository
+class CustomFieldRepository extends CustomCommonRepository
 {
     public function isAliasUnique(string $alias, ?int $id = null): bool
     {

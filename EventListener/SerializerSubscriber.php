@@ -23,36 +23,12 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class SerializerSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var ConfigProvider
-     */
-    private $configProvider;
-
-    /**
-     * @var CustomItemXrefContactRepository
-     */
-    private $customItemXrefContactRepository;
-
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
     public function __construct(
-        ConfigProvider $configProvider,
-        CustomItemXrefContactRepository $customItemXrefContactRepository,
-        CustomItemModel $customItemModel,
-        RequestStack $requestStack
+        private ConfigProvider $configProvider,
+        private CustomItemXrefContactRepository $customItemXrefContactRepository,
+        private CustomItemModel $customItemModel,
+        private RequestStack $requestStack
     ) {
-        $this->configProvider                  = $configProvider;
-        $this->customItemXrefContactRepository = $customItemXrefContactRepository;
-        $this->customItemModel                 = $customItemModel;
-        $this->requestStack                    = $requestStack;
     }
 
     /**
@@ -181,7 +157,7 @@ class SerializerSubscriber implements EventSubscriberInterface
             try {
                 $transformer = $customFieldValue->getCustomField()->getTypeObject()->createApiValueTransformer();
                 $value       = $transformer->reverseTransform($customFieldValue->getValue());
-            } catch (UndefinedTransformerException $e) {
+            } catch (UndefinedTransformerException) {
                 $value = $customFieldValue->getValue();
             }
 

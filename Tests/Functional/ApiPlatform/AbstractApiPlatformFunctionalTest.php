@@ -6,7 +6,6 @@ use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\UserBundle\Entity\Permission;
 use Mautic\UserBundle\Entity\User;
-use ReflectionClass;
 use Symfony\Component\HttpFoundation\Response;
 
 abstract class AbstractApiPlatformFunctionalTest extends MauticMysqlTestCase
@@ -58,7 +57,7 @@ abstract class AbstractApiPlatformFunctionalTest extends MauticMysqlTestCase
         $this->em->flush();
 
         // reset in-memory permission cache
-        $property = (new ReflectionClass(CorePermissions::class))->getProperty('grantedPermissions');
+        $property = (new \ReflectionClass(CorePermissions::class))->getProperty('grantedPermissions');
         $property->setAccessible(true);
         $property->setValue(self::$container->get('mautic.security'), []);
     }

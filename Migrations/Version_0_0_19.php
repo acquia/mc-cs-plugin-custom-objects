@@ -13,8 +13,7 @@ class Version_0_0_19 extends AbstractMigration
 {
     public const FOREIGN_KEY_TO_DELETE = '/^FK_\d+594D0CC2$/';
 
-    /** @var Schema */
-    private $schema;
+    private ?Schema $schema = null;
 
     protected function isApplicable(Schema $schema): bool
     {

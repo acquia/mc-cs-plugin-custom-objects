@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Entity;
 
-use DateTimeImmutable;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
-use UnexpectedValueException;
 
 class CustomItemXrefCustomItemTest extends \PHPUnit\Framework\TestCase
 {
@@ -15,7 +13,7 @@ class CustomItemXrefCustomItemTest extends \PHPUnit\Framework\TestCase
     {
         $customItemA = $this->createMock(CustomItem::class);
         $customItemB = $this->createMock(CustomItem::class);
-        $dateAdded   = new DateTimeImmutable('2019-03-04 12:34:56');
+        $dateAdded   = new \DateTimeImmutable('2019-03-04 12:34:56');
 
         $customItemA->method('getId')->willReturn(33);
         $customItemB->method('getId')->willReturn(55);
@@ -37,7 +35,7 @@ class CustomItemXrefCustomItemTest extends \PHPUnit\Framework\TestCase
     {
         $customItemA = $this->createMock(CustomItem::class);
         $customItemB = $this->createMock(CustomItem::class);
-        $dateAdded   = new DateTimeImmutable('2019-03-04 12:34:56');
+        $dateAdded   = new \DateTimeImmutable('2019-03-04 12:34:56');
 
         $customItemA->method('getId')->willReturn(55);
         $customItemB->method('getId')->willReturn(33);
@@ -57,12 +55,12 @@ class CustomItemXrefCustomItemTest extends \PHPUnit\Framework\TestCase
     {
         $customItemA = $this->createMock(CustomItem::class);
         $customItemB = $this->createMock(CustomItem::class);
-        $dateAdded   = new DateTimeImmutable('2019-03-04 12:34:56');
+        $dateAdded   = new \DateTimeImmutable('2019-03-04 12:34:56');
 
         $customItemA->method('getId')->willReturn(55);
         $customItemB->method('getId')->willReturn(55);
 
-        $this->expectException(UnexpectedValueException::class);
+        $this->expectException(\UnexpectedValueException::class);
 
         new CustomItemXrefCustomItem(
             $customItemA,

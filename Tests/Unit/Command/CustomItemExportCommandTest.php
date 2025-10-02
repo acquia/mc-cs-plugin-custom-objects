@@ -31,8 +31,7 @@ class CustomItemExportCommandTest extends CustomObjectTestCase
 
     public function testCustomItemExport(): void
     {
-        $client = static::createClient();
-        $client->enableProfiler();
+        $this->client->enableProfiler();
 
         $commandTester = $this->getCustomItemExportCommandTester();
         $this->em->clear();

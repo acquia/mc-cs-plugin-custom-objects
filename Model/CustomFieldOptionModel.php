@@ -8,18 +8,9 @@ use Doctrine\ORM\EntityManager;
 
 class CustomFieldOptionModel
 {
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * CustomFieldOptionModel constructor.
-     */
     public function __construct(
-        EntityManager $entityManager
+        private EntityManager $entityManager
     ) {
-        $this->entityManager = $entityManager;
     }
 
     /**

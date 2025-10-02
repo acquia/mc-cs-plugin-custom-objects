@@ -11,14 +11,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class CustomObjectListFormatSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var TokenFormatter
-     */
-    private $tokenFormatter;
-
-    public function __construct(TokenFormatter $tokenFormatter)
+    public function __construct(private TokenFormatter $tokenFormatter)
     {
-        $this->tokenFormatter = $tokenFormatter;
     }
 
     public static function getSubscribedEvents(): array

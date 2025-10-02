@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
-use DateTimeImmutable;
-use DateTimeInterface;
-use DateTimeZone;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Company;
@@ -17,26 +14,14 @@ class CustomItemXrefCompany implements CustomItemXrefInterface
     public const TABLE_NAME  = 'custom_item_xref_company';
     public const TABLE_ALIAS = 'CustomItemXrefCompany';
 
-    /**
-     * @var Company
-     */
-    private $company;
+    private \DateTimeInterface $dateAdded;
 
-    /**
-     * @var CustomItem
-     */
-    private $customItem;
-
-    /**
-     * @var DateTimeInterface
-     */
-    private $dateAdded;
-
-    public function __construct(CustomItem $customItem, Company $company, ?DateTimeInterface $dateAdded = null)
-    {
-        $this->customItem = $customItem;
-        $this->company    = $company;
-        $this->dateAdded  = $dateAdded ?: new DateTimeImmutable('now', new DateTimeZone('UTC'));
+    public function __construct(
+        private CustomItem $customItem,
+        private Company $company,
+        ?\DateTimeInterface $dateAdded = null
+    ) {
+        $this->dateAdded  = $dateAdded ?: new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
     }
 
     public static function loadMetadata(ORM\ClassMetadata $metadata): void
@@ -58,7 +43,7 @@ class CustomItemXrefCompany implements CustomItemXrefInterface
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createField('dateAdded', Type::DATETIME)
+        $builder->createField('dateAdded', Types::DATETIME_MUTABLE)
             ->columnName('date_added')
             ->build();
     }
@@ -88,7 +73,7 @@ class CustomItemXrefCompany implements CustomItemXrefInterface
     }
 
     /**
-     * @return DateTimeInterface
+     * @return \DateTimeInterface
      */
     public function getDateAdded()
     {

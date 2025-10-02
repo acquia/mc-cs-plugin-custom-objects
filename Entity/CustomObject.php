@@ -8,7 +8,7 @@ use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\OneToOne;
@@ -50,7 +50,9 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var int|null
+     *
      * @Groups({"custom_object:read"})
+     *
      * @ApiProperty(
      *     attributes={
      *         "openapi_context"={
@@ -65,66 +67,82 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
 
     /**
      * @var string|null
+     *
      * @Groups({"custom_object:read", "custom_object:write"})
      */
     private $alias;
 
     /**
      * @var string|null
+     *
      * @Groups({"custom_object:read", "custom_object:write"})
      */
     private $nameSingular;
 
     /**
      * @var string|null
+     *
      * @Groups({"custom_object:read", "custom_object:write"})
      */
     private $namePlural;
 
     /**
      * @var string|null
+     *
      * @Groups({"custom_object:read", "custom_object:write"})
      */
     private $description;
 
     /**
      * @var string|null
+     *
      * @Groups({"custom_object:read", "custom_object:write"})
      */
     private $language;
 
     /**
      * @var Category|null
+     *
      * @Assert\Valid
      **/
     private $category;
 
     /**
      * @var ArrayCollection
+     *
      * @Groups({"custom_object:read", "custom_object:write"})
      */
     private $customFields;
 
     /**
      * @var int|null
+     *
      * @Groups({"custom_object:read", "custom_object:write"})
      */
     private $type = self::TYPE_MASTER;
 
     /**
      * @var CustomObject|null
+     *
      * @OneToOne(targetEntity="CustomObject")
+     *
      * @JoinColumn(name="master_object", referencedColumnName="id")
+     *
      * @Groups({"custom_object:read", "custom_object:write"})
+     *
      * @ApiProperty(readableLink=false, writableLink=false)
      */
     private $masterObject;
 
     /**
      * @var CustomObject|null
+     *
      * @OneToOne(targetEntity="CustomObject")
+     *
      * @JoinColumn(name="relationship_object", referencedColumnName="id", onDelete="SET NULL")
+     *
      * @Groups({"custom_object:read", "custom_object:write"})
+     *
      * @ApiProperty(readableLink=false, writableLink=false)
      */
     private $relationshipObject;
@@ -164,12 +182,12 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
 
         $builder->addId();
         $builder->addCategory();
-        $builder->addField('alias', Type::STRING);
-        $builder->addNamedField('nameSingular', Type::STRING, 'name_singular');
-        $builder->addNamedField('namePlural', Type::STRING, 'name_plural');
-        $builder->addNullableField('description', Type::STRING, 'description');
-        $builder->addNullableField('language', Type::STRING, 'lang');
-        $builder->addNullableField('type', Type::INTEGER);
+        $builder->addField('alias', Types::STRING);
+        $builder->addNamedField('nameSingular', Types::STRING, 'name_singular');
+        $builder->addNamedField('namePlural', Types::STRING, 'name_plural');
+        $builder->addNullableField('description', Types::STRING, 'description');
+        $builder->addNullableField('language', Types::STRING, 'lang');
+        $builder->addNullableField('type', Types::INTEGER);
 
         $builder->createOneToOne('relationshipObject', CustomObject::class)
             ->addJoinColumn('relationship_object', 'id', true, false, 'SET NULL')
@@ -220,7 +238,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $alias
      */
-    public function setAlias($alias)
+    public function setAlias($alias): void
     {
         $this->isChanged('alias', $alias);
         $this->alias = $alias;
@@ -267,7 +285,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $nameSingular
      */
-    public function setNameSingular($nameSingular)
+    public function setNameSingular($nameSingular): void
     {
         $this->isChanged('nameSingular', $nameSingular);
         $this->nameSingular = $nameSingular;
@@ -284,7 +302,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $namePlural
      */
-    public function setNamePlural($namePlural)
+    public function setNamePlural($namePlural): void
     {
         $this->isChanged('namePlural', $namePlural);
         $this->namePlural = $namePlural;
@@ -301,7 +319,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $description
      */
-    public function setDescription($description)
+    public function setDescription($description): void
     {
         $this->isChanged('description', $description);
         $this->description = $description;
@@ -326,7 +344,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param Category|null $category
      */
-    public function setCategory($category)
+    public function setCategory($category): void
     {
         $this->category = $category;
     }
@@ -342,24 +360,24 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * @param string|null $language
      */
-    public function setLanguage($language)
+    public function setLanguage($language): void
     {
         $this->isChanged('language', $language);
         $this->language = $language;
     }
 
-    public function addCustomField(CustomField $customField)
+    public function addCustomField(CustomField $customField): void
     {
         $customField->setCustomObject($this);
         $this->customFields->add($customField);
     }
 
-    public function setCustomFields(ArrayCollection $customFields)
+    public function setCustomFields(ArrayCollection $customFields): void
     {
         $this->customFields = $customFields;
     }
 
-    public function removeCustomField(CustomField $customField)
+    public function removeCustomField(CustomField $customField): void
     {
         $this->customFields->removeElement($customField);
         $customField->setCustomObject();
@@ -389,13 +407,13 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
             }
         }
 
-        throw new NotFoundException("Custom field with order index '${order}' not found.");
+        throw new NotFoundException('Custom field with order index '.$order.' not found.');
     }
 
     public function getPublishedFields(): Collection
     {
         return $this->customFields->filter(
-            function (CustomField $customField) {
+            function (CustomField $customField): bool {
                 return $customField->isPublished();
             }
         );
@@ -404,7 +422,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     public function getFieldsShowInCustomObjectDetailList(): Collection
     {
         return $this->customFields->filter(
-            function (CustomField $customField) {
+            function (CustomField $customField): bool {
                 return $customField->isShowInCustomObjectDetailList();
             }
         );
@@ -413,7 +431,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     public function getFieldsShowInContactDetailList(): Collection
     {
         return $this->customFields->filter(
-            function (CustomField $customField) {
+            function (CustomField $customField): bool {
                 return $customField->isShowInContactDetailList();
             }
         );
@@ -429,7 +447,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * Called when the custom fields are loaded from the database.
      */
-    public function createFieldsSnapshot()
+    public function createFieldsSnapshot(): void
     {
         foreach ($this->customFields as $customField) {
             $this->initialCustomFields[$customField->getId()] = $customField->toArray();
@@ -439,7 +457,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
     /**
      * Called before CustomObjectSave. It will record changes that happened for custom fields.
      */
-    public function recordCustomFieldChanges()
+    public function recordCustomFieldChanges(): void
     {
         $existingFields = [];
         foreach ($this->customFields as $i => $customField) {
