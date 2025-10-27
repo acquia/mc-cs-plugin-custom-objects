@@ -20,3 +20,4 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomObject:
     name_plural: '<sentence(2)>'
     description: '<sentence(2)>'
     alias: 'custom_object_3'
+

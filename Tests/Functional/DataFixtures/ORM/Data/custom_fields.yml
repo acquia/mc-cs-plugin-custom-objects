@@ -69,3 +69,11 @@ MauticPlugin\CustomObjectsBundle\Entity\CustomField:
     label: '<word()> Country'
     alias: 'country_11'
     type: 'country'
+  features_field:
+    custom_object: '@custom_object1'   # or @custom_object_car if you defined it
+    is_published: true
+    date_added: '<date_create()>'
+    label: 'Features'
+    alias: 'features'
+    type: 'multiselect'
+

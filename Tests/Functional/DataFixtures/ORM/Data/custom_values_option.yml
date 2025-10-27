@@ -1,0 +1,15 @@
+MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption:
+  fvo1:  { __construct: ['@features_field', '@custom_item1', 'power_stearing'] }
+  fvo2:  { __construct: ['@features_field', '@custom_item1', '4_star_safety'] }
+
+  fvo3:  { __construct: ['@features_field', '@custom_item2', 'power_stearing'] }
+  fvo4:  { __construct: ['@features_field', '@custom_item2', '5_star_safety'] }
+
+  fvo5:  { __construct: ['@features_field', '@custom_item3', '4_star_safety'] }
+  fvo6:  { __construct: ['@features_field', '@custom_item3', 'power_window'] }
+
+  fvo7:  { __construct: ['@features_field', '@custom_item4', 'electric'] }
+  fvo8:  { __construct: ['@features_field', '@custom_item4', 'power_stearing'] }
+
+  fvo9:  { __construct: ['@features_field', '@custom_item5', 'power_stearing'] }
+  fvo10: { __construct: ['@features_field', '@custom_item5', '4_star_safety'] }
