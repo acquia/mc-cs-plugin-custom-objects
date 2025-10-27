@@ -149,6 +149,7 @@ class QueryFilterHelper
 
         switch ($operator) {
             case 'notIn':
+                $segmentQueryBuilder->andWhere($expression);
                 break;
             default:
                 $segmentQueryBuilder->andWhere($expression);

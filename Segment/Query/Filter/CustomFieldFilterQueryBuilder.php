@@ -60,11 +60,11 @@ class CustomFieldFilterQueryBuilder extends BaseFilterQueryBuilder
             case '!multiselect':
             case '!between':
             case 'notBetween':
+            case 'notIn': // ← add this line
                 $queryBuilder->addLogic(
                     $queryBuilder->expr()->notExists($unionQueryContainer->getSQL()),
                     $filter->getGlue()
                 );
-
                 break;
             default:
                 $queryBuilder->addLogic(

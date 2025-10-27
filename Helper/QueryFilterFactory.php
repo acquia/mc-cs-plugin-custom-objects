@@ -64,11 +64,12 @@ class QueryFilterFactory
     ): UnionQueryContainer {
         $segmentFilterFieldId   = (int) $segmentFilter->getField();
         $segmentFilterFieldType = $segmentFilter->getType();
-        $segmentFilterFieldType = $segmentFilterFieldType ?: $this->customFieldRepository->getCustomFieldTypeById($segmentFilterFieldId);
+        if ($segmentFilterFieldType === 'select' || $segmentFilterFieldType === null || $segmentFilterFieldType === '') {
+            $segmentFilterFieldType = $this->customFieldRepository->getCustomFieldTypeById($segmentFilterFieldId);
+        }
         $dataTable              = $this->fieldTypeProvider->getType($segmentFilterFieldType)->getTableName();
 
         $this->unionQueryContainer = new UnionQueryContainer();
-
         $this->create1LevelQuery($alias, $segmentFilterFieldId, $dataTable);
 
         $currentLevel = 2;
