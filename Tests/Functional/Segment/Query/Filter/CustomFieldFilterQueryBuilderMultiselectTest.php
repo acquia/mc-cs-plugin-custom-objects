@@ -29,6 +29,7 @@ class CustomFieldFilterQueryBuilderMultiselectTest extends MauticMysqlTestCase
     {
         $this->configParams['custom_object_merge_filter'] = false;
         parent::setUp();
+        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', '');
     }
 
     public function testIncludeAndExcludeOnMultiselectField(): void
