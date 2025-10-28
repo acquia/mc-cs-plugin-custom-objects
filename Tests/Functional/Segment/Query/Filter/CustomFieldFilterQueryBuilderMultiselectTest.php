@@ -29,7 +29,6 @@ class CustomFieldFilterQueryBuilderMultiselectTest extends MauticMysqlTestCase
     {
         $this->configParams['custom_object_merge_filter'] = false;
         parent::setUp();
-        defined('MAUTIC_TABLE_PREFIX') || define('MAUTIC_TABLE_PREFIX', '');
     }
 
     public function testIncludeAndExcludeOnMultiselectField(): void
@@ -121,7 +120,7 @@ class CustomFieldFilterQueryBuilderMultiselectTest extends MauticMysqlTestCase
         // DBAL 2/3-safe fallback: pick any field that has option rows
         $qb2 = $this->connection->createQueryBuilder()
             ->select('v.custom_field_id')
-            ->from(MAUTIC_TABLE_PREFIX.'custom_field_value_option', 'v')
+            ->from('custom_field_value_option', 'v')
             ->setMaxResults(1);
 
         $stmt = method_exists($qb2, 'executeQuery') ? $qb2->executeQuery() : $qb2->execute();
@@ -170,8 +169,7 @@ class CustomFieldFilterQueryBuilderMultiselectTest extends MauticMysqlTestCase
     private function baseLeadsQB(): QueryBuilder
     {
         $qb = new QueryBuilder($this->connection);
-        $qb->select('l.*')->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
-
+        $qb->select('l.*')->from('leads', 'l');
         return $qb;
     }
 }
