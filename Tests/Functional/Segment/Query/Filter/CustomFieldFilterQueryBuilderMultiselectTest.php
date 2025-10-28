@@ -170,6 +170,7 @@ class CustomFieldFilterQueryBuilderMultiselectTest extends MauticMysqlTestCase
     {
         $qb = new QueryBuilder($this->connection);
         $qb->select('l.*')->from('leads', 'l');
+
         return $qb;
     }
 }
