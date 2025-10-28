@@ -14,7 +14,6 @@ use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
-use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -22,7 +21,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class CustomFieldFilterQueryBuilderMultiselectTest extends MauticMysqlTestCase
 {
     use FixtureObjectsTrait;
-    use DbalQueryTrait;
 
     protected function setUp(): void
     {
