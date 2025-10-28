@@ -17,7 +17,6 @@ use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CustomFieldFilterQueryBuilderMultiselectTest extends MauticMysqlTestCase
@@ -74,13 +73,8 @@ class CustomFieldFilterQueryBuilderMultiselectTest extends MauticMysqlTestCase
             'in',
             'multiselect'
         );
-        $qb = $this->baseLeadsQB();
-        $qbService->applyQuery($qb, $includeFilter);
-        $this->assertGreaterThanOrEqual(
-            1,
-            $this->executeSelect($qb)->rowCount(),
-            'IN should match at least one contact'
-        );
+        $includeIds = $this->fetchLeadIdsForFilter($qbService, $includeFilter);
+        $this->assertNotEmpty($includeIds, 'IN should match at least one contact');
 
         // EXCLUDE (NOT IN)
         $excludeFilter = $this->createMultiselectFilterMock(
@@ -89,13 +83,8 @@ class CustomFieldFilterQueryBuilderMultiselectTest extends MauticMysqlTestCase
             'notIn',
             'multiselect'
         );
-        $qb2 = $this->baseLeadsQB();
-        $qbService->applyQuery($qb2, $excludeFilter);
-        $this->assertGreaterThanOrEqual(
-            0,
-            $this->executeSelect($qb2)->rowCount(),
-            'NOT IN should return contacts without those values'
-        );
+        $excludeIds = $this->fetchLeadIdsForFilter($qbService, $excludeFilter);
+        $this->assertIsArray($excludeIds);
     }
 
     private function findMultiselectFieldIdOrSkip(): int
@@ -120,7 +109,7 @@ class CustomFieldFilterQueryBuilderMultiselectTest extends MauticMysqlTestCase
         // DBAL 2/3-safe fallback: pick any field that has option rows
         $qb2 = $this->connection->createQueryBuilder()
             ->select('v.custom_field_id')
-            ->from(MAUTIC_TABLE_PREFIX.'custom_field_value_option', 'v')
+            ->from($this->prefixTable('custom_field_value_option'), 'v')
             ->setMaxResults(1);
 
         $stmt = method_exists($qb2, 'executeQuery') ? $qb2->executeQuery() : $qb2->execute();
@@ -139,11 +128,11 @@ class CustomFieldFilterQueryBuilderMultiselectTest extends MauticMysqlTestCase
      * @return ContactSegmentFilter&\PHPUnit\Framework\MockObject\MockObject
      */
     private function createMultiselectFilterMock(
-    int $fieldId,
-    array $values,
-    string $operator = 'in',
-    string $type = 'multiselect'
-    ): MockObject {
+        int $fieldId,
+        array $values,
+        string $operator = 'in',
+        string $type = 'multiselect'
+    ): ContactSegmentFilter {
         // Normalize operator to what prod code expects
         $raw  = (string) $operator;
         $low  = strtolower($raw);
@@ -155,10 +144,11 @@ class CustomFieldFilterQueryBuilderMultiselectTest extends MauticMysqlTestCase
             $normalized = $raw; // pass through others (eq, neq, etc.)
         }
 
+        /** @var ContactSegmentFilter&\PHPUnit\Framework\MockObject\MockObject $filter */
         $filter                            = $this->getMockBuilder(ContactSegmentFilter::class)->disableOriginalConstructor()->getMock();
         $filter->contactSegmentFilterCrate = $this->createMock(ContactSegmentFilterCrate::class);
-        $filter->method('getType')->willReturn($type);          // keep 'multiselect' here for option table mapping
-        $filter->method('getOperator')->willReturn($normalized); // <-- normalized op
+        $filter->method('getType')->willReturn($type);           // keep 'multiselect' here for option table mapping
+        $filter->method('getOperator')->willReturn($normalized); // normalized op
         $filter->method('getField')->willReturn((string) $fieldId);
         $filter->method('getParameterValue')->willReturn($values);
         $filter->method('getParameterHolder')->willReturn(':needle');
@@ -166,11 +156,48 @@ class CustomFieldFilterQueryBuilderMultiselectTest extends MauticMysqlTestCase
         return $filter;
     }
 
-    private function baseLeadsQB(): QueryBuilder
+    /**
+     * Prefixes a table name using the current DB configuration or the MAUTIC_TABLE_PREFIX constant.
+     */
+    private function prefixTable(string $table): string
     {
-        $qb = new QueryBuilder($this->connection);
-        $qb->select('l.*')->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+        $prefix = '';
+        // Don’t use isset() — PHPStan considers static::$container non-nullable.
+        try {
+            // In Mautic test envs this parameter exists.
+            $prefix = (string) self::$container->getParameter('mautic.db_table_prefix');
+        } catch (\Throwable $e) {
+            if (defined('MAUTIC_TABLE_PREFIX')) {
+                $prefix = (string) MAUTIC_TABLE_PREFIX;
+            }
+        }
 
-        return $qb;
+        return $prefix.$table;
+    }
+
+    /**
+     * Return distinct lead IDs matched by a filter.
+     *
+     * @return list<int>
+     */
+    private function fetchLeadIdsForFilter(
+        CustomFieldFilterQueryBuilder $svc,
+        ContactSegmentFilter $filter
+    ): array {
+        $qb = new QueryBuilder($this->connection);
+        $qb->select('DISTINCT l.id')->from($this->prefixTable('leads'), 'l');
+
+        $svc->applyQuery($qb, $filter);
+
+        $stmt = method_exists($qb, 'executeQuery') ? $qb->executeQuery() : $qb->execute();
+        /** @var list<int|string> $col */
+        $col = method_exists($stmt, 'fetchFirstColumn')
+            ? $stmt->fetchFirstColumn()
+            : array_column($stmt->fetchAll(\PDO::FETCH_NUM), 0);
+
+        $ids = array_values(array_unique(array_map('intval', $col)));
+        sort($ids);
+
+        return $ids;
     }
 }
