@@ -64,7 +64,8 @@ class QueryFilterFactory
     ): UnionQueryContainer {
         $segmentFilterFieldId   = (int) $segmentFilter->getField();
         $segmentFilterFieldType = $segmentFilter->getType();
-        if (empty($segmentFilterFieldType) || '' === $segmentFilterFieldType) {
+        $segmentFilterFieldType = $segmentFilterFieldType ?: $this->customFieldRepository->getCustomFieldTypeById($segmentFilterFieldId);
+        if ('select' === $segmentFilterFieldType) {
             $segmentFilterFieldType = $this->customFieldRepository->getCustomFieldTypeById($segmentFilterFieldId);
         }
         $dataTable              = $this->fieldTypeProvider->getType($segmentFilterFieldType)->getTableName();

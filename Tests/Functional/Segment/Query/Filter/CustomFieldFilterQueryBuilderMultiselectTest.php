@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\Segment\Query\Filter;
 
-use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
-use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\ContactSegmentFilterCrate;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use Mautic\LeadBundle\Segment\RandomParameterName;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterFactory;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
+use MauticPlugin\CustomObjectsBundle\Repository\DbalQueryTrait;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\CustomFieldFilterQueryBuilder;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\FixtureObjectsTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -68,7 +68,7 @@ class CustomFieldFilterQueryBuilderMultiselectTest extends MauticMysqlTestCase
         $qbService = new CustomFieldFilterQueryBuilder(new RandomParameterName(), $dispatcher, $helper);
 
         // INCLUDE (IN)
-       $includeFilter = $this->createMultiselectFilterMock(
+        $includeFilter = $this->createMultiselectFilterMock(
             fieldId: $cfId,
             values: ['power_stearing', '4_star_safety'],
             operator: 'in',        // lowercase
@@ -107,7 +107,7 @@ class CustomFieldFilterQueryBuilderMultiselectTest extends MauticMysqlTestCase
             return (int) $byLabel->getId();
         }
 
-        $qb = $repo->createQueryBuilder('f');
+        $qb    = $repo->createQueryBuilder('f');
         $field = $qb
             ->where($qb->expr()->in('f.type', ':types'))
             ->setParameter('types', ['option', 'multiselect'])
@@ -134,6 +134,11 @@ class CustomFieldFilterQueryBuilderMultiselectTest extends MauticMysqlTestCase
         $this->markTestSkipped('No multiselect/option field found in fixtures.');
     }
 
+    /**
+     * @param list<string> $values
+     *
+     * @return ContactSegmentFilter&\PHPUnit\Framework\MockObject\MockObject
+     */
     private function createMultiselectFilterMock(
     int $fieldId,
     array $values,
@@ -143,15 +148,15 @@ class CustomFieldFilterQueryBuilderMultiselectTest extends MauticMysqlTestCase
         // Normalize operator to what prod code expects
         $raw  = (string) $operator;
         $low  = strtolower($raw);
-        if ($low === 'in' || $low === 'multiselect') {
+        if ('in' === $low || 'multiselect' === $low) {
             $normalized = 'in';
-        } elseif ($low === 'notin' || $raw === '!multiselect') {
+        } elseif ('notin' === $low || '!multiselect' === $raw) {
             $normalized = 'notIn';
         } else {
             $normalized = $raw; // pass through others (eq, neq, etc.)
         }
 
-        $filter = $this->getMockBuilder(ContactSegmentFilter::class)->disableOriginalConstructor()->getMock();
+        $filter                            = $this->getMockBuilder(ContactSegmentFilter::class)->disableOriginalConstructor()->getMock();
         $filter->contactSegmentFilterCrate = $this->createMock(ContactSegmentFilterCrate::class);
         $filter->method('getType')->willReturn($type);          // keep 'multiselect' here for option table mapping
         $filter->method('getOperator')->willReturn($normalized); // <-- normalized op
@@ -162,11 +167,11 @@ class CustomFieldFilterQueryBuilderMultiselectTest extends MauticMysqlTestCase
         return $filter;
     }
 
-
     private function baseLeadsQB(): QueryBuilder
     {
         $qb = new QueryBuilder($this->connection);
         $qb->select('l.*')->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
+
         return $qb;
     }
 }
