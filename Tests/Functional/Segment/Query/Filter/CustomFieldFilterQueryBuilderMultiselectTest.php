@@ -69,12 +69,11 @@ class CustomFieldFilterQueryBuilderMultiselectTest extends MauticMysqlTestCase
 
         // INCLUDE (IN)
         $includeFilter = $this->createMultiselectFilterMock(
-            fieldId: $cfId,
-            values: ['power_stearing', '4_star_safety'],
-            operator: 'in',        // lowercase
-            type: 'multiselect'
+            $cfId,
+            ['power_stearing', '4_star_safety'],
+            'in',
+            'multiselect'
         );
-
         $qb = $this->baseLeadsQB();
         $qbService->applyQuery($qb, $includeFilter);
         $this->assertGreaterThanOrEqual(
@@ -85,10 +84,10 @@ class CustomFieldFilterQueryBuilderMultiselectTest extends MauticMysqlTestCase
 
         // EXCLUDE (NOT IN)
         $excludeFilter = $this->createMultiselectFilterMock(
-            fieldId: $cfId,
-            values: ['power_stearing', '4_star_safety'],
-            operator: 'notIn',     // exact camelCase
-            type: 'multiselect'
+            $cfId,
+            ['power_stearing', '4_star_safety'],
+            'notIn',
+            'multiselect'
         );
         $qb2 = $this->baseLeadsQB();
         $qbService->applyQuery($qb2, $excludeFilter);
