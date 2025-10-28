@@ -120,7 +120,7 @@ class CustomFieldFilterQueryBuilderMultiselectTest extends MauticMysqlTestCase
         // DBAL 2/3-safe fallback: pick any field that has option rows
         $qb2 = $this->connection->createQueryBuilder()
             ->select('v.custom_field_id')
-            ->from('custom_field_value_option', 'v')
+            ->from(MAUTIC_TABLE_PREFIX.'custom_field_value_option', 'v')
             ->setMaxResults(1);
 
         $stmt = method_exists($qb2, 'executeQuery') ? $qb2->executeQuery() : $qb2->execute();
@@ -169,7 +169,7 @@ class CustomFieldFilterQueryBuilderMultiselectTest extends MauticMysqlTestCase
     private function baseLeadsQB(): QueryBuilder
     {
         $qb = new QueryBuilder($this->connection);
-        $qb->select('l.*')->from('leads', 'l');
+        $qb->select('l.*')->from(MAUTIC_TABLE_PREFIX.'leads', 'l');
 
         return $qb;
     }
