@@ -66,7 +66,6 @@ class QueryFilterFactory
         $segmentFilterFieldType = $segmentFilter->getType();
         $segmentFilterFieldType = $segmentFilterFieldType ?: $this->customFieldRepository->getCustomFieldTypeById($segmentFilterFieldId);
         $dataTable              = $this->fieldTypeProvider->getType($segmentFilterFieldType)->getTableName();
-
         $this->unionQueryContainer = new UnionQueryContainer();
 
         $this->create1LevelQuery($alias, $segmentFilterFieldId, $dataTable);

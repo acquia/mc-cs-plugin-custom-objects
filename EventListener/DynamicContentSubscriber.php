@@ -40,9 +40,11 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 
     public function evaluateFilters(ContactFiltersEvaluateEvent $event): void
     {
+        // 2. Normalize only Custom Object filters
+        $filters = $this->normalizeCustomObjectFilters($event->getFilters());
         if ($event->isEvaluated()
             || !$this->configProvider->pluginIsEnabled()
-            || !$this->hasCustomObjectFilters($event->getFilters())
+            || !$this->hasCustomObjectFilters($filters)
         ) {
             return;
         }
@@ -50,7 +52,7 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         $event->setIsEvaluated(true);
         $event->stopPropagation();
         $event->setIsMatched($this->contactFilterMatcher->match(
-            $event->getFilters(),
+            $filters,
             $event->getContact()->getProfileFields()
         ));
     }
@@ -71,4 +73,41 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 
         return false;
     }
+
+    private function normalizeCustomObjectFilters(array $filters): array
+{
+    foreach ($filters as &$filter) {
+
+        // Only normalize filters that have options (custom objects)
+        if (
+            !isset($filter['properties']['options']) ||
+            !is_array($filter['properties']['options'])
+        ) {
+            continue;
+        }
+
+        $label = $filter['filter_value'] ?? null;
+        if (!$label) {
+            continue;
+        }
+
+        $options = $filter['properties']['options'];
+
+        // Case A: Standard format (label => value)
+        if (isset($options[$label])) {
+            $filter['filter_value'] = $options[$label];
+            continue;
+        }
+
+        // Case B: Reverse format (value => label)
+        $reversed = array_flip($options);
+        if (isset($reversed[$label])) {
+            $filter['filter_value'] = $reversed[$label];
+            continue;
+        }
+    }
+
+    return $filters;
+}
+
 }
