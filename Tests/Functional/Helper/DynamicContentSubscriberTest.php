@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\EventListener;
 
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
@@ -11,9 +12,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\EventListener\DynamicContentSubscriber;
 use MauticPlugin\CustomObjectsBundle\Helper\ContactFilterMatcher;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 
 class DynamicContentSubscriberTest extends MauticMysqlTestCase
 {
@@ -26,18 +25,18 @@ class DynamicContentSubscriberTest extends MauticMysqlTestCase
 
         // --- Create Custom Object ---
         $this->object = new CustomObject();
-        $this->object->setNameSingular("TestObject");
-        $this->object->setNamePlural("TestObjects");
-        $this->object->setAlias("testobject");
+        $this->object->setNameSingular('TestObject');
+        $this->object->setNamePlural('TestObjects');
+        $this->object->setAlias('testobject');
         $this->object->setIsPublished(true);
         $this->em->persist($this->object);
 
         // --- Create Custom Field ---
         $this->field = new CustomField();
-        $this->field->setLabel("Country");
-        $this->field->setAlias("country");
+        $this->field->setLabel('Country');
+        $this->field->setAlias('country');
         $this->field->setCustomObject($this->object);
-        $this->field->setType("select");         // important
+        $this->field->setType('select');         // important
         $this->field->setIsPublished(true);
 
         // Create Doctrine Collection of option entities
@@ -45,15 +44,15 @@ class DynamicContentSubscriberTest extends MauticMysqlTestCase
 
         // Albania => AL
         $opt1 = new \MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption();
-        $opt1->setLabel("Albania");
-        $opt1->setValue("AL");
+        $opt1->setLabel('Albania');
+        $opt1->setValue('AL');
         $opt1->setCustomField($this->field);
         $options->add($opt1);
 
         // France => FR
         $opt2 = new \MauticPlugin\CustomObjectsBundle\Entity\CustomFieldOption();
-        $opt2->setLabel("France");
-        $opt2->setValue("FR");
+        $opt2->setLabel('France');
+        $opt2->setValue('FR');
         $opt2->setCustomField($this->field);
         $options->add($opt2);
 
@@ -77,8 +76,8 @@ class DynamicContentSubscriberTest extends MauticMysqlTestCase
             'filter_value' => 'Albania',
             'properties'   => [
                 'options' => [
-                    "Albania" => "AL",
-                    "France"  => "FR",
+                    'Albania' => 'AL',
+                    'France'  => 'FR',
                 ],
             ],
         ]];
@@ -113,7 +112,7 @@ class DynamicContentSubscriberTest extends MauticMysqlTestCase
         $normalized = $method->invoke($subscriber, $filters);
 
         $this->assertSame(
-            "AL",
+            'AL',
             $normalized[0]['filter_value'],
             'Label "Albania" was not normalized to "AL"'
         );

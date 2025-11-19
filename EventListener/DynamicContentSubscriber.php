@@ -74,40 +74,41 @@ class DynamicContentSubscriber implements EventSubscriberInterface
         return false;
     }
 
+    /**
+     * @param array<int, array<string, mixed>> $filters
+     *
+     * @return array<int, array<string, mixed>>
+     */
     private function normalizeCustomObjectFilters(array $filters): array
-{
-    foreach ($filters as &$filter) {
+    {
+        foreach ($filters as &$filter) {
+            if (
+                !isset($filter['properties']['options']) ||
+                !is_array($filter['properties']['options'])
+            ) {
+                continue;
+            }
 
-        // Only normalize filters that have options (custom objects)
-        if (
-            !isset($filter['properties']['options']) ||
-            !is_array($filter['properties']['options'])
-        ) {
-            continue;
+            $label = $filter['filter_value'] ?? null;
+            if (!$label) {
+                continue;
+            }
+
+            $options = $filter['properties']['options'];
+
+            // Case A: Standard format (label => value)
+            if (isset($options[$label])) {
+                $filter['filter_value'] = $options[$label];
+                continue;
+            }
+
+            // Case B: Reverse format (value => label)
+            $reversed = array_flip($options);
+            if (isset($reversed[$label])) {
+                $filter['filter_value'] = $reversed[$label];
+            }
         }
 
-        $label = $filter['filter_value'] ?? null;
-        if (!$label) {
-            continue;
-        }
-
-        $options = $filter['properties']['options'];
-
-        // Case A: Standard format (label => value)
-        if (isset($options[$label])) {
-            $filter['filter_value'] = $options[$label];
-            continue;
-        }
-
-        // Case B: Reverse format (value => label)
-        $reversed = array_flip($options);
-        if (isset($reversed[$label])) {
-            $filter['filter_value'] = $reversed[$label];
-            continue;
-        }
+        return $filters;
     }
-
-    return $filters;
-}
-
 }
