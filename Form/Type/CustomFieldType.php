@@ -256,7 +256,6 @@ class CustomFieldType extends AbstractType
             FormButtonsType::class,
             [
                 'apply_text'     => '',
-                'cancel_onclick' => "mQuery('form[name=custom_field]').attr('method', 'get').attr('action', mQuery('form[name=custom_field]').attr('action').replace('/save', '/cancel'));",
             ]
         );
 

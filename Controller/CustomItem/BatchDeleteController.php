@@ -14,53 +14,32 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Translation\Translator;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 
 class BatchDeleteController extends CommonController
 {
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
-     * @var SessionProviderFactory
-     */
-    private $sessionProviderFactory;
-
-    /**
-     * @var CustomItemPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var CustomItemRouteProvider
-     */
-    private $routeProvider;
-
-    /**
-     * @var FlashBag
-     */
-    private $flashBag;
-
     public function __construct(
-        RequestStack $requestStack,
-        CustomItemModel $customItemModel,
-        SessionProviderFactory $sessionProviderFactory,
-        CustomItemPermissionProvider $permissionProvider,
-        CustomItemRouteProvider $routeProvider,
-        FlashBag $flashBag
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        private FlashBag $flashBag,
+        private RequestStack $requestStack,
+        CorePermissions $security,
+        private CustomItemPermissionProvider $permissionProvider,
+        private CustomItemRouteProvider $routeProvider,
+        private CustomItemModel $customItemModel,
+        private SessionProviderFactory $sessionProviderFactory,
     ) {
-        $this->requestStack           = $requestStack;
-        $this->customItemModel        = $customItemModel;
-        $this->sessionProviderFactory = $sessionProviderFactory;
-        $this->permissionProvider     = $permissionProvider;
-        $this->routeProvider          = $routeProvider;
-        $this->flashBag               = $flashBag;
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     public function deleteAction(int $objectId): Response
@@ -112,7 +91,7 @@ class BatchDeleteController extends CommonController
             [
                 'returnUrl'       => $this->routeProvider->buildListRoute($objectId, $page),
                 'viewParameters'  => ['objectId' => $objectId, 'page' => $page],
-                'contentTemplate' => 'CustomObjectsBundle:CustomItem\List:list',
+                'contentTemplate' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ListController::listAction',
                 'passthroughVars' => [
                     'mauticContent' => 'customItem',
                 ],

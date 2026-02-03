@@ -4,108 +4,57 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
-use Mautic\CoreBundle\Controller\AbstractFormController;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Translation\Translator;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Form\FormFactoryInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Mautic\CoreBundle\Controller\AbstractFormController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsToStringTransformer;
-use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransformer;
-use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
-use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Response;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\ParamsToStringTransformer;
+use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsToStringTransformer;
 
 class SaveController extends AbstractFormController
 {
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var FlashBag
-     */
-    private $flashBag;
-
-    /**
-     * @var FormFactoryInterface
-     */
-    private $formFactory;
-
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    /**
-     * @var CustomFieldModel
-     */
-    private $customFieldModel;
-
-    /**
-     * @var CustomObjectPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var CustomObjectRouteProvider
-     */
-    private $routeProvider;
-
-    /**
-     * @var CustomFieldTypeProvider
-     */
-    private $customFieldTypeProvider;
-
-    /**
-     * @var ParamsToStringTransformer
-     */
-    private $paramsToStringTransformer;
-
-    /**
-     * @var OptionsToStringTransformer
-     */
-    private $optionsToStringTransformer;
-
-    /**
-     * @var LockFlashMessageHelper
-     */
-    private $lockFlashMessageHelper;
-
     public function __construct(
-        RequestStack $requestStack,
-        FlashBag $flashBag,
-        FormFactoryInterface $formFactory,
-        CustomObjectModel $customObjectModel,
-        CustomFieldModel $customFieldModel,
-        CustomObjectPermissionProvider $permissionProvider,
-        CustomObjectRouteProvider $routeProvider,
-        CustomFieldTypeProvider $customFieldTypeProvider,
-        ParamsToStringTransformer $paramsToStringTransformer,
-        OptionsToStringTransformer $optionsToStringTransformer,
-        LockFlashMessageHelper $lockFlashMessageHelper
+        private FormFactoryInterface $formFactory,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        private FlashBag $flashBag,
+        private RequestStack $requestStack,
+        CorePermissions $security,
+        private CustomObjectPermissionProvider $permissionProvider,
+        private CustomObjectRouteProvider $routeProvider,
+        private CustomObjectModel $customObjectModel,
+        private CustomFieldModel $customFieldModel,
+        private CustomFieldTypeProvider $customFieldTypeProvider,
+        private LockFlashMessageHelper $lockFlashMessageHelper,
+        private ParamsToStringTransformer $paramsToStringTransformer,
+        private OptionsToStringTransformer $optionsToStringTransformer,
     ) {
-        $this->requestStack               = $requestStack;
-        $this->flashBag                   = $flashBag;
-        $this->formFactory                = $formFactory;
-        $this->customObjectModel          = $customObjectModel;
-        $this->customFieldModel           = $customFieldModel;
-        $this->permissionProvider         = $permissionProvider;
-        $this->routeProvider              = $routeProvider;
-        $this->customFieldTypeProvider    = $customFieldTypeProvider;
-        $this->paramsToStringTransformer  = $paramsToStringTransformer;
-        $this->optionsToStringTransformer = $optionsToStringTransformer;
-        $this->lockFlashMessageHelper     = $lockFlashMessageHelper;
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     public function saveAction(?int $objectId = null): Response
@@ -180,7 +129,7 @@ class SaveController extends AbstractFormController
                     'deletedFields'       => [],
                     'form'                => $form->createView(),
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.php',
+                'contentTemplate' => '@CustomObjects/CustomObject/form.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
                     'route'         => $objectId ? $this->routeProvider->buildEditRoute($customObject->getId()) : $this->routeProvider->buildNewRoute(),
@@ -190,7 +139,7 @@ class SaveController extends AbstractFormController
     }
 
     /**
-     * @param string[] $rawCustomObject
+     * @param array<string, mixed> $rawCustomObject
      */
     private function handleRawPost(CustomObject $customObject, array $rawCustomObject): void
     {

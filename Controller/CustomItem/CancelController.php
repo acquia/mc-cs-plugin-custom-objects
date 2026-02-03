@@ -10,32 +10,33 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use Symfony\Component\HttpFoundation\Response;
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class CancelController extends CommonController
 {
-    /**
-     * @var SessionProviderFactory
-     */
-    private $sessionProviderFactory;
-
-    /**
-     * @var CustomItemRouteProvider
-     */
-    private $routeProvider;
-
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
     public function __construct(
-        SessionProviderFactory $sessionProviderFactory,
-        CustomItemRouteProvider $routeProvider,
-        CustomItemModel $customItemModel
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security,
+        private SessionProviderFactory $sessionProviderFactory,
+        private CustomItemRouteProvider $routeProvider,
+        private CustomItemModel $customItemModel,
     ) {
-        $this->sessionProviderFactory = $sessionProviderFactory;
-        $this->routeProvider          = $routeProvider;
-        $this->customItemModel        = $customItemModel;
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
@@ -54,7 +55,7 @@ class CancelController extends CommonController
             [
                 'returnUrl'       => $this->routeProvider->buildListRoute($objectId, $page),
                 'viewParameters'  => ['objectId' => $objectId, 'page' => $page],
-                'contentTemplate' => 'CustomObjectsBundle:CustomItem\List:list',
+                'contentTemplate' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ListController::listAction',
                 'passthroughVars' => [
                     'mauticContent' => 'customItem',
                 ],

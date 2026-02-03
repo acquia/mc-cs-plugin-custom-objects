@@ -7,7 +7,6 @@ namespace MauticPlugin\CustomObjectsBundle\Entity;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
-use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 use Mautic\LeadBundle\Entity\Company;
@@ -58,7 +57,7 @@ class CustomItemXrefCompany implements CustomItemXrefInterface
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createField('dateAdded', Type::DATETIME)
+        $builder->createField('dateAdded', 'datetime')
             ->columnName('date_added')
             ->build();
     }

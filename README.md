@@ -18,6 +18,15 @@ Until Github Actions' CI/CD are in place, we request to developers to:
 - `Custom Object` is set of custom fields that will allow users to create multiple instances of this object. Example: Product, Invoice.
 - `Custom Item` is created when Custom Object fields are populated with specific information. Example: Mautic T-shirt, Invoice 2022-02-22-123.
 
+## Upgrade Notes
+
+If you upgrade mautic from 4.x to 7.x, using MariaDB, and install this plugin, you need to run the following query in your database to update the plugin:
+
+```sql
+ALTER TABLE mautic_custom_field MODIFY COLUMN params longtext COLLATE utf8mb4_unicode_ci COMMENT '(DC2Type:array)'
+```
+Mautic 4 used JSON for this column; newer versions use arrays, so the old schema causes issues. You can run this query to update the column type.
+
 ## Example Usage
 
 As an example we can create a `Custom Object` **Product**. To create one go to the right hand side admin menu. This Custom Object will have these `custom fields`:

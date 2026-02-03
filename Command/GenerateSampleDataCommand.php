@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Command;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManager;
 use MauticPlugin\CustomObjectsBundle\Helper\RandomHelper;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,7 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-class GenerateSampleDataCommand extends ContainerAwareCommand
+class GenerateSampleDataCommand extends Command
 {
     /**
      * @var EntityManager
@@ -67,7 +66,7 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io       = new SymfonyStyle($input, $output);
         $enquirer = $this->getHelper('question');
@@ -112,7 +111,6 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
     /**
      * @return int[]
      *
-     * @throws DBALException
      */
     private function createCustomObjectsWithItems(): array
     {
@@ -222,7 +220,6 @@ class GenerateSampleDataCommand extends ContainerAwareCommand
     /**
      * @return int Last inserted row ID
      *
-     * @throws DBALException
      */
     private function insertInto(string $table, array $row): int
     {

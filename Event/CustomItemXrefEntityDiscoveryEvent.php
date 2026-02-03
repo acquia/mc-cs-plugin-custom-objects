@@ -6,7 +6,7 @@ namespace MauticPlugin\CustomObjectsBundle\Event;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class CustomItemXrefEntityDiscoveryEvent extends Event
 {

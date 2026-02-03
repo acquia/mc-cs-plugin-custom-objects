@@ -17,12 +17,19 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
-use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Translation\TranslatorInterface;
-
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Form\FormFactoryInterface;
 /**
  * This controller is not used for saving to database, it is used only to generate forms and data validation.
  * Persisting is handled in:.
@@ -31,52 +38,25 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 class SaveController extends CommonController
 {
-    /**
-     * @var FormFactory
-     */
-    private $formFactory;
-
-    /**
-     * @var CustomFieldModel
-     */
-    private $customFieldModel;
-
-    /**
-     * @var CustomFieldFactory
-     */
-    private $customFieldFactory;
-
-    /**
-     * @var CustomFieldPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var CustomFieldRouteProvider
-     */
-    private $fieldRouteProvider;
-
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
 
     public function __construct(
-        FormFactory $formFactory,
-        TranslatorInterface $translator,
-        CustomFieldModel $customFieldModel,
-        CustomFieldFactory $customFieldFactory,
-        CustomFieldPermissionProvider $permissionProvider,
-        CustomFieldRouteProvider $fieldRouteProvider,
-        CustomObjectModel $customObjectModel
+        private FormFactoryInterface $formFactory,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security,
+        private CustomFieldRouteProvider $fieldRouteProvider,
+        private CustomFieldFactory $customFieldFactory,
+        private CustomObjectModel $customObjectModel,
+        private CustomFieldModel $customFieldModel,
+        private CustomFieldPermissionProvider $permissionProvider,
     ) {
-        $this->formFactory             = $formFactory;
-        $this->translator              = $translator;
-        $this->customFieldModel        = $customFieldModel;
-        $this->customFieldFactory      = $customFieldFactory;
-        $this->permissionProvider      = $permissionProvider;
-        $this->fieldRouteProvider      = $fieldRouteProvider;
-        $this->customObjectModel       = $customObjectModel;
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
@@ -134,7 +114,7 @@ class SaveController extends CommonController
                     'customField' => $customField,
                     'form'        => $form->createView(),
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomField:form.html.php',
+                'contentTemplate' => '@CustomObjects/CustomField/form.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customField',
                     'route'         => $route,
@@ -178,7 +158,7 @@ class SaveController extends CommonController
         );
 
         $template = $this->render(
-            'CustomObjectsBundle:CustomObject:_form-fields.html.php',
+            '@CustomObjects/CustomObject/_form-fields.html.twig',
             [
                 'form'          => $form->createView(),
                 'panelId'       => $panelId, // Panel id to me replaced if edit
@@ -212,7 +192,7 @@ class SaveController extends CommonController
      *
      * @see \Symfony\Component\Form\Exception\TransformationFailedException
      *
-     * @param string[] $customFieldPost
+     * @param array<string, mixed> $customFieldPost
      */
     private function recreateOptionsFromPost(array $customFieldPost, CustomField $customField): void
     {

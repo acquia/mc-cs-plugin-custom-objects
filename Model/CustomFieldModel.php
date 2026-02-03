@@ -4,17 +4,24 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
-use Doctrine\ORM\Tools\Pagination\Paginator;
-use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
+use Psr\Log\LoggerInterface;
+use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 
 class CustomFieldModel extends FormModel
 {
@@ -31,11 +38,19 @@ class CustomFieldModel extends FormModel
     public function __construct(
         CustomFieldRepository $customFieldRepository,
         CustomFieldPermissionProvider $permissionProvider,
-        UserHelper $userHelper
+        UserHelper $userHelper,
+        EntityManager $entityManager,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper,
     ) {
         $this->customFieldRepository = $customFieldRepository;
         $this->permissionProvider    = $permissionProvider;
         $this->userHelper            = $userHelper;
+        parent::__construct($entityManager, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function setMetadata(CustomField $entity): CustomField
@@ -140,7 +155,7 @@ class CustomFieldModel extends FormModel
         if (empty($dirtyAlias)) {
             $dirtyAlias = $entity->getName();
         }
-        $cleanAlias = $this->cleanAlias($dirtyAlias, '', false, '-');
+        $cleanAlias = $this->cleanAlias($dirtyAlias, '', 0, '-');
         $entity->setAlias($cleanAlias);
 
         return $entity;

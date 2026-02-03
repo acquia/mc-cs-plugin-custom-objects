@@ -17,12 +17,12 @@ use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 class ContactSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     private $translator;
 
@@ -53,7 +53,7 @@ class ContactSubscriber implements EventSubscriberInterface
 
     public function __construct(
         EntityManager $entityManager,
-        TranslatorInterface $translator,
+        Translator $translator,
         CustomItemRouteProvider $routeProvider,
         CustomItemModel $customItemModel,
         ConfigProvider $configProvider,
@@ -181,13 +181,14 @@ class ContactSubscriber implements EventSubscriberInterface
                 } catch (NotFoundException $e) {
                     $eventLabel = $this->translator->trans("custom.item.{$action}.event.not.found", ['%customItemId%' => $link['object_id']]);
                 }
+                $actionIcon = $action === 'link' ? 'ri-link' : 'ri-link-unlink';
                 $event->addEvent([
                     'event'           => $eventTypeKey,
                     'eventId'         => $eventTypeKey.'.'.$link['id'],
                     'eventType'       => $eventTypeName,
                     'eventLabel'      => $eventLabel,
                     'timestamp'       => $link['date_added'],
-                    'icon'            => "fa-{$action}",
+                    'icon'            => $actionIcon,
                     'extra'           => $link,
                     'contactId'       => $link['lead_id'],
                     'contentTemplate' => 'CustomObjectsBundle:SubscribedEvents\Timeline:link.html.php',

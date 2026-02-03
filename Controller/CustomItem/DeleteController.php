@@ -13,46 +13,34 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use Symfony\Component\HttpFoundation\Response;
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Translation\Translator;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class DeleteController extends CommonController
 {
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
-     * @var SessionProviderFactory
-     */
-    private $sessionProviderFactory;
-
-    /**
-     * @var CustomItemPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var CustomItemRouteProvider
-     */
-    private $routeProvider;
-
-    /**
-     * @var FlashBag
-     */
-    private $flashBag;
 
     public function __construct(
-        CustomItemModel $customItemModel,
-        SessionProviderFactory $sessionProviderFactory,
-        FlashBag $flashBag,
-        CustomItemPermissionProvider $permissionProvider,
-        CustomItemRouteProvider $routeProvider
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        private FlashBag $flashBag,
+        private RequestStack $requestStack,
+        CorePermissions $security,
+        private CustomItemPermissionProvider $permissionProvider,
+        private CustomItemRouteProvider $routeProvider,
+        private CustomItemModel $customItemModel,
+        private SessionProviderFactory $sessionProviderFactory,
     ) {
-        $this->customItemModel        = $customItemModel;
-        $this->sessionProviderFactory = $sessionProviderFactory;
-        $this->flashBag               = $flashBag;
-        $this->permissionProvider     = $permissionProvider;
-        $this->routeProvider          = $routeProvider;
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     public function deleteAction(int $objectId, int $itemId): Response
@@ -83,7 +71,7 @@ class DeleteController extends CommonController
             [
                 'returnUrl'       => $this->routeProvider->buildListRoute($objectId, $page),
                 'viewParameters'  => ['objectId' => $objectId, 'page' => $page],
-                'contentTemplate' => 'CustomObjectsBundle:CustomItem\List:list',
+                'contentTemplate' => 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ListController::listAction',
                 'passthroughVars' => [
                     'mauticContent' => 'customItem',
                 ],

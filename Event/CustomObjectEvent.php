@@ -6,7 +6,7 @@ namespace MauticPlugin\CustomObjectsBundle\Event;
 
 use Mautic\CoreBundle\Service\FlashBag;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class CustomObjectEvent extends Event
 {

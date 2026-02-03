@@ -16,7 +16,7 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 abstract class AbstractMultivalueType extends AbstractCustomFieldType
 {
@@ -28,7 +28,7 @@ abstract class AbstractMultivalueType extends AbstractCustomFieldType
     private $csvHelper;
 
     public function __construct(
-        TranslatorInterface $translator,
+        Translator $translator,
         FilterOperatorProviderInterface $filterOperatorProvider,
         CsvHelper $csvHelper
     ) {

@@ -9,7 +9,10 @@ use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\LeadList;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+/**
+ * @extends CommonRepository<CustomObject>
+ */
 class CustomObjectRepository extends CommonRepository
 {
     public function checkAliasExists(string $alias, ?int $id = null): bool
@@ -102,7 +105,7 @@ class CustomObjectRepository extends CommonRepository
     {
         $alias       = 'cmo_'.$customObject->getId();
         $aliasLength = mb_strlen($alias);
-        $like        = "%;s:5:\"field\";s:${aliasLength}:\"{$alias}\";%";
+        $like        = "%;s:5:\"field\";s:{$aliasLength}:\"{$alias}\";%";
 
         $filterExpression->add(
             $queryBuilder->expr()->like('l.filters', $queryBuilder->expr()->literal($like))
@@ -112,7 +115,7 @@ class CustomObjectRepository extends CommonRepository
         foreach ($customObject->getCustomFields() as $customField) {
             $alias       = 'cmf_'.$customField->getId();
             $aliasLength = mb_strlen($alias);
-            $like        = "%;s:5:\"field\";s:${aliasLength}:\"{$alias}\";%";
+            $like        = "%;s:5:\"field\";s:{$aliasLength}:\"{$alias}\";%";
             $filterExpression->add(
                 $queryBuilder->expr()->like('l.filters', $queryBuilder->expr()->literal($like))
             );

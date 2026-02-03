@@ -6,18 +6,18 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
-use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
+use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 class CustomItemButtonSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     private $translator;
 
@@ -34,7 +34,7 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
     public function __construct(
         CustomItemPermissionProvider $permissionProvider,
         CustomItemRouteProvider $routeProvider,
-        TranslatorInterface $translator
+        Translator $translator
     ) {
         $this->permissionProvider = $permissionProvider;
         $this->routeProvider      = $routeProvider;
@@ -108,7 +108,7 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
                         );
                         $event->addButton(
                             $this->defineBatchDeleteButton($customObjectId),
-                            ButtonHelper::LOCATION_BULK_ACTIONS,
+                            ButtonHelper::LOCATION_TOOLBAR_BULK_ACTIONS,
                             $event->getRoute()
                         );
                     }
@@ -120,11 +120,6 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
             case CustomItemRouteProvider::ROUTE_VIEW:
                 $customObjectId = $this->getCustomObjectIdFromEvent($event);
                 $this->addEntityButtons($event, ButtonHelper::LOCATION_PAGE_ACTIONS, $customObjectId);
-                $event->addButton(
-                    $this->defineCloseButton($customObjectId),
-                    ButtonHelper::LOCATION_PAGE_ACTIONS,
-                    $event->getRoute()
-                );
 
                 break;
         }
@@ -163,9 +158,10 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
         return [
             'attr' => [
                 'href' => $this->routeProvider->buildEditRoute($customObjectId, $customItem->getId()),
+                'class' => 'btn btn-primary',
             ],
             'btnText'   => 'mautic.core.form.edit',
-            'iconClass' => 'fa fa-pencil-square-o',
+            'iconClass' => 'ri-edit-line',
             'priority'  => 500,
         ];
     }
@@ -188,7 +184,7 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
                 'data-custom-object-id'     => $customObjectId,
             ],
             'btnText'   => 'mautic.core.form.edit',
-            'iconClass' => 'fa fa-pencil-square-o',
+            'iconClass' => 'ri-edit-line',
             'priority'  => 500,
         ];
     }
@@ -203,7 +199,7 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
                 'href' => $this->routeProvider->buildListRoute($customObjectId),
             ],
             'btnText'   => 'mautic.core.form.close',
-            'iconClass' => 'fa fa-fw fa-remove',
+            'iconClass' => 'ri-close-line',
             'priority'  => 400,
         ];
     }
@@ -222,7 +218,7 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
                 'href' => $this->routeProvider->buildCloneRoute($customObjectId, $customItem->getId()),
             ],
             'btnText'   => 'mautic.core.form.clone',
-            'iconClass' => 'fa fa-copy',
+            'iconClass' => 'ri-file-copy-line',
             'priority'  => 300,
         ];
     }
@@ -247,7 +243,7 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
                 'data-cancel-callback'  => 'dismissConfirmation',
             ],
             'btnText'   => 'mautic.core.form.delete',
-            'iconClass' => 'fa fa-fw fa-trash-o text-danger',
+            'iconClass' => 'ri-delete-bin-line',
             'priority'  => 0,
         ];
     }
@@ -264,9 +260,10 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
         return [
             'attr' => [
                 'href' => $this->routeProvider->buildNewRoute($customObjectId),
+                'class' => 'btn btn-primary',
             ],
             'btnText'   => 'mautic.core.form.new',
-            'iconClass' => 'fa fa-plus',
+            'iconClass' => 'ri-add-line',
             'priority'  => 500,
         ];
     }
@@ -295,12 +292,12 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
         return [
             'attr' => [
                 'href'        => '#',
-                'onclick'     => "CustomObjects.linkCustomItemWithEntity(this, event, ${customObjectId}, '${entityType}', ${entityId}, 'custom-object-${customObjectId}', ".($relationshipObjectId ?: 'null').');',
+                'onclick'     => "CustomObjects.linkCustomItemWithEntity(this, event, {$customObjectId}, '{$entityType}', {$entityId}, 'custom-object-{$customObjectId}', ".($relationshipObjectId ?: 'null').');',
                 'data-action' => $action,
                 'data-toggle' => '',
             ],
             'btnText'   => $this->translator->trans('custom.item.link'),
-            'iconClass' => 'fa fa-link',
+            'iconClass' => 'ri-link',
             'priority'  => 500,
         ];
     }
@@ -317,12 +314,12 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
         return [
             'attr' => [
                 'href'        => '#',
-                'onclick'     => "CustomObjects.unlinkCustomItemFromEntity(this, event, ${customObjectId}, '${entityType}', ${entityId}, 'custom-object-${customObjectId}');",
+                'onclick'     => "CustomObjects.unlinkCustomItemFromEntity(this, event, {$customObjectId}, '{$entityType}', {$entityId}, 'custom-object-{$customObjectId}');",
                 'data-action' => $this->routeProvider->buildUnlinkRoute($customItemId, $entityType, $entityId),
                 'data-toggle' => '',
             ],
             'btnText'   => $this->translator->trans('custom.item.unlink'),
-            'iconClass' => 'fa fa-unlink',
+            'iconClass' => 'ri-link-unlink',
             'priority'  => 500,
         ];
     }
@@ -341,7 +338,7 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
                 'href' => $this->routeProvider->buildNewImportRoute($customObjectId),
             ],
             'btnText'   => 'mautic.lead.import',
-            'iconClass' => 'fa fa-upload',
+            'iconClass' => 'ri-upload-line',
             'priority'  => 350,
         ];
     }
@@ -360,7 +357,7 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
                 'href' => $this->routeProvider->buildListImportRoute($customObjectId),
             ],
             'btnText'   => 'mautic.lead.lead.import.index',
-            'iconClass' => 'fa fa-history',
+            'iconClass' => 'ri-history-line',
             'priority'  => 300,
         ];
     }
@@ -380,7 +377,7 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
                 'data-method' => 'POST',
             ],
             'btnText'   => 'custom.item.export',
-            'iconClass' => 'fa fa-file-text-o',
+            'iconClass' => 'ri-file-text-line',
             'priority'  => 250,
         ];
     }
@@ -399,8 +396,7 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
                 'template'      => 'batchdelete',
             ],
             'btnText'   => 'mautic.core.form.delete',
-            'iconClass' => 'fa fa-fw fa-trash-o text-danger',
-            'priority'  => 0,
+            'iconClass' => 'ri-delete-bin-line',
         ];
     }
 

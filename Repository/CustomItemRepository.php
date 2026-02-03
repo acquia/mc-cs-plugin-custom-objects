@@ -8,10 +8,12 @@ use Doctrine\ORM\QueryBuilder;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\Lead;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-
+/**
+ * @extends CommonRepository<CustomItem>
+ */
 class CustomItemRepository extends CommonRepository
 {
     use DbalQueryTrait;

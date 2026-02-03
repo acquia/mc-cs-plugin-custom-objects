@@ -1,0 +1,78 @@
+{% extends '@MauticCore/Default/content.html.twig' %}
+
+{% block mauticContent %}customItem{% endblock %}
+
+{% block headerTitle %}
+    {% if entity.id %}
+        {{ 'custom.item.edit'|trans({
+            '%object%': customObject.getNameSingular()|trans,
+            '%item%': entity.getName()|trans
+        }) }}
+    {% else %}
+        {{ 'custom.item.new'|trans({
+            '%object%': customObject.getNameSingular()|trans
+        }) }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% set hideCategories = customObject.getType() == constant('MauticPlugin\\CustomObjectsBundle\\Entity\\CustomObject::TYPE_RELATIONSHIP') ? 'hide' : '' %}
+
+    {{ form_start(form) }}
+
+    <!-- start: box layout -->
+    <div class="box-layout">
+        <!-- container -->
+        <div class="col-md-9 bg-auto height-auto bdr-r">
+            <div class="pa-md">
+                <div class="row">
+                    <div class="col-md-6">
+                        {% if form.name is defined %}
+                            {{ form_row(form.name) }}
+                        {% endif %}
+                        {% if form.custom_field_values is defined %}
+                            {{ form_row(form.custom_field_values) }}
+                        {% endif %}
+                        {% if form.contact_id is defined %}
+                            {{ form_row(form.contact_id) }}
+                        {% endif %}
+                    </div>
+
+                    {% if customObject.getRelationshipObject() and form.contact_id is defined and form.contact_id.vars.value is not empty %}
+                        <div class="col-md-6">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h3 class="panel-title">
+                                        {{ 'custom.item.new'|trans({
+                                            '%object%': customObject.getRelationshipObject().getNameSingular()|trans
+                                        }) }}
+                                    </h3>
+                                </div>
+                                <div class="panel-body">
+                                    {% if form.child_custom_field_values is defined %}
+                                        {{ form_row(form.child_custom_field_values) }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3 bg-white height-auto {{ hideCategories }}">
+            <div class="pr-lg pl-lg pt-md pb-md">
+                {% if form.category is defined %}
+                    {{ form_row(form.category) }}
+                {% endif %}
+                {% if form.isPublished is defined %}
+                    {{ form_row(form.isPublished) }}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {{ form_end(form) }}
+{% endblock %}
+
+

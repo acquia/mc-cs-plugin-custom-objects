@@ -10,7 +10,9 @@ use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-
+/**
+ * @extends CommonRepository<CustomItemXrefContact>
+ */
 class CustomItemXrefContactRepository extends CommonRepository
 {
     /**

@@ -8,11 +8,8 @@ use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Type;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
@@ -28,12 +25,12 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField\Params;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
 use MauticPlugin\CustomObjectsBundle\Form\Validator\Constraints\AllowUniqueIdentifier;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 
 /**
  * @ApiResource(
@@ -220,7 +217,7 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
         $this->alias = null;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getLabel();
     }
@@ -255,20 +252,20 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
             ->build();
 
         $builder->addId();
-        $builder->addField('label', Type::STRING);
-        $builder->addField('alias', Type::STRING);
-        $builder->addField('type', Type::STRING);
+        $builder->addField('label', 'string');
+        $builder->addField('alias', 'string');
+        $builder->addField('type', 'string');
         $builder->createField('order', 'integer')
             ->columnName('field_order')
             ->nullable()
             ->build();
 
-        $builder->createField('required', Type::BOOLEAN)
+        $builder->createField('required', 'boolean')
             ->columnName('required')
             ->option('default', false)
             ->build();
 
-        $builder->createField('defaultValue', Type::STRING)
+        $builder->createField('defaultValue', 'string')
             ->columnName('default_value')
             ->nullable()
             ->build();
@@ -280,22 +277,22 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
             ->fetchExtraLazy()
             ->build();
 
-        $builder->createField('params', Type::JSON_ARRAY)
+        $builder->createField('params', 'array')
             ->columnName('params')
             ->nullable()
             ->build();
 
-        $builder->createField('showInCustomObjectDetailList', Type::BOOLEAN)
+        $builder->createField('showInCustomObjectDetailList', 'boolean')
             ->columnName('show_in_custom_object_detail_list')
             ->option('default', true)
             ->build();
 
-        $builder->createField('showInContactDetailList', Type::BOOLEAN)
+        $builder->createField('showInContactDetailList', 'boolean')
             ->columnName('show_in_contact_detail_list')
             ->option('default', true)
             ->build();
 
-        $builder->createField('isUniqueIdentifier', Types::BOOLEAN)
+        $builder->createField('isUniqueIdentifier', 'boolean')
             ->columnName('is_unique_identifier')
             ->option('default', false)
             ->build();
@@ -306,12 +303,12 @@ class CustomField extends FormEntity implements UniqueEntityInterface, UuidInter
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('label', new Assert\NotBlank());
-        $metadata->addPropertyConstraint('label', new Assert\Length(['max' => 255]));
-        $metadata->addPropertyConstraint('alias', new Assert\Length(['max' => 255]));
+        $metadata->addPropertyConstraint('label', new Assert\Length(null, null, 255));
+        $metadata->addPropertyConstraint('alias', new Assert\Length(null, null, 255));
         $metadata->addPropertyConstraint('type', new Assert\NotBlank());
-        $metadata->addPropertyConstraint('type', new Assert\Length(['max' => 255]));
+        $metadata->addPropertyConstraint('type', new Assert\Length(null, null, 255));
         $metadata->addPropertyConstraint('customObject', new Assert\NotBlank());
-        $metadata->addPropertyConstraint('defaultValue', new Assert\Length(['max' => 255]));
+        $metadata->addPropertyConstraint('defaultValue', new Assert\Length(null, null, 255));
         $metadata->addConstraint(new Assert\Callback('validateDefaultValue'));
         $metadata->addConstraint(new AllowUniqueIdentifier());
     }
