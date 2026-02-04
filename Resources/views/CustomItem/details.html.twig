@@ -3,7 +3,7 @@
 {% block mauticContent %}customItem{% endblock %}
 {% block headerTitle %}{{ item.getName() }}{% endblock %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{- include('@MauticCore/Helper/page_actions.html.twig',
     {
         'item'            : item,

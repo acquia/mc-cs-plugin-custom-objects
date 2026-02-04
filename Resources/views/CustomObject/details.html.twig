@@ -3,7 +3,7 @@
 {% block mauticContent %}customObject{% endblock %}
 {% block headerTitle %}{{ customObject.nameSingular }}{% endblock %}
 
-{% block indexButton %}
+{% block preHeader %}
 {{- include('@MauticCore/Helper/page_actions.html.twig',
     {
         'item'            : customObject,

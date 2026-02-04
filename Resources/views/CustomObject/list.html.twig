@@ -11,7 +11,7 @@
             {{ block('listResults') }}
         </div>
     </div>
-    {{ include('@MauticCore/Helper/protip.html.twig', {
+    {{ include('@MauticCore/Modules/protip.html.twig', {
         tip: random(['mautic.protip.custom.objects.create', 'mautic.protip.custom.objects.segmentation', 'mautic.protip.custom.objects.campaign'])
     }) }}
     {% else %}
