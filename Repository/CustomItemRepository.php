@@ -11,12 +11,17 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
+use Doctrine\Persistence\ManagerRegistry;
 /**
  * @extends CommonRepository<CustomItem>
  */
 class CustomItemRepository extends CommonRepository
 {
     use DbalQueryTrait;
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, CustomItem::class);
+    }
 
     public function countItemsLinkedToContact(CustomObject $customObject, Lead $contact): int
     {

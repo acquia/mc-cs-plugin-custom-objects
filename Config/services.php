@@ -20,17 +20,6 @@ return function (ContainerConfigurator $configurator): void {
 
     $services->load('MauticPlugin\\CustomObjectsBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
-    
-    $services->load('MauticPlugin\\CustomObjectsBundle\\Entity\\', '../Entity/*.php')
-        ->exclude([
-            '../Entity/CustomField/*.php', 
-            '../Entity/AbstractCustomFieldValue.php',
-            '../Entity/CustomFieldFactory.php',
-            '../Entity/CustomFieldValueInterface.php',
-            '../Entity/CustomItemXrefInterface.php',
-            '../Entity/UniqueEntityInterface.php',
-        ])
-        ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);
 
     $services->load('MauticPlugin\\CustomObjectsBundle\\Repository\\', '../Repository/*Repository.php')
         ->tag(Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\ServiceRepositoryCompilerPass::REPOSITORY_SERVICE_TAG);

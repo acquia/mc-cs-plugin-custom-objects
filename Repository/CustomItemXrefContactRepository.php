@@ -10,11 +10,16 @@ use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefContact;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use Doctrine\Persistence\ManagerRegistry;
 /**
  * @extends CommonRepository<CustomItemXrefContact>
  */
 class CustomItemXrefContactRepository extends CommonRepository
 {
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, CustomItemXrefContact::class);
+    }
     /**
      * @return int[]
      */

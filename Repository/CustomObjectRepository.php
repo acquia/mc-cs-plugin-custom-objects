@@ -10,11 +10,17 @@ use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\LeadBundle\Entity\LeadList;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use Doctrine\Persistence\ManagerRegistry;
 /**
  * @extends CommonRepository<CustomObject>
  */
 class CustomObjectRepository extends CommonRepository
 {
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, CustomObject::class);
+    }
     public function checkAliasExists(string $alias, ?int $id = null): bool
     {
         $q = $this->createQueryBuilder(CustomObject::TABLE_ALIAS);
