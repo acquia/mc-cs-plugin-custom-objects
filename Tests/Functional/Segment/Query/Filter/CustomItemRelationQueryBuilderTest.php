@@ -25,9 +25,9 @@ class CustomItemRelationQueryBuilderTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->coreParametersHelper = self::$container->get('mautic.helper.core_parameters');
-        $this->segmentRepository    = self::$container->get('mautic.lead.repository.lead_list');
-        $this->contactRepository    = self::$container->get('mautic.lead.repository.lead');
+        $this->coreParametersHelper = self::getContainer()->get('mautic.helper.core_parameters');
+        $this->segmentRepository    = self::getContainer()->get('mautic.lead.repository.lead_list');
+        $this->contactRepository    = self::getContainer()->get('mautic.lead.repository.lead');
     }
 
     protected function beforeBeginTransaction(): void
@@ -49,7 +49,7 @@ class CustomItemRelationQueryBuilderTest extends MauticMysqlTestCase
             $this->getFixturesDirectory().'/custom-item-relation-filter-query-builder-fixture-1.yml',
         ]);
 
-        $this->runCommand(
+        self::getContainer()->get('mautic.command_runner')->runCommand(
             'mautic:segments:update',
             ['--env' => 'test']
         );

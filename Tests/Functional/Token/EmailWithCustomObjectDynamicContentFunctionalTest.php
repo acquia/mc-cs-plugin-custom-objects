@@ -54,10 +54,10 @@ class EmailWithCustomObjectDynamicContentFunctionalTest extends MauticMysqlTestC
     {
         parent::setUp();
 
-        $this->customItemModel       = self::$container->get('mautic.custom.model.item');
-        $this->customFieldValueModel = self::$container->get('mautic.custom.model.field.value');
+        $this->customItemModel       = self::getContainer()->get('mautic.custom.model.item');
+        $this->customFieldValueModel = self::getContainer()->get('mautic.custom.model.field.value');
 
-        $this->customObject           = $this->createCustomObjectWithAllFields(self::$container, 'Car');
+        $this->customObject           = $this->createCustomObjectWithAllFields(self::getContainer(), 'Car');
         $this->customItems['nexon']   = new CustomItem($this->customObject);
 
         $this->customItems['nexon']->setName('Nexon');
@@ -284,7 +284,7 @@ class EmailWithCustomObjectDynamicContentFunctionalTest extends MauticMysqlTestC
     private function sendAndAssetText(Email $email, Lead $lead, string $matchText): void
     {
         /** @var EmailModel $emailModel */
-        $emailModel = self::$container->get('mautic.email.model.email');
+        $emailModel = self::getContainer()->get('mautic.email.model.email');
         $emailModel->sendEmail(
             $email,
             [

@@ -120,7 +120,7 @@ class MenuSubscriberTest extends TestCase
                     'items'    => [
                         'custom.object.title' => [
                             'access'    => 'custom_objects:custom_objects:view',
-                            'iconClass' => 'fa-list-alt',
+                            'iconClass' => 'ri-list-unordered',
                             'id'        => 'mautic_custom_object_list',
                         ],
                     ],
@@ -163,7 +163,7 @@ class MenuSubscriberTest extends TestCase
                         'id'        => CustomObjectRouteProvider::ROUTE_LIST,
                         'route'     => CustomObjectRouteProvider::ROUTE_LIST,
                         'access'    => 'custom_objects:custom_objects:view',
-                        'iconClass' => 'fa-list-alt',
+                        'iconClass' => 'ri-list-unordered',
                     ],
                 ],
             ]);

@@ -4,7 +4,13 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomItem;
 
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use Mautic\UserBundle\Entity\User;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\SaveController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
@@ -20,6 +26,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\ClickableInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -89,21 +96,35 @@ class SaveControllerTest extends ControllerTestCase
     {
         parent::setUp();
 
+        $doctrine             = $this->createMock(ManagerRegistry::class);
+        $modelFactory         = $this->createMock(ModelFactory::class);
+        $userHelper           = $this->createMock(UserHelper::class);
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $dispatcher           = $this->createMock(EventDispatcherInterface::class);
+        $translator           = $this->createMock(Translator::class);
+        $this->flashBag       = $this->createMock(FlashBag::class);
+        $this->requestStack   = $this->createMock(RequestStack::class);
+        $security             = $this->createMock(CorePermissions::class);
         $this->formFactory             = $this->createMock(FormFactoryInterface::class);
         $this->customItemModel         = $this->createMock(CustomItemModel::class);
         $this->customObjectModel       = $this->createMock(CustomObjectModel::class);
-        $this->flashBag                = $this->createMock(FlashBag::class);
         $this->permissionProvider      = $this->createMock(CustomItemPermissionProvider::class);
         $this->routeProvider           = $this->createMock(CustomItemRouteProvider::class);
         $this->lockFlashMessageHelper  = $this->createMock(LockFlashMessageHelper::class);
-        $this->requestStack            = $this->createMock(RequestStack::class);
         $this->request                 = new Request();
         $this->customItem              = $this->createMock(CustomItem::class);
         $this->form                    = $this->createMock(FormInterface::class);
         $this->saveController          = new SaveController(
-            $this->requestStack,
-            $this->formFactory,
+            $doctrine,
+            $modelFactory,
+            $userHelper,
+            $coreParametersHelper,
+            $dispatcher,
+            $translator,
             $this->flashBag,
+            $this->requestStack,
+            $security,
+            $this->formFactory,
             $this->customItemModel,
             $this->customObjectModel,
             $this->permissionProvider,

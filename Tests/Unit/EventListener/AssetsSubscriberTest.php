@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
-use Mautic\CoreBundle\Templating\Helper\AssetsHelper;
+use Mautic\CoreBundle\Twig\Helper\AssetsHelper;
 use MauticPlugin\CustomObjectsBundle\EventListener\AssetsSubscriber;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 class AssetsSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -16,7 +16,7 @@ class AssetsSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private $configProvider;
 
-    private $getResponseEvent;
+    private $getRequestEvent;
 
     private $request;
 
@@ -28,7 +28,7 @@ class AssetsSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->assetsHelper     = $this->createMock(AssetsHelper::class);
         $this->configProvider   = $this->createMock(ConfigProvider::class);
-        $this->getResponseEvent = $this->createMock(GetResponseEvent::class);
+        $this->getRequestEvent = $this->createMock(RequestEvent::class);
         $this->request          = $this->createMock(Request::class);
         $this->assetsSubscriber = new AssetsSubscriber($this->assetsHelper, $this->configProvider);
     }
@@ -39,13 +39,13 @@ class AssetsSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('pluginIsEnabled')
             ->willReturn(false);
 
-        $this->getResponseEvent->expects($this->never())
-            ->method('isMasterRequest');
+        $this->getRequestEvent->expects($this->never())
+            ->method('isMainrequest');
 
         $this->assetsHelper->expects($this->never())
             ->method('addStylesheet');
 
-        $this->assetsSubscriber->loadAssets($this->getResponseEvent);
+        $this->assetsSubscriber->loadAssets($this->getRequestEvent);
     }
 
     public function testPluginEnabledOnPublicPage(): void
@@ -54,11 +54,11 @@ class AssetsSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('pluginIsEnabled')
             ->willReturn(true);
 
-        $this->getResponseEvent->expects($this->once())
-            ->method('isMasterRequest')
+        $this->getRequestEvent->expects($this->once())
+            ->method('isMainrequest')
             ->willReturn(true);
 
-        $this->getResponseEvent->expects($this->once())
+        $this->getRequestEvent->expects($this->once())
             ->method('getRequest')
             ->willReturn($this->request);
 
@@ -69,7 +69,7 @@ class AssetsSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assetsHelper->expects($this->never())
             ->method('addStylesheet');
 
-        $this->assetsSubscriber->loadAssets($this->getResponseEvent);
+        $this->assetsSubscriber->loadAssets($this->getRequestEvent);
     }
 
     public function testPluginEnabled(): void
@@ -78,11 +78,11 @@ class AssetsSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('pluginIsEnabled')
             ->willReturn(true);
 
-        $this->getResponseEvent->expects($this->once())
-            ->method('isMasterRequest')
+        $this->getRequestEvent->expects($this->once())
+            ->method('isMainrequest')
             ->willReturn(true);
 
-        $this->getResponseEvent->expects($this->once())
+        $this->getRequestEvent->expects($this->once())
             ->method('getRequest')
             ->willReturn($this->request);
 
@@ -93,6 +93,6 @@ class AssetsSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assetsHelper->expects($this->once())
             ->method('addStylesheet');
 
-        $this->assetsSubscriber->loadAssets($this->getResponseEvent);
+        $this->assetsSubscriber->loadAssets($this->getRequestEvent);
     }
 }

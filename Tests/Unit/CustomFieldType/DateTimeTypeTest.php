@@ -13,7 +13,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueDateTime;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 class DateTimeTypeTest extends \PHPUnit\Framework\TestCase
 {
@@ -31,7 +31,7 @@ class DateTimeTypeTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->translator             = $this->createMock(TranslatorInterface::class);
+        $this->translator             = $this->createMock(Translator::class);
         $this->customField            = $this->createMock(CustomField::class);
         $this->customItem             = $this->createMock(CustomItem::class);
         $this->filterOperatorProvider = $this->createMock(FilterOperatorProviderInterface::class);

@@ -11,7 +11,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 class SelectTypeTest extends \PHPUnit\Framework\TestCase
 {
@@ -29,7 +29,7 @@ class SelectTypeTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->translator             = $this->createMock(TranslatorInterface::class);
+        $this->translator             = $this->createMock(Translator::class);
         $this->customField            = $this->createMock(CustomField::class);
         $this->customItem             = $this->createMock(CustomItem::class);
         $this->filterOperatorProvider = $this->createMock(FilterOperatorProviderInterface::class);

@@ -13,7 +13,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemXrefContactModel;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 class CustomItemXrefContactModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -40,7 +40,7 @@ class CustomItemXrefContactModelTest extends \PHPUnit\Framework\TestCase
         $this->entityManager                = $this->createMock(EntityManager::class);
         $this->queryBuilder                 = $this->createMock(QueryBuilder::class);
         $this->query                        = $this->createMock(AbstractQuery::class);
-        $this->translator                   = $this->createMock(TranslatorInterface::class);
+        $this->translator                   = $this->createMock(Translator::class);
         $this->customItemXrefContactModel   = new CustomItemXrefContactModel(
             $this->entityManager,
             $this->translator

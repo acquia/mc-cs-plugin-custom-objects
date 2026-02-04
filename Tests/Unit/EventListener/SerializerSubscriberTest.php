@@ -27,7 +27,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 class SerializerSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -198,7 +198,7 @@ class SerializerSubscriberTest extends \PHPUnit\Framework\TestCase
         $customFieldDate = $this->createMock(CustomField::class);
         $context         = $this->createMock(Context::class);
         $visitor         = $this->createMock(SerializationVisitorInterface::class);
-        $translator      = $this->createMock(TranslatorInterface::class);
+        $translator      = $this->createMock(Translator::class);
         $filterOperator  = $this->createMock(FilterOperatorProviderInterface::class);
 
         $contact->method('getId')->willReturn(345);

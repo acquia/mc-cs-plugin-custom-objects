@@ -4,8 +4,15 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomObject;
 
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Form\Type\DateRangeType;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Model\AuditLogModel;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomObject\ViewController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
@@ -14,6 +21,7 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -40,16 +48,32 @@ class ViewControllerTest extends ControllerTestCase
     {
         parent::setUp();
 
+        $doctrine             = $this->createMock(ManagerRegistry::class);
+        $modelFactory         = $this->createMock(ModelFactory::class);
+        $userHelper           = $this->createMock(UserHelper::class);
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $dispatcher           = $this->createMock(EventDispatcherInterface::class);
+        $translator           = $this->createMock(Translator::class);
+        $flashBag             = $this->createMock(FlashBag::class);
+        $this->requestStack   = $this->createMock(RequestStack::class);
+        $security             = $this->createMock(CorePermissions::class);
         $this->customObjectModel  = $this->createMock(CustomObjectModel::class);
         $this->auditLog           = $this->createMock(AuditLogModel::class);
         $this->permissionProvider = $this->createMock(CustomObjectPermissionProvider::class);
         $this->routeProvider      = $this->createMock(CustomObjectRouteProvider::class);
-        $this->requestStack       = $this->createMock(RequestStack::class);
         $this->formFactory        = $this->createMock(FormFactoryInterface::class);
         $this->form               = $this->createMock(FormInterface::class);
         $this->customObject       = $this->createMock(CustomObject::class);
         $this->viewController     = new ViewController(
+            $doctrine,
+            $modelFactory,
+            $userHelper,
+            $coreParametersHelper,
+            $dispatcher,
+            $translator,
+            $flashBag,
             $this->requestStack,
+            $security,
             $this->formFactory,
             $this->customObjectModel,
             $this->auditLog,
