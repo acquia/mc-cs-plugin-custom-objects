@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Factory\ModelFactory;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,6 +31,7 @@ class ListController extends CommonController
 {
     public function __construct(
         ManagerRegistry $doctrine,
+        MauticFactory $mauticFactory,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -44,7 +46,7 @@ class ListController extends CommonController
         private CustomItemPermissionProvider $permissionProvider,
         private CustomItemRouteProvider $routeProvider
     ) {
-        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($doctrine, $mauticFactory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     public function listAction(int $objectId, int $page = 1): Response
@@ -65,7 +67,7 @@ class ListController extends CommonController
         $sessionProvider  = $this->sessionProviderFactory->createItemProvider($objectId, $filterEntityType, $filterEntityId, $lookup);
         $search           = InputHelper::clean($request->get('search', $sessionProvider->getFilter()));
         $limit            = (int) $request->get('limit', $sessionProvider->getPageLimit());
-        $orderBy          = $sessionProvider->getOrderBy(CustomItem::TABLE_ALIAS.'.id');
+        $orderBy          = $sessionProvider->getOrderBy(CustomItem::TABLE_ALIAS . '.id');
         $orderByDir       = $sessionProvider->getOrderByDir('ASC');
 
         if ($request->query->has('orderby')) {

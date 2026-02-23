@@ -26,10 +26,13 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Factory\MauticFactory;
+
 class SaveController extends AbstractFormController
 {
     public function __construct(
         ManagerRegistry $doctrine,
+        MauticFactory $mauticFactory,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -45,7 +48,7 @@ class SaveController extends AbstractFormController
         private CustomItemRouteProvider $routeProvider,
         private LockFlashMessageHelper $lockFlashMessageHelper
     ) {
-        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($doctrine, $mauticFactory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     public function saveAction(int $objectId, ?int $itemId = null): Response

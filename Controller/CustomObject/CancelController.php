@@ -18,11 +18,13 @@ use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Mautic\CoreBundle\Factory\MauticFactory;
 
 class CancelController extends CommonController
 {
     public function __construct(
         ManagerRegistry $doctrine,
+        MauticFactory $mauticFactory,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -35,7 +37,7 @@ class CancelController extends CommonController
         private CustomObjectRouteProvider $routeProvider,
         private CustomObjectModel $customObjectModel
     ) {
-        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($doctrine, $mauticFactory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     public function cancelAction(?int $objectId): Response

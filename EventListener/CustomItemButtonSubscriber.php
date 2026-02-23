@@ -108,7 +108,7 @@ class CustomItemButtonSubscriber implements EventSubscriberInterface
                         );
                         $event->addButton(
                             $this->defineBatchDeleteButton($customObjectId),
-                            ButtonHelper::LOCATION_TOOLBAR_BULK_ACTIONS,
+                            ButtonHelper::LOCATION_BULK_ACTIONS,
                             $event->getRoute()
                         );
                     }

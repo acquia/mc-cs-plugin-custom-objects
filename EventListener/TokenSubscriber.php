@@ -4,38 +4,39 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use Mautic\CampaignBundle\Entity\Event;
-use Mautic\CampaignBundle\Model\EventModel;
-use Mautic\CoreBundle\Event\BuilderEvent;
-use Mautic\CoreBundle\Event\TokenReplacementEvent;
 use Mautic\EmailBundle\EmailEvents;
 use Mautic\EmailBundle\Entity\Email;
-use Mautic\EmailBundle\Event\EmailSendEvent;
 use Mautic\LeadBundle\Entity\LeadList;
-use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
-use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
-use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
+use Mautic\CampaignBundle\Entity\Event;
+use Mautic\CoreBundle\Event\BuilderEvent;
+use Mautic\CampaignBundle\Model\EventModel;
+use Mautic\EmailBundle\Event\EmailSendEvent;
 use MauticPlugin\CustomObjectsBundle\DTO\Token;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use Mautic\CoreBundle\Event\TokenReplacementEvent;
+use MauticPlugin\CustomObjectsBundle\DTO\LoopToken;
+use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
+use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
-use MauticPlugin\CustomObjectsBundle\Event\CustomObjectListFormatEvent;
-use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
-use MauticPlugin\CustomObjectsBundle\Exception\InvalidCustomObjectFormatListException;
-use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Helper\ContactFilterMatcher;
-use MauticPlugin\CustomObjectsBundle\Helper\QueryBuilderManipulatorTrait;
-use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
-use MauticPlugin\CustomObjectsBundle\Helper\TokenFormatter;
+use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Helper\TokenParser;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Helper\TokenFormatter;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
-use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
+use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Helper\ContactFilterMatcher;
+use MauticPlugin\CustomObjectsBundle\Event\CustomObjectListFormatEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidArgumentException;
+use MauticPlugin\CustomObjectsBundle\Helper\QueryBuilderManipulatorTrait;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
+use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidCustomObjectFormatListException;
 
 /**
  * Handles Custom Object token replacements with the correct value in emails.
@@ -147,11 +148,27 @@ class TokenSubscriber implements EventSubscriberInterface
                 $this->tokenParser->buildTokenWithDefaultOptions($customObject->getAlias(), 'name'),
                 $this->tokenParser->buildTokenLabel($customObject->getName(), 'Name')
             );
+
+            $event->addToken(
+                $this->tokenParser->buildTokenCustomObjectLoop($customObject->getAlias()),
+                $this->tokenParser->buildTokenCustomObjectLoopLabel($customObject->getName())
+            );
+
+            $event->addToken(
+                $this->tokenParser->buildTokenCustomObjectFieldInLoop($customObject->getAlias(), 'name'),
+                $this->tokenParser->buildTokenCustomObjectFieldInLoopLabel($customObject->getName(), 'Name')
+            );
+
             /** @var CustomField $customField */
             foreach ($customObject->getCustomFields() as $customField) {
                 $event->addToken(
                     $this->tokenParser->buildTokenWithDefaultOptions($customObject->getAlias(), $customField->getAlias()),
                     $this->tokenParser->buildTokenLabel($customObject->getName(), $customField->getLabel())
+                );
+
+                $event->addToken(
+                    $this->tokenParser->buildTokenCustomObjectFieldInLoop($customObject->getAlias(), $customField->getAlias()),
+                    $this->tokenParser->buildTokenCustomObjectFieldInLoopLabel($customObject->getName(), $customField->getLabel())
                 );
             }
         }
@@ -163,6 +180,31 @@ class TokenSubscriber implements EventSubscriberInterface
             return;
         }
 
+        $this->addDefaultTokens($event);
+        $this->addCustomObjectLoopTokens($event);
+    }
+
+    public function addCustomObjectLoopTokens(EmailSendEvent $event): void
+    {
+        $tokens = $this->tokenParser->findCustomObjectLoopTokens($event->getContent());
+
+        if (0 === $tokens->count()) {
+            return;
+        }
+        $tokens->map(function (LoopToken $token) use ($event): void {
+            try {
+                $customObject = $this->customObjectModel->fetchEntityByAlias($token->getCustomObjectAlias());
+                $tokenContent = $this->getLoopTokenContent($customObject, $token, $event);
+            } catch (NotFoundException $e) {
+                $tokenContent = '';
+            }
+
+            $event->addToken($token->getToken(), $tokenContent);
+        });
+    }
+
+    public function addDefaultTokens(EmailSendEvent $event): void
+    {
         $tokens = $this->tokenParser->findTokens($event->getContent());
 
         if (0 === $tokens->count()) {
@@ -251,14 +293,14 @@ class TokenSubscriber implements EventSubscriberInterface
 
             foreach ($segmentFilters as $id => $filter) {
                 try {
-                    $queryAlias        = 'filter_'.$id;
+                    $queryAlias        = 'filter_' . $id;
                     $innerQueryBuilder = $this->queryFilterFactory->configureQueryBuilderFromSegmentFilter($filter, $queryAlias);
                 } catch (InvalidSegmentFilterException $e) {
                     continue;
                 }
 
                 foreach ($innerQueryBuilder as $segmentQueryBuilder) {
-                    $segmentQueryBuilder->select($queryAlias.'_value.custom_item_id');
+                    $segmentQueryBuilder->select($queryAlias . '_value.custom_item_id');
                     $this->queryFilterHelper->addContactIdRestriction($segmentQueryBuilder, $queryAlias, $contactId);
                     $segmentQueryBuilder->andWhere("{$queryAlias}_contact.custom_item_id = {$queryAlias}_value.custom_item_id");
                 }
@@ -267,7 +309,7 @@ class TokenSubscriber implements EventSubscriberInterface
                     CustomItem::TABLE_ALIAS,
                     "({$innerQueryBuilder->getSQL()})",
                     $queryAlias,
-                    CustomItem::TABLE_ALIAS.".id = {$queryAlias}.custom_item_id"
+                    CustomItem::TABLE_ALIAS . ".id = {$queryAlias}.custom_item_id"
                 );
 
                 $this->copyParams($innerQueryBuilder, $queryBuilder);
@@ -283,7 +325,7 @@ class TokenSubscriber implements EventSubscriberInterface
      */
     private function getCustomFieldValues(CustomObject $customObject, Token $token, EmailSendEvent $event): array
     {
-        $orderBy  = CustomItem::TABLE_ALIAS.'.id';
+        $orderBy  = CustomItem::TABLE_ALIAS . '.id';
         $orderDir = 'DESC';
 
         if ('latest' === $token->getOrder()) {
@@ -329,6 +371,58 @@ class TokenSubscriber implements EventSubscriberInterface
         return $fieldValues;
     }
 
+    public function getLoopTokenContent(CustomObject $customObject, LoopToken $token, EmailSendEvent $event): string
+    {
+
+        $loopTokenContent = '';
+        $orderBy  = CustomItem::TABLE_ALIAS . '.id';
+        $orderDir = 'DESC';
+
+        if ('latest' === $token->getOrder()) {
+            // There is no other ordering option implemented at the moment.
+            // Use the default order and direction.
+        }
+
+        $tableConfig = new TableConfig($token->getLimit(), 1, $orderBy, $orderDir);
+        $tableConfig->addParameter('customObjectId', $customObject->getId());
+        $tableConfig->addParameter('filterEntityType', 'contact');
+        $tableConfig->addParameter('filterEntityId', (int) $event->getLead()['id']);
+        $tableConfig->addParameter('token', $token);
+        $tableConfig->addParameter('email', $event->getEmail());
+        $tableConfig->addParameter('source', $event->getSource());
+        $customItems = $this->customItemModel->getArrayTableData($tableConfig);
+
+        foreach ($customItems as $customItemData) {
+            $loopTokenContent .= $token->getLoopContent();
+            $customItem = new CustomItem($customObject);
+            $customItem->populateFromArray($customItemData);
+            $customItem = $this->customItemModel->populateCustomFields($customItem);
+
+            foreach ($token->getLoopContentTokens() as $loopContentToken => $loopContentTokenParams) {
+                $field = $loopContentTokenParams['field'];
+
+                if ('name' === $field) {
+                    $fieldValue = $customItemData['name'];
+                } else {
+                    $customFieldValue = $customItem->findCustomFieldValueForFieldAlias($field);
+                    if ($customFieldValue) {
+                        $fieldValue = $customFieldValue->getValue();
+                    }
+                }
+
+                if (empty($fieldValue)) {
+                    $fieldValue = $loopContentTokenParams['default'];
+                }
+
+                $fieldValue = (string) $fieldValue;
+
+                $loopTokenContent = str_replace($loopContentToken, $fieldValue, $loopTokenContent);
+            }
+        }
+
+        return $loopTokenContent;
+    }
+
     public function onTokenReplacement(TokenReplacementEvent $event): void
     {
         $clickthrough = $event->getClickthrough();
@@ -352,7 +446,7 @@ class TokenSubscriber implements EventSubscriberInterface
             }
 
             if ($isCustomObject) {
-                $event->addToken('{dynamiccontent="'.$data['tokenName'].'"}', $filterContent);
+                $event->addToken('{dynamiccontent="' . $data['tokenName'] . '"}', $filterContent);
             }
         }
     }

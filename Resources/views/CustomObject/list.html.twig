@@ -6,7 +6,10 @@
 {% block content %}
     {% if isIndex %}
     <div id="page-list-wrapper" class="panel panel-default">
-        {{- include('@MauticCore/Helper/list_toolbar.html.twig') -}}
+        {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
+            'searchValue': searchValue,
+            'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig')
+        }) -}}
         <div class="page-list">
             {{ block('listResults') }}
         </div>

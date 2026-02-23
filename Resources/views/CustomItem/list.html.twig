@@ -18,6 +18,7 @@
                 'action': currentRoute,
                 'target': target,
                 'overlayDisabled': lookup,
+                'list_actions': include('@MauticCore/Helper/toolbar_page_actions.html.twig')
             }) -}}
             <div class="page-list" id="{{ namespace }}">
                 {{ block('listResults') }}

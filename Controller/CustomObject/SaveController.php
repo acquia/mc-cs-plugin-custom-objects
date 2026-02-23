@@ -16,6 +16,7 @@ use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Mautic\CoreBundle\Controller\AbstractFormController;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
@@ -37,6 +38,7 @@ class SaveController extends AbstractFormController
     public function __construct(
         private FormFactoryInterface $formFactory,
         ManagerRegistry $doctrine,
+        MauticFactory $mauticFactory,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -54,7 +56,7 @@ class SaveController extends AbstractFormController
         private ParamsToStringTransformer $paramsToStringTransformer,
         private OptionsToStringTransformer $optionsToStringTransformer,
     ) {
-        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($doctrine, $mauticFactory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     public function saveAction(?int $objectId = null): Response

@@ -22,16 +22,19 @@ use Symfony\Component\HttpFoundation\Response;
 use UnexpectedValueException;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\HttpFoundation\RequestStack;
+
 class LinkFormController extends AbstractFormController
 {
     public function __construct(
         ManagerRegistry $doctrine,
+        MauticFactory $mauticFactory,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -45,7 +48,7 @@ class LinkFormController extends AbstractFormController
         private CustomItemPermissionProvider $permissionProvider,
         private CustomItemRouteProvider $routeProvider,
     ) {
-        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($doctrine, $mauticFactory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     public function formAction(int $itemId, string $entityType, int $entityId): Response
@@ -89,7 +92,7 @@ class LinkFormController extends AbstractFormController
                     ],
                 ]
             );
-        } catch (ForbiddenException|NotFoundException|UnexpectedValueException|NoRelationshipException $e) {
+        } catch (ForbiddenException | NotFoundException | UnexpectedValueException | NoRelationshipException $e) {
             $this->flashBag->add($e->getMessage(), [], FlashBag::LEVEL_ERROR);
         }
 
@@ -143,7 +146,7 @@ class LinkFormController extends AbstractFormController
 
                 return new JsonResponse($responseData);
             }
-        } catch (ForbiddenException|NoRelationshipException|NotFoundException $e) {
+        } catch (ForbiddenException | NoRelationshipException | NotFoundException $e) {
             $this->flashBag->add($e->getMessage(), [], FlashBag::LEVEL_ERROR);
         }
 
@@ -175,9 +178,9 @@ class LinkFormController extends AbstractFormController
                 $higher = $item->getCustomItemHigher();
 
                 return $higher->getRelationsByType($entityType)
-                        ->filter(function ($relation) use ($entityId) {
-                            return (int) $relation->getLinkedEntity()->getId() === (int) $entityId;
-                        })->count() > 0;
+                    ->filter(function ($relation) use ($entityId) {
+                        return (int) $relation->getLinkedEntity()->getId() === (int) $entityId;
+                    })->count() > 0;
             })->first();
 
         return $this->customItemModel->populateCustomFields(

@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\CoreBundle\Helper\CoreParametersHelper;
 use Mautic\CoreBundle\Service\FlashBag;
@@ -30,6 +31,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Form\FormFactoryInterface;
+
 /**
  * This controller is not used for saving to database, it is used only to generate forms and data validation.
  * Persisting is handled in:.
@@ -42,6 +44,7 @@ class SaveController extends CommonController
     public function __construct(
         private FormFactoryInterface $formFactory,
         ManagerRegistry $doctrine,
+        MauticFactory $mauticFactory,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -56,7 +59,7 @@ class SaveController extends CommonController
         private CustomFieldModel $customFieldModel,
         private CustomFieldPermissionProvider $permissionProvider,
     ) {
-        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($doctrine, $mauticFactory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
@@ -173,7 +176,7 @@ class SaveController extends CommonController
         // Replace order indexes witch free one to prevent duplicates in panel list
         $templateContent = str_replace(
             ['_0_', '[0]'],
-            ['_'.$panelId.'_', '['.$panelId.']'],
+            ['_' . $panelId . '_', '[' . $panelId . ']'],
             $templateContent
         );
 

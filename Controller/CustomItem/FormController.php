@@ -8,6 +8,7 @@ use Mautic\CoreBundle\Service\FlashBag;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Factory\MauticFactory;
 use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -30,6 +31,7 @@ class FormController extends AbstractFormController
 {
     public function __construct(
         ManagerRegistry $doctrine,
+        MauticFactory $mauticFactory,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -45,7 +47,7 @@ class FormController extends AbstractFormController
         private CustomItemRouteProvider $routeProvider,
         private LockFlashMessageHelper $lockFlashMessageHelper,
     ) {
-        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($doctrine, $mauticFactory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     public function newAction(int $objectId): Response
@@ -168,7 +170,7 @@ class FormController extends AbstractFormController
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        $customItem->setName($customItem->getName().' '.$this->translator->trans('mautic.core.form.clone'));
+        $customItem->setName($customItem->getName() . ' ' . $this->translator->trans('mautic.core.form.clone'));
 
         return $this->renderFormForItem($customItem, $this->routeProvider->buildCloneRoute($objectId, $itemId));
     }

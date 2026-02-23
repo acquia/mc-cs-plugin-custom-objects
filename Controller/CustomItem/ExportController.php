@@ -20,10 +20,13 @@ use Mautic\CoreBundle\Translation\Translator;
 use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Factory\MauticFactory;
+
 class ExportController extends AbstractFormController
 {
     public function __construct(
         ManagerRegistry $doctrine,
+        MauticFactory $mauticFactory,
         ModelFactory $modelFactory,
         UserHelper $userHelper,
         CoreParametersHelper $coreParametersHelper,
@@ -35,7 +38,7 @@ class ExportController extends AbstractFormController
         private CustomItemPermissionProvider $permissionProvider,
         private CustomItemExportSchedulerModel $model
     ) {
-        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
+        parent::__construct($doctrine, $mauticFactory, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     /**
@@ -52,7 +55,7 @@ class ExportController extends AbstractFormController
         /** @var EventDispatcherInterface $dispatcher */
         $this->dispatcher->dispatch(new CustomItemExportSchedulerEvent($customItemExportScheduler));
 
-        $this->addFlashMessage( 'custom.item.export.being.prepared', ['%user_email%' => $this->user->getEmail()]);
+        $this->addFlashMessage('custom.item.export.being.prepared', ['%user_email%' => $this->user->getEmail()]);
         $response['message'] = 'Custom Item export scheduled.';
         $response['flashes'] = $this->getFlashContent();
 
