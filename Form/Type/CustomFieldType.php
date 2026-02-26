@@ -341,7 +341,7 @@ class CustomFieldType extends AbstractType
 
             if (method_exists($symfonyFormFieldType, 'configureOptions')) {
                 // Do not use chosen jQuery plugin
-                $options['attr']['class'] = $options['attr']['class'] ? $options['attr']['class'].' not-chosen' : 'not-chosen';
+                $options['attr']['class'] = $options['attr']['class'] ? $options['attr']['class'] . ' not-chosen' : 'not-chosen';
             }
         } else {
             // Do not use defined label in modal form
