@@ -89,7 +89,7 @@ CustomObjectsForm = {
      * @param panel
      */
     initEditFieldButton: function(panel) {
-        mQuery(panel).find('button.btn-edit')
+        mQuery(panel).find('.btn.btn-edit')
             .unbind('click')
             .bind('click', function (event) {
                 event.preventDefault();
@@ -367,12 +367,19 @@ CustomObjectsForm = {
         // Activate content specific stuff
         Mautic.onPageLoad(target, response, true);
 
-        mQuery('#custom_field_isUniqueIdentifier_1').on('change', function() {
-            CustomObjectsForm.setChoiceRequiredVal(true, 'required')
-            mQuery('#objectFieldModal .chosen-required .choice-wrapper').find('label').attr('disabled', true);
-        });
-        mQuery('#custom_field_isUniqueIdentifier_0').on('change', function() {
-            mQuery('#objectFieldModal .chosen-required .choice-wrapper').find('label').removeAttr('disabled');
+        mQuery('#custom_field_isUniqueIdentifier_label').on('click', function(event) {
+            let $label = mQuery(event.target),
+            yesId = $label.data('yes-id'),
+            $yesInput = mQuery('#' + yesId);
+            isYes = $yesInput.is(':checked');
+
+            if(isYes) {
+                CustomObjectsForm.setChoiceRequiredVal(false, 'required')
+                mQuery('#objectFieldModal .chosen-required .choice-wrapper').find('label').attr('disabled', true);
+            } else {
+                CustomObjectsForm.setChoiceRequiredVal(true, 'required')
+                mQuery('#objectFieldModal .chosen-required .choice-wrapper').find('label').removeAttr('disabled');
+            }
         });
     },
 
@@ -528,20 +535,21 @@ CustomObjectsForm = {
      * @param name
      */
     setChoiceRequiredVal: function(value, name) {
-        let element = mQuery('#objectFieldModal .chosen-' + name + ' .choice-wrapper');
-        let no = element.find('label').eq(0);
-        let yes = element.find('label').eq(1);
 
-        if (value) {
-            yes.removeClass('btn-default').addClass('btn-success active');
-            no.removeClass('btn-danger active').addClass('btn-default');
-            yes.find('input').attr('checked', 'checked');
-            no.find('input').removeAttr('checked');
+        let $label = mQuery('#custom_field_' + name + '_label');
+        yesId = $label.data('yes-id');
+        noId = $label.data('no-id');
+
+        if(value === '1' || value === true) {
+            mQuery('#' + yesId).prop('checked', false);
+            mQuery('#' + noId).prop('checked', true);
         } else {
-            yes.removeClass('btn-success active').addClass('btn-default');
-            no.removeClass('btn-default').addClass('btn-danger active');
-            yes.find('input').removeAttr('checked');
-            no.find('input').attr('checked', 'checked');
+            mQuery('#' + noId).prop('checked', false);
+            mQuery('#' + yesId).prop('checked', true);
         }
+
+        isYes =  mQuery('#' + yesId).is(':checked');
+        
+        Mautic.toggleYesNo($label);
     }
 };

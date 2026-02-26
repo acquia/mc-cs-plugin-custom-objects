@@ -78,7 +78,7 @@ class ControllerTestCase extends \PHPUnit\Framework\TestCase
             ['twig', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE, $this->createMock(Environment::class)],
         ]);
 
-        $phpEngine->method('renderResponse')->willReturn($response);
+        // $phpEngine->method('renderResponse')->willReturn($response);
 
         $this->container->method('has')->willReturnMap([
             ['templating', false], // 'templating' will be removed in Symfony 5
