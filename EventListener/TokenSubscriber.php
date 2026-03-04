@@ -17,6 +17,7 @@ use Mautic\LeadBundle\Exception\OperatorsNotFoundException;
 use Mautic\LeadBundle\Segment\OperatorOptions;
 use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
 use MauticPlugin\CustomObjectsBundle\CustomObjectEvents;
+use MauticPlugin\CustomObjectsBundle\DTO\LoopToken;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\DTO\Token;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
@@ -60,8 +61,7 @@ class TokenSubscriber implements EventSubscriberInterface
         private EventDispatcherInterface $eventDispatcher,
         private TokenFormatter $tokenFormatter,
         private int $leadCustomItemFetchLimit
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}
@@ -95,11 +95,27 @@ class TokenSubscriber implements EventSubscriberInterface
                 $this->tokenParser->buildTokenWithDefaultOptions($customObject->getAlias(), 'name'),
                 $this->tokenParser->buildTokenLabel($customObject->getName(), 'Name')
             );
+
+            $event->addToken(
+                $this->tokenParser->buildTokenCustomObjectLoop($customObject->getAlias()),
+                $this->tokenParser->buildTokenCustomObjectLoopLabel($customObject->getName())
+            );
+
+            $event->addToken(
+                $this->tokenParser->buildTokenCustomObjectFieldInLoop($customObject->getAlias(), 'name'),
+                $this->tokenParser->buildTokenCustomObjectFieldInLoopLabel($customObject->getName(), 'Name')
+            );
+
             /** @var CustomField $customField */
             foreach ($customObject->getCustomFields() as $customField) {
                 $event->addToken(
                     $this->tokenParser->buildTokenWithDefaultOptions($customObject->getAlias(), $customField->getAlias()),
                     $this->tokenParser->buildTokenLabel($customObject->getName(), $customField->getLabel())
+                );
+
+                $event->addToken(
+                    $this->tokenParser->buildTokenCustomObjectFieldInLoop($customObject->getAlias(), $customField->getAlias()),
+                    $this->tokenParser->buildTokenCustomObjectFieldInLoopLabel($customObject->getName(), $customField->getLabel())
                 );
             }
         }
@@ -111,6 +127,31 @@ class TokenSubscriber implements EventSubscriberInterface
             return;
         }
 
+        $this->addDefaultTokens($event);
+        $this->addCustomObjectLoopTokens($event);
+    }
+
+    public function addCustomObjectLoopTokens(EmailSendEvent $event): void
+    {
+        $tokens = $this->tokenParser->findCustomObjectLoopTokens($event->getContent());
+
+        if (0 === $tokens->count()) {
+            return;
+        }
+        $tokens->map(function (LoopToken $token) use ($event): void {
+            try {
+                $customObject = $this->customObjectModel->fetchEntityByAlias($token->getCustomObjectAlias());
+                $tokenContent = $this->getLoopTokenContent($customObject, $token, $event);
+            } catch (NotFoundException $e) {
+                $tokenContent = '';
+            }
+
+            $event->addToken($token->getToken(), $tokenContent);
+        });
+    }
+
+    public function addDefaultTokens(EmailSendEvent $event): void
+    {
         $tokens = $this->tokenParser->findTokens($event->getContent());
 
         if (0 === $tokens->count()) {
@@ -120,8 +161,8 @@ class TokenSubscriber implements EventSubscriberInterface
         $tokens->map(function (Token $token) use ($event): void {
             try {
                 $customObject = $this->customObjectModel->fetchEntityByAlias($token->getCustomObjectAlias());
-                $fieldValues  = $this->getCustomFieldValues($customObject, $token, $event);
-            } catch (NotFoundException) {
+                $fieldValues = $this->getCustomFieldValues($customObject, $token, $event);
+            } catch (NotFoundException $e) {
                 $fieldValues = null;
             }
 
@@ -140,7 +181,7 @@ class TokenSubscriber implements EventSubscriberInterface
                         $result = $formatEvent->hasBeenFormatted() ?
                             $formatEvent->getFormattedString() :
                             $this->tokenFormatter->format($fieldValues, TokenFormatter::DEFAULT_FORMAT);
-                    } catch (InvalidCustomObjectFormatListException) {
+                    } catch (InvalidCustomObjectFormatListException $e) {
                         $result = $this->tokenFormatter->format($fieldValues, TokenFormatter::DEFAULT_FORMAT);
                     }
                 } else {
@@ -150,6 +191,58 @@ class TokenSubscriber implements EventSubscriberInterface
 
             $event->addToken($token->getToken(), $result);
         });
+    }
+
+    public function getLoopTokenContent(CustomObject $customObject, LoopToken $token, EmailSendEvent $event): string
+    {
+
+        $loopTokenContent = '';
+        $orderBy  = CustomItem::TABLE_ALIAS . '.id';
+        $orderDir = 'DESC';
+
+        if ('latest' === $token->getOrder()) {
+            // There is no other ordering option implemented at the moment.
+            // Use the default order and direction.
+        }
+
+        $tableConfig = new TableConfig($token->getLimit(), 1, $orderBy, $orderDir);
+        $tableConfig->addParameter('customObjectId', $customObject->getId());
+        $tableConfig->addParameter('filterEntityType', 'contact');
+        $tableConfig->addParameter('filterEntityId', (int) $event->getLead()['id']);
+        $tableConfig->addParameter('token', $token);
+        $tableConfig->addParameter('email', $event->getEmail());
+        $tableConfig->addParameter('source', $event->getSource());
+        $customItems = $this->customItemModel->getArrayTableData($tableConfig);
+
+        foreach ($customItems as $customItemData) {
+            $loopTokenContent .= $token->getLoopContent();
+            $customItem = new CustomItem($customObject);
+            $customItem->populateFromArray($customItemData);
+            $customItem = $this->customItemModel->populateCustomFields($customItem);
+
+            foreach ($token->getLoopContentTokens() as $loopContentToken => $loopContentTokenParams) {
+                $field = $loopContentTokenParams['field'];
+
+                if ('name' === $field) {
+                    $fieldValue = $customItemData['name'];
+                } else {
+                    $customFieldValue = $customItem->findCustomFieldValueForFieldAlias($field);
+                    if ($customFieldValue) {
+                        $fieldValue = $customFieldValue->getValue();
+                    }
+                }
+
+                if (empty($fieldValue)) {
+                    $fieldValue = $loopContentTokenParams['default'];
+                }
+
+                $fieldValue = (string) $fieldValue;
+
+                $loopTokenContent = str_replace($loopContentToken, $fieldValue, $loopTokenContent);
+            }
+        }
+
+        return $loopTokenContent;
     }
 
     /**
@@ -199,14 +292,14 @@ class TokenSubscriber implements EventSubscriberInterface
 
             foreach ($segmentFilters as $id => $filter) {
                 try {
-                    $queryAlias        = 'filter_'.$id;
+                    $queryAlias        = 'filter_' . $id;
                     $innerQueryBuilder = $this->queryFilterFactory->configureQueryBuilderFromSegmentFilter($filter, $queryAlias);
                 } catch (InvalidSegmentFilterException) {
                     continue;
                 }
 
                 foreach ($innerQueryBuilder as $segmentQueryBuilder) {
-                    $segmentQueryBuilder->select($queryAlias.'_value.custom_item_id');
+                    $segmentQueryBuilder->select($queryAlias . '_value.custom_item_id');
                     $this->queryFilterHelper->addContactIdRestriction($segmentQueryBuilder, $queryAlias, $contactId);
                     $segmentQueryBuilder->andWhere("{$queryAlias}_contact.custom_item_id = {$queryAlias}_value.custom_item_id");
                 }
@@ -215,7 +308,7 @@ class TokenSubscriber implements EventSubscriberInterface
                     CustomItem::TABLE_ALIAS,
                     "({$innerQueryBuilder->getSQL()})",
                     $queryAlias,
-                    CustomItem::TABLE_ALIAS.".id = {$queryAlias}.custom_item_id"
+                    CustomItem::TABLE_ALIAS . ".id = {$queryAlias}.custom_item_id"
                 );
 
                 $this->copyParams($innerQueryBuilder, $queryBuilder);
@@ -231,7 +324,7 @@ class TokenSubscriber implements EventSubscriberInterface
      */
     private function getCustomFieldValues(CustomObject $customObject, Token $token, EmailSendEvent $event): array
     {
-        $orderBy  = CustomItem::TABLE_ALIAS.'.id';
+        $orderBy  = CustomItem::TABLE_ALIAS . '.id';
         $orderDir = 'DESC';
 
         if ('latest' === $token->getOrder()) {
@@ -307,7 +400,7 @@ class TokenSubscriber implements EventSubscriberInterface
             }
 
             if ($isCustomObject) {
-                $event->addToken('{dynamiccontent="'.$data['tokenName'].'"}', $filterContent);
+                $event->addToken('{dynamiccontent="' . $data['tokenName'] . '"}', $filterContent);
             }
         }
     }
@@ -342,7 +435,7 @@ class TokenSubscriber implements EventSubscriberInterface
                     continue;
                 }
 
-                $key = $customObject->getId().'-'.$leadId;
+                $key = $customObject->getId() . '-' . $leadId;
                 if (!isset($cachedCustomItems[$key])) {
                     $cachedCustomItems[$key] = $this->getCustomItems($customObject, $leadId);
                 }
@@ -350,7 +443,7 @@ class TokenSubscriber implements EventSubscriberInterface
                 $result = $this->getCustomFieldValue($customObject, $fieldAlias, $cachedCustomItems[$key]);
 
                 $customFieldValues[$condition['field']] = $result;
-            } catch (NotFoundException|InvalidCustomObjectFormatListException) {
+            } catch (NotFoundException | InvalidCustomObjectFormatListException) {
                 continue;
             }
         }
@@ -408,7 +501,7 @@ class TokenSubscriber implements EventSubscriberInterface
      */
     private function getCustomItems(CustomObject $customObject, string $leadId): array
     {
-        $orderBy  = CustomItem::TABLE_ALIAS.'.id';
+        $orderBy  = CustomItem::TABLE_ALIAS . '.id';
         $orderDir = 'DESC';
 
         $tableConfig = new TableConfig($this->leadCustomItemFetchLimit, 1, $orderBy, $orderDir);
@@ -553,12 +646,12 @@ class TokenSubscriber implements EventSubscriberInterface
                             break;
                         case 'like':
                             $matchVal          = str_replace(['.', '*', '%'], ['\.', '\*', '.*'], $filterVal);
-                            $groups[$groupNum] = 1 === preg_match('/'.$matchVal.'/', $leadVal);
+                            $groups[$groupNum] = 1 === preg_match('/' . $matchVal . '/', $leadVal);
                             break;
                         case '!like':
                             $matchVal          = str_replace(['.', '*'], ['\.', '\*'], $filterVal);
                             $matchVal          = str_replace('%', '.*', $matchVal);
-                            $groups[$groupNum] = 1 !== preg_match('/'.$matchVal.'/', $leadVal);
+                            $groups[$groupNum] = 1 !== preg_match('/' . $matchVal . '/', $leadVal);
                             break;
                         case OperatorOptions::IN:
                             $groups[$groupNum] = $this->checkLeadValueIsInFilter($leadVal, $filterVal, false);
@@ -567,10 +660,10 @@ class TokenSubscriber implements EventSubscriberInterface
                             $groups[$groupNum] = $this->checkLeadValueIsInFilter($leadVal, $filterVal, true);
                             break;
                         case 'regexp':
-                            $groups[$groupNum] = 1 === preg_match('/'.$filterVal.'/i', $leadVal);
+                            $groups[$groupNum] = 1 === preg_match('/' . $filterVal . '/i', $leadVal);
                             break;
                         case '!regexp':
-                            $groups[$groupNum] = 1 !== preg_match('/'.$filterVal.'/i', $leadVal);
+                            $groups[$groupNum] = 1 !== preg_match('/' . $filterVal . '/i', $leadVal);
                             break;
                         case 'startsWith':
                             $groups[$groupNum] = str_starts_with($leadVal, $filterVal);
