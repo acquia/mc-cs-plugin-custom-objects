@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\EventListener;
 
-use Doctrine\DBAL\Result;
-use Doctrine\DBAL\Statement;
+use Mautic\DynamicContentBundle\DynamicContentEvents;
 use Mautic\DynamicContentBundle\Event\ContactFiltersEvaluateEvent;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\EventListener\DynamicContentSubscriber;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
 use MauticPlugin\CustomObjectsBundle\Helper\ContactFilterMatcher;
@@ -21,124 +19,161 @@ use PHPUnit\Framework\TestCase;
 
 class DynamicContentSubscriberTest extends TestCase
 {
-    /** @var ConfigProvider&MockObject */
-    private $configProviderMock;
-
     /** @var QueryFilterFactory&MockObject */
-    private $queryFilterFactory;
+    private MockObject $queryFilterFactory;
 
     /** @var ContactFilterMatcher&MockObject */
-    private $contactFilterMatcher;
+    private MockObject $contactFilterMatcher;
 
-    /** @var QueryBuilder&MockObject */
-    private $queryBuilderMock;
+    /** @var ConfigProvider&MockObject */
+    private MockObject $configProvider;
 
-    private DynamicContentSubscriber $dynamicContentSubscriber;
+    private DynamicContentSubscriber $subscriber;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->configProviderMock   = $this->createMock(ConfigProvider::class);
         $this->queryFilterFactory   = $this->createMock(QueryFilterFactory::class);
-        $this->queryBuilderMock     = $this->createMock(QueryBuilder::class);
         $this->contactFilterMatcher = $this->createMock(ContactFilterMatcher::class);
+        $this->configProvider       = $this->createMock(ConfigProvider::class);
 
-        $this->dynamicContentSubscriber = new DynamicContentSubscriber(
+        $this->subscriber = new DynamicContentSubscriber(
             $this->queryFilterFactory,
-            $this->configProviderMock,
-            $this->contactFilterMatcher
+            $this->contactFilterMatcher,
+            $this->configProvider,
         );
     }
 
-    public function testOnCampaignBuildWhenPluginDisabled(): void
+    public function testGetSubscribedEventsReturnsCorrectMapping(): void
     {
-        $this->configProviderMock->expects($this->once())
+        $events = DynamicContentSubscriber::getSubscribedEvents();
+
+        $this->assertArrayHasKey(DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE, $events);
+        $this->assertSame(['evaluateFilters', 0], $events[DynamicContentEvents::ON_CONTACTS_FILTER_EVALUATE]);
+    }
+
+    public function testEvaluateFiltersSkipsWhenEventAlreadyEvaluated(): void
+    {
+        $event = $this->buildEvent();
+        $event->setIsEvaluated(true);
+
+        // pluginIsEnabled must never be called — early exit on isEvaluated()
+        $this->configProvider->expects($this->never())->method('pluginIsEnabled');
+        $this->queryFilterFactory->expects($this->never())->method('configureQueryBuilderFromSegmentFilter');
+        $this->contactFilterMatcher->expects($this->never())->method('match');
+
+        $this->subscriber->evaluateFilters($event);
+    }
+
+    public function testEvaluateFiltersSkipsWhenPluginDisabled(): void
+    {
+        $this->configProvider->expects($this->once())
             ->method('pluginIsEnabled')
             ->willReturn(false);
 
         $this->queryFilterFactory->expects($this->never())->method('configureQueryBuilderFromSegmentFilter');
+        $this->contactFilterMatcher->expects($this->never())->method('match');
 
-        $this->dynamicContentSubscriber->evaluateFilters($this->buildEventWithFilters());
+        $this->subscriber->evaluateFilters($this->buildEvent());
     }
 
-    public function testFiltersNotEvaluatedIfEventMarkedEvaluated(): void
+    public function testEvaluateFiltersSkipsWhenNoCustomObjectFiltersFound(): void
     {
-        $this->configProviderMock->expects($this->never())->method('pluginIsEnabled');
+        $this->configProvider->expects($this->once())
+            ->method('pluginIsEnabled')
+            ->willReturn(true);
 
-        $event = $this->buildEventWithFilters();
-        $event->setIsEvaluated(true);
-
-        $this->queryFilterFactory->expects($this->never())->method('configureQueryBuilderFromSegmentFilter');
-
-        $this->dynamicContentSubscriber->evaluateFilters($event);
-    }
-
-    public function testFiltersInsertedIntoEvent(): void
-    {
-        $this->configProviderMock->expects($this->once())->method('pluginIsEnabled')->willReturn(true);
-
+        // All filters throw → no custom object filters present
         $this->queryFilterFactory->expects($this->exactly(2))
             ->method('configureQueryBuilderFromSegmentFilter')
-            ->withConsecutive(
-                [
-                    [
-                        'type'          => CustomFieldFilterQueryBuilder::getServiceId(),
-                        'table'         => 'custom_field_text',
-                        'field'         => 'cfwq_1',
-                        'foreign_table' => 'custom_objects',
-                    ],
-                    'filter',
-                ],
-                [
-                    [
-                        'type'          => CustomItemNameFilterQueryBuilder::getServiceId(),
-                        'table'         => 'custom_field_text',
-                        'field'         => 'cowq_2',
-                        'foreign_table' => 'custom_objects',
-                    ],
-                    'filter',
-                ]
-            )
-            ->will($this->onConsecutiveCalls(
-                $this->throwException(new InvalidSegmentFilterException('Testing invalid segment handling here.')),
-                $this->queryBuilderMock
-            ));
+            ->willThrowException(new InvalidSegmentFilterException('not a CO filter'));
 
-        $event = $this->buildEventWithFilters();
-        $event->setIsEvaluated(false);
+        $this->contactFilterMatcher->expects($this->never())->method('match');
 
-        $result = $this->createMock(Result::class);
+        $event = $this->buildEvent();
+        $this->subscriber->evaluateFilters($event);
 
-        $this->queryBuilderMock->expects($this->once())
-            ->method('execute')
-            ->willReturn($result);
-
-        $this->loggerMock
-            ->expects($this->never())
-            ->method('error');
-
-        $this->dynamicContentSubscriber->evaluateFilters($event);
+        $this->assertFalse($event->isEvaluated());
     }
 
-    private function buildEventWithFilters(): ContactFiltersEvaluateEvent
+    public function testEvaluateFiltersMatchesAndSetsResultOnEvent(): void
     {
-        return new ContactFiltersEvaluateEvent(
-            [
-                'custom_field_1' => [
-                    'type'          => CustomFieldFilterQueryBuilder::getServiceId(),
-                    'table'         => 'custom_field_text',
-                    'field'         => 'cfwq_1',
-                    'foreign_table' => 'custom_objects',
-                ],
-                'custom_item_1'  => [
-                    'type'          => CustomItemNameFilterQueryBuilder::getServiceId(),
-                    'table'         => 'custom_field_text',
-                    'field'         => 'cowq_2',
-                    'foreign_table' => 'custom_objects',
-                ],
+        $contact = new Lead();
+        $contact->setFields(['email' => 'test@example.com']);
+
+        $event = new ContactFiltersEvaluateEvent($this->buildFilters(), $contact);
+
+        $this->configProvider->expects($this->once())
+            ->method('pluginIsEnabled')
+            ->willReturn(true);
+
+        // First filter throws (not a CO filter), second succeeds → hasCustomObjectFilters returns true
+        $this->queryFilterFactory->expects($this->exactly(2))
+            ->method('configureQueryBuilderFromSegmentFilter')
+            ->willReturnOnConsecutiveCalls(
+                $this->throwException(new InvalidSegmentFilterException('not a CO filter')),
+                $this->returnValue(null),
+            );
+
+        $this->contactFilterMatcher->expects($this->once())
+            ->method('match')
+            ->with($this->buildFilters(), ['email' => 'test@example.com'])
+            ->willReturn(true);
+
+        $this->subscriber->evaluateFilters($event);
+
+        $this->assertTrue($event->isEvaluated());
+        $this->assertTrue($event->isMatched());
+    }
+
+    public function testEvaluateFiltersSetsMismatchOnEvent(): void
+    {
+        $contact = new Lead();
+        $contact->setFields([]);
+
+        $event = new ContactFiltersEvaluateEvent($this->buildFilters(), $contact);
+
+        $this->configProvider->method('pluginIsEnabled')->willReturn(true);
+
+        // First filter is a valid CO filter → hasCustomObjectFilters returns true immediately
+        $this->queryFilterFactory->expects($this->once())
+            ->method('configureQueryBuilderFromSegmentFilter')
+            ->willReturn(null);
+
+        $this->contactFilterMatcher->expects($this->once())
+            ->method('match')
+            ->willReturn(false);
+
+        $this->subscriber->evaluateFilters($event);
+
+        $this->assertTrue($event->isEvaluated());
+        $this->assertFalse($event->isMatched());
+    }
+
+    /**
+     * @return mixed[]
+     */
+    private function buildFilters(): array
+    {
+        return [
+            'custom_field_1' => [
+                'type'          => CustomFieldFilterQueryBuilder::getServiceId(),
+                'table'         => 'custom_field_text',
+                'field'         => 'cfwq_1',
+                'foreign_table' => 'custom_objects',
             ],
-            new Lead()
-        );
+            'custom_item_1' => [
+                'type'          => CustomItemNameFilterQueryBuilder::getServiceId(),
+                'table'         => 'custom_field_text',
+                'field'         => 'cowq_2',
+                'foreign_table' => 'custom_objects',
+            ],
+        ];
+    }
+
+    private function buildEvent(): ContactFiltersEvaluateEvent
+    {
+        return new ContactFiltersEvaluateEvent($this->buildFilters(), new Lead());
     }
 }

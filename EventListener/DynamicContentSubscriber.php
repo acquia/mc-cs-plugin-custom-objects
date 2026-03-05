@@ -10,19 +10,14 @@ use MauticPlugin\CustomObjectsBundle\Exception\InvalidSegmentFilterException;
 use MauticPlugin\CustomObjectsBundle\Helper\ContactFilterMatcher;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class DynamicContentSubscriber implements EventSubscriberInterface
 {
-    use MatchFilterForLeadTrait;
-    use DbalQueryTrait;
-
     public function __construct(
         private QueryFilterFactory $queryFilterFactory,
-        private QueryFilterHelper $queryFilterHelper,
+        private ContactFilterMatcher $contactFilterMatcher,
         private ConfigProvider $configProvider,
-        private LoggerInterface $logger
     ) {
     }
 
@@ -65,23 +60,6 @@ class DynamicContentSubscriber implements EventSubscriberInterface
                 return true;
             } catch (InvalidSegmentFilterException $e) {
             }
-
-            $this->queryFilterHelper->addContactIdRestriction($filterQueryBuilder, $queryAlias, (int) $event->getContact()->getId());
-
-            try {
-                if ($this->executeSelect($filterQueryBuilder)->rowCount()) {
-                    $event->setIsEvaluated(true);
-                    $event->setIsMatched(true);
-                } else {
-                    $event->setIsEvaluated(true);
-                }
-            } catch (\PDOException $e) {
-                $this->logger->error('Failed to evaluate dynamic content for custom object '.$e->getMessage());
-
-                throw $e;
-            }
-
-            $event->stopPropagation();  // The filter is ours, we won't allow no more processing
         }
 
         return false;
