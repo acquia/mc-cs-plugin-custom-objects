@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Helper;
 
 use Doctrine\DBAL\Connection;
-use Mautic\EmailBundle\EventListener\MatchFilterForLeadTrait;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\LeadListRepository;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
@@ -18,16 +17,10 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Polyfill\EventListener\MatchFilterForLeadTrait as MatchFilterForLeadTraitPolyfill;
 
-if (method_exists(MatchFilterForLeadTrait::class, 'transformFilterDataForLead')) {
-    class_alias(MatchFilterForLeadTrait::class, '\MauticPlugin\CustomObjectsBundle\Helper\MatchFilterForLeadTraitAlias');
-} else {
-    class_alias(MatchFilterForLeadTraitPolyfill::class, '\MauticPlugin\CustomObjectsBundle\Helper\MatchFilterForLeadTraitAlias');
-}
-
 class ContactFilterMatcher
 {
-    use MatchFilterForLeadTraitAlias {
-        transformFilterDataForLead as transformFilterDataForLeadAlias;
+    use MatchFilterForLeadTraitPolyfill {
+        transformFilterDataForLead as transformFilterDataForLeadPolyfill;
     }
 
     private CustomFieldModel $customFieldModel;
@@ -201,7 +194,7 @@ class ContactFilterMatcher
             return $lead[$data['field']];
         }
 
-        return $this->transformFilterDataForLeadAlias($data, $lead);
+        return $this->transformFilterDataForLeadPolyfill($data, $lead);
     }
 
     /**
