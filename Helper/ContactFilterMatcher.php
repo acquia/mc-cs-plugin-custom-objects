@@ -23,29 +23,16 @@ class ContactFilterMatcher
         transformFilterDataForLead as transformFilterDataForLeadPolyfill;
     }
 
-    private CustomFieldModel $customFieldModel;
-    private CustomObjectModel $customObjectModel;
-    private CustomItemModel $customItemModel;
-    private CompanyRepository $companyRepository;
-    private Connection $connection;
-    private int $leadCustomItemFetchLimit;
-
     public function __construct(
-        CustomFieldModel $customFieldModel,
-        CustomObjectModel $customObjectModel,
-        CustomItemModel $customItemModel,
+        private CustomFieldModel $customFieldModel,
+        private CustomObjectModel $customObjectModel,
+        private CustomItemModel $customItemModel,
         LeadListRepository $segmentRepository,
-        CompanyRepository $companyRepository,
-        Connection $connection,
-        int $leadCustomItemFetchLimit
+        private CompanyRepository $companyRepository,
+        private Connection $connection,
+        private int $leadCustomItemFetchLimit
     ) {
-        $this->customFieldModel         = $customFieldModel;
-        $this->customObjectModel        = $customObjectModel;
-        $this->customItemModel          = $customItemModel;
-        $this->segmentRepository        = $segmentRepository;
-        $this->companyRepository        = $companyRepository;
-        $this->connection               = $connection;
-        $this->leadCustomItemFetchLimit = $leadCustomItemFetchLimit;
+        $this->segmentRepository = $segmentRepository;
     }
 
     /**
@@ -90,13 +77,13 @@ class ContactFilterMatcher
                     continue;
                 }
 
-                if ('cmf_' === substr($condition['field'], 0, 4)) {
+                if (str_starts_with($condition['field'], 'cmf_')) {
                     $customField  = $this->customFieldModel->fetchEntity(
                         (int) explode('cmf_', $condition['field'])[1]
                     );
                     $customObject = $customField->getCustomObject();
                     $fieldAlias   = $customField->getAlias();
-                } elseif ('cmo_' === substr($condition['field'], 0, 4)) {
+                } elseif (str_starts_with($condition['field'], 'cmo_')) {
                     $customObject = $this->customObjectModel->fetchEntity(
                         (int) explode('cmo_', $condition['field'])[1]
                     );
@@ -113,7 +100,7 @@ class ContactFilterMatcher
                 $result = $this->getCustomFieldValue($customObject, $fieldAlias, $cachedCustomItems[$key]);
 
                 $customFieldValues[$condition['field']] = $result;
-            } catch (NotFoundException|InvalidCustomObjectFormatListException $e) {
+            } catch (NotFoundException|InvalidCustomObjectFormatListException) {
                 continue;
             }
         }
@@ -158,7 +145,7 @@ class ContactFilterMatcher
                 } else {
                     $fieldValues[] = $fieldValue->getCustomField()->getTypeObject()->valueToString($fieldValue);
                 }
-            } catch (NotFoundException $e) {
+            } catch (NotFoundException) {
                 // Custom field not found.
             }
         }
@@ -185,8 +172,6 @@ class ContactFilterMatcher
     /**
      * @param mixed[] $data
      * @param mixed[] $lead
-     *
-     * @return ?mixed[]
      */
     private function transformFilterDataForLead(array $data, array $lead): ?array
     {
