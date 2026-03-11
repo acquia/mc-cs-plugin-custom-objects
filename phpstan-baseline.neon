@@ -703,6 +703,11 @@ parameters:
 			path: Helper/ContactFilterMatcher.php
 
 		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Helper\\\\ContactFilterMatcher\\:\\:transformFilterDataForLeadPolyfill\\(\\) never returns array so it can be removed from the return type\\.$#"
+			count: 1
+			path: Polyfill/EventListener/MatchFilterForLeadTrait.php
+
+		-
 			message: """
 				#^Fetching deprecated class constant PARAM_INT_ARRAY of class Doctrine\\\\DBAL\\\\Connection\\:
 				Use \\{@see ArrayParameterType\\:\\:INTEGER\\} instead\\.$#
