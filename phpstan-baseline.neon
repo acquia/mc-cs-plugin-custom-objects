@@ -708,6 +708,16 @@ parameters:
 			path: Polyfill/EventListener/MatchFilterForLeadTrait.php
 
 		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Helper\\\\ContactFilterMatcher\\:\\:transformFilterDataForLeadPolyfill\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Polyfill/EventListener/MatchFilterForLeadTrait.php
+
+		-
+			message: "#^Method MauticPlugin\\\\CustomObjectsBundle\\\\Helper\\\\ContactFilterMatcher\\:\\:transformFilterDataForLead\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: Helper/ContactFilterMatcher.php
+
+		-
 			message: """
 				#^Fetching deprecated class constant PARAM_INT_ARRAY of class Doctrine\\\\DBAL\\\\Connection\\:
 				Use \\{@see ArrayParameterType\\:\\:INTEGER\\} instead\\.$#
