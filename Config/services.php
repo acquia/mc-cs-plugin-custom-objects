@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
+use MauticPlugin\CustomObjectsBundle\Helper\ContactFilterMatcher;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return function (ContainerConfigurator $configurator): void {
@@ -23,4 +24,7 @@ return function (ContainerConfigurator $configurator): void {
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('MauticPlugin\\CustomObjectsBundle\\Repository\\', '../Repository/*Repository.php');
+
+    $services->set(ContactFilterMatcher::class)
+        ->arg('$leadCustomItemFetchLimit', '%mautic.custom_item_fetch_limit_per_lead%');
 };

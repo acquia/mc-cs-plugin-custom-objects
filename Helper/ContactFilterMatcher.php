@@ -7,7 +7,6 @@ namespace MauticPlugin\CustomObjectsBundle\Helper;
 use Doctrine\DBAL\Connection;
 use Mautic\LeadBundle\Entity\CompanyRepository;
 use Mautic\LeadBundle\Entity\LeadListRepository;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
@@ -38,7 +37,6 @@ class ContactFilterMatcher
         LeadListRepository $segmentRepository,
         CompanyRepository $companyRepository,
         Connection $connection,
-        #[Autowire(param: 'mautic.custom_item_fetch_limit_per_lead')]
         int $leadCustomItemFetchLimit
     ) {
         $this->customFieldModel         = $customFieldModel;
