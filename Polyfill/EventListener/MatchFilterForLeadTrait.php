@@ -214,7 +214,7 @@ trait MatchFilterForLeadTrait
                 return true;
             }
 
-            if ((0 === strpos($filter['field'], 'company') && 'company' !== $filter['field'])) {
+            if (0 === strpos($filter['field'], 'company') && 'company' !== $filter['field']) {
                 return true;
             }
         }

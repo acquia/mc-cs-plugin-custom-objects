@@ -277,7 +277,7 @@ class ContactFilterMatcherTest extends TestCase
 
     // Helpers
 
-    private function buildCustomObject(int $id): CustomObject&MockObject
+    private function buildCustomObject(int $id): MockObject
     {
         $customObject = $this->createMock(CustomObject::class);
         $customObject->method('getId')->willReturn($id);

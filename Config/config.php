@@ -413,7 +413,6 @@ $coParams = [
                     '%mautic.custom_item_fetch_limit_per_lead%',
                 ],
             ],
-
         ],
         'forms' => [
             'custom_field.field.params.to.string.transformer' => [
