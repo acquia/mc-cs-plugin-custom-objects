@@ -10,8 +10,7 @@ return function (ContainerConfigurator $configurator): void {
         ->defaults()
         ->autowire()
         ->autoconfigure()
-        ->public()
-        ->bind('int $leadCustomItemFetchLimit', '%mautic.custom_item_fetch_limit_per_lead%');
+        ->public();
 
     $excludes = [
         'Provider/SessionProvider.php',
