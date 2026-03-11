@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Helper;
 
-if (!defined('MAUTIC_TABLE_PREFIX')) {
-    define('MAUTIC_TABLE_PREFIX', '');
-}
-
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\DBAL\Result;
