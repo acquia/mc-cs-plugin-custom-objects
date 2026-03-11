@@ -209,7 +209,7 @@ class ContactFilterMatcher
             ->from(MAUTIC_TABLE_PREFIX.'lead_tags_xref', 'x')
             ->where('x.lead_id = :leadId')
             ->setParameter('leadId', $leadId)
-            ->execute()
+            ->executeQuery()
             ->fetchFirstColumn();
     }
 }

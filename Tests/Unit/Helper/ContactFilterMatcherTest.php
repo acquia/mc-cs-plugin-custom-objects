@@ -224,7 +224,7 @@ class ContactFilterMatcherTest extends TestCase
         $queryBuilder->method('from')->willReturnSelf();
         $queryBuilder->method('where')->willReturnSelf();
         $queryBuilder->method('setParameter')->willReturnSelf();
-        $queryBuilder->method('execute')->willReturn($result);
+        $queryBuilder->method('executeQuery')->willReturn($result);
 
         $this->connection->expects($this->once())
             ->method('createQueryBuilder')
