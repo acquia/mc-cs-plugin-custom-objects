@@ -67,6 +67,12 @@ trait MatchFilterForLeadTrait
             $subgroup     = null;
 
             if (is_array($leadValues)) {
+                if ('custom_object' === $data['object'] && [] === $leadValues) {
+                    // No custom items linked to this contact: only 'empty' is true.
+                    $groups[$groupNum] = 'empty' === $data['operator'];
+                    continue;
+                }
+
                 foreach ($leadValues as $leadVal) {
                     if ($subgroup) {
                         break;

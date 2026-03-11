@@ -118,6 +118,28 @@ class ContactFilterMatcherTest extends TestCase
         $this->assertTrue($hasCustomFields);
     }
 
+    public function testMatchReturnsTrueForEmptyOperatorWhenContactHasNoLinkedItems(): void
+    {
+        $this->customObjectModel->method('fetchEntity')->willReturn($this->buildCustomObject(1));
+        $this->customItemModel->method('getArrayTableData')->willReturn([]);
+
+        $filter = array_merge($this->buildCmoFilter('cmo_1', 'empty', ''), ['type' => 'text']);
+        $result = $this->matcher->match([$filter], ['id' => 42]);
+
+        $this->assertTrue($result);
+    }
+
+    public function testMatchReturnsFalseForNotEmptyOperatorWhenContactHasNoLinkedItems(): void
+    {
+        $this->customObjectModel->method('fetchEntity')->willReturn($this->buildCustomObject(1));
+        $this->customItemModel->method('getArrayTableData')->willReturn([]);
+
+        $filter = array_merge($this->buildCmoFilter('cmo_1', '!empty', ''), ['type' => 'text']);
+        $result = $this->matcher->match([$filter], ['id' => 42]);
+
+        $this->assertFalse($result);
+    }
+
     public function testMatchReturnsTrueWhenItemNameMatchesEqualFilter(): void
     {
         $this->customObjectModel->method('fetchEntity')->willReturn($this->buildCustomObject(3));
