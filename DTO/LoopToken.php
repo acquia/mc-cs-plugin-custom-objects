@@ -9,36 +9,21 @@ namespace MauticPlugin\CustomObjectsBundle\DTO;
  *
  * {custom-object=product:sku | where=segment-filter |order=latest|limit=1 | default=Nothing to see here | format=or-list}
  */
-class LoopToken
+final class LoopToken
 {
-    /**
-     * @var string
-     */
-    private $token;
+    private string $token;
 
-    /**
-     * @var int
-     */
-    private $limit = 1;
+    private int $limit = 1;
 
-    /**
-     * @var string
-     */
-    private $where = '';
+    private string $where = '';
 
-    /**
-     * @var string
-     */
-    private $order = 'latest';
+    private string $order = 'latest';
 
-    /**
-     * @var string
-     */
-    private $customObjectAlias = '';
+    private string $customObjectAlias = '';
 
-    private $loopContentTokens = [];
+    private array $loopContentTokens = [];
 
-    private $loopContent = '';
+    private string $loopContent = '';
 
     public function __construct(string $token)
     {
@@ -60,7 +45,7 @@ class LoopToken
         return $this->loopContentTokens;
     }
 
-    public function addLoopContentToken($loopContentToken, $contentTokenParams): void
+    public function addLoopContentToken(string $loopContentToken, array $contentTokenParams): void
     {
         $this->loopContentTokens[$loopContentToken] = $contentTokenParams;
     }
