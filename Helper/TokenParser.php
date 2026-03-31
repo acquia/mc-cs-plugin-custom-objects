@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Helper;
 
-use MauticPlugin\CustomObjectsBundle\DTO\Token;
 use Doctrine\Common\Collections\ArrayCollection;
 use MauticPlugin\CustomObjectsBundle\DTO\LoopToken;
+use MauticPlugin\CustomObjectsBundle\DTO\Token;
 
 class TokenParser
 {
     public const TOKEN = '{custom-object=(.*?)}';
 
-    public const TOKEN_CUSTOM_OBJECT_LOOP = '{custom-object-loop\s+([^}]*)\}([\s\S]*?)\{\/custom-object-loop\}';
+    public const TOKEN_CUSTOM_OBJECT_LOOP       = '{custom-object-loop\s+([^}]*)\}([\s\S]*?)\{\/custom-object-loop\}';
     public const TOKEN_CUSTOM_OBJECT_LOOP_VALUE = '{custom-object-loop-value\s+([^}]*)\}';
 
     public function findTokens(string $content): ArrayCollection
     {
         $tokens = new ArrayCollection();
 
-        preg_match_all('/' . self::TOKEN . '/', $content, $matches);
+        preg_match_all('/'.self::TOKEN.'/', $content, $matches);
 
         if (empty($matches[1])) {
             return $tokens;
@@ -77,7 +77,7 @@ class TokenParser
     {
         $tokens = new ArrayCollection();
 
-        preg_match_all('/' . self::TOKEN_CUSTOM_OBJECT_LOOP . '/', $content, $matches);
+        preg_match_all('/'.self::TOKEN_CUSTOM_OBJECT_LOOP.'/', $content, $matches);
 
         if (empty($matches[1])) {
             return $tokens;
@@ -110,11 +110,11 @@ class TokenParser
 
             $loopContent = $matches[2][$key] ?? '';
             $loopToken->setLoopContent($loopContent);
-            preg_match_all('/' . self::TOKEN_CUSTOM_OBJECT_LOOP_VALUE . '/', $loopContent, $fieldMatches);
+            preg_match_all('/'.self::TOKEN_CUSTOM_OBJECT_LOOP_VALUE.'/', $loopContent, $fieldMatches);
 
             foreach ($fieldMatches[1] as $key => $fieldMatch) {
-                $contentToken = $fieldMatches[0][$key];
-                $rawFieldParams = $this->getPartsDividedByPipe($fieldMatch);
+                $contentToken       = $fieldMatches[0][$key];
+                $rawFieldParams     = $this->getPartsDividedByPipe($fieldMatch);
                 $contentTokenParams = [];
                 foreach ($rawFieldParams as $rawFieldParam) {
                     $options = $this->trimArrayElements(explode('=', $rawFieldParam));
@@ -157,7 +157,6 @@ class TokenParser
     {
         return "{custom-object-loop-value object={$customObjectAlias} | field={$customFieldAlias} | default=}";
     }
-
 
     public function buildTokenCustomObjectFieldInLoopLabel(string $customObjectLabel, string $customFieldLabel): string
     {

@@ -54,6 +54,7 @@ final class LoopToken
     {
         $this->loopContentTokens = $loopContentTokens;
     }
+
     public function getOrder(): string
     {
         return $this->order;

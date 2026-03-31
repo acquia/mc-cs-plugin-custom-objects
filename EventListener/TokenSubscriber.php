@@ -61,7 +61,8 @@ class TokenSubscriber implements EventSubscriberInterface
         private EventDispatcherInterface $eventDispatcher,
         private TokenFormatter $tokenFormatter,
         private int $leadCustomItemFetchLimit
-    ) {}
+    ) {
+    }
 
     /**
      * {@inheritdoc}
@@ -161,7 +162,7 @@ class TokenSubscriber implements EventSubscriberInterface
         $tokens->map(function (Token $token) use ($event): void {
             try {
                 $customObject = $this->customObjectModel->fetchEntityByAlias($token->getCustomObjectAlias());
-                $fieldValues = $this->getCustomFieldValues($customObject, $token, $event);
+                $fieldValues  = $this->getCustomFieldValues($customObject, $token, $event);
             } catch (NotFoundException $e) {
                 $fieldValues = null;
             }
@@ -195,10 +196,9 @@ class TokenSubscriber implements EventSubscriberInterface
 
     public function getLoopTokenContent(CustomObject $customObject, LoopToken $token, EmailSendEvent $event): string
     {
-
         $loopTokenContent = '';
-        $orderBy  = CustomItem::TABLE_ALIAS . '.id';
-        $orderDir = 'DESC';
+        $orderBy          = CustomItem::TABLE_ALIAS.'.id';
+        $orderDir         = 'DESC';
 
         if ('latest' === $token->getOrder()) {
             // There is no other ordering option implemented at the moment.
@@ -292,14 +292,14 @@ class TokenSubscriber implements EventSubscriberInterface
 
             foreach ($segmentFilters as $id => $filter) {
                 try {
-                    $queryAlias        = 'filter_' . $id;
+                    $queryAlias        = 'filter_'.$id;
                     $innerQueryBuilder = $this->queryFilterFactory->configureQueryBuilderFromSegmentFilter($filter, $queryAlias);
                 } catch (InvalidSegmentFilterException) {
                     continue;
                 }
 
                 foreach ($innerQueryBuilder as $segmentQueryBuilder) {
-                    $segmentQueryBuilder->select($queryAlias . '_value.custom_item_id');
+                    $segmentQueryBuilder->select($queryAlias.'_value.custom_item_id');
                     $this->queryFilterHelper->addContactIdRestriction($segmentQueryBuilder, $queryAlias, $contactId);
                     $segmentQueryBuilder->andWhere("{$queryAlias}_contact.custom_item_id = {$queryAlias}_value.custom_item_id");
                 }
@@ -308,7 +308,7 @@ class TokenSubscriber implements EventSubscriberInterface
                     CustomItem::TABLE_ALIAS,
                     "({$innerQueryBuilder->getSQL()})",
                     $queryAlias,
-                    CustomItem::TABLE_ALIAS . ".id = {$queryAlias}.custom_item_id"
+                    CustomItem::TABLE_ALIAS.".id = {$queryAlias}.custom_item_id"
                 );
 
                 $this->copyParams($innerQueryBuilder, $queryBuilder);
@@ -324,7 +324,7 @@ class TokenSubscriber implements EventSubscriberInterface
      */
     private function getCustomFieldValues(CustomObject $customObject, Token $token, EmailSendEvent $event): array
     {
-        $orderBy  = CustomItem::TABLE_ALIAS . '.id';
+        $orderBy  = CustomItem::TABLE_ALIAS.'.id';
         $orderDir = 'DESC';
 
         if ('latest' === $token->getOrder()) {
@@ -400,7 +400,7 @@ class TokenSubscriber implements EventSubscriberInterface
             }
 
             if ($isCustomObject) {
-                $event->addToken('{dynamiccontent="' . $data['tokenName'] . '"}', $filterContent);
+                $event->addToken('{dynamiccontent="'.$data['tokenName'].'"}', $filterContent);
             }
         }
     }
@@ -435,7 +435,7 @@ class TokenSubscriber implements EventSubscriberInterface
                     continue;
                 }
 
-                $key = $customObject->getId() . '-' . $leadId;
+                $key = $customObject->getId().'-'.$leadId;
                 if (!isset($cachedCustomItems[$key])) {
                     $cachedCustomItems[$key] = $this->getCustomItems($customObject, $leadId);
                 }
@@ -443,7 +443,7 @@ class TokenSubscriber implements EventSubscriberInterface
                 $result = $this->getCustomFieldValue($customObject, $fieldAlias, $cachedCustomItems[$key]);
 
                 $customFieldValues[$condition['field']] = $result;
-            } catch (NotFoundException | InvalidCustomObjectFormatListException) {
+            } catch (NotFoundException|InvalidCustomObjectFormatListException) {
                 continue;
             }
         }
@@ -501,7 +501,7 @@ class TokenSubscriber implements EventSubscriberInterface
      */
     private function getCustomItems(CustomObject $customObject, string $leadId): array
     {
-        $orderBy  = CustomItem::TABLE_ALIAS . '.id';
+        $orderBy  = CustomItem::TABLE_ALIAS.'.id';
         $orderDir = 'DESC';
 
         $tableConfig = new TableConfig($this->leadCustomItemFetchLimit, 1, $orderBy, $orderDir);
@@ -646,12 +646,12 @@ class TokenSubscriber implements EventSubscriberInterface
                             break;
                         case 'like':
                             $matchVal          = str_replace(['.', '*', '%'], ['\.', '\*', '.*'], $filterVal);
-                            $groups[$groupNum] = 1 === preg_match('/' . $matchVal . '/', $leadVal);
+                            $groups[$groupNum] = 1 === preg_match('/'.$matchVal.'/', $leadVal);
                             break;
                         case '!like':
                             $matchVal          = str_replace(['.', '*'], ['\.', '\*'], $filterVal);
                             $matchVal          = str_replace('%', '.*', $matchVal);
-                            $groups[$groupNum] = 1 !== preg_match('/' . $matchVal . '/', $leadVal);
+                            $groups[$groupNum] = 1 !== preg_match('/'.$matchVal.'/', $leadVal);
                             break;
                         case OperatorOptions::IN:
                             $groups[$groupNum] = $this->checkLeadValueIsInFilter($leadVal, $filterVal, false);
@@ -660,10 +660,10 @@ class TokenSubscriber implements EventSubscriberInterface
                             $groups[$groupNum] = $this->checkLeadValueIsInFilter($leadVal, $filterVal, true);
                             break;
                         case 'regexp':
-                            $groups[$groupNum] = 1 === preg_match('/' . $filterVal . '/i', $leadVal);
+                            $groups[$groupNum] = 1 === preg_match('/'.$filterVal.'/i', $leadVal);
                             break;
                         case '!regexp':
-                            $groups[$groupNum] = 1 !== preg_match('/' . $filterVal . '/i', $leadVal);
+                            $groups[$groupNum] = 1 !== preg_match('/'.$filterVal.'/i', $leadVal);
                             break;
                         case 'startsWith':
                             $groups[$groupNum] = str_starts_with($leadVal, $filterVal);
