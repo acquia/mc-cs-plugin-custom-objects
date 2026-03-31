@@ -226,9 +226,11 @@ class TokenSubscriber implements EventSubscriberInterface
                 if ('name' === $field) {
                     $fieldValue = $customItemData['name'];
                 } else {
-                    $customFieldValue = $customItem->findCustomFieldValueForFieldAlias($field);
-                    if ($customFieldValue) {
-                        $fieldValue = $customFieldValue->getValue();
+                    try {
+                        $customFieldValue = $customItem->findCustomFieldValueForFieldAlias($field);
+                        $fieldValue       = $customFieldValue->getValue();
+                    } catch (NotFoundException) {
+                        $fieldValue = null;
                     }
                 }
 

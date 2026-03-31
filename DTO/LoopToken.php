@@ -21,6 +21,9 @@ final class LoopToken
 
     private string $customObjectAlias = '';
 
+    /**
+     * @var array<string, array<string, string>>
+     */
     private array $loopContentTokens = [];
 
     private string $loopContent = '';
@@ -40,16 +43,25 @@ final class LoopToken
         $this->loopContent = $loopContent;
     }
 
+    /**
+     * @return array<string, array<string, string>>
+     */
     public function getLoopContentTokens(): array
     {
         return $this->loopContentTokens;
     }
 
+    /**
+     * @param array<string, string> $contentTokenParams
+     */
     public function addLoopContentToken(string $loopContentToken, array $contentTokenParams): void
     {
         $this->loopContentTokens[$loopContentToken] = $contentTokenParams;
     }
 
+    /**
+     * @param array<string, array<string, string>> $loopContentTokens
+     */
     public function setLoopContentTokens(array $loopContentTokens): void
     {
         $this->loopContentTokens = $loopContentTokens;
