@@ -40,10 +40,10 @@ class DynamicContentSubscriberTest extends MauticMysqlTestCase
         $customItem->setName('Test Item');
         $this->customFieldValueModel->createValuesForItem($customItem);
 
-        $textValue      = $customItem->findCustomFieldValueForFieldAlias('text-test-field');
-        $urlValue       = $customItem->findCustomFieldValueForFieldAlias('url-test-field');
-        $dateValue      = $customItem->findCustomFieldValueForFieldAlias('date-test-field');
-        $datetimeValue  = $customItem->findCustomFieldValueForFieldAlias('datetime-test-field');
+        $textValue        = $customItem->findCustomFieldValueForFieldAlias('text-test-field');
+        $urlValue         = $customItem->findCustomFieldValueForFieldAlias('url-test-field');
+        $dateValue        = $customItem->findCustomFieldValueForFieldAlias('date-test-field');
+        $datetimeValue    = $customItem->findCustomFieldValueForFieldAlias('datetime-test-field');
         $multiselectValue = $customItem->findCustomFieldValueForFieldAlias('multiselect-test-field');
 
         $textValue->setValue('abracadabra');

@@ -416,5 +416,4 @@ class TokenSubscriber implements EventSubscriberInterface
 
         return $this->customItemModel->getArrayTableData($tableConfig);
     }
-
 }

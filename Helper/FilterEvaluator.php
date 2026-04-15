@@ -74,7 +74,7 @@ class FilterEvaluator
                 }
 
                 [$leadVal, $filterVal] = $this->coerceTypes($data['type'], $leadVal, $filterVal);
-                $matched = $this->applyOperator($data['operator'], $data['type'], $leadVal, $filterVal);
+                $matched               = $this->applyOperator($data['operator'], $data['type'], $leadVal, $filterVal);
             }
 
             $groups[$groupNum] = $matched ?? false;
@@ -84,9 +84,6 @@ class FilterEvaluator
     }
 
     /**
-     * @param mixed $leadVal
-     * @param mixed $filterVal
-     *
      * @return array{mixed, mixed}
      */
     private function coerceTypes(string $type, mixed $leadVal, mixed $filterVal): array
@@ -128,9 +125,6 @@ class FilterEvaluator
     }
 
     /**
-     * @param mixed $leadVal
-     * @param mixed $filterVal
-     *
      * @throws OperatorsNotFoundException
      */
     private function applyOperator(string $operator, string $type, mixed $leadVal, mixed $filterVal): bool
@@ -179,10 +173,6 @@ class FilterEvaluator
         }
     }
 
-    /**
-     * @param mixed $leadVal
-     * @param mixed $filterVal
-     */
     private function checkLeadValueIsInFilter(mixed $leadVal, mixed $filterVal, bool $defaultFlag): bool
     {
         $leadVal   = !is_array($leadVal) ? [$leadVal] : $leadVal;
