@@ -398,7 +398,7 @@ class DynamicContentSubscriberTest extends MauticMysqlTestCase
         $customItem->setName('Test Item');
         $this->customFieldValueModel->createValuesForItem($customItem);
 
-        $intValue = $customItem->findCustomFieldValueForFieldAlias('int-test-field');
+        $intValue = $customItem->findCustomFieldValueForFieldAlias('number-test-field');
         $intValue->setValue(42);
         $customItem = $this->customItemModel->save($customItem);
         $this->customItemModel->linkEntity($customItem, 'contact', (int) $contact->getId());
