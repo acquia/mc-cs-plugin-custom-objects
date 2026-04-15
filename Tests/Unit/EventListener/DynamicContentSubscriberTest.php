@@ -118,7 +118,7 @@ class DynamicContentSubscriberTest extends TestCase
 
         $this->contactFilterMatcher->expects($this->once())
             ->method('match')
-            ->with($this->buildFilters(), ['email' => 'test@example.com'])
+            ->with($this->buildFilters(), ['id' => null, 'email' => 'test@example.com'])
             ->willReturn(true);
 
         $this->subscriber->evaluateFilters($event);
