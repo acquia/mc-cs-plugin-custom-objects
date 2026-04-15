@@ -114,6 +114,7 @@ class FilterEvaluator
                     $filterVal = explode('|', $filterVal);
                 }
                 break;
+            case 'int':
             case 'number':
                 $leadVal   = (int) $leadVal;
                 $filterVal = (int) $filterVal;

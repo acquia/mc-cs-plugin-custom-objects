@@ -304,6 +304,8 @@ class FilterEvaluatorTest extends TestCase
     {
         // String '42' in lead and int 42 as filter — both coerced to int.
         $this->assertOperator('number', '=', '42', 42, true);
+        // 'int' is the custom field type key — same coercion applies.
+        $this->assertOperator('int', '=', '42', 42, true);
     }
 
     // -------------------------------------------------------------------------

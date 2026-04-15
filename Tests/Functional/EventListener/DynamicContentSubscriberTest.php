@@ -406,20 +406,20 @@ class DynamicContentSubscriberTest extends MauticMysqlTestCase
         $fieldId = $intValue->getCustomField()->getId();
 
         // = match / no match
-        $this->assertMatched($contact, $fieldId, 'number', '=', 42);
-        $this->assertNotMatched($contact, $fieldId, 'number', '=', 99);
+        $this->assertMatched($contact, $fieldId, 'int', '=', 42);
+        $this->assertNotMatched($contact, $fieldId, 'int', '=', 99);
 
         // gt / gte
-        $this->assertMatched($contact, $fieldId, 'number', 'gt', 10);
-        $this->assertNotMatched($contact, $fieldId, 'number', 'gt', 42);
-        $this->assertMatched($contact, $fieldId, 'number', 'gte', 42);
-        $this->assertNotMatched($contact, $fieldId, 'number', 'gte', 43);
+        $this->assertMatched($contact, $fieldId, 'int', 'gt', 10);
+        $this->assertNotMatched($contact, $fieldId, 'int', 'gt', 42);
+        $this->assertMatched($contact, $fieldId, 'int', 'gte', 42);
+        $this->assertNotMatched($contact, $fieldId, 'int', 'gte', 43);
 
         // lt / lte
-        $this->assertMatched($contact, $fieldId, 'number', 'lt', 99);
-        $this->assertNotMatched($contact, $fieldId, 'number', 'lt', 42);
-        $this->assertMatched($contact, $fieldId, 'number', 'lte', 42);
-        $this->assertNotMatched($contact, $fieldId, 'number', 'lte', 41);
+        $this->assertMatched($contact, $fieldId, 'int', 'lt', 99);
+        $this->assertNotMatched($contact, $fieldId, 'int', 'lt', 42);
+        $this->assertMatched($contact, $fieldId, 'int', 'lte', 42);
+        $this->assertNotMatched($contact, $fieldId, 'int', 'lte', 41);
     }
 
     public function testOrFiltersFirstGroupPassesSecondFails(): void
