@@ -8,11 +8,11 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\DBAL\Result;
 use Mautic\LeadBundle\Entity\CompanyRepository;
-use Mautic\LeadBundle\Entity\LeadListRepository;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\InvalidCustomObjectFormatListException;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Helper\ContactFilterMatcher;
+use MauticPlugin\CustomObjectsBundle\Helper\FilterEvaluator;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
@@ -30,9 +30,6 @@ class ContactFilterMatcherTest extends TestCase
     /** @var CustomItemModel&MockObject */
     private MockObject $customItemModel;
 
-    /** @var LeadListRepository&MockObject */
-    private MockObject $segmentRepository;
-
     /** @var CompanyRepository&MockObject */
     private MockObject $companyRepository;
 
@@ -48,7 +45,6 @@ class ContactFilterMatcherTest extends TestCase
         $this->customFieldModel  = $this->createMock(CustomFieldModel::class);
         $this->customObjectModel = $this->createMock(CustomObjectModel::class);
         $this->customItemModel   = $this->createMock(CustomItemModel::class);
-        $this->segmentRepository = $this->createMock(LeadListRepository::class);
         $this->companyRepository = $this->createMock(CompanyRepository::class);
         $this->connection        = $this->createMock(Connection::class);
 
@@ -56,9 +52,9 @@ class ContactFilterMatcherTest extends TestCase
             $this->customFieldModel,
             $this->customObjectModel,
             $this->customItemModel,
-            $this->segmentRepository,
             $this->companyRepository,
             $this->connection,
+            new FilterEvaluator(),
             10
         );
     }
