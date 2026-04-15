@@ -351,14 +351,90 @@ class DynamicContentSubscriberTest extends MauticMysqlTestCase
 
     public function testAlreadyEvaluatedEventIsSkipped(): void
     {
+        // No DB setup needed — the subscriber bails out before touching the DB.
+        $contact = new Lead();
+        $event   = new ContactFiltersEvaluateEvent([], $contact);
+        $event->setIsEvaluated(true);  // already handled by another listener
+        $event->setIsMatched(false);   // prior result was false
+
+        $this->subscriber->evaluateFilters($event);
+
+        $this->assertFalse($event->isMatched(), 'Subscriber must not overwrite a result already set by another listener');
+    }
+
+    public function testRegexpOperator(): void
+    {
         $customObject = $this->createCustomObjectWithAllFields(self::$container, 'Product');
-        $contact      = $this->createContact('already-evaluated@example.com');
+        $contact      = $this->createContact('regexp@example.com');
         $customItem   = new CustomItem($customObject);
         $customItem->setName('Test Item');
         $this->customFieldValueModel->createValuesForItem($customItem);
 
         $textValue = $customItem->findCustomFieldValueForFieldAlias('text-test-field');
-        $textValue->setValue('premium');
+        $textValue->setValue('abracadabra');
+        $customItem = $this->customItemModel->save($customItem);
+        $this->customItemModel->linkEntity($customItem, 'contact', (int) $contact->getId());
+
+        $fieldId = $textValue->getCustomField()->getId();
+
+        // regexp match
+        $this->assertMatched($contact, $fieldId, 'text', 'regexp', 'abra.*cadabra');
+
+        // regexp no match
+        $this->assertNotMatched($contact, $fieldId, 'text', 'regexp', '^unicorn');
+
+        // !regexp match (value does not match pattern)
+        $this->assertMatched($contact, $fieldId, 'text', '!regexp', '^unicorn');
+
+        // !regexp no match (value matches pattern)
+        $this->assertNotMatched($contact, $fieldId, 'text', '!regexp', 'abra.*cadabra');
+    }
+
+    public function testNumberFieldComparisons(): void
+    {
+        $customObject = $this->createCustomObjectWithAllFields(self::$container, 'Product');
+        $contact      = $this->createContact('number@example.com');
+        $customItem   = new CustomItem($customObject);
+        $customItem->setName('Test Item');
+        $this->customFieldValueModel->createValuesForItem($customItem);
+
+        $intValue = $customItem->findCustomFieldValueForFieldAlias('int-test-field');
+        $intValue->setValue(42);
+        $customItem = $this->customItemModel->save($customItem);
+        $this->customItemModel->linkEntity($customItem, 'contact', (int) $contact->getId());
+
+        $fieldId = $intValue->getCustomField()->getId();
+
+        // = match / no match
+        $this->assertMatched($contact, $fieldId, 'number', '=', 42);
+        $this->assertNotMatched($contact, $fieldId, 'number', '=', 99);
+
+        // gt / gte
+        $this->assertMatched($contact, $fieldId, 'number', 'gt', 10);
+        $this->assertNotMatched($contact, $fieldId, 'number', 'gt', 42);
+        $this->assertMatched($contact, $fieldId, 'number', 'gte', 42);
+        $this->assertNotMatched($contact, $fieldId, 'number', 'gte', 43);
+
+        // lt / lte
+        $this->assertMatched($contact, $fieldId, 'number', 'lt', 99);
+        $this->assertNotMatched($contact, $fieldId, 'number', 'lt', 42);
+        $this->assertMatched($contact, $fieldId, 'number', 'lte', 42);
+        $this->assertNotMatched($contact, $fieldId, 'number', 'lte', 41);
+    }
+
+    public function testOrFiltersFirstGroupPassesSecondFails(): void
+    {
+        $customObject = $this->createCustomObjectWithAllFields(self::$container, 'Product');
+        $contact      = $this->createContact('or-first-passes@example.com');
+        $customItem   = new CustomItem($customObject);
+        $customItem->setName('Test Item');
+        $this->customFieldValueModel->createValuesForItem($customItem);
+
+        $textValue = $customItem->findCustomFieldValueForFieldAlias('text-test-field');
+        $urlValue  = $customItem->findCustomFieldValueForFieldAlias('url-test-field');
+        $textValue->setValue('abracadabra');
+        // urlValue left empty
+
         $customItem = $this->customItemModel->save($customItem);
         $this->customItemModel->linkEntity($customItem, 'contact', (int) $contact->getId());
 
@@ -368,19 +444,26 @@ class DynamicContentSubscriberTest extends MauticMysqlTestCase
                 'field'    => 'cmf_'.$textValue->getCustomField()->getId(),
                 'object'   => 'custom_object',
                 'type'     => 'text',
-                'filter'   => 'premium',
+                'filter'   => 'abracadabra',
                 'display'  => null,
-                'operator' => '=',
+                'operator' => '=',           // first group passes
+            ],
+            [
+                'glue'     => 'or',           // starts a second group
+                'field'    => 'cmf_'.$urlValue->getCustomField()->getId(),
+                'object'   => 'custom_object',
+                'type'     => 'text',
+                'filter'   => null,
+                'display'  => null,
+                'operator' => '!empty',       // second group fails (url is empty)
             ],
         ];
 
         $event = new ContactFiltersEvaluateEvent($filters, $contact);
-        $event->setIsEvaluated(true);   // already handled by another listener
-        $event->setIsMatched(false);    // prior result was false
-
         $this->subscriber->evaluateFilters($event);
 
-        $this->assertFalse($event->isMatched(), 'Subscriber must not overwrite a result already set by another listener');
+        $this->assertTrue($event->isEvaluated());
+        $this->assertTrue($event->isMatched(), 'First OR group passes — overall result must be true even though second group fails');
     }
 
     public function testEvaluateFiltersSkipsEventWithNoCustomObjectFilters(): void
