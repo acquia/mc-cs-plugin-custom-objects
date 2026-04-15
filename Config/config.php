@@ -410,7 +410,7 @@ $coParams = [
                     'mautic.campaign.model.event',
                     'event_dispatcher',
                     'custom_object.helper.token_formatter',
-                    MauticPlugin\CustomObjectsBundle\Helper\FilterEvaluator::class,
+                    'custom_object.helper.filter_evaluator',
                     '%mautic.custom_item_fetch_limit_per_lead%',
                 ],
             ],
@@ -637,7 +637,10 @@ $coParams = [
             'custom_object.helper.token_formatter' => [
                 'class'     => MauticPlugin\CustomObjectsBundle\Helper\TokenFormatter::class,
             ],
-            MauticPlugin\CustomObjectsBundle\Helper\ContactFilterMatcher::class => [
+            'custom_object.helper.filter_evaluator' => [
+                'class' => MauticPlugin\CustomObjectsBundle\Helper\FilterEvaluator::class,
+            ],
+            'custom_object.helper.contact_filter_matcher' => [
                 'class'     => MauticPlugin\CustomObjectsBundle\Helper\ContactFilterMatcher::class,
                 'arguments' => [
                     'mautic.custom.model.field',
@@ -645,12 +648,9 @@ $coParams = [
                     'mautic.custom.model.item',
                     'mautic.lead.repository.company',
                     'doctrine.dbal.default_connection',
-                    MauticPlugin\CustomObjectsBundle\Helper\FilterEvaluator::class,
+                    'custom_object.helper.filter_evaluator',
                     '%mautic.custom_item_fetch_limit_per_lead%',
                 ],
-            ],
-            MauticPlugin\CustomObjectsBundle\Helper\FilterEvaluator::class => [
-                'class' => MauticPlugin\CustomObjectsBundle\Helper\FilterEvaluator::class,
             ],
 
             'custom_object.data_persister.custom_item' => [
