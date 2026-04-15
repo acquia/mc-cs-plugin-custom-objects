@@ -18,13 +18,12 @@ return function (ContainerConfigurator $configurator): void {
         'Report/ReportColumnsBuilder.php',
         'Serializer/ApiNormalizer.php',
         'Extension/CustomItemListeningExtension.php',
+        // Registered explicitly in config.php so the int $leadCustomItemFetchLimit arg can be set
+        'Helper/ContactFilterMatcher.php',
     ];
 
     $services->load('MauticPlugin\\CustomObjectsBundle\\', '../')
         ->exclude('../{'.implode(',', array_merge(MauticCoreExtension::DEFAULT_EXCLUDES, $excludes)).'}');
 
     $services->load('MauticPlugin\\CustomObjectsBundle\\Repository\\', '../Repository/*Repository.php');
-
-    $services->set(ContactFilterMatcher::class)
-        ->arg('$leadCustomItemFetchLimit', '%mautic.custom_item_fetch_limit_per_lead%');
 };

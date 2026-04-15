@@ -6,7 +6,6 @@ namespace MauticPlugin\CustomObjectsBundle\Helper;
 
 use Doctrine\DBAL\Connection;
 use Mautic\LeadBundle\Entity\CompanyRepository;
-use Mautic\LeadBundle\Entity\LeadListRepository;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
@@ -15,24 +14,18 @@ use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use MauticPlugin\CustomObjectsBundle\Polyfill\EventListener\MatchFilterForLeadTrait as MatchFilterForLeadTraitPolyfill;
 
 class ContactFilterMatcher
 {
-    use MatchFilterForLeadTraitPolyfill {
-        transformFilterDataForLead as transformFilterDataForLeadPolyfill;
-    }
-
     public function __construct(
         private CustomFieldModel $customFieldModel,
         private CustomObjectModel $customObjectModel,
         private CustomItemModel $customItemModel,
-        LeadListRepository $segmentRepository,
         private CompanyRepository $companyRepository,
         private Connection $connection,
+        private FilterEvaluator $filterEvaluator,
         private int $leadCustomItemFetchLimit
     ) {
-        $this->segmentRepository = $segmentRepository;
     }
 
     /**
@@ -59,7 +52,7 @@ class ContactFilterMatcher
             $lead['tags'] = $this->getTagIdsByLeadId($leadId);
         }
 
-        return $this->matchFilterForLead($filters, $lead);
+        return $this->filterEvaluator->evaluate($filters, $lead);
     }
 
     /**
@@ -170,16 +163,37 @@ class ContactFilterMatcher
     }
 
     /**
-     * @param mixed[] $data
-     * @param mixed[] $lead
+     * @param mixed[] $filters
      */
-    private function transformFilterDataForLead(array $data, array $lead): ?array
+    private function doFiltersContainCompanyFilter(array $filters): bool
     {
-        if ('custom_object' === $data['object']) {
-            return $lead[$data['field']];
+        foreach ($filters as $filter) {
+            $object = $filter['object'] ?? '';
+
+            if ('company' === $object) {
+                return true;
+            }
+
+            if (str_starts_with($filter['field'], 'company') && 'company' !== $filter['field']) {
+                return true;
+            }
         }
 
-        return $this->transformFilterDataForLeadPolyfill($data, $lead);
+        return false;
+    }
+
+    /**
+     * @param mixed[] $filters
+     */
+    private function doFiltersContainTagsFilter(array $filters): bool
+    {
+        foreach ($filters as $filter) {
+            if ('tags' === ($filter['type'] ?? null)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
