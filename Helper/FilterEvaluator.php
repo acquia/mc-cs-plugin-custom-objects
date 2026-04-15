@@ -67,17 +67,16 @@ class FilterEvaluator
                 continue;
             }
 
-            $matched = null;
+            $matched = false;
             foreach ($leadValues as $leadVal) {
-                if (null !== $matched) {
+                [$leadVal, $filterVal] = $this->coerceTypes($data['type'], $leadVal, $filterVal);
+                if ($this->applyOperator($data['operator'], $data['type'], $leadVal, $filterVal)) {
+                    $matched = true;
                     break;
                 }
-
-                [$leadVal, $filterVal] = $this->coerceTypes($data['type'], $leadVal, $filterVal);
-                $matched               = $this->applyOperator($data['operator'], $data['type'], $leadVal, $filterVal);
             }
 
-            $groups[$groupNum] = $matched ?? false;
+            $groups[$groupNum] = $matched;
         }
 
         return in_array(true, $groups, true);

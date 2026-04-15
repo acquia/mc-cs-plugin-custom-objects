@@ -42,9 +42,10 @@ class DynamicContentSubscriber implements EventSubscriberInterface
 
         $event->setIsEvaluated(true);
         $event->stopPropagation();
+        $contact = $event->getContact();
         $event->setIsMatched($this->contactFilterMatcher->match(
             $event->getFilters(),
-            $event->getContact()->getProfileFields()
+            array_merge(['id' => $contact->getId()], $contact->getProfileFields())
         ));
     }
 
