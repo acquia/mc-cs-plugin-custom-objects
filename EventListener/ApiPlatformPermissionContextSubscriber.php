@@ -42,11 +42,15 @@ final class ApiPlatformPermissionContextSubscriber implements EventSubscriberInt
 
     private function extractObjectPath(string $permission): ?string
     {
-        if (preg_match('#\((.*?)\)#', $permission, $match) && !empty($match[1])) {
-            return $match[1];
+        if (1 !== preg_match('#\((.*?)\)#', $permission, $match)) {
+            return null;
         }
 
-        return null;
+        if (!isset($match[1]) || '' === $match[1]) {
+            return null;
+        }
+
+        return $match[1];
     }
 
     private function resolveRequestObject(mixed $requestObject, string $objectPath): mixed
@@ -64,7 +68,11 @@ final class ApiPlatformPermissionContextSubscriber implements EventSubscriberInt
 
     private function resolvePermissionPlaceholder(\Mautic\ApiBundle\Event\ApiPlatformPermissionContextEvent $event, mixed $requestObject, string $permission): string
     {
-        if (!preg_match('#\[(.*?)\]#', $permission, $match) || empty($match[1])) {
+        if (1 !== preg_match('#\[(.*?)\]#', $permission, $match)) {
+            return $permission;
+        }
+
+        if (!isset($match[1]) || '' === $match[1]) {
             return $permission;
         }
 
