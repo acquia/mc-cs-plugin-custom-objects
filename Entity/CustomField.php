@@ -42,10 +42,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  *          "post"={"security"="'custom_objects:custom_fields:create'"}
  *     },
  *     itemOperations={
- *          "get"={"security"="'custom_objects:custom_fields:view'"},
- *          "put"={"security"="'custom_objects:custom_fields:edit'"},
- *          "patch"={"security"="'custom_objects:custom_fields:edit'"},
- *          "delete"={"security"="'custom_objects:custom_fields:delete'"}
+ *          "get"={"security"="is_granted('custom_objects:custom_fields:viewown', object)"},
+ *          "put"={"security"="is_granted('custom_objects:custom_fields:editown', object)"},
+ *          "patch"={"security"="is_granted('custom_objects:custom_fields:editown', object)"},
+ *          "delete"={"security"="is_granted('custom_objects:custom_fields:deleteown', object)"}
  *     },
  *     shortName="custom_fields",
  *     normalizationContext={"groups"={"custom_field:read"}, "swagger_definition_name"="Read"},

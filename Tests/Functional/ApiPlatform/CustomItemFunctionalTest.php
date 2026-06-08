@@ -70,6 +70,108 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
         yield [['viewown', 'editown', 'create', 'deleteown', 'publishown'], Response::HTTP_FORBIDDEN];
     }
 
+    public function testGetCustomItemDeniesOwnPermissionForOtherUsersItem(): void
+    {
+        $user = $this->getUser();
+        
+        self::assertNotNull($user);
+
+        $customItem = $this->createCustomItem(['viewown'], false, $user->getId() + 9999);
+        $response   = $this->retrieveEntity('/api/v2/custom_items/'.$customItem->getId());
+        $json       = json_decode($response->getContent(), true);
+
+        self::assertSame(Response::HTTP_FORBIDDEN, $response->getStatusCode());
+        $this->assertAccessForbiddenContent($json);
+    }
+
+    /**
+     * @dataProvider ownedCustomItemOperationsDataProvider
+     *
+     * @param array<int, string> $permissions
+     */
+    public function testOwnedCustomItemAllowsOwnScopedOperations(callable $operation, callable $assertion, array $permissions, int $expectedResponse): void
+    {
+        $customItem = $this->createCustomItem($permissions, true);
+
+        $response = $operation($this, $customItem);
+
+        self::assertSame($expectedResponse, $response->getStatusCode());
+
+        $assertion($this, $response, $customItem);
+    }
+
+    /**
+     * @return iterable<int, array{0: callable(self, CustomItem): Response, 1: callable(self, Response, CustomItem): void, 2: array<int, string>, 3: int}>
+     */
+    public function ownedCustomItemOperationsDataProvider(): iterable
+    {
+        $getOperation = static fn (self $test, CustomItem $customItem): Response => $test->retrieveEntity('/api/v2/custom_items/'.$customItem->getId());
+        $putOperation = static fn (self $test, CustomItem $customItem): Response => $test->updateEntity('/api/v2/custom_items/'.$customItem->getId(), [
+            'name'         => 'Custom Item Edited',
+            'fieldValues'  => [
+                [
+                    'id'    => '/api/v2/custom_fields/'.$customItem->getCustomObject()->getCustomFields()->first()->getId(),
+                    'value' => 'test3',
+                ],
+            ],
+        ]);
+        $patchOperation = static fn (self $test, CustomItem $customItem): Response => $test->patchEntity('/api/v2/custom_items/'.$customItem->getId(), [
+            'fieldValues'  => [
+                [
+                    'id'    => '/api/v2/custom_fields/'.$customItem->getCustomObject()->getCustomFields()->first()->getId(),
+                    'value' => 'test2',
+                ],
+            ],
+        ]);
+        $deleteOperation = static fn (self $test, CustomItem $customItem): Response => $test->deleteEntity('/api/v2/custom_items/'.$customItem->getId());
+
+        $forbiddenAssertion = static function (self $test, Response $response): void {
+            $json = json_decode($response->getContent(), true);
+            $test->assertAccessForbiddenContent($json);
+        };
+        $getSuccessAssertion = static function (self $test, Response $response, CustomItem $customItem): void {
+            $json = json_decode($response->getContent(), true);
+            $test->assertSuccessContent($json, $customItem);
+        };
+        $writeSuccessAssertion = static function (self $test, Response $response, CustomItem $customItem): void {
+            $json = json_decode($response->getContent(), true);
+            $test->em->clear();
+            $customItem = $test->em->getRepository(CustomItem::class)->find($customItem->getId());
+            $test->customItemModel->populateCustomFields($customItem);
+            $test->assertSuccessContent($json, $customItem);
+        };
+        $deleteSuccessAssertion = static function (self $test, Response $response, CustomItem $customItem): void {
+            $json = json_decode($response->getContent(), true);
+            $test->em->clear();
+            self::assertNull($json);
+            self::assertNull($test->em->getRepository(CustomItem::class)->find($customItem->getId()));
+        };
+
+        yield [$getOperation, $getSuccessAssertion, ['viewown'], Response::HTTP_OK];
+
+        yield [$getOperation, $forbiddenAssertion, [], Response::HTTP_FORBIDDEN];
+
+        yield [$getOperation, $getSuccessAssertion, ['viewown', 'viewother'], Response::HTTP_OK];
+
+        yield [$putOperation, $writeSuccessAssertion, ['editown'], Response::HTTP_OK];
+
+        yield [$putOperation, $forbiddenAssertion, ['editother'], Response::HTTP_FORBIDDEN];
+
+        yield [$putOperation, $writeSuccessAssertion, ['editown', 'editother'], Response::HTTP_OK];
+
+        yield [$patchOperation, $writeSuccessAssertion, ['editown'], Response::HTTP_OK];
+
+        yield [$patchOperation, $forbiddenAssertion, ['editother'], Response::HTTP_FORBIDDEN];
+
+        yield [$patchOperation, $writeSuccessAssertion, ['editown', 'editother'], Response::HTTP_OK];
+
+        yield [$deleteOperation, $deleteSuccessAssertion, ['deleteown'], Response::HTTP_NO_CONTENT];
+
+        yield [$deleteOperation, $forbiddenAssertion, ['deleteother'], Response::HTTP_FORBIDDEN];
+
+        yield [$deleteOperation, $deleteSuccessAssertion, ['deleteown', 'deleteother'], Response::HTTP_NO_CONTENT];
+    }
+
     /**
      * @dataProvider postCustomItemsDataProvider
      *
@@ -257,22 +359,29 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
     /**
      * @param array<int, string> $permissions
      */
-    private function createCustomItem(array $permissions): CustomItem
+    private function createCustomItem(array $permissions, bool $ownedByCurrentUser = false, ?int $ownerId = null): CustomItem
     {
         $customObject = $this->createCustomObject();
         $category     = $this->createCategory();
         $customField  = $this->createCustomField($customObject);
+        $user         = $this->getUser();
         $customItem   = new CustomItem($customObject);
         $customItem->setName('Custom Item');
         $customItem->setLanguage('en');
         $customItem->setCategory($category);
+
+        if ($ownedByCurrentUser && null !== $user) {
+            $customItem->setCreatedBy($user);
+        } elseif (null !== $ownerId) {
+            $customItem->setCreatedBy($ownerId);
+        }
+
         $customFieldValue = new CustomFieldValueText($customField, $customItem, 'value');
         $customItem->addCustomFieldValue($customFieldValue);
 
         $this->em->persist($customItem);
         $this->em->flush();
 
-        $user = $this->getUser();
         $this->setPermission($user, 'custom_objects:'.$customObject->getId(), $permissions);
 
         return $customItem;
