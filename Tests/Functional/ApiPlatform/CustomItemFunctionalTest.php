@@ -73,7 +73,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
     public function testGetCustomItemDeniesOwnPermissionForOtherUsersItem(): void
     {
         $user = $this->getUser();
-        
+
         self::assertNotNull($user);
 
         $customItem = $this->createCustomItem(['viewown'], false, $user->getId() + 9999);
