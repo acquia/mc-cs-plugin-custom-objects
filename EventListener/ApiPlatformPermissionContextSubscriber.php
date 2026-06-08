@@ -16,11 +16,18 @@ final class ApiPlatformPermissionContextSubscriber implements EventSubscriberInt
         ];
     }
 
-    public function onApiPlatformPermissionContext(\Mautic\ApiBundle\Event\ApiPlatformPermissionContextEvent $event): void
+    public function onApiPlatformPermissionContext(object $event): void
     {
-        $permission = $event->getPermission();
+        if (!method_exists($event, 'getPermission')
+            || !method_exists($event, 'setPermission')
+            || !method_exists($event, 'getRequestObject')
+            || !method_exists($event, 'setRequestObject')
+        ) {
+            return;
+        }
 
-        if (0 !== strpos($permission, 'custom_objects:')) {
+        $permission = $event->getPermission();
+        if (!is_string($permission) || 0 !== strpos($permission, 'custom_objects:')) {
             return;
         }
 
@@ -66,7 +73,7 @@ final class ApiPlatformPermissionContextSubscriber implements EventSubscriberInt
         return $requestObject;
     }
 
-    private function resolvePermissionPlaceholder(\Mautic\ApiBundle\Event\ApiPlatformPermissionContextEvent $event, mixed $requestObject, string $permission): string
+    private function resolvePermissionPlaceholder(object $event, mixed $requestObject, string $permission): string
     {
         if (1 !== preg_match('#\[(.*?)\]#', $permission, $match)) {
             return $permission;
@@ -78,7 +85,7 @@ final class ApiPlatformPermissionContextSubscriber implements EventSubscriberInt
 
         $property = $match[1];
         $objectId = null;
-        $request  = $event->getRequest();
+        $request  = method_exists($event, 'getRequest') ? $event->getRequest() : null;
         $content  = $request instanceof Request ? json_decode($request->getContent(), true) : null;
 
         if (is_array($content) && array_key_exists($property, $content)) {

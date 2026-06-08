@@ -32,10 +32,10 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  *          "post"={"security"="'custom_objects:[customObject]:create'"}
  *     },
  *     itemOperations={
- *          "get"={"security"="is_granted('custom_objects:[customObject]:viewown', object)"},
- *          "put"={"security"="is_granted('custom_objects:[customObject]:editown', object)"},
- *          "patch"={"security"="is_granted('custom_objects:[customObject]:editown', object)"},
- *          "delete"={"security"="is_granted('custom_objects:[customObject]:deleteown', object)"}
+ *          "get"={"security"="'custom_objects:[customObject]:view'"},
+ *          "put"={"security"="'custom_objects:[customObject]:edit'"},
+ *          "patch"={"security"="'custom_objects:[customObject]:edit'"},
+ *          "delete"={"security"="'custom_objects:[customObject]:delete'"}
  *     },
  *     shortName="custom_items",
  *     normalizationContext={"groups"={"custom_item:read"}, "swagger_definition_name"="Read"},
