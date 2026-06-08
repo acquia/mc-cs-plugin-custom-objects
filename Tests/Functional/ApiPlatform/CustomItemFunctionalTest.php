@@ -101,7 +101,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
     }
 
     /**
-     * @return iterable<int, array{0: callable(self, CustomItem): Response, 1: callable(self, Response, CustomItem): void, 2: array<int, string>, 3: int}>
+     * @return iterable<int, array{0: callable(self, CustomItem): Response, 1: callable(self, Response, CustomItem): void, 2: array<int, string>|, 3: int}>
      */
     public function ownedCustomItemOperationsDataProvider(): iterable
     {
