@@ -13,6 +13,13 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 final class CustomFieldOptionFunctionalTest extends AbstractApiPlatformFunctionalTest
 {
+    public function setUp(): void
+    {
+        $this->configParams['custom_objects_enabled'] = true;
+
+        parent::setUp();
+    }
+
     public function testCustomFieldOptionCRUD(): void
     {
         foreach ($this->getCRUDProvider() as $parameters) {
@@ -148,8 +155,8 @@ final class CustomFieldOptionFunctionalTest extends AbstractApiPlatformFunctiona
                     Response::HTTP_CREATED,
                     Response::HTTP_OK,
                     'New Custom Field Option',
-                    Response::HTTP_FORBIDDEN,
-                    null,
+                    Response::HTTP_OK,
+                    'Edited Custom Field Option',
                     Response::HTTP_NO_CONTENT,
                 ],
             'no_create' => [
