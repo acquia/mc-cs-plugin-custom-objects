@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
-use Mautic\ApiBundle\ApiEvents;
-use Mautic\ApiBundle\Event\ApiPlatformPermissionContextEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -14,11 +12,15 @@ final class ApiPlatformPermissionContextSubscriber implements EventSubscriberInt
     public static function getSubscribedEvents(): array
     {
         return [
-            ApiEvents::API_PLATFORM_PERMISSION_CONTEXT => ['onApiPlatformPermissionContext', 0],
+            'mautic.api_platform_permission_context' => ['onApiPlatformPermissionContext', 0],
         ];
     }
 
-    public function onApiPlatformPermissionContext(ApiPlatformPermissionContextEvent $event): void
+    /*
+     * Note, the new ApiPlatformPermissionContextEvent will be available in Mautic 7.
+     * Till then we have to go with a plain object type.
+     */
+    public function onApiPlatformPermissionContext(object $event): void
     {
         if (!method_exists($event, 'getPermission')
             || !method_exists($event, 'setPermission')
