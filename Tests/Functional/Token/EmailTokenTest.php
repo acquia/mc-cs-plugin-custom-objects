@@ -20,6 +20,12 @@ class EmailTokenTest extends MauticMysqlTestCase
 {
     use CustomObjectsTrait;
 
+    protected function setUp(): void
+    {
+        $this->configParams['custom_objects_enabled'] = true;
+        parent::setUp();
+    }
+
     public function testEmailTokens(): void
     {
         $product  = $this->createCustomObjectWithAllFields(self::$container, 'Product');
@@ -148,6 +154,7 @@ class EmailTokenTest extends MauticMysqlTestCase
 
         Assert::assertNotNull($emailStat);
 
+        $this->loginUser('admin');
         $crawler = $this->client->request(Request::METHOD_GET, "/email/view/{$emailStat->getTrackingHash()}");
 
         $body = $crawler->filter('body');
