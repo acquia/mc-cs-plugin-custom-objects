@@ -637,6 +637,9 @@ $coParams = [
             ],
         ],
         'events' => [
+            'custom_objects.api_platform.permission_context.subscriber' => [
+                'class' => \MauticPlugin\CustomObjectsBundle\EventListener\ApiPlatformPermissionContextSubscriber::class,
+            ],
             'custom_object.api.subscriber' => [
                 'class'     => \MauticPlugin\CustomObjectsBundle\EventListener\ApiSubscriber::class,
                 'arguments' => [
