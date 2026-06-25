@@ -91,7 +91,7 @@ class CampaignSubscriber implements EventSubscriberInterface
                 'description'     => $this->translator->trans('custom.item.events.field.value_descr', ['%customObject%' => $customObject->getNameSingular()]),
                 'eventName'       => CustomItemEvents::ON_CAMPAIGN_TRIGGER_CONDITION,
                 'formType'        => CampaignConditionFieldValueType::class,
-                'formTheme'       => '@MauticForm/FormTheme/FieldValueCondition/_campaignevent_form_field_value_widget.html.twig',
+                'formTheme'       => '@CustomObjects/FormTheme/FieldValueCondition/campaign_condition_field_value_widget.html.twig',
                 'formTypeOptions' => ['customObjectId' => $customObject->getId()],
             ]);
         }

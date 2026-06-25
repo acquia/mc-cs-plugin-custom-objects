@@ -1,15 +1,15 @@
-<?php declare(strict_types=1);
-
-?>
+{% block _campaignevent_properties_row %}
 <div class="row">
     <div class="col-xs-4">
-        {{ form_row(field) }}
+        {{ form_row(form.field) }}
     </div>
     <div class="col-xs-4">
-        {{ form_row(operator) }}
+        {{ form_row(form.operator) }}
     </div>
     <div class="col-xs-4">
-        {{ form_row(value) }}
+        {{ form_row(form.value) }}
     </div>
 </div>
+{{ form_widget(form.customObjectId) }}
 <script>CustomObjects.initCustomFieldConditions()</script>
+{% endblock %}
