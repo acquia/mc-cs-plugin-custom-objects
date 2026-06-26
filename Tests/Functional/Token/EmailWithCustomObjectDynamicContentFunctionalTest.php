@@ -310,6 +310,7 @@ class EmailWithCustomObjectDynamicContentFunctionalTest extends MauticMysqlTestC
 
         Assert::assertNotNull($emailStat);
 
+        $this->loginUser('admin');
         $crawler = $this->client->request(Request::METHOD_GET, "/email/view/{$emailStat->getTrackingHash()}");
 
         $body = $crawler->filter('body');
