@@ -185,6 +185,25 @@ $coParams = [
                 'method'     => 'GET|POST',
             ],
         ],
+        'api' => [
+            'mautic_api_custom_item_unlink' => [
+                'path'         => '/custom/item/{itemId}/unlink/{contactId}',
+                'controller'   => 'CustomObjectsBundle:CustomItem\Api\Custom:unlink',
+                'method'       => 'DELETE',
+                'requirements' => [
+                    'itemId'    => '\d+',
+                    'contactId' => '\d+',
+                ],
+            ],
+            'mautic_api_custom_item_delete' => [
+                'path'         => '/custom/item/{itemId}/delete',
+                'controller'   => 'CustomObjectsBundle:CustomItem\Api\Custom:delete',
+                'method'       => 'DELETE',
+                'requirements' => [
+                    'itemId'    => '\d+',
+                ],
+            ],
+        ],
     ],
 
     'services' => [
@@ -405,6 +424,20 @@ $coParams = [
                 'arguments' => [
                     'custom_item.permission.provider',
                     'mautic.custom.model.export_scheduler',
+                ],
+            ],
+
+            'custom_item.api_custom_controller' => [
+                'class'     => \MauticPlugin\CustomObjectsBundle\Controller\CustomItem\Api\CustomController::class,
+                'arguments' => [
+                    'mautic.custom.model.item',
+                    'custom_item.permission.provider',
+                    'translator',
+                ],
+                'methodCalls' => [
+                    'setContainer' => [
+                        '@service_container',
+                    ],
                 ],
             ],
 
