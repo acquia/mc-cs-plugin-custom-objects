@@ -9,6 +9,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\OneToOne;
@@ -167,7 +168,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
         $builder->addField('alias', Type::STRING);
         $builder->addNamedField('nameSingular', Type::STRING, 'name_singular');
         $builder->addNamedField('namePlural', Type::STRING, 'name_plural');
-        $builder->addNullableField('description', Type::STRING, 'description');
+        $builder->addNullableField('description', Types::TEXT, 'description');
         $builder->addNullableField('language', Type::STRING, 'lang');
         $builder->addNullableField('type', Type::INTEGER);
 
