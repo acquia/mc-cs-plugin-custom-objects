@@ -47,7 +47,6 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @throws \Doctrine\DBAL\DBALException
      */
     public function onGenerateSegmentDictionary(SegmentDictionaryGenerationEvent $event): void
     {
@@ -66,7 +65,7 @@ class SegmentFiltersDictionarySubscriber implements EventSubscriberInterface
             ->leftJoin('o', MAUTIC_TABLE_PREFIX.'custom_field', 'f', 'f.custom_object_id = o.id');
 
         $registeredObjects                = [];
-        $fields                           = $this->executeSelect($queryBuilder)->fetchAll();
+        $fields                           = $this->executeSelect($queryBuilder)->fetchAllAssociative();
         $isCustomObjectMergeFilterEnabled = $this->configProvider->isCustomObjectMergeFilterEnabled();
         $cmoType                          = CustomItemNameFilterQueryBuilder::getServiceId();
         $cmfType                          = CustomFieldFilterQueryBuilder::getServiceId();

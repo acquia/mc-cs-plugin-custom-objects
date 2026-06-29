@@ -1,0 +1,74 @@
+{% set customFieldEntity = customField.vars.data %}
+{% set order = customField.vars.value.getOrder() %}
+{% set postedCustomObject = app.request is defined and app.request ? app.request.request.get('custom_object')|default({}) : {} %}
+{% set postedFields = postedCustomObject.customFields|default({}) %}
+{% set postedField = postedFields[order]|default({}) %}
+{% set isDeleted = postedField.deleted is defined and postedField.deleted %}
+{% set resolvedPanelId = panelId is defined and panelId is not null ? panelId : order %}
+
+<div class="panel form-field-wrapper ui-sortable-handle"
+     id="customField_{{ resolvedPanelId }}"
+     {% if isDeleted %}style="display:none;"{% endif %}>
+    <div class="form-buttons btn-group" role="group" aria-label="Field options">
+        {% include '@MauticCore/Helper/button.html.twig' with {
+            buttons: [
+                {
+                    variant: 'ghost',
+                    label: 'mautic.core.form.edit',
+                    icon_only: true,
+                    icon: 'ri-edit-line text-interactive',
+                    size: 'sm',
+                    href: path(constant('MauticPlugin\\CustomObjectsBundle\\Provider\\CustomFieldRouteProvider::ROUTE_FORM'),
+                                {
+                                    'fieldId': customFieldEntity.getId(),
+                                    'objectId': customObject.getId(),
+                                    'fieldType': customFieldEntity.getTypeObject() ? customFieldEntity.getTypeObject().getKey() : ''
+                                }
+                            ),
+                    attributes: {
+                        'data-toggle': 'ajaxmodal',
+                        'data-target': '#objectFieldModal',
+                        'class': 'btn-edit'
+                    }
+                }
+            ]
+        } %}
+        {% include '@MauticCore/Helper/button.html.twig' with {
+            buttons: [
+                {
+                    label: 'mautic.core.form.delete',
+                    variant: 'ghost',
+                    danger: 'true',
+                    icon_only: 'true',
+                    size: 'sm',
+                    icon: 'ri-delete-bin-line text-danger',
+                    attributes: {
+                        'data-hide-panel': 'true',
+                        'type': 'button',
+                    }
+                }
+            ]
+        } %}
+    </div>
+    <div class="row ml-0 mr-0">
+        <div class="mauticform-row mb-0">
+            <div class="col-xs-10">
+                {{ form_row(customField.defaultValue) }}
+            </div>
+        </div>
+    </div>
+
+    <div class="hidden-fields">
+        {{ form_rest(customField) }}
+    </div>
+
+    <div class="panel-footer">
+        <i class="fa fa-cog" aria-hidden="true"></i>
+        <span class="inline-spacer">
+            {{ customFieldEntity.getTypeObject() ? customFieldEntity.getTypeObject().getName() : '' }}
+        </span>
+    </div>
+
+</div>
+
+

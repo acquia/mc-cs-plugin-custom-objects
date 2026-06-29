@@ -14,39 +14,14 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
-
 class LookupController extends JsonController
 {
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
-     * @var CustomItemPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var FlashBag
-     */
-    private $flashBag;
-
     public function __construct(
-        RequestStack $requestStack,
-        CustomItemModel $customItemModel,
-        CustomItemPermissionProvider $permissionProvider,
-        FlashBag $flashBag
+        private RequestStack $requestStack,
+        private CustomItemModel $customItemModel,
+        private CustomItemPermissionProvider $permissionProvider,
+        private FlashBag $flashBag
     ) {
-        $this->requestStack       = $requestStack;
-        $this->customItemModel    = $customItemModel;
-        $this->permissionProvider = $permissionProvider;
-        $this->flashBag           = $flashBag;
     }
 
     public function listAction(int $objectId): JsonResponse

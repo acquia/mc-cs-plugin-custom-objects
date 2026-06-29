@@ -215,13 +215,13 @@ class QueryFilterHelper
             case 'multiselect':
                 $expression     = $customQuery->expr()->in(
                     $tableAlias.'_value.value',
-                    ":${valueParameter}"
+                    ":{$valueParameter}"
                 );
 
                 break;
             case 'neq':
                 $expression     = $customQuery->expr()->orX(
-                    $customQuery->expr()->neq($tableAlias.'_value.value', ":${valueParameter}"),
+                    $customQuery->expr()->neq($tableAlias.'_value.value', ":{$valueParameter}"),
                     $customQuery->expr()->isNull($tableAlias.'_value.value')
                 );
 
@@ -233,7 +233,7 @@ class QueryFilterHelper
             case 'notLike':
                 $expression = $customQuery->expr()->orX(
                     $customQuery->expr()->isNull($tableAlias.'_value.value'),
-                    $customQuery->expr()->like($tableAlias.'_value.value', ":${valueParameter}")
+                    $customQuery->expr()->like($tableAlias.'_value.value', ":{$valueParameter}")
                 );
 
                 break;
@@ -253,7 +253,7 @@ class QueryFilterHelper
             default:
                 $expression     = $customQuery->expr()->{$operator}(
                     $tableAlias.'_value.value',
-                    ":${valueParameter}"
+                    ":{$valueParameter}"
                 );
         }
 
@@ -290,13 +290,13 @@ class QueryFilterHelper
             case 'in':
                 $expression     = $customQuery->expr()->in(
                     $tableAlias.'_item.name',
-                    ":${valueParameter}"
+                    ":{$valueParameter}"
                 );
 
                 break;
             case 'neq':
                 $expression     = $customQuery->expr()->orX(
-                    $customQuery->expr()->eq($tableAlias.'_item.name', ":${valueParameter}"),
+                    $customQuery->expr()->eq($tableAlias.'_item.name', ":{$valueParameter}"),
                     $customQuery->expr()->isNull($tableAlias.'_item.name')
                 );
 
@@ -304,14 +304,14 @@ class QueryFilterHelper
             case 'notLike':
                 $expression = $customQuery->expr()->orX(
                     $customQuery->expr()->isNull($tableAlias.'_item.name'),
-                    $customQuery->expr()->like($tableAlias.'_item.name', ":${valueParameter}")
+                    $customQuery->expr()->like($tableAlias.'_item.name', ":{$valueParameter}")
                 );
 
                 break;
             default:
                 $expression     = $customQuery->expr()->{$operator}(
                     $tableAlias.'_item.name',
-                    ":${valueParameter}"
+                    ":{$valueParameter}"
                 );
         }
 

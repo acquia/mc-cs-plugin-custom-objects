@@ -2,11 +2,10 @@
 
 namespace MauticPlugin\CustomObjectsBundle\DataPersister;
 
-use ApiPlatform\Core\DataPersister\DataPersisterInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 
-final class CustomItemDataPersister implements DataPersisterInterface
+final class CustomItemDataPersister
 {
     private CustomItemModel $customItemModel;
 

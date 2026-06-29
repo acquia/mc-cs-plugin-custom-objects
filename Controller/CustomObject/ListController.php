@@ -13,48 +13,34 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
-use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Component\HttpFoundation\RequestStack;
 class ListController extends CommonController
 {
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var SessionProviderFactory
-     */
-    private $sessionProviderFactory;
-
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    /**
-     * @var CustomObjectPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var CustomObjectRouteProvider
-     */
-    private $routeProvider;
-
     public function __construct(
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
         RequestStack $requestStack,
-        SessionProviderFactory $sessionProviderFactory,
-        CustomObjectModel $customObjectModel,
-        CustomObjectPermissionProvider $permissionProvider,
-        CustomObjectRouteProvider $routeProvider
+        CorePermissions $security,
+        private CustomObjectPermissionProvider $permissionProvider,
+        private CustomObjectRouteProvider $routeProvider,
+        private CustomObjectModel $customObjectModel,
+        private SessionProviderFactory $sessionProviderFactory,
     ) {
-        $this->requestStack              = $requestStack;
-        $this->sessionProviderFactory    = $sessionProviderFactory;
-        $this->customObjectModel         = $customObjectModel;
-        $this->permissionProvider        = $permissionProvider;
-        $this->routeProvider             = $routeProvider;
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     public function listAction(int $page = 1): Response
@@ -65,7 +51,7 @@ class ListController extends CommonController
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        $request         = $this->requestStack->getCurrentRequest();
+        $request         = $this->getCurrentRequest();
         $sessionProvider = $this->sessionProviderFactory->createObjectProvider();
         $search          = InputHelper::clean($request->get('search', $sessionProvider->getFilter()));
         $limit           = (int) $request->get('limit', $sessionProvider->getPageLimit());
@@ -81,6 +67,7 @@ class ListController extends CommonController
         }
 
         $tableConfig = new TableConfig($limit, $page, $orderBy, $orderByDir);
+        $tableConfig->addParameter('search', $search);
 
         $sessionProvider->setPage($page);
         $sessionProvider->setPageLimit($limit);
@@ -97,8 +84,10 @@ class ListController extends CommonController
                     'limit'          => $limit,
                     'tmpl'           => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                     'sessionVar'     => $sessionProvider->getNamespace(),
+                    'tableAlias'     => CustomObject::TABLE_ALIAS,
+                    'viewRoute'      => CustomObjectRouteProvider::ROUTE_VIEW
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObject:list.html.php',
+                'contentTemplate' => '@CustomObjects/CustomObject/list.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
                     'route'         => $route,

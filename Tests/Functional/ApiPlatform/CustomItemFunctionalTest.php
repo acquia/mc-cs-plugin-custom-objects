@@ -12,7 +12,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
 {
@@ -402,7 +402,7 @@ final class CustomItemFunctionalTest extends AbstractApiPlatformFunctionalTest
 
     private function createCustomField(CustomObject $customObject): CustomField
     {
-        $translatorMock             = $this->createMock(TranslatorInterface::class);
+        $translatorMock             = $this->createMock(Translator::class);
         $filterOperatorProviderMock = $this->createMock(FilterOperatorProviderInterface::class);
         $customFieldType            = new TextType($translatorMock, $filterOperatorProviderMock);
         $customField                = new CustomField();

@@ -4,23 +4,32 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
-use DateTimeImmutable;
 use DateTimeZone;
-use Mautic\CoreBundle\Helper\ExportHelper;
-use Mautic\CoreBundle\Model\AbstractCommonModel;
+use DateTimeImmutable;
+use Psr\Log\LoggerInterface;
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\EmailBundle\Helper\MailHelper;
-use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemExportScheduler;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomItemExportSchedulerRepository;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Mautic\CoreBundle\Helper\ExportHelper;
+use Symfony\Contracts\EventDispatcher\Event;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\CoreBundle\Helper\FilePathResolver;
 use Symfony\Component\HttpFoundation\Response;
+use Mautic\CoreBundle\Model\AbstractCommonModel;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemExportScheduler;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemExportSchedulerRepository;
 
 class CustomItemExportSchedulerModel extends AbstractCommonModel
 {
@@ -28,38 +37,27 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
     private const CUSTOM_ITEM_LIMIT            = 200;
     private const CONTACT_LIMIT                = 5000;
 
-    private ExportHelper $exportHelper;
-
-    private MailHelper $mailHelper;
-
-    private CustomItemRouteProvider $customItemRouteProvider;
-
-    private CustomFieldValueModel $customFieldValueModel;
-
-    private CustomItemXrefContactRepository $customItemXrefContactRepository;
-
-    private CustomItemRepository $customItemRepository;
-
-    private EventDispatcherInterface $eventDispatcher;
-
     private string $filePath;
 
     public function __construct(
-        ExportHelper $exportHelper,
-        MailHelper $mailHelper,
-        CustomFieldValueModel $customFieldValueModel,
-        CustomItemRouteProvider $customItemRouteProvider,
-        CustomItemXrefContactRepository $customItemXrefContactRepository,
-        CustomItemRepository $customItemRepository,
-        EventDispatcherInterface $eventDispatcher
+        EntityManager $entityManager,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper,
+        private ExportHelper $exportHelper,
+        private MailHelper $mailHelper,
+        private CustomFieldValueModel $customFieldValueModel,
+        private CustomItemRouteProvider $customItemRouteProvider,
+        private CustomItemXrefContactRepository $customItemXrefContactRepository,
+        private CustomItemRepository $customItemRepository,
+        private EventDispatcherInterface $eventDispatcher,
+        private FilePathResolver $filePathResolver
     ) {
-        $this->exportHelper                    = $exportHelper;
-        $this->mailHelper                      = $mailHelper;
-        $this->customFieldValueModel           = $customFieldValueModel;
-        $this->customItemRouteProvider         = $customItemRouteProvider;
-        $this->customItemXrefContactRepository = $customItemXrefContactRepository;
-        $this->customItemRepository            = $customItemRepository;
-        $this->eventDispatcher                 = $eventDispatcher;
+        parent::__construct($entityManager, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function getRepository(): CustomItemExportSchedulerRepository
@@ -93,7 +91,7 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
         $scheduledDateTime = $customItemExportScheduler->getScheduledDateTime();
         $fileName          = 'custom_items_export_'.$scheduledDateTime->format(self::EXPORT_FILE_NAME_DATE_FORMAT).'.csv';
 
-        $filePath = $this->exportHelper->getValidExportFileName($fileName, 'custom_item_export_dir');
+        $filePath = $this->getValidExportFileName($fileName, 'custom_item_export_dir');
 
         $this->filePath = $filePath;
 
@@ -207,7 +205,7 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
                     $rowData[] = implode(',', $results);
 
                     if ($this->eventDispatcher->hasListeners(CustomItemEvents::ON_PROCESSING_FILE)) {
-                        $this->eventDispatcher->dispatch(CustomItemEvents::ON_PROCESSING_FILE);
+                        $this->eventDispatcher->dispatch(new Event(), CustomItemEvents::ON_PROCESSING_FILE);
                     }
 
                     fputcsv($handler, $rowData);
@@ -290,5 +288,24 @@ class CustomItemExportSchedulerModel extends AbstractCommonModel
                 'Pragma'              => 'public',
             ]
         );
+    }
+
+    public function getValidExportFileName(string $fileName, string $directory): string
+    {
+        $contactExportDir = $this->coreParametersHelper->get($directory);
+        $this->filePathResolver->createDirectory($contactExportDir);
+        $filePath     = $contactExportDir.'/'.$fileName;
+        $fileName     = (string) pathinfo($filePath, PATHINFO_FILENAME);
+        $extension    = (string) pathinfo($filePath, PATHINFO_EXTENSION);
+        $originalName = $fileName;
+        $i            = 1;
+
+        while (file_exists($filePath)) {
+            $fileName = $originalName.'_'.$i;
+            $filePath = $contactExportDir.'/'.$fileName.'.'.$extension;
+            ++$i;
+        }
+
+        return $filePath;
     }
 }

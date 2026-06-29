@@ -15,7 +15,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCompany;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 class CustomItemTest extends \PHPUnit\Framework\TestCase
 {
@@ -116,7 +116,7 @@ class CustomItemTest extends \PHPUnit\Framework\TestCase
         $field->method('getId')->willReturn(1);
         $field->method('getTypeObject')->willReturn(
             new TextType(
-                $this->createMock(TranslatorInterface::class),
+                $this->createMock(Translator::class),
                 $this->createMock(FilterOperatorProviderInterface::class)
             )
         );
@@ -143,7 +143,7 @@ class CustomItemTest extends \PHPUnit\Framework\TestCase
         $field->method('getId')->willReturn(1);
         $field->method('getTypeObject')->willReturn(
             new TextType(
-                $this->createMock(TranslatorInterface::class),
+                $this->createMock(Translator::class),
                 $this->createMock(FilterOperatorProviderInterface::class)
             )
         );
@@ -172,7 +172,7 @@ class CustomItemTest extends \PHPUnit\Framework\TestCase
         $fieldA->expects($this->never())->method('getDefaultValue');
         $fieldA->method('getTypeObject')->willReturn(
             new TextType(
-                $this->createMock(TranslatorInterface::class),
+                $this->createMock(Translator::class),
                 $this->createMock(FilterOperatorProviderInterface::class)
             )
         );
@@ -181,7 +181,7 @@ class CustomItemTest extends \PHPUnit\Framework\TestCase
         $fieldB->expects($this->once())->method('getDefaultValue')->willReturn('Default B');
         $fieldB->method('getTypeObject')->willReturn(
             new TextType(
-                $this->createMock(TranslatorInterface::class),
+                $this->createMock(Translator::class),
                 $this->createMock(FilterOperatorProviderInterface::class)
             )
         );
@@ -190,7 +190,7 @@ class CustomItemTest extends \PHPUnit\Framework\TestCase
         $fieldB->expects($this->once())->method('getDefaultValue')->willReturn(null);
         $fieldC->method('getTypeObject')->willReturn(
             new TextType(
-                $this->createMock(TranslatorInterface::class),
+                $this->createMock(Translator::class),
                 $this->createMock(FilterOperatorProviderInterface::class)
             )
         );

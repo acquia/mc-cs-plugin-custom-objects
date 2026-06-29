@@ -16,50 +16,36 @@ use MauticPlugin\CustomObjectsBundle\Form\Type\CustomItemType;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
-use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use UnexpectedValueException;
-
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Translation\Translator;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Component\HttpFoundation\RequestStack;
 class LinkFormController extends AbstractFormController
 {
-    /**
-     * @var FormFactory
-     */
-    private $formFactory;
-
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
-     * @var CustomItemPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var FlashBag
-     */
-    private $flashBag;
-
-    /**
-     * @var CustomItemRouteProvider
-     */
-    private $routeProvider;
-
     public function __construct(
-        FormFactory $formFactory,
-        CustomItemModel $customItemModel,
-        CustomItemPermissionProvider $permissionProvider,
-        CustomItemRouteProvider $customItemRouteProvider,
-        FlashBag $flashBag
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        private FlashBag $flashBag,
+        private RequestStack $requestStack,
+        CorePermissions $security,
+        private FormFactoryInterface $formFactory,
+        private CustomItemModel $customItemModel,
+        private CustomItemPermissionProvider $permissionProvider,
+        private CustomItemRouteProvider $routeProvider,
     ) {
-        $this->formFactory        = $formFactory;
-        $this->customItemModel    = $customItemModel;
-        $this->permissionProvider = $permissionProvider;
-        $this->routeProvider      = $customItemRouteProvider;
-        $this->flashBag           = $flashBag;
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     public function formAction(int $itemId, string $entityType, int $entityId): Response
@@ -95,7 +81,7 @@ class LinkFormController extends AbstractFormController
                         'customObject' => $relationshipObject,
                         'form'         => $form->createView(),
                     ],
-                    'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.php',
+                    'contentTemplate' => '@CustomObjects/CustomItem/form.html.twig',
                     'passthroughVars' => [
                         'callback'      => 'customItemLinkFormLoad',
                         'mauticContent' => 'customItem',
@@ -109,7 +95,7 @@ class LinkFormController extends AbstractFormController
 
         $responseData = [
             'closeModal' => true,
-            'flashes'    => $this->renderView('MauticCoreBundle:Notification:flash_messages.html.php'),
+            'flashes'    => $this->renderView('@MauticCore/Notification/flash_messages.html.twig'),
         ];
 
         return new JsonResponse($responseData);
@@ -143,7 +129,7 @@ class LinkFormController extends AbstractFormController
                 ]
             );
 
-            $form->handleRequest($this->request);
+            $form->handleRequest($this->requestStack->getCurrentRequest());
 
             if ($form->isValid()) {
                 $callback         = $relationshipItem->getId() ? null : 'customItemLinkFormPostSubmit';
@@ -152,7 +138,7 @@ class LinkFormController extends AbstractFormController
                 $responseData = [
                     'closeModal' => true,
                     'callback'   => $callback,
-                    'flashes'    => $this->renderView('MauticCoreBundle:Notification:flash_messages.html.php'),
+                    'flashes'    => $this->renderView('@MauticCore/Notification/flash_messages.html.twig'),
                 ];
 
                 return new JsonResponse($responseData);
@@ -168,9 +154,9 @@ class LinkFormController extends AbstractFormController
                     'entity'       => $relationshipItem,
                     'customObject' => $relationshipObject,
                     'form'         => $form->createView(),
-                    'tmpl'         => $this->request->isXmlHttpRequest() ? $this->request->get('tmpl', 'index') : 'index',
+                    'tmpl'         => $this->requestStack->getCurrentRequest()->isXmlHttpRequest() ? $this->requestStack->getCurrentRequest()->get('tmpl', 'index') : 'index',
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.php',
+                'contentTemplate' => '@CustomObjects/CustomItem/form.html.twig',
                 'passthroughVars' => [
                     'closeModal'    => false,
                     'callback'      => 'customItemLinkFormLoad',

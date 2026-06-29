@@ -4,7 +4,13 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomItem;
 
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomItem\BatchDeleteController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
@@ -15,6 +21,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -35,21 +42,35 @@ class BatchDeleteControllerTest extends ControllerTestCase
     {
         parent::setUp();
 
+        $doctrine             = $this->createMock(ManagerRegistry::class);
+        $modelFactory         = $this->createMock(ModelFactory::class);
+        $userHelper           = $this->createMock(UserHelper::class);
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $dispatcher           = $this->createMock(EventDispatcherInterface::class);
+        $translator           = $this->createMock(Translator::class);
+        $this->flashBag       = $this->createMock(FlashBag::class);
+        $this->requestStack   = $this->createMock(RequestStack::class);
+        $security             = $this->createMock(CorePermissions::class);
         $sessionProviderFactory      = $this->createMock(SessionProviderFactory::class);
-        $this->requestStack          = $this->createMock(RequestStack::class);
         $this->customItemModel       = $this->createMock(CustomItemModel::class);
         $this->sessionProvider       = $this->createMock(SessionProvider::class);
-        $this->flashBag              = $this->createMock(FlashBag::class);
         $this->permissionProvider    = $this->createMock(CustomItemPermissionProvider::class);
         $this->routeProvider         = $this->createMock(CustomItemRouteProvider::class);
         $this->request               = $this->createMock(Request::class);
         $this->batchDeleteController = new BatchDeleteController(
+            $doctrine,
+            $modelFactory,
+            $userHelper,
+            $coreParametersHelper,
+            $dispatcher,
+            $translator,
+            $this->flashBag,
             $this->requestStack,
-            $this->customItemModel,
-            $sessionProviderFactory,
+            $security,
             $this->permissionProvider,
             $this->routeProvider,
-            $this->flashBag
+            $this->customItemModel,
+            $sessionProviderFactory
         );
 
         $this->addSymfonyDependencies($this->batchDeleteController);

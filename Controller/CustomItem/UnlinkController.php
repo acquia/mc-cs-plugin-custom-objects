@@ -15,29 +15,11 @@ use UnexpectedValueException;
 
 class UnlinkController extends JsonController
 {
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
-     * @var CustomItemPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var FlashBag
-     */
-    private $flashBag;
-
     public function __construct(
-        CustomItemModel $customItemModel,
-        CustomItemPermissionProvider $permissionProvider,
-        FlashBag $flashBag
+        private CustomItemModel $customItemModel,
+        private CustomItemPermissionProvider $permissionProvider,
+        private FlashBag $flashBag
     ) {
-        $this->customItemModel    = $customItemModel;
-        $this->permissionProvider = $permissionProvider;
-        $this->flashBag           = $flashBag;
     }
 
     public function saveAction(int $itemId, string $entityType, int $entityId): JsonResponse

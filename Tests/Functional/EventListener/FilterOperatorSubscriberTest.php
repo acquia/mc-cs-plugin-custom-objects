@@ -93,7 +93,7 @@ class FilterOperatorSubscriberTest extends MauticMysqlTestCase
 
         $leadField = $this->createField('date_field', 'date');
 
-        $fieldTypeProvider = self::$container->get('custom_field.type.provider');
+        $fieldTypeProvider = self::getContainer()->get('custom_field.type.provider');
         \assert($fieldTypeProvider instanceof CustomFieldTypeProvider);
         $objectType = $fieldTypeProvider->getType('date');
         $dateField  = $this->createCustomField('co_date_field', $objectType);

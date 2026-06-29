@@ -6,7 +6,7 @@ namespace MauticPlugin\CustomObjectsBundle\Event;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class CustomItemListDbalQueryEvent extends Event
 {

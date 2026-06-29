@@ -26,7 +26,7 @@ use MauticPlugin\CustomObjectsBundle\Tests\ProjectVersionTrait;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 class SegmentFiltersChoicesGenerateSubscriberTest extends TestCase
 {
@@ -38,7 +38,7 @@ class SegmentFiltersChoicesGenerateSubscriberTest extends TestCase
     private $customObjectRepository;
 
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject|Translator
      */
     private $translator;
 
@@ -77,7 +77,7 @@ class SegmentFiltersChoicesGenerateSubscriberTest extends TestCase
         parent::setUp();
 
         $this->customObjectRepository = $this->createMock(CustomObjectRepository::class);
-        $this->translator             = $this->createMock(TranslatorInterface::class);
+        $this->translator             = $this->createMock(Translator::class);
         $this->configProvider         = $this->createMock(ConfigProvider::class);
         $this->fieldTypeProvider      = $this->createMock(CustomFieldTypeProvider::class);
         $this->filterOperatorProvider = $this->createMock(FilterOperatorProviderInterface::class);

@@ -16,60 +16,35 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Translation\Translator;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
 
 class ViewController extends CommonController
 {
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
-     * @var CustomItemXrefContactModel
-     */
-    private $customItemXrefContactModel;
-
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
-    /**
-     * @var CustomItemPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var CustomItemRouteProvider
-     */
-    private $routeProvider;
-
-    /**
-     * @var FormFactoryInterface
-     */
-    private $formFactory;
-
     public function __construct(
-        RequestStack $requestStack,
-        FormFactoryInterface $formFactory,
-        CustomItemModel $customItemModel,
-        CustomItemXrefContactModel $customItemXrefContactModel,
-        AuditLogModel $auditLogModel,
-        CustomItemPermissionProvider $permissionProvider,
-        CustomItemRouteProvider $routeProvider
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        private RequestStack $requestStack,
+        CorePermissions $security,
+        private FormFactoryInterface $formFactory,
+        private CustomItemModel $customItemModel,
+        private CustomItemXrefContactModel $customItemXrefContactModel,
+        private AuditLogModel $auditLogModel,
+        private CustomItemPermissionProvider $permissionProvider,
+        private CustomItemRouteProvider $routeProvider
     ) {
-        $this->requestStack               = $requestStack;
-        $this->formFactory                = $formFactory;
-        $this->customItemModel            = $customItemModel;
-        $this->customItemXrefContactModel = $customItemXrefContactModel;
-        $this->auditLogModel              = $auditLogModel;
-        $this->permissionProvider         = $permissionProvider;
-        $this->routeProvider              = $routeProvider;
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     public function viewAction(int $objectId, int $itemId): Response
@@ -106,7 +81,7 @@ class ViewController extends CommonController
                     'stats'         => $stats,
                     'logs'          => $auditLogs,
                     'contacts'      => $this->forward(
-                        'CustomObjectsBundle:CustomItem\ContactList:list',
+                        'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ContactListController::listAction',
                         [
                             'objectId'   => $itemId,
                             'page'       => 1,
@@ -114,7 +89,7 @@ class ViewController extends CommonController
                         ]
                     )->getContent(),
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomItem:detail.html.php',
+                'contentTemplate' => '@CustomObjects/CustomItem/details.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customItem',
                     'activeLink'    => "#mautic_custom_object_{$objectId}",

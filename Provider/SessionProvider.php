@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Provider;
 
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class SessionProvider
 {
@@ -34,9 +34,9 @@ class SessionProvider
     private const KEY_FILTER = 'filter';
 
     /**
-     * @var Session
+     * @var RequestStack
      */
-    private $session;
+    private $requestStack;
 
     /**
      * @var int
@@ -48,9 +48,9 @@ class SessionProvider
      */
     private $namespace;
 
-    public function __construct(Session $session, string $namespace, int $defaultPageLimit)
+    public function __construct(RequestStack $requestStack, string $namespace = '', int $defaultPageLimit = 20)
     {
-        $this->session          = $session;
+        $this->requestStack     = $requestStack;
         $this->namespace        = $namespace;
         $this->defaultPageLimit = $defaultPageLimit;
     }
@@ -117,12 +117,14 @@ class SessionProvider
      */
     private function getValue(string $key, $default)
     {
-        return $this->session->get($this->buildName($key), $default);
+        $session = $this->requestStack->getSession();
+        return $session->get($this->buildName($key), $default);
     }
 
     private function setValue(string $key, $value): void
     {
-        $this->session->set($this->buildName($key), $value);
+        $session = $this->requestStack->getSession();
+        $session->set($this->buildName($key), $value);
     }
 
     private function buildName(string $key): string

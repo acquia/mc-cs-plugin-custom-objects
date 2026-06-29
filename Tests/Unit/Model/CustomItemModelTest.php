@@ -34,6 +34,11 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use UnexpectedValueException;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Mautic\CoreBundle\Translation\Translator;
+use Psr\Log\LoggerInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 class CustomItemModelTest extends TestCase
 {
@@ -100,7 +105,12 @@ class CustomItemModelTest extends TestCase
             $this->userHelper,
             $this->customFieldValueModel,
             $this->dispatcher,
-            $this->validator
+            $this->validator,
+            $this->createMock(CorePermissions::class),
+            $this->createMock(UrlGeneratorInterface::class),
+            $this->createMock(Translator::class),
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(CoreParametersHelper::class),
         );
 
         $this->entityManager->method('createQueryBuilder')->willReturn($this->queryBuilder);

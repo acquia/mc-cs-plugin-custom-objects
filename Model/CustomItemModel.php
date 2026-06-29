@@ -4,36 +4,41 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
-use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\QueryBuilder;
-use Mautic\CoreBundle\Doctrine\Helper\FulltextKeyword;
-use Mautic\CoreBundle\Entity\CommonRepository;
-use Mautic\CoreBundle\Helper\DateTimeHelper;
-use Mautic\CoreBundle\Helper\UserHelper;
-use Mautic\CoreBundle\Model\FormModel;
-use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
-use MauticPlugin\CustomObjectsBundle\DTO\CustomItemFieldListData;
-use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefInterface;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
-use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
-use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Psr\Log\LoggerInterface;
 use UnexpectedValueException;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\EntityManager;
+use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Helper\DateTimeHelper;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\CoreBundle\Entity\CommonRepository;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
+use Mautic\CoreBundle\Doctrine\Helper\FulltextKeyword;
+use MauticPlugin\CustomObjectsBundle\CustomItemEvents;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemEvent;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use MauticPlugin\CustomObjectsBundle\DTO\CustomItemFieldListData;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueText;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueOption;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefInterface;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemListQueryEvent;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityEvent;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Event\CustomItemXrefEntityDiscoveryEvent;
 
 class CustomItemModel extends FormModel
 {
@@ -69,7 +74,12 @@ class CustomItemModel extends FormModel
         UserHelper $userHelper,
         CustomFieldValueModel $customFieldValueModel,
         EventDispatcherInterface $dispatcher,
-        ValidatorInterface $validator
+        ValidatorInterface $validator,
+        CorePermissions $security,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper,
     ) {
         $this->entityManager         = $entityManager;
         $this->customItemRepository  = $customItemRepository;
@@ -78,6 +88,7 @@ class CustomItemModel extends FormModel
         $this->customFieldValueModel = $customFieldValueModel;
         $this->dispatcher            = $dispatcher;
         $this->validator             = $validator;
+        parent::__construct($entityManager, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     public function save(CustomItem $customItem, bool $dryRun = false): CustomItem
@@ -102,7 +113,7 @@ class CustomItemModel extends FormModel
             throw new InvalidValueException($errors->get(0)->getMessage());
         }
 
-        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE, new CustomItemEvent($customItem, $customItem->isNew()));
+        $this->dispatcher->dispatch(new CustomItemEvent($customItem, $customItem->isNew()), CustomItemEvents::ON_CUSTOM_ITEM_PRE_SAVE);
 
         if (!$dryRun) {
             if ($customItem->isNew()) {
@@ -134,7 +145,7 @@ class CustomItemModel extends FormModel
 
             $customItem->recordCustomFieldValueChanges();
 
-            $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE, new CustomItemEvent($customItem, $customItem->isNew()));
+            $this->dispatcher->dispatch(new CustomItemEvent($customItem, $customItem->isNew()), CustomItemEvents::ON_CUSTOM_ITEM_POST_SAVE);
         }
 
         return $customItem;
@@ -163,13 +174,13 @@ class CustomItemModel extends FormModel
     {
         $event = new CustomItemXrefEntityDiscoveryEvent($customItem, $entityType, $entityId);
 
-        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY, $event);
+        $this->dispatcher->dispatch($event, CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY);
 
         if (!$event->getXrefEntity() instanceof CustomItemXrefInterface) {
             throw new UnexpectedValueException("Entity {$entityType} was not able to be linked to {$customItem->getName()} ({$customItem->getId()})");
         }
 
-        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY, new CustomItemXrefEntityEvent($event->getXrefEntity()));
+        $this->dispatcher->dispatch(new CustomItemXrefEntityEvent($event->getXrefEntity()), CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY);
 
         return $event->getXrefEntity();
     }
@@ -181,13 +192,13 @@ class CustomItemModel extends FormModel
     {
         $event = new CustomItemXrefEntityDiscoveryEvent($customItem, $entityType, $entityId);
 
-        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY, $event);
+        $this->dispatcher->dispatch($event, CustomItemEvents::ON_CUSTOM_ITEM_LINK_ENTITY_DISCOVERY);
 
         if (!$event->getXrefEntity() instanceof CustomItemXrefInterface) {
             throw new UnexpectedValueException("Entity {$entityType} was not able to be unlinked from {$customItem->getName()} ({$customItem->getId()})");
         }
 
-        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_UNLINK_ENTITY, new CustomItemXrefEntityEvent($event->getXrefEntity()));
+        $this->dispatcher->dispatch(new CustomItemXrefEntityEvent($event->getXrefEntity()), CustomItemEvents::ON_CUSTOM_ITEM_UNLINK_ENTITY);
 
         return $event->getXrefEntity();
     }
@@ -197,14 +208,14 @@ class CustomItemModel extends FormModel
         //take note of ID before doctrine wipes it out
         $id    = $customItem->getId();
         $event = new CustomItemEvent($customItem);
-        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_PRE_DELETE, $event);
+        $this->dispatcher->dispatch($event, CustomItemEvents::ON_CUSTOM_ITEM_PRE_DELETE);
 
         $this->entityManager->remove($customItem);
         $this->entityManager->flush();
 
         //set the id for use in events
         $customItem->deletedId = $id;
-        $this->dispatcher->dispatch(CustomItemEvents::ON_CUSTOM_ITEM_POST_DELETE, $event);
+        $this->dispatcher->dispatch($event, CustomItemEvents::ON_CUSTOM_ITEM_POST_DELETE);
     }
 
     /**
@@ -232,8 +243,8 @@ class CustomItemModel extends FormModel
         $queryBuilder = $this->createListOrmQueryBuilder($tableConfig);
 
         $this->dispatcher->dispatch(
-            CustomItemEvents::ON_CUSTOM_ITEM_LIST_ORM_QUERY,
-            new CustomItemListQueryEvent($queryBuilder, $tableConfig)
+            new CustomItemListQueryEvent($queryBuilder, $tableConfig),
+            CustomItemEvents::ON_CUSTOM_ITEM_LIST_ORM_QUERY
         );
 
         return $queryBuilder->getQuery()->getResult();
@@ -247,11 +258,11 @@ class CustomItemModel extends FormModel
         $queryBuilder = $this->createListDbalQueryBuilder($tableConfig);
 
         $this->dispatcher->dispatch(
-            CustomItemEvents::ON_CUSTOM_ITEM_LIST_DBAL_QUERY,
-            new CustomItemListDbalQueryEvent($queryBuilder, $tableConfig)
+            new CustomItemListDbalQueryEvent($queryBuilder, $tableConfig),
+            CustomItemEvents::ON_CUSTOM_ITEM_LIST_DBAL_QUERY
         );
 
-        return $queryBuilder->execute()->fetchAll();
+        return $queryBuilder->executeQuery()->fetchAllAssociative();
     }
 
     public function getCountForTable(TableConfig $tableConfig): int
@@ -263,8 +274,8 @@ class CustomItemModel extends FormModel
         $queryBuilder->resetDQLPart('orderBy');
 
         $this->dispatcher->dispatch(
-            CustomItemEvents::ON_CUSTOM_ITEM_LIST_ORM_QUERY,
-            new CustomItemListQueryEvent($queryBuilder, $tableConfig)
+            new CustomItemListQueryEvent($queryBuilder, $tableConfig),
+            CustomItemEvents::ON_CUSTOM_ITEM_LIST_ORM_QUERY
         );
 
         return (int) $queryBuilder->getQuery()->getSingleScalarResult();
@@ -280,8 +291,8 @@ class CustomItemModel extends FormModel
         $queryBuilder->select("{$rootAlias}.name as value, {$rootAlias}.id");
 
         $this->dispatcher->dispatch(
-            CustomItemEvents::ON_CUSTOM_ITEM_LOOKUP_QUERY,
-            new CustomItemListQueryEvent($queryBuilder, $tableConfig)
+            new CustomItemListQueryEvent($queryBuilder, $tableConfig),
+            CustomItemEvents::ON_CUSTOM_ITEM_LOOKUP_QUERY
         );
 
         $rows = $queryBuilder->getQuery()->getArrayResult();

@@ -16,51 +16,37 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class DeleteController extends CommonController
 {
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    /**
-     * @var SessionProviderFactory
-     */
-    private $sessionProviderFactory;
-
-    /**
-     * @var FlashBag
-     */
-    private $flashBag;
-
-    /**
-     * @var CustomObjectPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var EventDispatcherInterface
-     */
-    private $eventDispatcher;
-
     public function __construct(
-        CustomObjectModel $customObjectModel,
-        SessionProviderFactory $sessionProviderFactory,
-        FlashBag $flashBag,
-        CustomObjectPermissionProvider $permissionProvider,
-        EventDispatcherInterface $eventDispatcher
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        private FlashBag $flashBag,
+        private RequestStack $requestStack,
+        CorePermissions $security,
+        private CustomObjectModel $customObjectModel,
+        private SessionProviderFactory $sessionProviderFactory,
+        private CustomObjectPermissionProvider $permissionProvider,
+        private EventDispatcherInterface $eventDispatcher
     ) {
-        $this->customObjectModel      = $customObjectModel;
-        $this->sessionProviderFactory = $sessionProviderFactory;
-        $this->flashBag               = $flashBag;
-        $this->permissionProvider     = $permissionProvider;
-        $this->eventDispatcher        = $eventDispatcher;
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     public function deleteAction(int $objectId): Response
     {
-        $controller = 'CustomObjectsBundle:CustomObject\List:list';
+        $controller = 'MauticPlugin\CustomObjectsBundle\Controller\CustomObject\ListController::listAction';
         $page       = [
             'page' => $this->sessionProviderFactory->createObjectProvider()->getPage(),
         ];
@@ -95,7 +81,7 @@ class DeleteController extends CommonController
 
         $customObjectEvent = new CustomObjectEvent($customObject);
         $customObjectEvent->setFlashBag($this->flashBag);
-        $this->eventDispatcher->dispatch(CustomObjectEvents::ON_CUSTOM_OBJECT_USER_PRE_DELETE, $customObjectEvent);
+        $this->eventDispatcher->dispatch(new CustomObjectEvent($customObject), CustomObjectEvents::ON_CUSTOM_OBJECT_USER_PRE_DELETE);
 
         return $this->forward(
             $controller,

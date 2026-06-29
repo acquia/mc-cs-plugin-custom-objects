@@ -1,0 +1,38 @@
+<div class="tab-pane fade bdr-w-0 custom-object-tab" id="{{ tabId }}-container">
+	<div class="panel panel-default">
+		<div class="panel-heading pa-0">
+			<div class="d-flex ai-center list-toolbar toolbar--toolbar-content h-48">
+				{{ include('@MauticCore/Helper/search.html.twig', {
+                    'searchValue': searchValue,
+                    'action': searchRoute,
+                    'searchId': searchId,
+                    'target': '#' ~ namespace,
+                    'searchHelp': ''
+                }) }}
+				<a href="{{ linkRoute }}" class="btn btn-primary bdr-r" data-toggle="ajaxmodal" data-target="#customItemLookupModal" data-header="{{ linkHeader }}">
+					<span>
+						<i class="ri-link"></i>
+						<span class="hidden-xs hidden-sm">
+							{{ 'custom.item.link.existing'|trans }}
+						</span>
+					</span>
+				</a>
+				<a href="{{ newRoute }}" class="btn btn-primary" data-toggle="ajax">
+					<span>
+						<i class="ri-add-line"></i>
+						<span class="hidden-xs hidden-sm">
+							{{ 'custom.item.link.new'|trans }}
+						</span>
+					</span>
+				</a>
+			</div>
+		</div>
+		<div class="custom-item-list page-list" id="{{ namespace }}">
+			Loading...
+		</div>
+		<script type="text/javascript">
+			CustomObjects.reloadItemsTable({{ customObjectId }}, {{ currentEntityId }}, '{{ currentEntityType }}', '{{ tabId }}');
+		</script>
+	</div>
+</div>
+

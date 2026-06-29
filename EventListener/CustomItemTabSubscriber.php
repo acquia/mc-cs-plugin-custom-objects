@@ -13,12 +13,12 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 class CustomItemTabSubscriber implements EventSubscriberInterface
 {
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     private $translator;
 
@@ -50,7 +50,7 @@ class CustomItemTabSubscriber implements EventSubscriberInterface
     public function __construct(
         CustomObjectModel $customObjectModel,
         CustomItemRepository $customItemRepository,
-        TranslatorInterface $translator,
+        Translator $translator,
         CustomItemRouteProvider $customItemRouteProvider,
         SessionProviderFactory $sessionProviderFactory
     ) {
@@ -73,7 +73,7 @@ class CustomItemTabSubscriber implements EventSubscriberInterface
 
     public function injectTabs(CustomContentEvent $event): void
     {
-        if ($event->checkContext('CustomObjectsBundle:CustomItem:detail.html.php', 'tabs')) {
+        if ($event->checkContext('@CustomObjects/CustomItem/details.html.twig', 'tabs')) {
             $vars    = $event->getVars();
             $objects = $this->customObjectModel->getMasterCustomObjects();
 
@@ -92,13 +92,13 @@ class CustomItemTabSubscriber implements EventSubscriberInterface
                     'tabId' => "custom-object-{$object->getId()}",
                 ];
 
-                $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:link.html.php', $data);
+                $event->addTemplate('@CustomObjects/SubscribedEvents/Tab/link.html.twig', $data);
             }
 
-            $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:modal.html.php');
+            $event->addTemplate('@CustomObjects/SubscribedEvents/Tab/modal.html.twig');
         }
 
-        if ($event->checkContext('CustomObjectsBundle:CustomItem:detail.html.php', 'tabs.content')) {
+        if ($event->checkContext('@CustomObjects/CustomItem/details.html.twig', 'tabs.content')) {
             $vars    = $event->getVars();
             $objects = $this->getCustomObjects();
 
@@ -129,7 +129,7 @@ class CustomItemTabSubscriber implements EventSubscriberInterface
                     'namespace'         => $sessionProvider->getNamespace(),
                 ];
 
-                $event->addTemplate('CustomObjectsBundle:SubscribedEvents/Tab:content.html.php', $data);
+                $event->addTemplate('@CustomObjects/SubscribedEvents/Tab/content.html.twig', $data);
             }
         }
     }

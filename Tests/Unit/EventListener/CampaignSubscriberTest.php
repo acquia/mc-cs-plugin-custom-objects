@@ -26,7 +26,7 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 class CampaignSubscriberTest extends TestCase
 {
@@ -68,7 +68,7 @@ class CampaignSubscriberTest extends TestCase
         $this->customFieldModel       = $this->createMock(CustomFieldModel::class);
         $this->customObjectModel      = $this->createMock(CustomObjectModel::class);
         $this->customItemModel        = $this->createMock(CustomItemModel::class);
-        $this->translator             = $this->createMock(TranslatorInterface::class);
+        $this->translator             = $this->createMock(Translator::class);
         $this->configProvider         = $this->createMock(ConfigProvider::class);
         $this->queryFilterHelper      = $this->createMock(QueryFilterHelper::class);
         $this->queryFilterFactory     = $this->createMock(QueryFilterFactory::class);

@@ -9,7 +9,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 final class CustomFieldOptionFunctionalTest extends AbstractApiPlatformFunctionalTest
 {
@@ -87,7 +87,7 @@ final class CustomFieldOptionFunctionalTest extends AbstractApiPlatformFunctiona
 
     private function createField(CustomObject $customObject, User $user): CustomField
     {
-        $translatorMock             = $this->createMock(TranslatorInterface::class);
+        $translatorMock             = $this->createMock(Translator::class);
         $filterOperatorProviderMock = $this->createMock(FilterOperatorProviderInterface::class);
         $csvHelperMock              = $this->createMock(CsvHelper::class);
         $customFieldType            = new MultiselectType($translatorMock, $filterOperatorProviderMock, $csvHelperMock);

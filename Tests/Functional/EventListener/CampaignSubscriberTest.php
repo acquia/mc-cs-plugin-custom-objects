@@ -21,16 +21,16 @@ class CampaignSubscriberTest extends MauticMysqlTestCase
     public function testVariousConditions(): void
     {
         /** @var CustomItemModel $customItemModel */
-        $customItemModel       = self::$container->get('mautic.custom.model.item');
+        $customItemModel       = self::getContainer()->get('mautic.custom.model.item');
 
         /** @var CustomFieldValueModel $customFieldValueModel */
-        $customFieldValueModel       = self::$container->get('mautic.custom.model.field.value');
+        $customFieldValueModel       = self::getContainer()->get('mautic.custom.model.field.value');
 
         /** @var CampaignSubscriber $campaignSubscriber */
-        $campaignSubscriber       = self::$container->get('custom_item.campaign.subscriber');
+        $campaignSubscriber       = self::getContainer()->get('custom_item.campaign.subscriber');
 
         $contact      = $this->createContact('john@doe.email');
-        $customObject = $this->createCustomObjectWithAllFields(self::$container, 'Campaign test object');
+        $customObject = $this->createCustomObjectWithAllFields(self::getContainer(), 'Campaign test object');
         $customItem   = new CustomItem($customObject);
 
         $customItem->setName('Campaign test item');
@@ -313,7 +313,7 @@ class CampaignSubscriberTest extends MauticMysqlTestCase
     private function createContact(string $email): Lead
     {
         /** @var LeadModel $contactModel */
-        $contactModel = self::$container->get('mautic.lead.model.lead');
+        $contactModel = self::getContainer()->get('mautic.lead.model.lead');
         $contact      = new Lead();
         $contact->setEmail($email);
         $contactModel->saveEntity($contact);

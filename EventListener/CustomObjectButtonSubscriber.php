@@ -6,7 +6,8 @@ namespace MauticPlugin\CustomObjectsBundle\EventListener;
 
 use Mautic\CoreBundle\CoreEvents;
 use Mautic\CoreBundle\Event\CustomButtonEvent;
-use Mautic\CoreBundle\Templating\Helper\ButtonHelper;
+use Mautic\CoreBundle\Twig\Helper\ButtonHelper;
+use Mautic\CoreBundle\Translation\Translator;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
@@ -14,7 +15,6 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class CustomObjectButtonSubscriber implements EventSubscriberInterface
 {
@@ -39,7 +39,7 @@ class CustomObjectButtonSubscriber implements EventSubscriberInterface
     private $customItemRouteProvider;
 
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     private $translator;
 
@@ -48,7 +48,7 @@ class CustomObjectButtonSubscriber implements EventSubscriberInterface
         CustomObjectRouteProvider $routeProvider,
         CustomItemPermissionProvider $customItemPermissionProvider,
         CustomItemRouteProvider $customItemRouteProvider,
-        TranslatorInterface $translator
+        Translator $translator
     ) {
         $this->permissionProvider           = $permissionProvider;
         $this->routeProvider                = $routeProvider;
@@ -82,7 +82,7 @@ class CustomObjectButtonSubscriber implements EventSubscriberInterface
 
             case CustomObjectRouteProvider::ROUTE_VIEW:
                 $this->addEntityButtons($event, ButtonHelper::LOCATION_PAGE_ACTIONS);
-                $event->addButton($this->defineCloseButton(), ButtonHelper::LOCATION_PAGE_ACTIONS, $event->getRoute());
+                // $event->addButton($this->defineCloseButton(), ButtonHelper::LOCATION_PAGE_ACTIONS, $event->getRoute());
 
                 $customObject = $event->getItem();
 
@@ -135,9 +135,10 @@ class CustomObjectButtonSubscriber implements EventSubscriberInterface
         return [
             'attr' => [
                 'href' => $this->routeProvider->buildEditRoute($entity->getId()),
+                'class' => 'btn btn-primary',
             ],
             'btnText'   => 'mautic.core.form.edit',
-            'iconClass' => 'fa fa-pencil-square-o',
+            'iconClass' => 'ri-edit-line',
             'priority'  => 500,
         ];
     }
@@ -171,7 +172,7 @@ class CustomObjectButtonSubscriber implements EventSubscriberInterface
                 'href' => $this->routeProvider->buildCloneRoute($entity->getId()),
             ],
             'btnText'   => 'mautic.core.form.clone',
-            'iconClass' => 'fa fa-copy',
+            'iconClass' => 'ri-file-copy-line',
             'priority'  => 300,
         ];
     }
@@ -196,7 +197,7 @@ class CustomObjectButtonSubscriber implements EventSubscriberInterface
                 'data-cancel-callback'  => 'dismissConfirmation',
             ],
             'btnText'   => 'mautic.core.form.delete',
-            'iconClass' => 'fa fa-fw fa-trash-o text-danger',
+            'iconClass' => 'ri-delete-bin-line',
             'priority'  => 0,
         ];
     }
@@ -213,9 +214,10 @@ class CustomObjectButtonSubscriber implements EventSubscriberInterface
         return [
             'attr' => [
                 'href' => $this->routeProvider->buildNewRoute(),
+                'class' => 'btn btn-primary',
             ],
             'btnText'   => 'mautic.core.form.new',
-            'iconClass' => 'fa fa-plus',
+            'iconClass' => 'ri-add-line',
             'priority'  => 500,
         ];
     }
@@ -234,7 +236,7 @@ class CustomObjectButtonSubscriber implements EventSubscriberInterface
                 'href' => $this->customItemRouteProvider->buildListRoute($customObject->getId()),
             ],
             'btnText'   => 'custom.items.view.link',
-            'iconClass' => 'fa fa-fw fa-list-alt',
+            'iconClass' => 'ri-list-unordered',
             'priority'  => 0,
         ];
     }
@@ -253,7 +255,7 @@ class CustomObjectButtonSubscriber implements EventSubscriberInterface
                 'href' => $this->customItemRouteProvider->buildNewRoute($customObject->getId()),
             ],
             'btnText'   => 'custom.item.create.link',
-            'iconClass' => 'fa fa-fw fa-plus',
+            'iconClass' => 'ri-add-line',
             'priority'  => 0,
         ];
     }

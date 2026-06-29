@@ -37,7 +37,7 @@ use MauticPlugin\CustomObjectsBundle\Segment\Query\Filter\QueryFilterFactory;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 class TokenSubscriberTest extends TestCase
 {
@@ -498,7 +498,7 @@ class TokenSubscriberTest extends TestCase
             ->method('getTypeObject')
             ->willReturn(
                 new TextType(
-                    $this->createMock(TranslatorInterface::class),
+                    $this->createMock(Translator::class),
                     $this->createMock(FilterOperatorProviderInterface::class)
                 )
             );
@@ -645,7 +645,7 @@ class TokenSubscriberTest extends TestCase
             ->method('getTypeObject')
             ->willReturn(
                 new TextType(
-                    $this->createMock(TranslatorInterface::class),
+                    $this->createMock(Translator::class),
                     $this->createMock(FilterOperatorProviderInterface::class)
                 )
             );

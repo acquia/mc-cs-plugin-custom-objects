@@ -4,66 +4,47 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomItem;
 
-use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Doctrine\Persistence\ManagerRegistry;
 use Mautic\CoreBundle\Helper\InputHelper;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Translation\Translator;
+use Symfony\Component\HttpFoundation\Response;
+use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Symfony\Component\HttpFoundation\RequestStack;
 use MauticPlugin\CustomObjectsBundle\DTO\TableConfig;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Response;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
 
 class ListController extends CommonController
 {
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var SessionProviderFactory
-     */
-    private $sessionProviderFactory;
-
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    /**
-     * @var CustomItemPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var CustomItemRouteProvider
-     */
-    private $routeProvider;
-
     public function __construct(
-        RequestStack $requestStack,
-        SessionProviderFactory $sessionProviderFactory,
-        CustomItemModel $customItemModel,
-        CustomObjectModel $customObjectModel,
-        CustomItemPermissionProvider $permissionProvider,
-        CustomItemRouteProvider $routeProvider
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        private RequestStack $requestStack,
+        CorePermissions $security,
+        private SessionProviderFactory $sessionProviderFactory,
+        private CustomItemModel $customItemModel,
+        private CustomObjectModel $customObjectModel,
+        private CustomItemPermissionProvider $permissionProvider,
+        private CustomItemRouteProvider $routeProvider
     ) {
-        $this->requestStack           = $requestStack;
-        $this->sessionProviderFactory = $sessionProviderFactory;
-        $this->customItemModel        = $customItemModel;
-        $this->customObjectModel      = $customObjectModel;
-        $this->permissionProvider     = $permissionProvider;
-        $this->routeProvider          = $routeProvider;
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     public function listAction(int $objectId, int $page = 1): Response
@@ -124,7 +105,7 @@ class ListController extends CommonController
                 'sessionVar'       => $namespace,
                 'namespace'        => $namespace,
             ],
-            'contentTemplate' => 'CustomObjectsBundle:CustomItem:list.html.php',
+            'contentTemplate' => '@CustomObjects/CustomItem/list.html.twig',
             'passthroughVars' => [
                 'mauticContent' => 'customItem',
                 'route'         => $filterEntityType ? null : $route,

@@ -7,12 +7,18 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Provider;
 use MauticPlugin\CustomObjectsBundle\Provider\SessionProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class SessionProviderTest extends TestCase
 {
     /**
-     * @var Session|MockObject
+     * @var RequestStack|MockObject
+     */
+    private $requestStack;
+
+    /**
+     * @var SessionInterface|MockObject
      */
     private $session;
 
@@ -34,10 +40,12 @@ class SessionProviderTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->session          = $this->createMock(Session::class);
+        $this->requestStack          = $this->createMock(RequestStack::class);
+        $this->session = $this->createMock(SessionInterface::class);
+        $this->requestStack->method('getSession')->willReturn($this->session);
         $this->namespace        = 'some.namespace';
         $this->defaultPageLimit = 15;
-        $this->provider         = new SessionProvider($this->session, $this->namespace, $this->defaultPageLimit);
+        $this->provider         = new SessionProvider($this->requestStack, $this->namespace, $this->defaultPageLimit);
     }
 
     public function testGetPage(): void
