@@ -172,4 +172,9 @@ class SaveController extends AbstractFormController
     {
         return $request->isXmlHttpRequest() ? new JsonResponse(['redirect' => $url]) : $this->redirect($url);
     }
+
+    protected function getPermissionBase(): string
+    {
+        return 'custom_objects:custom_objects';
+    }
 }
