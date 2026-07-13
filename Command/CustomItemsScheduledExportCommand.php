@@ -52,8 +52,13 @@ class CustomItemsScheduledExportCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $ids                        = $this->formatterHelper->simpleCsvToArray($input->getOption('ids'), 'int');
-        $customItemExportSchedulers = $this->customItemExportSchedulerModel->getRepository()->findBy(['id' => $ids]);
+        if ($ids = $input->getOption('ids')) {
+            $ids                        = $this->formatterHelper->simpleCsvToArray($ids, 'int');
+            $customItemExportSchedulers = $this->customItemExportSchedulerModel->getRepository()->findBy(['id' => $ids]);
+        } else {
+            $customItemExportSchedulers = $this->customItemExportSchedulerModel->getRepository()->getEntities();
+        }
+
         $count                      = 0;
 
         foreach ($customItemExportSchedulers as $customItemExportScheduler) {
