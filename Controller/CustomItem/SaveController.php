@@ -160,4 +160,9 @@ class SaveController extends AbstractFormController
             ]
         );
     }
+
+    protected function getPermissionBase(): string
+    {
+        return 'custom_objects:custom_objects';
+    }
 }

@@ -36,8 +36,7 @@
                                     </h3>
                                 </div>
                                 <div class="panel-body">
-                                    {{ form_row(fields, 'child_custom_field_values', template) }}
-{#                                    {{ formRowIfExists(fields, 'child_custom_field_values', template) }}#}
+                                    {%- if form.child_custom_field_values is defined %}{{ form_row(form.child_custom_field_values) }}{% endif %}
                                 </div>
                             </div>
                         </div>

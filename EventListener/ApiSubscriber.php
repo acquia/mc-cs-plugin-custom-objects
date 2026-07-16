@@ -67,12 +67,16 @@ class ApiSubscriber implements EventSubscriberInterface
         /** @var Lead $contact */
         $contact = $event->getEntity();
 
+        $savedItemsByCustomObjectId = [];
+        $relationshipBlocks         = [];
+
         foreach ($customObjectsPayload['data'] as $customObjectData) {
             if (empty($customObjectData['data']) || !is_array($customObjectData['data'])) {
                 continue;
             }
 
             $customObject = $this->getCustomObject($customObjectData);
+            $savedItems   = [];
 
             foreach ($customObjectData['data'] as $customItemData) {
                 $customItem = $this->getCustomItem($customObject, $customItemData);
@@ -84,6 +88,40 @@ class ApiSubscriber implements EventSubscriberInterface
                 if (!$dryRun) {
                     $this->customItemModel->linkEntity($customItem, 'contact', (int) $contact->getId());
                 }
+
+                $savedItems[] = $customItem;
+            }
+
+            $savedItemsByCustomObjectId[$customObject->getId()] = $savedItems;
+
+            if (CustomObject::TYPE_RELATIONSHIP === $customObject->getType() && $customObject->getMasterObject()) {
+                $relationshipBlocks[] = ['customObject' => $customObject, 'items' => $savedItems];
+            }
+        }
+
+        if ($dryRun) {
+            return;
+        }
+
+        // Link each relationship item (e.g. "Matricula na Disciplina") to the master item
+        // (e.g. "Disciplina") sent alongside it in the same request, paired by position —
+        // mirroring how the "New" screen links a relationship item to the master item
+        // it was created together with.
+        foreach ($relationshipBlocks as $relationshipBlock) {
+            $masterObjectId = $relationshipBlock['customObject']->getMasterObject()->getId();
+
+            if (!isset($savedItemsByCustomObjectId[$masterObjectId])) {
+                continue;
+            }
+
+            $masterItems = $savedItemsByCustomObjectId[$masterObjectId];
+
+            foreach ($relationshipBlock['items'] as $index => $relationshipItem) {
+                if (!isset($masterItems[$index])) {
+                    continue;
+                }
+
+                $this->customItemModel->linkEntity($relationshipItem, 'customItem', (int) $masterItems[$index]->getId());
             }
         }
     }
