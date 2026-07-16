@@ -7,6 +7,9 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\EventListener;
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
 use Mautic\LeadBundle\Model\LeadModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomItemXrefCustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\CustomObjectsTrait;
 use Symfony\Component\HttpFoundation\Response;
@@ -688,5 +691,63 @@ class ApiSubscriberTest extends MauticMysqlTestCase
         $this->assertSame('Custom Item Created Via Contact API 4', $contact4CustomItem['name']);
         $this->assertSame('Take a brake', $contact3CustomItem['attributes']['text-test-field']);
         $this->assertSame('Make a milkshake', $contact4CustomItem['attributes']['text-test-field']);
+    }
+
+    /**
+     * Sending a master object item ("Disciplina") and its relationship object item
+     * ("Matricula na Disciplina") in the same request must link them to each other,
+     * not just to the contact.
+     */
+    public function testCreatingContactWithMasterAndRelationshipCustomItemsLinksThemToEachOther(): void
+    {
+        $masterObject       = $this->createCustomObjectWithAllFields(self::$container, 'Disciplina');
+        $relationshipObject = $this->createCustomObjectWithAllFields(self::$container, 'Matricula na Disciplina');
+        $relationshipObject->setType(CustomObject::TYPE_RELATIONSHIP);
+        $relationshipObject->setMasterObject($masterObject);
+
+        /** @var CustomObjectModel $customObjectModel */
+        $customObjectModel = self::$container->get('mautic.custom.model.object');
+        $customObjectModel->save($relationshipObject);
+
+        $contact = [
+            'email'         => 'contact1@api.test',
+            'customObjects' => [
+                'data' => [
+                    [
+                        'alias' => $masterObject->getAlias(),
+                        'data'  => [
+                            ['name' => 'Estatística II'],
+                        ],
+                    ],
+                    [
+                        'alias' => $relationshipObject->getAlias(),
+                        'data'  => [
+                            ['name' => 'Matrícula Estatística II - Maria'],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->client->request('POST', 'api/contacts/new', $contact);
+        $response = $this->client->getResponse();
+
+        $this->assertSame(Response::HTTP_CREATED, $response->getStatusCode(), $response->getContent());
+
+        /** @var CustomItemRepository $customItemRepository */
+        $customItemRepository = self::$container->get('custom_item.repository');
+
+        $masterItem       = $customItemRepository->findOneBy(['name' => 'Estatística II']);
+        $relationshipItem = $customItemRepository->findOneBy(['name' => 'Matrícula Estatística II - Maria']);
+
+        $this->assertNotNull($masterItem);
+        $this->assertNotNull($relationshipItem);
+
+        $xref = $this->em->getRepository(CustomItemXrefCustomItem::class)->findOneBy([
+            'customItemLower'  => min($masterItem->getId(), $relationshipItem->getId()),
+            'customItemHigher' => max($masterItem->getId(), $relationshipItem->getId()),
+        ]);
+
+        $this->assertNotNull($xref, 'A CustomItemXrefCustomItem should have been created linking the relationship item to its master item.');
     }
 }
