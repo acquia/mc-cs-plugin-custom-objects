@@ -55,6 +55,9 @@ class FilterEvaluator
 
             $isCustomObject = 'custom_object' === $data['object'];
             $leadValues     = $isCustomObject ? $lead[$data['field']] : [$lead[$data['field']]];
+            // Dynamic content stores the value flat as $data['filter'], whereas segments nest it
+            // under $data['properties']['filter']. Both callers here pass dynamic content filters
+            // (DynamicContentSubscriber and TokenSubscriber::onTokenReplacement), so read it flat.
             $filterVal      = $data['filter'];
 
             if (!is_array($leadValues)) {
