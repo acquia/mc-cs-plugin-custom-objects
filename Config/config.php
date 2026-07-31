@@ -410,6 +410,7 @@ $coParams = [
                     'mautic.campaign.model.event',
                     'event_dispatcher',
                     'custom_object.helper.token_formatter',
+                    'custom_object.helper.filter_evaluator',
                     '%mautic.custom_item_fetch_limit_per_lead%',
                 ],
             ],
@@ -636,6 +637,22 @@ $coParams = [
             'custom_object.helper.token_formatter' => [
                 'class'     => MauticPlugin\CustomObjectsBundle\Helper\TokenFormatter::class,
             ],
+            'custom_object.helper.filter_evaluator' => [
+                'class' => MauticPlugin\CustomObjectsBundle\Helper\FilterEvaluator::class,
+            ],
+            'custom_object.helper.contact_filter_matcher' => [
+                'class'     => MauticPlugin\CustomObjectsBundle\Helper\ContactFilterMatcher::class,
+                'arguments' => [
+                    'mautic.custom.model.field',
+                    'mautic.custom.model.object',
+                    'mautic.custom.model.item',
+                    'mautic.lead.repository.company',
+                    'doctrine.dbal.default_connection',
+                    'custom_object.helper.filter_evaluator',
+                    '%mautic.custom_item_fetch_limit_per_lead%',
+                ],
+            ],
+
             'custom_object.data_persister.custom_item' => [
                 'class'     => MauticPlugin\CustomObjectsBundle\DataPersister\CustomItemDataPersister::class,
                 'tag'       => 'api_platform.data_persister',

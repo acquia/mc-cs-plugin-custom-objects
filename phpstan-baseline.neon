@@ -693,6 +693,11 @@ parameters:
 			path: Tests/Unit/Segment/Query/UnionQueryContainerTest.php
 
 		-
+			message: "#^Constant MAUTIC_TABLE_PREFIX not found\\.$#"
+			count: 1
+			path: Helper/ContactFilterMatcher.php
+
+		-
 			message: """
 				#^Fetching deprecated class constant PARAM_INT_ARRAY of class Doctrine\\\\DBAL\\\\Connection\\:
 				Use \\{@see ArrayParameterType\\:\\:INTEGER\\} instead\\.$#

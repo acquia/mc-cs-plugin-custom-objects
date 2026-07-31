@@ -1,3 +1,4 @@
 /vendor/*
 /Tests/Coverage/*
 .idea
+.superpowers/

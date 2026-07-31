@@ -7,7 +7,9 @@ on:
       - '[0-9]+\.[0-9]+'
       - development
       - beta
+      - 'fix/**'
   pull_request:
+  workflow_dispatch:
 
 env:
   PLUGIN_DIR: plugins/CustomObjectsBundle # Same as extra.install-directory-name in composer.json

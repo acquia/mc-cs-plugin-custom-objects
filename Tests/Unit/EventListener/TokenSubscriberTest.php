@@ -27,6 +27,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Event\CustomItemListDbalQueryEvent;
 use MauticPlugin\CustomObjectsBundle\EventListener\TokenSubscriber;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Helper\FilterEvaluator;
 use MauticPlugin\CustomObjectsBundle\Helper\QueryFilterHelper;
 use MauticPlugin\CustomObjectsBundle\Helper\TokenFormatter;
 use MauticPlugin\CustomObjectsBundle\Helper\TokenParser;
@@ -93,6 +94,11 @@ class TokenSubscriberTest extends TestCase
     private $tokenFormatter;
 
     /**
+     * @var FilterEvaluator|MockObject
+     */
+    private $filterEvaluator;
+
+    /**
      * @var TokenSubscriber
      */
     private $subscriber;
@@ -126,6 +132,7 @@ class TokenSubscriberTest extends TestCase
         $this->eventModel         = $this->createMock(EventModel::class);
         $this->eventDispatcher    = $this->createMock(EventDispatcher::class);
         $this->tokenFormatter     = $this->createMock(TokenFormatter::class);
+        $this->filterEvaluator    = $this->createMock(FilterEvaluator::class);
         $this->subscriber         = new TokenSubscriber(
             $this->configProvider,
             $this->queryFilterHelper,
@@ -137,6 +144,7 @@ class TokenSubscriberTest extends TestCase
             $this->eventModel,
             $this->eventDispatcher,
             $this->tokenFormatter,
+            $this->filterEvaluator,
             15
         );
 
@@ -860,6 +868,7 @@ class TokenSubscriberTest extends TestCase
             $this->eventModel,
             $this->eventDispatcher,
             new TokenFormatter(),
+            $this->createMock(FilterEvaluator::class),
             15
         );
     }
