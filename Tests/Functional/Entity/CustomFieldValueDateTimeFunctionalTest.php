@@ -21,8 +21,6 @@ class CustomFieldValueDateTimeFunctionalTest extends MauticMysqlTestCase
 
     protected function setUp(): void
     {
-        $this->configParams['default_timezone'] = 'America/New_York';
-
         parent::setUp();
 
         $this->customObject = $this->createCustomObjectWithAllFields(self::$container, 'Event');
@@ -160,6 +158,22 @@ class CustomFieldValueDateTimeFunctionalTest extends MauticMysqlTestCase
 
     public function testUiFormSubmitStoresDatetimeCorrectly(): void
     {
+        $previousTimeZone = date_default_timezone_get();
+
+        try {
+            $this->doTestUiFormSubmitStoresDatetimeCorrectly();
+        } finally {
+            date_default_timezone_set($previousTimeZone);
+        }
+    }
+
+    private function doTestUiFormSubmitStoresDatetimeCorrectly(): void
+    {
+        $timezone = 'America/New_York';
+        $session  = self::$container->get('session');
+        $session->set('_timezone', $timezone);
+        date_default_timezone_set($timezone);
+
         $inputDate     = '2027-06-07 08:00';
         $datetimeField = $this->getDatetimeField($this->customObject);
 
@@ -171,6 +185,8 @@ class CustomFieldValueDateTimeFunctionalTest extends MauticMysqlTestCase
         $form['custom_item[name]']                                                    = 'UI TZ Test';
         $form['custom_item[custom_field_values]['.$datetimeField->getId().'][value]'] = $inputDate;
 
+        $this->client->restart();
+
         $this->client->submit($form);
         $this->assertResponseIsSuccessful();
 
@@ -179,14 +195,15 @@ class CustomFieldValueDateTimeFunctionalTest extends MauticMysqlTestCase
         $this->assertNotFalse($storedValue, 'Datetime value must be stored in the database');
 
         $storedDt = new DateTimeImmutable($storedValue, new DateTimeZone('UTC'));
-        $inputDt  = new DateTimeImmutable($inputDate, new DateTimeZone('America/New_York'));
+        $inputDt  = new DateTimeImmutable($inputDate, new DateTimeZone($timezone));
 
         $this->assertSame(
             $inputDt->getTimestamp(),
             $storedDt->getTimestamp(),
             sprintf(
-                'UI input "%s" in America/New_York should be stored as UTC equivalent. Stored: %s.',
+                'UI input "%s" in %s should be stored as UTC equivalent. Stored: %s.',
                 $inputDate,
+                $timezone,
                 $storedValue
             )
         );
@@ -200,8 +217,9 @@ class CustomFieldValueDateTimeFunctionalTest extends MauticMysqlTestCase
             $inputDate,
             $uiDate,
             sprintf(
-                'Input date "%s" in America/New_York should be presented as America/New_York in the UI. UI: %s.',
+                'Input date "%s" should be presented in %s in the UI. UI date: %s.',
                 $inputDate,
+                $timezone,
                 $uiDate
             )
         );
