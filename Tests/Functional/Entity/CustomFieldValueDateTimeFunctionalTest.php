@@ -223,8 +223,10 @@ class CustomFieldValueDateTimeFunctionalTest extends MauticMysqlTestCase
      */
     private function fetchDateTimeFieldValue(string $customItemId)
     {
+        $prefix = self::$container->getParameter('mautic.db_table_prefix');
+
         return $this->connection->fetchOne(
-            'SELECT value FROM '.MAUTIC_TABLE_PREFIX.'custom_field_value_datetime WHERE custom_item_id = :id',
+            'SELECT value FROM '.$prefix.'custom_field_value_datetime WHERE custom_item_id = :id',
             ['id' => $customItemId]
         );
     }
