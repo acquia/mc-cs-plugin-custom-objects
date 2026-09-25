@@ -45,7 +45,15 @@ class CustomFieldValueDateTime extends AbstractCustomFieldValue
         }
 
         if (!$value instanceof DateTimeInterface) {
-            $value = new \DateTimeImmutable($value);
+            $value = new \DateTimeImmutable($value, new \DateTimeZone('UTC'));
+        }
+
+        $timezone = new \DateTimeZone(date_default_timezone_get());
+
+        if ($value instanceof \DateTime) {
+            $value->setTimezone($timezone);
+        } elseif ($value instanceof \DateTimeImmutable) {
+            $value = $value->setTimezone($timezone);
         }
 
         $this->value = $value;

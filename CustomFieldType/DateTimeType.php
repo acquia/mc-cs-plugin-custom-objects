@@ -53,7 +53,8 @@ class DateTimeType extends AbstractCustomFieldType
             $value = null;
         } elseif (is_string($value)) {
             try {
-                $value = new \DateTimeImmutable($value);
+                $value = new \DateTimeImmutable($value, new \DateTimeZone('UTC'));
+                $value = $value->setTimezone(new \DateTimeZone(date_default_timezone_get()));
             } catch (\Throwable $e) {
                 throw new InvalidValueException($e->getMessage());
             }
