@@ -15,53 +15,33 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 class ViewController extends CommonController
 {
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var FormFactoryInterface
-     */
-    private $formFactory;
-
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    /**
-     * @var AuditLogModel
-     */
-    private $auditLogModel;
-
-    /**
-     * @var CustomObjectPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var CustomObjectRouteProvider
-     */
-    private $routeProvider;
-
     public function __construct(
-        RequestStack $requestStack,
-        FormFactoryInterface $formFactory,
-        CustomObjectModel $customObjectModel,
-        AuditLogModel $auditLogModel,
-        CustomObjectPermissionProvider $permissionProvider,
-        CustomObjectRouteProvider $routeProvider
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        private RequestStack $requestStack,
+        CorePermissions $security,
+        private FormFactoryInterface $formFactory,
+        private CustomObjectModel $customObjectModel,
+        private AuditLogModel $auditLogModel,
+        private CustomObjectPermissionProvider $permissionProvider,
+        private CustomObjectRouteProvider $routeProvider
     ) {
-        $this->requestStack         = $requestStack;
-        $this->formFactory          = $formFactory;
-        $this->customObjectModel    = $customObjectModel;
-        $this->auditLogModel        = $auditLogModel;
-        $this->permissionProvider   = $permissionProvider;
-        $this->routeProvider        = $routeProvider;
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     public function viewAction(int $objectId): Response
@@ -104,7 +84,7 @@ class ViewController extends CommonController
                     'stats'         => $stats,
                     'logs'          => $auditLogs,
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObject:detail.html.php',
+                'contentTemplate' => '@CustomObjects/CustomObject/details.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
                     'activeLink'    => "#mautic_custom_object_{$objectId}",

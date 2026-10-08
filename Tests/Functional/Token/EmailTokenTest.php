@@ -28,9 +28,9 @@ class EmailTokenTest extends MauticMysqlTestCase
 
     public function testEmailTokens(): void
     {
-        $product  = $this->createCustomObjectWithAllFields(self::$container, 'Product');
+        $product  = $this->createCustomObjectWithAllFields(self::getContainer(), 'Product');
         $productA = $this->createCustomItem(
-            self::$container,
+            self::getContainer(),
             $product,
             'Product A',
             [
@@ -49,7 +49,7 @@ class EmailTokenTest extends MauticMysqlTestCase
             ]
         );
         $productB = $this->createCustomItem(
-            self::$container,
+            self::getContainer(),
             $product,
             'Product B',
             [
@@ -69,7 +69,7 @@ class EmailTokenTest extends MauticMysqlTestCase
         );
 
         $productC = $this->createCustomItem(
-            self::$container,
+            self::getContainer(),
             $product,
             'Product C',
             []
@@ -128,7 +128,7 @@ class EmailTokenTest extends MauticMysqlTestCase
         $this->em->flush();
 
         /** @var EmailModel $emailModel */
-        $emailModel = self::$container->get('mautic.email.model.email');
+        $emailModel = self::getContainer()->get('mautic.email.model.email');
         $emailModel->sendEmail(
             $email,
             [

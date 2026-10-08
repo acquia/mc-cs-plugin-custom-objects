@@ -10,7 +10,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\UndefinedTransformerException;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
 {
@@ -25,7 +25,7 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     protected $formTypeOptions = [];
 
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     protected $translator;
 
@@ -35,7 +35,7 @@ abstract class AbstractCustomFieldType implements CustomFieldTypeInterface
     protected $filterOperatorProvider;
 
     public function __construct(
-        TranslatorInterface $translator,
+        Translator $translator,
         FilterOperatorProviderInterface $filterOperatorProvider
     ) {
         $this->translator             = $translator;

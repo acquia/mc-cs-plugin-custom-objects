@@ -9,7 +9,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\CustomObjectsTrait;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 class UpsertFunctionalTest extends \Mautic\CoreBundle\Test\MauticMysqlTestCase
 {
@@ -24,8 +24,8 @@ class UpsertFunctionalTest extends \Mautic\CoreBundle\Test\MauticMysqlTestCase
     {
         parent::setUp();
 
-        $this->customItemModel       = self::$container->get('mautic.custom.model.item');
-        $this->customItemRepository  = self::$container->get('custom_item.repository');
+        $this->customItemModel       = self::getContainer()->get('mautic.custom.model.item');
+        $this->customItemRepository  = self::getContainer()->get('custom_item.repository');
         $this->customObject          = $this->createCustomObject();
         $this->existingCustomItem    = $this->createCustomItem($this->customObject, 'Sapiens');
         $this->existingCustomItem->createNewCustomFieldValueByFieldAlias('unique_id_field', 'SomeUniqueHash');
@@ -79,7 +79,7 @@ class UpsertFunctionalTest extends \Mautic\CoreBundle\Test\MauticMysqlTestCase
 
     private function createCustomField(CustomObject $customObject): CustomField
     {
-        $translatorMock             = $this->createMock(TranslatorInterface::class);
+        $translatorMock             = $this->createMock(Translator::class);
         $filterOperatorProviderMock = $this->createMock(FilterOperatorProviderInterface::class);
         $customFieldType            = new TextType($translatorMock, $filterOperatorProviderMock);
         $customField                = new CustomField();

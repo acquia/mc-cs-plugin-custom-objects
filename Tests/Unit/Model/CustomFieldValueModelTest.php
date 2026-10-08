@@ -18,7 +18,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldValueInterface;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldValueModel;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -53,7 +53,7 @@ class CustomFieldValueModelTest extends \PHPUnit\Framework\TestCase
         $this->validator              = $this->createMock(ValidatorInterface::class);
         $this->violationList          = $this->createMock(ConstraintViolationListInterface::class);
         $this->filterOperatorProvider = $this->createMock(FilterOperatorProviderInterface::class);
-        $this->translator             = $this->createMock(TranslatorInterface::class);
+        $this->translator             = $this->createMock(Translator::class);
         $this->customFieldValueModel  = new CustomFieldValueModel(
             $this->entityManager,
             $this->validator

@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Id;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\ManyToOne;
@@ -99,11 +97,11 @@ class CustomFieldOption implements \ArrayAccess
             ->makePrimaryKey()
             ->build();
 
-        $builder->createField('value', Type::STRING)
+        $builder->createField('value', 'string')
             ->makePrimaryKey()
             ->build();
 
-        $builder->addField('label', Type::STRING);
+        $builder->addField('label', 'string');
 
         $builder->createField('order', 'integer')
             ->columnName('option_order')
@@ -115,9 +113,9 @@ class CustomFieldOption implements \ArrayAccess
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
         $metadata->addPropertyConstraint('label', new Assert\NotBlank());
-        $metadata->addPropertyConstraint('label', new Assert\Length(['max' => 255]));
+        $metadata->addPropertyConstraint('label', new Assert\Length(null, null, 255));
         $metadata->addPropertyConstraint('value', new Assert\NotNull());
-        $metadata->addPropertyConstraint('value', new Assert\Length(['max' => 255]));
+        $metadata->addPropertyConstraint('value', new Assert\Length(null, null, 255));
         $metadata->addPropertyConstraint('order', new Assert\NotNull());
     }
 
@@ -176,7 +174,7 @@ class CustomFieldOption implements \ArrayAccess
      *
      * @return mixed
      */
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->offsetExists($offset) ? $this->{$offset} : null;
     }

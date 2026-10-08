@@ -19,73 +19,39 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
-
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Translation\Translator;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 class SaveController extends AbstractFormController
 {
-    /**
-     * @var RequestStack
-     */
-    private $requestStack;
-
-    /**
-     * @var FormFactoryInterface
-     */
-    private $formFactory;
-
-    /**
-     * @var FlashBag
-     */
-    private $flashBag;
-
-    /**
-     * @var CustomItemModel
-     */
-    private $customItemModel;
-
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    /**
-     * @var CustomItemPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var CustomItemRouteProvider
-     */
-    private $routeProvider;
-
-    /**
-     * @var LockFlashMessageHelper
-     */
-    private $lockFlashMessageHelper;
-
     public function __construct(
-        RequestStack $requestStack,
-        FormFactoryInterface $formFactory,
-        FlashBag $flashBag,
-        CustomItemModel $customItemModel,
-        CustomObjectModel $customObjectModel,
-        CustomItemPermissionProvider $permissionProvider,
-        CustomItemRouteProvider $routeProvider,
-        LockFlashMessageHelper $lockFlashMessageHelper
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        private FlashBag $flashBag,
+        private RequestStack $requestStack,
+        CorePermissions $security,
+        private FormFactoryInterface $formFactory,
+        private CustomItemModel $customItemModel,
+        private CustomObjectModel $customObjectModel,
+        private CustomItemPermissionProvider $permissionProvider,
+        private CustomItemRouteProvider $routeProvider,
+        private LockFlashMessageHelper $lockFlashMessageHelper
     ) {
-        $this->requestStack           = $requestStack;
-        $this->formFactory            = $formFactory;
-        $this->flashBag               = $flashBag;
-        $this->customItemModel        = $customItemModel;
-        $this->customObjectModel      = $customObjectModel;
-        $this->permissionProvider     = $permissionProvider;
-        $this->routeProvider          = $routeProvider;
-        $this->lockFlashMessageHelper = $lockFlashMessageHelper;
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     public function saveAction(int $objectId, ?int $itemId = null): Response
     {
         $request        = $this->requestStack->getCurrentRequest();
-        $customItemData = $request->request->get('custom_item');
+        $customItemData = $request->request->all('custom_item');
         $contactId      = intval($customItemData['contact_id'] ?? 0);
 
         try {
@@ -156,8 +122,8 @@ class SaveController extends AbstractFormController
             );
 
             $saveClicked = $form->get('buttons')->get('save')->isClicked();
-            $detailView  = 'CustomObjectsBundle:CustomItem\View:view';
-            $formView    = 'CustomObjectsBundle:CustomItem\Form:edit';
+            $detailView  = 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\ViewController::viewAction';
+            $formView    = 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\FormController::editAction';
 
             $pathParameters = [
                 'objectId' => $objectId,
@@ -178,7 +144,7 @@ class SaveController extends AbstractFormController
                     return $this->redirectToRoute('mautic_contact_action', ['objectAction' => 'view', 'objectId' => $contactId]);
                 }
 
-                $formView                    = 'CustomObjectsBundle:CustomItem\Form:editWithRedirectToContact';
+                $formView                    = 'MauticPlugin\CustomObjectsBundle\Controller\CustomItem\FormController::editWithRedirectToContactAction';
                 $pathParameters['contactId'] = $contactId;
             }
 
@@ -203,7 +169,7 @@ class SaveController extends AbstractFormController
                     'form'         => $form->createView(),
                     'tmpl'         => $request->isXmlHttpRequest() ? $request->get('tmpl', 'index') : 'index',
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomItem:form.html.php',
+                'contentTemplate' => '@CustomObjects/CustomItem/form.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customItem',
                     'route'         => $route,

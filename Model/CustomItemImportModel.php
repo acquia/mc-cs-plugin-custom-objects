@@ -4,15 +4,22 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Model;
 
+use Psr\Log\LoggerInterface;
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Model\FormModel;
-use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
-use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\UserBundle\Entity\User;
+use Mautic\LeadBundle\Entity\Import;
+use Mautic\CoreBundle\Model\FormModel;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use MauticPlugin\CustomObjectsBundle\DTO\ImportLogDTO;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 
 class CustomItemImportModel extends FormModel
@@ -35,11 +42,19 @@ class CustomItemImportModel extends FormModel
     public function __construct(
         EntityManager $entityManager,
         CustomItemModel $customItemModel,
-        FormatterHelper $formatterHelper
+        FormatterHelper $formatterHelper,
+        CorePermissions $security,
+        EventDispatcherInterface $dispatcher,
+        UrlGeneratorInterface $router,
+        Translator $translator,
+        UserHelper $userHelper,
+        LoggerInterface $mauticLogger,
+        CoreParametersHelper $coreParametersHelper,
     ) {
         $this->entityManager   = $entityManager;
         $this->customItemModel = $customItemModel;
         $this->formatterHelper = $formatterHelper;
+        parent::__construct($entityManager, $security, $dispatcher, $router, $translator, $userHelper, $mauticLogger, $coreParametersHelper);
     }
 
     /**
@@ -120,7 +135,7 @@ class CustomItemImportModel extends FormModel
                 continue;
             }
 
-            $xref = $this->customItemModel->linkEntity($customItem, 'contact', $contactId);
+            $xref = $this->customItemModel->linkEntity($customItem, 'contact', (int) $contactId);
             $customItem->addContactReference($xref);
         }
     }

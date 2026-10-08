@@ -18,7 +18,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemXrefContactRepository;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 class ContactSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -44,7 +44,7 @@ class ContactSubscriberTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->translator        = $this->createMock(TranslatorInterface::class);
+        $this->translator        = $this->createMock(Translator::class);
         $this->entityManager     = $this->createMock(EntityManager::class);
         $this->routeProvider     = $this->createMock(CustomItemRouteProvider::class);
         $this->customItemModel   = $this->createMock(CustomItemModel::class);

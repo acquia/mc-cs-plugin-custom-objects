@@ -15,7 +15,7 @@ use MauticPlugin\CustomObjectsBundle\Provider\SessionProviderFactory;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 class CustomItemTabSubscriberTest extends TestCase
 {
@@ -30,7 +30,7 @@ class CustomItemTabSubscriberTest extends TestCase
     private $customItemRepository;
 
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject|Translator
      */
     private $translator;
 
@@ -70,7 +70,7 @@ class CustomItemTabSubscriberTest extends TestCase
 
         $this->customObjectModel       = $this->createMock(CustomObjectModel::class);
         $this->customItemRepository    = $this->createMock(CustomItemRepository::class);
-        $this->translator              = $this->createMock(TranslatorInterface::class);
+        $this->translator              = $this->createMock(Translator::class);
         $this->customItemRouteProvider = $this->createMock(CustomItemRouteProvider::class);
         $this->customContentEvent      = $this->createMock(CustomContentEvent::class);
         $this->customObject            = $this->createMock(CustomObject::class);

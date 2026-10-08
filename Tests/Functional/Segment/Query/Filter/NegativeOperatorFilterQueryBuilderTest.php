@@ -36,7 +36,7 @@ class NegativeOperatorFilterQueryBuilderTest extends MauticMysqlTestCase
 
         parent::setUp();
 
-        $this->customItemModel = self::$container->get('mautic.custom.model.item');
+        $this->customItemModel = self::getContainer()->get('mautic.custom.model.item');
         $this->createCustomObjectWithCustomField();
         $this->em->flush();
     }

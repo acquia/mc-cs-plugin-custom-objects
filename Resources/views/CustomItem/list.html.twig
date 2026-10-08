@@ -1,0 +1,155 @@
+{% set isIndex = tmpl == 'index' ? true : false %}
+{% set tmpl = 'list' %}
+{% set target = '#' ~ namespace %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+
+{% block mauticContent %} {{ customObject.getName() }} {% endblock %}
+{% block headerTitle %}
+    {% if not lookup %}
+        {{ customObject.getName() }} 
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if isIndex %}
+        <div id="page-list-wrapper" class="panel panel-default">
+            {{- include('@MauticCore/Helper/list_toolbar.html.twig', {
+                'searchValue': searchValue,
+                'action': currentRoute,
+                'target': target,
+                'overlayDisabled': lookup,
+            }) -}}
+            <div class="page-list" id="{{ namespace }}">
+                {{ block('listResults') }}
+            </div>
+        </div>
+    {% else %}
+        {{ block('listResults') }}
+    {% endif %}
+{% endblock %}
+
+{% block listResults %}
+{% if items|length %}
+    {% set routeSelf = path(constant('MauticPlugin\\CustomObjectsBundle\\Provider\\CustomItemRouteProvider::ROUTE_LIST'), {
+        'objectId': customObject.getId(),
+        'filterEntityId': filterEntityId,
+        'filterEntityType': filterEntityType,
+        'lookup': lookup ? 1 : 0,
+        'tmpl': 'list'
+    }) %}
+
+    <div class="table-responsive">
+        <table class="table table-hover" id="custom-items-{{ customObject.getId() }}-table">
+            <thead>
+            <tr>
+                {{- include(
+                    '@MauticCore/Helper/tableheader.html.twig',
+                    {
+                        'checkall'  : 'true',
+                        'target'    : target,
+                        'langVar'   : 'custom.item',
+                        'routeBase' : 'custom_item',
+                        'baseUrl'   : routeSelf,
+                    }
+                ) -}}
+
+                {{- include(
+                    '@MauticCore/Helper/tableheader.html.twig',
+                    {
+                        'sessionVar' : sessionVar,
+                        'orderBy'    : constant('MauticPlugin\\CustomObjectsBundle\\Entity\\CustomItem::TABLE_ALIAS') ~ '.name',
+                        'text'       : 'mautic.core.name',
+                        'class'      : 'col-custom_item_name',
+                        'baseUrl'    : routeSelf,
+                        'target'     : target,
+                    }
+                ) -}}
+
+                {{- include(
+                    '@MauticCore/Helper/tableheader.html.twig',
+                    {
+                        'sessionVar' : sessionVar,
+                        'orderBy'    : constant('MauticPlugin\\CustomObjectsBundle\\Entity\\CustomItem::TABLE_ALIAS') ~ '.id',
+                        'text'       : 'mautic.core.id',
+                        'default'    : true,
+                        'baseUrl'    : routeSelf,
+                        'target'     : target,
+                    }
+                ) -}}
+
+                {% if fieldData is defined and fieldData %}
+                    {% for columnLabel in fieldData.getColumnLabels() %}
+                        {{- include('@MauticCore/Helper/tableheader.html.twig', {'text': columnLabel}) -}}
+                    {% endfor %}
+                {% endif %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in items %}
+                <tr>
+                    <td>
+                        {{- include(
+                            '@MauticCore/Helper/list_actions.html.twig',
+                            {
+                                'item': item,
+                            }
+                        ) -}}
+                    </td>
+                    <td>
+                        <div>
+                            {% if not filterEntityId %}
+                                {{- include('@MauticCore/Helper/publishstatus_icon.html.twig',
+                                    {
+                                        'item'  : item,
+                                        'model' : 'custom.item',
+                                    }
+                                ) -}}
+                            {% endif %}
+                            <a href="{{ path(constant('MauticPlugin\\CustomObjectsBundle\\Provider\\CustomItemRouteProvider::ROUTE_VIEW'), {
+                                'objectId': customObject.getId(),
+                                'itemId': item.getId()
+                            }) }}"
+                               data-toggle="ajax">
+                                {{ item.getName() }}
+                            </a>
+                        </div>
+                    </td>
+                    <td>{{ item.getId() }}</td>
+
+                    {% if fieldData is defined and fieldData %}
+                        {% set fields = fieldData.getFields(item.getId()) %}
+                        {% for fieldValue in fields %}
+                            <td>
+                                {{ include('@CustomObjects/CustomField/value.html.twig', {'fieldValue': fieldValue}) }}
+                            </td>
+                        {% endfor %}
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="panel-footer">
+        {{- include('@MauticCore/Helper/pagination.html.twig', {
+            'totalItems'  : itemCount,
+            'page'        : page,
+            'limit'       : limit,
+            'baseUrl'     : path(constant('MauticPlugin\\CustomObjectsBundle\\Provider\\CustomItemRouteProvider::ROUTE_LIST'), {
+                'objectId': customObject.getId()
+            }),
+            'queryString' : '&filterEntityId=' ~ filterEntityId ~
+                            '&filterEntityType=' ~ filterEntityType ~
+                            '&lookup=' ~ (lookup ? 1 : 0),
+            'sessionVar'  : sessionVar,
+            'routeBase'   : constant('MauticPlugin\\CustomObjectsBundle\\Provider\\CustomItemRouteProvider::ROUTE_LIST'),
+            'target'      : target,
+        }) -}}
+    </div>
+{% else %}
+    {{- include('@MauticCore/Helper/noresults.html.twig', {
+        'message': lookup ? 'custom.item.link.noresults.tip' : 'custom.object.noresults.tip'
+    }) -}}
+{% endif %}
+{% endblock %}
+
+

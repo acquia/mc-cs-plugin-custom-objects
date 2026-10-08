@@ -12,7 +12,7 @@ use MauticPlugin\CustomObjectsBundle\Security\Permissions\CustomObjectPermission
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 class CustomObjectPermissionsTest extends TestCase
 {
@@ -42,7 +42,7 @@ class CustomObjectPermissionsTest extends TestCase
     private $configProvider;
 
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject|Translator
      */
     private $translator;
 
@@ -60,7 +60,7 @@ class CustomObjectPermissionsTest extends TestCase
         $this->customObject         = $this->createMock(CustomObject::class);
         $this->configProvider       = $this->createMock(ConfigProvider::class);
         $this->formBuilder          = $this->createMock(FormBuilderInterface::class);
-        $this->translator           = $this->createMock(TranslatorInterface::class);
+        $this->translator           = $this->createMock(Translator::class);
         $this->permissions          = new CustomObjectPermissions(
             $this->coreParametersHelper,
             $this->customObjectModel,

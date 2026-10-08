@@ -6,7 +6,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
-use Mautic\CoreBundle\Templating\Helper\FormatterHelper;
+use Mautic\CoreBundle\Twig\Helper\FormatterHelper;
 use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\Lead;
 use Mautic\LeadBundle\Entity\LeadRepository;
@@ -24,6 +24,13 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemImportModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Psr\Log\LoggerInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 class CustomItemImportModelTest extends \PHPUnit\Framework\TestCase
 {
@@ -101,11 +108,18 @@ class CustomItemImportModelTest extends \PHPUnit\Framework\TestCase
         $this->customItemImportModel  = new CustomItemImportModel(
             $this->entityManager,
             $this->customItemModel,
-            $this->formatterHelper
+            $this->formatterHelper,
+            $this->createMock(CorePermissions::class),
+            $this->createMock(EventDispatcherInterface::class),
+            $this->createMock(UrlGeneratorInterface::class),
+            $this->createMock(Translator::class),
+            $this->createMock(UserHelper::class),
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(CoreParametersHelper::class),
         );
 
-        /** @var TranslatorInterface $translator */
-        $translator = $this->createMock(TranslatorInterface::class);
+        /** @var Translator $translator */
+        $translator = $this->createMock(Translator::class);
 
         $textareaType = new TextareaType($translator, $this->filterOperatorProvider);
         $dateTimeType = new DateTimeType($translator, $this->filterOperatorProvider);
@@ -363,12 +377,10 @@ class CustomItemImportModelTest extends \PHPUnit\Framework\TestCase
             ->with(Lead::class)
             ->willReturn($leadRepository);
 
-        $translator = $this->createMock(TranslatorInterface::class);
+        $translator = $this->createMock(Translator::class);
         $translator->expects($this->any())
             ->method('trans')
             ->willReturn('test warning');
-
-        $this->customItemImportModel->setTranslator($translator);
 
         $importLogDto = new ImportLogDTO();
         $this->customItemImportModel->import($this->import, $rowData, $this->customObject, $importLogDto);

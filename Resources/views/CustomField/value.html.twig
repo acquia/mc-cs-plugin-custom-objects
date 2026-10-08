@@ -1,0 +1,17 @@
+{% set customFieldType = fieldValue.getCustomField().getType() %}
+
+{% if fieldValue.getValue() is instanceof('\\DateTimeInterface') %}
+    {% if customFieldType == 'date' %}
+        {{ fieldValue.getValue()|date('Y-m-d') }}
+    {% else %}
+        {{ fieldValue.getValue()|date('Y-m-d H:i:s') }}
+    {% endif %}
+{% elseif customFieldType in ['select', 'multiselect'] %}
+    {{ fieldValue.getCustomField().getTypeObject().valueToString(fieldValue)|e }}
+{% elseif fieldValue.getValue() is iterable %}
+    {{ fieldValue.getValue()|join(', ')|e }}
+{% else %}
+    {{ fieldValue.getValue()|e }}
+{% endif %}
+
+

@@ -15,7 +15,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 class CustomItemButtonSubscriberTest extends TestCase
 {
@@ -34,7 +34,7 @@ class CustomItemButtonSubscriberTest extends TestCase
     private $routeProvider;
 
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject|Translator
      */
     private $translator;
 
@@ -64,7 +64,7 @@ class CustomItemButtonSubscriberTest extends TestCase
 
         $this->permissionProvider = $this->createMock(CustomItemPermissionProvider::class);
         $this->routeProvider      = $this->createMock(CustomItemRouteProvider::class);
-        $this->translator         = $this->createMock(TranslatorInterface::class);
+        $this->translator         = $this->createMock(Translator::class);
         $this->request            = $this->createMock(Request::class);
         $this->customItem         = $this->createMock(CustomItem::class);
         $this->event              = $this->createMock(CustomButtonEvent::class);

@@ -19,9 +19,10 @@ use MauticPlugin\CustomObjectsBundle\Model\CustomItemImportModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
 use Symfony\Component\Form\Form;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 class ImportSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -29,7 +30,8 @@ class ImportSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private $customItemImportModel;
 
-    private $permissionProvider;
+    private $customItemPermissionProvider;
+    private $customObjectPermissionProvider;
 
     private $configProvider;
 
@@ -62,10 +64,11 @@ class ImportSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $this->customObjectModel     = $this->createMock(CustomObjectModel::class);
         $this->customItemImportModel = $this->createMock(CustomItemImportModel::class);
-        $this->permissionProvider    = $this->createMock(CustomItemPermissionProvider::class);
+        $this->customItemPermissionProvider    = $this->createMock(CustomItemPermissionProvider::class);
+        $this->customObjectPermissionProvider = $this->createMock(CustomObjectPermissionProvider::class);
         $this->configProvider        = $this->createMock(ConfigProvider::class);
         $this->customFieldRepository = $this->createMock(CustomFieldRepository::class);
-        $this->translator            = $this->createMock(TranslatorInterface::class);
+        $this->translator            = $this->createMock(Translator::class);
         $this->importValidateEvent   = $this->createMock(ImportValidateEvent::class);
         $this->importInitEvent       = new ImportInitEvent('unicorn');
         $this->importMappingEvent    = new ImportMappingEvent('unicorn');
@@ -78,7 +81,8 @@ class ImportSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->customObjectModel,
             $this->customItemImportModel,
             $this->configProvider,
-            $this->permissionProvider,
+            $this->customItemPermissionProvider,
+            $this->customObjectPermissionProvider,
             $this->customFieldRepository,
             $this->translator
         );
@@ -378,7 +382,7 @@ class ImportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getObject')
             ->willReturn('company');
 
-        $this->permissionProvider->expects($this->never())
+        $this->customItemPermissionProvider->expects($this->never())
             ->method('canCreate');
 
         $this->importSubscriber->onImportProcess($this->importProcessEvent);
@@ -396,7 +400,7 @@ class ImportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getObject')
             ->willReturn('custom-object:350');
 
-        $this->permissionProvider->expects($this->once())
+        $this->customItemPermissionProvider->expects($this->once())
             ->method('canCreate');
 
         $this->customObjectModel->expects($this->once())
@@ -424,7 +428,7 @@ class ImportSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getObject')
             ->willReturn('custom-object:350');
 
-        $this->permissionProvider->expects($this->once())
+        $this->customItemPermissionProvider->expects($this->once())
             ->method('canCreate');
 
         $this->customObjectModel->expects($this->once())

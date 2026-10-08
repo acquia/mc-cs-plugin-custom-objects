@@ -41,9 +41,9 @@ class LinkControllerTest extends ControllerTestCase
         $this->flashBag                   = $this->createMock(FlashBag::class);
         $this->permissionProvider         = $this->createMock(CustomItemPermissionProvider::class);
         $this->linkController             = new LinkController(
+            $this->flashBag,
             $this->customItemModel,
-            $this->permissionProvider,
-            $this->flashBag
+            $this->permissionProvider
         );
 
         $this->addSymfonyDependencies($this->linkController);

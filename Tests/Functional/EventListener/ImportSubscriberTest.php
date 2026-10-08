@@ -5,26 +5,27 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Tests\Functional\EventListener;
 
 use DateTimeImmutable;
-use Mautic\CoreBundle\Test\MauticMysqlTestCase;
-use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Entity\Lead;
-use Mautic\LeadBundle\Entity\LeadEventLog;
-use Mautic\LeadBundle\Event\ImportProcessEvent;
+use Mautic\LeadBundle\Entity\Import;
 use Mautic\LeadBundle\Model\LeadModel;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
+use Mautic\LeadBundle\Entity\LeadEventLog;
+use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Event\ImportProcessEvent;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\EventListener\ImportSubscriber;
-use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
-use MauticPlugin\CustomObjectsBundle\Model\CustomItemImportModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomItemModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
-use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
+use MauticPlugin\CustomObjectsBundle\Model\CustomItemImportModel;
+use MauticPlugin\CustomObjectsBundle\EventListener\ImportSubscriber;
+use MauticPlugin\CustomObjectsBundle\Exception\InvalidValueException;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomItemRepository;
+use MauticPlugin\CustomObjectsBundle\Repository\CustomFieldRepository;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomItemPermissionProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Tests\Functional\DataFixtures\Traits\CustomObjectsTrait;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 class ImportSubscriberTest extends MauticMysqlTestCase
 {
@@ -43,7 +44,7 @@ class ImportSubscriberTest extends MauticMysqlTestCase
     {
         $jane         = $this->createContact('jane@doe.email');
         $john         = $this->createContact('john@doe.email');
-        $customObject = $this->createCustomObjectWithAllFields(self::$container, 'Import CI all fields test Custom Object');
+        $customObject = $this->createCustomObjectWithAllFields(self::getContainer(), 'Import CI all fields test Custom Object');
         $csvRow       = [
             'name'           => 'Import CI all fields test Custom Item',
             'contacts'       => "{$jane->getId()},{$john->getId()}",
@@ -148,7 +149,7 @@ class ImportSubscriberTest extends MauticMysqlTestCase
 
         $jane         = $this->createContact('jane@doe.email');
         $john         = $this->createContact('john@doe.email');
-        $customObject = $this->createCustomObjectWithAllFields(self::$container, 'Import CI all fields test Custom Object', $configureFieldCallback);
+        $customObject = $this->createCustomObjectWithAllFields(self::getContainer(), 'Import CI all fields test Custom Object', $configureFieldCallback);
         $csvRow       = [
             'name'           => 'Import CI all fields test Custom Item',
             'contacts'       => "{$jane->getId()},{$john->getId()}",
@@ -321,25 +322,27 @@ class ImportSubscriberTest extends MauticMysqlTestCase
         });
 
         /** @var CustomObjectModel $customObjectModel */
-        $customObjectModel = self::$container->get('mautic.custom.model.object');
+        $customObjectModel = self::getContainer()->get('mautic.custom.model.object');
 
         /** @var CustomItemImportModel $customItemImportModel */
-        $customItemImportModel = self::$container->get('mautic.custom.model.import.item');
+        $customItemImportModel = self::getContainer()->get('mautic.custom.model.import.item');
 
         /** @var CustomFieldRepository $customFieldRepository */
-        $customFieldRepository = self::$container->get('custom_field.repository');
+        $customFieldRepository = self::getContainer()->get('custom_field.repository');
 
-        /** @var TranslatorInterface $translator */
-        $translator = self::$container->get('translator');
+        /** @var Translator $translator */
+        $translator = self::getContainer()->get('translator');
 
         $configProvider     = $this->createMock(ConfigProvider::class);
-        $permissionProvider = $this->createMock(CustomItemPermissionProvider::class);
+        $customItemPermissionProvider = $this->createMock(CustomItemPermissionProvider::class);
+        $customObjectPermissionProvider = $this->createMock(CustomObjectPermissionProvider::class);
 
         $importSubscriber = new ImportSubscriber(
             $customObjectModel,
             $customItemImportModel,
             $configProvider,
-            $permissionProvider,
+            $customItemPermissionProvider,
+            $customObjectPermissionProvider,
             $customFieldRepository,
             $translator
         );
@@ -348,7 +351,7 @@ class ImportSubscriberTest extends MauticMysqlTestCase
             ->method('pluginIsEnabled')
             ->willReturn(true);
 
-        $permissionProvider->expects($this->once())
+        $customItemPermissionProvider->expects($this->once())
             ->method('canCreate')
             ->with($customObject->getId());
 
@@ -367,10 +370,10 @@ class ImportSubscriberTest extends MauticMysqlTestCase
     private function getCustomItemByName(string $name): ?CustomItem
     {
         /** @var CustomItemRepository $customItemRepository */
-        $customItemRepository = self::$container->get('custom_item.repository');
+        $customItemRepository = self::getContainer()->get('custom_item.repository');
 
         /** @var CustomItemModel $customItemModel */
-        $customItemModel = self::$container->get('mautic.custom.model.item');
+        $customItemModel = self::getContainer()->get('mautic.custom.model.item');
 
         /** @var CustomItem $customItem */
         $customItem = $customItemRepository->findOneBy(['name' => $name]);
@@ -385,7 +388,7 @@ class ImportSubscriberTest extends MauticMysqlTestCase
     private function createContact(string $email): Lead
     {
         /** @var LeadModel $contactModel */
-        $contactModel = self::$container->get('mautic.lead.model.lead');
+        $contactModel = self::getContainer()->get('mautic.lead.model.lead');
         $contact      = new Lead();
         $contact->setEmail($email);
         $contactModel->saveEntity($contact);

@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Provider;
 
-use Mautic\CoreBundle\Translation\Translator;
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateTimeType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\DateType;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\TextType;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 class CustomFieldTypeProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -19,7 +18,7 @@ class CustomFieldTypeProviderTest extends \PHPUnit\Framework\TestCase
     {
         $customFieldTypeProvider = new CustomFieldTypeProvider();
         $filterOperatorProvider  = $this->createMock(FilterOperatorProviderInterface::class);
-        $textType                = new TextType($this->createMock(TranslatorInterface::class), $filterOperatorProvider);
+        $textType                = new TextType($this->createMock(Translator::class), $filterOperatorProvider);
 
         $customFieldTypeProvider->addType($textType);
 

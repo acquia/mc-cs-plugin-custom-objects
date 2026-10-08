@@ -151,10 +151,10 @@ trait MatchFilterForLeadTrait
                             $matchVal          = str_replace('%', '.*', $matchVal);
                             $groups[$groupNum] = 1 !== preg_match('/'.$matchVal.'/', $leadVal);
                             break;
-                        case OperatorOptions::IN:
+                        case OperatorOptions::INCLUDING_ANY:
                             $groups[$groupNum] = $this->checkLeadValueIsInFilter($leadVal, $filterVal, false);
                             break;
-                        case OperatorOptions::NOT_IN:
+                        case OperatorOptions::EXCLUDING_ANY:
                             $groups[$groupNum] = $this->checkLeadValueIsInFilter($leadVal, $filterVal, true);
                             break;
                         case 'regexp':

@@ -10,7 +10,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use MauticPlugin\CustomObjectsBundle\Provider\ConfigProvider;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 class CustomObjectPermissions extends AbstractPermissions
 {
@@ -27,7 +27,7 @@ class CustomObjectPermissions extends AbstractPermissions
     private $configProvider;
 
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     private $translator;
 
@@ -42,7 +42,7 @@ class CustomObjectPermissions extends AbstractPermissions
         CoreParametersHelper $coreParametersHelper,
         CustomObjectModel $customObjectModel,
         ConfigProvider $configProvider,
-        TranslatorInterface $translator
+        Translator $translator
     ) {
         parent::__construct($coreParametersHelper->all());
 

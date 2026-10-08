@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Event;
 
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class CustomItemEvent extends Event
 {

@@ -8,7 +8,6 @@ use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\JoinColumn;
 use Doctrine\ORM\Mapping\OneToOne;
@@ -164,12 +163,12 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
 
         $builder->addId();
         $builder->addCategory();
-        $builder->addField('alias', Type::STRING);
-        $builder->addNamedField('nameSingular', Type::STRING, 'name_singular');
-        $builder->addNamedField('namePlural', Type::STRING, 'name_plural');
-        $builder->addNullableField('description', Type::STRING, 'description');
-        $builder->addNullableField('language', Type::STRING, 'lang');
-        $builder->addNullableField('type', Type::INTEGER);
+        $builder->addField('alias', 'string');
+        $builder->addNamedField('nameSingular', 'string', 'name_singular');
+        $builder->addNamedField('namePlural', 'string', 'name_plural');
+        $builder->addNullableField('description', 'string', 'description');
+        $builder->addNullableField('language', 'string', 'lang');
+        $builder->addNullableField('type', 'integer');
 
         $builder->createOneToOne('relationshipObject', CustomObject::class)
             ->addJoinColumn('relationship_object', 'id', true, false, 'SET NULL')
@@ -183,12 +182,12 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
 
     public static function loadValidatorMetadata(ClassMetadata $metadata): void
     {
-        $metadata->addPropertyConstraint('alias', new Assert\Length(['max' => 255]));
+        $metadata->addPropertyConstraint('alias', new Assert\Length(null, null, 255));
         $metadata->addPropertyConstraint('nameSingular', new Assert\NotBlank());
-        $metadata->addPropertyConstraint('nameSingular', new Assert\Length(['max' => 255]));
+        $metadata->addPropertyConstraint('nameSingular', new Assert\Length(null, null, 255));
         $metadata->addPropertyConstraint('namePlural', new Assert\NotBlank());
-        $metadata->addPropertyConstraint('namePlural', new Assert\Length(['max' => 255]));
-        $metadata->addPropertyConstraint('description', new Assert\Length(['max' => 255]));
+        $metadata->addPropertyConstraint('namePlural', new Assert\Length(null, null, 255));
+        $metadata->addPropertyConstraint('description', new Assert\Length(null, null, 255));
         $metadata->addConstraint(new CustomObjectTypeValues());
     }
 
@@ -389,7 +388,7 @@ class CustomObject extends FormEntity implements UniqueEntityInterface
             }
         }
 
-        throw new NotFoundException("Custom field with order index '${order}' not found.");
+        throw new NotFoundException("Custom field with order index '{$order}' not found.");
     }
 
     public function getPublishedFields(): Collection

@@ -4,73 +4,50 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomObject;
 
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Form\FormFactoryInterface;
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
 use Mautic\CoreBundle\Controller\AbstractFormController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
-use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
 use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CustomObjectType;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Helper\LockFlashMessageHelper;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
-use Symfony\Component\Form\FormFactory;
-use Symfony\Component\HttpFoundation\Response;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 
 class FormController extends AbstractFormController
 {
-    /**
-     * @var FormFactory
-     */
-    private $formFactory;
-
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    /**
-     * @var CustomFieldModel
-     */
-    private $customFieldModel;
-
-    /**
-     * @var CustomObjectPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var CustomObjectRouteProvider
-     */
-    private $routeProvider;
-
-    /**
-     * @var CustomFieldTypeProvider
-     */
-    private $customFieldTypeProvider;
-
-    /**
-     * @var LockFlashMessageHelper
-     */
-    private $lockFlashMessageHelper;
-
     public function __construct(
-        FormFactory $formFactory,
-        CustomObjectModel $customObjectModel,
-        CustomFieldModel $customFieldModel,
-        CustomObjectPermissionProvider $permissionProvider,
-        CustomObjectRouteProvider $routeProvider,
-        CustomFieldTypeProvider $customFieldTypeProvider,
-        LockFlashMessageHelper $lockFlashMessageHelper
+        private FormFactoryInterface $formFactory,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security,
+        private CustomObjectPermissionProvider $permissionProvider,
+        private CustomObjectRouteProvider $routeProvider,
+        private CustomObjectModel $customObjectModel,
+        private CustomFieldModel $customFieldModel,
+        private CustomFieldTypeProvider $customFieldTypeProvider,
+        private LockFlashMessageHelper $lockFlashMessageHelper,
     ) {
-        $this->formFactory             = $formFactory;
-        $this->customObjectModel       = $customObjectModel;
-        $this->customFieldModel        = $customFieldModel;
-        $this->permissionProvider      = $permissionProvider;
-        $this->routeProvider           = $routeProvider;
-        $this->customFieldTypeProvider = $customFieldTypeProvider;
-        $this->lockFlashMessageHelper  = $lockFlashMessageHelper;
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     public function newAction(): Response
@@ -82,7 +59,7 @@ class FormController extends AbstractFormController
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        return $this->renderForm($customObject, $this->routeProvider->buildNewRoute());
+        return $this->renderObjectForm($customObject, $this->routeProvider->buildNewRoute());
     }
 
     public function editAction(int $objectId): Response
@@ -109,7 +86,7 @@ class FormController extends AbstractFormController
 
         $this->customObjectModel->lockEntity($customObject);
 
-        return $this->renderForm($customObject, $this->routeProvider->buildEditRoute($objectId));
+        return $this->renderObjectForm($customObject, $this->routeProvider->buildEditRoute($objectId));
     }
 
     public function cloneAction(int $objectId): Response
@@ -123,10 +100,10 @@ class FormController extends AbstractFormController
             return $this->accessDenied(false, $e->getMessage());
         }
 
-        return $this->renderForm($customObject, $this->routeProvider->buildCloneRoute($objectId));
+        return $this->renderObjectForm($customObject, $this->routeProvider->buildCloneRoute($objectId));
     }
 
-    private function renderForm(CustomObject $customObject, string $route): Response
+    private function renderObjectForm(CustomObject $customObject, string $route): Response
     {
         $form = $this->formFactory->create(
             CustomObjectType::class,
@@ -144,7 +121,7 @@ class FormController extends AbstractFormController
                     'deletedFields'       => [],
                     'form'                => $form->createView(),
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomObject:form.html.php',
+                'contentTemplate' => '@CustomObjects/CustomObject/form.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customObject',
                     'route'         => $route,

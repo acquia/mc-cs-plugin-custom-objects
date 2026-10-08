@@ -13,7 +13,7 @@ use MauticPlugin\CustomObjectsBundle\EventListener\FilterOperatorSubscriber;
 use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
 {
@@ -48,8 +48,8 @@ final class FilterOperatorSubscriberTest extends \PHPUnit\Framework\TestCase
      */
     public function testOnOperatorsGenerate(): void
     {
-        /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface translatorInterfaceMock */
-        $translatorInterfaceMock = $this->createMock(TranslatorInterface::class);
+        /** @var \PHPUnit\Framework\MockObject\MockObject|Translator translatorInterfaceMock */
+        $translatorInterfaceMock = $this->createMock(Translator::class);
         $event                   = new LeadListFiltersOperatorsEvent([], $translatorInterfaceMock);
         $this->assertCount(0, $event->getOperators(), 'Expects 0 operators');
         $this->filterOperatorSubscriber->onOperatorsGenerate($event);

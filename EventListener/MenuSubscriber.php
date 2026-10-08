@@ -67,7 +67,7 @@ class MenuSubscriber implements EventSubscriberInterface
                 'items'    => [
                     'custom.object.title' => [
                         'access'    => 'custom_objects:custom_objects:view',
-                        'iconClass' => 'fa-list-alt',
+                        'iconClass' => 'ri-list-check-2',
                         'id'        => 'mautic_custom_object_list',
                     ],
                 ],
@@ -101,7 +101,7 @@ class MenuSubscriber implements EventSubscriberInterface
                         'id'        => CustomObjectRouteProvider::ROUTE_LIST,
                         'route'     => CustomObjectRouteProvider::ROUTE_LIST,
                         'access'    => 'custom_objects:custom_objects:view',
-                        'iconClass' => 'fa-list-alt',
+                        'iconClass' => 'ri-list-check-2',
                     ],
                 ],
             ]

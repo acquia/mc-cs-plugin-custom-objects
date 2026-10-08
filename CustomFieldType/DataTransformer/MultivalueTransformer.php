@@ -11,7 +11,7 @@ class MultivalueTransformer implements DataTransformerInterface
     /**
      * {@inheritdoc}
      */
-    public function transform($value)
+    public function transform(mixed $value): mixed
     {
         if ($value) {
             return json_decode($value);
@@ -23,7 +23,7 @@ class MultivalueTransformer implements DataTransformerInterface
     /**
      * {@inheritdoc}
      */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value): mixed
     {
         if ($value) {
             return json_encode($value);

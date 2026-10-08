@@ -4,74 +4,51 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Controller\CustomField;
 
-use Mautic\CoreBundle\Controller\CommonController;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
-use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
-use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
-use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
-use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
-use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
-use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
-use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
-use Symfony\Component\Form\FormFactory;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Translation\Translator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Form\FormFactoryInterface;
+use Mautic\CoreBundle\Controller\CommonController;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Symfony\Component\HttpFoundation\RequestStack;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use MauticPlugin\CustomObjectsBundle\Model\CustomFieldModel;
+use MauticPlugin\CustomObjectsBundle\Model\CustomObjectModel;
+use MauticPlugin\CustomObjectsBundle\Entity\CustomFieldFactory;
+use MauticPlugin\CustomObjectsBundle\Form\Type\CustomFieldType;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
+use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
+use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldPermissionProvider;
 
 class FormController extends CommonController
 {
-    /**
-     * @var FormFactory
-     */
-    private $formFactory;
-
-    /**
-     * @var CustomFieldModel
-     */
-    private $customFieldModel;
-
-    /**
-     * @var CustomFieldPermissionProvider
-     */
-    private $permissionProvider;
-
-    /**
-     * @var CustomFieldRouteProvider
-     */
-    private $fieldRouteProvider;
-
-    /**
-     * @var CustomFieldFactory
-     */
-    private $customFieldFactory;
-
-    /**
-     * @var CustomObjectModel
-     */
-    private $customObjectModel;
-
-    /**
-     * @var CustomObjectRouteProvider
-     */
-    private $objectRouteProvider;
-
     public function __construct(
-        FormFactory $formFactory,
-        CustomFieldModel $customFieldModel,
-        CustomFieldFactory $customFieldFactory,
-        CustomFieldPermissionProvider $permissionProvider,
-        CustomFieldRouteProvider $fieldRouteProvider,
-        CustomObjectModel $customObjectModel,
-        CustomObjectRouteProvider $objectRouteProvider
+        private FormFactoryInterface $formFactory,
+        ManagerRegistry $doctrine,
+        ModelFactory $modelFactory,
+        UserHelper $userHelper,
+        CoreParametersHelper $coreParametersHelper,
+        EventDispatcherInterface $dispatcher,
+        Translator $translator,
+        FlashBag $flashBag,
+        RequestStack $requestStack,
+        CorePermissions $security,
+        private CustomObjectRouteProvider $objectRouteProvider,
+        private CustomFieldRouteProvider $fieldRouteProvider,
+        private CustomFieldFactory $customFieldFactory,
+        private CustomObjectModel $customObjectModel,
+        private CustomFieldModel $customFieldModel,
+        private CustomFieldPermissionProvider $permissionProvider,
     ) {
-        $this->formFactory             = $formFactory;
-        $this->customFieldModel        = $customFieldModel;
-        $this->customFieldFactory      = $customFieldFactory;
-        $this->permissionProvider      = $permissionProvider;
-        $this->fieldRouteProvider      = $fieldRouteProvider;
-        $this->customObjectModel       = $customObjectModel;
-        $this->objectRouteProvider     = $objectRouteProvider;
+        parent::__construct($doctrine, $modelFactory, $userHelper, $coreParametersHelper, $dispatcher, $translator, $flashBag, $requestStack, $security);
     }
 
     public function renderFormAction(Request $request): Response
@@ -114,7 +91,7 @@ class FormController extends CommonController
                     'customField'  => $customField,
                     'form'         => $form->createView(),
                 ],
-                'contentTemplate' => 'CustomObjectsBundle:CustomField:form.html.php',
+                'contentTemplate' => '@CustomObjects/CustomField/form.html.twig',
                 'passthroughVars' => [
                     'mauticContent' => 'customField',
                     'route'         => $route,

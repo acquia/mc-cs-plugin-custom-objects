@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Helper;
 
-use Mautic\CoreBundle\Helper\CoreParametersHelper;
-use Mautic\CoreBundle\Service\FlashBag;
 use Symfony\Component\Routing\Router;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 class LockFlashMessageHelper
 {
@@ -17,7 +17,7 @@ class LockFlashMessageHelper
     private $coreParametersHelper;
 
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     private $translator;
 
@@ -33,7 +33,7 @@ class LockFlashMessageHelper
 
     public function __construct(
         CoreParametersHelper $coreParametersHelper,
-        TranslatorInterface $translator,
+        Translator $translator,
         FlashBag $flashBag,
         Router $router
     ) {

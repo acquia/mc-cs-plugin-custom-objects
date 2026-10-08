@@ -125,7 +125,7 @@ trait FixtureObjectsTrait
 
     private function skipIfMissingDependency(): void
     {
-        if (!self::$container->has('fidry_alice_data_fixtures.loader.doctrine')) {
+        if (!self::getContainer()->has('fidry_alice_data_fixtures.loader.doctrine')) {
             $this->markTestSkipped('This test requires the theofidry/alice-data-fixtures package');
         }
     }

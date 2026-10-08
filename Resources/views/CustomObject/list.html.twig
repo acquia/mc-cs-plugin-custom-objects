@@ -1,0 +1,103 @@
+{% set isIndex = tmpl == 'index' ? true : false %}
+{% set tmpl = 'list' %}
+{% extends isIndex ? '@MauticCore/Default/content.html.twig' : '@MauticCore/Default/raw_output.html.twig' %}
+{% block mauticContent %}customObject{% endblock %}
+{% block headerTitle %}{{ 'custom.object.title'|trans }}{% endblock %}
+{% block content %}
+    {% if isIndex %}
+    <div id="page-list-wrapper" class="panel panel-default">
+        {{- include('@MauticCore/Helper/list_toolbar.html.twig') -}}
+        <div class="page-list">
+            {{ block('listResults') }}
+        </div>
+    </div>
+    {{ include('@MauticCore/Modules/protip.html.twig', {
+        tip: random(['mautic.protip.custom.objects.create', 'mautic.protip.custom.objects.segmentation', 'mautic.protip.custom.objects.campaign'])
+    }) }}
+    {% else %}
+		{{ block('listResults') }}
+	{% endif %}
+{% endblock %}
+
+{% block listResults %}
+{% if items|length %}
+    <div class="table-responsive">
+        <table class="table table-hover custom-objects-list" id="custom-objects-table">
+            <thead>
+            <tr>
+                {{- include(
+                    '@MauticCore/Helper/tableheader.html.twig',
+                    {
+                        'checkall'        : 'true',
+                        'routeBase'       : 'custom_object',
+                        'langVar'         : 'custom.object',
+                    }
+                ) -}}
+
+                {{- include(
+                    '@MauticCore/Helper/tableheader.html.twig',
+                    {
+                        'sessionVar' : sessionVar,
+                        'orderBy'    : tableAlias ~ '.name',
+                        'text'       : 'mautic.core.name',
+                        'class'      : 'col-custom_object_-name',
+                    }
+                ) -}}
+
+                {{- include(
+                    '@MauticCore/Helper/tableheader.html.twig',
+                    {
+                        'sessionVar' : sessionVar,
+                        'orderBy'    : tableAlias ~ '.id',
+                        'text'       : 'mautic.core.id',
+                        'class'      : 'col-custom_object_id',
+                        'default'    : true,
+                    }
+                ) -}}
+            </tr>
+            </thead>
+            <tbody>
+            {# @var item \MauticPlugin\CustomObjectsBundle\Entity\CustomObject #}
+            {% for item in items %}
+                <tr>
+                    <td>
+                        {{- include(
+                            '@MauticCore/Helper/list_actions.html.twig',
+                            {
+                                'item'            : item,
+                            }
+                        ) -}}
+                    </td>
+                    <td>
+                        <div>
+                            {{- include('@MauticCore/Helper/publishstatus_icon.html.twig',
+                                {
+                                    'item'  : item,
+                                    'model' : 'custom.object',
+                                }
+                            ) -}}
+                            <a href="{{ path(viewRoute, {'objectId' : item.getId()}) }}">
+                                {{ item.getName() }}
+                            </a>
+                        </div>
+                    </td>
+                    <td>{{ item.getId() }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="panel-footer">
+        {{- include('@MauticCore/Helper/pagination.html.twig', {
+            'totalItems' : count,
+            'page'       : page,
+            'limit'      : limit,
+            'baseUrl'    : path(constant('MauticPlugin\\CustomObjectsBundle\\Provider\\CustomObjectRouteProvider::ROUTE_LIST')),
+            'sessionVar' : sessionVar,
+            'routeBase'  : constant('MauticPlugin\\CustomObjectsBundle\\Provider\\CustomObjectRouteProvider::ROUTE_LIST'),
+        }) -}}
+    </div>
+{% else %}
+    {{- include('@MauticCore/Helper/noresults.html.twig', {'message' : 'custom.object.noresults.tip'}) -}}
+{% endif %}
+{% endblock %}

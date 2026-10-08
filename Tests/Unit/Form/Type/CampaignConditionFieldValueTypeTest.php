@@ -19,7 +19,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormConfigBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 final class CampaignConditionFieldValueTypeTest extends TestCase
 {
@@ -34,7 +34,7 @@ final class CampaignConditionFieldValueTypeTest extends TestCase
     private $customItemRouterMock;
 
     /**
-     * @var MockObject|TranslatorInterface
+     * @var MockObject|Translator
      */
     private $translatorMock;
 
@@ -49,7 +49,7 @@ final class CampaignConditionFieldValueTypeTest extends TestCase
 
         $this->customFieldModelMock            = $this->createMock(CustomFieldModel::class);
         $this->customItemRouterMock            = $this->createMock(CustomItemRouteProvider::class);
-        $this->translatorMock                  = $this->createMock(TranslatorInterface::class);
+        $this->translatorMock                  = $this->createMock(Translator::class);
         $this->campaignConditionFieldValueType = new CampaignConditionFieldValueType(
             $this->customFieldModelMock,
             $this->customItemRouterMock,

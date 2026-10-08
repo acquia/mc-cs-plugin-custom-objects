@@ -24,7 +24,7 @@ class CustomObjectHiddenTransformer implements DataTransformerInterface
     /**
      * {@inheritdoc}
      */
-    public function transform($value)
+    public function transform(mixed $value): mixed
     {
         if (!$value) {
             return '';
@@ -36,7 +36,7 @@ class CustomObjectHiddenTransformer implements DataTransformerInterface
     /**
      * {@inheritdoc}
      */
-    public function reverseTransform($value)
+    public function reverseTransform(mixed $value): mixed
     {
         if (!$value) {
             return new CustomObject();

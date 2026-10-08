@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace MauticPlugin\CustomObjectsBundle\Entity;
 
 use DateTimeInterface;
-use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Mapping as ORM;
 use Mautic\CoreBundle\Doctrine\Mapping\ClassMetadataBuilder;
 
@@ -28,7 +27,7 @@ class CustomFieldValueDate extends AbstractCustomFieldValue
         $builder = new ClassMetadataBuilder($metadata);
         $builder->setTable('custom_field_value_date');
         $builder->addIndex(['value'], 'value_index');
-        $builder->addNullableField('value', Type::DATE);
+        $builder->addNullableField('value', 'date');
 
         parent::addReferenceColumns($builder);
     }

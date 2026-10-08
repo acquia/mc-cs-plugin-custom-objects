@@ -29,7 +29,11 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Repository\CustomObjectRepository;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Psr\Log\LoggerInterface;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
 
 class CustomObjectModelTest extends TestCase
 {
@@ -81,20 +85,23 @@ class CustomObjectModelTest extends TestCase
         $this->userHelper                     = $this->createMock(UserHelper::class);
         $this->customFieldModel               = $this->createMock(CustomFieldModel::class);
         $this->dispatcher                     = $this->createMock(EventDispatcherInterface::class);
-        $this->translator                     = $this->createMock(TranslatorInterface::class);
+        $this->translator                     = $this->createMock(Translator::class);
         $this->listModel                      = $this->createMock(ListModel::class);
         $this->customObjectModel              = new CustomObjectModel(
             $this->entityManager,
             $this->customObjectRepository,
             $this->customObjectPermissionProvider,
-            $this->userHelper,
             $this->customFieldModel,
             $this->dispatcher,
-            $this->listModel
+            $this->listModel,
+            $this->createMock(CorePermissions::class),
+            $this->createMock(UrlGeneratorInterface::class),
+            $this->createMock(Translator::class),
+            $this->createMock(UserHelper::class),
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(CoreParametersHelper::class),
         );
 
-        $this->customObjectModel->setEntityManager($this->entityManager);
-        $this->customObjectModel->setTranslator($this->translator);
         $this->entityManager->method('createQueryBuilder')->willReturn($this->queryBuilder);
         $this->entityManager->method('getConnection')->willReturn($this->connection);
         $this->connection->method('getDatabasePlatform')->willReturn($this->databasePlatform);

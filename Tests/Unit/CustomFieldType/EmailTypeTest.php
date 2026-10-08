@@ -7,7 +7,7 @@ namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\CustomFieldType;
 use Mautic\LeadBundle\Provider\FilterOperatorProviderInterface;
 use MauticPlugin\CustomObjectsBundle\CustomFieldType\EmailType;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomField;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 class EmailTypeTest extends \PHPUnit\Framework\TestCase
 {
@@ -23,7 +23,7 @@ class EmailTypeTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->translator  = $this->createMock(TranslatorInterface::class);
+        $this->translator  = $this->createMock(Translator::class);
         $this->customField = $this->createMock(CustomField::class);
         $this->fieldType   = new EmailType(
             $this->translator,

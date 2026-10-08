@@ -16,7 +16,7 @@ use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
 use MauticPlugin\CustomObjectsBundle\Exception\NotFoundException;
 use MauticPlugin\CustomObjectsBundle\Helper\CsvHelper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 class AbstractMultivalueTypeTest extends \PHPUnit\Framework\TestCase
 {
@@ -34,7 +34,7 @@ class AbstractMultivalueTypeTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->translator  = $this->createMock(TranslatorInterface::class);
+        $this->translator  = $this->createMock(Translator::class);
         $this->customField = $this->createMock(CustomField::class);
         $this->customItem  = $this->createMock(CustomItem::class);
         $this->provider    = $this->createMock(FilterOperatorProviderInterface::class);

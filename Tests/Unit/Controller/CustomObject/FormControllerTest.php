@@ -4,6 +4,13 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\CustomObject;
 
+use Doctrine\Persistence\ManagerRegistry;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Translation\Translator;
 use MauticPlugin\CustomObjectsBundle\Controller\CustomObject\FormController;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomObject;
 use MauticPlugin\CustomObjectsBundle\Exception\ForbiddenException;
@@ -16,9 +23,11 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomFieldTypeProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectPermissionProvider;
 use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use MauticPlugin\CustomObjectsBundle\Tests\Unit\Controller\ControllerTestCase;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class FormControllerTest extends ControllerTestCase
@@ -44,6 +53,15 @@ class FormControllerTest extends ControllerTestCase
     {
         parent::setUp();
 
+        $doctrine             = $this->createMock(ManagerRegistry::class);
+        $modelFactory         = $this->createMock(ModelFactory::class);
+        $userHelper           = $this->createMock(UserHelper::class);
+        $coreParametersHelper = $this->createMock(CoreParametersHelper::class);
+        $dispatcher           = $this->createMock(EventDispatcherInterface::class);
+        $translator           = $this->createMock(Translator::class);
+        $flashBag             = $this->createMock(FlashBag::class);
+        $this->requestStack   = $this->createMock(RequestStack::class);
+        $security             = $this->createMock(CorePermissions::class);
         $this->customObjectModel       = $this->createMock(CustomObjectModel::class);
         $this->customFieldModel        = $this->createMock(CustomFieldModel::class);
         $this->formFactory             = $this->createMock(FormFactory::class);
@@ -56,10 +74,19 @@ class FormControllerTest extends ControllerTestCase
         $this->form                    = $this->createMock(FormInterface::class);
         $this->formController          = new FormController(
             $this->formFactory,
-            $this->customObjectModel,
-            $this->customFieldModel,
+            $doctrine,
+            $modelFactory,
+            $userHelper,
+            $coreParametersHelper,
+            $dispatcher,
+            $translator,
+            $flashBag,
+            $this->requestStack,
+            $security,
             $this->permissionProvider,
             $this->routeProvider,
+            $this->customObjectModel,
+            $this->customFieldModel,
             $this->customFieldTypeProvider,
             $this->lockFlashMessageHelper
         );

@@ -19,6 +19,15 @@ use MauticPlugin\CustomObjectsBundle\Provider\CustomObjectRouteProvider;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Mautic\CoreBundle\Helper\CoreParametersHelper;
+use Mautic\CoreBundle\Helper\UserHelper;
+use Mautic\CoreBundle\Translation\Translator;
+use Mautic\CoreBundle\Factory\ModelFactory;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Mautic\CoreBundle\Service\FlashBag;
+use Mautic\CoreBundle\Security\Permissions\CorePermissions;
+use Doctrine\Persistence\ManagerRegistry;
 
 class FormControllerTest extends AbstractFieldControllerTest
 {
@@ -32,27 +41,52 @@ class FormControllerTest extends AbstractFieldControllerTest
     private $form;
     private $formController;
 
+    private $registry;
+    private $coreParametersHelper;
+    private $translator;
+    private $flashBag;
+    private $security;
+    private $modelFactory;
+    private $dispatcher;
+
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->formFactory         = $this->createMock(FormFactory::class);
-        $this->customFieldModel    = $this->createMock(CustomFieldModel::class);
-        $this->customFieldFactory  = $this->createMock(CustomFieldFactory::class);
-        $this->permissionProvider  = $this->createMock(CustomFieldPermissionProvider::class);
-        $this->fieldRouteProvider  = $this->createMock(CustomFieldRouteProvider::class);
-        $this->customObjectModel   = $this->createMock(CustomObjectModel::class);
-        $this->objectRouteProvider = $this->createMock(CustomObjectRouteProvider::class);
-        $this->form                = $this->createMock(FormInterface::class);
-
-        $this->formController = new FormController(
+        $this->registry              = $this->createMock(ManagerRegistry::class);
+        $this->coreParametersHelper  = $this->createMock(CoreParametersHelper::class);
+        $this->translator            = $this->createMock(Translator::class);
+        $this->flashBag              = $this->createMock(FlashBag::class);
+        $this->requestStack          = $this->createMock(RequestStack::class);
+        $this->security              = $this->createMock(CorePermissions::class);
+        $this->customFieldFactory    = $this->createMock(CustomFieldFactory::class);
+        $this->customObjectModel     = $this->createMock(CustomObjectModel::class);
+        $this->customFieldModel      = $this->createMock(CustomFieldModel::class);
+        $this->permissionProvider    = $this->createMock(CustomFieldPermissionProvider::class);
+        $this->fieldRouteProvider    = $this->createMock(CustomFieldRouteProvider::class);
+        $this->objectRouteProvider   = $this->createMock(CustomObjectRouteProvider::class);
+        $this->form                  = $this->createMock(FormInterface::class);
+        $this->modelFactory          = $this->createMock(ModelFactory::class);
+        $this->userHelper            = $this->createMock(UserHelper::class);
+        $this->dispatcher            = $this->createMock(EventDispatcherInterface::class);
+        $this->formFactory           = $this->createMock(FormFactory::class);
+        $this->formController        = new FormController(
             $this->formFactory,
-            $this->customFieldModel,
-            $this->customFieldFactory,
-            $this->permissionProvider,
+            $this->registry,
+            $this->modelFactory,
+            $this->userHelper,
+            $this->coreParametersHelper,
+            $this->dispatcher,
+            $this->translator,
+            $this->flashBag,
+            $this->requestStack,
+            $this->security,
+            $this->objectRouteProvider,
             $this->fieldRouteProvider,
+            $this->customFieldFactory,
             $this->customObjectModel,
-            $this->objectRouteProvider
+            $this->customFieldModel,
+            $this->permissionProvider
         );
 
         $this->addSymfonyDependencies($this->formController);

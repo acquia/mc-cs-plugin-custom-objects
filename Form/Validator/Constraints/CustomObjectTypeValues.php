@@ -10,12 +10,12 @@ class CustomObjectTypeValues extends Constraint
 {
     public $missingMasterObject = "Objects of type 'Relationship' must select a master object.";
 
-    public function validatedBy()
+    public function validatedBy(): string
     {
         return CustomObjectTypeValuesValidator::class;
     }
 
-    public function getTargets()
+    public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;
     }

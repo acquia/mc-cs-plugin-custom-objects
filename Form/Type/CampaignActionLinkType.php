@@ -10,7 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 class CampaignActionLinkType extends AbstractType
 {
@@ -20,11 +20,11 @@ class CampaignActionLinkType extends AbstractType
     protected $routeProvider;
 
     /**
-     * @var TranslatorInterface
+     * @var Translator
      */
     protected $translator;
 
-    public function __construct(CustomItemRouteProvider $routeProvider, TranslatorInterface $translator)
+    public function __construct(CustomItemRouteProvider $routeProvider, Translator $translator)
     {
         $this->routeProvider = $routeProvider;
         $this->translator    = $translator;

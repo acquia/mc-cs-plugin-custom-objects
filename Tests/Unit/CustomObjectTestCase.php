@@ -28,7 +28,7 @@ class CustomObjectTestCase extends MauticMysqlTestCase
 
     protected function createCustomField(string $type, CustomObject $customObject): CustomField
     {
-        $customFieldFactory = self::$container->get('custom_object.custom_field_factory');
+        $customFieldFactory = $this->getContainer()->get('custom_object.custom_field_factory');
         $customField        = $customFieldFactory->create('text', $customObject);
         $customField->setLabel($type);
         $customField->setAlias($type);

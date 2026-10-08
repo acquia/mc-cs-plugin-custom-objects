@@ -10,7 +10,7 @@ use Mautic\CoreBundle\Helper\Chart\ChartQuery;
 use Mautic\CoreBundle\Helper\Chart\LineChart;
 use Mautic\CoreBundle\Model\FormModel;
 use MauticPlugin\CustomObjectsBundle\Entity\CustomItem;
-use Symfony\Component\Translation\TranslatorInterface;
+use Mautic\CoreBundle\Translation\Translator;
 
 class CustomItemXrefContactModel extends FormModel
 {
@@ -21,7 +21,7 @@ class CustomItemXrefContactModel extends FormModel
 
     public function __construct(
         EntityManager $entityManager,
-        TranslatorInterface $translator
+        Translator $translator
     ) {
         $this->entityManager = $entityManager;
         $this->translator    = $translator;

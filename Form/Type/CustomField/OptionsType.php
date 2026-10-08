@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace MauticPlugin\CustomObjectsBundle\Form\Type\CustomField;
 
-use Mautic\CoreBundle\Form\Type\SortableValueLabelListType;
-use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsTransformer;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\CollectionType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormBuilderInterface;
+use Mautic\CoreBundle\Form\Type\SortableValueLabelListType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use MauticPlugin\CustomObjectsBundle\Form\DataTransformer\OptionsTransformer;
 
 class OptionsType extends AbstractType
 {
@@ -31,11 +31,11 @@ class OptionsType extends AbstractType
                         'required' => false,
                         'attr'     => [
                             'class'         => 'form-control',
-                            'preaddon'      => 'fa fa-times',
+                            'preaddon'      => 'ri-close-line',
                             'preaddon_attr' => [
                                 'onclick' => 'Mautic.removeFormListOption(this);',
                             ],
-                            'postaddon' => 'fa fa-ellipsis-v handle',
+                            'postaddon' => 'ri-draggable handle',
                         ],
                         'error_bubbling' => true,
                     ],

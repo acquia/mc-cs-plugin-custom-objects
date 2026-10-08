@@ -1,0 +1,17 @@
+{% block _campaignevent_properties_row %}
+	<div class="row condition-row">
+		<div class="col-xs-4">
+			{{ form_row(form.field) }}
+		</div>
+		<div class="col-xs-4">
+			{{ form_row(form.operator) }}
+		</div>
+		<div class="col-xs-4">
+			{{ form_row(form.value) }}
+		</div>
+	</div>
+	<script>
+		CustomObjects.initCustomFieldConditions()
+	</script>
+{% endblock %}
+
